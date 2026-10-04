@@ -26,7 +26,6 @@ import { cn } from '@/lib/utils'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { getCurrency } from '@/data/currencies'
 import {
-  getRemainingStock,
   isOutOfStock,
   shouldDisplayShopItem,
   type ShopPurchaseData,
@@ -206,7 +205,6 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
           {visibleItems.map((item) => {
             const purchaseData = shopPurchases[item.id]
             const outOfStock = isOutOfStock(item, purchaseData)
-            const remainingStock = getRemainingStock(item, purchaseData)
 
             // Check Can Afford
             let canAfford = true
@@ -267,13 +265,12 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                       title={item.name}
                     >
                       <span className="min-w-0 truncate">{item.name}</span>
-                      {item.cost.map((cost, idx) => (
+                      {outOfStock ? (
+                        <span className="shrink-0 text-white/80">· OOS</span>
+                      ) : item.cost.map((cost, idx) => (
                         <span
                           key={`${cost.type}-${cost.id}-${idx}`}
-                          className={cn(
-                            'inline-flex shrink-0 items-center gap-1 text-[10px] font-black uppercase tracking-[0.06em]',
-                            canAfford ? 'text-white/90' : 'text-game-danger',
-                          )}
+                          className="inline-flex shrink-0 items-center gap-1 text-[10px] font-black uppercase tracking-[0.06em] text-white/90"
                           title={
                             cost.type === 'currency'
                               ? getCurrency(cost.id)?.name || cost.id
@@ -296,29 +293,6 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                     </h3>
                   </div>
 
-                  <div className="relative z-10 mt-2 flex max-w-full flex-wrap justify-end gap-1.5">
-                    {outOfStock ? (
-                      <span className="rounded-full border border-game-danger/25 bg-game-danger/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-danger">
-                        Sold out
-                      </span>
-                    ) : remainingStock !== undefined ? (
-                      <span className="rounded-full border border-game-border bg-game-surface-raised/85 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
-                        {remainingStock} in stock
-                      </span>
-                    ) : null}
-
-                    {item.stock !== undefined && item.daily && (
-                      <span className="rounded-full border border-game-ochre/25 bg-game-ochre/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-ochre">
-                        Restocks daily
-                      </span>
-                    )}
-                    {!canAfford && !outOfStock && (
-                      <span className="rounded-full border border-game-danger/25 bg-game-danger/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-danger">
-                        Insufficient funds
-                      </span>
-                    )}
-                  </div>
-
                   <div className="relative z-20 mt-auto flex max-w-full justify-end pt-3">
                     <Button
                       type="button"
@@ -328,7 +302,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                       onClick={() => requestBuy(item)}
                       aria-label={`Buy ${item.name}`}
                       title={`Buy ${item.name}`}
-                      className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/65 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/90 active:bg-game-surface-raised"
+                      className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/65 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/90 active:bg-game-surface-raised disabled:opacity-40"
                     >
                       {purchasingItem === item.id ? (
                         <Loader2 className="size-5 animate-spin" aria-hidden="true" />
