@@ -224,7 +224,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
               <Card
                 key={item.id}
                 className={cn(
-                  'relative flex min-h-32 flex-row items-center gap-3 overflow-hidden rounded-md rounded-tr-none border p-3',
+                  'relative flex flex-row items-center gap-3 overflow-hidden rounded-md rounded-tr-none border p-3',
                   outOfStock
                     ? 'border-game-danger/40 bg-game-surface'
                     : 'border-game-card-border bg-game-surface',
@@ -293,7 +293,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                     </h3>
                   </div>
 
-                  <div className="relative z-20 mt-auto flex max-w-full justify-end pt-3">
+                  <div className="relative z-20 mt-2 flex max-w-full justify-end">
                     <Button
                       type="button"
                       variant="ghost"
