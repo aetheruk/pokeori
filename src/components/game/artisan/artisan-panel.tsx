@@ -827,7 +827,7 @@ function HoldReleaseDialog({
             'game-focus-ring flex h-16 w-full items-center justify-center rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors disabled:opacity-70',
             holding
               ? 'border-game-ochre bg-game-ochre/20 text-game-ink shadow-inner'
-              : 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90',
+              : 'border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong',
           )}
         >
           {completing ? (
@@ -972,7 +972,7 @@ function CrushDialog({
           className={cn(
             'game-focus-ring h-16 w-full rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
             started
-              ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
+              ? 'border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong'
               : 'border-game-border bg-game-canvas text-game-muted',
           )}
         >
@@ -1293,7 +1293,7 @@ export function BalanceDialog({
           className={cn(
             'game-focus-ring h-16 w-full touch-manipulation select-none rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
             started
-              ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
+              ? 'border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong'
               : 'border-game-border bg-game-canvas text-game-muted',
           )}
         >

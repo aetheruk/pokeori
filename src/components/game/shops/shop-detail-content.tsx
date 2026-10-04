@@ -168,7 +168,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
               Keep browsing
             </AlertDialogCancel>
             <AlertDialogAction
-              className="min-h-11 bg-game-clay text-game-cream hover:bg-game-clay-strong"
+              className="min-h-11 bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
               onClick={() => {
                 if (!pendingPurchase) return
                 const purchase = pendingPurchase

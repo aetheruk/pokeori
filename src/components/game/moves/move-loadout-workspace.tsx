@@ -268,7 +268,7 @@ export function MoveLoadoutWorkspace({
                           type="button"
                           onClick={() => onToggleMove(entry.move.id)}
                           aria-label={`Remove ${entry.move.name}`}
-                          className="flex size-8 shrink-0 items-center justify-center rounded-md text-game-muted hover:bg-game-clay/10 hover:text-game-clay-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss/50"
+                          className="flex size-8 shrink-0 items-center justify-center rounded-md text-game-muted hover:bg-game-charcoal/10 hover:text-game-clay-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss/50"
                         >
                           <X className="size-3.5" aria-hidden="true" />
                         </button>
@@ -463,7 +463,7 @@ export function MoveLoadoutWorkspace({
             type="button"
             onClick={onSave}
             disabled={!hasChanges || isSaving}
-            className="min-h-11 flex-1 bg-game-clay text-game-cream hover:bg-game-clay/90 sm:flex-none"
+            className="min-h-11 flex-1 bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong sm:flex-none"
           >
             {isSaving ? 'Saving…' : 'Save loadout'}
           </Button>

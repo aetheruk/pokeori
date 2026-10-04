@@ -806,7 +806,7 @@ export function PokemonSnapGame({
                 onClick={handleSnap}
                 disabled={!pokemonVisible || isProcessing || !roundActive}
                 aria-label={isProcessing ? 'Saving photo' : 'Snap photo'}
-                className="my-2 flex h-14 w-full shrink-0 items-center justify-center rounded-xl bg-game-clay text-game-cream hover:bg-game-clay-strong disabled:opacity-50 sm:my-4 sm:h-16"
+                className="my-2 flex h-14 w-full shrink-0 items-center justify-center rounded-xl bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong disabled:opacity-50 sm:my-4 sm:h-16"
               >
                 <Camera className="size-7" aria-hidden="true" />
               </Button>

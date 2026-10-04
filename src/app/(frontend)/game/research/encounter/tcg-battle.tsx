@@ -1791,7 +1791,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         <AlertDialogFooter>
           <AlertDialogCancel>Keep playing</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-game-clay text-game-cream hover:bg-game-clay/90"
+            className="bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
             onClick={handleSurrender}
           >
             Surrender
@@ -1925,7 +1925,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                   transition={{ duration: 0.22, ease: 'easeOut' }}
                 >
                   <Button
-                    className="h-12 rounded-md bg-game-clay px-8 text-xs font-black uppercase tracking-[0.18em] text-game-cream shadow-md hover:bg-game-clay/90"
+                    className="h-12 rounded-md bg-game-charcoal px-8 text-xs font-black uppercase tracking-[0.18em] text-game-cream shadow-md hover:bg-game-charcoal-strong"
                     disabled={isBusy}
                     onClick={() =>
                       callAction(
@@ -2908,7 +2908,7 @@ function AttackChoiceDrawer({
             onClick={() =>
               onConfirm(attackIndex, selectedTargetId, buildChoice())
             }
-            className="min-h-11 bg-game-clay text-white hover:bg-game-clay-strong"
+            className="min-h-11 bg-game-charcoal text-white hover:bg-game-charcoal-strong"
           >
             Commit attack
           </Button>
@@ -3093,7 +3093,7 @@ function BattleCommandControls({
               {claimError}
             </p>
             <Button
-              className="mt-4 h-11 rounded-md bg-game-clay px-5 text-sm font-bold text-game-cream hover:bg-game-clay/90"
+              className="mt-4 h-11 rounded-md bg-game-charcoal px-5 text-sm font-bold text-game-cream hover:bg-game-charcoal-strong"
               disabled={isPending}
               onClick={onClaim}
             >

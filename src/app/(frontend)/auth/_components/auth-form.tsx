@@ -136,7 +136,7 @@ export function AuthForm() {
                 </CardContent>
                 <CardFooter className="pt-4">
                   <Button
-                    className="w-full bg-game-clay text-game-cream hover:bg-game-clay/90"
+                    className="w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                     type="submit"
                     disabled={isLoginPending}
                   >
@@ -281,7 +281,7 @@ export function AuthForm() {
                 </CardContent>
                 <CardFooter className="pt-4">
                   <Button
-                    className="w-full bg-game-clay text-game-cream hover:bg-game-clay/90"
+                    className="w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                     type="submit"
                     disabled={isRegisterPending}
                   >

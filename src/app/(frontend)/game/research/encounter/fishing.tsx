@@ -749,7 +749,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="flex flex-col gap-2 w-full">
                     <Button
-                      className="h-11 w-full rounded-xl bg-game-clay text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-clay/90"
+                      className="h-11 w-full rounded-xl bg-game-charcoal text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
                       onClick={handleAttemptCatch}
                     >
                       CATCH!
@@ -811,7 +811,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="w-full">
                     <Button
-                      className="h-11 w-full rounded-xl bg-game-clay text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-clay/90"
+                      className="h-11 w-full rounded-xl bg-game-charcoal text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
                       onClick={handleClaimItem}
                       disabled={isClaimingItem}
                     >
@@ -834,7 +834,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
           <Button
             size="lg"
             className={cn(
-              'h-12 w-full max-w-md bg-game-clay text-base !text-game-cream hover:bg-game-clay/90',
+              'h-12 w-full max-w-md bg-game-charcoal text-base !text-game-cream hover:bg-game-charcoal-strong',
               // Dynamic Styling based on Phase
               phase === 'nibble' &&
                 'bg-game-ochre hover:bg-game-ochre border-game-ochre animate-pulse',

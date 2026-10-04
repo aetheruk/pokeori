@@ -642,7 +642,7 @@ export function WhosThatPokemonGame({
                         className={cn(
                           'game-focus-ring flex h-11 w-11 items-center justify-center rounded-md border text-game-cream transition-colors',
                           isListening
-                            ? 'border-game-clay bg-game-clay'
+                            ? 'border-game-charcoal bg-game-charcoal'
                             : 'border-game-moss bg-game-moss hover:bg-game-moss-strong',
                           'disabled:cursor-not-allowed disabled:opacity-45',
                         )}

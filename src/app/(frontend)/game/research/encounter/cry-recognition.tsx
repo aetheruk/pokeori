@@ -599,7 +599,7 @@ export function CryRecognitionGame({
                     disabled={isPlaying || isProcessing}
                     aria-pressed={isPlaying}
                     aria-busy={isProcessing}
-                    className="h-12 w-full bg-game-clay text-base font-bold tracking-wide text-game-cream shadow-sm hover:bg-game-clay/90"
+                    className="h-12 w-full bg-game-charcoal text-base font-bold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
                   >
                     {isProcessing ? (
                       <Loader2 className="w-5 h-5 animate-spin" />

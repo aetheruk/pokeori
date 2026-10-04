@@ -155,7 +155,7 @@ export function PvpModal({
               <Button
                 type="button"
                 variant="outline"
-                className="game-focus-ring flex h-24 flex-col gap-2 border-game-border bg-game-surface-raised text-game-ink hover:border-game-clay/45 hover:bg-game-clay/10"
+                className="game-focus-ring flex h-24 flex-col gap-2 border-game-border bg-game-surface-raised text-game-ink hover:border-game-charcoal/45 hover:bg-game-charcoal/10"
                 onClick={() => setMode('join')}
               >
                 Join Lobby
@@ -207,7 +207,7 @@ export function PvpModal({
               </div>
               <Button
                 type="button"
-                className="game-accent-button w-full bg-game-clay hover:bg-game-clay/90"
+                className="game-accent-button w-full bg-game-charcoal hover:bg-game-charcoal-strong"
                 onClick={handleJoin}
                 disabled={loading || joinCode.length < 6}
                 aria-busy={loading}

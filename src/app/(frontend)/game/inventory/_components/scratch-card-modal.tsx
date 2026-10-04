@@ -222,7 +222,7 @@ function ScratchCardInterface({
           <Button
             ref={claimButtonRef}
             onClick={() => setShowRewards(true)}
-            className="absolute bottom-4 left-1/2 z-30 min-h-11 -translate-x-1/2 whitespace-nowrap bg-game-clay font-bold text-game-cream shadow-md hover:bg-game-clay/90"
+            className="absolute bottom-4 left-1/2 z-30 min-h-11 -translate-x-1/2 whitespace-nowrap bg-game-charcoal font-bold text-game-cream shadow-md hover:bg-game-charcoal-strong"
           >
             Claim Prize
           </Button>

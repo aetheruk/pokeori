@@ -1148,7 +1148,7 @@ export function ActionButton({
           disabled={!isSelectionComplete || completingTaskId === task.id}
           aria-busy={completingTaskId === task.id}
           aria-label={`Confirm selection for ${task.title || task.name || 'task'} (${item.selectedPokemonIds?.length || 0} of ${totalRequired})`}
-          className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
+          className="min-h-11 w-full border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
         >
           {completingTaskId === task.id ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />
@@ -1167,7 +1167,7 @@ export function ActionButton({
         disabled={completingTaskId === task.id}
         aria-busy={completingTaskId === task.id}
         aria-label={task.completeButtonText || 'Complete task'}
-        className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90 [&_svg]:!text-game-cream"
+        className="min-h-11 w-full border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong [&_svg]:!text-game-cream"
       >
         {completingTaskId === task.id ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />
@@ -1198,7 +1198,7 @@ export function ActionButton({
             disabled={loadingId === item.id}
             aria-busy={loadingId === item.id}
             aria-label={`Check results for ${item.name || 'voyage'}`}
-            className="min-h-11 w-full bg-game-clay text-game-cream hover:bg-game-clay/90"
+            className="min-h-11 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
           >
             {loadingId === item.id ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -1222,7 +1222,7 @@ export function ActionButton({
         disabled={loadingId === item.id || !criteriaMet}
         aria-busy={loadingId === item.id}
         aria-label={`Begin ${item.name || 'voyage'}`}
-        className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
+        className="min-h-11 w-full border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
       >
         Begin Voyage
       </Button>
@@ -1247,7 +1247,7 @@ export function ActionButton({
             disabled={loadingId === item.id}
             aria-busy={loadingId === item.id}
             aria-label={`Claim ${expeditionLabel} rewards`}
-            className="min-h-11 w-full bg-game-clay text-game-cream hover:bg-game-clay/90"
+            className="min-h-11 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
           >
             {loadingId === item.id ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -1273,7 +1273,7 @@ export function ActionButton({
           }
           aria-busy={loadingId === item.id}
           aria-label={`Continue ${expeditionLabel}`}
-          className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
+          className="min-h-11 w-full border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
         >
           {loadingId === item.id ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />
@@ -1295,7 +1295,7 @@ export function ActionButton({
             ? `Another ${expeditionLabel} is active`
             : `Begin ${expeditionLabel}`
         }
-        className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
+        className="min-h-11 w-full border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
       >
         {loadingId === item.id && (
           <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />
@@ -1325,7 +1325,7 @@ export function ActionButton({
         disabled={loadingId === item.id}
         aria-busy={loadingId === item.id}
         aria-label={`Start level ${selectedLevel}, difficulty ${selectedDifficulty} VS Seeker rematch`}
-        className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90 [&_svg]:!text-game-cream"
+        className="min-h-11 w-full border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong [&_svg]:!text-game-cream"
       >
         {loadingId === item.id ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />
@@ -1371,7 +1371,7 @@ export function ActionButton({
           )
         }
         disabled={!isSelectionComplete || loadingId === item.id}
-        className="w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
+        className="w-full border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
       >
         {loadingId === item.id ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />
@@ -1388,7 +1388,7 @@ export function ActionButton({
     <Button
       onClick={() => handleAction(item)}
       disabled={isDisabled}
-      className="w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90 [&_svg]:!text-game-cream"
+      className="w-full border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong [&_svg]:!text-game-cream"
     >
       {loadingId === item.id && (
         <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />

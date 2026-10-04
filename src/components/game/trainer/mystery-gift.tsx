@@ -106,7 +106,7 @@ export function MysteryGift() {
                   type="submit"
                   disabled={isLoading || !code.trim()}
                   aria-busy={isLoading}
-                  className="w-full bg-game-clay text-game-cream hover:bg-game-clay/90"
+                  className="w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                 >
                   {isLoading ? (
                     <Loader2 className="w-6 h-6 animate-spin" />

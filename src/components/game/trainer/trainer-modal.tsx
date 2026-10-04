@@ -283,7 +283,7 @@ export function TrainerModal({
                 void handleRemoveFriend()
               }}
               disabled={isLoading}
-              className="bg-game-clay text-game-cream"
+              className="bg-game-charcoal text-game-cream"
             >
               Remove friend
             </AlertDialogAction>

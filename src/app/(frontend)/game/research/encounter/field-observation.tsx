@@ -359,7 +359,7 @@ export function FieldObservationGame({
                         disabled={isSubmitting || !!result}
                         aria-busy={isSubmitting}
                         onClick={handleCountSubmit}
-                        className="min-h-12 w-full bg-game-clay text-game-cream hover:bg-game-clay-strong"
+                        className="min-h-12 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                       >
                         Submit count
                       </Button>

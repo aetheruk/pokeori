@@ -149,7 +149,7 @@ export function RenameDialog({
         variant="ghost"
         size="icon"
         disabled={isPending}
-        className="h-10 w-10 text-game-muted hover:bg-game-clay/10 hover:text-game-clay"
+        className="h-10 w-10 text-game-muted hover:bg-game-charcoal/10 hover:text-game-clay"
         title="Cancel rename"
         onClick={(event) => {
           event.preventDefault()

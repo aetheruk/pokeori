@@ -1046,7 +1046,7 @@ export function InventoryList() {
         actionButton={
           selectedItemCanChannel && selectedItem ? (
             <Button
-              className="w-full bg-game-clay font-bold text-game-cream hover:bg-game-clay-strong"
+              className="w-full bg-game-charcoal font-bold text-game-cream hover:bg-game-charcoal-strong"
               disabled={isUsing}
               onClick={() => handleUseInventoryItem(selectedItem)}
             >
@@ -1057,7 +1057,7 @@ export function InventoryList() {
             </Button>
           ) : selectedItem && isArtisanIngredientItem(selectedItem) ? (
             <Button
-              className="w-full bg-game-clay font-bold text-game-cream hover:bg-game-clay-strong"
+              className="w-full bg-game-charcoal font-bold text-game-cream hover:bg-game-charcoal-strong"
               onClick={() => openArtisanForItem(selectedItem)}
             >
               <span className="flex items-center gap-2">
@@ -1068,7 +1068,7 @@ export function InventoryList() {
           ) : selectedItem?.category === 'booster-pack' ? (
             <div className="flex w-full items-center gap-2">
               <Button
-                className="flex-1 bg-game-clay font-bold text-game-cream hover:bg-game-clay-strong"
+                className="flex-1 bg-game-charcoal font-bold text-game-cream hover:bg-game-charcoal-strong"
                 disabled={isUsing}
                 onClick={() => handleUseInventoryItem(selectedItem)}
               >
@@ -1077,7 +1077,7 @@ export function InventoryList() {
               <Button
                 type="button"
                 size="icon"
-                className="h-11 w-11 rounded-xl bg-game-clay text-game-cream hover:bg-game-clay-strong"
+                className="h-11 w-11 rounded-xl bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                 disabled={isUsing || selectedItemQuantity <= 0}
                 onClick={() => handleOpenAllBoosterPacks(selectedItem)}
                 aria-label={`Open all ${selectedItem.name}`}
@@ -1088,7 +1088,7 @@ export function InventoryList() {
             </div>
           ) : selectedItem?.category === 'scratch-card' ? (
             <Button
-              className="w-full bg-game-clay text-game-cream font-bold hover:bg-game-clay/90"
+              className="w-full bg-game-charcoal text-game-cream font-bold hover:bg-game-charcoal-strong"
               disabled={isUsing}
               onClick={() => handleUseInventoryItem(selectedItem)}
             >
@@ -1101,7 +1101,7 @@ export function InventoryList() {
             selectedItem?.effects?.startResearch ||
             selectedItem?.effects?.startMinigame ? (
             <Button
-              className="w-full bg-game-clay text-game-cream font-bold hover:bg-game-clay/90"
+              className="w-full bg-game-charcoal text-game-cream font-bold hover:bg-game-charcoal-strong"
               disabled={isUsing}
               onClick={() => handleUseInventoryItem(selectedItem)}
             >
@@ -1113,7 +1113,7 @@ export function InventoryList() {
             (selectedItem?.effects?.grantPokemonResearchXp &&
               !selectedItem?.effects?.grantPokemonResearchXp.formId) ? (
             <Button
-              className="w-full bg-game-clay text-game-cream font-bold hover:bg-game-clay/90"
+              className="w-full bg-game-charcoal text-game-cream font-bold hover:bg-game-charcoal-strong"
               disabled={!!selectedPokemonItemLockReason}
               onClick={() => handleUseInventoryItem(selectedItem)}
             >

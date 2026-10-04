@@ -254,7 +254,7 @@ export function UseItemDialog({
         <Button
           variant="default"
           size="sm"
-          className={`gap-2 border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90 ${fullWidth ? 'w-full justify-center' : ''}`}
+          className={`gap-2 border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong ${fullWidth ? 'w-full justify-center' : ''}`}
         >
           <Package className="h-4 w-4 text-game-cream" />
           Use Item

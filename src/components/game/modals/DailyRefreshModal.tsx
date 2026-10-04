@@ -40,7 +40,7 @@ export function DailyRefreshModal({ open, onOpenChange, onLetsGo }: DailyRefresh
               onOpenChange(false)
               onLetsGo?.()
             }}
-            className="w-full bg-game-clay font-bold text-game-cream hover:bg-game-clay/90 sm:w-auto"
+            className="w-full bg-game-charcoal font-bold text-game-cream hover:bg-game-charcoal-strong sm:w-auto"
           >
             View challenges
           </Button>

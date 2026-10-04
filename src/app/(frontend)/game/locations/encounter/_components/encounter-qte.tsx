@@ -416,7 +416,7 @@ export function EncounterQte({
           </motion.div>
           <button
             type="button"
-            className="game-focus-ring group relative z-10 flex h-32 w-32 touch-manipulation select-none flex-col items-center justify-center gap-2 rounded-full border-2 border-game-clay bg-game-clay text-game-cream shadow-md transition active:translate-y-0.5"
+            className="game-focus-ring group relative z-10 flex h-32 w-32 touch-manipulation select-none flex-col items-center justify-center gap-2 rounded-full border-2 border-game-charcoal bg-game-charcoal text-game-cream shadow-md transition active:translate-y-0.5"
             aria-label={`Chase after ${pokemonName}`}
             onClick={() => {
               if (completedRef.current) return
