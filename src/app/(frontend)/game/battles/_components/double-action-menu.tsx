@@ -326,7 +326,7 @@ export function DoubleActionMenu() {
       ) : panel === 'flee' ? (
         <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
           <p className="text-sm text-game-muted">Leave this battle? This counts as a loss.</p>
-          <Button type="button" className="game-accent-button w-full bg-game-clay" disabled={fleeing || disabled} onClick={async () => { setFleeing(true); try { await handleSurrender() } finally { setFleeing(false) } }}>Confirm flee</Button>
+          <Button type="button" className="game-accent-button w-full bg-game-charcoal" disabled={fleeing || disabled} onClick={async () => { setFleeing(true); try { await handleSurrender() } finally { setFleeing(false) } }}>Confirm flee</Button>
         </div>
       ) : null}
     </BattleControlRegion>

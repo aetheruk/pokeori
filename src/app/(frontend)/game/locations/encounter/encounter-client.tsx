@@ -2111,7 +2111,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                 <Button
                   type="button"
                   variant="outline"
-                  className="min-h-12 border-game-clay/60 bg-game-clay/10 text-game-clay hover:bg-game-clay/15"
+                  className="min-h-12 border-game-charcoal/60 bg-game-charcoal/10 text-game-clay hover:bg-game-charcoal/15"
                   disabled={submittingSafariAction}
                   onClick={handleEndSafariExpedition}
                 >

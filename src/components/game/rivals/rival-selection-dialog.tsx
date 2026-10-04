@@ -136,7 +136,7 @@ export function RivalSelectionDialog({
             <Button
               type="submit"
               disabled={isSearching || query.trim().length < 3}
-              className="h-11 bg-game-clay px-4 font-bold text-game-cream hover:bg-game-clay/90"
+              className="h-11 bg-game-charcoal px-4 font-bold text-game-cream hover:bg-game-charcoal-strong"
             >
               {isSearching ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

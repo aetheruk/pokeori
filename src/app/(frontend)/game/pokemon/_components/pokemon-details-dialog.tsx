@@ -1302,7 +1302,7 @@ function MountedPokemonDetailsDialog({
                                 className={cn(
                                   'relative h-11 w-full gap-3 rounded-xl transition-colors',
                                   canEvolve
-                                    ? 'bg-game-clay text-game-cream hover:bg-game-clay/90'
+                                    ? 'bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong'
                                     : 'cursor-not-allowed border border-game-border bg-game-canvas text-game-muted',
                                 )}
                               >
@@ -1578,7 +1578,7 @@ function MountedPokemonDetailsDialog({
                             variant="outline"
                             onClick={() => handleSelectHeldItem(null)}
                             disabled={isSavingHeldItem !== null}
-                            className="flex min-h-14 w-full items-center justify-between gap-3 border-game-clay/40 bg-game-clay/5 px-3 text-left text-game-ink hover:border-game-clay hover:bg-game-clay/10"
+                            className="flex min-h-14 w-full items-center justify-between gap-3 border-game-charcoal/40 bg-game-charcoal/5 px-3 text-left text-game-ink hover:border-game-charcoal hover:bg-game-charcoal/10"
                           >
                             <span className="flex min-w-0 items-center gap-3">
                               {isSavingHeldItem === 'none' ? (
@@ -1834,7 +1834,7 @@ function MountedPokemonDetailsDialog({
                                       handleToggleMoveAssignment(move.id)
                                     }
                                     aria-label={`Remove ${move.name}`}
-                                    className="flex size-8 shrink-0 items-center justify-center rounded-md text-game-muted hover:bg-game-clay/10 hover:text-game-clay-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss/50"
+                                    className="flex size-8 shrink-0 items-center justify-center rounded-md text-game-muted hover:bg-game-charcoal/10 hover:text-game-clay-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss/50"
                                   >
                                     <X
                                       className="size-3.5"
@@ -2458,7 +2458,7 @@ function EvolutionOverlay({
                 <Button
                   onClick={onComplete}
                   size="lg"
-                  className="min-w-[200px] border-none bg-game-clay text-game-cream hover:bg-game-clay/90"
+                  className="min-w-[200px] border-none bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                 >
                   Continue
                 </Button>

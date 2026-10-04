@@ -1793,7 +1793,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           </Button>
           <Button
             size="icon"
-            className="h-10 w-10 rounded-full border-2 border-game-clay bg-game-clay text-game-cream shadow-sm hover:bg-game-clay/90"
+            className="h-10 w-10 rounded-full border-2 border-game-charcoal bg-game-charcoal text-game-cream shadow-sm hover:bg-game-charcoal-strong"
             onClick={() => initGame()}
             disabled={isSliding}
             aria-label="Restart puzzle"

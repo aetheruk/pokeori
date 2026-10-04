@@ -121,7 +121,7 @@ class CardRevealErrorBoundary extends Component<
             </p>
             <Button
               type="button"
-              className="game-accent-button mt-4 w-full border border-game-clay bg-game-clay hover:bg-game-clay-strong"
+              className="game-accent-button mt-4 w-full border border-game-charcoal bg-game-charcoal hover:bg-game-charcoal-strong"
               onClick={this.props.onSkip}
             >
               Continue
@@ -1150,7 +1150,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                       setIsReplayLoading(false)
                     }
                   }}
-                  className="game-accent-button w-full border border-game-clay bg-game-clay font-bold shadow-sm transition-colors hover:bg-game-clay-strong"
+                  className="game-accent-button w-full border border-game-charcoal bg-game-charcoal font-bold shadow-sm transition-colors hover:bg-game-charcoal-strong"
                 >
                   {isReplayLoading ? (
                     <>

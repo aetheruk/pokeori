@@ -100,7 +100,7 @@ function ClearBattleButton() {
     <Button
       type="button"
       variant="destructive"
-      className="game-accent-button flex-1 gap-2 border border-game-clay-strong/60 bg-game-clay/80 hover:bg-game-clay-strong"
+      className="game-accent-button flex-1 gap-2 border border-game-charcoal-strong/60 bg-game-charcoal/80 hover:bg-game-charcoal-strong"
       onClick={handleClear}
       disabled={loading}
       aria-busy={loading}

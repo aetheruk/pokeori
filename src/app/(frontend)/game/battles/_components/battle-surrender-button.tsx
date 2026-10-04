@@ -46,7 +46,7 @@ export function BattleSurrenderButton({
           <Button
             type="button"
             variant="outline"
-            className="game-focus-ring h-12 w-12 rounded-xl border-game-clay/45 bg-game-surface-raised p-0 text-game-clay-strong shadow-sm transition-colors hover:border-game-clay hover:bg-game-clay/10"
+            className="game-focus-ring h-12 w-12 rounded-xl border-game-charcoal/45 bg-game-surface-raised p-0 text-game-clay-strong shadow-sm transition-colors hover:border-game-charcoal hover:bg-game-charcoal/10"
             disabled={isDisabled}
             aria-label="Surrender battle"
           >
@@ -79,7 +79,7 @@ export function BattleSurrenderButton({
                 setIsSubmitting(false)
               }
             }}
-            className="game-accent-button w-full border-0 bg-game-clay hover:bg-game-clay/90"
+            className="game-accent-button w-full border-0 bg-game-charcoal hover:bg-game-charcoal-strong"
           >
             Flee
           </Button>

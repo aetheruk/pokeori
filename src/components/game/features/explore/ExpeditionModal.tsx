@@ -390,7 +390,7 @@ function ExpeditionModalContent({
                 variant="outline"
                 onClick={onRequestAbandonExpedition}
                 disabled={loadingId === item.id}
-                className="gap-2 rounded-full border-game-clay/45 bg-game-surface-raised/90 text-game-clay-strong hover:border-game-clay hover:bg-game-clay hover:text-game-cream"
+                className="gap-2 rounded-full border-game-charcoal/45 bg-game-surface-raised/90 text-game-clay-strong hover:border-game-charcoal hover:bg-game-charcoal hover:text-game-cream"
                 aria-label={`Abandon ${expeditionLabel}`}
                 title={`Abandon ${expeditionLabel}`}
               >

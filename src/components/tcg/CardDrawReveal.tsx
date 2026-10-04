@@ -778,7 +778,7 @@ export function CardDrawReveal({
               'h-14 w-full text-xs font-black uppercase tracking-[0.16em] transition-colors',
               isCurrentRevealed
                 ? 'border border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface'
-                : 'bg-game-clay text-game-cream hover:bg-game-clay/90',
+                : 'bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong',
             )}
           >
             {isCurrentRevealed

@@ -34,7 +34,7 @@ export function ResultActionButton({
     variant: 'default' as const,
     size: 'default' as const,
     className: cn(
-      'w-full min-w-0 border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90',
+      'w-full min-w-0 border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong',
       className,
     ),
   }

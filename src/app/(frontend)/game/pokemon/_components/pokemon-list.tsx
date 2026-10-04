@@ -1272,7 +1272,7 @@ export function PokemonList({
               disabled={
                 bulkReleaseIds.length === 0 || bulkReleaseWouldEmptyCollection
               }
-              className="min-h-11 bg-game-clay text-game-cream hover:bg-game-clay-strong disabled:opacity-50"
+              className="min-h-11 bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong disabled:opacity-50"
               onClick={() => setBulkReleaseConfirmOpen(true)}
             >
               <Trash2 className="mr-1.5 h-3.5 w-3.5" />
@@ -1526,7 +1526,7 @@ export function PokemonList({
                         <DialogFooter>
                           <Button
                             onClick={handleCreateBox}
-                            className="h-10 w-full bg-game-clay text-game-cream hover:bg-game-clay-strong"
+                            className="h-10 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                           >
                             Create Box
                           </Button>
@@ -1583,7 +1583,7 @@ export function PokemonList({
                             <DialogFooter>
                               <Button
                                 onClick={handleRenameBox}
-                                className="h-10 w-full bg-game-clay text-game-cream hover:bg-game-clay-strong"
+                                className="h-10 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                               >
                                 Save
                               </Button>
@@ -1777,7 +1777,7 @@ export function PokemonList({
             <Button
               onClick={handleConfirmBulkRelease}
               disabled={isBulkReleasingPokemon || bulkReleaseIds.length === 0}
-              className="min-h-11 flex-1 bg-game-clay text-game-cream hover:bg-game-clay-strong"
+              className="min-h-11 flex-1 bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
             >
               {isBulkReleasingPokemon ? 'Releasing...' : 'Release All'}
             </Button>
@@ -1974,7 +1974,7 @@ function EggCard({
         <DialogFooter className="border-t border-game-border px-5 py-4">
           {ready ? (
             <Button
-              className="min-h-11 w-full bg-game-clay text-game-cream hover:bg-game-clay-strong"
+              className="min-h-11 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
               disabled={hatchingEggId === egg.id}
               onClick={() => onHatch(egg)}
             >

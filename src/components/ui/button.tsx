@@ -11,7 +11,7 @@ const buttonVariants = cva(appButtonBase, {
   variants: {
     variant: {
       default:
-        'game-accent-button bg-game-clay text-game-cream hover:bg-game-clay-strong active:bg-game-clay-strong',
+        'game-accent-button bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong active:bg-game-charcoal-strong',
       moss:
         'game-accent-button border border-game-moss/60 bg-game-moss text-game-cream hover:bg-game-moss-strong active:bg-game-moss-strong',
       destructive:
