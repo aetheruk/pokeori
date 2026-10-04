@@ -297,11 +297,7 @@ function ExploreGridComponent({
       {eventsCard}
       {vsSeekerEvent && (
         <div>
-          <SectionDivider
-            className="mb-6"
-            textColor="text-game-ochre"
-            variant="chip"
-          >
+          <SectionDivider className="mb-6" variant="chip">
             Tools
           </SectionDivider>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -322,11 +318,7 @@ function ExploreGridComponent({
       )}
       {randomEvent && (
         <div>
-          <SectionDivider
-            className="mb-6"
-            textColor="text-game-ochre"
-            variant="chip"
-          >
+          <SectionDivider className="mb-6" variant="chip">
             Random Event
           </SectionDivider>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -355,15 +347,7 @@ function ExploreGridComponent({
             )}
           >
             {!takeoverStyle && (
-              <SectionDivider
-                className="mb-6"
-                variant="chip"
-                textColor={
-                  type === 'gym-challenge'
-                    ? 'text-game-battle-orange-strong'
-                    : 'text-game-moss-strong'
-                }
-              >
+              <SectionDivider className="mb-6" variant="chip">
                 {typeDisplayNames[type]}
               </SectionDivider>
             )}
