@@ -10,31 +10,31 @@ export default function DevPage() {
       </p>
 
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+        <div className="rounded-md border bg-card text-card-foreground shadow-sm p-6">
           <h3 className="font-semibold leading-none tracking-tight">Battles</h3>
           <p className="text-sm text-muted-foreground mt-2">
             Manage trainer battles, wild encounters config, and PVP presets.
           </p>
         </div>
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+        <div className="rounded-md border bg-card text-card-foreground shadow-sm p-6">
           <h3 className="font-semibold leading-none tracking-tight">Locations</h3>
           <p className="text-sm text-muted-foreground mt-2">
             Manage location data, encounters, and requirements.
           </p>
         </div>
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+        <div className="rounded-md border bg-card text-card-foreground shadow-sm p-6">
           <h3 className="font-semibold leading-none tracking-tight">Tasks</h3>
           <p className="text-sm text-muted-foreground mt-2">
             Manage quests, tasks, and NPC interactions.
           </p>
         </div>
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+        <div className="rounded-md border bg-card text-card-foreground shadow-sm p-6">
           <h3 className="font-semibold leading-none tracking-tight">Shops</h3>
           <p className="text-sm text-muted-foreground mt-2">
             Manage shop inventories, items, costs, and stock.
           </p>
         </div>
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+        <div className="rounded-md border bg-card text-card-foreground shadow-sm p-6">
           <h3 className="font-semibold leading-none tracking-tight">Voyages</h3>
           <p className="text-sm text-muted-foreground mt-2">
             Manage voyage expeditions, pokemon criteria, and rewards.
@@ -42,7 +42,7 @@ export default function DevPage() {
         </div>
         <Link
           href="/moves"
-          className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
+          className="rounded-md border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
         >
           <h3 className="font-semibold leading-none tracking-tight">Moves</h3>
           <p className="text-sm text-muted-foreground mt-2">
@@ -51,7 +51,7 @@ export default function DevPage() {
         </Link>
         <Link
           href="/abilities"
-          className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
+          className="rounded-md border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
         >
           <h3 className="font-semibold leading-none tracking-tight">Abilities</h3>
           <p className="text-sm text-muted-foreground mt-2">
@@ -60,7 +60,7 @@ export default function DevPage() {
         </Link>
         <Link
           href="/rarities"
-          className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
+          className="rounded-md border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
         >
           <h3 className="font-semibold leading-none tracking-tight">Rarities</h3>
           <p className="text-sm text-muted-foreground mt-2">

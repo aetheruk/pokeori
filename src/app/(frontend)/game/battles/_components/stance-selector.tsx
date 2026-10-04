@@ -200,7 +200,7 @@ export function StanceSelector({
                       type="button"
                       variant="ghost"
                       className={cn(
-                        'game-battle-type-option group relative flex h-10 w-20 items-center justify-center rounded-lg border-0 bg-transparent p-0 hover:bg-transparent',
+                        'game-battle-type-option group relative flex h-10 w-20 items-center justify-center rounded-md border-0 bg-transparent p-0 hover:bg-transparent',
                         isSelected ? 'opacity-100' : 'opacity-60 grayscale',
                       )}
                       aria-label={type}

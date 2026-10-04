@@ -400,7 +400,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
                       onTouchEnd={handleTouchEnd}
                       disabled={isProcessing || gameEnded}
                       className={cn(
-                        'relative rounded-lg flex items-center justify-center',
+                        'relative rounded-md flex items-center justify-center',
                         'hover:border-game-moss/40 active:opacity-80',
                         cell.isMatched && 'animate-ping opacity-0',
                         isSelected &&

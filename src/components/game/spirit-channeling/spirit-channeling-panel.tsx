@@ -516,7 +516,7 @@ function IncenseSelector({
         onClick={onOpen}
         disabled={disabled}
         className={cn(
-          'game-focus-ring relative flex h-[72px] w-[72px] items-center justify-center rounded-lg border transition-colors disabled:opacity-50',
+          'game-focus-ring relative flex h-[72px] w-[72px] items-center justify-center rounded-md border transition-colors disabled:opacity-50',
           selectedIncenseId
             ? 'border-game-moss/60 bg-game-moss/10'
             : 'border-game-border bg-game-surface/55 hover:border-game-moss/45',
@@ -570,7 +570,7 @@ function IncensePickerDialog({
           </DialogDescription>
 
           {incenses.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
+            <div className="rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
               No incense available
             </div>
           ) : (
@@ -582,7 +582,7 @@ function IncensePickerDialog({
                   onClick={() => onSelect(incense.id)}
                   aria-pressed={selectedIncenseId === incense.id}
                   className={cn(
-                    'flex min-w-0 flex-col items-center rounded-lg border px-2 py-3 text-center transition-colors',
+                    'flex min-w-0 flex-col items-center rounded-md border px-2 py-3 text-center transition-colors',
                     selectedIncenseId === incense.id
                       ? 'border-game-moss bg-game-moss/10 text-game-ink'
                       : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
@@ -637,7 +637,7 @@ function OfferingPickerDialog({
           </DialogDescription>
 
           {offerings.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
+            <div className="rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
               No offerings available
             </div>
           ) : (
@@ -649,7 +649,7 @@ function OfferingPickerDialog({
                   onClick={() => onSelect(offering.itemId)}
                   aria-pressed={selectedItemId === offering.itemId}
                   className={cn(
-                    'relative flex min-w-0 flex-col items-center rounded-lg border px-1.5 py-2 text-center transition-colors',
+                    'relative flex min-w-0 flex-col items-center rounded-md border px-1.5 py-2 text-center transition-colors',
                     selectedItemId === offering.itemId
                       ? 'border-game-moss bg-game-moss/10 text-game-ink'
                       : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
@@ -702,7 +702,7 @@ function ChannelerSelector({
         onClick={onOpen}
         disabled={disabled}
         className={cn(
-          'game-focus-ring relative flex h-[72px] w-[72px] items-center justify-center rounded-lg border transition-colors disabled:opacity-50',
+          'game-focus-ring relative flex h-[72px] w-[72px] items-center justify-center rounded-md border transition-colors disabled:opacity-50',
           pokemon
             ? 'border-game-moss/60 bg-game-moss/10'
             : 'border-game-border bg-game-surface/55 hover:border-game-moss/45',
@@ -796,11 +796,11 @@ function PokemonPickerDialog({
           </div>
 
           {pokemon.length === 0 ? (
-            <div className="mt-5 rounded-lg border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
+            <div className="mt-5 rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
               No Pokemon available
             </div>
           ) : filteredPokemon.length === 0 ? (
-            <div className="mt-5 rounded-lg border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-sm text-game-muted">
+            <div className="mt-5 rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-sm text-game-muted">
               No Pokemon match that search.
             </div>
           ) : (
@@ -819,13 +819,13 @@ function PokemonPickerDialog({
                     onClick={() => onSelect(entry.id)}
                     aria-pressed={selectedPokemonId === entry.id}
                     className={cn(
-                      'flex min-h-16 w-full min-w-0 items-center gap-3 rounded-lg border p-2 text-left transition-colors',
+                      'flex min-h-16 w-full min-w-0 items-center gap-3 rounded-md border p-2 text-left transition-colors',
                       selectedPokemonId === entry.id
                         ? 'border-game-moss bg-game-moss/10 text-game-ink'
                         : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
                     )}
                   >
-                    <span className="relative h-14 w-14 shrink-0 rounded-lg border border-game-border bg-game-canvas/45">
+                    <span className="relative h-14 w-14 shrink-0 rounded-md border border-game-border bg-game-canvas/45">
                       <Image
                         src={imageUrl}
                         alt={pokemonDisplayName(entry)}
@@ -872,7 +872,7 @@ function InlineCeremonyPanel({
 
   return (
     <div className="mx-auto w-full max-w-xs">
-      <div className="relative h-32 overflow-hidden rounded-lg border border-game-border bg-game-surface/45">
+      <div className="relative h-32 overflow-hidden rounded-md border border-game-border bg-game-surface/45">
         <CeremonyDisplay state={state} incenseItemId={incenseItemId} />
       </div>
       {status && (

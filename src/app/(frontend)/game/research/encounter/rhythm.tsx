@@ -71,7 +71,7 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
             {/* Track */}
             <div
               ref={trackRef}
-              className="absolute bottom-8 left-1/2 h-24 w-[calc(100%-2rem)] max-w-[450px] -translate-x-1/2 overflow-hidden rounded-lg border-2 border-[#5b686b] bg-[#22353d]/90"
+              className="absolute bottom-8 left-1/2 h-24 w-[calc(100%-2rem)] max-w-[450px] -translate-x-1/2 overflow-hidden rounded-md border-2 border-[#5b686b] bg-[#22353d]/90"
             >
               {/* Target Shadow Zone - Dynamic color based on closest icon */}
               {(() => {

@@ -100,7 +100,7 @@ export function ExploreHeader({
 
   return (
     <div className="w-full shrink-0 px-0 md:px-6 md:pt-5">
-      <div className="relative h-44 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-56 md:rounded-lg md:border">
+      <div className="relative h-44 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-56 md:rounded-md md:border">
         {currentImage ? (
           <Image
             src={currentImage}

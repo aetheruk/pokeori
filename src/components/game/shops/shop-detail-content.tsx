@@ -228,7 +228,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                 aria-label={`Buy ${item.name}`}
                 title={`Buy ${item.name}`}
                 className={cn(
-                  'group relative flex items-center gap-4 overflow-hidden rounded-lg border bg-game-surface p-3 text-left transition-colors',
+                  'group relative flex items-center gap-4 overflow-hidden rounded-md border bg-game-surface p-3 text-left transition-colors',
                   outOfStock
                     ? 'border-game-danger/30 bg-game-canvas grayscale'
                     : canAfford
@@ -305,7 +305,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
           })}
 
           {visibleItems.length === 0 && (
-            <Card className="rounded-lg border-game-border bg-game-surface p-6 text-center text-game-muted">
+            <Card className="rounded-md border-game-border bg-game-surface p-6 text-center text-game-muted">
               No items are currently available for your requirements.
             </Card>
           )}

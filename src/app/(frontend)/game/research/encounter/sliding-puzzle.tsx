@@ -264,7 +264,7 @@ export function SlidingPuzzleGame({
             {/* Target Preview - Simple Centered */}
             {(puzzleImage || currentPokemon) && (
               <div
-                className="relative z-10 h-64 w-64 overflow-hidden rounded-lg border-2 border-game-night-border shadow-xl"
+                className="relative z-10 h-64 w-64 overflow-hidden rounded-md border-2 border-game-night-border shadow-xl"
                 style={{
                   backgroundImage: puzzleImage
                     ? `url(${puzzleImage})`

@@ -204,7 +204,7 @@ export function SideScrollerStage({
         <div
           ref={wrapperRef}
           className={cn(
-            'relative aspect-square max-w-[600px] overflow-hidden rounded-lg border border-[#f7ecd6]/18 bg-game-night-surface',
+            'relative aspect-square max-w-[600px] overflow-hidden rounded-md border border-[#f7ecd6]/18 bg-game-night-surface',
             hapticOutsideTaps && 'z-10',
           )}
           style={{ width: 'min(94vw, calc(100dvh - 12.25rem), 600px)' }}
@@ -216,7 +216,7 @@ export function SideScrollerStage({
           >
             {children}
           </div>
-          <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-white/15" />
+          <div className="pointer-events-none absolute inset-0 rounded-md ring-1 ring-inset ring-white/15" />
           {overlay}
         </div>
 

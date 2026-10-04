@@ -490,7 +490,7 @@ export function CryRecognitionGame({
                       />
                     </>
                   )}
-                  <div className="relative z-10 flex h-20 w-20 items-center justify-center rounded-lg border border-[#f7ecd6]/20 bg-[#172733]/85 backdrop-blur-sm">
+                  <div className="relative z-10 flex h-20 w-20 items-center justify-center rounded-md border border-[#f7ecd6]/20 bg-[#172733]/85 backdrop-blur-sm">
                     <div aria-hidden="true">
                       {isPlaying ? (
                         <Volume2 className="h-8 w-8 animate-pulse text-[#d3ad63]" />

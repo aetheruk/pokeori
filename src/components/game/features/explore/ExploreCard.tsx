@@ -340,7 +340,7 @@ function ExploreCardComponent({
                   size="icon"
                   title={getModeLabel(groupedItem)}
                   className={cn(
-                    'relative z-20 size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
+                    'relative z-20 size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
                     isActive && 'border-game-ochre/60',
                   )}
                   onClick={() => selectItem(groupedItem)}

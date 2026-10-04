@@ -33,7 +33,7 @@ export function TrainerGenderPicker({
               checked={value === option}
               onChange={() => onChange(option)}
             />
-            <span className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-lg border border-game-border bg-game-surface-raised p-2 peer-checked:border-game-moss peer-checked:bg-game-moss/10 peer-focus-visible:ring-2 peer-focus-visible:ring-game-moss peer-disabled:opacity-50">
+            <span className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-game-border bg-game-surface-raised p-2 peer-checked:border-game-moss peer-checked:bg-game-moss/10 peer-focus-visible:ring-2 peer-focus-visible:ring-game-moss peer-disabled:opacity-50">
               <GridPlayerSprite gender={option} className="h-12 w-12" />
               <span className="flex items-center gap-1.5 text-sm">
                 <Icon

@@ -31,7 +31,7 @@ export function PokemonSelectionList({
             aria-label={`${isSelected ? 'Remove' : 'Select'} ${p.name || 'Pokémon'}, level ${p.level}`}
             key={p.id}
             className={cn(
-              'game-focus-ring group relative flex min-w-0 cursor-pointer flex-col items-center rounded-lg border p-3 transition-colors',
+              'game-focus-ring group relative flex min-w-0 cursor-pointer flex-col items-center rounded-md border p-3 transition-colors',
               isSelected
                 ? 'border-game-moss/55 bg-game-moss/10'
                 : 'border-game-border bg-game-surface hover:border-game-moss/35 hover:bg-game-surface-raised',

@@ -182,7 +182,7 @@ export function LevelUpModal({
                       {levelUnlocks.map((unlock) => (
                         <div
                           key={`${unlock.source}:${unlock.level}:${unlock.label}:${unlock.itemId || ''}`}
-                          className="flex min-h-16 items-center gap-3 rounded-lg border border-game-moss/35 bg-game-moss/10 px-3 py-2 text-game-ink"
+                          className="flex min-h-16 items-center gap-3 rounded-md border border-game-moss/35 bg-game-moss/10 px-3 py-2 text-game-ink"
                         >
                           <div className="game-icon-orb h-11 w-11 shrink-0">
                             <SkillUnlockCategoryIcon unlock={unlock} />
@@ -200,7 +200,7 @@ export function LevelUpModal({
                     </div>
                   ) : (
                     <div
-                      className="mt-4 rounded-lg border border-dashed border-game-border bg-game-surface p-4 text-center text-xs font-medium text-game-muted"
+                      className="mt-4 rounded-md border border-dashed border-game-border bg-game-surface p-4 text-center text-xs font-medium text-game-muted"
                       role="status"
                       aria-live="polite"
                     >

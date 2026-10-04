@@ -80,7 +80,7 @@ export function formDefault(schema: FormSchema): any {
   return ''
 }
 const fieldClass =
-  'game-focus-ring min-h-11 w-full rounded-lg border border-game-border bg-game-canvas px-3 py-2 text-sm'
+  'game-focus-ring min-h-11 w-full rounded-md border border-game-border bg-game-canvas px-3 py-2 text-sm'
 export function SchemaForm({
   schema,
   value,
@@ -223,7 +223,7 @@ export function SchemaForm({
   }
   if (label === 'rarityChances')
     return (
-      <fieldset className="space-y-3 rounded-lg border border-game-border p-3">
+      <fieldset className="space-y-3 rounded-md border border-game-border p-3">
         <legend>Rarity thresholds</legend>
         <p className="text-sm text-game-muted">
           Blank inherits the default or parent. Zero disables a rarity. The
@@ -607,7 +607,7 @@ export function ReferenceField({
         </p>
       )}
       {options.length > 0 && (
-        <div className="max-h-64 overflow-y-auto overscroll-contain rounded-lg border border-game-border">
+        <div className="max-h-64 overflow-y-auto overscroll-contain rounded-md border border-game-border">
           {options.map((option) => (
             <button
               key={option.id}
@@ -694,7 +694,7 @@ function PokemonRoster({
           <article
             key={index}
             aria-label={`Pokémon slot ${index + 1}`}
-            className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4"
+            className="space-y-3 rounded-md border border-game-border bg-game-surface p-4"
           >
             <div className="flex items-center justify-between gap-2">
               <h5 className="text-sm font-semibold">Pokémon {index + 1}</h5>

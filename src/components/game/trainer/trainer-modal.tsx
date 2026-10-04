@@ -134,7 +134,7 @@ export function TrainerModal({
       >
         <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-4 sm:px-5">
           <SectionDivider className="my-5">Trainer record</SectionDivider>
-          <div className="grid grid-cols-3 divide-x divide-game-border rounded-lg border border-game-border bg-game-surface">
+          <div className="grid grid-cols-3 divide-x divide-game-border rounded-md border border-game-border bg-game-surface">
             <ProfileMetric label="Cards" value={trainer.stats.uniqueCards} />
             <ProfileMetric label="Seen" value={trainer.stats.pokedexSeen} />
             <ProfileMetric label="Caught" value={trainer.stats.pokedexCaught} />
@@ -142,7 +142,7 @@ export function TrainerModal({
 
           <SectionDivider className="my-5">Battle team</SectionDivider>
           {trainer.battleTeam.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-game-border bg-game-surface px-4 py-6 text-center text-sm text-game-muted">
+            <p className="rounded-md border border-dashed border-game-border bg-game-surface px-4 py-6 text-center text-sm text-game-muted">
               No public battle team is currently assigned.
             </p>
           ) : (
@@ -150,7 +150,7 @@ export function TrainerModal({
               {trainer.battleTeam.slice(0, 6).map((pokemon) => (
                 <div
                   key={`${pokemon.position}-${pokemon.formId}`}
-                  className="flex min-w-0 items-center gap-2 rounded-lg border border-game-border bg-game-surface p-2"
+                  className="flex min-w-0 items-center gap-2 rounded-md border border-game-border bg-game-surface p-2"
                 >
                   <PokemonRaritySprite
                     formId={pokemon.formId}
@@ -174,7 +174,7 @@ export function TrainerModal({
           )}
 
           <SectionDivider className="my-5">Skills</SectionDivider>
-          <div className="divide-y divide-game-border overflow-hidden rounded-lg border border-game-border bg-game-surface">
+          <div className="divide-y divide-game-border overflow-hidden rounded-md border border-game-border bg-game-surface">
             {skills.map((skill) => {
               const skillData =
                 trainer.skills?.[

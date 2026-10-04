@@ -104,7 +104,7 @@ export function BadgeShowcase() {
 
   if (badgeGroups.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-game-border bg-game-surface px-4 py-7 text-center">
+      <div className="rounded-md border border-dashed border-game-border bg-game-surface px-4 py-7 text-center">
         <Award className="mx-auto h-7 w-7 text-game-muted" aria-hidden="true" />
         <p className="mt-2 text-sm font-semibold text-game-ink">
           No badge case yet
@@ -138,7 +138,7 @@ export function BadgeShowcase() {
 
             return (
               <CarouselItem key={group.region} className="basis-full pl-4">
-                <div className="relative overflow-hidden rounded-lg border border-game-border bg-game-surface p-5 md:p-6">
+                <div className="relative overflow-hidden rounded-md border border-game-border bg-game-surface p-5 md:p-6">
                   <Image
                     src={REGION_BACKGROUNDS[group.region] || '/backgrounds/kanto.avif'}
                     alt=""

@@ -940,7 +940,7 @@ export default function TcgExplorerPage({
             <div className="grid items-start gap-5 lg:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1fr)]">
               {/* Large Card Image */}
               <div className="mx-auto w-full max-w-64 lg:sticky lg:top-0">
-                <div className="relative aspect-[240/330] w-full overflow-hidden rounded-lg border border-game-border bg-game-canvas shadow-sm">
+                <div className="relative aspect-[240/330] w-full overflow-hidden rounded-md border border-game-border bg-game-canvas shadow-sm">
                   <Image
                     src={
                       selectedCard.card.images.large ||
@@ -957,7 +957,7 @@ export default function TcgExplorerPage({
 
               {/* Card Details */}
               <div className="w-full min-w-0 space-y-5">
-                <div className="divide-y divide-game-border rounded-lg border border-game-border bg-game-surface-raised px-4">
+                <div className="divide-y divide-game-border rounded-md border border-game-border bg-game-surface-raised px-4">
                   <div className="grid min-h-12 grid-cols-[5rem_1fr] items-center gap-3 py-2">
                     <span className="text-xs font-semibold text-game-muted">
                       Set
@@ -1247,7 +1247,7 @@ export function CarddexBinderShelf({
           type="button"
           aria-pressed={scope.series === 'all'}
           onClick={() => onSelectSeries('all')}
-          className={`game-focus-ring flex min-h-14 w-36 shrink-0 snap-start items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
+          className={`game-focus-ring flex min-h-14 w-36 shrink-0 snap-start items-center gap-2 rounded-md border px-2.5 py-2 text-left transition-colors ${
             scope.series === 'all'
               ? 'border-game-moss bg-game-moss/10'
               : 'border-game-border bg-game-surface-raised hover:border-game-moss/40'
@@ -1276,7 +1276,7 @@ export function CarddexBinderShelf({
               key={group.series}
               aria-pressed={scope.series === group.series}
               onClick={() => onSelectSeries(group.series)}
-              className={`game-focus-ring flex min-h-14 w-44 shrink-0 snap-start items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
+              className={`game-focus-ring flex min-h-14 w-44 shrink-0 snap-start items-center gap-2 rounded-md border px-2.5 py-2 text-left transition-colors ${
                 scope.series === group.series
                   ? 'border-game-moss bg-game-moss/10'
                   : 'border-game-border bg-game-surface-raised hover:border-game-moss/40'
@@ -1312,7 +1312,7 @@ export function CarddexBinderShelf({
             type="button"
             aria-pressed={scope.setId === 'all'}
             onClick={() => onSelectSet('all')}
-            className={`game-focus-ring flex min-h-14 w-36 shrink-0 snap-start items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
+            className={`game-focus-ring flex min-h-14 w-36 shrink-0 snap-start items-center gap-2 rounded-md border px-2.5 py-2 text-left transition-colors ${
               scope.setId === 'all'
                 ? 'border-game-ochre bg-game-ochre/10'
                 : 'border-game-border bg-game-surface-raised hover:border-game-ochre/40'
@@ -1344,7 +1344,7 @@ export function CarddexBinderShelf({
                 key={set.id}
                 aria-pressed={scope.setId === set.id}
                 onClick={() => onSelectSet(set.id)}
-                className={`game-focus-ring flex min-h-14 w-44 shrink-0 snap-start items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
+                className={`game-focus-ring flex min-h-14 w-44 shrink-0 snap-start items-center gap-2 rounded-md border px-2.5 py-2 text-left transition-colors ${
                   scope.setId === set.id
                     ? 'border-game-ochre bg-game-ochre/10'
                     : 'border-game-border bg-game-surface-raised hover:border-game-ochre/40'

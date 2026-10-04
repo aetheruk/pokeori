@@ -244,14 +244,14 @@ export function ProcedureOrderGame({
                   playSfx('select')
                 }}
                 className={cn(
-                  'grid grid-cols-[1.75rem_2.5rem_minmax(0,1fr)_5.25rem] items-center gap-1.5 rounded-lg border border-game-border bg-game-surface-raised p-1.5 text-game-ink shadow-sm sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_5.5rem] sm:gap-2 sm:p-2',
+                  'grid grid-cols-[1.75rem_2.5rem_minmax(0,1fr)_5.25rem] items-center gap-1.5 rounded-md border border-game-border bg-game-surface-raised p-1.5 text-game-ink shadow-sm sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_5.5rem] sm:gap-2 sm:p-2',
                   !gameEnded && 'cursor-grab active:cursor-grabbing',
                 )}
               >
                 <span className="flex h-9 items-center justify-center font-mono text-sm font-bold text-game-moss-strong">
                   {index + 1}
                 </span>
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-game-border bg-game-surface sm:h-10 sm:w-10">
+                <span className="flex h-9 w-9 items-center justify-center rounded-md border border-game-border bg-game-surface sm:h-10 sm:w-10">
                   {card.icon ? (
                     <TaskIconDisplay icon={card.icon} className="h-7 w-7" />
                   ) : (
@@ -299,7 +299,7 @@ export function ProcedureOrderGame({
           <div className="mt-3 shrink-0 border-t border-game-border pt-3">
             {feedback ? (
               <p
-                className="mb-3 rounded-lg border border-game-clay/40 bg-game-clay/10 p-3 text-sm text-game-ink"
+                className="mb-3 rounded-md border border-game-clay/40 bg-game-clay/10 p-3 text-sm text-game-ink"
                 role="status"
               >
                 {feedback}

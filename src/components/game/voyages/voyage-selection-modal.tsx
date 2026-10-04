@@ -266,7 +266,7 @@ export function VoyageSelectionModal({
                     <div
                       key={i}
                       className={cn(
-                        'flex items-center gap-4 rounded-lg border p-4 transition-colors',
+                        'flex items-center gap-4 rounded-md border p-4 transition-colors',
                         met
                           ? 'border-game-moss/30 bg-game-moss/5'
                           : 'border-game-border bg-game-surface',
@@ -312,7 +312,7 @@ export function VoyageSelectionModal({
                 })}
                 <div
                   className={cn(
-                    'flex items-center gap-4 rounded-lg border p-4 transition-colors',
+                    'flex items-center gap-4 rounded-md border p-4 transition-colors',
                     selectedPokemonIds.length >= (voyage.minPokemon || 1) &&
                       selectedPokemonIds.length <= voyage.maxPokemon
                       ? 'border-game-moss/30 bg-game-moss/5'
@@ -367,7 +367,7 @@ export function VoyageSelectionModal({
             {/* Team Selection */}
             <div className="space-y-4">
               <SectionDivider>ASSEMBLE TEAM</SectionDivider>
-              <div className="flex items-start gap-3 rounded-lg border border-game-clay/35 bg-game-clay/10 p-4">
+              <div className="flex items-start gap-3 rounded-md border border-game-clay/35 bg-game-clay/10 p-4">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-game-clay-strong" />
                 <p className="text-[11px] font-medium leading-relaxed text-game-clay-strong">
                   Caution: Pokemon sent on this voyage are permanently consumed
@@ -376,7 +376,7 @@ export function VoyageSelectionModal({
               </div>
 
               {eligiblePokemon.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-game-border bg-game-surface px-6 py-12 text-center">
+                <div className="rounded-md border border-dashed border-game-border bg-game-surface px-6 py-12 text-center">
                   <span className="font-medium italic text-game-muted">
                     No eligible Pokemon in your collection.
                   </span>
@@ -392,7 +392,7 @@ export function VoyageSelectionModal({
                         aria-pressed={isSelected}
                         aria-label={`${isSelected ? 'Remove' : 'Select'} ${p.name || 'Pokémon'}, level ${p.level}`}
                         className={cn(
-                          'game-focus-ring group relative flex h-32 w-28 flex-shrink-0 cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border transition-colors',
+                          'game-focus-ring group relative flex h-32 w-28 flex-shrink-0 cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden rounded-md border transition-colors',
                           isSelected
                             ? 'border-game-moss bg-game-moss'
                             : 'border-game-border bg-game-surface hover:border-game-moss/40',

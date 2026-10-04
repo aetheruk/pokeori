@@ -138,7 +138,7 @@ export function CaptureScene({
         </div>
       ) : (
         <div className="text-center py-8 space-y-6">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-game-border bg-game-surface-raised">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised">
             <span className="text-4xl">🚫</span>
           </div>
           <div>

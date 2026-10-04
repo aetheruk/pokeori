@@ -278,7 +278,7 @@ function ExploreGridComponent({
     if (hideEmptyState) return null
     return (
       <div
-        className="mx-auto max-w-xl rounded-lg border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"
+        className="mx-auto max-w-xl rounded-md border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"
         role="status"
         aria-live="polite"
       >
@@ -300,7 +300,7 @@ function ExploreGridComponent({
           <SectionDivider
             className="mb-6"
             textColor="text-game-ochre"
-            textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+            variant="chip"
           >
             Tools
           </SectionDivider>
@@ -325,7 +325,7 @@ function ExploreGridComponent({
           <SectionDivider
             className="mb-6"
             textColor="text-game-ochre"
-            textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+            variant="chip"
           >
             Random Event
           </SectionDivider>
@@ -357,7 +357,7 @@ function ExploreGridComponent({
             {!takeoverStyle && (
               <SectionDivider
                 className="mb-6"
-                textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+                variant="chip"
                 textColor={
                   type === 'gym-challenge'
                     ? 'text-game-battle-orange-strong'

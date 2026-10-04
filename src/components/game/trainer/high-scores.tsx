@@ -61,7 +61,7 @@ export function HighScores() {
           </div>
         ) : loadError ? (
           <div
-            className="rounded-lg border border-game-clay/35 bg-game-clay/10 px-5 py-8 text-center text-sm font-medium text-game-clay-strong"
+            className="rounded-md border border-game-clay/35 bg-game-clay/10 px-5 py-8 text-center text-sm font-medium text-game-clay-strong"
             role="alert"
             aria-live="assertive"
           >
@@ -69,7 +69,7 @@ export function HighScores() {
           </div>
         ) : scores.length === 0 ? (
           <div
-            className="rounded-lg border border-dashed border-game-border bg-game-surface-raised px-5 py-16 text-center font-medium text-game-muted"
+            className="rounded-md border border-dashed border-game-border bg-game-surface-raised px-5 py-16 text-center font-medium text-game-muted"
             role="status"
             aria-live="polite"
           >
@@ -123,7 +123,7 @@ export function HighScores() {
                   prefix={
                     <span
                       className={cn(
-                        'flex h-11 w-11 shrink-0 items-center justify-center gap-1 rounded-lg border font-mono text-base font-bold',
+                        'flex h-11 w-11 shrink-0 items-center justify-center gap-1 rounded-md border font-mono text-base font-bold',
                         rankBg,
                         rankBorder,
                         rankColor,

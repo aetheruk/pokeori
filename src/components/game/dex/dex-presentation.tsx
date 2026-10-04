@@ -79,7 +79,7 @@ export function DexEmptyState({
         className,
       )}
     >
-      <div className="mb-3 flex size-11 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised text-game-muted">
+      <div className="mb-3 flex size-11 items-center justify-center rounded-md border border-game-border bg-game-surface-raised text-game-muted">
         {icon ?? <CircleHelp className="size-5" aria-hidden="true" />}
       </div>
       <h2 className="font-display text-lg font-semibold text-game-ink">

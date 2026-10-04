@@ -1518,7 +1518,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
       <div className="mt-6 space-y-5">
         <SectionDivider>Rematch Setup</SectionDivider>
 
-        <div className="space-y-3 rounded-lg border border-game-border bg-game-surface-raised p-4">
+        <div className="space-y-3 rounded-md border border-game-border bg-game-surface-raised p-4">
           <div className="flex items-center justify-between gap-3">
             <label
               htmlFor="vs-seeker-level"
@@ -1550,7 +1550,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
           </div>
         </div>
 
-        <div className="space-y-3 rounded-lg border border-game-border bg-game-surface-raised p-4">
+        <div className="space-y-3 rounded-md border border-game-border bg-game-surface-raised p-4">
           <div className="flex items-center justify-between gap-3">
             <label
               htmlFor="vs-seeker-difficulty"
@@ -1738,7 +1738,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                     }
                     aria-pressed={isSelected}
                     className={cn(
-                      'h-full min-h-[92px] rounded-lg border bg-game-surface-raised p-3 text-left text-game-ink transition-colors hover:border-game-moss',
+                      'h-full min-h-[92px] rounded-md border bg-game-surface-raised p-3 text-left text-game-ink transition-colors hover:border-game-moss',
                       isSelected
                         ? 'border-game-moss bg-game-moss/10'
                         : 'border-game-border',
@@ -1828,7 +1828,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
           </div>
 
           {selectedLockedEncounter && (
-            <div className="rounded-lg border border-game-clay/35 bg-game-clay/10 p-4">
+            <div className="rounded-md border border-game-clay/35 bg-game-clay/10 p-4">
               <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-wider text-game-clay-strong">
                 <AlertCircle className="w-4 h-4" />
                 Locked Encounter
@@ -1933,7 +1933,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
               <div
                 key={i}
                 className={cn(
-                  'group relative flex min-w-[100px] flex-shrink-0 flex-col items-center rounded-lg border p-3 transition-colors',
+                  'group relative flex min-w-[100px] flex-shrink-0 flex-col items-center rounded-md border p-3 transition-colors',
                   hasSeen
                     ? 'border-game-border bg-game-surface-raised'
                     : 'border-game-border/70 bg-game-canvas opacity-80',
@@ -1994,7 +1994,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
         <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <SectionDivider>Selection Required</SectionDivider>
 
-          <div className="flex items-start gap-3 rounded-lg border border-game-danger/25 bg-game-danger/10 p-4">
+          <div className="flex items-start gap-3 rounded-md border border-game-danger/25 bg-game-danger/10 p-4">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-game-danger" />
             <p className="text-xs font-medium leading-relaxed text-game-danger">
               CAUTION: Pokemon handed over for this requirement are permanently

@@ -117,7 +117,7 @@ function SingleBattleActionMenu() {
 
       {forceSwitch ? (
         <div className="flex w-full flex-col items-stretch gap-3">
-          <div className="w-full rounded-lg border border-game-ochre/40 bg-game-ochre/10 px-4 py-3 text-center text-sm font-semibold text-game-ink">
+          <div className="w-full rounded-md border border-game-ochre/40 bg-game-ochre/10 px-4 py-3 text-center text-sm font-semibold text-game-ink">
             {requiresLeadSelection
               ? `A wild ${activeEnemyMon.battleAbilityState?.illusionMask?.name || activeEnemyMon.name} appeared. Choose your Pokemon.`
               : requiresMoveSwitch

@@ -565,7 +565,7 @@ export default function MoveDexPage() {
                 })}
               >
                 {selectedView === 'sketchbook' && (
-                  <div className="rounded-lg border border-game-ochre/30 bg-game-ochre/10 p-3">
+                  <div className="rounded-md border border-game-ochre/30 bg-game-ochre/10 p-3">
                     <h3 className="font-display text-sm font-semibold text-game-ink">
                       Using this record
                     </h3>
@@ -808,7 +808,7 @@ function UnknownMoveNote({ clue }: { clue: string }) {
   return (
     <div className="rounded-xl border border-dashed border-game-ochre/45 bg-game-ochre/10 p-4">
       <div className="flex items-start gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-game-ochre/30 bg-game-surface-raised">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-md border border-game-ochre/30 bg-game-surface-raised">
           <CircleHelp className="size-6 text-game-ochre" aria-hidden="true" />
         </div>
         <div>

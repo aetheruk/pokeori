@@ -54,7 +54,7 @@ export function BattleActionTrigger({
       type="button"
       variant="outline"
       className={cn(
-        'game-battle-utility-trigger h-12 min-w-0 flex-1 justify-between gap-2 rounded-lg border px-2 text-right shadow-none sm:px-3',
+        'game-battle-utility-trigger h-12 min-w-0 flex-1 justify-between gap-2 rounded-md border px-2 text-right shadow-none sm:px-3',
         className,
       )}
       {...props}

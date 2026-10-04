@@ -640,7 +640,7 @@ export function WhosThatPokemonGame({
                         aria-pressed={isListening}
                         aria-busy={isProcessing}
                         className={cn(
-                          'game-focus-ring flex h-11 w-11 items-center justify-center rounded-lg border text-game-cream transition-colors',
+                          'game-focus-ring flex h-11 w-11 items-center justify-center rounded-md border text-game-cream transition-colors',
                           isListening
                             ? 'border-game-clay bg-game-clay'
                             : 'border-game-moss bg-game-moss hover:bg-game-moss-strong',
@@ -679,7 +679,7 @@ export function WhosThatPokemonGame({
                           }
                           aria-busy={isProcessing}
                           className={cn(
-                            'game-focus-ring flex h-11 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised text-base font-black text-game-ink shadow-sm transition-colors',
+                            'game-focus-ring flex h-11 items-center justify-center rounded-md border border-game-border bg-game-surface-raised text-base font-black text-game-ink shadow-sm transition-colors',
                             'hover:border-game-moss hover:bg-game-moss/10',
                             'disabled:cursor-not-allowed disabled:opacity-45',
                           )}

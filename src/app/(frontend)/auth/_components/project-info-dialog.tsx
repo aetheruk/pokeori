@@ -62,7 +62,7 @@ export function ProjectInfoDialog() {
           type="button"
           aria-label="About Pokeori, licensing, and sources"
           title="About Pokeori"
-          className="game-focus-ring flex size-10 items-center justify-center rounded-lg border border-game-border bg-game-surface/90 text-game-ink shadow-lg shadow-black/20 backdrop-blur-md transition-colors hover:border-game-clay/60 hover:bg-game-surface-raised hover:text-game-clay focus-visible:outline-none"
+          className="game-focus-ring flex size-10 items-center justify-center rounded-md border border-game-border bg-game-surface/90 text-game-ink shadow-lg shadow-black/20 backdrop-blur-md transition-colors hover:border-game-clay/60 hover:bg-game-surface-raised hover:text-game-clay focus-visible:outline-none"
         >
           <CircleAlert className="size-5" aria-hidden="true" />
         </button>
@@ -76,7 +76,7 @@ export function ProjectInfoDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <section className="rounded-lg border border-game-clay/35 bg-game-clay/10 p-4">
+        <section className="rounded-md border border-game-clay/35 bg-game-clay/10 p-4">
           <h2 className="font-display text-base font-semibold text-game-ink">Important notice</h2>
           <p className="mt-2 text-sm leading-relaxed text-game-ink">
             Pokeori is not affiliated with, endorsed by, sponsored by, or otherwise associated with

@@ -41,7 +41,7 @@ export function GameDataTools() {
   }
 
   return (
-    <section className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+    <section className="rounded-md border bg-card p-6 text-card-foreground shadow-sm">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h2 className="text-lg font-semibold">Game Data Pipeline</h2>

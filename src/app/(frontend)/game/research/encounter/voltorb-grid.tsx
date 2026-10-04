@@ -730,7 +730,7 @@ export function VoltorbGridGame({
             frameSrc={frameSprite}
             frameSlice={frameSprite ? resolveGridFrameSlice(encounter.settings.tilePaletteId) : undefined}
             ariaLabel="Voltorb Grid board"
-            className="relative isolate overflow-hidden rounded-lg bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
+            className="relative isolate overflow-hidden rounded-md bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
           >
             {boardCells.map((position) => {
               const key = positionKey(position)

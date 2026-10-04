@@ -231,8 +231,10 @@ export function TcgDecksPanel({
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <div className="game-paper-background space-y-4 rounded-xl border border-game-border bg-game-surface p-4 shadow-sm">
-        <SectionDivider className="mb-1">TCG Generation Decks</SectionDivider>
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-game-border bg-game-surface-raised px-3 py-2">
+        <SectionDivider className="mb-1" variant="chip">
+          TCG Generation Decks
+        </SectionDivider>
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-game-border bg-game-surface-raised px-3 py-2">
           <span className="text-sm font-semibold text-game-ink">
             {activeFormat?.label} Deck
           </span>
@@ -271,7 +273,7 @@ export function TcgDecksPanel({
 
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-8">
           {activeDeck.length === 0 ? (
-            <span className="col-span-full rounded-lg border border-dashed border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-muted">
+            <span className="col-span-full rounded-md border border-dashed border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-muted">
               No cards selected. Use Auto fill to draft a legal starting deck.
             </span>
           ) : (
@@ -326,7 +328,7 @@ export function TcgDecksPanel({
         )}
         {cardCatalogState === 'error' && (
           <p
-            className="rounded-lg border border-game-danger/25 bg-game-danger/5 px-3 py-2 text-xs text-game-danger"
+            className="rounded-md border border-game-danger/25 bg-game-danger/5 px-3 py-2 text-xs text-game-danger"
             role="alert"
           >
             Card art and costs could not be loaded. You can still edit and save
@@ -337,7 +339,7 @@ export function TcgDecksPanel({
         {activeValidation &&
           !activeValidation.valid &&
           activeValidation.errors.length > 0 && (
-            <p className="rounded-lg border border-game-ochre/35 bg-game-ochre/10 px-3 py-2 text-xs text-game-ochre">
+            <p className="rounded-md border border-game-ochre/35 bg-game-ochre/10 px-3 py-2 text-xs text-game-ochre">
               {activeValidation.errors[0]}
             </p>
           )}

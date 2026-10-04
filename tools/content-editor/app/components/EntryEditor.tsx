@@ -168,7 +168,7 @@ export function EntryEditor({ type, title }: EntryEditorProps) {
   return (
     <div className="flex flex-1 min-h-[600px] gap-4">
       {/* Sidebar - File Selection */}
-      <div className="w-64 flex flex-col border rounded-lg bg-card text-card-foreground">
+      <div className="w-64 flex flex-col border rounded-md bg-card text-card-foreground">
         <div className="p-4 border-b">
           <h2 className="font-semibold mb-2">{title}</h2>
           <div className="flex gap-2">
@@ -222,7 +222,7 @@ export function EntryEditor({ type, title }: EntryEditorProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col border rounded-lg bg-card text-card-foreground overflow-hidden">
+      <div className="flex-1 flex flex-col border rounded-md bg-card text-card-foreground overflow-hidden">
         {selectedFile ? (
           <>
             <div className="p-4 border-b bg-muted/20 space-y-4">
@@ -352,7 +352,7 @@ export function EntryEditor({ type, title }: EntryEditorProps) {
                         )}
                       </>
                     ) : (
-                      <div className="text-center p-12 text-muted-foreground border-2 border-dashed rounded-lg">
+                      <div className="text-center p-12 text-muted-foreground border-2 border-dashed rounded-md">
                         <p>No item selected.</p>
                         <Button onClick={handleAddItem} variant="link">
                           Create your first entry

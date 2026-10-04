@@ -2004,14 +2004,14 @@ export function ArtisanPanel({
           <SectionDivider
             className="mb-6"
             textColor="text-game-moss-strong"
-            textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+            variant="chip"
           >
             {subcategoryOptions.find(
               (option) => option.id === activeSubcategory,
             )?.label || categoryLabels[activeCategory]}
           </SectionDivider>
           {ingredientId && (
-            <div className="mb-4 flex min-h-14 items-center justify-between gap-3 rounded-lg border border-game-border bg-game-surface px-3 py-2">
+            <div className="mb-4 flex min-h-14 items-center justify-between gap-3 rounded-md border border-game-border bg-game-surface px-3 py-2">
               <div className="flex min-w-0 items-center gap-2">
                 <ItemSprite
                   itemId={ingredientId}
@@ -2040,7 +2040,7 @@ export function ArtisanPanel({
           )}
           {visibleRecipes.length === 0 ? (
             <div
-              className="rounded-lg border border-dashed border-game-border bg-game-surface py-16 text-center text-sm font-medium text-game-muted"
+              className="rounded-md border border-dashed border-game-border bg-game-surface py-16 text-center text-sm font-medium text-game-muted"
               role="status"
               aria-live="polite"
             >
@@ -2100,10 +2100,10 @@ export function ArtisanPanel({
                     </div>
 
                     <div className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
-                      <h3 className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-xs font-bold leading-tight tracking-[0.12em] text-white">
+                      <h3 className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-xs font-bold leading-tight tracking-[0.08em] text-white">
                         {recipe.name}
                         <span className="ml-1 font-mono text-game-battle-orange">
-                          Lv {recipe.artisanLevel}
+                          Lvl{recipe.artisanLevel}
                         </span>
                       </h3>
 
@@ -2120,7 +2120,7 @@ export function ArtisanPanel({
                             triggerHaptic('selection')
                             setSelectedRecipe(recipe)
                           }}
-                          className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75"
+                          className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75"
                         >
                           <TaskIconDisplay
                             icon={{ type: 'item', id: 'explorers-journal' }}
@@ -2144,7 +2144,7 @@ export function ArtisanPanel({
                             startCraft(recipe)
                           }}
                           className={cn(
-                            'size-11 rounded-lg border bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
+                            'size-11 rounded-md border bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
                             state.canCraft
                               ? 'border-game-clay/35 text-game-clay-strong hover:border-game-clay/60'
                               : 'border-game-charcoal/15 text-game-muted',
@@ -2181,7 +2181,7 @@ export function ArtisanPanel({
                               triggerHaptic('selection')
                               startCraft(recipe, bulkMultiplier)
                             }}
-                            className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 font-mono text-[11px] font-bold text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
+                            className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 font-mono text-[11px] font-bold text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
                             aria-label={`Craft ${recipe.name} x${bulkMultiplier}`}
                             title={`Craft ${recipe.name} x${bulkMultiplier}`}
                           >
@@ -2308,7 +2308,7 @@ export function ArtisanPanel({
                   <div
                     key={cost.id}
                     className={cn(
-                      'flex items-center gap-3 rounded-lg border bg-game-surface p-3',
+                      'flex items-center gap-3 rounded-md border bg-game-surface p-3',
                       hasEnough
                         ? 'border-game-border'
                         : 'border-game-danger/30 bg-game-danger/10',

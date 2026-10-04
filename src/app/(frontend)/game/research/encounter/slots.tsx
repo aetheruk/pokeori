@@ -187,7 +187,7 @@ function PrizesModal({
             return (
               <div
                 key={i}
-                className="flex items-center justify-between rounded-lg border border-game-border bg-game-surface-raised p-3"
+                className="flex items-center justify-between rounded-md border border-game-border bg-game-surface-raised p-3"
               >
                 {/* Combination */}
                 <div className="flex gap-2">
@@ -402,7 +402,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
       <div className="flex-1 flex flex-col items-center justify-center p-4 pb-32">
         {/* Reels Viewport */}
         <div
-          className="relative flex scale-125 gap-1 overflow-hidden rounded-lg border-4 bg-[#081014] p-2 shadow-xl"
+          className="relative flex scale-125 gap-1 overflow-hidden rounded-md border-4 bg-[#081014] p-2 shadow-xl"
           style={{
             borderColor: `color-mix(in srgb, ${themeColour} 50%, black)`,
           }}

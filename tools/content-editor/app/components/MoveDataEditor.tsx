@@ -259,7 +259,7 @@ const MOVE_CONTEST_COMPARISONS: MoveContestComparison[] = [
 const MOVE_CONTEST_RESULTS: MoveContestResult[] = ['win', 'loss', 'tie']
 const CONTEST_CUSTOM_METRIC_VALUE = '__custom__'
 const FIELD_CONTROL_CLASS = 'h-8 w-full text-sm'
-const EDITOR_PANEL_CLASS = 'rounded-lg border bg-background/80 p-4 shadow-sm'
+const EDITOR_PANEL_CLASS = 'rounded-md border bg-background/80 p-4 shadow-sm'
 const EDITOR_PANEL_HEADER_CLASS = 'mb-3 flex flex-wrap items-start justify-between gap-3'
 const EDITOR_PANEL_TITLE_CLASS = 'text-sm font-semibold tracking-tight'
 const EDITOR_PANEL_DESCRIPTION_CLASS = 'mt-0.5 text-xs text-muted-foreground'
@@ -868,7 +868,7 @@ function DashboardMetric({
   return (
     <div
       className={cn(
-        'rounded-lg border bg-card px-3 py-2 shadow-sm',
+        'rounded-md border bg-card px-3 py-2 shadow-sm',
         tone === 'accent' && 'border-primary/30 bg-primary/5',
         tone === 'warning' && 'border-amber-500/30 bg-amber-500/10',
       )}
@@ -4802,7 +4802,7 @@ export function MoveDataEditor() {
                         key={move.id}
                         type="button"
                         className={cn(
-                          'w-full rounded-lg border px-3 py-2.5 text-left transition hover:shadow-sm',
+                          'w-full rounded-md border px-3 py-2.5 text-left transition hover:shadow-sm',
                           move.id === selectedMoveId
                             ? 'border-primary/70 bg-primary/10 shadow-sm'
                             : 'border-border bg-background/70 hover:bg-muted/30',
@@ -8261,7 +8261,7 @@ export function MoveDataEditor() {
                       )}
                     </div>
 
-                    <div className="grid gap-3 rounded-lg border bg-muted/10 p-3 md:grid-cols-[minmax(0,1fr)_120px_auto_auto]">
+                    <div className="grid gap-3 rounded-md border bg-muted/10 p-3 md:grid-cols-[minmax(0,1fr)_120px_auto_auto]">
                       <div className="space-y-1">
                         <Label>Pokemon form</Label>
                         <Select value={researchFormId} onValueChange={setResearchFormId}>
@@ -8322,7 +8322,7 @@ export function MoveDataEditor() {
                         return (
                           <div
                             key={`${reward.formId}:${reward.level}:${reward.itemId}`}
-                            className="grid grid-cols-[48px_minmax(0,1fr)_80px_auto] items-center gap-2 rounded-lg border bg-card p-2.5 shadow-sm"
+                            className="grid grid-cols-[48px_minmax(0,1fr)_80px_auto] items-center gap-2 rounded-md border bg-card p-2.5 shadow-sm"
                           >
                             <div className="relative h-10 w-10 overflow-hidden rounded-md bg-muted">
                               {form ? (
@@ -8372,7 +8372,7 @@ export function MoveDataEditor() {
                         )
                       })}
                       {selectedMoveResearchRewards.length === 0 && (
-                        <div className="rounded-lg border border-dashed bg-muted/10 p-4 text-center text-sm text-muted-foreground">
+                        <div className="rounded-md border border-dashed bg-muted/10 p-4 text-center text-sm text-muted-foreground">
                           No Pokemon Research unlocks for this move.
                         </div>
                       )}
@@ -8471,7 +8471,7 @@ export function MoveDataEditor() {
                         />
                       ))}
                       {filteredPokemonForms.length === 0 && (
-                        <div className="rounded-lg border border-dashed bg-muted/10 py-6 text-center text-sm text-muted-foreground">
+                        <div className="rounded-md border border-dashed bg-muted/10 py-6 text-center text-sm text-muted-foreground">
                           No matching pokemon/forms.
                         </div>
                       )}

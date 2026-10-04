@@ -2519,7 +2519,7 @@ function MarkingButton({
       aria-label={title}
       disabled={isLoading}
       className={cn(
-        'game-focus-ring flex size-10 shrink-0 items-center justify-center rounded-lg border p-0 transition-colors',
+        'game-focus-ring flex size-10 shrink-0 items-center justify-center rounded-md border p-0 transition-colors',
         isActive
           ? 'border-game-moss bg-game-moss/10'
           : 'border-transparent opacity-55 hover:border-game-border hover:bg-game-surface-raised hover:opacity-100',

@@ -199,7 +199,7 @@ export function TrainerSettings({
           <span>{isAudioEnabled ? 'On' : 'Off'}</span>
         </Button>
         <NotificationSettings />
-        <section className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
+        <section className="space-y-3 rounded-md border border-game-border bg-game-surface p-4">
           <h3 className="text-sm font-semibold">
             Image downloads
           </h3>

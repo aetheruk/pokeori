@@ -161,7 +161,7 @@ function SectionLabelSkeleton({ className }: { className?: string }) {
 
 function ExploreCardSkeleton() {
   return (
-    <div className="relative flex min-h-[6.5rem] items-center gap-4 overflow-hidden rounded-lg border border-game-card-border bg-game-surface p-4">
+    <div className="relative flex min-h-[6.5rem] items-center gap-4 overflow-hidden rounded-md border border-game-card-border bg-game-surface p-4">
       <QuietBlock className="game-icon-orb game-icon-orb-art relative z-10 h-14 w-14 shrink-0 rounded-full border border-game-border" />
       <div className="relative z-10 flex min-w-0 flex-1 flex-col items-end gap-2 pt-1">
         <Block className="h-4 w-3/4" />
@@ -178,7 +178,7 @@ function ExploreCardSkeleton() {
 function ExploreHeaderSkeleton() {
   return (
     <div className="w-full shrink-0 px-0 md:px-6 md:pt-5">
-      <div className="relative h-44 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-56 md:rounded-lg md:border">
+      <div className="relative h-44 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-56 md:rounded-md md:border">
         <div className="game-contour-motif absolute inset-0 opacity-20" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#172733]/92 via-[#172733]/26 to-[#172733]/12" />
         <div className="absolute inset-x-0 bottom-0 z-10 flex justify-center p-4 text-center md:p-5">
@@ -200,17 +200,17 @@ function ExploreFilterBarSkeleton() {
   return (
     <SecondaryControlBar desktopInline>
       <div className="grid grid-cols-[1fr_1fr_auto] gap-3" aria-hidden="true">
-        <div className="flex h-12 min-w-0 items-center gap-2 rounded-lg border border-game-border bg-game-surface px-3">
+        <div className="flex h-12 min-w-0 items-center gap-2 rounded-md border border-game-border bg-game-surface px-3">
           <MapIcon className="h-4 w-4 shrink-0 text-game-moss-strong" />
           <Block className="h-3 w-3/4" />
           <ChevronDown className="h-4 w-4 shrink-0 text-game-muted" />
         </div>
-        <div className="flex h-12 min-w-0 items-center gap-2 rounded-lg border border-game-border bg-game-surface px-3">
+        <div className="flex h-12 min-w-0 items-center gap-2 rounded-md border border-game-border bg-game-surface px-3">
           <MapPin className="h-4 w-4 shrink-0 text-game-moss-strong" />
           <Block className="h-3 w-3/4" />
           <ChevronDown className="h-4 w-4 shrink-0 text-game-muted" />
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-game-border bg-game-surface text-game-moss-strong">
+        <div className="flex h-12 w-12 items-center justify-center rounded-md border border-game-border bg-game-surface text-game-moss-strong">
           <Timer className="h-5 w-5" />
         </div>
       </div>
@@ -220,7 +220,7 @@ function ExploreFilterBarSkeleton() {
 
 function InventoryCardSkeleton() {
   return (
-    <div className="flex min-h-[5.25rem] items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3">
+    <div className="flex min-h-[5.25rem] items-center gap-3 rounded-md border border-game-border bg-game-surface p-3">
       <div className="game-icon-orb relative h-12 w-12 shrink-0">
         <Block className="absolute inset-1.5 rounded-full" />
       </div>
@@ -230,7 +230,7 @@ function InventoryCardSkeleton() {
         <Block className="mt-2 h-5 w-14 rounded-md" />
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
-        <QuietBlock className="h-7 w-12 rounded-lg border border-game-border bg-game-surface-raised" />
+        <QuietBlock className="h-7 w-12 rounded-md border border-game-border bg-game-surface-raised" />
       </div>
     </div>
   )
@@ -238,7 +238,7 @@ function InventoryCardSkeleton() {
 
 function RecipeCardSkeleton() {
   return (
-    <div className="flex min-h-[5.5rem] items-center gap-4 overflow-hidden rounded-lg border border-game-card-border bg-game-surface p-4">
+    <div className="flex min-h-[5.5rem] items-center gap-4 overflow-hidden rounded-md border border-game-card-border bg-game-surface p-4">
       <QuietBlock className="game-icon-orb relative h-14 w-14 shrink-0 rounded-full border border-game-border" />
       <div className="min-w-0 flex-1 space-y-2">
         <Block className="h-2.5 w-4/5" />
@@ -246,8 +246,8 @@ function RecipeCardSkeleton() {
         <Block className="h-2.5 w-1/2" />
       </div>
       <div className="flex shrink-0 items-center gap-1">
-        <QuietBlock className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised" />
-        <QuietBlock className="hidden h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised sm:block" />
+        <QuietBlock className="h-10 w-10 rounded-md border border-game-border bg-game-surface-raised" />
+        <QuietBlock className="hidden h-10 w-10 rounded-md border border-game-border bg-game-surface-raised sm:block" />
       </div>
     </div>
   )
@@ -297,7 +297,7 @@ function PokedexSpecimens() {
       {Array.from({ length: 24 }, (_, index) => (
         <div
           key={index}
-          className="flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-game-border bg-game-surface/65 p-2"
+          className="flex aspect-square items-center justify-center overflow-hidden rounded-md border border-game-border bg-game-surface/65 p-2"
         >
           <Block className="h-3/4 w-3/4 rounded-full" />
         </div>
@@ -343,7 +343,7 @@ export function TrainerSkeleton() {
                 <SectionLabelSkeleton />
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
                   {Array.from({ length: 6 }, (_, index) => (
-                    <div key={index} className="flex min-h-16 items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3">
+                    <div key={index} className="flex min-h-16 items-center gap-3 rounded-md border border-game-border bg-game-surface p-3">
                       <Block className="h-12 w-12 shrink-0 rounded-full" />
                       <div className="min-w-0 flex-1 space-y-2">
                         <Block className="h-3 w-2/3" />
@@ -359,7 +359,7 @@ export function TrainerSkeleton() {
                 <SectionLabelSkeleton />
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
                   {Array.from({ length: 3 }, (_, index) => (
-                    <div key={index} className="flex min-h-16 items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3">
+                    <div key={index} className="flex min-h-16 items-center gap-3 rounded-md border border-game-border bg-game-surface p-3">
                       <QuietBlock className="h-12 w-12 shrink-0 rounded-full" />
                       <div className="flex-1 space-y-2">
                         <Block className="h-3 w-2/3" />
@@ -437,7 +437,7 @@ export function PokemonSkeleton() {
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 xl:grid-cols-[repeat(auto-fill,minmax(104px,1fr))]">
                 {Array.from({ length: 24 }, (_, index) => (
                   <div key={index} className="relative aspect-square w-full rounded-xl border border-game-border bg-game-surface p-1">
-                    <Block className="h-full w-full rounded-lg" />
+                    <Block className="h-full w-full rounded-md" />
                   </div>
                 ))}
               </div>
@@ -452,23 +452,23 @@ export function PokemonSkeleton() {
             <div className="min-h-0 overflow-hidden">
               <div className="w-full max-w-7xl mx-auto px-4 md:px-6 py-3">
                 <div className="flex flex-col gap-4 items-stretch">
-                  <div className="h-full rounded-lg border border-game-border bg-game-surface p-2">
+                  <div className="h-full rounded-md border border-game-border bg-game-surface p-2">
                     <div className="mb-2 flex items-center justify-center gap-2">
                       <Swords className="h-3 w-3 text-game-moss-strong" />
                       <QuietBlock className="h-3 w-20" />
                     </div>
                     <div className="grid w-full grid-cols-3 gap-2">
                       {Array.from({ length: 6 }, (_, index) => (
-                        <Block key={index} className="aspect-square w-full rounded-lg" />
+                        <Block key={index} className="aspect-square w-full rounded-md" />
                       ))}
                     </div>
                   </div>
-                  <div className="w-full shrink-0 rounded-lg border border-game-border bg-game-surface p-2">
+                  <div className="w-full shrink-0 rounded-md border border-game-border bg-game-surface p-2">
                     <div className="mb-2 flex items-center justify-center gap-2">
                       <Heart className="h-3 w-3 text-game-moss-strong" />
                       <QuietBlock className="h-3 w-14" />
                     </div>
-                    <Block className="mx-auto h-24 w-24 rounded-lg" />
+                    <Block className="mx-auto h-24 w-24 rounded-md" />
                   </div>
                 </div>
               </div>
@@ -577,7 +577,7 @@ export function MoveDexSkeleton() {
       subtitle={<QuietBlock className="h-3 w-40" />}
     >
       <DelayedContent className="game-desktop-workspace flex min-h-0 min-w-0 w-full flex-1 flex-col px-4 pb-3 pt-4 md:px-6">
-        <div className="grid h-auto min-h-11 grid-cols-3 gap-1 rounded-lg border border-game-border bg-game-surface p-1">
+        <div className="grid h-auto min-h-11 grid-cols-3 gap-1 rounded-md border border-game-border bg-game-surface p-1">
           {Array.from({ length: 3 }, (_, index) => (
             <QuietBlock key={index} className={cn('h-9 rounded-md', index === 0 && 'bg-game-border/65')} />
           ))}
@@ -623,7 +623,7 @@ export function AbilityDexSkeleton() {
       subtitle={<QuietBlock className="h-3 w-36" />}
     >
       <DelayedContent className="game-desktop-workspace flex min-h-0 min-w-0 w-full flex-1 flex-col px-4 pb-3 pt-4 md:px-6">
-        <div className="grid h-auto min-h-11 grid-cols-2 gap-1 rounded-lg border border-game-border bg-game-surface p-1">
+        <div className="grid h-auto min-h-11 grid-cols-2 gap-1 rounded-md border border-game-border bg-game-surface p-1">
           {Array.from({ length: 2 }, (_, index) => (
             <QuietBlock key={index} className={cn('h-9 rounded-md', index === 0 && 'bg-game-border/65')} />
           ))}

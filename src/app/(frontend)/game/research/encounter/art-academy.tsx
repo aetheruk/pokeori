@@ -544,7 +544,7 @@ export function ArtAcademyGame({
                 disabled={!gameStarted || gameEnded}
                 onClick={() => setSelectedColor(color)}
                 className={cn(
-                  'game-focus-ring flex h-11 min-w-11 items-center justify-center rounded-lg border-2 bg-game-canvas p-1 transition-colors disabled:opacity-60',
+                  'game-focus-ring flex h-11 min-w-11 items-center justify-center rounded-md border-2 bg-game-canvas p-1 transition-colors disabled:opacity-60',
                   selectedColor === color
                     ? 'border-game-moss'
                     : 'border-transparent hover:border-game-border-strong',
@@ -592,7 +592,7 @@ export function ArtAcademyGame({
           </fieldset>
 
           <div
-            className="relative mx-auto aspect-square max-w-[520px] overflow-hidden rounded-lg border border-game-border bg-game-canvas"
+            className="relative mx-auto aspect-square max-w-[520px] overflow-hidden rounded-md border border-game-border bg-game-canvas"
             style={{ width: 'min(100%, max(240px, calc(100dvh - 27rem)))' }}
           >
             <GuideGrid count={guideCount} />

@@ -89,7 +89,7 @@ export function RewardCarousel({
               return (
                 <div
                   className={cn(
-                    'relative overflow-hidden rounded-lg border border-game-border bg-game-surface-raised p-4',
+                    'relative overflow-hidden rounded-md border border-game-border bg-game-surface-raised p-4',
                     variant === 'journal' &&
                       'rounded-none border-x-0 border-y border-game-border/75 bg-transparent px-1 py-3 md:px-2',
                   )}

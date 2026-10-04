@@ -95,7 +95,7 @@ export function MysteryGift() {
                 {error && (
                   <p
                     id="mystery-gift-error"
-                    className="rounded-lg border border-game-danger/25 bg-game-danger/5 px-3 py-2 text-sm text-game-danger"
+                    className="rounded-md border border-game-danger/25 bg-game-danger/5 px-3 py-2 text-sm text-game-danger"
                     role="alert"
                   >
                     {error}

@@ -1198,7 +1198,7 @@ export function PokemonList({
         </div>
       )}
       {rosterSelection && !itemToUse && (
-        <div className="mx-auto mt-3 flex w-[calc(100%-2rem)] max-w-7xl items-center justify-between gap-3 rounded-lg border border-game-moss/35 bg-game-moss/10 px-4 py-3 text-game-ink">
+        <div className="mx-auto mt-3 flex w-[calc(100%-2rem)] max-w-7xl items-center justify-between gap-3 rounded-md border border-game-moss/35 bg-game-moss/10 px-4 py-3 text-game-ink">
           <div className="min-w-0">
             <p className="font-display text-base font-semibold">
               Choose a Pokemon
@@ -1245,7 +1245,7 @@ export function PokemonList({
         </div>
       )}
       {isBulkReleaseMode && !itemToUse && (
-        <div className="mx-auto mt-3 flex w-[calc(100%-2rem)] max-w-7xl items-center justify-between gap-3 rounded-lg border border-game-danger/30 bg-game-danger/10 px-4 py-3 text-sm text-game-ink">
+        <div className="mx-auto mt-3 flex w-[calc(100%-2rem)] max-w-7xl items-center justify-between gap-3 rounded-md border border-game-danger/30 bg-game-danger/10 px-4 py-3 text-sm text-game-ink">
           <div className="min-w-0">
             <div className="font-display font-semibold text-game-danger">
               Select Pokemon to release
@@ -1371,7 +1371,7 @@ export function PokemonList({
               <div className="w-full max-w-7xl mx-auto px-4 md:px-6 py-3">
                 <div className="flex flex-col gap-4 items-stretch">
                   <div className="flex-1 min-w-0 w-full">
-                    <div className="h-full rounded-lg border border-game-border bg-game-surface p-2">
+                    <div className="h-full rounded-md border border-game-border bg-game-surface p-2">
                       <div className="flex items-center justify-center mb-2 px-1 relative">
                         <div className="flex items-center gap-2">
                           <Swords className="h-3 w-3 text-game-moss-strong" />
@@ -1415,7 +1415,7 @@ export function PokemonList({
                                   position: i + 1,
                                 })
                               }
-                              className="game-focus-ring group/slot flex aspect-square w-full max-w-[104px] items-center justify-center rounded-lg border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
+                              className="game-focus-ring group/slot flex aspect-square w-full max-w-[104px] items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
                               aria-label={`Choose a Pokemon for battle team slot ${i + 1}`}
                             >
                               <span className="text-[10px] font-bold text-game-muted group-hover/slot:text-game-moss-strong">
@@ -1429,7 +1429,7 @@ export function PokemonList({
                     </div>
                   </div>
                   <div className="w-full shrink-0">
-                    <div className="flex h-full flex-col rounded-lg border border-game-border bg-game-surface p-2">
+                    <div className="flex h-full flex-col rounded-md border border-game-border bg-game-surface p-2">
                       <div className="flex items-center justify-center gap-2 mb-2 px-1">
                         <Heart className="h-3 w-3 text-game-moss-strong" />
                         <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-game-ink">
@@ -1453,7 +1453,7 @@ export function PokemonList({
                             onClick={() =>
                               beginRosterSelection({ role: 'companion' })
                             }
-                            className="game-focus-ring group/slot flex h-full w-full items-center justify-center rounded-lg border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
+                            className="game-focus-ring group/slot flex h-full w-full items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
                             aria-label="Choose a partner Pokemon"
                           >
                             <Plus className="h-4 w-4 text-game-muted group-hover/slot:text-game-moss-strong" />

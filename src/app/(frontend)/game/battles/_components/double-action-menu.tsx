@@ -317,9 +317,9 @@ export function DoubleActionMenu() {
         />
       ) : panel === 'powers' ? (
         <div className="mx-auto max-w-xl space-y-2">
-          {getStanceWinCharges(battleState.powers) < POWER_STANCE_WIN_COST && <p className="rounded-lg border border-game-border bg-game-canvas/70 p-3 text-sm text-game-muted">Win {POWER_STANCE_WIN_COST - getStanceWinCharges(battleState.powers)} more stance matchups to use a Power.</p>}
+          {getStanceWinCharges(battleState.powers) < POWER_STANCE_WIN_COST && <p className="rounded-md border border-game-border bg-game-canvas/70 p-3 text-sm text-game-muted">Win {POWER_STANCE_WIN_COST - getStanceWinCharges(battleState.powers)} more stance matchups to use a Power.</p>}
           {powerOptions.map((option) => (
-            <Button key={option.label} type="button" variant="outline" className="h-12 w-full justify-start rounded-lg border-game-border bg-game-canvas px-3 text-left text-sm font-semibold" disabled={disabled || getStanceWinCharges(battleState.powers) < POWER_STANCE_WIN_COST} onClick={() => { if (option.freeZ) { void handleUseZMove(selectedSlot); setPanel(null) } else if (option.command) commit(option.command) }}>{option.label}</Button>
+            <Button key={option.label} type="button" variant="outline" className="h-12 w-full justify-start rounded-md border-game-border bg-game-canvas px-3 text-left text-sm font-semibold" disabled={disabled || getStanceWinCharges(battleState.powers) < POWER_STANCE_WIN_COST} onClick={() => { if (option.freeZ) { void handleUseZMove(selectedSlot); setPanel(null) } else if (option.command) commit(option.command) }}>{option.label}</Button>
           ))}
           {powerOptions.length === 0 && <p className="p-4 text-sm text-game-muted">No assigned power is available for this Pokémon.</p>}
         </div>

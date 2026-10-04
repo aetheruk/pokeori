@@ -1,21 +1,11 @@
 'use client'
 
-import {
-  ArrowRight,
-  CircleDot,
-  Gamepad2,
-  Layers,
-  Map as MapIcon,
-  Microscope,
-  Sparkles,
-  Swords,
-  Trophy,
-} from 'lucide-react'
-import Link from 'next/link'
 import { useHaptics } from '@haptics/react'
-import { type ComponentType, useMemo } from 'react'
+import Link from 'next/link'
+import { useMemo } from 'react'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
@@ -27,17 +17,11 @@ import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { getIcon } from '@/data/user'
 import { usePokedex } from '@/hooks/usePokedex'
 import { useTCG } from '@/hooks/useTCG'
-import { cn } from '@/lib/utils'
 import { ALL_ABILITY_DEX_ENTRIES } from '@/utilities/pokemon/abilitydex'
 import { ALL_MOVE_DEX_ENTRIES } from '@/utilities/pokemon/movedex'
 
 const tcgSets = tcgSetSummaries
 const totalPokemon = pokemonData.length
-const totalPokedexForms = pokemonData.reduce(
-  (total, pokemon) =>
-    total + pokemon.forms.filter((form) => form.form !== 'base').length,
-  0,
-)
 const totalTcgCards = tcgSets.reduce((total, set) => total + set.total, 0)
 const totalMoveDexEntries = ALL_MOVE_DEX_ENTRIES.length
 const totalAbilityDexEntries = ALL_ABILITY_DEX_ENTRIES.length
@@ -64,28 +48,14 @@ export function TrainerCollection() {
   const { summary: tcgSummary, isLoading: tcgLoading } = useTCG()
 
   const pokemonProgress = useMemo(() => {
-    let seen = 0
     let caught = 0
-    let observed = 0
-    let observedForms = 0
-    let caughtForms = 0
 
     for (const pokemon of pokemonData) {
       const formEntries = pokemon.forms.map((form) => entriesByForm[form.id])
-      if (formEntries.some((entry) => entry?.seen || entry?.caught)) seen += 1
       if (formEntries.some((entry) => entry?.caught)) caught += 1
-      if (formEntries.some((entry) => entry?.preferredBattleStance))
-        observed += 1
-
-      for (const form of pokemon.forms) {
-        if (form.form === 'base') continue
-        const entry = entriesByForm[form.id]
-        if (entry?.seen || entry?.caught) observedForms += 1
-        if (entry?.caught) caughtForms += 1
-      }
     }
 
-    return { seen, caught, observed, observedForms, caughtForms }
+    return { caught }
   }, [entriesByForm])
 
   const inventory = useMemo(
@@ -102,10 +72,6 @@ export function TrainerCollection() {
       ),
     [inventory],
   )
-  const moveDexCompletion = getPercent(
-    ownedMoveDexEntries.length,
-    Math.max(ALL_MOVE_DEX_ENTRIES.length, 1),
-  )
   const registeredAbilityIds = useMemo(
     () =>
       new Set(
@@ -115,41 +81,10 @@ export function TrainerCollection() {
       ),
     [gameData?.abilityDex],
   )
-  const abilityDexCompletion = getPercent(
-    registeredAbilityIds.size,
-    Math.max(totalAbilityDexEntries, 1),
-  )
-
-  const activeBinders = tcgSets.filter(
-    (set) => (inventory[`binder-${set.id}`] || 0) > 0,
-  ).length
-  const missingPokemon = Math.max(totalPokemon - pokemonProgress.caught, 0)
-  const missingForms = Math.max(
-    totalPokedexForms - pokemonProgress.caughtForms,
-    0,
-  )
-  const missingTcgCards = Math.max(totalTcgCards - tcgSummary.uniqueCards, 0)
-  const missingBinders = Math.max(tcgSets.length - activeBinders, 0)
   const completedTaskRuns = getCompletedTaskRuns(gameData?.completedTasks)
   const playerStats = getPlayerStats(gameData)
   const favoriteContent = getFavoriteContent(playerStats)
   const favoriteMode = getFavoriteMode(playerStats)
-
-  const pokemonCompletion = getPercent(pokemonProgress.caught, totalPokemon)
-  const seenCompletion = getPercent(pokemonProgress.seen, totalPokemon)
-  const observedCompletion = getPercent(pokemonProgress.observed, totalPokemon)
-  const formCompletion = getPercent(
-    pokemonProgress.caughtForms,
-    totalPokedexForms,
-  )
-  const cardCompletion = getPercent(tcgSummary.uniqueCards, totalTcgCards)
-  const overallCompletion = getPercent(
-    pokemonProgress.caught +
-      tcgSummary.uniqueCards +
-      ownedMoveDexEntries.length +
-      registeredAbilityIds.size,
-    totalPokemon + totalTcgCards + totalMoveDexEntries + totalAbilityDexEntries,
-  )
 
   const loading = pokedexLoading || tcgLoading
   const trainerName = user?.trainerName || 'Trainer'
@@ -160,7 +95,7 @@ export function TrainerCollection() {
       aria-busy={loading}
     >
       <PremiumHeader
-        title="Personal Progress"
+        title={`${trainerName}'s Stats`}
         subtitle="Collections"
         icon={
           <TaskIconDisplay
@@ -175,191 +110,84 @@ export function TrainerCollection() {
         }
       />
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 md:px-6 md:py-6">
-        <section>
-          <div className="game-folio-section relative overflow-hidden p-4 md:p-5">
-            <div
-              className="absolute inset-y-5 left-0 w-1 bg-game-ochre"
-              aria-hidden="true"
-            />
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <div className="game-field-label before:hidden flex items-center gap-2">
-                  <Layers className="h-3.5 w-3.5" />
-                  {trainerName}'s Collection
-                </div>
-                <h2 className="mt-2 font-display text-3xl font-semibold text-game-ink md:text-4xl">
-                  {loading ? 'Syncing' : `${overallCompletion}%`}
-                </h2>
-                <div className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-game-muted">
-                  Collection complete
-                </div>
-              </div>
-
-              <ProgressDial value={overallCompletion} label="All" />
-            </div>
-
-            <div className="mt-5 h-2 overflow-hidden rounded-full border border-game-border bg-game-canvas">
-              <div
-                role="progressbar"
-                aria-label="Overall collection completion"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={overallCompletion}
-                className="h-full rounded-full bg-game-charcoal transition-[width] motion-reduce:transition-none"
-                style={{ width: `${overallCompletion}%` }}
-              />
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-y-4 border-t border-game-border pt-4 sm:grid-cols-4 sm:divide-x sm:divide-game-border">
-              <InlineStat
-                label="Pokemon"
-                value={loading ? '...' : `${pokemonProgress.caught}`}
-              />
-              <InlineStat
-                label="Cards"
-                value={loading ? '...' : `${tcgSummary.uniqueCards}`}
-              />
-              <InlineStat
-                label="Moves"
-                value={loading ? '...' : `${ownedMoveDexEntries.length}`}
-              />
-              <InlineStat
-                label="Abilities"
-                value={loading ? '...' : `${registeredAbilityIds.size}`}
-              />
-            </div>
-          </div>
-        </section>
-
-        <SectionDivider className="my-4">Collections</SectionDivider>
+        <SectionDivider className="my-4" variant="chip">
+          Collections
+        </SectionDivider>
 
         <section className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-4">
           <CollectionPanel
             href="/game/pokedex"
             title="Pokedex"
-            subtitle="Pokemon Records"
             iconItemId="poke-ball"
-            accent="charcoal"
-            completion={pokemonCompletion}
-            stats={[
-              {
-                label: 'Missing',
-                value: loading ? '...' : `${missingPokemon}`,
-              },
-              {
-                label: 'Missing Forms',
-                value: loading ? '...' : `${missingForms}`,
-              },
-            ]}
-            railStats={[
-              { label: 'Pokemon', value: pokemonCompletion },
-              { label: 'Seen', value: seenCompletion },
-              { label: 'Observed', value: observedCompletion },
-              { label: 'Forms', value: formCompletion },
-            ]}
+            background="/backgrounds/friend-stadium.avif"
+            progress={{
+              current: pokemonProgress.caught,
+              total: totalPokemon,
+            }}
+            loading={loading}
           />
 
           <CollectionPanel
             href="/game/tcg"
             title="Carddex"
-            subtitle="Card Binders"
             iconItemId="pack-base1"
-            accent="ochre"
-            completion={cardCompletion}
-            stats={[
-              {
-                label: 'Missing Cards',
-                value: tcgLoading ? '...' : `${missingTcgCards}`,
-              },
-              {
-                label: 'Missing Binders',
-                value: user ? `${missingBinders}` : '...',
-              },
-            ]}
-            railStats={[
-              { label: 'Cards', value: cardCompletion },
-              {
-                label: 'Binders',
-                value: getPercent(activeBinders, tcgSets.length),
-              },
-            ]}
+            background="/backgrounds/inventory.avif"
+            progress={{
+              current: tcgSummary.uniqueCards,
+              total: totalTcgCards,
+            }}
+            loading={loading}
           />
 
           <CollectionPanel
             href="/game/movedex"
-            title="MoveDex"
-            subtitle="TM / HM Moves"
+            title="Movedex"
             iconItemId="tm-normal"
-            accent="charcoal"
-            completion={moveDexCompletion}
-            stats={[
-              {
-                label: 'Owned',
-                value: loading ? '...' : `${ownedMoveDexEntries.length}`,
-              },
-              {
-                label: 'Missing',
-                value: loading
-                  ? '...'
-                  : `${Math.max(ALL_MOVE_DEX_ENTRIES.length - ownedMoveDexEntries.length, 0)}`,
-              },
-            ]}
-            railStats={[{ label: 'Moves', value: moveDexCompletion }]}
+            background="/backgrounds/gym-fighting.avif"
+            progress={{
+              current: ownedMoveDexEntries.length,
+              total: totalMoveDexEntries,
+            }}
+            loading={loading}
           />
 
           <CollectionPanel
             href="/game/abilitydex"
-            title="AbilityDex"
-            subtitle="Pokemon Abilities"
+            title="Abilitydex"
             iconItemId="ability-patch"
-            accent="ochre"
-            completion={abilityDexCompletion}
-            stats={[
-              {
-                label: 'Registered',
-                value: loading ? '...' : `${registeredAbilityIds.size}`,
-              },
-              {
-                label: 'Missing',
-                value: loading
-                  ? '...'
-                  : `${Math.max(totalAbilityDexEntries - registeredAbilityIds.size, 0)}`,
-              },
-            ]}
-            railStats={[{ label: 'Abilities', value: abilityDexCompletion }]}
+            background="/backgrounds/chansey.avif"
+            progress={{
+              current: registeredAbilityIds.size,
+              total: totalAbilityDexEntries,
+            }}
+            loading={loading}
           />
         </section>
 
-        <SectionDivider className="my-4">Journal activity</SectionDivider>
+        <SectionDivider className="my-4" variant="chip">
+          More Stats
+        </SectionDivider>
 
-        <section className="game-folio-section min-w-0 overflow-hidden p-4 md:p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="game-field-label before:hidden flex items-center gap-2">
-              <Sparkles className="h-3.5 w-3.5 text-game-ochre" />
-              Recent fieldwork
-            </div>
-            <Trophy className="h-4 w-4 text-game-muted" />
-          </div>
-
-          <div className="mt-3 grid min-w-0 gap-x-5 md:grid-cols-2 md:divide-x md:divide-game-border">
+        <section className="min-w-0">
+          <div className="grid min-w-0 gap-x-5 md:grid-cols-2 md:divide-x md:divide-game-border">
             <div className="min-w-0 divide-y divide-game-border md:pr-5">
               <StatusRow
-                icon={Swords}
+                iconItemId="vs-seeker"
                 label="Total battles"
                 value={user ? `${playerStats.totalBattles}` : '...'}
               />
               <StatusRow
-                icon={MapIcon}
+                iconItemId="poke-ball"
                 label="Wild encounters"
                 value={user ? `${playerStats.totalLocations}` : '...'}
               />
               <StatusRow
-                icon={Gamepad2}
+                iconItemId="rotom-catalogue"
                 label="Mini-game runs"
                 value={user ? `${playerStats.totalGames}` : '...'}
               />
               <StatusRow
-                icon={Microscope}
+                iconItemId="eject-pack"
                 label="Field Research studies"
                 value={user ? `${playerStats.totalFieldResearch}` : '...'}
               />
@@ -367,17 +195,17 @@ export function TrainerCollection() {
 
             <div className="min-w-0 divide-y divide-game-border border-t border-game-border md:border-t-0 md:pl-5">
               <StatusRow
-                icon={Trophy}
+                iconItemId="guide-book"
                 label="Tasks completed"
                 value={user ? `${completedTaskRuns}` : '...'}
               />
               <StatusRow
-                icon={Sparkles}
+                iconItemId={favoriteMode.iconItemId}
                 label="Most played mode"
-                value={user ? favoriteMode : '...'}
+                value={user ? favoriteMode.label : '...'}
               />
               <StatusRow
-                icon={CircleDot}
+                iconItemId="guide-book"
                 label="Favourite content"
                 value={user ? favoriteContent : '...'}
               />
@@ -392,180 +220,82 @@ export function TrainerCollection() {
 function CollectionPanel({
   href,
   title,
-  subtitle,
   iconItemId,
-  accent,
-  completion,
-  stats,
-  railStats,
+  background,
+  progress,
+  loading,
 }: {
   href: string
   title: string
-  subtitle: string
   iconItemId: string
-  accent: 'charcoal' | 'ochre'
-  completion: number
-  stats: { label: string; value: string }[]
-  railStats: { label: string; value: number }[]
+  background: string
+  progress: { current: number; total: number }
+  loading: boolean
 }) {
   const { trigger: triggerHaptic } = useHaptics()
-  const isCharcoal = accent === 'charcoal'
 
   return (
-    <Link
-      href={href}
-      data-haptic-manual="true"
-      onClick={() => triggerHaptic('selection')}
-      className="game-focus-ring group relative overflow-hidden rounded-lg border border-game-border bg-game-surface p-4 transition-colors hover:border-game-charcoal/45 hover:bg-game-surface-raised"
-    >
+    <article className="relative flex h-full min-h-28 flex-col overflow-hidden rounded-md border border-game-border bg-game-surface p-4 pt-8">
       <div
-        className={cn(
-          'absolute inset-y-0 left-0 w-1',
-          isCharcoal ? 'bg-game-charcoal' : 'bg-game-ochre',
-        )}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-70"
+        style={{ backgroundImage: `url(${background})` }}
       />
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <div
-            className={cn(
-              'game-icon-orb h-11 w-11 shrink-0',
-              isCharcoal
-                ? 'border-game-charcoal/30 text-game-charcoal-strong'
-                : 'border-game-ochre/35 text-game-ochre',
-            )}
-          >
-            <ItemSprite
-              itemId={iconItemId}
-              alt=""
-              width={36}
-              height={36}
-              className="h-8 w-8 object-contain"
-            />
-          </div>
-          <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-game-muted">
-              {subtitle}
-            </div>
-            <h2 className="mt-0.5 truncate font-display text-2xl font-semibold text-game-ink">
-              {title}
-            </h2>
-          </div>
-        </div>
-        <ArrowRight className="h-5 w-5 shrink-0 text-game-muted transition-transform group-hover:translate-x-0.5 group-hover:text-game-charcoal-strong" />
-      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-game-surface-raised/78 via-game-surface/58 to-game-surface/10" />
 
-      <div className="mt-5 grid grid-cols-[auto_1fr] gap-4">
-        <ProgressDial value={completion} label="Done" />
-        <div className="min-w-0 space-y-3">
-          {railStats.map((stat) => (
-            <ProgressRail
-              key={stat.label}
-              label={stat.label}
-              value={stat.value}
-              className={isCharcoal ? 'bg-game-charcoal' : 'bg-game-ochre'}
-            />
-          ))}
-        </div>
-      </div>
+      <h2 className="absolute right-0 top-0 z-10 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
+        {title}
+        <span className="ml-1 whitespace-nowrap text-game-battle-orange">
+          {loading ? '…' : progress.current.toLocaleString()}/
+          {progress.total.toLocaleString()}
+        </span>
+      </h2>
 
-      <div className="mt-5 grid grid-cols-2 divide-x divide-game-border border-t border-game-border pt-4">
-        {stats.map((stat) => (
-          <InlineStat key={stat.label} label={stat.label} value={stat.value} />
-        ))}
-      </div>
-    </Link>
-  )
-}
-
-function ProgressDial({ value, label }: { value: number; label: string }) {
-  return (
-    <div
-      role="progressbar"
-      aria-label={`${label} completion`}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={value}
-      className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-game-border"
-      style={{
-        background: `conic-gradient(var(--game-charcoal) ${value * 3.6}deg, var(--game-canvas) 0deg)`,
-      }}
-    >
-      <div className="grid h-12 w-12 place-items-center rounded-full bg-game-surface text-center">
-        <div>
-          <div className="font-mono text-sm font-bold text-game-ink">
-            {value}%
-          </div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-game-muted">
-            {label}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function ProgressRail({
-  label,
-  value,
-  className,
-}: {
-  label: string
-  value: number
-  className: string
-}) {
-  return (
-    <div>
-      <div className="mb-1 flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-game-muted">
-        <span>{label}</span>
-        <span className="font-mono text-game-ink">{value}%</span>
-      </div>
-      <div className="h-1.5 overflow-hidden rounded-full border border-game-border bg-game-canvas">
-        <div
-          role="progressbar"
-          aria-label={`${label} completion`}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={value}
-          className={cn(
-            'h-full rounded-full transition-[width] motion-reduce:transition-none',
-            className,
-          )}
-          style={{ width: `${value}%` }}
+      <div className="relative z-10 mt-auto flex items-center gap-3 pt-4">
+        <ItemSprite
+          itemId={iconItemId}
+          alt=""
+          width={36}
+          height={36}
+          className="h-9 w-9 shrink-0 object-contain"
         />
+        <Button
+          asChild
+          variant="outline"
+          className="min-w-0 flex-1 border-game-border-strong bg-game-surface-raised/65 px-3 text-left text-game-charcoal-strong hover:border-game-charcoal/45 hover:bg-game-surface-raised/85"
+        >
+          <Link
+            href={href}
+            data-haptic-manual="true"
+            onClick={() => triggerHaptic('selection')}
+          >
+            <span>View {title}</span>
+          </Link>
+        </Button>
       </div>
-    </div>
-  )
-}
-
-function InlineStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0 px-2 first:pl-0 last:pr-0">
-      <div className="truncate text-[11px] font-semibold uppercase tracking-[0.1em] text-game-muted">
-        {label}
-      </div>
-      <div className="mt-1 truncate font-mono text-sm font-bold text-game-ink">
-        {value}
-      </div>
-    </div>
+    </article>
   )
 }
 
 function StatusRow({
-  icon: Icon,
+  iconItemId,
   label,
   value,
 }: {
-  icon: ComponentType<{ className?: string }>
+  iconItemId: string
   label: string
   value: string
 }) {
   return (
     <div className="grid min-h-11 grid-cols-[minmax(0,1fr)_minmax(0,55%)] items-center gap-3 py-2">
       <div className="flex min-w-0 items-center gap-2">
-        <Icon className="h-4 w-4 shrink-0 text-game-charcoal-strong" />
+        <TaskIconDisplay
+          icon={{ type: 'item', id: iconItemId }}
+          className="h-5 w-5 shrink-0"
+        />
         <span className="truncate text-sm text-game-muted">{label}</span>
       </div>
-      <span className="min-w-0 break-words text-right font-mono text-sm font-bold leading-tight text-game-ink [overflow-wrap:anywhere]">
+      <span className="min-w-0 break-words text-right text-sm font-bold leading-tight text-game-ink [overflow-wrap:anywhere]">
         {value}
       </span>
     </div>
@@ -652,14 +382,32 @@ function getPlayCount(stat: PlayStat) {
 
 function getFavoriteMode(stats: ReturnType<typeof getPlayerStats>) {
   const modes = [
-    { label: 'Battles', plays: stats.totalBattles },
-    { label: 'Mini Games', plays: stats.totalGames },
-    { label: 'Field Research', plays: stats.totalFieldResearch },
-    { label: 'Wild encounters', plays: stats.totalLocations },
+    { label: 'Battles', plays: stats.totalBattles, iconItemId: 'vs-seeker' },
+    {
+      label: 'Mini Games',
+      plays: stats.totalGames,
+      iconItemId: 'rotom-catalogue',
+    },
+    {
+      label: 'Field Research',
+      plays: stats.totalFieldResearch,
+      iconItemId: 'eject-pack',
+    },
+    {
+      label: 'Wild encounters',
+      plays: stats.totalLocations,
+      iconItemId: 'poke-ball',
+    },
   ].sort((a, b) => b.plays - a.plays)
 
-  if (modes[0].plays <= 0) return 'No plays yet'
-  return `${modes[0].label} (${modes[0].plays})`
+  if (modes[0].plays <= 0) {
+    return { label: 'No plays yet', iconItemId: 'rotom-catalogue' }
+  }
+
+  return {
+    label: `${modes[0].label} (${modes[0].plays})`,
+    iconItemId: modes[0].iconItemId,
+  }
 }
 
 function getFavoriteContent(stats: ReturnType<typeof getPlayerStats>) {
@@ -708,9 +456,4 @@ function getCompletedTaskRuns(completedTasks: unknown) {
   return Object.values(
     completedTasks as Record<string, { count?: number }>,
   ).reduce((total, task) => total + (task?.count || 1), 0)
-}
-
-function getPercent(value: number, total: number) {
-  if (total <= 0) return 0
-  return Math.min(Math.round((value / total) * 100), 100)
 }

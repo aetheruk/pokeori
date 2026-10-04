@@ -251,7 +251,7 @@ export function BattleBetsGame({
               </Button>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border border-game-ochre/30 bg-game-ochre/10 px-3 py-2">
+            <div className="flex items-center justify-between rounded-md border border-game-ochre/30 bg-game-ochre/10 px-3 py-2">
               <span className="text-xs text-game-muted">Total return</span>
               <span className="font-mono font-semibold text-game-ochre">
                 {potentialPayout.toLocaleString()} Fun Tokens
@@ -316,7 +316,7 @@ function TeamCard({
   return (
     <section className="game-activity-panel p-3">
       <div className="flex items-center gap-2.5">
-        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-game-ochre/35 bg-game-night-canvas">
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border border-game-ochre/35 bg-game-night-canvas">
           <Image
             src={`/sprites/trainers/${team.trainerSpriteId}.avif`}
             alt={team.trainerName}
@@ -342,7 +342,7 @@ function TeamCard({
         {team.pokemon.map((pokemon, index) => (
           <article
             key={`${pokemon.formId}-${index}`}
-            className="flex min-w-0 items-center gap-1 rounded-lg border border-game-border/35 bg-game-night-surface px-1.5 py-1"
+            className="flex min-w-0 items-center gap-1 rounded-md border border-game-border/35 bg-game-night-surface px-1.5 py-1"
           >
             <PokemonRaritySprite
               formId={pokemon.formId}

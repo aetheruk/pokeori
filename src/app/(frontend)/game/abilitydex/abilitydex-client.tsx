@@ -424,7 +424,7 @@ function AbilityDexSummary({ entry }: { entry: AbilityDexEntry }) {
 
       {partnerEffects.length ? (
         <DexInspectorSection title="Partner effect">
-          <ul className="space-y-2 rounded-lg border border-game-moss/25 bg-game-moss/10 p-4">
+          <ul className="space-y-2 rounded-md border border-game-moss/25 bg-game-moss/10 p-4">
             {partnerEffects.map((effect) => (
               <li
                 key={effect.id}

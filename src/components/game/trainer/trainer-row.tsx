@@ -53,7 +53,7 @@ export function TrainerRow({
     return (
       <div
         className={cn(
-          'flex min-h-16 items-center gap-3 rounded-lg border border-game-border bg-game-surface px-3 py-2',
+          'flex min-h-16 items-center gap-3 rounded-md border border-game-border bg-game-surface px-3 py-2',
           className,
         )}
       >
@@ -69,7 +69,7 @@ export function TrainerRow({
       aria-label={`View ${trainer.trainerName}'s trainer profile`}
       onClick={onSelect}
       className={cn(
-        'game-focus-ring flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-border bg-game-surface px-3 py-2 text-left transition-colors hover:border-game-charcoal/40 hover:bg-game-surface-raised',
+        'game-focus-ring flex min-h-16 w-full items-center gap-3 rounded-md border border-game-border bg-game-surface px-3 py-2 text-left transition-colors hover:border-game-charcoal/40 hover:bg-game-surface-raised',
         className,
       )}
     >
