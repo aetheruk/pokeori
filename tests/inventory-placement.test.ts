@@ -4,6 +4,7 @@ import {
   getInventoryDisplayPlacement,
   INVENTORY_GROUP_LABELS,
   INVENTORY_GROUP_ORDER,
+  INVENTORY_SUBCATEGORY_LABELS,
   INVENTORY_SUBCATEGORY_ORDER,
   isCraftingMaterialItem,
 } from '@/data/items/types'
@@ -25,6 +26,9 @@ describe('inventory placement', () => {
       'training',
     ])
     expect(INVENTORY_GROUP_LABELS['key-items']).toBe('Key Items')
+    expect(INVENTORY_SUBCATEGORY_LABELS['capture-tools']).toBe('Balls')
+    expect(INVENTORY_SUBCATEGORY_LABELS['battle-kit']).toBe('Battle')
+    expect(INVENTORY_SUBCATEGORY_LABELS['encounter-tools']).toBe('Tools')
     expect(INVENTORY_SUBCATEGORY_ORDER.training).toEqual([
       'candies',
       'evolution-items',
@@ -34,6 +38,7 @@ describe('inventory placement', () => {
     ])
     expect(INVENTORY_SUBCATEGORY_ORDER.crafting).toContain('berries')
     expect(INVENTORY_SUBCATEGORY_ORDER['key-items']).toEqual([
+      'currency',
       'key-items',
       'badges',
       'books',

@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.43.65",
+  "version": "0.43.66",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -96,7 +96,7 @@
     "lucide-react": "1.42.0",
     "matter-js": "0.20.0",
     "motion": "13.2.0",
-    "next": "16.3.4",
+    "next": "16.3.8",
     "next-themes": "0.4.6",
     "payload": "3.88.0",
     "postcss": "8.5.28",
@@ -151,7 +151,10 @@
   "packageManager": "bun@1.4.2",
   "overrides": {
     "@radix-ui/react-dialog": "1.1.23",
-    "dompurify": "3.4.14",
-    "nanoid": "3.3.18"
+    "dompurify": "3.4.16",
+    "fast-uri": "3.1.8",
+    "nanoid": "3.3.18",
+    "undici@7": "7.30.0",
+    "undici@8": "8.11.2"
   }
 }

@@ -260,6 +260,7 @@ export type InventoryDisplaySubCategory =
   | 'powder'
   | 'binders'
   | 'booster-packs'
+  | 'currency'
   | 'key-items'
   | 'badges'
   | 'evolution-items'
@@ -280,9 +281,9 @@ export const INVENTORY_GROUP_LABELS: Record<InventoryDisplayGroup, string> = {
 }
 
 export const INVENTORY_SUBCATEGORY_LABELS: Record<InventoryDisplaySubCategory, string> = {
-  'capture-tools': 'Capture Tools',
-  'battle-kit': 'Battle & Recovery',
-  'encounter-tools': 'Lures & Escape',
+  'capture-tools': 'Balls',
+  'battle-kit': 'Battle',
+  'encounter-tools': 'Tools',
   candies: 'Candies',
   berries: 'Berries',
   materials: 'Materials',
@@ -291,6 +292,7 @@ export const INVENTORY_SUBCATEGORY_LABELS: Record<InventoryDisplaySubCategory, s
   powder: 'Powder',
   binders: 'Binders',
   'booster-packs': 'Booster Packs',
+  currency: 'Currency',
   'key-items': 'Key Items',
   badges: 'Badges',
   'evolution-items': 'Evolution',
@@ -318,7 +320,7 @@ export const INVENTORY_SUBCATEGORY_ORDER: Record<
   encounter: ['capture-tools', 'battle-kit', 'encounter-tools'],
   crafting: ['materials', 'dyes', 'gems', 'powder', 'berries'],
   tcg: ['binders', 'booster-packs'],
-  'key-items': ['key-items', 'badges', 'books', 'scratch-cards'],
+  'key-items': ['currency', 'key-items', 'badges', 'books', 'scratch-cards'],
   tms: ['tms'],
   training: [
     'candies',
