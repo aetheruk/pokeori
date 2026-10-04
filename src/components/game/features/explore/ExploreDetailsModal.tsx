@@ -39,14 +39,14 @@ function ExploreDetailSkeleton() {
       aria-label="Loading activity details"
       className="space-y-5"
     >
-      <div className="h-20 rounded-lg border border-game-border bg-game-surface-raised p-4">
+      <div className="h-20 rounded-md border border-game-border bg-game-surface-raised p-4">
         <div className="h-3 w-24 rounded bg-game-border/55" />
         <div className="mt-3 h-4 w-full rounded bg-game-border/55" />
         <div className="mt-2 h-4 w-4/5 rounded bg-game-border/55" />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="h-20 rounded-lg border border-game-border bg-game-surface-raised" />
-        <div className="h-20 rounded-lg border border-game-border bg-game-surface-raised" />
+        <div className="h-20 rounded-md border border-game-border bg-game-surface-raised" />
+        <div className="h-20 rounded-md border border-game-border bg-game-surface-raised" />
       </div>
       <div className="h-11 rounded-md bg-game-border/55" />
     </div>

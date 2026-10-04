@@ -339,7 +339,7 @@ export function MagnemiteCircuitGame({
 
         <div className="flex flex-1 items-center justify-center px-4 pb-6">
           <div
-            className="grid max-w-[92vw] rounded-lg border border-[#f1cf7a]/20 bg-[#081014]/55 p-3 shadow-2xl backdrop-blur"
+            className="grid max-w-[92vw] rounded-md border border-[#f1cf7a]/20 bg-[#081014]/55 p-3 shadow-2xl backdrop-blur"
             style={{
               gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
               gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,

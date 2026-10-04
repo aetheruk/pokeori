@@ -87,7 +87,7 @@ export function MoveMetrics({
       className={cn(
         inline
           ? 'flex flex-wrap items-baseline gap-x-3 gap-y-1'
-          : 'grid gap-px overflow-hidden rounded-lg border border-game-border bg-game-border',
+          : 'grid gap-px overflow-hidden rounded-md border border-game-border bg-game-border',
         !inline &&
           (compact
             ? 'grid-cols-2'
@@ -151,7 +151,7 @@ export function MoveDetailList({
         return (
           <li
             key={item.id}
-            className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-2.5 rounded-lg border border-game-border bg-game-surface-raised p-2.5"
+            className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-2.5 rounded-md border border-game-border bg-game-surface-raised p-2.5"
           >
             <span
               className={cn(
@@ -190,7 +190,7 @@ export function BattleContext({
 
   return (
     <section
-      className="flex flex-wrap gap-2 rounded-lg border border-game-ochre/40 bg-game-ochre/10 p-2.5 text-xs text-game-ink"
+      className="flex flex-wrap gap-2 rounded-md border border-game-ochre/40 bg-game-ochre/10 p-2.5 text-xs text-game-ink"
 
       aria-label="Current battle information"
     >

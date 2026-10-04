@@ -243,7 +243,7 @@ export function MoveLoadoutWorkspace({
                   <li
                     key={`move-slot-${index + 1}`}
                     className={cn(
-                      'flex min-h-12 items-center gap-2 rounded-lg border px-2.5 py-2',
+                      'flex min-h-12 items-center gap-2 rounded-md border px-2.5 py-2',
                       entry
                         ? 'border-game-moss/45 bg-game-moss/10'
                         : 'border-dashed border-game-border',

@@ -41,7 +41,7 @@ export function ScenicChoiceCard({
       aria-pressed={ariaPressed ?? selected}
       onClick={onClick}
       className={cn(
-        'game-focus-ring flex size-11 shrink-0 items-center justify-center rounded-lg border bg-game-surface-raised/50 p-0 text-game-charcoal backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
+        'game-focus-ring flex size-11 shrink-0 items-center justify-center rounded-md border bg-game-surface-raised/50 p-0 text-game-charcoal backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
         selected ? 'border-game-charcoal/45' : 'border-game-charcoal/15',
       )}
     >
@@ -105,7 +105,7 @@ export function ScenicChoiceCard({
   return (
     <div
       className={cn(
-        'relative flex min-h-24 w-full items-stretch overflow-hidden rounded-lg border text-left md:min-h-28',
+        'relative flex min-h-24 w-full items-stretch overflow-hidden rounded-md border text-left md:min-h-28',
         selected
           ? 'border-game-charcoal/65 ring-1 ring-game-charcoal/15'
           : 'border-game-card-border',

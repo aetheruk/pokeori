@@ -24,7 +24,7 @@ export function KidModeInfoDialog() {
         <button
           type="button"
           aria-label="Learn about Kid Mode"
-          className="game-focus-ring flex size-10 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised text-game-moss-strong transition-colors hover:border-game-moss/50 hover:bg-game-moss/10"
+          className="game-focus-ring flex size-10 shrink-0 items-center justify-center rounded-md border border-game-border bg-game-surface-raised text-game-moss-strong transition-colors hover:border-game-moss/50 hover:bg-game-moss/10"
         >
           <CircleHelp className="size-5" aria-hidden="true" />
         </button>
@@ -43,7 +43,7 @@ export function KidModeInfoDialog() {
           {kidModeFeatures.map((feature) => (
             <li
               key={feature}
-              className="rounded-lg border border-game-border bg-game-surface-raised p-3"
+              className="rounded-md border border-game-border bg-game-surface-raised p-3"
             >
               {feature}
             </li>

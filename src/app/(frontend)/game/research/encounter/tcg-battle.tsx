@@ -1818,7 +1818,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     return (
       <div className="game-activity-chrome relative grid h-[100dvh] place-items-center overflow-hidden bg-game-canvas p-6 text-game-ink">
         <ArenaBackdrop />
-        <div className="relative z-10 flex items-center gap-3 rounded-lg border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 py-3 shadow-2xl backdrop-blur-md">
+        <div className="relative z-10 flex items-center gap-3 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 py-3 shadow-2xl backdrop-blur-md">
           <Sparkles className="h-4 w-4 text-amber-200" />
           <div className="text-xs font-black uppercase text-[#f7ecd6]">
             Loading TCG battle
@@ -1836,7 +1836,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     return (
       <div className="game-activity-chrome relative grid h-[100dvh] place-items-center overflow-hidden bg-game-canvas p-6 text-game-ink">
         <ArenaBackdrop />
-        <div className="relative z-10 w-full max-w-md rounded-lg border border-[#d3ad63]/30 bg-[#172733]/90 p-6 text-center shadow-2xl backdrop-blur-md">
+        <div className="relative z-10 w-full max-w-md rounded-md border border-[#d3ad63]/30 bg-[#172733]/90 p-6 text-center shadow-2xl backdrop-blur-md">
           <Loader2 className="mx-auto h-9 w-9 animate-spin text-game-ochre" />
           <SectionDivider className="mx-auto mb-2 mt-5 max-w-xs">
             Your board is ready
@@ -1848,7 +1848,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             Their cards stay hidden until both collectors are ready.
           </p>
           {deadlineSeconds !== null && (
-            <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#f7ecd6]/15 bg-[#081014]/45 px-4 font-mono text-lg font-bold text-amber-200">
+            <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-[#f7ecd6]/15 bg-[#081014]/45 px-4 font-mono text-lg font-bold text-amber-200">
               <Clock3 className="h-4 w-4" />
               {formatMatchClock(deadlineSeconds)}
             </div>
@@ -1882,7 +1882,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         <main className="relative z-10 flex h-full flex-col">
           <header className="shrink-0 px-4 pt-[calc(env(safe-area-inset-top)+1.8rem)] text-center sm:pt-[calc(env(safe-area-inset-top)+2.6rem)]">
             {state.battleMode === 'pvp' && deadlineSeconds !== null && (
-              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-lg border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 font-mono text-sm font-bold text-amber-200">
+              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 font-mono text-sm font-bold text-amber-200">
                 <Clock3 className="h-4 w-4" />
                 {formatMatchClock(deadlineSeconds)}
                 <Button
@@ -1925,7 +1925,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                   transition={{ duration: 0.22, ease: 'easeOut' }}
                 >
                   <Button
-                    className="h-12 rounded-lg bg-game-clay px-8 text-xs font-black uppercase tracking-[0.18em] text-game-cream shadow-md hover:bg-game-clay/90"
+                    className="h-12 rounded-md bg-game-clay px-8 text-xs font-black uppercase tracking-[0.18em] text-game-cream shadow-md hover:bg-game-clay/90"
                     disabled={isBusy}
                     onClick={() =>
                       callAction(
@@ -1986,7 +1986,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           state.phase !== 'finished' &&
           (state.activeSide === 'opponent' ||
             state.pendingPromotion === 'opponent') && (
-            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-lg border border-[#f7ecd6]/15 bg-[#172733]/90 px-3 py-2 text-center text-[11px] font-black uppercase tracking-[0.12em] text-amber-200 shadow-lg backdrop-blur-md">
+            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/90 px-3 py-2 text-center text-[11px] font-black uppercase tracking-[0.12em] text-amber-200 shadow-lg backdrop-blur-md">
               {state.pendingPromotion === 'opponent'
                 ? 'Opponent is choosing a promotion'
                 : 'Opponent’s turn'}
@@ -2443,7 +2443,7 @@ function EvolutionEnergyBurst() {
       transition={{ duration: 0.35, ease: 'easeOut' }}
       className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.75rem)] z-[70] mx-auto flex w-[min(92vw,780px)] items-center justify-center"
     >
-      <div className="relative overflow-hidden rounded-lg border border-[#d3ad63]/40 bg-[#172733]/90 px-4 py-3 text-center backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-md border border-[#d3ad63]/40 bg-[#172733]/90 px-4 py-3 text-center backdrop-blur-md">
         <div className="pointer-events-none absolute inset-0 animate-[tcg-energy-sweep_900ms_ease-out] bg-[linear-gradient(to_right,transparent,rgba(211,173,99,0.18),transparent)]" />
         <p className="relative text-xs font-black uppercase tracking-[0.18em] text-[#f1cf7a] sm:text-sm">
           A burst of Evolution Energy sweeps across the battlefield
@@ -2471,7 +2471,7 @@ function EnergyCardActivationBurst({ state }: { state: TcgBattleState }) {
       transition={{ duration: 0.35, ease: 'easeOut' }}
       className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+6.75rem)] z-[70] mx-auto flex w-[min(92vw,860px)] items-center justify-center"
     >
-      <div className="relative overflow-hidden rounded-lg border border-[#b8c894]/40 bg-[#172733]/90 px-4 py-3 text-center backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-md border border-[#b8c894]/40 bg-[#172733]/90 px-4 py-3 text-center backdrop-blur-md">
         <div className="pointer-events-none absolute inset-0 animate-[tcg-energy-sweep_900ms_ease-out] bg-[linear-gradient(to_right,transparent,rgba(184,200,148,0.16),transparent)]" />
         <p className="relative text-[11px] font-black uppercase tracking-[0.12em] text-[#c9d8a7] sm:text-xs">
           {detail}
@@ -2687,7 +2687,7 @@ function AttackChoiceDrawer({
             key={card.instanceId}
             onClick={() => onChange(card.instanceId)}
             className={cn(
-              'game-focus-ring min-h-11 rounded-lg border bg-game-night-surface px-3 py-2 text-left text-game-night-ink transition-colors',
+              'game-focus-ring min-h-11 rounded-md border bg-game-night-surface px-3 py-2 text-left text-game-night-ink transition-colors',
               value === card.instanceId
                 ? 'border-game-moss bg-game-moss/25'
                 : 'border-game-night-border/60 hover:border-game-moss/60',
@@ -2715,7 +2715,7 @@ function AttackChoiceDrawer({
           key={type}
           onClick={() => onChange(type)}
           className={cn(
-            'game-focus-ring min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors',
+            'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold transition-colors',
             TYPE_BADGE_CLASSES[type],
             value === type
               ? 'ring-2 ring-game-moss'
@@ -2795,7 +2795,7 @@ function AttackChoiceDrawer({
                         setFollowUpAttackIndex(null)
                       }}
                       className={cn(
-                        'game-focus-ring min-h-11 rounded-lg border px-3 py-2 text-left transition-colors',
+                        'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left transition-colors',
                         selectedAttackIndex === index
                           ? 'border-game-moss bg-game-moss/25'
                           : 'border-game-night-border bg-game-night-canvas/50 hover:border-game-moss/60',
@@ -2835,7 +2835,7 @@ function AttackChoiceDrawer({
                           : setSelectedAttackIndex(index)
                       }
                       className={cn(
-                        'game-focus-ring min-h-11 rounded-lg border px-3 py-2 text-left transition-colors',
+                        'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left transition-colors',
                         selectedIndex === index
                           ? 'border-game-moss bg-game-moss/25'
                           : 'border-game-night-border bg-game-night-canvas/50 hover:border-game-moss/60',
@@ -2862,7 +2862,7 @@ function AttackChoiceDrawer({
                     key={amount}
                     onClick={() => setEnergyAmount(amount)}
                     className={cn(
-                      'game-focus-ring min-h-11 rounded-lg border font-mono text-sm',
+                      'game-focus-ring min-h-11 rounded-md border font-mono text-sm',
                       energyAmount === amount
                         ? 'border-game-moss bg-game-moss/25 text-game-night-ink'
                         : 'border-game-night-border bg-game-night-canvas/50 text-game-night-muted',
@@ -2991,7 +2991,7 @@ function InlineAttackButtons({
             type="button"
             key={`${attack.name}-${index}`}
             className={cn(
-              'game-focus-ring group flex min-h-11 min-w-0 flex-1 basis-[10rem] items-center justify-between gap-2 rounded-lg border border-[#b8c894]/30 bg-[#172733]/80 px-3 py-2 text-left backdrop-blur-md transition-colors hover:border-[#c9d8a7]/70 hover:bg-[#405d3d]/35',
+              'game-focus-ring group flex min-h-11 min-w-0 flex-1 basis-[10rem] items-center justify-between gap-2 rounded-md border border-[#b8c894]/30 bg-[#172733]/80 px-3 py-2 text-left backdrop-blur-md transition-colors hover:border-[#c9d8a7]/70 hover:bg-[#405d3d]/35',
               disabled &&
                 'cursor-default border-[#f7ecd6]/10 bg-[#172733]/55 opacity-40 hover:border-[#f7ecd6]/10 hover:bg-[#172733]/55',
             )}
@@ -3093,7 +3093,7 @@ function BattleCommandControls({
               {claimError}
             </p>
             <Button
-              className="mt-4 h-11 rounded-lg bg-game-clay px-5 text-sm font-bold text-game-cream hover:bg-game-clay/90"
+              className="mt-4 h-11 rounded-md bg-game-clay px-5 text-sm font-bold text-game-cream hover:bg-game-clay/90"
               disabled={isPending}
               onClick={onClaim}
             >
@@ -3291,7 +3291,7 @@ function CoinFlipOverlay({ cue }: { cue: CoinCue }) {
             )
           })}
           {cue.results.length > 6 && (
-            <div className="flex h-20 min-w-20 items-center justify-center rounded-lg border border-game-night-border bg-game-night-surface px-3 font-mono text-sm font-bold text-game-night-ink sm:h-24">
+            <div className="flex h-20 min-w-20 items-center justify-center rounded-md border border-game-night-border bg-game-night-surface px-3 font-mono text-sm font-bold text-game-night-ink sm:h-24">
               +{cue.results.length - 6}
             </div>
           )}
@@ -3334,7 +3334,7 @@ function BattleHeader({
           : 'Opponent turn'
 
   return (
-    <header className="relative overflow-hidden rounded-lg border border-[#f7ecd6]/15 bg-[#172733]/82 px-3 py-2 shadow-2xl backdrop-blur-md">
+    <header className="relative overflow-hidden rounded-md border border-[#f7ecd6]/15 bg-[#172733]/82 px-3 py-2 shadow-2xl backdrop-blur-md">
       <div className="grid grid-cols-[1fr_auto] items-center gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -3448,7 +3448,7 @@ function SetupRevealSlot({
         }}
       >
         <div
-          className="absolute inset-0 overflow-hidden rounded-lg border border-[#f7ecd6]/15 bg-[#162147] shadow-[0_22px_48px_rgba(0,0,0,0.55)]"
+          className="absolute inset-0 overflow-hidden rounded-md border border-[#f7ecd6]/15 bg-[#162147] shadow-[0_22px_48px_rgba(0,0,0,0.55)]"
           style={{ backfaceVisibility: 'hidden' }}
         >
           <Image
@@ -3472,7 +3472,7 @@ function SetupRevealSlot({
         </div>
 
         <div
-          className="absolute inset-0 overflow-hidden rounded-lg border border-[#d3ad63]/55 bg-[#0d1820] shadow-[0_24px_54px_rgba(0,0,0,0.58)]"
+          className="absolute inset-0 overflow-hidden rounded-md border border-[#d3ad63]/55 bg-[#0d1820] shadow-[0_24px_54px_rgba(0,0,0,0.58)]"
           style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
         >
           {card ? (
@@ -3516,7 +3516,7 @@ function SetupHandCard({
       type="button"
       layout
       className={cn(
-        'tcg-motion group relative aspect-[240/330] w-[calc((100vw-4.5rem)/3.5)] max-w-[9rem] shrink-0 snap-center overflow-hidden rounded-lg border bg-[#0d1820] p-0 transition duration-200 active:scale-[0.97] sm:w-[clamp(7.5rem,15vw,9.5rem)]',
+        'tcg-motion group relative aspect-[240/330] w-[calc((100vw-4.5rem)/3.5)] max-w-[9rem] shrink-0 snap-center overflow-hidden rounded-md border bg-[#0d1820] p-0 transition duration-200 active:scale-[0.97] sm:w-[clamp(7.5rem,15vw,9.5rem)]',
         selected
           ? 'border-[#d3ad63] shadow-[0_0_0_3px_rgba(211,173,99,0.18)]'
           : 'border-[#f7ecd6]/15 shadow-[0_12px_28px_rgba(0,0,0,0.42)] hover:border-[#d3ad63]/55',
@@ -3951,7 +3951,7 @@ function BenchSheet({
         <div className="mx-auto grid max-w-5xl grid-cols-3 place-items-center gap-2">
           {state.player.back.length === 0 ? (
             <div
-              className="col-span-3 flex h-32 w-full items-center justify-center rounded-lg border border-dashed border-game-night-border bg-game-night-surface-raised text-sm font-bold text-game-night-muted"
+              className="col-span-3 flex h-32 w-full items-center justify-center rounded-md border border-dashed border-game-night-border bg-game-night-surface-raised text-sm font-bold text-game-night-muted"
               role="status"
               aria-live="polite"
             >
@@ -4124,7 +4124,7 @@ function CardImageButton({
       )}
       <div
         className={cn(
-          'relative h-full w-full overflow-hidden rounded-lg shadow-[0_18px_38px_rgba(0,0,0,0.5)]',
+          'relative h-full w-full overflow-hidden rounded-md shadow-[0_18px_38px_rgba(0,0,0,0.5)]',
           side === 'opponent' && 'rotate-180',
         )}
       >

@@ -328,7 +328,7 @@ export function TrainerDashboard({
                   aria-pressed={deckFormat === format}
                   onClick={() => setDeckFormat(format)}
                   className={cn(
-                    'game-focus-ring h-10 rounded-lg border text-xs font-bold capitalize transition-colors',
+                    'game-focus-ring h-10 rounded-md border text-xs font-bold capitalize transition-colors',
                     deckFormat === format
                       ? 'border-game-charcoal/45 bg-game-charcoal/8 text-game-charcoal-strong'
                       : 'border-game-border bg-game-surface text-game-muted',

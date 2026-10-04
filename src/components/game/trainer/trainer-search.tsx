@@ -50,7 +50,7 @@ export function TrainerSearch() {
       <div className="relative z-10 mx-auto min-h-0 w-full max-w-3xl flex-1 space-y-6 overflow-y-auto px-4 py-5 md:px-6">
         <div className="space-y-3">
           <form onSubmit={handleSearch} className="relative">
-            <div className="flex gap-2 rounded-lg border border-game-border bg-game-surface p-1.5 focus-within:border-game-moss/35">
+            <div className="flex gap-2 rounded-md border border-game-border bg-game-surface p-1.5 focus-within:border-game-moss/35">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-game-muted transition-colors group-focus-within:text-game-moss" />
                 <Input
@@ -83,8 +83,8 @@ export function TrainerSearch() {
           <div
             className={
               error === 'No trainers found.'
-                ? 'mx-auto flex max-w-xl flex-col items-center gap-3 rounded-lg border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center'
-                : 'flex flex-col items-center gap-3 rounded-lg border border-game-danger/25 bg-game-danger/5 py-10'
+                ? 'mx-auto flex max-w-xl flex-col items-center gap-3 rounded-md border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center'
+                : 'flex flex-col items-center gap-3 rounded-md border border-game-danger/25 bg-game-danger/5 py-10'
             }
             role={error === 'No trainers found.' ? 'status' : 'alert'}
             aria-live={error === 'No trainers found.' ? 'polite' : 'assertive'}
@@ -121,7 +121,9 @@ export function TrainerSearch() {
           <div className="space-y-4 animate-in fade-in duration-300">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-game-moss-strong" />
-              <SectionDivider>Results Found ({results.length})</SectionDivider>
+              <SectionDivider variant="chip">
+                Results Found ({results.length})
+              </SectionDivider>
             </div>
             <div className="grid gap-3">
               {results.map((trainer) => (

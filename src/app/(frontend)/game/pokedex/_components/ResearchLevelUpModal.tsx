@@ -108,7 +108,7 @@ export function ResearchLevelUpModal({
                 Reward Unlocked
               </SectionDivider>
 
-              <div className="rounded-lg border border-game-border bg-game-surface-raised p-5 text-center">
+              <div className="rounded-md border border-game-border bg-game-surface-raised p-5 text-center">
                 <p className="text-lg font-semibold leading-snug text-game-ochre">
                   {rewardDescription}
                 </p>

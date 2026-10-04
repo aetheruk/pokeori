@@ -1530,7 +1530,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             cols={gridSize.w}
             rows={gridSize.h}
             ariaLabel="Rock Push puzzle board"
-            className="relative isolate overflow-hidden rounded-lg bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
+            className="relative isolate overflow-hidden rounded-md bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
           >
             {grid.map((row, y) =>
               row.map((cell, x) => {

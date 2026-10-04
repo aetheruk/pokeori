@@ -22,7 +22,7 @@ export function TrainerGuilds() {
 
   return (
     <div className="space-y-4">
-      <SectionDivider>Guilds</SectionDivider>
+      <SectionDivider variant="chip">Guilds</SectionDivider>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {joined.map((guild) => {
           const progress = userGuilds[guild.id]!
@@ -30,7 +30,7 @@ export function TrainerGuilds() {
             <button
               key={guild.id}
               type="button"
-              className="game-focus-ring flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-card-border bg-game-surface p-3 text-left transition-colors hover:border-game-charcoal/35 hover:bg-game-surface-raised"
+              className="game-focus-ring flex min-h-16 w-full items-center gap-3 rounded-md border border-game-card-border bg-game-surface p-3 text-left transition-colors hover:border-game-charcoal/35 hover:bg-game-surface-raised"
               onClick={() => setSelectedGuildId(guild.id)}
               aria-label={`View ${guild.name} details`}
             >

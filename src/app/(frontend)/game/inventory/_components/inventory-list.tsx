@@ -838,7 +838,7 @@ export function InventoryList() {
             <SectionDivider
               className="mb-6"
               textColor="text-game-moss-strong"
-              textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+              variant="chip"
             >
               Wallet
             </SectionDivider>
@@ -861,14 +861,14 @@ export function InventoryList() {
         <SectionDivider
           className="mb-6"
           textColor="text-game-moss-strong"
-          textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+          variant="chip"
         >
           {searchQuery.trim() ? 'Search Results' : activeDisplayLabel}
         </SectionDivider>
 
         {filteredInventory.length === 0 ? (
           <div
-            className="mx-auto max-w-xl rounded-lg border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"
+            className="mx-auto max-w-xl rounded-md border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"
             role="status"
             aria-live="polite"
           >
@@ -1211,7 +1211,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
             variant="ghost"
             size="icon"
             data-haptic-manual="true"
-            className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
+            className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
             onClick={() =>
               isCrafting ? onAction(item.details) : onClick(item.details)
             }
@@ -1240,7 +1240,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
               size="icon"
               data-haptic-manual="true"
               disabled={disabledAction}
-              className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
+              className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
               onClick={(event) => {
                 event.stopPropagation()
                 onBulkAction(item.details)

@@ -789,7 +789,7 @@ export function BattleLog({ logs }: BattleLogProps) {
           <button
             type="button"
             onClick={() => setShowAllTurns(true)}
-            className="game-focus-ring w-full rounded-lg border border-game-border bg-game-surface py-2 text-xs font-semibold text-game-muted transition-colors hover:border-game-moss/50 hover:text-game-ink"
+            className="game-focus-ring w-full rounded-md border border-game-border bg-game-surface py-2 text-xs font-semibold text-game-muted transition-colors hover:border-game-moss/50 hover:text-game-ink"
           >
             Show {hiddenTurnCount} older turn
             {hiddenTurnCount === 1 ? '' : 's'}
@@ -800,7 +800,7 @@ export function BattleLog({ logs }: BattleLogProps) {
           <button
             type="button"
             onClick={() => setShowAllTurns(false)}
-            className="game-focus-ring w-full rounded-lg border border-game-border bg-game-surface py-2 text-xs font-semibold text-game-muted transition-colors hover:border-game-moss/50 hover:text-game-ink"
+            className="game-focus-ring w-full rounded-md border border-game-border bg-game-surface py-2 text-xs font-semibold text-game-muted transition-colors hover:border-game-moss/50 hover:text-game-ink"
           >
             Show latest turns only
           </button>

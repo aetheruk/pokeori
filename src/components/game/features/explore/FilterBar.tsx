@@ -23,7 +23,7 @@ export function FilterBar({
           type="button"
           data-haptic="selection"
           onClick={onOpenRegionModal}
-          className="game-focus-ring flex h-12 min-w-0 items-center rounded-lg border border-game-border bg-game-surface px-3 text-left text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40"
+          className="game-focus-ring flex h-12 min-w-0 items-center rounded-md border border-game-border bg-game-surface px-3 text-left text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40"
         >
           <span className="min-w-0 flex-1 truncate">
             {isDailies ? 'Choose region' : activeCategory}
@@ -33,7 +33,7 @@ export function FilterBar({
           type="button"
           data-haptic="selection"
           onClick={onOpenAreaModal}
-          className="game-focus-ring flex h-12 min-w-0 items-center rounded-lg border border-game-border bg-game-surface px-3 text-left text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40 disabled:opacity-50"
+          className="game-focus-ring flex h-12 min-w-0 items-center rounded-md border border-game-border bg-game-surface px-3 text-left text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40 disabled:opacity-50"
           disabled={isDailies}
         >
           <span className="min-w-0 flex-1 truncate">

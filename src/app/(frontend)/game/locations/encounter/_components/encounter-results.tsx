@@ -126,7 +126,7 @@ export function EncounterResults({
     encounter.pokemonId.toString()
 
   const expeditionUpdateContent = expeditionProgress ? (
-    <div className="flex items-start gap-3 rounded-lg border border-game-border bg-game-surface p-4 text-left shadow-sm">
+    <div className="flex items-start gap-3 rounded-md border border-game-border bg-game-surface p-4 text-left shadow-sm">
       <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
         <MapIcon className="h-6 w-6" aria-hidden="true" />
       </div>
@@ -168,7 +168,7 @@ export function EncounterResults({
     captureResult.messages && captureResult.messages.length > 0 ? (
       <div>
         <SectionDivider>Capture Notes</SectionDivider>
-        <div className="flex items-start gap-3 rounded-lg border border-game-border bg-game-surface-raised p-4 shadow-sm">
+        <div className="flex items-start gap-3 rounded-md border border-game-border bg-game-surface-raised p-4 shadow-sm">
           <div className="game-icon-orb game-icon-orb-catch h-12 w-12 shrink-0 border-game-danger/55">
             <TaskIconDisplay
               icon={{ type: 'pokemon', id: capturePokemonFormId }}

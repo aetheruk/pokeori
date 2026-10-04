@@ -67,7 +67,7 @@ export function RarityPreviewLab() {
           </span>
         </div>
 
-        <div className="mb-5 grid gap-3 rounded-lg border border-game-border bg-game-surface-raised p-3 sm:grid-cols-2 sm:p-4 lg:max-w-3xl">
+        <div className="mb-5 grid gap-3 rounded-md border border-game-border bg-game-surface-raised p-3 sm:grid-cols-2 sm:p-4 lg:max-w-3xl">
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-game-muted">
               Pokemon
@@ -127,7 +127,7 @@ export function RarityPreviewLab() {
               <div className="grid grid-cols-3 divide-x divide-game-border">
                 {spriteViews.map((sprite) => (
                   <figure key={sprite.view} className="min-w-0 space-y-2 p-2 text-center sm:p-3">
-                    <div className="flex aspect-square items-center justify-center rounded-lg border border-game-night-border bg-game-night-canvas/95 p-2 shadow-inner">
+                    <div className="flex aspect-square items-center justify-center rounded-md border border-game-night-border bg-game-night-canvas/95 p-2 shadow-inner">
                       <PokemonRaritySprite
                         formId={preview.formId}
                         view={sprite.view}

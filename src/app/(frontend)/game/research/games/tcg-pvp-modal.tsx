@@ -180,7 +180,7 @@ export function TcgPvpModal({
           <div className="grid gap-3 py-3 sm:grid-cols-2">
             <Button
               type="button"
-              className="game-focus-ring h-20 justify-start rounded-lg bg-game-clay px-4 text-left text-game-cream hover:bg-game-clay/90 sm:col-span-2"
+              className="game-focus-ring h-20 justify-start rounded-md bg-game-clay px-4 text-left text-game-cream hover:bg-game-clay/90 sm:col-span-2"
               disabled={loading}
               onClick={() => void joinQueue()}
             >
@@ -195,7 +195,7 @@ export function TcgPvpModal({
             <Button
               type="button"
               variant="outline"
-              className="game-focus-ring h-20 justify-start rounded-lg border-game-moss/45 bg-game-moss/10 px-4 text-left text-game-ink hover:bg-game-moss/15"
+              className="game-focus-ring h-20 justify-start rounded-md border-game-moss/45 bg-game-moss/10 px-4 text-left text-game-ink hover:bg-game-moss/15"
               disabled={loading}
               onClick={() => void createLobby()}
             >
@@ -210,7 +210,7 @@ export function TcgPvpModal({
             <Button
               type="button"
               variant="outline"
-              className="game-focus-ring h-20 justify-start rounded-lg border-game-border bg-game-surface-raised px-4 text-left text-game-ink hover:border-game-clay/45 hover:bg-game-clay/10"
+              className="game-focus-ring h-20 justify-start rounded-md border-game-border bg-game-surface-raised px-4 text-left text-game-ink hover:border-game-clay/45 hover:bg-game-clay/10"
               disabled={loading}
               onClick={() => setMode('join')}
             >

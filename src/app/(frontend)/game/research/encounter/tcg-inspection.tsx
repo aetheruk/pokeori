@@ -226,7 +226,7 @@ export function TcgInspectionGame({
   if (error) {
     return (
       <div className="flex min-h-dvh items-center justify-center game-night bg-game-night-canvas p-4 text-game-night-ink">
-        <div className="w-full max-w-sm rounded-lg border border-game-clay/40 bg-game-surface p-4 text-center text-game-ink shadow-sm">
+        <div className="w-full max-w-sm rounded-md border border-game-clay/40 bg-game-surface p-4 text-center text-game-ink shadow-sm">
           <p className="mb-4 text-sm">{error}</p>
           <Button onClick={() => router.push('/game/explore')}>Return</Button>
         </div>
@@ -282,7 +282,7 @@ export function TcgInspectionGame({
           {phase === 'study' && (
             <div className="relative z-10 flex flex-col items-center justify-center gap-3 px-6 text-center text-game-night-ink">
               <Eye className="h-12 w-12 text-game-ochre drop-shadow-lg" />
-              <div className="rounded-lg border border-game-night-border bg-game-night-surface/75 px-5 py-3 backdrop-blur">
+              <div className="rounded-md border border-game-night-border bg-game-night-surface/75 px-5 py-3 backdrop-blur">
                 <p className="font-serif text-xl font-bold">Study the cards</p>
                 <p className="mt-1 text-sm text-game-night-muted">
                   Review each card, then press Ready when you are prepared.
@@ -409,7 +409,7 @@ export function TcgInspectionGame({
                       scale: 0.96,
                     }}
                     transition={{ duration: 0.22, ease: 'easeOut' }}
-                    className="relative aspect-[2.5/3.5] h-[38dvh] max-h-[440px] min-h-[260px] overflow-hidden rounded-lg border border-game-border bg-game-night-surface shadow-xl"
+                    className="relative aspect-[2.5/3.5] h-[38dvh] max-h-[440px] min-h-[260px] overflow-hidden rounded-md border border-game-border bg-game-night-surface shadow-xl"
                   >
                     <Image
                       src={currentCard.images.large || currentCard.images.small}

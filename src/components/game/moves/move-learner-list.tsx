@@ -81,7 +81,7 @@ export function MoveLearnerList({
             aria-pressed={caughtOnly}
             onClick={() => setCaughtOnly((current) => !current)}
             className={cn(
-              'game-focus-ring min-h-11 rounded-lg border px-3 text-xs font-bold transition-colors',
+              'game-focus-ring min-h-11 rounded-md border px-3 text-xs font-bold transition-colors',
               caughtOnly
                 ? 'border-game-moss/50 bg-game-moss/10 text-game-moss-strong'
                 : 'border-game-border bg-game-surface-raised text-game-muted hover:border-game-moss/35',
@@ -92,7 +92,7 @@ export function MoveLearnerList({
         </div>
       )}
 
-      <div className="max-h-[min(23rem,45dvh)] overflow-y-auto rounded-lg border border-game-border bg-game-surface p-2 custom-scrollbar">
+      <div className="max-h-[min(23rem,45dvh)] overflow-y-auto rounded-md border border-game-border bg-game-surface p-2 custom-scrollbar">
         {visibleLearners.length === 0 ? (
           <p className="px-3 py-8 text-center text-sm text-game-muted">
             No compatible Pokémon match these filters.
@@ -109,7 +109,7 @@ export function MoveLearnerList({
                 <div
                   key={`${learner.speciesId}-${learner.form.id}`}
                   className={cn(
-                    'flex min-w-0 items-center gap-2 rounded-lg border bg-game-surface-raised p-2',
+                    'flex min-w-0 items-center gap-2 rounded-md border bg-game-surface-raised p-2',
                     caught ? 'border-game-moss/40' : 'border-game-border',
                   )}
                 >

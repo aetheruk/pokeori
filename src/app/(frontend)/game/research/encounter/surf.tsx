@@ -371,7 +371,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
               <GameTimer timeLeft={timeLeft} totalTime={settings.timeLimit} />
             ) : null}
           </div>
-          <div className="rounded-lg border border-game-border/70 bg-game-surface/90 px-4 py-2 text-center text-game-ink shadow-lg backdrop-blur-md">
+          <div className="rounded-md border border-game-border/70 bg-game-surface/90 px-4 py-2 text-center text-game-ink shadow-lg backdrop-blur-md">
             <p className="text-[10px] font-semibold text-game-muted">
               Distance
             </p>
@@ -403,7 +403,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
               className="text-[#fff8e8] drop-shadow-xl"
               colorOverride="text-[#f0cc75]"
             />
-            <p className="mt-5 rounded-lg border border-[#fff8e8]/25 bg-[#102f3a]/75 px-4 py-2 text-center text-sm font-semibold text-[#fff8e8] shadow-lg">
+            <p className="mt-5 rounded-md border border-[#fff8e8]/25 bg-[#102f3a]/75 px-4 py-2 text-center text-sm font-semibold text-[#fff8e8] shadow-lg">
               Drag side to side to steer
             </p>
           </div>

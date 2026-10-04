@@ -84,7 +84,7 @@ export function NotificationSettings() {
   }
 
   return (
-    <section aria-label="Notifications" className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
+    <section aria-label="Notifications" className="space-y-3 rounded-md border border-game-border bg-game-surface p-4">
       <h3 className="flex items-center gap-2 text-sm font-semibold"><Bell className="h-4 w-4" aria-hidden="true" />Notifications</h3>
       <p className="text-sm text-game-muted">This device only.</p>
       {([

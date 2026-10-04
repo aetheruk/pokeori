@@ -28,7 +28,7 @@ import { ActivityEditor } from './activity-editor'
 import { RANDOM_POKEMON_RARITIES } from '@/utilities/pokemon/rarity-chances'
 
 const field =
-  'game-focus-ring min-h-11 w-full rounded-lg border border-game-border bg-game-canvas px-3 py-2 text-sm'
+  'game-focus-ring min-h-11 w-full rounded-md border border-game-border bg-game-canvas px-3 py-2 text-sm'
 const kinds: EventKind[] = [
   'battle',
   'location',
@@ -268,7 +268,7 @@ export function EventStudio({
               .map((event) => (
                 <article
                   key={event.id}
-                  className="rounded-lg border border-game-border bg-game-surface p-4"
+                  className="rounded-md border border-game-border bg-game-surface p-4"
                 >
                   <h3 className="font-semibold">{event.title}</h3>
                   <p className="text-sm text-game-muted">
@@ -393,7 +393,7 @@ export function EventStudio({
                         key={value}
                         aria-pressed={kind === value}
                         onClick={() => setKind(value)}
-                        className={`game-focus-ring flex min-h-20 items-center gap-3 rounded-lg border p-3 text-left ${kind === value ? 'border-game-moss bg-game-surface' : 'border-game-border bg-game-canvas'}`}
+                        className={`game-focus-ring flex min-h-20 items-center gap-3 rounded-md border p-3 text-left ${kind === value ? 'border-game-moss bg-game-surface' : 'border-game-border bg-game-canvas'}`}
                       >
                         <Icon className="h-6 w-6 shrink-0" />
                         <span>
@@ -473,7 +473,7 @@ export function EventStudio({
                   <details
                     key={index}
                     open
-                    className="rounded-lg border border-game-border bg-game-surface p-3"
+                    className="rounded-md border border-game-border bg-game-surface p-3"
                   >
                     <summary className="cursor-pointer py-2 font-semibold">
                       {labels[entry.kind]}:{' '}
@@ -595,7 +595,7 @@ export function EventStudio({
                   </select>
                 </label>
                 {draft.timingMode === 'manual' ? (
-                  <div className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
+                  <div className="space-y-3 rounded-md border border-game-border bg-game-surface p-4">
                     <h3 className="font-semibold">
                       Available until you switch it off
                     </h3>
@@ -737,7 +737,7 @@ export function EventStudio({
               </>
             )}
             {tab === 'Review' && (
-              <article className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
+              <article className="space-y-3 rounded-md border border-game-border bg-game-surface p-4">
                 <Button
                   variant="outline"
                   disabled={busy}
@@ -952,7 +952,7 @@ function RarityPreview({
     setResult(null)
   }, [config, index])
   return (
-    <details className="my-3 rounded-lg border border-game-border p-3">
+    <details className="my-3 rounded-md border border-game-border p-3">
       <summary className="cursor-pointer py-2 font-semibold">
         Rarity preview for my trainer
       </summary>
@@ -1069,7 +1069,7 @@ function ModifierEditor({
         }
       : schemaAt(modifier.field)
   return (
-    <fieldset className="space-y-3 rounded-lg border border-game-border p-3">
+    <fieldset className="space-y-3 rounded-md border border-game-border p-3">
       <legend className="font-semibold">
         {studio?.catalog[modifier.kind]?.find(
           (entry: any) => entry.id === modifier.targetId,

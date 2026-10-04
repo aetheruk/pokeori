@@ -101,7 +101,7 @@ export function GameNavigation() {
                 onClick={playSelectSfx}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
-                  'game-focus-ring relative flex h-11 items-center justify-center gap-3 overflow-hidden rounded-lg border px-3 text-sm font-medium transition-colors lg:justify-start',
+                  'game-focus-ring relative flex h-11 items-center justify-center gap-3 overflow-hidden rounded-md border px-3 text-sm font-medium transition-colors lg:justify-start',
                   isActive
                     ? 'border-game-charcoal/35 bg-game-surface-raised text-game-charcoal-strong shadow-[0_4px_12px_rgb(75_62_39_/_0.08)] before:absolute before:bottom-2 before:left-0 before:top-2 before:w-1 before:rounded-r-sm before:bg-game-charcoal'
                     : 'border-transparent text-game-muted hover:bg-game-surface hover:text-game-ink',
@@ -131,7 +131,7 @@ export function GameNavigation() {
           <Link
             href="/game"
             prefetch={true}
-            className="game-focus-ring relative flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface lg:justify-start"
+            className="game-focus-ring relative flex items-center justify-center gap-3 overflow-hidden rounded-md px-2 py-2 transition-colors hover:bg-game-surface lg:justify-start"
           >
             <div className="game-icon-orb relative h-8 w-8 shrink-0 overflow-hidden border-game-charcoal/30">
               {user ? (

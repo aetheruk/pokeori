@@ -304,7 +304,7 @@ export function UseItemDialog({
             </div>
           ) : selectedItemForStat ? (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 rounded-lg border border-game-ochre/25 bg-game-ochre/10 p-3">
+              <div className="flex items-center gap-3 rounded-md border border-game-ochre/25 bg-game-ochre/10 p-3">
                 <ItemSprite
                   itemId={selectedItemForStat.itemId}
                   alt={selectedItemForStat.definition.name}
@@ -343,7 +343,7 @@ export function UseItemDialog({
             </div>
           ) : selectedFusionItem ? (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 rounded-lg border border-game-ochre/25 bg-game-ochre/10 p-3">
+              <div className="flex items-center gap-3 rounded-md border border-game-ochre/25 bg-game-ochre/10 p-3">
                 <ItemSprite
                   itemId={selectedFusionItem.itemId}
                   alt={selectedFusionItem.definition.name}
@@ -367,7 +367,7 @@ export function UseItemDialog({
                 </div>
               ) : fusionPartnerOptions.length === 0 ? (
                 <div
-                  className="rounded-lg border border-dashed border-game-border bg-game-canvas py-8 text-center text-sm text-game-muted"
+                  className="rounded-md border border-dashed border-game-border bg-game-canvas py-8 text-center text-sm text-game-muted"
                   role="status"
                   aria-live="polite"
                 >
@@ -381,7 +381,7 @@ export function UseItemDialog({
                       <Button
                         key={partner.id}
                         variant="outline"
-                        className="flex min-h-[68px] w-full items-center justify-between gap-3 whitespace-normal rounded-lg border-game-border bg-game-surface-raised p-3 text-left text-game-ink hover:border-game-moss/45 hover:bg-game-moss/5"
+                        className="flex min-h-[68px] w-full items-center justify-between gap-3 whitespace-normal rounded-md border-game-border bg-game-surface-raised p-3 text-left text-game-ink hover:border-game-moss/45 hover:bg-game-moss/5"
                         onClick={() =>
                           handleUseItem(
                             selectedFusionItem.itemId,
@@ -427,7 +427,7 @@ export function UseItemDialog({
             </div>
           ) : items.length === 0 ? (
             <div
-              className="rounded-lg border border-dashed border-game-border bg-game-canvas py-10 text-center text-game-muted"
+              className="rounded-md border border-dashed border-game-border bg-game-canvas py-10 text-center text-game-muted"
               role="status"
               aria-live="polite"
             >

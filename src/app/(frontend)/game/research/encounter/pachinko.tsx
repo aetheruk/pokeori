@@ -91,10 +91,10 @@ function PrizesModal({ buckets }: { buckets: any[] }) {
           {buckets.map((bucket) => (
             <div
               key={bucket.id}
-              className="flex items-center gap-3 rounded-lg border border-game-border bg-game-surface-raised p-3"
+              className="flex items-center gap-3 rounded-md border border-game-border bg-game-surface-raised p-3"
             >
               <div
-                className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border-b-2 bg-game-canvas"
+                className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border-b-2 bg-game-canvas"
                 style={{ borderColor: bucket.color || '#14b8a6' }}
               >
                 {bucket.icon && <TaskIconDisplay icon={bucket.icon as any} />}
@@ -604,7 +604,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
       {/* Game Area */}
       <div className="flex-1 flex flex-col items-center justify-center p-4 pt-20 pb-48 z-10">
         <div
-          className="relative overflow-hidden rounded-lg border-4 border-[#40545c] bg-[#081014] shadow-xl"
+          className="relative overflow-hidden rounded-md border-4 border-[#40545c] bg-[#081014] shadow-xl"
           style={{
             width: 'min(90vw, 400px)',
             aspectRatio: `${config.board.width}/${config.board.height}`,

@@ -42,7 +42,7 @@ Do not use green, moss, teal, or saturated emerald in routine interface chrome; 
 
 ## Geometry and surfaces
 
-- Use 8px to 12px corner radii for cards and panels.
+- Use 6px to 12px corner radii for cards and panels.
 - Use crisp 1px warm borders with low-contrast paper shadows; avoid black glow halos.
 - Raised white cards use the shared `game-card-border` edge, a slightly firmer charcoal-tinted line than ordinary paper rules. This is the card treatment used by Artisan, Explore, and collection chips; keep state borders such as clay, ochre, and charcoal accents on top where they communicate selection or progress.
 - Use clipped, ticket-like, or map-tab shapes for navigation and section selectors when they improve hierarchy.
@@ -57,7 +57,7 @@ Do not use green, moss, teal, or saturated emerald in routine interface chrome; 
 - Secondary actions use outlined or lightly tinted paper surfaces, never a second competing neon accent.
 - Page headers combine a small contextual label, a serif title, and an optional short description. Avoid repeated oversized headers above every subsection.
 - Lists use stable rows with a centered glass icon orb, clear title/metadata hierarchy, and visible keyboard focus. Hover should not move or enlarge the row.
-- Section headings use centered text with rules extending to both sides; do not add a decorative diamond before the heading.
+- Card-group section headings use centered, pill-outlined text labels with thin rules extending to both sides. Keep the plain divider treatment for compact in-panel labels and gameplay prompts; do not add a decorative diamond.
 - Explore list cards keep the activity artwork on the left, remove redundant right-side type accessories, and right-align the title and status. When content provides a background, use it as a low-opacity scenic layer beneath a directional raised-paper fade so the scene remains visible on the art side while titles and statuses stay readable. Special Events use the cosmic-gold scene with an ochre bulletin treatment; trainer rematches use the battle scene. Repeatable tasks use a small repeat badge at the bottom center of their icon. Primary card icons use a visible frosted-glass orb with a restrained activity tint: catch red, research green, battles/rematches burnt orange, fishing blue, and events/expeditions ochre. When a card groups multiple activities, its actions stay right-aligned and use clean two-part buttons with matching semantic icon wells; grouped action icons sit directly in their colored wells without an extra circle.
 - Badge collections show the badge artwork without a label or rounded-square frame. Inventory’s bag artwork follows the same unframed treatment as skill artwork.
 - Inventory and Artisan list cards follow Explore's scenic composition, with bare normalized item artwork on the left and a flush top-right charcoal title tab. Append Inventory quantity or Artisan level in orange after the name. Omit card categories, output quantities, and readiness chips; details belong in drawers. Use Explore's outlined section-title treatment. Cards themselves are not interactive: translucent 44px controls open details or perform crafting/bulk actions. Inventory informational controls use the book artwork, usable controls use a Poké Ball, and materials use the Artisan skill artwork. Artisan recipe controls use book artwork for details, Artisan skill artwork for single crafts, and x{number} for bulk crafts. Preserve disabled states and accessible names.

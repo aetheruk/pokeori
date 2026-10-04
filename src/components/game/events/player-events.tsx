@@ -119,7 +119,7 @@ export function PlayerEventsCard({
   }
   return (
     <section aria-label="Game events">
-      <SectionDivider>Events</SectionDivider>
+      <SectionDivider variant="chip">Events</SectionDivider>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         <ExploreCard
           entry={{ kind: 'single', item }}
@@ -160,7 +160,7 @@ export function PlayerEventsCard({
               key={event.id}
               id={`event-${event.id}`}
               ref={targetRef}
-              className="rounded-lg border border-game-border bg-game-surface p-4"
+              className="rounded-md border border-game-border bg-game-surface p-4"
             >
               <p className="mb-1 text-xs font-semibold text-game-moss-strong">
                 {event.phase === 'active' ? 'Active now' : 'Upcoming'}

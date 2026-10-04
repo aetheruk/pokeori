@@ -5,6 +5,7 @@ interface SectionDividerProps {
   className?: string
   textColor?: string
   textClassName?: string
+  variant?: 'divider' | 'chip'
 }
 
 export function SectionDivider({
@@ -12,6 +13,7 @@ export function SectionDivider({
   className,
   textColor = 'text-game-ink',
   textClassName,
+  variant = 'divider',
 }: SectionDividerProps) {
   if (!children) {
     return (
@@ -27,6 +29,8 @@ export function SectionDivider({
       <div
         className={cn(
           'min-w-0 text-center text-sm font-semibold uppercase tracking-[0.08em]',
+          variant === 'chip' &&
+            'rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]',
           textColor,
           textClassName,
         )}

@@ -1007,7 +1007,7 @@ function PreferredStanceBadge({
         <div className="space-y-5">
           <div
             className={cn(
-              'flex items-center justify-between rounded-lg border px-4 py-3',
+              'flex items-center justify-between rounded-md border px-4 py-3',
               projectedConfig.className,
             )}
           >
@@ -1105,7 +1105,7 @@ function ObservedMoveListButton({
           <div className="max-h-[65dvh] overflow-y-auto p-4 custom-scrollbar">
             {compatibleMoves.length === 0 ? (
               <div
-                className="rounded-lg border border-dashed border-game-border bg-game-canvas px-4 py-6 text-center text-sm text-game-muted"
+                className="rounded-md border border-dashed border-game-border bg-game-canvas px-4 py-6 text-center text-sm text-game-muted"
                 role="status"
                 aria-live="polite"
               >
@@ -1168,7 +1168,7 @@ function ObservedMoveRow({
   return isKnown ? (
     <MoveCompactRow presentation={presentation} onDetails={onDetails} />
   ) : (
-    <div className="rounded-lg border border-game-border bg-game-canvas p-3">
+    <div className="rounded-md border border-game-border bg-game-canvas p-3">
       <div className="flex items-center gap-3">
         <div className="game-icon-orb h-11 w-11 shrink-0">
           <CircleHelp className="h-6 w-6 text-game-muted" />
@@ -1226,7 +1226,7 @@ function ResearchSection({
     <div className="space-y-4 pt-4">
       <SectionDivider>Research progress</SectionDivider>
 
-      <div className="relative overflow-hidden rounded-lg border border-game-border bg-game-surface p-5">
+      <div className="relative overflow-hidden rounded-md border border-game-border bg-game-surface p-5">
         <div className="absolute right-0 top-0 p-3 opacity-[0.07]">
           <FlaskConical className="h-16 w-16 -rotate-12 text-game-moss" />
         </div>
@@ -1292,7 +1292,7 @@ function ResearchSection({
                   <CarouselContent>
                     {activeRewards.map(({ level, reward }) => (
                       <CarouselItem key={level}>
-                        <div className="flex min-h-[60px] flex-col items-center justify-center rounded-lg border border-game-moss/20 bg-game-moss/10 p-3 text-center">
+                        <div className="flex min-h-[60px] flex-col items-center justify-center rounded-md border border-game-moss/20 bg-game-moss/10 p-3 text-center">
                           <span className="mb-1 text-[10px] font-bold uppercase tracking-[0.08em] text-game-moss-strong">
                             Level {level}
                           </span>
@@ -1349,7 +1349,7 @@ function ResearchTmUnlockCard({
   return (
     <div
       className={cn(
-        'rounded-lg border p-3 transition-colors',
+        'rounded-md border p-3 transition-colors',
         isUnlocked
           ? 'border-game-moss/25 bg-game-moss/8'
           : 'border-game-border bg-game-canvas',
@@ -1557,7 +1557,7 @@ const PokedexGridItem = memo(function PokedexGridItem({
       }
       title={hasSeen ? baseForm.name : `Unknown Pokémon #${speciesId}`}
       onClick={() => onSelect(speciesId)}
-      className={`game-focus-ring relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg border transition-colors motion-reduce:transition-none ${
+      className={`game-focus-ring relative flex h-full w-full items-center justify-center overflow-hidden rounded-md border transition-colors motion-reduce:transition-none ${
         isSelected
           ? 'border-game-moss bg-game-moss/12 ring-1 ring-game-moss/35'
           : canLevelUp

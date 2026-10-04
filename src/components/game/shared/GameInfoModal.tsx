@@ -40,7 +40,7 @@ function GameInfoMetricCard({
 }: GameInfoMetricCardProps) {
   return (
     <div
-      className="group flex h-[4.5rem] items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45"
+      className="group flex h-[4.5rem] items-center gap-3 rounded-md border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45"
       title={title || label}
     >
       <div className="flex size-9 shrink-0 items-center justify-center text-game-charcoal-strong [&>svg]:size-4">
@@ -321,7 +321,7 @@ export function GameInfoModal({
                     'mt-3',
                     isDrawer
                       ? 'text-left'
-                      : 'rounded-lg border border-game-border bg-game-surface-raised p-4 md:p-5',
+                      : 'rounded-md border border-game-border bg-game-surface-raised p-4 md:p-5',
                   )}
                 >
                   <p className="text-sm font-medium leading-relaxed text-game-ink md:text-base">
@@ -353,7 +353,7 @@ export function GameInfoModal({
                 className={cn(
                   isDrawer
                     ? 'border-y border-game-border/75 py-4'
-                    : 'rounded-lg border border-game-border bg-game-surface-raised p-4',
+                    : 'rounded-md border border-game-border bg-game-surface-raised p-4',
                 )}
               >
                 <div className="flex justify-between items-end mb-3">

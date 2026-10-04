@@ -97,7 +97,7 @@ export function FriendsList() {
     <div className="game-paper-first game-paper-background flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       <div className="relative z-10 mx-auto min-h-0 w-full max-w-3xl flex-1 space-y-6 overflow-y-auto px-4 py-5 md:px-6">
         <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-lg border border-game-moss/30 bg-game-surface-raised p-3">
+          <div className="rounded-md border border-game-moss/30 bg-game-surface-raised p-3">
             <p className="text-xs font-bold uppercase text-game-moss-strong">
               Friends
             </p>
@@ -105,7 +105,7 @@ export function FriendsList() {
               {friends.length}
             </p>
           </div>
-          <div className="rounded-lg border border-game-ochre/30 bg-game-surface-raised p-3">
+          <div className="rounded-md border border-game-ochre/30 bg-game-surface-raised p-3">
             <p className="text-xs font-bold uppercase text-game-ochre">
               Requests
             </p>
@@ -127,7 +127,7 @@ export function FriendsList() {
           </div>
         ) : loadError ? (
           <div
-            className="flex flex-col items-center gap-3 rounded-lg border border-game-danger/25 bg-game-danger/5 px-5 py-10 text-center text-sm font-medium text-game-danger"
+            className="flex flex-col items-center gap-3 rounded-md border border-game-danger/25 bg-game-danger/5 px-5 py-10 text-center text-sm font-medium text-game-danger"
             role="alert"
             aria-live="assertive"
           >
@@ -148,7 +148,7 @@ export function FriendsList() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-game-moss-strong" />
-                  <SectionDivider>Pending Requests</SectionDivider>
+                  <SectionDivider variant="chip">Pending Requests</SectionDivider>
                 </div>
                 <div className="grid gap-3">
                   {pendingRequests.map((request) => {
@@ -157,7 +157,7 @@ export function FriendsList() {
                     return (
                       <div
                         key={request.id}
-                        className="flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:bg-game-surface-raised"
+                        className="flex items-center gap-3 rounded-md border border-game-border bg-game-surface p-3 transition-colors hover:bg-game-surface-raised"
                       >
                         <div>
                           <div className="game-icon-orb h-12 w-12">
@@ -220,12 +220,12 @@ export function FriendsList() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-game-moss-strong" />
-                <SectionDivider>All Friends</SectionDivider>
+                <SectionDivider variant="chip">All Friends</SectionDivider>
               </div>
 
               {friends.length === 0 ? (
                 <div
-                  className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-game-border bg-game-surface px-4 py-14 text-center font-medium text-game-muted"
+                  className="flex flex-col items-center gap-3 rounded-md border border-dashed border-game-border bg-game-surface px-4 py-14 text-center font-medium text-game-muted"
                   role="status"
                   aria-live="polite"
                 >

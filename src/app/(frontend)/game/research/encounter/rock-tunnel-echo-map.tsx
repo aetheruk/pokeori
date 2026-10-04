@@ -404,7 +404,7 @@ export function RockTunnelEchoMapGame({
             frameSrc={frameSprite}
             frameSlice={frameSprite ? resolveGridFrameSlice(encounter.settings.tilePaletteId) : undefined}
             ariaLabel="Rock Tunnel Echo Map board. Reach the gold doorway in the back wall. Violet rifts are hazards that end the run."
-            className="relative isolate overflow-hidden rounded-lg bg-[#0d1820] shadow-2xl ring-4 ring-[#081014]/40"
+            className="relative isolate overflow-hidden rounded-md bg-[#0d1820] shadow-2xl ring-4 ring-[#081014]/40"
           >
             {cells.map((cell) => {
               const key = positionKey(cell)

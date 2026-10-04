@@ -5,7 +5,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const appButtonBase =
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-colors duration-150 disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 outline-none focus-visible:ring-2 focus-visible:ring-game-moss/60 focus-visible:ring-offset-2 focus-visible:ring-offset-game-canvas aria-invalid:border-destructive aria-invalid:ring-destructive/30"
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors duration-150 disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 outline-none focus-visible:ring-2 focus-visible:ring-game-moss/60 focus-visible:ring-offset-2 focus-visible:ring-offset-game-canvas aria-invalid:border-destructive aria-invalid:ring-destructive/30"
 
 const buttonVariants = cva(appButtonBase, {
   variants: {

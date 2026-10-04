@@ -48,7 +48,7 @@ export function InstallHelpDialog() {
           type="button"
           aria-label="How to install Pokeori"
           title="Install Pokeori"
-          className="game-focus-ring flex size-10 items-center justify-center rounded-lg border border-game-border bg-game-surface/90 text-game-ink shadow-lg shadow-black/20 backdrop-blur-md transition-colors hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-moss-strong focus-visible:outline-none"
+          className="game-focus-ring flex size-10 items-center justify-center rounded-md border border-game-border bg-game-surface/90 text-game-ink shadow-lg shadow-black/20 backdrop-blur-md transition-colors hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-moss-strong focus-visible:outline-none"
         >
           <CircleHelp className="size-5" aria-hidden="true" />
         </button>
@@ -66,13 +66,13 @@ export function InstallHelpDialog() {
             <TabsTrigger value="ios">iPhone &amp; iPad</TabsTrigger>
             <TabsTrigger value="android">Android</TabsTrigger>
           </TabsList>
-          <TabsContent value="ios" className="rounded-lg border border-game-border bg-game-surface-raised p-4">
+          <TabsContent value="ios" className="rounded-md border border-game-border bg-game-surface-raised p-4">
             <p className="text-sm font-medium text-game-ink">Install from Safari</p>
             <InstallSteps steps={iosSteps} />
           </TabsContent>
           <TabsContent
             value="android"
-            className="rounded-lg border border-game-border bg-game-surface-raised p-4"
+            className="rounded-md border border-game-border bg-game-surface-raised p-4"
           >
             <p className="text-sm font-medium text-game-ink">Install from Chrome</p>
             <InstallSteps steps={androidSteps} />

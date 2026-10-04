@@ -763,7 +763,7 @@ function RewardsEditor({
   }
 
   return (
-    <div className="space-y-2 rounded-lg border bg-background/60 p-3">
+    <div className="space-y-2 rounded-md border bg-background/60 p-3">
       <div className="flex items-center justify-between gap-2">
         <div>
           <Label className="text-xs font-medium">{title}</Label>
@@ -877,7 +877,7 @@ function EncountersEditor({
   }
 
   return (
-    <div className="space-y-2 rounded-lg border bg-background/60 p-3">
+    <div className="space-y-2 rounded-md border bg-background/60 p-3">
       <div className="flex items-center justify-between gap-2">
         <div>
           <Label className="text-xs font-medium">Replacement encounters</Label>
@@ -968,7 +968,7 @@ function SourceFormItemsEditor({
   const entries = Object.entries(value || {})
 
   return (
-    <div className="space-y-3 rounded-lg border bg-background/60 p-3">
+    <div className="space-y-3 rounded-md border bg-background/60 p-3">
       <div className="grid gap-3 md:grid-cols-[1fr_160px]">
         <div>
           <Label className="text-xs font-medium">Source form item drops</Label>
@@ -1073,7 +1073,7 @@ function RandomItemEditor({
   disabled?: boolean
 }) {
   return (
-    <div className="space-y-2 rounded-lg border bg-background/60 p-3">
+    <div className="space-y-2 rounded-md border bg-background/60 p-3">
       <div className="flex items-center justify-between gap-2">
         <div>
           <Label className="text-xs font-medium">Random item pool</Label>
@@ -1139,7 +1139,7 @@ function ConditionEditor({
   }
 
   return (
-    <details className="rounded-lg border bg-background/60 p-3">
+    <details className="rounded-md border bg-background/60 p-3">
       <summary className="cursor-pointer text-sm font-medium">Trigger and conditions</summary>
       <p className="mt-2 text-xs text-muted-foreground">
         Conditions limit where an effect applies. Leave fields as Any or blank for global behavior.
@@ -1429,7 +1429,7 @@ function EffectFields({
       ) : null}
 
       {effect.type === 'field-observation-extra-collectible' ? (
-        <div className="space-y-3 rounded-lg border bg-background/60 p-3">
+        <div className="space-y-3 rounded-md border bg-background/60 p-3">
           <div>
             <Label className="text-xs font-medium">Extra collectible</Label>
             <p className="text-xs text-muted-foreground">The reward sprite shown here is added to Field Observation drops.</p>
@@ -1510,7 +1510,7 @@ function EffectCard({
   const help = EFFECT_HELP[effect.type]
 
   return (
-    <div className="rounded-lg border bg-card">
+    <div className="rounded-md border bg-card">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b p-3">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
@@ -1645,35 +1645,35 @@ function AbilityDashboard({
 
   return (
     <div className="grid gap-3 md:grid-cols-4">
-      <div className="rounded-lg border bg-background/70 p-3">
+      <div className="rounded-md border bg-background/70 p-3">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <BadgeCheck className="h-4 w-4" />
           Pokemon
         </div>
         <p className="mt-2 text-2xl font-semibold">{selectedForms.size}</p>
       </div>
-      <div className="rounded-lg border bg-background/70 p-3">
+      <div className="rounded-md border bg-background/70 p-3">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <WandSparkles className="h-4 w-4" />
           Effects
         </div>
         <p className="mt-2 text-2xl font-semibold">{ability.effects.length}</p>
       </div>
-      <div className="rounded-lg border bg-background/70 p-3">
+      <div className="rounded-md border bg-background/70 p-3">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-4 w-4" />
           Rate
         </div>
         <p className="mt-2 text-2xl font-semibold">{ability.rate}%</p>
       </div>
-      <div className="rounded-lg border bg-background/70 p-3">
+      <div className="rounded-md border bg-background/70 p-3">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Sparkles className="h-4 w-4" />
           Natural
         </div>
         <p className="mt-2 text-2xl font-semibold">{ability.naturalChance ?? 0}%</p>
       </div>
-      <div className="rounded-lg border bg-background/70 p-3 md:col-span-4">
+      <div className="rounded-md border bg-background/70 p-3 md:col-span-4">
         <div className="mb-2 text-xs font-medium text-muted-foreground">Assigned Pokemon preview</div>
         <div className="flex min-h-14 flex-wrap gap-2">
           {previewForms.length ? (
@@ -1893,7 +1893,7 @@ export function AbilityDataEditor() {
 
   return (
     <div className="grid min-h-[calc(100vh-9rem)] gap-4 lg:grid-cols-[320px_1fr]">
-      <aside className="flex min-h-0 flex-col rounded-lg border bg-card">
+      <aside className="flex min-h-0 flex-col rounded-md border bg-card">
         <div className="space-y-3 border-b p-3">
           <div className="relative">
             <Search className="pointer-events-none absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -1934,7 +1934,7 @@ export function AbilityDataEditor() {
         </ScrollArea>
       </aside>
 
-      <main className="min-w-0 rounded-lg border bg-card">
+      <main className="min-w-0 rounded-md border bg-card">
         {draft ? (
           <div className="flex h-full min-h-0 flex-col">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b p-4">
@@ -1978,7 +1978,7 @@ export function AbilityDataEditor() {
               <TabsContent value="overview" className="mt-0 space-y-4 p-4">
                 <AbilityDashboard ability={draft} forms={allForms} />
 
-                <div className="rounded-lg border bg-background/60 p-4">
+                <div className="rounded-md border bg-background/60 p-4">
                   <div className="mb-3">
                     <h2 className="text-sm font-semibold">Identity</h2>
                     <p className="text-xs text-muted-foreground">
@@ -2057,7 +2057,7 @@ export function AbilityDataEditor() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border bg-background/60 p-4">
+                <div className="rounded-md border bg-background/60 p-4">
                   <div className="mb-3">
                     <h2 className="text-sm font-semibold">Legacy rewards and encounters</h2>
                     <p className="text-xs text-muted-foreground">
@@ -2081,7 +2081,7 @@ export function AbilityDataEditor() {
               </TabsContent>
 
               <TabsContent value="pokemon" className="mt-0 space-y-4 p-4">
-                <div className="rounded-lg border bg-background/60 p-4">
+                <div className="rounded-md border bg-background/60 p-4">
                   <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
                       <h2 className="text-sm font-semibold">Pokemon assignment</h2>
@@ -2157,7 +2157,7 @@ export function AbilityDataEditor() {
               </TabsContent>
 
               <TabsContent value="effects" className="mt-0 space-y-4 p-4">
-                <div className="rounded-lg border bg-background/60 p-4">
+                <div className="rounded-md border bg-background/60 p-4">
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <h2 className="text-sm font-semibold">Effect templates</h2>
@@ -2194,7 +2194,7 @@ export function AbilityDataEditor() {
                 </div>
 
                 {draft.effects.length === 0 ? (
-                  <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+                  <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
                     No effects configured.
                   </div>
                 ) : (
@@ -2221,7 +2221,7 @@ export function AbilityDataEditor() {
               </TabsContent>
 
               <TabsContent value="json" className="mt-0 p-4">
-                <div className="rounded-lg border bg-background/60 p-4">
+                <div className="rounded-md border bg-background/60 p-4">
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <h2 className="text-sm font-semibold">Effects JSON</h2>

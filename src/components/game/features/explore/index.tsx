@@ -430,7 +430,7 @@ function ExploreListContent({
       {isTakeover && !struggleCompleted && !eggRevealed && (
         <button
           type="button"
-          className="sr-only focus:not-sr-only focus:absolute focus:bottom-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-game-surface focus:p-3 focus:text-game-ink"
+          className="sr-only focus:not-sr-only focus:absolute focus:bottom-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-game-surface focus:p-3 focus:text-game-ink"
         >
           Struggle free ({20 - goldenTapCount} presses remaining)
         </button>

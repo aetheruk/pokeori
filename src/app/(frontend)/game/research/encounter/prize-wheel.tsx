@@ -74,7 +74,7 @@ function PrizesModal({ slots }: { slots: PrizeWheelSlot[] }) {
             return (
               <div
                 key={i}
-                className="flex items-center justify-between rounded-lg border border-game-border bg-game-surface-raised p-3"
+                className="flex items-center justify-between rounded-md border border-game-border bg-game-surface-raised p-3"
               >
                 {/* Icon */}
                 <div className="flex gap-2 items-center">

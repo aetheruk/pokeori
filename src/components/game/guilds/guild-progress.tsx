@@ -36,14 +36,14 @@ export function GuildProgressContent({
       <p className="text-sm leading-relaxed text-game-muted">{guild.description}</p>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-lg border border-game-card-border bg-game-surface-raised p-4 text-center">
+        <div className="rounded-md border border-game-card-border bg-game-surface-raised p-4 text-center">
           <div className="text-xs font-semibold text-game-muted">Current rank</div>
           <div className="mt-1 font-mono text-2xl font-semibold text-game-ink">
             {rank}
           </div>
           <div className="text-xs text-game-ochre">{current?.name || 'Not joined'}</div>
         </div>
-        <div className="rounded-lg border border-game-card-border bg-game-surface-raised p-4 text-center">
+        <div className="rounded-md border border-game-card-border bg-game-surface-raised p-4 text-center">
           <div className="text-xs font-semibold text-game-muted">Guild XP</div>
           <div className="mt-1 font-mono text-2xl font-semibold text-game-ink">
             {xp.toLocaleString()}

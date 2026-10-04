@@ -175,7 +175,7 @@ describe('Brick Breaker presentation', () => {
     )
     expect(source).not.toContain('game-activity-panel')
     expect(source).toContain("aspectRatio: '1 / 1'")
-    expect(source).toContain('rounded-lg')
+    expect(source).toContain('rounded-md')
     expect(source).toContain('color-mix(in srgb,')
     expect(source).toContain('crystalColor} 70%, white)')
     expect(source).not.toContain('clipPath:')

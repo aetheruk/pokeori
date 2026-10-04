@@ -171,7 +171,7 @@ const SkillUnlockList = memo(function SkillUnlockList({
               <div
                 key={`${unlock.source}:${unlock.level}:${unlock.label}:${unlock.itemId || ''}`}
                 className={cn(
-                  'flex min-h-16 items-center gap-3 rounded-lg border px-3 py-2',
+                  'flex min-h-16 items-center gap-3 rounded-md border px-3 py-2',
                   unlocked
                     ? 'border-game-moss/35 bg-game-moss/10 text-game-ink'
                     : 'border-game-border bg-game-surface text-game-muted',
@@ -511,7 +511,7 @@ export function TrainerLeveling({
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col space-y-6 overflow-y-auto px-4 pb-20 pt-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border md:px-6">
         {/* Skills Section */}
         <div className="space-y-4">
-          <SectionDivider>Skills</SectionDivider>
+          <SectionDivider variant="chip">Skills</SectionDivider>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {coreSkills.map((skill) => {
               const skillData = userSkills[skill.id] || { level: 1, exp: 0 }
@@ -544,7 +544,7 @@ export function TrainerLeveling({
                     setSelectedSkill(skill)
                     setIsSkillModalOpen(true)
                   }}
-                  className="game-focus-ring group flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
+                  className="game-focus-ring group flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-md border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
                 >
                   <SkillDisplayIcon
                     skill={skill}
@@ -599,9 +599,9 @@ export function TrainerLeveling({
 
         {/* Ranked PvP Section */}
         <div className="space-y-4">
-          <SectionDivider>Ranking</SectionDivider>
+          <SectionDivider variant="chip">Ranking</SectionDivider>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
-            <div className="flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left">
+            <div className="flex min-h-16 w-full items-center gap-3 rounded-md border border-game-border bg-game-surface p-3 text-left">
               <Image
                 src="/fallback/skills/ranked-v2.png"
                 alt=""
@@ -634,7 +634,7 @@ export function TrainerLeveling({
 
         {/* Badges Section */}
         <div className="space-y-4">
-          <SectionDivider>Gym Badges</SectionDivider>
+          <SectionDivider variant="chip">Gym Badges</SectionDivider>
           <BadgeShowcase />
         </div>
         <TrainerSettings deferImageChecks={deferImageChecks} />
@@ -722,8 +722,8 @@ export function TrainerLeveling({
               </Select>
             </div>
 
-            <details className="rounded-lg border border-game-border bg-game-surface">
-              <summary className="game-focus-ring cursor-pointer rounded-lg p-3 text-sm font-semibold">
+            <details className="rounded-md border border-game-border bg-game-surface">
+              <summary className="game-focus-ring cursor-pointer rounded-md p-3 text-sm font-semibold">
                 Avatar ·{' '}
                 {availableIcons.find((icon) => icon.id === selectedIcon)
                   ?.name || 'Ditto'}

@@ -34,7 +34,7 @@ export default function GameError({ error, reset }: GameErrorProps) {
         </p>
         {error.message && (
           <p
-            className="max-h-24 w-full max-w-md overflow-auto rounded-lg border border-game-danger/25 bg-game-danger/5 p-3 text-left font-mono text-xs text-game-danger"
+            className="max-h-24 w-full max-w-md overflow-auto rounded-md border border-game-danger/25 bg-game-danger/5 p-3 text-left font-mono text-xs text-game-danger"
             data-selectable="true"
           >
             {error.message}

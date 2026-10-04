@@ -318,7 +318,7 @@ export function FieldObservationGame({
               </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center p-4 pt-16 sm:p-6 sm:pt-16">
-                <div className="game-paper-first flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-game-border bg-game-surface-raised text-[#293532] shadow-lg">
+                <div className="game-paper-first flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-md border border-game-border bg-game-surface-raised text-[#293532] shadow-lg">
                   <div className="relative shrink-0 overflow-hidden border-b border-game-border bg-game-surface-raised px-4 py-3">
                     <div className="relative flex min-w-0 items-center gap-3">
                       <Image
@@ -495,7 +495,7 @@ function PokemonAnswerTile({
       aria-pressed={selected}
       onClick={onSelect}
       className={cn(
-        'game-focus-ring flex min-h-28 flex-col items-center justify-center gap-2 rounded-lg border bg-game-surface-raised p-3 text-center text-game-ink shadow-sm transition-colors hover:border-game-moss/50 hover:bg-game-moss/5 disabled:opacity-70',
+        'game-focus-ring flex min-h-28 flex-col items-center justify-center gap-2 rounded-md border bg-game-surface-raised p-3 text-center text-game-ink shadow-sm transition-colors hover:border-game-moss/50 hover:bg-game-moss/5 disabled:opacity-70',
         selected
           ? 'border-game-moss bg-game-moss/10 ring-2 ring-game-moss/30'
           : 'border-game-border',

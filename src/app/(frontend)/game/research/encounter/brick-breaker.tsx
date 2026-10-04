@@ -79,7 +79,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
       <div className="absolute inset-0 bg-[#18211e]/28" />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between gap-3 p-[max(0.75rem,env(safe-area-inset-top))]">
-        <div className="flex items-center gap-2 rounded-lg border border-game-border/80 bg-game-surface-raised/95 px-3 py-2 text-sm font-bold text-game-ink shadow-md backdrop-blur-sm">
+        <div className="flex items-center gap-2 rounded-md border border-game-border/80 bg-game-surface-raised/95 px-3 py-2 text-sm font-bold text-game-ink shadow-md backdrop-blur-sm">
           <span className="font-mono tabular-nums">Score {score}</span>
           <span aria-hidden className="h-4 w-px bg-game-border" />
           <span className="flex items-center gap-1">
@@ -147,7 +147,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
             <div
               key={brick.id}
               aria-hidden
-              className={`absolute flex items-center justify-center rounded-lg ${specimen ? 'motion-safe:animate-pulse' : ''}`}
+              className={`absolute flex items-center justify-center rounded-md ${specimen ? 'motion-safe:animate-pulse' : ''}`}
               style={{
                 left: `${(brick.x / width) * 100}%`,
                 top: `${(brick.y / height) * 100}%`,
@@ -251,7 +251,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
           <button
             type="button"
             onClick={launch}
-            className="absolute bottom-[20%] left-1/2 min-h-11 -translate-x-1/2 whitespace-nowrap rounded-lg border border-game-border bg-game-surface-raised/95 px-4 py-2 font-bold text-game-ink shadow-md backdrop-blur-sm focus-visible:outline-2 focus-visible:outline-game-clay"
+            className="absolute bottom-[20%] left-1/2 min-h-11 -translate-x-1/2 whitespace-nowrap rounded-md border border-game-border bg-game-surface-raised/95 px-4 py-2 font-bold text-game-ink shadow-md backdrop-blur-sm focus-visible:outline-2 focus-visible:outline-game-clay"
           >
             Tap or Space to launch
           </button>
@@ -261,7 +261,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
       {error && (
         <p
           role="alert"
-          className="absolute bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-lg border border-red-700/30 bg-red-50 p-3 text-sm text-red-800 shadow-md"
+          className="absolute bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-md border border-red-700/30 bg-red-50 p-3 text-sm text-red-800 shadow-md"
         >
           {error}
         </p>

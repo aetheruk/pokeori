@@ -184,7 +184,7 @@ export function DiglettTunnelTapGame({
 
         <div className="flex flex-1 items-center justify-center px-4 pb-6">
           <div
-            className="grid max-w-[92vw] rounded-lg border border-[#f7ecd6]/15 bg-[#081014]/50 p-3 shadow-2xl backdrop-blur"
+            className="grid max-w-[92vw] rounded-md border border-[#f7ecd6]/15 bg-[#081014]/50 p-3 shadow-2xl backdrop-blur"
             style={{
               gridTemplateColumns: `repeat(${cols}, minmax(0, 72px))`,
               gridTemplateRows: `repeat(${rows}, minmax(0, 72px))`,

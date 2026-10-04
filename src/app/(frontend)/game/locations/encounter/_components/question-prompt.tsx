@@ -58,7 +58,7 @@ export function QuestionPrompt({
           'relative flex flex-none shrink-0 justify-center text-game-ink',
           isCatchAppearance
             ? 'mb-4 min-h-14 items-center px-3 py-2'
-            : 'mb-4 min-h-[5rem] items-center overflow-hidden rounded-lg border border-game-border bg-game-surface-raised px-4 py-5 shadow-sm backdrop-blur-xl',
+            : 'mb-4 min-h-[5rem] items-center overflow-hidden rounded-md border border-game-border bg-game-surface-raised px-4 py-5 shadow-sm backdrop-blur-xl',
         )}
       >
         <AnimatePresence mode="wait">
@@ -163,7 +163,7 @@ export function QuestionPrompt({
                 disabled={disabled}
                 aria-pressed={selected}
                 className={cn(
-                  'game-focus-ring group relative flex min-h-16 w-full items-center gap-3 overflow-hidden rounded-lg border px-3 py-3 text-left text-game-ink transition-[border-color,background-color,box-shadow] duration-150 disabled:pointer-events-none',
+                  'game-focus-ring group relative flex min-h-16 w-full items-center gap-3 overflow-hidden rounded-md border px-3 py-3 text-left text-game-ink transition-[border-color,background-color,box-shadow] duration-150 disabled:pointer-events-none',
                   isCatchAppearance
                     ? 'border-game-card-border bg-game-surface-raised shadow-[0_2px_6px_rgb(75_62_39_/_0.08)] hover:border-game-charcoal/40 hover:bg-game-surface hover:shadow-[0_3px_9px_rgb(75_62_39_/_0.11)] active:bg-game-canvas'
                     : 'border-game-border bg-game-surface-raised shadow-sm backdrop-blur-xl hover:border-game-moss/35 hover:bg-game-surface',
@@ -190,7 +190,7 @@ export function QuestionPrompt({
                 <div className="relative shrink-0">
                   <div
                     className={cn(
-                      'relative z-10 flex h-10 w-10 items-center justify-center rounded-lg border',
+                      'relative z-10 flex h-10 w-10 items-center justify-center rounded-md border',
                       isCatchAppearance
                         ? 'border-game-charcoal/35 bg-game-canvas/80 text-game-charcoal-strong shadow-inner'
                         : 'border-game-moss/25 bg-game-canvas text-game-moss-strong',

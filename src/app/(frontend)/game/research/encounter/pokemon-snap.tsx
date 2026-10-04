@@ -680,7 +680,7 @@ export function PokemonSnapGame({
           <div className="game-paper-background relative flex min-h-0 flex-1 flex-col border-t border-game-border bg-game-surface text-game-ink">
             <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-4 sm:px-6">
               <div className="flex shrink-0 items-center justify-center border-b border-game-border py-2 sm:py-3">
-                <div className="relative flex size-24 shrink-0 items-center justify-center rounded-lg border border-game-card-border bg-game-surface-raised sm:size-32">
+                <div className="relative flex size-24 shrink-0 items-center justify-center rounded-md border border-game-card-border bg-game-surface-raised sm:size-32">
                   <Crosshair
                     aria-hidden="true"
                     className="absolute inset-3 size-[calc(100%-1.5rem)] stroke-[0.5] text-game-border"
@@ -757,7 +757,7 @@ export function PokemonSnapGame({
                           initial={reduceMotion ? false : { opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2 }}
-                          className="relative rounded-lg border border-game-card-border bg-game-surface-raised p-2 shadow-sm"
+                          className="relative rounded-md border border-game-card-border bg-game-surface-raised p-2 shadow-sm"
                         >
                           <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-sm bg-game-surface">
                             {encounter.background && (

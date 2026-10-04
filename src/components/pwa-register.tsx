@@ -168,7 +168,7 @@ export function PwaRegister() {
   }, [pathname])
 
   return pendingVersion && isActivityUpdateDeferred(pathname) ? (
-    <div role="status" className="pointer-events-none fixed left-1/2 top-[max(0.5rem,env(safe-area-inset-top))] z-[100] w-max max-w-[90vw] -translate-x-1/2 rounded-lg border border-game-border bg-game-surface-raised px-3 py-2 text-center text-xs text-game-ink shadow-sm">
+    <div role="status" className="pointer-events-none fixed left-1/2 top-[max(0.5rem,env(safe-area-inset-top))] z-[100] w-max max-w-[90vw] -translate-x-1/2 rounded-md border border-game-border bg-game-surface-raised px-3 py-2 text-center text-xs text-game-ink shadow-sm">
       {reloadIn !== null ? `Result saved. Updating in ${reloadIn} seconds.` : 'Update ready. It will apply after your result is saved or you return to Explore.'}
     </div>
   ) : null

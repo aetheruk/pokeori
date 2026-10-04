@@ -2343,7 +2343,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
               if (filteredItems.length === 0) {
                 return (
                   <div
-                    className="rounded-lg border border-dashed border-game-border bg-game-canvas py-8 text-center text-game-muted"
+                    className="rounded-md border border-dashed border-game-border bg-game-canvas py-8 text-center text-game-muted"
                     role="status"
                     aria-live="polite"
                   >

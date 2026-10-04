@@ -177,7 +177,7 @@ function LaneSprite({
       <button
         type="button"
         data-testid={`doubles-sprite-${side}-${slot}`}
-        className={`${wrapperClass} pointer-events-auto rounded-lg bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-game-danger`}
+        className={`${wrapperClass} pointer-events-auto rounded-md bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-game-danger`}
         aria-label={`Target ${mon.battleAbilityState?.illusionMask?.name || mon.name}`}
         aria-pressed={isTargetSelected}
         disabled={targetDisabled}
@@ -192,7 +192,7 @@ function LaneSprite({
       <button
         type="button"
         data-testid={`doubles-sprite-${side}-${slot}`}
-        className={`${wrapperClass} pointer-events-auto rounded-lg bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-game-ochre`}
+        className={`${wrapperClass} pointer-events-auto rounded-md bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-game-ochre`}
         aria-label={`Choose ${mon.name} to act next`}
         aria-pressed={isSelected}
         disabled={targetDisabled}
