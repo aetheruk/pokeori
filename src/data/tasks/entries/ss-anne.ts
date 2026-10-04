@@ -403,7 +403,7 @@ export const ssAnneTasks: Task[] = [
         id: 1,
         title: 'Lt. Surge',
         message:
-          "That's the majority of the reapairs are finished. The ship won't move until we get some juice in the old girl",
+          "That's the majority of repairs finished. The ship won't move until we get some juice in the old girl",
         background: ssAnneBackground,
         icon: {
           type: 'trainer',

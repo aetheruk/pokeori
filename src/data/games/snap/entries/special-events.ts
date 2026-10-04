@@ -173,7 +173,7 @@ export const specialEventSnapEntries: SnapConfig[] = [
       },
       {
         type: 'roll',
-        count: oneIn(256),
+        count: oneIn(512),
       },
     ],
     rewards: [

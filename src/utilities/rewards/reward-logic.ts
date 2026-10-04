@@ -1056,16 +1056,27 @@ export async function grantRewards(
         const speciesForm = getPokemonForm(formId)
         const pokemonName = speciesForm?.name || formId
 
-        summary.researchXp?.push({
-          formId,
-          formName: pokemonName,
-          amount: effectiveQuantity,
-          isCompanion: reward.isCompanion === true,
-          oldExperience: oldXp,
-          newExperience: newXp,
-          oldLevel,
-          newLevel: maxAchievableLevel,
-        })
+        const existingResearchReward = summary.researchXp?.find(
+          (entry) => entry.formId === formId,
+        )
+        if (existingResearchReward) {
+          existingResearchReward.amount += effectiveQuantity
+          existingResearchReward.isCompanion =
+            existingResearchReward.isCompanion || reward.isCompanion === true
+          existingResearchReward.newExperience = newXp
+          existingResearchReward.newLevel = maxAchievableLevel
+        } else {
+          summary.researchXp?.push({
+            formId,
+            formName: pokemonName,
+            amount: effectiveQuantity,
+            isCompanion: reward.isCompanion === true,
+            oldExperience: oldXp,
+            newExperience: newXp,
+            oldLevel,
+            newLevel: maxAchievableLevel,
+          })
+        }
 
         if (hasBreakthrough) {
           summary.researchBreakthroughs?.push({

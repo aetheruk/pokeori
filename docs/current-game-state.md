@@ -1,5 +1,8 @@
 # Current Game State
 
+- Release `0.43.67`: All 18 battle type backgrounds now use polished abstract elemental fields with layered material textures and restrained motion in Stance, Moves, and Powers. The fields retain proportional cropping, cached base rendering, and reduced-motion support.
+
+- Release `0.43.67`: The `A Moonlit Shadow` Lugia Snap event is now half as likely to appear (1 in 512 instead of 1 in 256). S.S. Anne repair dialogue says “That's the majority of repairs finished.” Result summaries combine Pokemon Research XP rewards for the same form into one entry. Diglett's Cave keeps its secret Promo binder reward across catches, battles, and Field Observation; the separate Rubber Mallet observation drop remains non-secret.
 - Unreleased (`0.43.64`): Cerulean City's Underground Path task now requires Catching level 12 instead of 15.
 - Unreleased (`0.43.63`): Region, area, and trainer-section scenic selectors respond only through their Poké Ball buttons. Region and area lists omit the Selected chip; current selections keep their stronger edge and pressed button state. Explore already uses dedicated action buttons.
 - Unreleased (`0.43.63`): Inventory and Artisan use Explore's outlined section titles and icon-only card controls. Inventory quantities and Artisan levels appear in orange after the name; card categories, output quantities, and ready/missing-material chips are removed. Inventory book/Poké Ball controls open item details, material controls open Artisan, and recipe cards provide book, Artisan, and bulk controls. Card backgrounds no longer open drawers; craft eligibility and details remain available in the recipe drawer.
