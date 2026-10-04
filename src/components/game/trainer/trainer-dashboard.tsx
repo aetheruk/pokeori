@@ -56,6 +56,7 @@ import { getGridPlayerAppearance } from '@/utilities/trainer-appearance'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { useUser } from '@/context/UserContext'
 import { getBanner, getIcon } from '@/data/user'
+import type { TaskIcon } from '@/data/tasks/types'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { cn } from '@/lib/utils'
 import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
@@ -112,6 +113,18 @@ export function TrainerDashboard({
         backgroundPosition: genderAppearance.backgroundPosition,
       }}
     />
+  )
+  const sectionIcons: Record<TrainerSection, TaskIcon> = {
+    profile: trainerIcon,
+    events: { type: 'item', id: 'master-ball' },
+    decks: { type: 'local', id: 'images/tcg-back.avif' },
+    trainers: { type: 'item', id: 'vs-seeker' },
+    friends: { type: 'pokemon', id: '133' },
+    gift: { type: 'item', id: 'relic-gold' },
+    rankings: { type: 'local', id: 'fallback/skills/ranked-v2.png' },
+  }
+  const renderSectionIcon = (section: TrainerSection) => (
+    <TaskIconDisplay icon={sectionIcons[section]} className="h-10 w-10" />
   )
   const TABS = [
     ...(user?.isAdmin
@@ -241,6 +254,8 @@ export function TrainerDashboard({
                   background={tab.background}
                   title={tab.label}
                   appearance="explore"
+                  icon={renderSectionIcon(tab.id)}
+                  iconPosition="left"
                   selectionIcon={trainerGenderIcon}
                   selected={selected}
                   onClick={() => selectSection(tab.id)}
@@ -360,6 +375,8 @@ export function TrainerDashboard({
                 background={tab.background}
                 title={tab.label}
                 appearance="explore"
+                icon={renderSectionIcon(tab.id)}
+                iconPosition="left"
                 selectionIcon={trainerGenderIcon}
                 selected={selected}
                 onClick={() => {
