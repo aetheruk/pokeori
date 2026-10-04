@@ -52,10 +52,10 @@ import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { ScenicChoiceCard } from '@/components/game/shared/ScenicChoiceCard'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { getGridPlayerAppearance } from '@/utilities/trainer-appearance'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { useUser } from '@/context/UserContext'
-import { getBanner, getIcon, getTitle } from '@/data/user'
-import type { TaskIcon } from '@/data/tasks/types'
+import { getBanner, getIcon } from '@/data/user'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { cn } from '@/lib/utils'
 import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
@@ -97,19 +97,21 @@ export function TrainerDashboard({
     type: 'pokemon',
     id: '132',
   }
-  const trainerTitle =
-    getTitle(user?.title || 'new-beginnings')?.name || 'Trainer'
-  const sectionIcons: Record<TrainerSection, TaskIcon> = {
-    profile: trainerIcon,
-    events: { type: 'item', id: 'master-ball' },
-    decks: { type: 'local', id: 'images/tcg-back.avif' },
-    trainers: { type: 'item', id: 'vs-seeker' },
-    friends: { type: 'pokemon', id: '133' },
-    gift: { type: 'item', id: 'relic-gold' },
-    rankings: { type: 'local', id: 'fallback/skills/ranked-v2.png' },
-  }
-  const renderSectionIcon = (section: TrainerSection) => (
-    <TaskIconDisplay icon={sectionIcons[section]} className="h-10 w-10" />
+  const genderAppearance = getGridPlayerAppearance(
+    user?.trainerGender,
+    'down',
+    0,
+  )
+  const trainerGenderIcon = (
+    <span
+      aria-hidden="true"
+      className="block h-8 w-8 bg-no-repeat [image-rendering:pixelated]"
+      style={{
+        backgroundImage: `url('${genderAppearance.src}')`,
+        backgroundSize: genderAppearance.backgroundSize,
+        backgroundPosition: genderAppearance.backgroundPosition,
+      }}
+    />
   )
   const TABS = [
     ...(user?.isAdmin
@@ -117,7 +119,6 @@ export function TrainerDashboard({
           {
             id: 'events' as const,
             label: 'Events',
-            description: 'Manage live event content',
             background: '/backgrounds/cosmos-gold.avif',
             component: (
               <LazyWrapper>
@@ -130,7 +131,6 @@ export function TrainerDashboard({
     {
       id: 'profile' as const,
       label: user?.trainerName || 'Trainer',
-      description: 'Skills and trainer progress',
       background: trainerBanner,
       component: (
         <LazyWrapper>
@@ -143,7 +143,6 @@ export function TrainerDashboard({
           {
             id: 'decks' as const,
             label: 'TCG Decks',
-            description: 'Build and manage your decks',
             background: '/backgrounds/tcg.avif',
             component: (
               <LazyWrapper>
@@ -163,7 +162,6 @@ export function TrainerDashboard({
           {
             id: 'trainers' as const,
             label: 'Trainers',
-            description: 'Find other trainers',
             background: '/backgrounds/friend-stadium.avif',
             component: (
               <LazyWrapper>
@@ -174,7 +172,6 @@ export function TrainerDashboard({
           {
             id: 'friends' as const,
             label: 'Friends',
-            description: 'Manage your connections',
             background: '/backgrounds/past-small-city.avif',
             component: (
               <LazyWrapper>
@@ -185,7 +182,6 @@ export function TrainerDashboard({
           {
             id: 'gift' as const,
             label: 'Mystery Gift',
-            description: 'Redeem gifts and codes',
             background: '/backgrounds/inventory.avif',
             component: (
               <LazyWrapper>
@@ -196,7 +192,6 @@ export function TrainerDashboard({
           {
             id: 'rankings' as const,
             label: 'Rankings',
-            description: 'Elo ratings from ranked PvP',
             background: '/backgrounds/crystal-stadium.avif',
             component: (
               <LazyWrapper>
@@ -245,9 +240,8 @@ export function TrainerDashboard({
                   key={tab.id}
                   background={tab.background}
                   title={tab.label}
-                  description={tab.description}
-                  icon={renderSectionIcon(tab.id)}
-                  iconPosition="left"
+                  appearance="explore"
+                  selectionIcon={trainerGenderIcon}
                   selected={selected}
                   onClick={() => selectSection(tab.id)}
                   className="min-h-20"
@@ -301,9 +295,8 @@ export function TrainerDashboard({
           <ScenicChoiceCard
             background={trainerBanner}
             title={user?.trainerName || 'Trainer'}
-            description={trainerTitle}
-            icon={<TaskIconDisplay icon={trainerIcon} className="h-10 w-10" />}
-            iconPosition="left"
+            appearance="explore"
+            selectionIcon={trainerGenderIcon}
             onClick={() => setSectionDrawerOpen(true)}
             className="min-h-20"
           />
@@ -346,7 +339,6 @@ export function TrainerDashboard({
         open={sectionDrawerOpen}
         onOpenChange={setSectionDrawerOpen}
         title={user?.trainerName || 'Trainer'}
-        description={trainerTitle}
         background={trainerBanner}
         icon={
           <TaskIconDisplay
@@ -367,9 +359,8 @@ export function TrainerDashboard({
                 key={tab.id}
                 background={tab.background}
                 title={tab.label}
-                description={tab.description}
-                icon={renderSectionIcon(tab.id)}
-                iconPosition="left"
+                appearance="explore"
+                selectionIcon={trainerGenderIcon}
                 selected={selected}
                 onClick={() => {
                   selectSection(tab.id)

@@ -9,6 +9,7 @@ interface ScenicChoiceCardProps {
   title: ReactNode
   description?: ReactNode
   icon?: ReactNode
+  selectionIcon?: ReactNode
   iconPosition?: 'left' | 'right'
   selected?: boolean
   onClick: () => void
@@ -26,6 +27,7 @@ export function ScenicChoiceCard({
   title,
   description,
   icon,
+  selectionIcon,
   iconPosition = 'right',
   selected = false,
   onClick,
@@ -47,11 +49,13 @@ export function ScenicChoiceCard({
     >
       <span className="sr-only">{title}</span>
       <span aria-hidden="true">
-        <TaskIconDisplay
-          icon={{ type: 'item', id: 'poke-ball' }}
-          normalizeVisibleBounds
-          className="h-7 w-7"
-        />
+        {selectionIcon ?? (
+          <TaskIconDisplay
+            icon={{ type: 'item', id: 'poke-ball' }}
+            normalizeVisibleBounds
+            className="h-7 w-7"
+          />
+        )}
       </span>
     </button>
   )
