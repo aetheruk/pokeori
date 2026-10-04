@@ -2267,7 +2267,7 @@ export const ceruleanCityTasks: Task[] = [
       {
         type: 'skill_level',
         targetId: 'catching',
-        count: 15,
+        count: 12,
       },
       {
         type: 'battle_result',
