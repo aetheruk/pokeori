@@ -156,6 +156,29 @@ describe('task_complete reward cascading', () => {
     expect(pokedexState['74']?.['74']?.researchXp).toBe(30)
   })
 
+  test('combines research XP rewards for the same Pokemon form', async () => {
+    const { grantRewards } = await import('@/utilities/rewards/reward-logic')
+
+    const { summary } = await grantRewards('user-1', [
+      { type: 'pokemon_research_xp', targetId: '19', quantity: 2 },
+      { type: 'pokemon_research_xp', targetId: '19', quantity: 3 },
+    ], transactionOptions)
+
+    expect(summary.researchXp).toEqual([
+      {
+        formId: '19',
+        formName: 'Rattata',
+        amount: 5,
+        isCompanion: false,
+        oldExperience: 0,
+        newExperience: 5,
+        oldLevel: 0,
+        newLevel: 0,
+      },
+    ])
+    expect(pokedexState['19']?.['19']?.researchXp).toBe(5)
+  })
+
   test('pokemon rewards roll a natural ability unless explicitly authored', async () => {
     const { grantRewards } = await import('@/utilities/rewards/reward-logic')
 

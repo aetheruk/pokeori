@@ -2799,6 +2799,11 @@ describe('static data references', () => {
         },
       ],
     })
+    expect(
+      (diglettStudy as any)?.settings.itemDrops.find(
+        (drop: { itemId: string }) => drop.itemId === 'rubber-mallet',
+      ),
+    ).not.toHaveProperty('secret')
     expect((malletGame as any)?.requirements).toContainEqual({
       type: 'item_owned',
       targetId: 'rubber-mallet',
@@ -4505,6 +4510,9 @@ describe('static data references', () => {
 
     expect(silverFeather?.unique).toBe(false)
     expect(lugiaSnap?.settings.target).toBe(249)
+    expect(
+      lugiaSnap?.requirements.find((requirement) => requirement.type === 'roll')?.count,
+    ).toBe(1953)
     expect(lugiaSnap?.requirements).not.toContainEqual({
       type: 'item_owned',
       targetId: 'clear-bell',
