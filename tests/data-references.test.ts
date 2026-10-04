@@ -1443,16 +1443,12 @@ describe('static data references', () => {
     )
   })
 
-  test('Route 11 Vermilion side tasks use criteria for their Route 11 progress gates', () => {
+  test('Route 11 Vermilion side tasks wait for the Route 11 unlock', () => {
     const researcherTask = tasks.find(
       (task) => task.id === 'route-11-researcher-itemfinder',
     )
     const nidoTask = tasks.find((task) => task.id === 'nido-stories-route-11')
-    const vermilionVisibilityRequirement: TaskCondition = {
-      type: 'task_completed',
-      targetId: 'explore-vermilion-city',
-    }
-    const redundantSsAnneCriterion: TaskCondition = {
+    const route11UnlockRequirement: TaskCondition = {
       type: 'expedition_result',
       targetId: 'ss-anne-repair-duty',
       expeditionStatus: 'completed',
@@ -1472,18 +1468,9 @@ describe('static data references', () => {
       },
     ]
 
-    expect(researcherTask?.requirements).toEqual([
-      vermilionVisibilityRequirement,
-    ])
-    expect(nidoTask?.requirements).toEqual([vermilionVisibilityRequirement])
-    expect(researcherTask?.requirements).not.toContainEqual(
-      redundantSsAnneCriterion,
-    )
-    expect(nidoTask?.requirements).not.toContainEqual(redundantSsAnneCriterion)
-    expect(researcherTask?.criteria).not.toContainEqual(
-      redundantSsAnneCriterion,
-    )
-    expect(nidoTask?.criteria).not.toContainEqual(redundantSsAnneCriterion)
+    expect(researcherTask?.requirements).toEqual([route11UnlockRequirement])
+    expect(nidoTask?.requirements).toEqual([route11UnlockRequirement])
+    expect(researcherTask?.chat).toBeUndefined()
     for (const criterion of sharedRoute11Criteria) {
       expect(researcherTask?.criteria).toContainEqual(criterion)
       expect(nidoTask?.criteria).toContainEqual(criterion)

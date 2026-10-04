@@ -341,22 +341,20 @@ function RecipeNavigationChip({
           : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
       )}
     >
-      <span
-        aria-hidden="true"
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-game-border/80 bg-game-canvas/90"
-      >
-        {iconItemId ? (
-          <ItemSprite
-            itemId={iconItemId}
-            alt=""
-            width={28}
-            height={28}
-            className="h-7 w-7 object-contain"
-          />
-        ) : (
-          <Hammer className="h-4 w-4 text-game-moss-strong" />
-        )}
-      </span>
+      {iconItemId ? (
+        <ItemSprite
+          itemId={iconItemId}
+          alt=""
+          width={28}
+          height={28}
+          className="h-7 w-7 shrink-0 object-contain"
+        />
+      ) : (
+        <TaskIconDisplay
+          icon={{ type: 'local', id: '/fallback/skills/artisan-v2.png' }}
+          className="h-7 w-7 shrink-0"
+        />
+      )}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-xs font-semibold">{label}</span>
         <span

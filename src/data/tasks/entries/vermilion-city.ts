@@ -428,8 +428,10 @@ export const vermilionCityTasks: Task[] = [
     completeButtonText: 'Share Route 11 Notes',
     requirements: [
       {
-        type: 'task_completed',
-        targetId: 'explore-vermilion-city',
+        type: 'expedition_result',
+        targetId: 'ss-anne-repair-duty',
+        expeditionStatus: 'completed',
+        count: 1,
       },
     ],
     criteria: [
@@ -489,12 +491,13 @@ export const vermilionCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    chat: true,
     completeButtonText: 'Show Pokedex',
     requirements: [
       {
-        type: 'task_completed',
-        targetId: 'explore-vermilion-city',
+        type: 'expedition_result',
+        targetId: 'ss-anne-repair-duty',
+        expeditionStatus: 'completed',
+        count: 1,
       },
     ],
     criteria: [
@@ -1039,7 +1042,7 @@ export const vermilionCityTasks: Task[] = [
   {
     id: 'pokemon-fan-club-intro',
     name: 'Fan Club President',
-    description: 'The president of the Pokemon Fan Club wants to know how big a fan you are.',
+    description: "Hmm a Pokemon Fan Club. Must be a very busy club, isn't everyone a fan?",
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {

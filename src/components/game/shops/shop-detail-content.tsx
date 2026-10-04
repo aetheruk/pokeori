@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { ShopConfig } from '@/data/shops/types'
 import { useUser } from '@/context/UserContext'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -134,6 +134,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
       amount: userCurrency[currencyId] || 0,
     }))
     .filter(({ currency }) => !!currency)
+  const shopCurrencyId = shopCurrencyBalances[0]?.id
 
   return (
     <div ref={containerRef} className="relative z-10">
@@ -183,7 +184,9 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
       </AlertDialog>
 
       <div className="space-y-6">
-        <SectionDivider>AVAILABLE ITEMS</SectionDivider>
+        <SectionDivider className="mb-6" variant="chip">
+          Available Items
+        </SectionDivider>
 
         {shopCurrencyBalances.length > 0 && (
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 py-1 text-center">
@@ -220,87 +223,133 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
             }
 
             return (
-              <button
-                type="button"
+              <Card
                 key={item.id}
-                disabled={outOfStock || !canAfford || purchasingItem === item.id}
-                onClick={() => requestBuy(item)}
-                aria-label={`Buy ${item.name}`}
-                title={`Buy ${item.name}`}
                 className={cn(
-                  'group relative flex items-center gap-4 overflow-hidden rounded-md border bg-game-surface p-3 text-left transition-colors',
+                  'relative flex min-h-32 flex-row items-center gap-3 overflow-hidden rounded-md rounded-tr-none border p-3',
                   outOfStock
-                    ? 'border-game-danger/30 bg-game-canvas grayscale'
-                    : canAfford
-                      ? 'border-game-border hover:border-game-moss/45 hover:bg-game-surface-raised'
-                      : 'border-game-border opacity-70',
+                    ? 'border-game-danger/40 bg-game-surface'
+                    : 'border-game-card-border bg-game-surface',
                 )}
               >
-                <div className="relative shrink-0">
-                  <div className="game-icon-orb relative z-10 h-12 w-12 transition-colors group-hover:border-game-charcoal/45">
-                    {item.icon ? (
-                      <TaskIconDisplay
-                        icon={item.icon}
-                        className="h-9 w-9"
-                      />
-                    ) : (
-                      <ShoppingBag className="h-5 w-5 text-game-muted" />
-                    )}
-                  </div>
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-70"
+                  style={{
+                    backgroundImage: `url(${shop.background || '/backgrounds/shop.avif'})`,
+                  }}
+                />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-r from-game-surface-raised/76 via-game-surface/56 to-game-surface/10"
+                />
+
+                <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
+                  {item.icon ? (
+                    <TaskIconDisplay
+                      icon={item.icon}
+                      normalizeVisibleBounds
+                      outlineVisiblePixels
+                      className="h-9 w-9"
+                    />
+                  ) : (
+                    <ShoppingBag
+                      className="h-7 w-7 text-game-charcoal"
+                      aria-hidden="true"
+                    />
+                  )}
                 </div>
 
-                <div className="min-w-0 flex-1 text-right">
-                  <div className="mb-1 flex items-center justify-end gap-2">
-                    <h3 className="truncate text-sm font-black uppercase tracking-tight text-game-ink">
-                      {item.name}
+                <div className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+                  <div className="-mr-3 -mt-3 flex w-fit max-w-full items-center justify-end rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-white">
+                    <h3
+                      className="flex max-w-full items-center justify-end gap-1 whitespace-nowrap text-right text-xs font-bold leading-tight tracking-[0.12em]"
+                      title={item.name}
+                    >
+                      <span className="min-w-0 truncate">{item.name}</span>
+                      {item.cost.map((cost, idx) => (
+                        <span
+                          key={`${cost.type}-${cost.id}-${idx}`}
+                          className={cn(
+                            'inline-flex shrink-0 items-center gap-1 text-[10px] font-black uppercase tracking-[0.06em]',
+                            canAfford ? 'text-white/90' : 'text-game-danger',
+                          )}
+                          title={
+                            cost.type === 'currency'
+                              ? getCurrency(cost.id)?.name || cost.id
+                              : cost.id
+                          }
+                        >
+                          <span aria-hidden="true">·</span>
+                          {cost.type === 'item' && (
+                            <TaskIconDisplay
+                              icon={{ type: 'item', id: cost.id }}
+                              normalizeVisibleBounds
+                              className="size-3.5"
+                            />
+                          )}
+                          <span className="font-mono">
+                            {cost.amount.toLocaleString()}
+                          </span>
+                        </span>
+                      ))}
                     </h3>
-                    {outOfStock && (
-                      <Badge className="border-game-danger/30 bg-game-danger/10 py-0 px-1.5 h-5 text-[10px] font-black uppercase tracking-[0.08em] text-game-danger">
-                        OoS
-                      </Badge>
-                    )}
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-end gap-1.5">
-                    {item.cost.map((c, idx) => (
-                      <div
-                        key={idx}
-                        className={cn(
-                          'flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-black tracking-[0.08em] uppercase transition-colors',
-                          canAfford
-                            ? 'border-game-border bg-game-surface-raised text-game-muted group-hover:border-game-moss/30 group-hover:text-game-moss-strong'
-                            : 'border-game-danger/20 bg-game-danger/5 text-game-danger',
-                        )}
-                      >
-                        {c.type === 'currency' ? (
-                          <CurrencySprite
-                            currencyId={c.id}
-                            width={16}
-                            height={16}
-                          />
-                        ) : (
-                          <ShoppingBag className="size-3.5" aria-hidden="true" />
-                        )}
-                        <span className={cn(canAfford ? 'text-game-ink' : 'text-game-danger')}>
-                          {c.amount}
-                        </span>
-                      </div>
-                    ))}
-
-                    {remainingStock !== undefined && !outOfStock && (
-                      <div className="flex items-center gap-1 rounded-full border border-game-moss/20 bg-game-moss/5 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-moss-strong">
-                        {remainingStock} <span>In Stock</span>
-                      </div>
-                    )}
+                  <div className="relative z-10 mt-2 flex max-w-full flex-wrap justify-end gap-1.5">
+                    {outOfStock ? (
+                      <span className="rounded-full border border-game-danger/25 bg-game-danger/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-danger">
+                        Sold out
+                      </span>
+                    ) : remainingStock !== undefined ? (
+                      <span className="rounded-full border border-game-border bg-game-surface-raised/85 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
+                        {remainingStock} in stock
+                      </span>
+                    ) : null}
 
                     {item.stock !== undefined && item.daily && (
-                      <div className="flex items-center gap-1 rounded-full border border-game-ochre/20 bg-game-ochre/5 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-ochre">
-                        <span>Restocks</span>
-                      </div>
+                      <span className="rounded-full border border-game-ochre/25 bg-game-ochre/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-ochre">
+                        Restocks daily
+                      </span>
+                    )}
+                    {!canAfford && !outOfStock && (
+                      <span className="rounded-full border border-game-danger/25 bg-game-danger/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-danger">
+                        Insufficient funds
+                      </span>
                     )}
                   </div>
+
+                  <div className="relative z-20 mt-auto flex max-w-full justify-end pt-3">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={outOfStock || !canAfford || purchasingItem === item.id}
+                      onClick={() => requestBuy(item)}
+                      aria-label={`Buy ${item.name}`}
+                      title={`Buy ${item.name}`}
+                      className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/65 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/90 active:bg-game-surface-raised"
+                    >
+                      {purchasingItem === item.id ? (
+                        <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+                      ) : shopCurrencyId ? (
+                        <CurrencySprite
+                          currencyId={shopCurrencyId}
+                          width={24}
+                          height={24}
+                          alt=""
+                        />
+                      ) : (
+                        <TaskIconDisplay
+                          icon={shop.icon}
+                          normalizeVisibleBounds
+                          className="size-7"
+                        />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </button>
+              </Card>
             )
           })}
 

@@ -16,7 +16,6 @@ import {
 import { toast } from 'sonner'
 import { MoveFieldNote } from '@/components/game/moves'
 import { MoveLearnerList } from '@/components/game/moves/move-learner-list'
-import { RewardCarousel } from '@/components/game/reward-carousel'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
@@ -79,6 +78,10 @@ type InventoryListItem = {
   canChannel: boolean
 }
 
+type InventoryCurrencyBalance = (typeof currencies)[number] & {
+  amount: number
+}
+
 type PokedexProgressByForm = Record<
   string,
   {
@@ -134,13 +137,19 @@ function getRepresentativeInventoryItem(
 function InventoryNavChip({
   label,
   itemId,
+  currencyId,
+  all = false,
   quantity,
+  countLabel,
   isSelected,
   onSelect,
 }: {
   label: string
   itemId?: string
+  currencyId?: string
+  all?: boolean
   quantity: number
+  countLabel?: string
   isSelected: boolean
   onSelect: () => void
 }) {
@@ -148,7 +157,7 @@ function InventoryNavChip({
     <button
       type="button"
       data-haptic-manual="true"
-      aria-label={`${label}, ${quantity} ${quantity === 1 ? 'item' : 'items'}`}
+      aria-label={`${label}, ${countLabel || `${quantity} ${quantity === 1 ? 'item' : 'items'}`}`}
       aria-pressed={isSelected}
       onClick={onSelect}
       className={cn(
@@ -158,11 +167,13 @@ function InventoryNavChip({
           : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
       )}
     >
-      <span
-        aria-hidden="true"
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-game-border/80 bg-game-canvas/90"
-      >
-        {itemId && (
+      <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center">
+        {all ? (
+          <TaskIconDisplay
+            icon={{ type: 'local', id: '/fallback/skills/inventory-v2.png' }}
+            className="h-7 w-7"
+          />
+        ) : itemId ? (
           <ItemSprite
             itemId={itemId}
             alt=""
@@ -170,7 +181,15 @@ function InventoryNavChip({
             height={28}
             className="h-7 w-7 object-contain"
           />
-        )}
+        ) : currencyId ? (
+          <CurrencySprite
+            currencyId={currencyId}
+            alt=""
+            width={28}
+            height={28}
+            className="h-7 w-7 object-contain"
+          />
+        ) : null}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-xs font-semibold">{label}</span>
@@ -180,7 +199,8 @@ function InventoryNavChip({
             isSelected ? 'text-game-canvas/75' : 'text-game-muted',
           )}
         >
-          {quantity.toLocaleString()} {quantity === 1 ? 'item' : 'items'}
+          {countLabel ||
+            `${quantity.toLocaleString()} ${quantity === 1 ? 'item' : 'items'}`}
         </span>
       </span>
     </button>
@@ -268,11 +288,11 @@ function getEmptyMessage(
   switch (activeSubCategory || activeGroup) {
     case 'capture-tools':
     case 'encounter':
-      return 'No encounter tools yet. Buy Poke Balls from shops or earn them from tasks.'
+      return 'No Poké Balls yet. Buy them from shops or earn them from tasks.'
     case 'battle-kit':
-      return 'No battle or recovery items yet. Shops and battles are the fastest way to stock up.'
+      return 'No battle items yet. Shops and battles are the fastest way to stock up.'
     case 'encounter-tools':
-      return 'No lures or escape tools yet. Explore and check specialty shops.'
+      return 'No tools yet. Explore and check specialty shops.'
     case 'candies':
       return 'No training treats yet. Research, battles, and rewards can add candies.'
     case 'berries':
@@ -299,6 +319,8 @@ function getEmptyMessage(
       return 'No Research Kits yet. Craft one from the Artisan menu.'
     case 'key-items':
       return 'No key items yet. Complete tasks and explore to find useful keepsakes.'
+    case 'currency':
+      return 'No currencies in your wallet yet.'
     case 'scratch-cards':
       return 'No scratch cards yet. Find them in shops and rewards.'
     case 'books':
@@ -314,7 +336,7 @@ function getInventoryDisplayLabel(
   activeGroup: InventoryDisplayGroup | null,
   activeSubCategory: InventoryDisplaySubCategory | null,
 ) {
-  if (!activeGroup) return 'Items'
+  if (!activeGroup) return 'All Items'
 
   const groupLabel = INVENTORY_GROUP_LABELS[activeGroup]
   if (!activeSubCategory) return groupLabel
@@ -374,7 +396,7 @@ export function InventoryList() {
       ]),
     )
   }, [gameData?.pokedex])
-  const walletRewards = useMemo(() => {
+  const currencyBalances = useMemo<InventoryCurrencyBalance[]>(() => {
     const userCurrency = (user?.currency || {}) as Record<string, number>
 
     return currencies
@@ -383,21 +405,6 @@ export function InventoryList() {
         amount: userCurrency[currency.id] || 0,
       }))
       .filter((currency) => currency.amount > 0)
-      .map((currency) => ({
-        icon: (
-          <div className="relative">
-            <CurrencySprite
-              currencyId={currency.id}
-              alt={currency.name}
-              width={28}
-              height={28}
-              className="relative z-10 object-contain"
-            />
-          </div>
-        ),
-        label: currency.name,
-        subLabel: currency.amount.toLocaleString(),
-      }))
   }, [user?.currency])
 
   const inventory = useMemo(() => {
@@ -452,6 +459,7 @@ export function InventoryList() {
     const uniqueGroups = new Set(
       inventoryWithDetails.map((item) => item.displayGroup),
     )
+    if (currencyBalances.length > 0) uniqueGroups.add('key-items')
 
     return Array.from(uniqueGroups).sort((a, b) => {
       const idxA = INVENTORY_GROUP_ORDER.indexOf(a)
@@ -463,7 +471,7 @@ export function InventoryList() {
 
       return a.localeCompare(b)
     })
-  }, [inventoryWithDetails])
+  }, [currencyBalances.length, inventoryWithDetails])
 
   const subCategories = useMemo(() => {
     if (!activeGroup) {
@@ -475,6 +483,7 @@ export function InventoryList() {
         .filter((item) => item.displayGroup === activeGroup)
         .map((item) => item.displaySubCategory),
     )
+    if (activeGroup === 'key-items') uniqueSubCategories.add('currency')
     const preferredOrder = INVENTORY_SUBCATEGORY_ORDER[activeGroup] || []
 
     return Array.from(uniqueSubCategories).sort((a, b) => {
@@ -491,9 +500,23 @@ export function InventoryList() {
     })
   }, [inventoryWithDetails, activeGroup])
 
-  const groupNavOptions = useMemo(
-    () =>
-      groups.map((group) => {
+  const groupNavOptions = useMemo(() => {
+    if (groups.length === 0) return []
+
+    const allQuantity =
+      inventoryWithDetails.reduce((total, item) => total + item.quantity, 0) +
+      currencyBalances.length
+
+    return [
+      {
+        group: null,
+        label: 'All',
+        all: true,
+        itemId: undefined,
+        quantity: allQuantity,
+        countLabel: `${allQuantity.toLocaleString()} ${allQuantity === 1 ? 'item' : 'items'}`,
+      },
+      ...groups.map((group) => {
         const groupItems = inventoryWithDetails.filter(
           (item) => item.displayGroup === group,
         )
@@ -501,15 +524,23 @@ export function InventoryList() {
           groupItems,
           INVENTORY_GROUP_ICON_PREFERENCES[group],
         )
+        const quantity = groupCounts[group] || 0
+        const currencyCount = currencyBalances.length
 
         return {
           group,
+          label: INVENTORY_GROUP_LABELS[group] || group,
+          all: false,
           itemId: representative?.itemId,
-          quantity: groupCounts[group] || 0,
+          quantity,
+          countLabel:
+            group === 'key-items' && quantity === 0 && currencyCount > 0
+              ? `${currencyCount} ${currencyCount === 1 ? 'currency' : 'currencies'}`
+              : undefined,
         }
       }),
-    [groups, groupCounts, inventoryWithDetails],
-  )
+    ]
+  }, [currencyBalances.length, groups, groupCounts, inventoryWithDetails])
 
   const subCategoryNavOptions = useMemo(
     () =>
@@ -523,17 +554,35 @@ export function InventoryList() {
           subCategoryItems,
           INVENTORY_SUBCATEGORY_ICON_PREFERENCES[subCategory],
         )
+        const quantity =
+          subCategory === 'currency'
+            ? currencyBalances.length
+            : inventoryWithDetails
+                .filter(
+                  (item) =>
+                    item.displayGroup === activeGroup &&
+                    item.displaySubCategory === subCategory,
+                )
+                .reduce((total, item) => total + item.quantity, 0)
 
         return {
           subCategory,
           itemId: representative?.itemId,
-          quantity: subCategoryItems.reduce(
-            (total, item) => total + item.quantity,
-            0,
-          ),
+          currencyId:
+            subCategory === 'currency' ? currencyBalances[0]?.id : undefined,
+          quantity,
+          countLabel:
+            subCategory === 'currency'
+              ? `${quantity.toLocaleString()} ${quantity === 1 ? 'currency' : 'currencies'}`
+              : undefined,
         }
       }),
-    [activeGroup, inventoryWithDetails, subCategories],
+    [
+      activeGroup,
+      currencyBalances,
+      inventoryWithDetails,
+      subCategories,
+    ],
   )
 
   useEffect(() => {
@@ -542,7 +591,7 @@ export function InventoryList() {
       return
     }
 
-    if (!activeGroup || !groups.includes(activeGroup)) {
+    if (activeGroup && !groups.includes(activeGroup)) {
       setActiveGroup(groups[0])
     }
   }, [groups, activeGroup])
@@ -564,8 +613,7 @@ export function InventoryList() {
     return inventoryWithDetails
       .filter((item) => {
         if (!normalizedSearch) {
-          if (!activeGroup) return false
-          if (item.displayGroup !== activeGroup) return false
+          if (activeGroup && item.displayGroup !== activeGroup) return false
           return (
             !activeSubCategory || item.displaySubCategory === activeSubCategory
           )
@@ -588,6 +636,22 @@ export function InventoryList() {
       })
       .sort((a, b) => a.details.name.localeCompare(b.details.name))
   }, [inventoryWithDetails, activeGroup, activeSubCategory, searchQuery])
+
+  const filteredCurrencyBalances = useMemo(() => {
+    const normalizedSearch = searchQuery.trim().toLowerCase()
+    if (!normalizedSearch) {
+      return !activeGroup ||
+        (activeGroup === 'key-items' && activeSubCategory === 'currency')
+        ? currencyBalances
+        : []
+    }
+
+    return currencyBalances.filter((currency) =>
+      `${currency.name} ${currency.id} currency`
+        .toLowerCase()
+        .includes(normalizedSearch),
+    )
+  }, [activeGroup, activeSubCategory, currencyBalances, searchQuery])
 
   const selectedItemDisplayPlacement = useMemo(
     () => (selectedItem ? getInventoryDisplayPlacement(selectedItem) : null),
@@ -785,19 +849,23 @@ export function InventoryList() {
             className="block w-full min-w-0"
           >
             <div className="flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
-              {groupNavOptions.map(({ group, itemId, quantity }) => (
+              {groupNavOptions.map(
+                ({ group, label, itemId, all, quantity, countLabel }) => (
                 <InventoryNavChip
                   key={group}
-                  label={INVENTORY_GROUP_LABELS[group] || group}
+                  label={label}
                   itemId={itemId}
+                  all={all}
                   quantity={quantity}
+                  countLabel={countLabel}
                   isSelected={activeGroup === group}
                   onSelect={() => {
                     triggerHaptic('selection')
                     setActiveGroup(group)
                   }}
                 />
-              ))}
+                ),
+              )}
             </div>
           </fieldset>
 
@@ -808,12 +876,14 @@ export function InventoryList() {
             >
               <div className="flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
                 {subCategoryNavOptions.map(
-                  ({ subCategory, itemId, quantity }) => (
+                  ({ subCategory, itemId, currencyId, quantity, countLabel }) => (
                     <InventoryNavChip
                       key={subCategory}
                       label={getInventorySubCategoryLabel(subCategory)}
                       itemId={itemId}
+                      currencyId={currencyId}
                       quantity={quantity}
+                      countLabel={countLabel}
                       isSelected={activeSubCategory === subCategory}
                       onSelect={() => {
                         triggerHaptic('selection')
@@ -833,21 +903,6 @@ export function InventoryList() {
         className="flex-1 min-h-0 touch-pan-y overflow-y-auto px-4 pt-4 pb-4 md:px-6"
         {...scrollClickGuard}
       >
-        {walletRewards.length > 0 && (
-          <div className="mb-6">
-            <SectionDivider
-              className="mb-6"
-              textColor="text-game-moss-strong"
-              variant="chip"
-            >
-              Wallet
-            </SectionDivider>
-            <div className="mt-3">
-              <RewardCarousel rewards={walletRewards} />
-            </div>
-          </div>
-        )}
-
         <div className="mb-5">
           <PremiumSearch
             value={searchQuery}
@@ -866,7 +921,7 @@ export function InventoryList() {
           {searchQuery.trim() ? 'Search Results' : activeDisplayLabel}
         </SectionDivider>
 
-        {filteredInventory.length === 0 ? (
+        {filteredInventory.length === 0 && filteredCurrencyBalances.length === 0 ? (
           <div
             className="mx-auto max-w-xl rounded-md border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"
             role="status"
@@ -880,6 +935,12 @@ export function InventoryList() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            {filteredCurrencyBalances.map((currency) => (
+              <InventoryCurrencyCard
+                key={`currency-${currency.id}`}
+                currency={currency}
+              />
+            ))}
             {filteredInventory.map((item) => (
               <InventoryItemCard
                 key={item.id}
@@ -1148,6 +1209,48 @@ function TmMoveDetails({
   )
 }
 
+function InventoryCurrencyCard({
+  currency,
+}: {
+  currency: InventoryCurrencyBalance
+}) {
+  return (
+    <div className="relative flex min-h-24 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-card-border bg-game-surface p-4">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-70"
+        style={{ backgroundImage: 'url(/backgrounds/inventory.avif)' }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-game-surface-raised/76 via-game-surface/56 to-game-surface/10"
+      />
+      <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
+        <CurrencySprite
+          currencyId={currency.id}
+          alt={currency.name}
+          width={48}
+          height={48}
+          className="h-9 w-9 object-contain"
+        />
+      </div>
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+        <h3
+          className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-xs font-bold leading-tight tracking-[0.12em] text-white"
+          title={currency.name}
+        >
+          {currency.name}
+          <span className="ml-1 font-mono text-game-battle-orange">
+            <span className="sr-only">Balance: </span>
+            <span aria-hidden="true">×</span>
+            {currency.amount.toLocaleString()}
+          </span>
+        </h3>
+      </div>
+    </div>
+  )
+}
+
 // Memoized inventory item card to prevent unnecessary re-renders
 const InventoryItemCard = memo(function InventoryItemCard({
   item,
@@ -1165,11 +1268,9 @@ const InventoryItemCard = memo(function InventoryItemCard({
   const actionLabel = getItemActionLabel(item.details, item.canChannel)
   const isCrafting = isArtisanIngredientItem(item.details)
   const isUsable = !!actionLabel && actionLabel !== 'Battle Only'
-  const controlIcon: TaskIcon = isCrafting
+  const actionIcon: TaskIcon = isCrafting
     ? { type: 'local', id: '/fallback/skills/artisan-v2.png' }
-    : isUsable
-      ? { type: 'item', id: 'poke-ball' }
-      : { type: 'item', id: 'explorers-journal' }
+    : { type: 'item', id: 'poke-ball' }
   const showBulkOpen =
     item.details.category === 'booster-pack' &&
     item.quantity > 1 &&
@@ -1206,33 +1307,44 @@ const InventoryItemCard = memo(function InventoryItemCard({
           </span>
         </h3>
         <div className="relative z-20 mt-auto flex max-w-full flex-wrap justify-end gap-2 pt-3">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            data-haptic-manual="true"
-            className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
-            onClick={() =>
-              isCrafting ? onAction(item.details) : onClick(item.details)
-            }
-            aria-haspopup={isCrafting ? undefined : 'dialog'}
-            aria-label={
-              isCrafting
-                ? `Craft with ${item.details.name}`
-                : `View ${item.details.name}`
-            }
-            title={
-              isCrafting
-                ? `Craft with ${item.details.name}`
-                : `View ${item.details.name}`
-            }
-          >
-            <TaskIconDisplay
-              icon={controlIcon}
-              normalizeVisibleBounds
-              className="h-7 w-7"
-            />
-          </Button>
+          {!isCrafting && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              data-haptic-manual="true"
+              className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
+              onClick={() => onClick(item.details)}
+              aria-haspopup="dialog"
+              aria-label={`View ${item.details.name}`}
+              title={`View ${item.details.name}`}
+            >
+              <TaskIconDisplay
+                icon={{ type: 'item', id: 'explorers-journal' }}
+                normalizeVisibleBounds
+                className="h-7 w-7"
+              />
+            </Button>
+          )}
+          {isUsable && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              data-haptic-manual="true"
+              disabled={disabledAction}
+              className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
+              onClick={() => onAction(item.details)}
+              aria-label={`${actionLabel} ${item.details.name}`}
+              title={`${actionLabel} ${item.details.name}`}
+            >
+              <TaskIconDisplay
+                icon={actionIcon}
+                normalizeVisibleBounds
+                className="h-7 w-7"
+              />
+            </Button>
+          )}
           {showBulkOpen && (
             <Button
               type="button"
