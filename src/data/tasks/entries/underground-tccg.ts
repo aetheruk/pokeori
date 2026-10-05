@@ -40,7 +40,12 @@ export const undergroundTccgTasks: Task[] = [
     chat: true,
     requirements: [{ type: 'task_completed', targetId: 'kanto-underground-somehow-deeper' }],
     criteria: [],
-    rewards: [],
+    rewards: [
+      {
+        type: 'guild_membership',
+        targetId: UNDERGROUND_SOCIETY_GUILD_ID,
+      },
+    ],
     enterModal: [
       {
         id: 1,
@@ -119,10 +124,12 @@ export const undergroundTccgTasks: Task[] = [
     chat: true,
     requirements: [
       { type: 'task_completed', targetId: 'underground-tcg-basic-training' },
-      { type: 'guild_rank', targetId: UNDERGROUND_SOCIETY_GUILD_ID, count: 1 },
     ],
     criteria: [{ type: 'currency_owned', targetId: 'crystals', count: 500, consume: true }],
-    rewards: [{ type: 'item', targetId: 'card-crystalizer', quantity: 1, dropChance: 100 }],
+    rewards: [
+      { type: 'item', targetId: 'card-crystalizer', quantity: 1, dropChance: 100 },
+      { type: 'guild_membership', targetId: UNDERGROUND_SOCIETY_GUILD_ID },
+    ],
     enterModal: [
       {
         id: 1,
