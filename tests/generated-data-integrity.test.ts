@@ -979,8 +979,14 @@ describe('generated data integrity', () => {
       resolveEvolvedAbility('133', 'anticipation', '134', () => 0.999999),
     ).toBe('hydration')
     expect(resolveEvolvedAbility('16', 'tiny_roar', '17', () => 0)).toBe(
-      'big_pecks',
+      'keen_eye',
     )
+    expect(
+      resolveEvolvedAbility('1', 'unrecognized_ability', '1', () => 0),
+    ).toBe('overgrow')
+    expect(
+      resolveEvolvedAbility('1', 'unrecognized_ability', '1', () => 0, true),
+    ).toBe('chlorophyll')
   })
 
   test('AbilityDex exposes authored partner effect text', () => {

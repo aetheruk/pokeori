@@ -331,6 +331,12 @@ function ExploreCardComponent({
               const isActive =
                 groupedItem.type === 'expedition' &&
                 activeExpedition?.expeditionId === groupedItem.id
+              const activeVoyageData =
+                groupedItem.type === 'voyage'
+                  ? activeVoyages.find(
+                      (voyage) => voyage.voyageId === groupedItem.id,
+                    )
+                  : undefined
 
               return (
                 <Button
@@ -341,43 +347,51 @@ function ExploreCardComponent({
                   title={getModeLabel(groupedItem)}
                   className={cn(
                     'relative z-20 size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
+                    activeVoyageData && 'h-11 w-auto min-w-28 px-2',
                     isActive && 'border-game-ochre/60',
                   )}
                   onClick={() => selectItem(groupedItem)}
                 >
                   <span className="sr-only">
-                    {getModeLabel(groupedItem)}:{' '}
+                    {activeVoyageData
+                      ? 'Voyage status:'
+                      : `${getModeLabel(groupedItem)}:`}{' '}
                     {parseText(groupedItem.name, trainerName)}
                   </span>
-                  <span aria-hidden="true" className="pointer-events-none">
-                    {isConversation ? (
-                      <GridPlayerSprite
-                        gender={userData.user.trainerGender}
-                        className="h-7 w-7"
-                      />
-                    ) : shopCurrencyId ? (
-                      <CurrencySprite
-                        currencyId={shopCurrencyId}
-                        width={28}
-                        height={28}
-                        className="h-7 w-7 object-contain pixelated"
-                      />
-                    ) : (
-                      <TaskIconDisplay
-                        icon={getActionIcon(groupedItem)}
-                        normalizeVisibleBounds
-                        className="h-7 w-7"
-                      />
-                    )}
-                  </span>
+                  {activeVoyageData ? (
+                    <VoyageCountdown
+                      endTime={activeVoyageData.endTime}
+                      className="pointer-events-none whitespace-nowrap text-[10px]"
+                    />
+                  ) : (
+                    <span aria-hidden="true" className="pointer-events-none">
+                      {isConversation ? (
+                        <GridPlayerSprite
+                          gender={userData.user.trainerGender}
+                          className="h-7 w-7"
+                        />
+                      ) : shopCurrencyId ? (
+                        <CurrencySprite
+                          currencyId={shopCurrencyId}
+                          width={28}
+                          height={28}
+                          className="h-7 w-7 object-contain pixelated"
+                        />
+                      ) : (
+                        <TaskIconDisplay
+                          icon={getActionIcon(groupedItem)}
+                          normalizeVisibleBounds
+                          className="h-7 w-7"
+                        />
+                      )}
+                    </span>
+                  )}
                 </Button>
               )
             })}
           </div>
         )}
-        {(isActiveVoyage ||
-          (isActiveExpedition &&
-            activeExpedition?.status === 'ready_to_claim')) && (
+        {isActiveExpedition && activeExpedition?.status === 'ready_to_claim' && (
           <div
             className={cn(
               isGrouped
@@ -387,18 +401,6 @@ function ExploreCardComponent({
             )}
           >
             {(() => {
-              if (item.type === 'voyage') {
-                const active = activeVoyages.find((v) => v.voyageId === item.id)
-                if (active) {
-                  return (
-                    <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
-                      <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
-                      <VoyageCountdown endTime={active.endTime} />
-                    </div>
-                  )
-                }
-              }
-
               if (
                 expeditionItem &&
                 activeExpedition &&

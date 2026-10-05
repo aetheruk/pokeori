@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.43.75`): Hidden abilities remain unavailable to natural wild catch rolls and evolution rerolls until Researcher level 27; an already-held hidden ability is preserved through evolution. Voyage Explore cards show their countdown in the action button, which changes to “Check Results” when ready, and no longer show a separate orange countdown line. Cerulean City's `route-9-sturdy-boots` task consumes 2 Metal Scrap instead of 6 Small Stone.
 - Release `0.43.67`: All 18 battle type backgrounds now use polished abstract elemental fields with layered material textures and restrained motion in Stance, Moves, and Powers. The fields retain proportional cropping, cached base rendering, and reduced-motion support.
 
 - Release `0.43.67`: The `A Moonlit Shadow` Lugia Snap event is now half as likely to appear (1 in 512 instead of 1 in 256). S.S. Anne repair dialogue says “That's the majority of repairs finished.” Result summaries combine Pokemon Research XP rewards for the same form into one entry. Diglett's Cave keeps its secret Promo binder reward across catches, battles, and Field Observation; the separate Rubber Mallet observation drop remains non-secret.

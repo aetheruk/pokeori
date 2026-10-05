@@ -16,3 +16,4 @@ Send Pokemon on timed voyages for rewards.
 - Rewards scale with Pokemon level/stats
 - Risk of failure (low HP Pokemon)
 - Claim rewards on completion
+- Active voyage cards show the live countdown in their action button, which changes to “Check Results” when complete.
