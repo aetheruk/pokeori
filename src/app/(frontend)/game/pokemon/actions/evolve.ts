@@ -31,6 +31,7 @@ import { rollResearchXp } from '@/utilities/research/research-levels'
 import { EVOLUTIONS, type EvolutionCondition } from '@/data/evolutions'
 import { getLevelEvolutionCatalystForEvolution } from '@/data/evolution-catalysts'
 import { resolveEvolvedAbility } from '@/data/abilities'
+import { getResearcherHiddenAbilitiesUnlocked } from '@/utilities/skills/unlocks'
 import { resolveEvolutionTargetForm } from '@/utilities/pokemon/evolution-targets'
 import {
   getEvolutionTimeOfDayLabel,
@@ -256,7 +257,14 @@ export async function evolvePokemon(
   }
 
   const newFormId = newSpeciesInfo.id
-  const newAbilityId = resolveEvolvedAbility(pokemon.formId, pokemon.ability, newFormId)
+  const researcherLevel = user.skills?.researching?.level || 1
+  const newAbilityId = resolveEvolvedAbility(
+    pokemon.formId,
+    pokemon.ability,
+    newFormId,
+    Math.random,
+    getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+  )
 
   await payload.update({
     collection: 'pokemon',

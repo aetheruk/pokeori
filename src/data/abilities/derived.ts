@@ -106,9 +106,12 @@ export function createAbilityFormResolvers(formMap: Record<string, AbilityAssign
     sourceAbilityId: string | null | undefined,
     targetFormId: string,
     random: () => number = Math.random,
+    hiddenEligible = false,
   ): string | undefined => {
     const sourceAssignment = getNaturalFormAbilityAssignment(sourceFormId, sourceAbilityId)
-    if (!sourceAssignment) return rollNaturalFormAbility(targetFormId, random)
+    if (!sourceAssignment) {
+      return rollNaturalFormAbility(targetFormId, random, { hiddenEligible })
+    }
 
     const sourceHidden = !!sourceAssignment.hidden
     const targetAssignments = formMap[targetFormId] || []
@@ -120,7 +123,7 @@ export function createAbilityFormResolvers(formMap: Record<string, AbilityAssign
     return (
       matchingSlotAssignment?.id ||
       getPrimaryMatchingVisibilityAssignment(targetFormId, sourceHidden)?.id ||
-      rollNaturalFormAbility(targetFormId, random)
+      rollNaturalFormAbility(targetFormId, random, { hiddenEligible })
     )
   }
 

@@ -3536,8 +3536,8 @@ describe('static data references', () => {
         },
         {
           type: 'item_owned',
-          targetId: 'small-stone-t1',
-          count: 6,
+          targetId: 'metal-scrap-t1',
+          count: 2,
           consume: true,
         },
         {
