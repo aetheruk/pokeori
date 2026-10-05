@@ -1,4 +1,5 @@
 import { Task, TaskIcon } from '../../types'
+import { UNDERGROUND_SOCIETY_GUILD_ID } from '@/data/guilds/underground-society'
 
 const schoolBackground = '/backgrounds/town.avif'
 const lessonIcon = { type: 'trainer' as const, id: 'expert-m' }
@@ -213,6 +214,12 @@ export const pewterTcgTasks: Task[] = [
         quantity: 1,
         dropChance: 100,
         cardDrawParams: { allowedCardIds: ['basep-10'], guaranteed: true },
+      },
+      {
+        type: 'guild_xp',
+        targetId: UNDERGROUND_SOCIETY_GUILD_ID,
+        quantity: 100,
+        dropChance: 100,
       },
     ],
     enterModal: [
