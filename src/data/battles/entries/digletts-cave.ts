@@ -45,6 +45,9 @@ export const diglettsCaveBattles: BattleConfig[] = [
         quantity: 1,
         dropChance: 5,
         secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'binder-basep', inverse: true },
+        ],
       },
       {
         type: 'item',
@@ -52,6 +55,9 @@ export const diglettsCaveBattles: BattleConfig[] = [
         quantity: 1,
         dropChance: 5,
         secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
+        ],
       },
     ],
     maxPokemon: 1,

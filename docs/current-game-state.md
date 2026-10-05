@@ -1,6 +1,7 @@
 # Current Game State
 
-- Unreleased (`0.43.76`): Diglett's Cave now rolls both the Promo Binder and Rubber Mallet as secret drops from catches (20%), wild battles (5%), and Field Observation (10%). Field Observation can award another Rubber Mallet even if one is already owned.
+- Unreleased (`0.43.77`): Diglett's Cave stops rolling the secret Promo Binder or Rubber Mallet reward from catching, battling, or Field Observation after the player owns that item, keeping each unique reward to one copy.
+- Unreleased (`0.43.76`): Diglett's Cave now rolls both the Promo Binder and Rubber Mallet as secret drops from catches (20%), wild battles (5%), and Field Observation (10%).
 - Unreleased (`0.43.75`): Hidden abilities remain unavailable to natural wild catch rolls and evolution rerolls until Researcher level 27; an already-held hidden ability is preserved through evolution. Voyage Explore cards show their countdown in the action button, which changes to “Check Results” when ready, and no longer show a separate orange countdown line. Cerulean City's `route-9-sturdy-boots` task consumes 2 Metal Scrap instead of 6 Small Stone.
 - Release `0.43.67`: All 18 battle type backgrounds now use polished abstract elemental fields with layered material textures and restrained motion in Stance, Moves, and Powers. The fields retain proportional cropping, cached base rendering, and reduced-motion support.
 

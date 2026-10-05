@@ -38,12 +38,18 @@ export const diglettsCaveFieldObservationEntries: FieldObservationConfig[] = [
           itemId: 'binder-basep',
           dropChance: 10,
           secret: true,
+          requirements: [
+            { type: 'item_owned', targetId: 'binder-basep', inverse: true },
+          ],
         },
         {
           id: 'digletts-cave-rubber-mallet',
           itemId: 'rubber-mallet',
           dropChance: 10,
           secret: true,
+          requirements: [
+            { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
+          ],
         },
       ],
     },
