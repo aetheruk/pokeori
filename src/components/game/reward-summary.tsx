@@ -16,6 +16,7 @@ import { SkillExperienceRewardList } from '@/components/game/shared/skill-experi
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { getCurrency } from '@/data/currencies'
+import { getGuild } from '@/data/guilds'
 import { getSkill } from '@/data/skills'
 import { getIcon } from '@/data/user'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
@@ -464,19 +465,29 @@ export function RewardSummaryDisplay({
                 <span className={REWARD_VALUE_CLASS}>+{entry.amount} XP</span>
               </RewardLedgerRow>
             ))}
-            {(summary.guildRankUps || []).map((entry) => (
-              <RewardLedgerRow key={`${entry.guildId}-rank-${entry.newRank}`}>
-                <Trophy className="h-5 w-5 shrink-0 text-game-ochre" />
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-game-ink">
-                    Rank {entry.newRank}: {entry.rankName}
+            {(summary.guildRankUps || []).map((entry) => {
+              const guildIcon = getGuild(entry.guildId)?.icon
+              return (
+                <RewardLedgerRow key={`${entry.guildId}-rank-${entry.newRank}`}>
+                  {guildIcon ? (
+                    <TaskIconDisplay
+                      icon={guildIcon}
+                      className="h-8 w-8 shrink-0"
+                    />
+                  ) : (
+                    <Trophy className="h-5 w-5 shrink-0 text-game-ochre" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold text-game-ink">
+                      Rank {entry.newRank}: {entry.rankName}
+                    </div>
+                    <div className="text-xs text-game-muted">
+                      {entry.unlocks.join(' · ')}
+                    </div>
                   </div>
-                  <div className="text-xs text-game-muted">
-                    {entry.unlocks.join(' · ')}
-                  </div>
-                </div>
-              </RewardLedgerRow>
-            ))}
+                </RewardLedgerRow>
+              )
+            })}
           </div>
         </>
       )}

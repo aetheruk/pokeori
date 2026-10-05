@@ -113,10 +113,7 @@ describe('TCG Basic Training content', () => {
       'This is all quite strange… Nobody seems to be acknowledging the pit. Is that fine?',
     )
     expect(basicTraining?.completeButtonText).toBe('Begin Training')
-    expect(basicTraining?.rewards).toContainEqual({
-      type: 'guild_membership',
-      targetId: 'underground-society',
-    })
+    expect(basicTraining?.rewards).toEqual([])
     expect(
       basicTraining?.enterModal?.[0]?.buttons.map((button) => button.text),
     ).toEqual(['Keep the pit supplied', 'Dig Even Deeper', 'Profit?'])
@@ -125,6 +122,7 @@ describe('TCG Basic Training content', () => {
     ).toEqual(['You make them here', 'The Pit', 'Wild booster packs'])
     expect(taskDialogue(basicTraining)).toContain('Make cards. Spread cards.')
     expect(taskDialogue(basicTraining)).toContain('Feed pit')
+    expect(taskDialogue(basicTraining)).not.toContain('You are now part of')
     expect(redistribution?.name).toBe('Feeding the Pit')
     expect(redistribution?.completeButtonText).toBe('Throw Crystals')
     expect(redistribution?.criteria).toContainEqual({
@@ -146,6 +144,7 @@ describe('TCG Basic Training content', () => {
       type: 'guild_membership',
       targetId: 'underground-society',
     })
+    expect(taskDialogue(redistribution)).toContain('membership form')
     expect(ownSet?.criteria).toEqual([])
     expect(ownSet?.requirements).toEqual([
       { type: 'task_completed', targetId: 'underground-tcg-wrapup' },

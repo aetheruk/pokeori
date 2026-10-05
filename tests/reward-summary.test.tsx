@@ -20,6 +20,28 @@ function summary(overrides: Partial<RewardSummary> = {}): RewardSummary {
 }
 
 describe('reward summary sections', () => {
+  test('guild rank ups use the authored guild icon', () => {
+    const markup = renderToStaticMarkup(
+      <RewardSummaryDisplay
+        summary={summary({
+          guildRankUps: [
+            {
+              guildId: 'underground-society',
+              guildName: 'Underground Society',
+              oldRank: 0,
+              newRank: 1,
+              rankName: 'New Recruit',
+              unlocks: ['Society membership'],
+            },
+          ],
+        })}
+      />,
+    )
+
+    expect(markup).toContain('Rank 1: New Recruit')
+    expect(markup).toContain('tcg-maniac-m.avif')
+  })
+
   test('shows Other and Rewards before the experience sections', () => {
     const markup = renderToStaticMarkup(
       <RewardSummaryDisplay

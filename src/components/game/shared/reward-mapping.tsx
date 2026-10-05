@@ -315,6 +315,14 @@ export function mapRewardToDisplayItem(
       )
       break
     }
+    case 'guild_membership': {
+      const guild = reward.targetId ? getGuild(String(reward.targetId)) : undefined
+      label = `${guild?.name || 'Guild'} Membership`
+      if (guild?.icon) {
+        icon = <TaskIconDisplay icon={guild.icon} className="h-8 w-8" />
+      }
+      break
+    }
     case 'card': {
       label = `TCG Card${(typeof reward.quantity === 'number' && reward.quantity > 1) || typeof reward.quantity === 'object' ? '(s)' : ''}`
       if (quantityStr) label += ` ${quantityStr}`
