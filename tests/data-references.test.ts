@@ -2730,6 +2730,9 @@ describe('static data references', () => {
     const malletTask = tasks.find(
       (entry) => entry.id === 'digletts-cave-rubber-mallet',
     )
+    const stressedStrangerTask = tasks.find(
+      (entry) => entry.id === 'digletts-cave-stressed-stranger',
+    )
     const malletGame = exploreItems.find(
       (entry) => entry.id === 'digletts-cave-mallet-tap',
     )
@@ -2751,6 +2754,11 @@ describe('static data references', () => {
     expect(sailorWarning?.exitModal?.message).toContain(
       'Viridian City entrance',
     )
+    expect(stressedStrangerTask?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'vermilion-rumours',
+    })
+    expect(stressedStrangerTask?.completeButtonText).toBe('Are you okay?')
     expect(diglettSubRegion.unlockRequirements).toContainEqual({
       type: 'task_completed',
       targetId: 'vermilion-rumours',
@@ -2787,6 +2795,10 @@ describe('static data references', () => {
       dropChance: 10,
       secret: true,
       requirements: [
+        {
+          type: 'task_completed',
+          targetId: 'digletts-cave-stressed-stranger',
+        },
         { type: 'item_owned', targetId: 'binder-basep', inverse: true },
       ],
     })
@@ -2796,6 +2808,10 @@ describe('static data references', () => {
       dropChance: 10,
       secret: true,
       requirements: [
+        {
+          type: 'task_completed',
+          targetId: 'digletts-cave-stressed-stranger',
+        },
         { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
       ],
     })
@@ -2830,6 +2846,10 @@ describe('static data references', () => {
         dropChance: 20,
         secret: true,
         requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'digletts-cave-stressed-stranger',
+          },
           { type: 'item_owned', targetId: 'binder-basep', inverse: true },
         ],
       },
@@ -2840,6 +2860,10 @@ describe('static data references', () => {
         dropChance: 20,
         secret: true,
         requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'digletts-cave-stressed-stranger',
+          },
           { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
         ],
       },
@@ -2857,6 +2881,10 @@ describe('static data references', () => {
         dropChance: 5,
         secret: true,
         requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'digletts-cave-stressed-stranger',
+          },
           { type: 'item_owned', targetId: 'binder-basep', inverse: true },
         ],
       },
@@ -2867,6 +2895,10 @@ describe('static data references', () => {
         dropChance: 5,
         secret: true,
         requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'digletts-cave-stressed-stranger',
+          },
           { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
         ],
       },

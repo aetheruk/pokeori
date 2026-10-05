@@ -39,6 +39,7 @@ export const diglettsCaveFieldObservationEntries: FieldObservationConfig[] = [
           dropChance: 10,
           secret: true,
           requirements: [
+            { type: 'task_completed', targetId: 'digletts-cave-stressed-stranger' },
             { type: 'item_owned', targetId: 'binder-basep', inverse: true },
           ],
         },
@@ -48,6 +49,7 @@ export const diglettsCaveFieldObservationEntries: FieldObservationConfig[] = [
           dropChance: 10,
           secret: true,
           requirements: [
+            { type: 'task_completed', targetId: 'digletts-cave-stressed-stranger' },
             { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
           ],
         },
