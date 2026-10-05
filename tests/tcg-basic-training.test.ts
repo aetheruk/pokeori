@@ -113,6 +113,10 @@ describe('TCG Basic Training content', () => {
       'This is all quite strange… Nobody seems to be acknowledging the pit. Is that fine?',
     )
     expect(basicTraining?.completeButtonText).toBe('Begin Training')
+    expect(basicTraining?.rewards).toContainEqual({
+      type: 'guild_membership',
+      targetId: 'underground-society',
+    })
     expect(
       basicTraining?.enterModal?.[0]?.buttons.map((button) => button.text),
     ).toEqual(['Keep the pit supplied', 'Dig Even Deeper', 'Profit?'])
@@ -129,11 +133,18 @@ describe('TCG Basic Training content', () => {
       count: 500,
       consume: true,
     })
+    expect(redistribution?.requirements).toEqual([
+      { type: 'task_completed', targetId: 'underground-tcg-basic-training' },
+    ])
     expect(redistribution?.rewards).toContainEqual({
       type: 'item',
       targetId: 'card-crystalizer',
       quantity: 1,
       dropChance: 100,
+    })
+    expect(redistribution?.rewards).toContainEqual({
+      type: 'guild_membership',
+      targetId: 'underground-society',
     })
     expect(ownSet?.criteria).toEqual([])
     expect(ownSet?.requirements).toEqual([
