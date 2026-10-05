@@ -300,7 +300,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 2,
+            amount: 5,
           },
         ],
         rewards: [

@@ -2047,7 +2047,7 @@ describe('static data references', () => {
 
     expect(hasLeagueTicketReward(starterTask?.rewards, 10)).toBe(true)
     expect(exchange?.cost).toEqual([
-      { type: 'currency', id: 'prof-scrip', amount: 2 },
+      { type: 'currency', id: 'prof-scrip', amount: 5 },
     ])
     expect(hasLeagueTicketReward(exchange?.rewards, 1)).toBe(true)
     expect(
