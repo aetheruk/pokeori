@@ -5,6 +5,7 @@ export function SecretPokemonIcon({ className }: { className?: string }) {
     <TaskIconDisplay
       icon={{ type: 'pokemon', id: '201-question' }}
       className={className}
+      normalizeVisibleBounds
     />
   )
 }

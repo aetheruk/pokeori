@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { type CSSProperties, type SyntheticEvent, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { getItemHueRotate, getItemSpriteUrl } from '@/data/items'
+import { getVisibleBoundsImageStyle } from '@/utilities/visible-image-bounds'
 
 interface ItemSpriteProps {
   itemId: string
@@ -12,6 +13,7 @@ interface ItemSpriteProps {
   className?: string
   priority?: boolean
   style?: React.CSSProperties
+  normalizeVisibleBounds?: boolean
   onLoad?: React.ReactEventHandler<HTMLImageElement>
 }
 
@@ -23,6 +25,7 @@ export function ItemSprite({
   className = '',
   priority = false,
   style,
+  normalizeVisibleBounds = false,
   onLoad,
 }: ItemSpriteProps) {
   const hueRotate = getItemHueRotate(itemId)
@@ -33,6 +36,20 @@ export function ItemSprite({
   }
 
   const [hasError, setHasError] = useState(false)
+  const [visibleBoundsStyle, setVisibleBoundsStyle] =
+    useState<CSSProperties>()
+
+  useEffect(() => {
+    setVisibleBoundsStyle(undefined)
+  }, [itemId, normalizeVisibleBounds])
+
+  const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    if (normalizeVisibleBounds) {
+      const normalizedStyle = getVisibleBoundsImageStyle(event.currentTarget)
+      if (normalizedStyle) setVisibleBoundsStyle(normalizedStyle)
+    }
+    onLoad?.(event)
+  }
 
   if (hasError) {
     // Image failed to load - show a placeholder
@@ -55,9 +72,9 @@ export function ItemSprite({
       width={width}
       height={height}
       className={`pixelated ${className}`}
-      style={mergedStyle}
+      style={{ ...mergedStyle, ...visibleBoundsStyle }}
       priority={priority}
-      onLoad={onLoad}
+      onLoad={handleImageLoad}
       onError={() => setHasError(true)}
     />
   )

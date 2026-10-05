@@ -1038,6 +1038,7 @@ export function getFormattedRewards(
               width={32}
               height={32}
               className="w-10 h-10 object-contain"
+              normalizeVisibleBounds
             />
           ),
           label: item?.name || entry.itemId,

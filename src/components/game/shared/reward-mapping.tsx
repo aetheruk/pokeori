@@ -22,7 +22,7 @@ import { items } from '@/data/items'
 import { getSkill } from '@/data/skills'
 import { tasks } from '@/data/tasks'
 import { getBanner, getIcon, getTitle } from '@/data/user'
-import { getPokemonForm, getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { PokemonRaritySprite } from './PokemonRaritySprite'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 
@@ -139,6 +139,7 @@ export function mapRewardToDisplayItem(
               className="object-contain pixelated"
               width={32}
               height={32}
+              normalizeVisibleBounds
             />
           </div>
         )
@@ -158,6 +159,7 @@ export function mapRewardToDisplayItem(
             className="object-contain pixelated"
             width={32}
             height={32}
+            normalizeVisibleBounds
           />
         </div>
       )
@@ -175,6 +177,7 @@ export function mapRewardToDisplayItem(
             className="object-contain pixelated"
             width={32}
             height={32}
+            normalizeVisibleBounds
           />
         </div>
       )
@@ -225,6 +228,7 @@ export function mapRewardToDisplayItem(
             rarity={rarity}
             alt="Pokemon"
             className="h-full w-full"
+            normalizeVisibleBounds
           />
         </div>
       )
@@ -259,6 +263,7 @@ export function mapRewardToDisplayItem(
                 className="object-contain pixelated"
                 width={32}
                 height={32}
+                normalizeVisibleBounds
               />
             </div>
           )
@@ -292,6 +297,7 @@ export function mapRewardToDisplayItem(
               className="object-contain pixelated"
               width={32}
               height={32}
+              normalizeVisibleBounds
             />
           </div>
         )
@@ -311,6 +317,7 @@ export function mapRewardToDisplayItem(
             className="object-contain pixelated"
             width={32}
             height={32}
+            normalizeVisibleBounds
           />
         </div>
       )
@@ -320,7 +327,13 @@ export function mapRewardToDisplayItem(
       const guild = reward.targetId ? getGuild(String(reward.targetId)) : undefined
       label = `${guild?.name || 'Guild'} Membership`
       if (guild?.icon) {
-        icon = <TaskIconDisplay icon={guild.icon} className="h-8 w-8" />
+        icon = (
+          <TaskIconDisplay
+            icon={guild.icon}
+            className="h-8 w-8"
+            normalizeVisibleBounds
+          />
+        )
       }
       break
     }
@@ -368,7 +381,11 @@ export function mapRewardToDisplayItem(
           } else {
             label = `Unlock: ${taskDef?.name || taskId}`
             icon = taskDef?.icon ? (
-              <TaskIconDisplay icon={taskDef.icon} className="w-8 h-8" />
+              <TaskIconDisplay
+                icon={taskDef.icon}
+                className="w-8 h-8"
+                normalizeVisibleBounds
+              />
             ) : (
               <HelpCircle className="w-6 h-6 text-game-ochre" />
             )
@@ -410,7 +427,11 @@ export function mapRewardToDisplayItem(
       const iconDef = getIcon(reward.targetId as string)
       label = `Icon: ${iconDef?.name || 'Unknown'}`
       icon = iconDef ? (
-        <TaskIconDisplay icon={iconDef.icon} className="h-8 w-8" />
+        <TaskIconDisplay
+          icon={iconDef.icon}
+          className="h-8 w-8"
+          normalizeVisibleBounds
+        />
       ) : (
         <Box className="w-8 h-8 text-game-muted" />
       )
@@ -455,18 +476,11 @@ export function mapRewardToDisplayItem(
       if (quantityStr) label += ` ${quantityStr}`
       if (formData && reward.targetId) {
         icon = (
-          <div className="relative w-8 h-8">
-            <Image
-              src={getPokemonImageUrl(
-                reward.targetId.toString(),
-                'sprite',
-                false,
-              )}
-              alt={formData.name}
-              fill
-              className="object-contain pixelated"
-            />
-          </div>
+          <TaskIconDisplay
+            icon={{ type: 'pokemon', id: reward.targetId.toString() }}
+            className="h-8 w-8"
+            normalizeVisibleBounds
+          />
         )
       } else {
         icon = <Scroll className="w-6 h-6 text-game-moss-strong" />
@@ -484,14 +498,11 @@ export function mapRewardToDisplayItem(
       const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
       label = `Companion Friendship +${qty}`
       icon = context?.activeCompanionFormId ? (
-        <div className="relative h-8 w-8">
-          <Image
-            src={getPokemonImageUrl(context.activeCompanionFormId, 'sprite')}
-            alt="Active companion"
-            fill
-            className="object-contain pixelated"
-          />
-        </div>
+        <TaskIconDisplay
+          icon={{ type: 'pokemon', id: context.activeCompanionFormId }}
+          className="h-8 w-8"
+          normalizeVisibleBounds
+        />
       ) : (
         <Heart className="h-6 w-6 text-game-clay" />
       )
@@ -502,14 +513,11 @@ export function mapRewardToDisplayItem(
       const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
       label = `Companion Research XP +${qty}`
       icon = context?.activeCompanionFormId ? (
-        <div className="relative h-8 w-8">
-          <Image
-            src={getPokemonImageUrl(context.activeCompanionFormId, 'sprite')}
-            alt="Active companion"
-            fill
-            className="object-contain pixelated"
-          />
-        </div>
+        <TaskIconDisplay
+          icon={{ type: 'pokemon', id: context.activeCompanionFormId }}
+          className="h-8 w-8"
+          normalizeVisibleBounds
+        />
       ) : (
         <Scroll className="h-6 w-6 text-game-moss-strong" />
       )

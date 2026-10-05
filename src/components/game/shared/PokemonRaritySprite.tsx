@@ -1,5 +1,11 @@
 import Image from 'next/image'
-import { type CSSProperties } from 'react'
+import {
+  type CSSProperties,
+  type SyntheticEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 import { cn } from '@/lib/utils'
 import { getBundledPokemonSpriteUrl } from '@/utilities/pokemon/local-sprites'
 import {
@@ -8,6 +14,7 @@ import {
   resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
 import { PixelatedSpriteCanvas } from './PixelatedSpriteCanvas'
+import { getVisibleBoundsImageStyle } from '@/utilities/visible-image-bounds'
 
 export type PokemonRaritySpriteView = 'front' | 'back' | 'home'
 
@@ -22,6 +29,7 @@ interface PokemonRaritySpriteProps {
   alt: string
   className?: string
   imageClassName?: string
+  normalizeVisibleBounds?: boolean
   sizes?: string
 }
 
@@ -36,6 +44,7 @@ export function PokemonRaritySprite({
   alt,
   className,
   imageClassName,
+  normalizeVisibleBounds = false,
   sizes = '128px',
 }: PokemonRaritySpriteProps) {
   const resolvedRarity = resolvePokemonRarity({
@@ -59,6 +68,20 @@ export function PokemonRaritySprite({
     shiny: effect.sourcePalette === 'shiny',
     female,
   })
+  const [visibleBoundsStyle, setVisibleBoundsStyle] = useState<CSSProperties>()
+
+  useEffect(() => {
+    setVisibleBoundsStyle(undefined)
+  }, [imageUrl, normalizeVisibleBounds])
+
+  const handleImageLoad = useCallback(
+    (event: SyntheticEvent<HTMLImageElement>) => {
+      if (!normalizeVisibleBounds) return
+      const style = getVisibleBoundsImageStyle(event.currentTarget)
+      if (style) setVisibleBoundsStyle(style)
+    },
+    [normalizeVisibleBounds],
+  )
 
   return (
     <div
@@ -81,6 +104,7 @@ export function PokemonRaritySprite({
           src={imageUrl}
           alt={alt}
           className={imageClassName}
+          normalizeVisibleBounds={normalizeVisibleBounds}
         />
       ) : (
         <Image
@@ -88,7 +112,8 @@ export function PokemonRaritySprite({
           alt={alt}
           fill
           sizes={sizes}
-          style={imageStyle}
+          onLoad={normalizeVisibleBounds ? handleImageLoad : undefined}
+          style={{ ...imageStyle, ...visibleBoundsStyle }}
           className={cn(
             'pokemon-rarity-sprite__image object-contain',
             !isHomeSprite && 'pixelated',

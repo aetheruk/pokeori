@@ -35,7 +35,6 @@ import { RewardItem } from '@/components/game/reward-carousel'
 import { SecretPokemonIcon } from '@/components/game/shared/SecretPokemonIcon'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
-import { ItemSprite } from '@/components/ui/item-sprite'
 import { battles } from '@/data/battles'
 import { getCurrency } from '@/data/currencies'
 import { getGuild } from '@/data/guilds'
@@ -50,7 +49,6 @@ import { getBanner, getIcon, getTitle } from '@/data/user'
 import { isWeatherType, WEATHER_LABELS, type WeatherType } from '@/data/weather'
 import {
   getPokemonForm,
-  getPokemonImageUrl,
   getPokemonSpecies,
 } from '@/utilities/pokemon/pokedex'
 import { getRegionTimeLabel } from '@/utilities/requirements'
@@ -71,7 +69,14 @@ function getContentIcon(
   icon?: TaskIcon,
   fallback?: React.ReactNode,
 ): React.ReactNode {
-  if (icon) return <TaskIconDisplay icon={icon} className="w-7 h-7" />
+  if (icon)
+    return (
+      <TaskIconDisplay
+        icon={icon}
+        className="w-7 h-7"
+        normalizeVisibleBounds
+      />
+    )
   return fallback || <BookOpen className="w-5 h-5 text-game-moss-strong" />
 }
 
@@ -271,6 +276,7 @@ export function mapCriteriaToDisplayItem(
           <TaskIconDisplay
             icon={guild?.icon || { type: 'item', id: 'researchers-journal-page' }}
             className="h-5 w-5"
+            normalizeVisibleBounds
           />
         ),
         label: `${guild?.name || 'Guild'} Rank ${count}`,
@@ -285,10 +291,10 @@ export function mapCriteriaToDisplayItem(
       const verb = condition.consume ? 'Hand Over' : 'Own'
       return {
         icon: itemId ? (
-          <ItemSprite
-            itemId={itemId}
-            alt={item?.name || 'Item'}
+          <TaskIconDisplay
+            icon={{ type: 'item', id: itemId }}
             className="w-6 h-6"
+            normalizeVisibleBounds
           />
         ) : (
           <ShoppingBag className="w-5 h-5 text-game-moss-strong" />
@@ -306,6 +312,7 @@ export function mapCriteriaToDisplayItem(
             currencyId={currencyId}
             alt={currency.name}
             className="w-6 h-6 object-contain"
+            normalizeVisibleBounds
           />
         ) : (
           <div className="w-5 h-5 rounded-full bg-game-ochre" />
@@ -325,12 +332,10 @@ export function mapCriteriaToDisplayItem(
         const species = getPokemonSpecies(speciesId)
         return {
           icon: (
-            <Image
-              src={getPokemonImageUrl(speciesId.toString(), 'sprite', false)}
-              alt="Pokemon"
-              width={32}
-              height={32}
-              className="pixelated"
+            <TaskIconDisplay
+              icon={{ type: 'pokemon', id: speciesId.toString() }}
+              className="w-8 h-8"
+              normalizeVisibleBounds
             />
           ),
           label: `${verb} ${countLabel(count)}${traitLabel}${species?.name || 'Pokemon'}${originLabel}`,
@@ -498,12 +503,10 @@ export function mapCriteriaToDisplayItem(
       const species = getPokemonSpecies(speciesId)
       return {
         icon: (
-          <Image
-            src={getPokemonImageUrl(speciesId.toString(), 'sprite', false)}
-            alt="Pokemon"
-            width={32}
-            height={32}
-            className="pixelated"
+          <TaskIconDisplay
+            icon={{ type: 'pokemon', id: speciesId.toString() }}
+            className="w-8 h-8"
+            normalizeVisibleBounds
           />
         ),
         label: `Catch ${countLabel(count)}${species?.name || 'Pokemon'}`,
@@ -515,12 +518,10 @@ export function mapCriteriaToDisplayItem(
       const species = getPokemonSpecies(speciesId)
       return {
         icon: (
-          <Image
-            src={getPokemonImageUrl(speciesId.toString(), 'sprite', false)}
-            alt="Pokemon"
-            width={32}
-            height={32}
-            className="pixelated opacity-70"
+          <TaskIconDisplay
+            icon={{ type: 'pokemon', id: speciesId.toString() }}
+            className="w-8 h-8 opacity-70"
+            normalizeVisibleBounds
           />
         ),
         label: `See ${countLabel(count)}${species?.name || 'Pokemon'}`,
@@ -634,16 +635,10 @@ export function mapCriteriaToDisplayItem(
         description += `${species?.name || 'Pokemon'}${originLabel}`
         return {
           icon: (
-            <Image
-              src={getPokemonImageUrl(
-                check.speciesId.toString(),
-                'sprite',
-                false,
-              )}
-              alt="Pokemon"
-              width={32}
-              height={32}
-              className="pixelated"
+            <TaskIconDisplay
+              icon={{ type: 'pokemon', id: check.speciesId.toString() }}
+              className="w-8 h-8"
+              normalizeVisibleBounds
             />
           ),
           label: `${description}${check.position !== 'any' ? ` in battle slot ${check.position}` : ' on your battle team'}`,
@@ -689,16 +684,10 @@ export function mapCriteriaToDisplayItem(
         description += ` ${traitLabel}${species?.name || 'Pokemon'}${originLabel}`
         return {
           icon: (
-            <Image
-              src={getPokemonImageUrl(
-                check.speciesId.toString(),
-                'sprite',
-                false,
-              )}
-              alt="Pokemon"
-              width={32}
-              height={32}
-              className="pixelated"
+            <TaskIconDisplay
+              icon={{ type: 'pokemon', id: check.speciesId.toString() }}
+              className="w-8 h-8"
+              normalizeVisibleBounds
             />
           ),
           label: label || `${description} as your companion`,
@@ -721,12 +710,10 @@ export function mapCriteriaToDisplayItem(
       const formData = formId ? getPokemonForm(formId) : null
       return {
         icon: formId ? (
-          <Image
-            src={getPokemonImageUrl(formId, 'sprite', false)}
-            alt={formData?.name || 'Pokemon'}
-            width={32}
-            height={32}
-            className="pixelated"
+          <TaskIconDisplay
+            icon={{ type: 'pokemon', id: formId }}
+            className="w-8 h-8"
+            normalizeVisibleBounds
           />
         ) : (
           <Search className="w-5 h-5 text-game-moss-strong" />

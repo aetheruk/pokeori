@@ -26,6 +26,7 @@ import { TaskIcon } from '@/data/tasks/types'
 import { getTrainerSpriteUrl } from '@/data/trainers'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { getVisibleBoundsImageStyle } from '@/utilities/visible-image-bounds'
 
 const LUCIDE_ICONS: Record<string, any> = {
   MapPin,
@@ -75,57 +76,8 @@ export function TaskIconDisplay({
       if (!normalizeVisibleBounds) return
 
       const image = event.currentTarget
-      const naturalWidth = image.naturalWidth
-      const naturalHeight = image.naturalHeight
-      const viewWidth = image.clientWidth
-      const viewHeight = image.clientHeight
-      if (!naturalWidth || !naturalHeight || !viewWidth || !viewHeight) return
-
-      const canvas = document.createElement('canvas')
-      canvas.width = naturalWidth
-      canvas.height = naturalHeight
-      const context = canvas.getContext('2d', { willReadFrequently: true })
-      if (!context) return
-
-      try {
-        context.drawImage(image, 0, 0)
-        const pixels = context.getImageData(0, 0, naturalWidth, naturalHeight).data
-        let left = naturalWidth
-        let top = naturalHeight
-        let right = -1
-        let bottom = -1
-
-        for (let y = 0; y < naturalHeight; y += 1) {
-          for (let x = 0; x < naturalWidth; x += 1) {
-            if (pixels[(y * naturalWidth + x) * 4 + 3]! <= 16) continue
-            left = Math.min(left, x)
-            top = Math.min(top, y)
-            right = Math.max(right, x)
-            bottom = Math.max(bottom, y)
-          }
-        }
-
-        if (right < left || bottom < top) return
-
-        const imageScale = Math.min(viewWidth / naturalWidth, viewHeight / naturalHeight)
-        const renderedWidth = naturalWidth * imageScale
-        const renderedHeight = naturalHeight * imageScale
-        const contentWidth = (right - left + 1) * imageScale
-        const contentHeight = (bottom - top + 1) * imageScale
-        const targetSize = Math.min(viewWidth, viewHeight) * 0.92
-        const scale = targetSize / Math.max(contentWidth, contentHeight)
-        const contentCenterX =
-          (viewWidth - renderedWidth) / 2 + ((left + right + 1) / 2) * imageScale
-        const contentCenterY =
-          (viewHeight - renderedHeight) / 2 + ((top + bottom + 1) / 2) * imageScale
-
-        setVisibleImageStyle({
-          transform: `translate(${(viewWidth / 2 - contentCenterX) * scale}px, ${(viewHeight / 2 - contentCenterY) * scale}px) scale(${scale})`,
-          transformOrigin: 'center',
-        })
-      } catch {
-        // Keep the source image at its default size if the browser cannot read its pixels.
-      }
+      const style = getVisibleBoundsImageStyle(image)
+      if (style) setVisibleImageStyle(style)
     },
     [normalizeVisibleBounds],
   )
@@ -144,9 +96,8 @@ export function TaskIconDisplay({
           width={48}
           height={48}
           priority={priority}
-          onLoad={handleImageLoad}
+          normalizeVisibleBounds={normalizeVisibleBounds}
           className="w-full h-full object-contain pixelated"
-          style={imageStyle}
         />
       </div>
     )
