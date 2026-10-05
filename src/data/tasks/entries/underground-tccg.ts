@@ -40,18 +40,13 @@ export const undergroundTccgTasks: Task[] = [
     chat: true,
     requirements: [{ type: 'task_completed', targetId: 'kanto-underground-somehow-deeper' }],
     criteria: [],
-    rewards: [
-      {
-        type: 'guild_membership',
-        targetId: UNDERGROUND_SOCIETY_GUILD_ID,
-      },
-    ],
+    rewards: [],
     enterModal: [
       {
         id: 1,
         title: 'Basic Training',
         message:
-          'Mina pins a badge to your shirt before you can object. “Welcome, {Trainer}! You are now part of one of the largest secret organizations beneath Kanto. First question: what is our purpose?”',
+          'Mina pins a training badge to your shirt before you can object. “Welcome, {Trainer}! Before we make anything official, first question: what is our purpose?”',
         background: undergroundBackground,
         icon: maniacFemale,
         buttons: [
@@ -135,7 +130,7 @@ export const undergroundTccgTasks: Task[] = [
         id: 1,
         title: 'Mina',
         message:
-          'Mina weighs your crystals, stamps the contribution slip, and hands the full crate back to you. “Everything is in order. Please deliver them directly to the recipient.”',
+          'Mina weighs your crystals, stamps the contribution slip and membership form, and hands the full crate back to you. “Everything is in order. Please deliver them directly to the recipient.”',
         background: undergroundBackground,
         icon: maniacFemale,
         buttons: [{ text: 'Approach the Pit', type: 'navigate', id: 2 }],
@@ -161,7 +156,7 @@ export const undergroundTccgTasks: Task[] = [
       title: 'Crystals for the Pit',
       icon: { type: 'item', id: 'card-crystalizer' },
       message:
-        '“Excellent work, {Trainer}!” Mina presents a Card Redistribution Box. Put duplicate cards inside and the box returns them to HQ for repacking. Collectors can then trade crystals for those cards all over again, while the box compensates you in Pokédollars. Gideon calls it recycling. The pit calls it insufficient.',
+        '“Excellent work, {Trainer}! You are officially one of us.” Mina presents a Card Redistribution Box. Put duplicate cards inside and the box returns them to HQ for repacking. Collectors can then trade crystals for those cards all over again, while the box compensates you in Pokédollars. Gideon calls it recycling. The pit calls it insufficient.',
       closeButtonText: 'Take the Box',
     },
   },

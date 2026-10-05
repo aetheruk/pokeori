@@ -101,8 +101,8 @@ describe('display mapping copy', () => {
       { checkRequirements: () => true, completedTasks: [] },
     )
 
-    expect(reward?.label).toBe('???')
-    expect(reward?.subLabel).toBe('Secret Reward')
+    expect(reward?.label).toBe('Secret to Unlock')
+    expect(reward?.subLabel).toBe('')
     expect((reward!.icon as any).type).not.toBe(TaskIconDisplay)
 
     const targetSecretReward = mapRewardToDisplayItem(
@@ -184,6 +184,20 @@ describe('display mapping copy', () => {
     })
 
     expect(reward?.label).toBe('Underground Society XP x5')
+  })
+
+  test('guild membership rewards use the guild name and icon', () => {
+    const reward = mapRewardToDisplayItem({
+      type: 'guild_membership',
+      targetId: 'underground-society',
+    })
+
+    expect(reward?.label).toBe('Underground Society Membership')
+    expect((reward?.icon as any)?.type).toBe(TaskIconDisplay)
+    expect((reward?.icon as any)?.props.icon).toEqual({
+      type: 'trainer',
+      id: 'tcg-maniac-m',
+    })
   })
 
   test('set collection criteria use set names without duplicating progress counts', () => {

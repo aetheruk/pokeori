@@ -1,7 +1,8 @@
 # Current Game State
 
-- Unreleased (`0.43.81`): Completing Kanto Underground Basic Training grants Rank 1 in the Underground Society, which unlocks the 500-Crystal contribution task. The contribution task also grants membership to players who had already completed Basic Training before the reward was added.
-- Unreleased (`0.43.80`): Diglett's Cave now offers the short `Stressed Stranger` conversation after the cave rumor unlocks. Completing it gates the unique secret Promo Binder and Rubber Mallet rewards from catches, wild battles, and Field Observation.
+- Unreleased (`0.43.82`): Underground Society membership is awarded only when the player hands over 500 Crystals with the Card Redistribution Box. Membership reward previews and rank-up summaries use the Society's authored trainer icon.
+- Release (`0.43.81`): Basic Training progression introduced the 500-Crystal contribution and Underground Society Rank 1 membership, including a fallback for players who had already completed training.
+- Release (`0.43.80`): Diglett's Cave now offers the short `Stressed Stranger` conversation after the cave rumor unlocks. Completing it gates the unique secret Promo Binder and Rubber Mallet rewards from catches, wild battles, and Field Observation.
 - Release (`0.43.79`): Explore detail cards show secret Field Research drops as undisclosed rewards. Secret task reward previews use a lock icon and “Requirements not met” before eligibility, then show “Secret to Unlock” when eligible.
 - Unreleased (`0.43.77`): Diglett's Cave stops rolling the secret Promo Binder or Rubber Mallet reward from catching, battling, or Field Observation after the player owns that item, keeping each unique reward to one copy.
 - Unreleased (`0.43.76`): Diglett's Cave now rolls both the Promo Binder and Rubber Mallet as secret drops from catches (20%), wild battles (5%), and Field Observation (10%).
