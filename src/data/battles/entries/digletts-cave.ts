@@ -46,6 +46,7 @@ export const diglettsCaveBattles: BattleConfig[] = [
         dropChance: 5,
         secret: true,
         requirements: [
+          { type: 'task_completed', targetId: 'digletts-cave-stressed-stranger' },
           { type: 'item_owned', targetId: 'binder-basep', inverse: true },
         ],
       },
@@ -56,6 +57,7 @@ export const diglettsCaveBattles: BattleConfig[] = [
         dropChance: 5,
         secret: true,
         requirements: [
+          { type: 'task_completed', targetId: 'digletts-cave-stressed-stranger' },
           { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
         ],
       },

@@ -7,6 +7,37 @@ const diglettsCaveUnlockRequirement = {
 
 export const diglettsCaveTasks: Task[] = [
   {
+    id: 'digletts-cave-stressed-stranger',
+    name: 'Stressed Stranger',
+    description: 'Whoa they’re really not having a great time.',
+    category: 'Kanto',
+    subCategory: 'Digletts Cave',
+    icon: {
+      type: 'trainer',
+      id: 'tcg-maniac-m',
+    },
+    background: '/backgrounds/digletts-cave.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Are you okay?',
+    requirements: [diglettsCaveUnlockRequirement],
+    criteria: [],
+    rewards: [],
+    chat: true,
+    exitModal: {
+      background: '/backgrounds/digletts-cave.avif',
+      title: 'Stressed Stranger',
+      icon: {
+        type: 'trainer',
+        id: 'tcg-maniac-m',
+      },
+      message:
+        '“I can’t do this! It’s all too weird I’m out!” The trainer throws something in the distance as they leave the cave.',
+      closeButtonText: 'See what they threw',
+    },
+  },
+  {
     id: 'digletts-cave-rubber-mallet',
     name: 'No Way!!!',
     description: "I can't believe my luck!",
