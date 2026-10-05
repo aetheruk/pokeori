@@ -2786,12 +2786,18 @@ describe('static data references', () => {
       itemId: 'binder-basep',
       dropChance: 10,
       secret: true,
+      requirements: [
+        { type: 'item_owned', targetId: 'binder-basep', inverse: true },
+      ],
     })
     expect((diglettStudy as any)?.settings.itemDrops).toContainEqual({
       id: 'digletts-cave-rubber-mallet',
       itemId: 'rubber-mallet',
       dropChance: 10,
       secret: true,
+      requirements: [
+        { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
+      ],
     })
     expect((malletGame as any)?.requirements).toContainEqual({
       type: 'item_owned',
@@ -2823,6 +2829,9 @@ describe('static data references', () => {
         quantity: 1,
         dropChance: 20,
         secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'binder-basep', inverse: true },
+        ],
       },
       {
         type: 'item',
@@ -2830,6 +2839,9 @@ describe('static data references', () => {
         quantity: 1,
         dropChance: 20,
         secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
+        ],
       },
       {
         type: 'task_complete',
@@ -2844,6 +2856,9 @@ describe('static data references', () => {
         quantity: 1,
         dropChance: 5,
         secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'binder-basep', inverse: true },
+        ],
       },
       {
         type: 'item',
@@ -2851,6 +2866,9 @@ describe('static data references', () => {
         quantity: 1,
         dropChance: 5,
         secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
+        ],
       },
     ])
   })

@@ -33,6 +33,9 @@ export const diglettsCaveLocations: Location[] = [
         quantity: 1,
         dropChance: 20,
         secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'binder-basep', inverse: true },
+        ],
       },
       {
         type: 'item',
@@ -40,6 +43,9 @@ export const diglettsCaveLocations: Location[] = [
         quantity: 1,
         dropChance: 20,
         secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'rubber-mallet', inverse: true },
+        ],
       },
       {
         type: 'task_complete',
