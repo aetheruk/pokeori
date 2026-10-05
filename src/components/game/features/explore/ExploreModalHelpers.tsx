@@ -426,8 +426,6 @@ function shouldHideExploreRewardPreview(selectedItem: any, reward: any) {
     return true
   }
 
-  if (isFieldObservation && reward?.secret) return true
-
   if (reward?.type !== 'item') return false
 
   if (selectedItem.type === 'location') {
@@ -825,6 +823,7 @@ export function getFormattedRewards(
           userInventory,
           user: userData.user,
           activeCompanionFormId,
+          showLockedSecretReward: selectedItem.type === 'field-research',
         }),
       )
       .filter((r: any) => r !== null) || []
@@ -908,8 +907,6 @@ export function getFormattedRewards(
     const fieldObservationItemDrops =
       selectedItem.originalData.settings?.itemDrops || []
     fieldObservationItemDrops.forEach((drop: any) => {
-      if (drop.secret) return
-
       const reward = drop.reward || {
         type: 'item',
         targetId: drop.itemId,
@@ -935,12 +932,15 @@ export function getFormattedRewards(
         userInventory,
         user: userData.user,
         activeCompanionFormId,
+        showLockedSecretReward: true,
       })
 
       if (mappedReward) {
         rewardItems.push({
           ...mappedReward,
-          subLabel: drop.secret ? 'Secret Reward' : `${drop.dropChance}%`,
+          subLabel:
+            mappedReward.subLabel ||
+            (drop.secret ? 'Secret Reward' : `${drop.dropChance}%`),
         })
       }
     })

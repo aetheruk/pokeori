@@ -54,6 +54,7 @@ export interface RewardDisplayItem {
 export interface RewardMappingContext {
   completedTasks?: string[] // IDs of completed tasks
   checkRequirements?: (requirements?: any[]) => boolean
+  showLockedSecretReward?: boolean
   userInventory?: Record<string, number>
   user?: any
   activeCompanionFormId?: string
@@ -63,13 +64,38 @@ export function mapRewardToDisplayItem(
   reward: DisplayableReward,
   context?: RewardMappingContext,
 ): RewardDisplayItem | null {
+  const requirementsMet =
+    !reward.requirements?.length ||
+    !context?.checkRequirements ||
+    context.checkRequirements(reward.requirements)
+
   if (
     reward.type !== 'task_complete' &&
     reward.requirements &&
     reward.requirements.length > 0 &&
     context?.checkRequirements &&
-    !context.checkRequirements(reward.requirements)
+    !requirementsMet
   ) {
+    if (reward.secret && context.showLockedSecretReward) {
+      const itemDef =
+        reward.type === 'item'
+          ? items.find((item) => item.id === reward.targetId)
+          : undefined
+      if (
+        itemDef?.unique &&
+        context.userInventory?.[itemDef.id] &&
+        context.userInventory[itemDef.id] > 0
+      ) {
+        return null
+      }
+
+      return {
+        icon: <Lock className="w-6 h-6 text-game-muted" />,
+        label: 'Secret to Unlock',
+        subLabel: 'Requirements not met',
+      }
+    }
+
     return null
   }
 
@@ -314,6 +340,7 @@ export function mapRewardToDisplayItem(
 
       // Determine requirements status
       const requirementsToCheck = reward.requirements || taskDef?.requirements
+      const isSecretUnlock = Boolean(reward.secret || taskDef?.secret)
 
       // If no checker provided, default to true
       const requirementsMet = context?.checkRequirements
@@ -326,7 +353,7 @@ export function mapRewardToDisplayItem(
         // If not completed:
         if (requirementsMet) {
           // Met requirements but not found yet -> ?
-          if (taskDef?.secret) {
+          if (isSecretUnlock) {
             label = 'Secret to Unlock'
             icon = <HelpCircle className="w-6 h-6 text-game-muted" />
           } else {
@@ -339,8 +366,9 @@ export function mapRewardToDisplayItem(
           }
         } else {
           // Requirements NOT met -> Lock
-          label = 'Requirements not met'
+          label = isSecretUnlock ? 'Secret to Unlock' : 'Requirements not met'
           icon = <Lock className="w-6 h-6 text-game-muted" />
+          if (isSecretUnlock) subLabel = 'Requirements not met'
         }
       }
 
@@ -492,7 +520,7 @@ export function mapRewardToDisplayItem(
     }
   }
 
-  if (reward.secret) {
+  if (reward.secret && reward.type !== 'task_complete') {
     return {
       icon: <Box className="w-8 h-8 text-game-muted" />,
       label: '???',
