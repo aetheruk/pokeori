@@ -40,6 +40,7 @@ const battle = (input: {
     | ReturnType<typeof undergroundBattleRequirements>
     | ReturnType<typeof rematchRequirements>
   reward: number
+  guildXpReward?: number
   replayable: boolean
 }): TcgBattleGameConfig => ({
   id: input.id,
@@ -58,7 +59,16 @@ const battle = (input: {
     { type: 'currency', targetId: 'pokedollars', quantity: input.reward },
     ...(input.replayable
       ? [{ type: 'guild_xp' as const, targetId: UNDERGROUND_SOCIETY_GUILD_ID, quantity: 50, dropChance: 100 }]
-      : []),
+      : input.guildXpReward
+        ? [
+            {
+              type: 'guild_xp' as const,
+              targetId: UNDERGROUND_SOCIETY_GUILD_ID,
+              quantity: input.guildXpReward,
+              dropChance: 100,
+            },
+          ]
+        : []),
   ],
   isEligibleForReplay: input.replayable,
   settings: {
@@ -132,6 +142,7 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
       'underground-tcg-practice-briefing',
     ),
     reward: 250,
+    guildXpReward: 100,
     replayable: false,
   }),
   battle({
@@ -147,6 +158,7 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
       'underground-tcg-cal-outreach',
     ),
     reward: 1000,
+    guildXpReward: 250,
     replayable: false,
   }),
   battle({
@@ -162,6 +174,7 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
       'underground-tcg-marina-outreach',
     ),
     reward: 1000,
+    guildXpReward: 250,
     replayable: false,
   }),
   battle({
@@ -177,6 +190,7 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
       'underground-tcg-fern-outreach',
     ),
     reward: 1000,
+    guildXpReward: 250,
     replayable: false,
   }),
   battle({

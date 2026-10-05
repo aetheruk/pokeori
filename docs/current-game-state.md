@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.43.83`): Underground Society members earn 100 Guild XP for the Pewter School quiz Promo Meowth, 100 for the first Lost-and-Found tutorial battle victory, and 250 for each first victory against the Fire, Water, and Grass decks.
 - Unreleased (`0.43.82`): Underground Society membership is awarded only when the player hands over 500 Crystals with the Card Redistribution Box. Membership reward previews and rank-up summaries use the Society's authored trainer icon.
 - Release (`0.43.81`): Basic Training progression introduced the 500-Crystal contribution and Underground Society Rank 1 membership, including a fallback for players who had already completed training.
 - Release (`0.43.80`): Diglett's Cave now offers the short `Stressed Stranger` conversation after the cave rumor unlocks. Completing it gates the unique secret Promo Binder and Rubber Mallet rewards from catches, wild battles, and Field Observation.
