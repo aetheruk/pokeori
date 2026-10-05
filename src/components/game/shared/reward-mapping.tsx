@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
+import { SecretPokemonIcon } from '@/components/game/shared/SecretPokemonIcon'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Badge } from '@/components/ui/badge'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
@@ -90,7 +91,7 @@ export function mapRewardToDisplayItem(
       }
 
       return {
-        icon: <Lock className="w-6 h-6 text-game-muted" />,
+        icon: <SecretPokemonIcon className="w-6 h-6" />,
         label: 'Secret to Unlock',
         subLabel: 'Requirements not met',
       }
@@ -363,7 +364,7 @@ export function mapRewardToDisplayItem(
           // Met requirements but not found yet -> ?
           if (isSecretUnlock) {
             label = 'Secret to Unlock'
-            icon = <HelpCircle className="w-6 h-6 text-game-muted" />
+            icon = <SecretPokemonIcon className="w-6 h-6" />
           } else {
             label = `Unlock: ${taskDef?.name || taskId}`
             icon = taskDef?.icon ? (
@@ -529,7 +530,7 @@ export function mapRewardToDisplayItem(
 
   if (reward.secret && reward.type !== 'task_complete') {
     return {
-      icon: <Box className="w-8 h-8 text-game-muted" />,
+      icon: <SecretPokemonIcon className="w-8 h-8" />,
       label: '???',
       subLabel: 'Secret Reward',
     }

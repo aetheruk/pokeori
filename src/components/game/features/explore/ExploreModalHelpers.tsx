@@ -20,6 +20,7 @@ import {
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
+import { SecretPokemonIcon } from '@/components/game/shared/SecretPokemonIcon'
 import type { TaskProgressData } from '@/components/game/shared/GameInfoModal'
 import { PokemonSelectionList } from '@/components/game/shared/PokemonSelectionList'
 import { mapRewardToDisplayItem } from '@/components/game/shared/reward-mapping'
@@ -1020,7 +1021,7 @@ export function getFormattedRewards(
           if (secretRewardAdded) continue
           secretRewardAdded = true
           rewardItems.push({
-            icon: <HelpCircle className="h-8 w-8 text-game-muted" />,
+            icon: <SecretPokemonIcon className="h-8 w-8" />,
             label: '???',
             subLabel: `${rodLabels[rodType] || rodType} Secret Reward`,
           })
@@ -1463,6 +1464,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                 activeRun?.status === 'active' &&
                 index === activeRun.currentStepIndex
               const isDone = step.status === 'completed'
+              const isSecret = !!step.secret && !isDone && !isCurrent
 
               return (
                 <div
@@ -1489,6 +1491,8 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                     <CheckCircle className="h-4 w-4 shrink-0 text-game-moss" />
                   ) : isCurrent ? (
                     <CircleDot className="w-4 h-4 text-game-ochre shrink-0" />
+                  ) : isSecret ? (
+                    <SecretPokemonIcon className="h-4 w-4" />
                   ) : (
                     <HelpCircle className="h-4 w-4 shrink-0 text-game-muted" />
                   )}
@@ -1836,7 +1840,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
 
               {selectedLockedEncounter.isSecret ? (
                 <div className="flex items-center gap-3 rounded-xl border border-game-clay/25 bg-game-surface-raised p-3 text-sm text-game-muted">
-                  <HelpCircle className="h-5 w-5 text-game-clay-strong" />
+                  <SecretPokemonIcon className="h-5 w-5" />
                   Requirements are hidden.
                 </div>
               ) : (

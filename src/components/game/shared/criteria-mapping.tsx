@@ -32,6 +32,7 @@ import Image from 'next/image'
 import type React from 'react'
 import { MdCatchingPokemon } from 'react-icons/md'
 import { RewardItem } from '@/components/game/reward-carousel'
+import { SecretPokemonIcon } from '@/components/game/shared/SecretPokemonIcon'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -226,7 +227,7 @@ export function mapCriteriaToDisplayItem(
   // Handle secret conditions
   if (condition.secret) {
     return {
-      icon: <BookOpen className="w-5 h-5 text-game-moss-strong" />,
+      icon: <SecretPokemonIcon className="w-5 h-5" />,
       label: '???',
       subLabel: 'Secret Requirement',
     }
