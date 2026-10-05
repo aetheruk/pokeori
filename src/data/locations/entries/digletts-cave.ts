@@ -31,7 +31,14 @@ export const diglettsCaveLocations: Location[] = [
         type: 'item',
         targetId: 'binder-basep',
         quantity: 1,
-        dropChance: 10,
+        dropChance: 20,
+        secret: true,
+      },
+      {
+        type: 'item',
+        targetId: 'rubber-mallet',
+        quantity: 1,
+        dropChance: 20,
         secret: true,
       },
       {

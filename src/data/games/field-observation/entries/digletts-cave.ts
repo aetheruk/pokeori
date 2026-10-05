@@ -36,20 +36,14 @@ export const diglettsCaveFieldObservationEntries: FieldObservationConfig[] = [
         {
           id: 'digletts-cave-promo-binder',
           itemId: 'binder-basep',
-          dropChance: 5,
+          dropChance: 10,
           secret: true,
         },
         {
           id: 'digletts-cave-rubber-mallet',
           itemId: 'rubber-mallet',
           dropChance: 10,
-          requirements: [
-            {
-              type: 'item_owned',
-              targetId: 'rubber-mallet',
-              inverse: true,
-            },
-          ],
+          secret: true,
         },
       ],
     },
