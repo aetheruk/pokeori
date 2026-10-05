@@ -366,9 +366,8 @@ export function mapRewardToDisplayItem(
           }
         } else {
           // Requirements NOT met -> Lock
-          label = isSecretUnlock ? 'Secret to Unlock' : 'Requirements not met'
+          label = 'Requirements not met'
           icon = <Lock className="w-6 h-6 text-game-muted" />
-          if (isSecretUnlock) subLabel = 'Requirements not met'
         }
       }
 
