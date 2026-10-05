@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
+import { getVisibleImageBounds } from '@/utilities/visible-image-bounds'
 
 const PIXEL_SIZE = 4
 
@@ -9,6 +10,7 @@ interface PixelatedSpriteCanvasProps {
   src: string
   alt: string
   className?: string
+  normalizeVisibleBounds?: boolean
 }
 
 /**
@@ -19,6 +21,7 @@ export function PixelatedSpriteCanvas({
   src,
   alt,
   className,
+  normalizeVisibleBounds = false,
 }: PixelatedSpriteCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -29,6 +32,7 @@ export function PixelatedSpriteCanvas({
     const image = new window.Image()
     image.decoding = 'async'
     let resizeObserver: ResizeObserver | null = null
+    let visibleBounds: ReturnType<typeof getVisibleImageBounds> = null
 
     const draw = () => {
       const context = canvas.getContext('2d')
@@ -39,12 +43,20 @@ export function PixelatedSpriteCanvas({
       const width = Math.max(1, Math.round(bounds.width * devicePixelRatio))
       const height = Math.max(1, Math.round(bounds.height * devicePixelRatio))
 
+      if (normalizeVisibleBounds && !visibleBounds) {
+        visibleBounds = getVisibleImageBounds(image)
+      }
+      const sourceLeft = visibleBounds?.left ?? 0
+      const sourceTop = visibleBounds?.top ?? 0
+      const sourceWidth = visibleBounds?.width ?? image.naturalWidth
+      const sourceHeight = visibleBounds?.height ?? image.naturalHeight
+
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width
         canvas.height = height
       }
 
-      const imageRatio = image.naturalWidth / image.naturalHeight
+      const imageRatio = sourceWidth / sourceHeight
       const canvasRatio = width / height
       const drawWidth = Math.round(
         imageRatio > canvasRatio ? width : height * imageRatio,
@@ -70,7 +82,17 @@ export function PixelatedSpriteCanvas({
       if (!sampleContext) return
 
       sampleContext.imageSmoothingEnabled = false
-      sampleContext.drawImage(image, 0, 0, sampleWidth, sampleHeight)
+      sampleContext.drawImage(
+        image,
+        sourceLeft,
+        sourceTop,
+        sourceWidth,
+        sourceHeight,
+        0,
+        0,
+        sampleWidth,
+        sampleHeight,
+      )
       context.clearRect(0, 0, width, height)
       context.imageSmoothingEnabled = false
       context.drawImage(
@@ -103,7 +125,7 @@ export function PixelatedSpriteCanvas({
       resizeObserver?.disconnect()
       window.removeEventListener('resize', draw)
     }
-  }, [src])
+  }, [normalizeVisibleBounds, src])
 
   return (
     <canvas

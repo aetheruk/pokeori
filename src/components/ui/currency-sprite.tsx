@@ -10,6 +10,7 @@ interface CurrencySpriteProps {
   height?: number
   className?: string
   priority?: boolean
+  normalizeVisibleBounds?: boolean
 }
 
 export function CurrencySprite({
@@ -19,6 +20,7 @@ export function CurrencySprite({
   height = 32,
   className = '',
   priority = false,
+  normalizeVisibleBounds = false,
 }: CurrencySpriteProps) {
   const currency = getCurrency(currencyId)
   if (!currency) return null
@@ -31,6 +33,7 @@ export function CurrencySprite({
       height={height}
       className={className}
       priority={priority}
+      normalizeVisibleBounds={normalizeVisibleBounds}
       style={
         currency.iconHueRotate
           ? { filter: `hue-rotate(${currency.iconHueRotate}deg)` }
