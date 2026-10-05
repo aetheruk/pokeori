@@ -21,6 +21,7 @@ import {
   type RewardItem,
 } from '@/components/game/reward-carousel'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { SecretPokemonIcon } from '@/components/game/shared/SecretPokemonIcon'
 import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
@@ -555,9 +556,7 @@ function ExpeditionModalContent({
                           )}
                         >
                           {shouldHideSecret ? (
-                            <span className="text-base font-bold leading-none text-game-ink">
-                              ?
-                            </span>
+                            <SecretPokemonIcon className="w-6 h-6" />
                           ) : stepType === 'branch_choice' ? (
                             <GitBranch className="h-4 w-4 text-game-moss-strong" />
                           ) : stepType === 'result_branch' ? (
