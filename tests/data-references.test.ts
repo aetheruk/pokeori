@@ -2784,26 +2784,15 @@ describe('static data references', () => {
     expect((diglettStudy as any)?.settings.itemDrops).toContainEqual({
       id: 'digletts-cave-promo-binder',
       itemId: 'binder-basep',
-      dropChance: 5,
+      dropChance: 10,
       secret: true,
     })
     expect((diglettStudy as any)?.settings.itemDrops).toContainEqual({
       id: 'digletts-cave-rubber-mallet',
       itemId: 'rubber-mallet',
       dropChance: 10,
-      requirements: [
-        {
-          type: 'item_owned',
-          targetId: 'rubber-mallet',
-          inverse: true,
-        },
-      ],
+      secret: true,
     })
-    expect(
-      (diglettStudy as any)?.settings.itemDrops.find(
-        (drop: { itemId: string }) => drop.itemId === 'rubber-mallet',
-      ),
-    ).not.toHaveProperty('secret')
     expect((malletGame as any)?.requirements).toContainEqual({
       type: 'item_owned',
       targetId: 'rubber-mallet',
@@ -2832,7 +2821,14 @@ describe('static data references', () => {
         type: 'item',
         targetId: 'binder-basep',
         quantity: 1,
-        dropChance: 10,
+        dropChance: 20,
+        secret: true,
+      },
+      {
+        type: 'item',
+        targetId: 'rubber-mallet',
+        quantity: 1,
+        dropChance: 20,
         secret: true,
       },
       {
@@ -2846,7 +2842,14 @@ describe('static data references', () => {
         type: 'item',
         targetId: 'binder-basep',
         quantity: 1,
-        dropChance: 2,
+        dropChance: 5,
+        secret: true,
+      },
+      {
+        type: 'item',
+        targetId: 'rubber-mallet',
+        quantity: 1,
+        dropChance: 5,
         secret: true,
       },
     ])
