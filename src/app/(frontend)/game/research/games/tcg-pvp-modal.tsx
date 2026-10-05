@@ -1,6 +1,5 @@
 'use client'
 
-import { Check, Copy, Loader2, Swords, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -23,6 +22,15 @@ import {
 } from './tcg-battle'
 
 type TcgPvpModalMode = 'menu' | 'host' | 'join' | 'queue'
+
+function Spinner({ className = '' }: { className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`inline-block size-4 animate-spin rounded-full border-2 border-current border-r-transparent ${className}`}
+    />
+  )
+}
 
 interface TcgPvpModalProps {
   open: boolean
@@ -184,7 +192,7 @@ export function TcgPvpModal({
               disabled={loading}
               onClick={() => void joinQueue()}
             >
-              {loading ? <Loader2 className="animate-spin" /> : <Swords />}
+              {loading && <Spinner />}
               <span>
                 <span className="block font-semibold">Quick Match</span>
                 <span className="block text-xs font-normal opacity-85">
@@ -199,7 +207,6 @@ export function TcgPvpModal({
               disabled={loading}
               onClick={() => void createLobby()}
             >
-              <Users />
               <span>
                 <span className="block font-semibold">Create lobby</span>
                 <span className="block text-xs font-normal text-game-muted">
@@ -214,7 +221,6 @@ export function TcgPvpModal({
               disabled={loading}
               onClick={() => setMode('join')}
             >
-              <Users />
               <span>
                 <span className="block font-semibold">Join lobby</span>
                 <span className="block text-xs font-normal text-game-muted">
@@ -236,16 +242,16 @@ export function TcgPvpModal({
               </span>
               <Button
                 type="button"
-                size="icon"
-                variant="ghost"
+                size="sm"
+                variant="outline"
                 aria-label="Copy lobby code"
                 onClick={() => void copyCode()}
               >
-                {copied ? <Check className="text-game-moss" /> : <Copy />}
+                {copied ? 'Copied' : 'Copy'}
               </Button>
             </div>
             <div className="flex items-center justify-center gap-2 text-sm text-game-muted">
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Spinner />
               Waiting for another collector…
             </div>
             <Button
@@ -281,7 +287,7 @@ export function TcgPvpModal({
               disabled={loading || joinCode.length !== 6}
               onClick={() => void joinLobby()}
             >
-              {loading && <Loader2 className="animate-spin" />}
+              {loading && <Spinner />}
               Join battle
             </Button>
             <Button
@@ -297,7 +303,7 @@ export function TcgPvpModal({
 
         {mode === 'queue' && (
           <div className="space-y-4 py-7 text-center">
-            <Loader2 className="mx-auto h-10 w-10 animate-spin text-game-ochre" />
+            <Spinner className="mx-auto size-10 border-game-battle-orange" />
             <div>
               <p className="font-display text-xl font-semibold">
                 Finding a collector

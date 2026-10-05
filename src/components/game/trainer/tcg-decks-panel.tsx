@@ -1,6 +1,5 @@
 'use client'
 
-import { Save, Wand2, X } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -304,8 +303,8 @@ export function TcgDecksPanel({
                     <span className="absolute left-1 top-1 rounded bg-game-ink/85 px-1.5 py-0.5 text-[10px] font-bold text-game-cream">
                       {cardCost === null ? '…' : `Cost ${cardCost}`}
                     </span>
-                    <span className="absolute right-1 top-1 rounded-md bg-game-clay p-1 text-game-cream">
-                      <X className="h-3 w-3" />
+                    <span className="absolute right-1 top-1 rounded-md bg-game-clay px-1.5 py-0.5 text-[9px] font-bold uppercase text-game-cream">
+                      Remove
                     </span>
                   </div>
                   <span className="mt-1 block truncate text-[10px] font-semibold text-game-ink">
@@ -353,7 +352,6 @@ export function TcgDecksPanel({
             onClick={autoBuildActiveDeck}
             className="min-h-11"
           >
-            <Wand2 className="h-4 w-4 mr-2" />
             Auto Fill
           </Button>
           <Button
@@ -363,7 +361,6 @@ export function TcgDecksPanel({
             onClick={saveActiveDeck}
             className="min-h-11"
           >
-            <Save className="h-4 w-4 mr-2" />
             Save {DECK_FORMATS.find((f) => f.id === deckFormat)?.label} Deck
           </Button>
           {deckMessage && (

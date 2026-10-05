@@ -1,25 +1,6 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  ArrowDownUp,
-  Check,
-  ChevronsUp,
-  CircleDot,
-  Clock3,
-  Crosshair,
-  EyeOff,
-  Layers,
-  Loader2,
-  Lock,
-  Shield,
-  SkipForward,
-  Skull,
-  Sparkles,
-  Swords,
-  X,
-  Zap,
-} from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
@@ -50,6 +31,7 @@ import { Drawer, DrawerContent, DrawerFooter } from '@/components/ui/drawer'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
+import { useHaptics } from '@haptics/react'
 import type { TcgBattleGameConfig } from '@/data/games'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
@@ -547,6 +529,7 @@ function getWinnerMessage(
 export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   useGameMusic(encounter)
   const { playSfx } = useAudio()
+  const { trigger: triggerHaptic } = useHaptics()
   const { refreshUser } = useUser()
   const router = useRouter()
   const [state, setState] = useState<TcgBattleState | null>(null)
@@ -1819,7 +1802,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       <div className="game-activity-chrome relative grid h-[100dvh] place-items-center overflow-hidden bg-game-canvas p-6 text-game-ink">
         <ArenaBackdrop />
         <div className="relative z-10 flex items-center gap-3 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 py-3 shadow-2xl backdrop-blur-md">
-          <Sparkles className="h-4 w-4 text-amber-200" />
+          <span className="h-2 w-2 rounded-full bg-game-ochre" aria-hidden="true" />
           <div className="text-xs font-black uppercase text-[#f7ecd6]">
             Loading TCG battle
           </div>
@@ -1837,7 +1820,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       <div className="game-activity-chrome relative grid h-[100dvh] place-items-center overflow-hidden bg-game-canvas p-6 text-game-ink">
         <ArenaBackdrop />
         <div className="relative z-10 w-full max-w-md rounded-md border border-[#d3ad63]/30 bg-[#172733]/90 p-6 text-center shadow-2xl backdrop-blur-md">
-          <Loader2 className="mx-auto h-9 w-9 animate-spin text-game-ochre" />
+          <span aria-hidden="true" className="mx-auto block size-9 animate-spin rounded-full border-2 border-game-ochre border-r-transparent" />
           <SectionDivider className="mx-auto mb-2 mt-5 max-w-xs">
             Your board is ready
           </SectionDivider>
@@ -1848,8 +1831,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             Their cards stay hidden until both collectors are ready.
           </p>
           {deadlineSeconds !== null && (
-            <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-[#f7ecd6]/15 bg-[#081014]/45 px-4 font-mono text-lg font-bold text-amber-200">
-              <Clock3 className="h-4 w-4" />
+          <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-[#f7ecd6]/15 bg-[#081014]/45 px-4 font-mono text-lg font-bold text-game-ochre">
               {formatMatchClock(deadlineSeconds)}
             </div>
           )}
@@ -1859,7 +1841,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             className="game-focus-ring mx-auto mt-5 min-h-11 text-[#d8d2c3] hover:bg-[#f7ecd6]/10 hover:text-[#f7ecd6]"
             onClick={() => setShowSurrenderConfirm(true)}
           >
-            <X className="h-4 w-4" />
+            <span aria-hidden="true">×</span>
             Leave match
           </Button>
         </div>
@@ -1882,8 +1864,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         <main className="relative z-10 flex h-full flex-col">
           <header className="shrink-0 px-4 pt-[calc(env(safe-area-inset-top)+1.8rem)] text-center sm:pt-[calc(env(safe-area-inset-top)+2.6rem)]">
             {state.battleMode === 'pvp' && deadlineSeconds !== null && (
-              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 font-mono text-sm font-bold text-amber-200">
-                <Clock3 className="h-4 w-4" />
+              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 font-mono text-sm font-bold text-game-ochre">
                 {formatMatchClock(deadlineSeconds)}
                 <Button
                   type="button"
@@ -1893,7 +1874,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                   aria-label="Surrender match"
                   onClick={() => setShowSurrenderConfirm(true)}
                 >
-                  <X className="h-4 w-4" />
+                  <span aria-hidden="true">×</span>
                 </Button>
               </div>
             )}
@@ -1937,7 +1918,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                       )
                     }
                   >
-                    <Check className="h-4 w-4" />
                     Start Battle
                   </Button>
                 </motion.div>
@@ -1946,7 +1926,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           </div>
 
           <footer className="shrink-0 bg-[linear-gradient(to_top,rgba(8,16,20,1),rgba(8,16,20,0.86),transparent)] pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-5">
-            <div className="mx-auto flex max-w-5xl snap-x snap-mandatory justify-start gap-3 overflow-x-auto px-6 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] sm:gap-4 sm:px-10 [&::-webkit-scrollbar]:hidden">
+            <div className="mx-auto flex w-full max-w-5xl snap-x snap-mandatory justify-start gap-3 overflow-x-auto overscroll-x-contain px-6 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [touch-action:pan-x] sm:gap-4 sm:px-10 [&::-webkit-scrollbar]:hidden">
               {state.player.hand.map((card) => {
                 const slotIndex = frontIds.indexOf(card.instanceId)
                 const selected = slotIndex >= 0
@@ -1958,7 +1938,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                     slotIndex={selected ? slotIndex : undefined}
                     disabled={isBusy}
                     inactive={!selected && frontIds.length >= 3}
-                    onClick={() => handleSetupSelect(card.instanceId)}
+                  onClick={() => {
+                    triggerHaptic('selection')
+                    handleSetupSelect(card.instanceId)
+                  }}
                   />
                 )
               })}
@@ -1986,7 +1969,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           state.phase !== 'finished' &&
           (state.activeSide === 'opponent' ||
             state.pendingPromotion === 'opponent') && (
-            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/90 px-3 py-2 text-center text-[11px] font-black uppercase tracking-[0.12em] text-amber-200 shadow-lg backdrop-blur-md">
+            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/90 px-3 py-2 text-center text-[11px] font-black uppercase tracking-[0.12em] text-game-ochre shadow-lg backdrop-blur-md">
               {state.pendingPromotion === 'opponent'
                 ? 'Opponent is choosing a promotion'
                 : 'Opponent’s turn'}
@@ -2289,16 +2272,16 @@ function ArenaBackdrop() {
 function ResolutionToast({ resolution }: { resolution: BattleResolution }) {
   const toneClasses =
     resolution.tone === 'player'
-      ? 'border-cyan-200/35 bg-cyan-950/55 text-cyan-50'
+      ? 'border-game-charcoal/55 bg-game-charcoal/70 text-game-night-ink'
       : resolution.tone === 'opponent'
-        ? 'border-red-200/35 bg-red-950/55 text-red-50'
-        : 'border-amber-200/35 bg-[#0d1820]/80 text-amber-50'
-  const Icon =
+        ? 'border-game-clay/55 bg-game-clay-strong/70 text-game-night-ink'
+        : 'border-game-ochre/55 bg-[#0d1820]/80 text-game-night-ink'
+  const actorLabel =
     resolution.tone === 'player'
-      ? Swords
+      ? 'You'
       : resolution.tone === 'opponent'
-        ? Shield
-        : Sparkles
+        ? 'Foe'
+        : 'Battle'
 
   return (
     <motion.div
@@ -2316,9 +2299,9 @@ function ResolutionToast({ resolution }: { resolution: BattleResolution }) {
         )}
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-[#f7ecd6]/15 bg-[#081014]/35">
-            <Icon className="h-4 w-4" />
-          </div>
+          <span className="shrink-0 border border-[#f7ecd6]/15 bg-[#081014]/35 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-game-night-ink">
+            {actorLabel}
+          </span>
           <div className="min-w-0">
             <div className="truncate text-xs font-black uppercase">
               {resolution.title}
@@ -2328,8 +2311,7 @@ function ResolutionToast({ resolution }: { resolution: BattleResolution }) {
             </div>
           </div>
           {resolution.damageCue && (
-            <div className="ml-auto flex shrink-0 items-center gap-1 border border-[#f7ecd6]/15 bg-[#081014]/35 px-2 py-1 text-xs font-black text-[#f7ecd6]">
-              <Crosshair className="h-3.5 w-3.5 text-amber-200" />
+            <div className="ml-auto flex shrink-0 items-center gap-1 border border-[#f7ecd6]/15 bg-[#081014]/35 px-2 py-1 text-xs font-black text-game-night-ink">
               {resolution.damageCue.damage}
             </div>
           )}
@@ -2402,7 +2384,7 @@ function BattleTopBar({
               ? ` · ${formatMatchClock(deadlineSeconds)}`
               : ''}
           </div>
-          <div className="text-[12px] font-black tracking-[0.14em] text-emerald-300">
+          <div className="text-[12px] font-black tracking-[0.14em] text-game-battle-orange">
             {sideLabel}
           </div>
         </div>
@@ -2425,7 +2407,7 @@ function BattleTopBar({
               aria-label="Surrender match"
               onClick={onSurrender}
             >
-              <X className="h-4 w-4" />
+              <span aria-hidden="true">×</span>
             </Button>
           )}
         </div>
@@ -2508,9 +2490,9 @@ function TeamEnergyReadout({
           {energy}/{cap}
         </span>
       </span>
-      <span className="inline-flex items-center gap-1.5">
-        <Layers className="h-5 w-5 text-[#d8d2c3]" />
-        <span>{benchCount}</span>
+      <span className="inline-flex items-center gap-1.5 text-game-night-muted">
+        <span>Bench</span>
+        <span className="font-mono text-game-night-ink">{benchCount}</span>
       </span>
     </div>
   )
@@ -2733,7 +2715,7 @@ function AttackChoiceDrawer({
       <DrawerContent
         title={`Choose ${attack.name}`}
         description="Complete the card’s extra choice before committing the attack."
-        icon={<Crosshair className="h-14 w-14" aria-hidden="true" />}
+        icon={<span className="text-xs font-bold uppercase tracking-wide">Target</span>}
         background="/backgrounds/tcg.avif"
         heroLabel="Card battle"
         className="border-game-night-border bg-game-night-surface text-game-night-ink"
@@ -2908,7 +2890,7 @@ function AttackChoiceDrawer({
             onClick={() =>
               onConfirm(attackIndex, selectedTargetId, buildChoice())
             }
-            className="min-h-11 bg-game-charcoal text-white hover:bg-game-charcoal-strong"
+            className="min-h-11 bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
           >
             Commit attack
           </Button>
@@ -2999,16 +2981,12 @@ function InlineAttackButtons({
             onClick={() => onAttack(index)}
           >
             <span className="flex min-w-0 items-center gap-2">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#91a96b]/15 text-[#c9d8a7]">
-                <Swords className="h-3.5 w-3.5" />
-              </span>
               <span className="min-w-0">
                 <span className="block truncate text-[11px] font-black uppercase text-[#f7ecd6]">
                   {attack.name}
                 </span>
-                <span className="mt-0.5 flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.1em] text-[#b2b6a8]">
-                  <Crosshair className="h-3 w-3 text-amber-200" />
-                  {disabledReason || projectedDamage}
+                <span className="mt-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-game-night-muted">
+                  {disabledReason || `${projectedDamage} damage`}
                 </span>
               </span>
             </span>
@@ -3083,7 +3061,7 @@ function BattleCommandControls({
       <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#081014]/90 p-4 backdrop-blur-md sm:p-6">
         <div className="flex flex-col items-center gap-5 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full border border-game-danger/40 bg-game-danger/10 text-game-danger">
-            <X className="h-6 w-6" aria-hidden="true" />
+            <span aria-hidden="true" className="text-2xl font-semibold">!</span>
           </div>
           <div>
             <p className="font-display text-2xl font-semibold text-[#f7ecd6]">
@@ -3108,14 +3086,14 @@ function BattleCommandControls({
   if (state.pendingPromotion === 'player') {
     return (
       <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1.25rem)] z-30 flex justify-center">
-        <IconCommandButton
-          label="Promote"
-          size="large"
+        <Button
+          type="button"
           disabled={isPending}
           onClick={onPromote}
+          className="game-focus-ring min-h-12 rounded-md border border-game-ochre/50 bg-game-night-surface px-5 text-xs font-black uppercase tracking-wide text-game-night-ink hover:bg-game-ochre/15"
         >
-          <ChevronsUp className="h-[22px] w-[22px]" />
-        </IconCommandButton>
+          Promote
+        </Button>
       </div>
     )
   }
@@ -3127,9 +3105,7 @@ function BattleCommandControls({
           label="Switch"
           disabled={!canAct || !selectedAttacker || isPending || forceAttack}
           onClick={onRetreat}
-        >
-          <ArrowDownUp className="h-[18px] w-[18px]" />
-        </LabeledCommandButton>
+        />
         <LabeledCommandButton
           label={atCap ? 'End Turn' : 'Energise'}
           disabled={!canAct || isPending || forceAttack}
@@ -3158,7 +3134,7 @@ function LabeledCommandButton({
   label: string
   disabled?: boolean
   onClick: () => void
-  children: ReactNode
+  children?: ReactNode
 }) {
   return (
     <Button
@@ -3173,42 +3149,10 @@ function LabeledCommandButton({
         disabled && 'opacity-35',
       )}
     >
-      <span className="shrink-0">{children}</span>
+      {children && <span className="shrink-0">{children}</span>}
       <span className="text-[11px] font-light uppercase tracking-[0.14em]">
         {label}
       </span>
-    </Button>
-  )
-}
-
-function IconCommandButton({
-  label,
-  size = 'small',
-  disabled,
-  onClick,
-  children,
-}: {
-  label: string
-  size?: 'small' | 'large'
-  disabled?: boolean
-  onClick: () => void
-  children: ReactNode
-}) {
-  return (
-    <Button
-      type="button"
-      size="icon"
-      aria-label={label}
-      title={label}
-      disabled={disabled}
-      onClick={onClick}
-      className={cn(
-        'game-focus-ring rounded-full border border-game-night-border/60 bg-game-night-surface/80 text-game-night-ink shadow-[0_12px_28px_rgba(0,0,0,0.4)] backdrop-blur-md transition-colors hover:border-game-moss/55 hover:bg-game-moss/20',
-        size === 'large' ? 'h-[52px] w-[52px]' : 'h-11 w-11',
-        disabled && 'opacity-35',
-      )}
-    >
-      {children}
     </Button>
   )
 }
@@ -3300,8 +3244,8 @@ function CoinFlipOverlay({ cue }: { cue: CoinCue }) {
           className={cn(
             'border px-4 py-2 text-xs font-black uppercase tracking-[0.18em] shadow-2xl backdrop-blur-md',
             cue.side === 'player'
-              ? 'border-cyan-200/35 bg-cyan-950/65 text-cyan-50'
-              : 'border-red-200/35 bg-red-950/65 text-red-50',
+              ? 'border-game-charcoal/55 bg-game-charcoal/70 text-game-night-ink'
+              : 'border-game-clay/55 bg-game-clay-strong/70 text-game-night-ink',
           )}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -3344,7 +3288,6 @@ function BattleHeader({
             </h1>
           </div>
           <div className="mt-1 flex min-w-0 items-center gap-2 text-[11px] text-[#b2b6a8]">
-            <Clock3 className="h-3.5 w-3.5 shrink-0 text-[#b2b6a8]" />
             <span className="truncate">
               {subtitle || `Turn ${state.turnNumber} / ${phaseLabel}`}
             </span>
@@ -3387,16 +3330,16 @@ function SideScorePill({
       className={cn(
         'min-w-[4.7rem] border px-2 py-1 shadow-inner',
         tone === 'player'
-          ? 'border-cyan-300/25 bg-cyan-950/40'
-          : 'border-red-300/25 bg-red-950/35',
+          ? 'border-game-charcoal/50 bg-game-charcoal/35'
+          : 'border-game-clay/50 bg-game-clay-strong/35',
       )}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="text-[10px] font-black uppercase tracking-[0.08em] text-[#b2b6a8]">
           {label}
         </div>
-        <div className="flex items-center gap-1 text-xs font-black text-amber-200">
-          <Zap className="h-3.5 w-3.5" />
+        <div className="flex items-center gap-1 text-xs font-black text-game-ochre">
+          <span className="text-[9px] uppercase tracking-wide">Energy</span>
           {energy}
         </div>
       </div>
@@ -3514,9 +3457,10 @@ function SetupHandCard({
   return (
     <motion.button
       type="button"
+      data-haptic-manual="true"
       layout
       className={cn(
-        'tcg-motion group relative aspect-[240/330] w-[calc((100vw-4.5rem)/3.5)] max-w-[9rem] shrink-0 snap-center overflow-hidden rounded-md border bg-[#0d1820] p-0 transition duration-200 active:scale-[0.97] sm:w-[clamp(7.5rem,15vw,9.5rem)]',
+        'tcg-motion group relative aspect-[240/330] w-[calc((100vw-4.5rem)/3.5)] max-w-[9rem] shrink-0 snap-center touch-manipulation overflow-hidden rounded-md border bg-[#0d1820] p-0 transition duration-200 active:scale-[0.97] sm:w-[clamp(7.5rem,15vw,9.5rem)]',
         selected
           ? 'border-[#d3ad63] shadow-[0_0_0_3px_rgba(211,173,99,0.18)]'
           : 'border-[#f7ecd6]/15 shadow-[0_12px_28px_rgba(0,0,0,0.42)] hover:border-[#d3ad63]/55',
@@ -3665,16 +3609,14 @@ function CommandMatchup({
         className={cn(
           'flex h-10 min-w-16 flex-col items-center justify-center border px-2 shadow-inner',
           active
-            ? 'border-cyan-300/25 bg-cyan-400/10'
+            ? 'border-game-charcoal/50 bg-game-charcoal/20'
             : 'border-[#f7ecd6]/15 bg-[#f7ecd6]/5',
         )}
       >
-        <div className="flex items-center gap-1 text-[10px] font-black uppercase text-[#f7ecd6]">
-          {canKnockOut ? (
-            <Skull className="h-3.5 w-3.5 text-red-200" />
-          ) : (
-            <Crosshair className="h-3.5 w-3.5 text-amber-200" />
-          )}
+        <div className="flex items-center gap-1 text-[10px] font-black uppercase text-game-night-ink">
+          <span className={canKnockOut ? 'text-game-danger' : 'text-game-night-muted'}>
+            {canKnockOut ? 'KO' : 'Damage'}
+          </span>
           {bestDamage}
         </div>
         <div className="text-[10px] font-bold uppercase tracking-[0.06em] text-[#b2b6a8]">
@@ -3708,7 +3650,7 @@ function CombatantSummary({
     <div
       className={cn(
         'grid min-w-0 grid-cols-[auto_1fr] items-center gap-2 border bg-[#081014]/35 p-1.5',
-        tone === 'player' ? 'border-cyan-300/20' : 'border-red-300/20',
+        tone === 'player' ? 'border-game-charcoal/35' : 'border-game-clay/35',
         align === 'right' && 'grid-cols-[1fr_auto]',
       )}
     >
@@ -3753,7 +3695,7 @@ function CombatantThumb({
     <div
       className={cn(
         'relative h-9 w-7 shrink-0 overflow-hidden border bg-[#0d1820]',
-        tone === 'player' ? 'border-cyan-300/25' : 'border-red-300/25',
+        tone === 'player' ? 'border-game-charcoal/40' : 'border-game-clay/40',
       )}
     >
       {card ? (
@@ -3766,7 +3708,9 @@ function CombatantThumb({
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center">
-          <CircleDot className="h-3.5 w-3.5 text-[#748083]" />
+          <span className="px-0.5 text-[8px] font-bold uppercase text-game-night-muted">
+            Empty
+          </span>
         </div>
       )}
     </div>
@@ -3809,7 +3753,6 @@ function AttackCommandButton({
               disabledReason
             ) : (
               <>
-                <Crosshair className="h-3 w-3 text-game-ochre" />
                 {projectedDamage} damage
               </>
             )}
@@ -3839,7 +3782,7 @@ function TinyHpPill({
     <div
       className={cn(
         'border bg-[#081014]/35 px-2 py-1',
-        tone === 'player' ? 'border-cyan-300/20' : 'border-red-300/20',
+        tone === 'player' ? 'border-game-charcoal/35' : 'border-game-clay/35',
       )}
     >
       <div className="flex items-center justify-between gap-1 text-[10px] font-black uppercase tracking-[0.06em] text-[#b2b6a8]">
@@ -3878,19 +3821,17 @@ function BenchBar({
 
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] gap-1.5">
-      <div className="flex items-center justify-center gap-2 border border-red-300/15 bg-[#081014]/35 py-2 text-xs text-[#b2b6a8]">
-        <EyeOff className="h-3.5 w-3.5" />
+      <div className="flex items-center justify-center gap-2 border border-game-clay/20 bg-[#081014]/35 py-2 text-xs text-game-night-muted">
         Foe bench {opponentBenchCount}
       </div>
-      <div className="flex min-w-20 items-center justify-center border border-amber-300/20 bg-amber-500/10 px-2 py-2 text-xs font-black uppercase text-amber-100">
+      <div className="flex min-w-20 items-center justify-center border border-game-ochre/30 bg-game-ochre/15 px-2 py-2 text-xs font-black uppercase text-game-night-ink">
         {turnLabel}
       </div>
       <button
         type="button"
-        className="game-focus-ring flex items-center justify-center gap-2 border border-cyan-300/20 bg-cyan-500/10 py-2 text-xs font-black uppercase text-cyan-50 transition-colors hover:bg-cyan-400/15"
+        className="game-focus-ring flex items-center justify-center gap-2 border border-game-charcoal/35 bg-game-charcoal/20 py-2 text-xs font-black uppercase text-game-night-ink transition-colors hover:bg-game-charcoal/35"
         onClick={onOpenBench}
       >
-        <Layers className="h-3.5 w-3.5" />
         Bench {playerBenchCount}
       </button>
     </div>
@@ -3927,11 +3868,11 @@ function BenchSheet({
       ? `${attacker?.name || 'Selected card'} retreat cost ${attacker?.convertedRetreatCost ?? 0}.`
       : `${state.player.back.length} ready / ${state.player.discard.length} discarded.`
   const icon = isPromotion ? (
-    <ChevronsUp className="h-14 w-14" aria-hidden="true" />
+    <span className="text-xs font-bold uppercase tracking-wide">Promote</span>
   ) : isRetreat ? (
-    <ArrowDownUp className="h-14 w-14" aria-hidden="true" />
+    <span className="text-xs font-bold uppercase tracking-wide">Switch</span>
   ) : (
-    <Layers className="h-14 w-14" aria-hidden="true" />
+    <span className="text-xs font-bold uppercase tracking-wide">Bench</span>
   )
 
   return (
@@ -4110,8 +4051,7 @@ function CardImageButton({
             side === 'opponent' ? '-left-2 -top-2' : '-right-2 -top-2',
           )}
         >
-          <Lock className="h-3 w-3" />
-          <span>T-{lockedTurnsRemaining}</span>
+          <span>Locked · T-{lockedTurnsRemaining}</span>
         </div>
       )}
       {damage !== undefined && damage > 0 && (
@@ -4186,7 +4126,6 @@ function CardImageButton({
           )}
           title="Lightning Rod marker"
         >
-          <Zap className="h-3 w-3" />
           Rod
         </div>
       )}
@@ -4199,7 +4138,7 @@ function EmptyCardSlot({ side }: { side: SideTone }) {
     <div
       className={cn(
         'aspect-[240/330] w-[clamp(82px,27vw,150px)] opacity-0 sm:w-[clamp(108px,14vw,190px)]',
-        side === 'player' ? 'bg-cyan-300/0' : 'bg-red-300/0',
+        side === 'player' ? 'bg-game-charcoal/0' : 'bg-game-clay/0',
       )}
     />
   )
