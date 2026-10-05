@@ -25,3 +25,7 @@ Pokémon roster tiles, Pokédex/MoveDex/AbilityDex records, and Trainer collecti
 cards call the shared selection haptic from their click handlers. This lets a
 drag across a large tile or virtualized record grid remain a scroll gesture
 without placing an iOS switch overlay over the scroll target.
+
+The TCG battle opening hand uses the same manual selection haptic on each card
+and leaves the horizontal card rail free of iOS switch overlays, so selecting a
+card and swiping through the hand both work on touch screens.
