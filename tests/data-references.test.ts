@@ -3555,6 +3555,9 @@ describe('static data references', () => {
     const warning = tasks.find((task) => task.id === 'route-9-hiker-warning')
     const boots = tasks.find((task) => task.id === 'route-9-sturdy-boots')
     const clothes = tasks.find((task) => task.id === 'route-9-trail-clothes')
+    const clothesReminder = tasks.find(
+      (task) => task.id === 'route-9-trail-clothes-reminder',
+    )
     const gloves = tasks.find((task) => task.id === 'route-9-climbing-gloves')
     const outfit = tasks.find(
       (task) => task.id === 'route-9-assemble-hiker-outfit',
@@ -3615,6 +3618,21 @@ describe('static data references', () => {
     })
     expect(clothes?.criteria).toEqual([])
     expect(clothes?.rewards).toEqual([])
+    expect(clothesReminder?.requirements).toEqual(
+      expect.arrayContaining([
+        { type: 'task_completed', targetId: 'route-9-trail-clothes' },
+        {
+          type: 'item_owned',
+          targetId: 'hiker-clothes',
+          inverse: true,
+        },
+        {
+          type: 'task_completed',
+          targetId: 'route-9-assemble-hiker-outfit',
+          inverse: true,
+        },
+      ]),
+    )
     expect(clothesRecipe).toBeDefined()
     expect(clothesRecipe?.category).toBe('quests')
     expect(clothesRecipe?.artisanLevel).toBe(15)
