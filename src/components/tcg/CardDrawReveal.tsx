@@ -2,7 +2,7 @@
 
 import confetti from 'canvas-confetti'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
-import { Sparkles, Trophy, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -88,9 +88,9 @@ function getRarityTheme(rarity: string | null | undefined): RarityTheme {
         glow: '0 0 32px 10px rgba(168,85,247,0.7), 0 0 60px 20px rgba(236,72,153,0.4)',
         glowColor: '#a855f7',
         border: 'border-purple-400',
-        badgeBg: 'bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400',
-        badgeText: 'text-white',
-        label: '✦ Secret Rare',
+        badgeBg: 'border border-purple-300 bg-purple-50',
+        badgeText: 'text-purple-800',
+        label: 'Secret Rare',
         shimmerIntensity: 1,
       }
     case 'ultra':
@@ -99,9 +99,9 @@ function getRarityTheme(rarity: string | null | undefined): RarityTheme {
         glow: '0 0 28px 8px rgba(251,191,36,0.6), 0 0 55px 16px rgba(245,158,11,0.3)',
         glowColor: '#f59e0b',
         border: 'border-amber-400',
-        badgeBg: 'bg-gradient-to-r from-amber-500 to-yellow-300',
-        badgeText: 'text-amber-950',
-        label: '★ Ultra Rare',
+        badgeBg: 'border border-game-ochre/40 bg-game-ochre/10',
+        badgeText: 'text-game-ochre',
+        label: 'Ultra Rare',
         shimmerIntensity: 0.85,
       }
     case 'rare':
@@ -110,9 +110,9 @@ function getRarityTheme(rarity: string | null | undefined): RarityTheme {
         glow: '0 0 24px 7px rgba(99,102,241,0.6), 0 0 45px 14px rgba(79,70,229,0.3)',
         glowColor: '#6366f1',
         border: 'border-indigo-400',
-        badgeBg: 'bg-gradient-to-r from-indigo-600 to-blue-400',
-        badgeText: 'text-white',
-        label: '◆ Rare',
+        badgeBg: 'border border-indigo-300 bg-indigo-50',
+        badgeText: 'text-indigo-800',
+        label: 'Rare',
         shimmerIntensity: 0.65,
       }
     case 'uncommon':
@@ -121,9 +121,9 @@ function getRarityTheme(rarity: string | null | undefined): RarityTheme {
         glow: 'none',
         glowColor: '#22c55e',
         border: 'border-green-400',
-        badgeBg: 'border border-[#71906b] bg-[#e5efe0]',
-        badgeText: 'text-[#355332]',
-        label: '● Uncommon',
+        badgeBg: 'border border-game-moss/30 bg-game-moss/10',
+        badgeText: 'text-game-moss-strong',
+        label: 'Uncommon',
         shimmerIntensity: 0,
       }
     default:
@@ -134,7 +134,7 @@ function getRarityTheme(rarity: string | null | undefined): RarityTheme {
         border: 'border-game-border-strong',
         badgeBg: 'border border-game-border-strong bg-game-surface-raised',
         badgeText: 'text-game-ink',
-        label: '○ Common',
+        label: 'Common',
         shimmerIntensity: 0,
       }
   }
@@ -321,21 +321,27 @@ function DotProgress({
   revealed: Set<number>
 }) {
   return (
-    <div className="flex items-center justify-center gap-2.5 rounded-full border border-game-night-border bg-game-night-surface px-4 py-2">
-      {Array.from({ length: total }).map((_, i) => (
+    <div
+      className="w-full max-w-xs space-y-1.5 rounded-md border border-game-border bg-game-surface-raised px-3 py-2"
+    >
+      <div className="flex items-center justify-between text-[10px] font-bold text-game-muted">
+        <span>Card {current + 1} of {total}</span>
+        <span>{revealed.size} revealed</span>
+      </div>
+      <div
+        className="h-1.5 overflow-hidden rounded-full bg-game-border/60"
+        role="progressbar"
+        aria-label="Card reveal progress"
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-valuenow={current + 1}
+      >
         <motion.div
-          key={i}
-          className={cn(
-            'rounded-full transition-all duration-300',
-            i === current
-              ? 'h-3 w-3 bg-game-ochre'
-              : revealed.has(i)
-                ? 'h-2 w-2 bg-game-moss'
-                : 'h-2 w-2 bg-game-night-border',
-          )}
-          layoutId={`dot-${i}`}
+          className="h-full rounded-full bg-game-ochre"
+          animate={{ width: `${((current + 1) / total) * 100}%` }}
+          transition={{ duration: 0.25 }}
         />
-      ))}
+      </div>
     </div>
   )
 }
@@ -369,27 +375,25 @@ function SummaryGrid({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-game-night-canvas text-game-night-ink"
+      className="game-paper-first game-paper-background fixed inset-0 z-50 flex flex-col overflow-hidden bg-game-canvas text-game-ink"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="relative z-10 flex-shrink-0 px-6 pt-12 pb-4">
-        <div className="flex flex-col items-center gap-2 mb-8">
-          <div className="flex items-center gap-3 text-game-ochre">
-            <Trophy className="w-5 h-5" />
-            <h2 className="text-sm font-semibold">Collection summary</h2>
-            <Trophy className="w-5 h-5" />
-          </div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-game-night-muted">
-            You obtained {cards.length} cards
+      <div className="relative z-10 flex-shrink-0 px-5 pb-4 pt-[max(2rem,env(safe-area-inset-top))]">
+        <div className="mb-5 flex flex-col items-center gap-1 text-center">
+          <h2 className="font-display text-xl font-semibold text-game-ink">
+            Cards added to your collection
+          </h2>
+          <p className="text-xs font-medium text-game-muted">
+            {cards.length} {cards.length === 1 ? 'card' : 'cards'} obtained
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 flex-1 overflow-y-auto px-8 pt-2 pb-8 scrollbar-hide">
+      <div className="relative z-10 flex-1 overflow-y-auto px-5 pb-6 pt-2 scrollbar-hide">
         <motion.div
-          className="grid gap-6 mx-auto"
+          className="mx-auto grid gap-5"
           style={{
             gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
             maxWidth: cols === 1 ? 260 : cols === 2 ? 520 : 700,
@@ -420,7 +424,7 @@ function SummaryGrid({
                           : undefined,
                     }}
                     className={cn(
-                      'relative w-full h-full rounded-xl overflow-hidden border-2 transition-all duration-500',
+                      'relative h-full w-full overflow-hidden rounded-xl border-2 transition-all duration-500',
                       theme.border,
                     )}
                   >
@@ -445,7 +449,7 @@ function SummaryGrid({
                   )}
                 </div>
                 <div className="flex flex-col items-center gap-1">
-                  <p className="max-w-full truncate text-center text-xs font-black text-game-night-ink">
+                  <p className="max-w-full truncate text-center text-xs font-semibold text-game-ink">
                     {card.name}
                   </p>
                   <span
@@ -455,7 +459,7 @@ function SummaryGrid({
                       theme.badgeText,
                     )}
                   >
-                    {theme.label.split(' ')[1]}
+                    {theme.label}
                   </span>
                 </div>
               </motion.div>
@@ -465,12 +469,12 @@ function SummaryGrid({
       </div>
 
       <motion.div
-        className="relative z-10 flex-shrink-0 border-t border-game-night-border bg-game-night-canvas/95 px-8 pb-12 pt-6"
+        className="game-paper-first relative z-10 flex-shrink-0 border-t border-game-border bg-game-surface-raised px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
       >
-        <Button onClick={onClose} className="w-full">
+        <Button onClick={onClose} className="min-h-11 w-full">
           Add to Collection
         </Button>
       </motion.div>
@@ -579,7 +583,7 @@ export function CardDrawReveal({
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 flex flex-col overflow-hidden bg-game-night-canvas text-game-night-ink',
+        'game-paper-first game-paper-background fixed inset-0 z-50 flex flex-col overflow-hidden bg-game-canvas text-game-ink',
         className,
       )}
     >
@@ -589,12 +593,12 @@ export function CardDrawReveal({
       </AnimatePresence>
 
       {/* Close button */}
-      <div className="absolute top-6 right-6 z-50">
+      <div className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-50">
         <Button
           variant="ghost"
           size="icon"
           onClick={onComplete}
-          className="text-game-night-muted hover:bg-game-night-surface hover:text-game-night-ink"
+          className="game-focus-ring border border-game-border bg-game-surface-raised text-game-muted hover:bg-game-surface hover:text-game-ink"
           aria-label="Close card reveal"
         >
           <X className="w-6 h-6" />
@@ -602,16 +606,15 @@ export function CardDrawReveal({
       </div>
 
       {/* ── TOP: instructions + progress ── */}
-      <div className="relative z-10 flex flex-col items-center gap-6 pt-14 px-6 flex-shrink-0">
+      <div className="relative z-10 flex flex-shrink-0 flex-col items-center gap-4 px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center gap-2"
         >
-          <p className="ml-[0.3em] text-[10px] font-black uppercase tracking-[0.3em] text-game-ochre">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-game-muted">
             {isCurrentRevealed ? 'Revealed' : 'New Card'}
           </p>
-          <div className="h-px w-16 bg-game-ochre/60" />
         </motion.div>
         <DotProgress
           total={cards.length}
@@ -621,7 +624,7 @@ export function CardDrawReveal({
       </div>
 
       {/* ── CENTER: card ── */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-4">
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center overflow-y-auto px-5 py-4">
         <button
           type="button"
           aria-label={isCurrentRevealed ? `${currentCard.name} revealed` : 'Reveal card'}
@@ -673,7 +676,7 @@ export function CardDrawReveal({
               >
                 {/* Back Face */}
                 <div
-                  className="absolute inset-0 overflow-hidden rounded-2xl border border-game-night-border shadow-lg"
+                  className="absolute inset-0 overflow-hidden rounded-xl border border-game-border shadow-lg"
                   style={{ backfaceVisibility: 'hidden' }}
                 >
                   {!isCurrentRevealed ? (
@@ -687,14 +690,14 @@ export function CardDrawReveal({
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-full bg-[#1c2c51]" />
+                    <div className="h-full w-full bg-game-surface" />
                   )}
                 </div>
 
                 {/* Front Face */}
                 <div
                   className={cn(
-                    'absolute inset-0 overflow-hidden rounded-2xl border-2 shadow-lg will-change-transform',
+                    'absolute inset-0 overflow-hidden rounded-xl border-2 shadow-lg will-change-transform',
                     currentTheme.border,
                   )}
                   style={{
@@ -728,7 +731,7 @@ export function CardDrawReveal({
         </button>
 
         {/* Details Area */}
-        <div className="min-h-[80px] flex items-start justify-center w-full mt-10">
+        <div className="mt-6 flex min-h-[80px] w-full items-start justify-center">
           <AnimatePresence mode="wait">
             {isCurrentRevealed && (
               <motion.div
@@ -738,7 +741,7 @@ export function CardDrawReveal({
                 exit={{ opacity: 0, y: -10 }}
                 className="flex flex-col items-center gap-3"
               >
-                <h3 className="text-xl font-black italic tracking-tight text-game-night-ink">
+                <h3 className="font-display text-xl font-semibold tracking-tight text-game-ink">
                   {currentCard.name}
                 </h3>
                 <div className="flex items-center gap-3">
@@ -749,14 +752,13 @@ export function CardDrawReveal({
                       currentTheme.badgeText,
                     )}
                   >
-                    <Sparkles className="w-3 h-3" />
                     {currentTheme.label}
                   </span>
                   {currentCard.isNew && (
                     <motion.span
                       initial={{ scale: 0, rotate: -15 }}
                       animate={{ scale: 1, rotate: 0 }}
-                      className="rounded bg-game-ochre px-2.5 py-1 text-[10px] font-black italic text-game-cream"
+                      className="rounded-md bg-game-ochre px-2.5 py-1 text-[10px] font-bold text-game-cream"
                     >
                       NEW
                     </motion.span>
@@ -769,13 +771,13 @@ export function CardDrawReveal({
       </div>
 
       {/* ── BOTTOM: button ── */}
-      <div className="relative z-10 flex-shrink-0 border-t border-game-night-border bg-game-night-canvas/95 pb-safe-bottom">
-        <div className="px-8 pb-10 pt-4">
+      <div className="game-paper-first relative z-10 flex-shrink-0 border-t border-game-border bg-game-surface-raised pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="px-5 pt-4">
           <Button
             onClick={handleReveal}
             variant={isCurrentRevealed ? 'outline' : 'default'}
             className={cn(
-              'h-14 w-full text-xs font-black uppercase tracking-[0.16em] transition-colors',
+              'min-h-11 w-full text-xs font-bold uppercase tracking-[0.12em] transition-colors',
               isCurrentRevealed
                 ? 'border border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface'
                 : 'bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong',

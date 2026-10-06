@@ -1438,7 +1438,7 @@ const QUEST_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-day-care-clay-brick',
     name: 'Kiln-Fired Brick',
     description: 'Fire soft clay in the Day Care kiln with Magby watching the heat.',
-    artisanLevel: 15,
+    artisanLevel: 12,
     costs: [{ id: 'terra-dust-t1', amount: 1 }],
     rewards: [
       {

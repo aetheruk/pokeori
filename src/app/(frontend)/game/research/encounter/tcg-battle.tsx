@@ -130,17 +130,17 @@ interface TcgBattleGameProps {
 }
 
 const TYPE_BADGE_CLASSES: Record<string, string> = {
-  Colorless: 'border-[#f7ecd6]/35 bg-[#f7ecd6]/10 text-[#f7ecd6]',
-  Darkness: 'border-[#748083]/40 bg-[#172733]/80 text-[#f7ecd6]',
-  Dragon: 'border-violet-300/40 bg-violet-500/15 text-violet-100',
-  Fairy: 'border-pink-300/40 bg-pink-500/15 text-pink-100',
-  Fighting: 'border-orange-300/45 bg-orange-600/15 text-orange-100',
-  Fire: 'border-red-300/45 bg-red-600/15 text-red-100',
-  Grass: 'border-emerald-300/40 bg-emerald-600/15 text-emerald-100',
-  Lightning: 'border-yellow-200/50 bg-yellow-400/15 text-yellow-100',
-  Metal: 'border-slate-300/40 bg-slate-400/15 text-slate-100',
-  Psychic: 'border-fuchsia-300/40 bg-fuchsia-500/15 text-fuchsia-100',
-  Water: 'border-sky-300/45 bg-sky-500/15 text-sky-100',
+  Colorless: 'border-game-border-strong bg-game-surface-raised text-game-ink',
+  Darkness: 'border-game-charcoal/30 bg-game-charcoal/10 text-game-charcoal',
+  Dragon: 'border-violet-300 bg-violet-50 text-violet-800',
+  Fairy: 'border-pink-300 bg-pink-50 text-pink-800',
+  Fighting: 'border-orange-300 bg-orange-50 text-orange-800',
+  Fire: 'border-red-300 bg-red-50 text-red-800',
+  Grass: 'border-emerald-300 bg-emerald-50 text-emerald-800',
+  Lightning: 'border-yellow-300 bg-yellow-50 text-yellow-800',
+  Metal: 'border-slate-300 bg-slate-50 text-slate-800',
+  Psychic: 'border-fuchsia-300 bg-fuchsia-50 text-fuchsia-800',
+  Water: 'border-sky-300 bg-sky-50 text-sky-800',
 }
 
 const STATUS_ICON_SRC: Record<TcgBattleStatusCondition, string> = {
@@ -1801,9 +1801,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     return (
       <div className="game-activity-chrome relative grid h-[100dvh] place-items-center overflow-hidden bg-game-canvas p-6 text-game-ink">
         <ArenaBackdrop />
-        <div className="relative z-10 flex items-center gap-3 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 py-3 shadow-2xl backdrop-blur-md">
+        <div className="relative z-10 flex items-center gap-3 rounded-md border border-game-border bg-game-surface-raised px-4 py-3 shadow-md">
           <span className="h-2 w-2 rounded-full bg-game-ochre" aria-hidden="true" />
-          <div className="text-xs font-black uppercase text-[#f7ecd6]">
+          <div className="text-xs font-black uppercase text-game-ink">
             Loading TCG battle
           </div>
         </div>
@@ -1819,26 +1819,26 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     return (
       <div className="game-activity-chrome relative grid h-[100dvh] place-items-center overflow-hidden bg-game-canvas p-6 text-game-ink">
         <ArenaBackdrop />
-        <div className="relative z-10 w-full max-w-md rounded-md border border-[#d3ad63]/30 bg-[#172733]/90 p-6 text-center shadow-2xl backdrop-blur-md">
+        <div className="relative z-10 w-full max-w-md rounded-md border border-game-ochre/30 bg-game-surface-raised p-6 text-center shadow-md">
           <span aria-hidden="true" className="mx-auto block size-9 animate-spin rounded-full border-2 border-game-ochre border-r-transparent" />
           <SectionDivider className="mx-auto mb-2 mt-5 max-w-xs">
             Your board is ready
           </SectionDivider>
-          <h1 className="font-display text-3xl font-semibold text-[#f7ecd6]">
+          <h1 className="font-display text-3xl font-semibold text-game-ink">
             Waiting for your opponent
           </h1>
-          <p className="mt-3 text-sm text-[#d8d2c3]">
+          <p className="mt-3 text-sm text-game-muted">
             Their cards stay hidden until both collectors are ready.
           </p>
           {deadlineSeconds !== null && (
-          <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-[#f7ecd6]/15 bg-[#081014]/45 px-4 font-mono text-lg font-bold text-game-ochre">
+          <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-game-border bg-game-surface-raised/90 px-4 font-mono text-lg font-bold text-game-ochre">
               {formatMatchClock(deadlineSeconds)}
             </div>
           )}
           <Button
             type="button"
             variant="ghost"
-            className="game-focus-ring mx-auto mt-5 min-h-11 text-[#d8d2c3] hover:bg-[#f7ecd6]/10 hover:text-[#f7ecd6]"
+            className="game-focus-ring mx-auto mt-5 min-h-11 text-game-muted hover:bg-game-surface hover:text-game-ink"
             onClick={() => setShowSurrenderConfirm(true)}
           >
             <span aria-hidden="true">×</span>
@@ -1864,13 +1864,13 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         <main className="relative z-10 flex h-full flex-col">
           <header className="shrink-0 px-4 pt-[calc(env(safe-area-inset-top)+1.8rem)] text-center sm:pt-[calc(env(safe-area-inset-top)+2.6rem)]">
             {state.battleMode === 'pvp' && deadlineSeconds !== null && (
-              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 font-mono text-sm font-bold text-game-ochre">
+              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-md border border-game-border bg-game-surface-raised/95 px-4 font-mono text-sm font-bold text-game-ochre">
                 {formatMatchClock(deadlineSeconds)}
                 <Button
                   type="button"
                   size="icon"
                   variant="ghost"
-                  className="ml-1 h-9 w-9 text-[#d8d2c3] hover:bg-[#f7ecd6]/10 hover:text-[#f7ecd6]"
+                  className="ml-1 h-9 w-9 text-game-muted hover:bg-game-surface hover:text-game-ink"
                   aria-label="Surrender match"
                   onClick={() => setShowSurrenderConfirm(true)}
                 >
@@ -1925,7 +1925,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             </AnimatePresence>
           </div>
 
-          <footer className="shrink-0 bg-[linear-gradient(to_top,rgba(8,16,20,1),rgba(8,16,20,0.86),transparent)] pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-5">
+          <footer className="shrink-0 bg-gradient-to-t from-game-canvas via-game-canvas/90 to-transparent pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-5">
             <div className="mx-auto flex w-full max-w-5xl snap-x snap-mandatory justify-start gap-3 overflow-x-auto overscroll-x-contain px-6 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [touch-action:pan-x] sm:gap-4 sm:px-10 [&::-webkit-scrollbar]:hidden">
               {state.player.hand.map((card) => {
                 const slotIndex = frontIds.indexOf(card.instanceId)
@@ -1969,7 +1969,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           state.phase !== 'finished' &&
           (state.activeSide === 'opponent' ||
             state.pendingPromotion === 'opponent') && (
-            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-md border border-[#f7ecd6]/15 bg-[#172733]/90 px-3 py-2 text-center text-[11px] font-black uppercase tracking-[0.12em] text-game-ochre shadow-lg backdrop-blur-md">
+            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-md border border-game-ochre/35 bg-game-surface-raised px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-game-ochre shadow-md">
               {state.pendingPromotion === 'opponent'
                 ? 'Opponent is choosing a promotion'
                 : 'Opponent’s turn'}
@@ -2095,6 +2095,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       <AnimatePresence>
         {showOpeningVs && state.playerTrainer && state.enemyTrainer && (
           <VSAnimation
+            appearance="paper"
             player={state.playerTrainer}
             enemy={state.enemyTrainer}
             onComplete={closeOpeningVs}
@@ -2261,10 +2262,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
 function ArenaBackdrop() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-[#07080c]" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(127,29,29,0.28)_0%,rgba(9,9,11,0.34)_28%,rgba(14,116,144,0.2)_72%,rgba(5,8,11,0.96)_100%)]" />
-      <div className="absolute inset-0 opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:38px_38px]" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.78)_0%,transparent_16%,transparent_84%,rgba(0,0,0,0.78)_100%)]" />
+      <div className="absolute inset-0 bg-game-canvas" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(181,138,67,0.09),transparent_58%)]" />
+      <div className="absolute inset-x-0 top-1/2 h-px bg-game-border/45" />
     </div>
   )
 }
@@ -2272,10 +2272,10 @@ function ArenaBackdrop() {
 function ResolutionToast({ resolution }: { resolution: BattleResolution }) {
   const toneClasses =
     resolution.tone === 'player'
-      ? 'border-game-charcoal/55 bg-game-charcoal/70 text-game-night-ink'
+      ? 'border-game-charcoal/35 bg-game-surface-raised text-game-ink'
       : resolution.tone === 'opponent'
-        ? 'border-game-clay/55 bg-game-clay-strong/70 text-game-night-ink'
-        : 'border-game-ochre/55 bg-[#0d1820]/80 text-game-night-ink'
+        ? 'border-game-clay/40 bg-game-surface-raised text-game-ink'
+        : 'border-game-ochre/45 bg-game-surface-raised text-game-ink'
   const actorLabel =
     resolution.tone === 'player'
       ? 'You'
@@ -2294,24 +2294,24 @@ function ResolutionToast({ resolution }: { resolution: BattleResolution }) {
     >
       <div
         className={cn(
-          'relative min-w-64 max-w-[min(32rem,calc(100vw-2rem))] overflow-hidden border px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur-md',
+          'relative min-w-64 max-w-[min(32rem,calc(100vw-2rem))] overflow-hidden rounded-md border px-4 py-3 shadow-md',
           toneClasses,
         )}
       >
         <div className="flex items-center gap-3">
-          <span className="shrink-0 border border-[#f7ecd6]/15 bg-[#081014]/35 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-game-night-ink">
+          <span className="shrink-0 rounded-md border border-game-border bg-game-canvas px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-game-muted">
             {actorLabel}
           </span>
           <div className="min-w-0">
             <div className="truncate text-xs font-black uppercase">
               {resolution.title}
             </div>
-            <div className="mt-0.5 truncate text-[11px] text-[#f7ecd6]">
+            <div className="mt-0.5 truncate text-[11px] text-game-muted">
               {resolution.detail}
             </div>
           </div>
           {resolution.damageCue && (
-            <div className="ml-auto flex shrink-0 items-center gap-1 border border-[#f7ecd6]/15 bg-[#081014]/35 px-2 py-1 text-xs font-black text-game-night-ink">
+            <div className="ml-auto flex shrink-0 items-center gap-1 rounded-md border border-game-border bg-game-canvas px-2 py-1 text-xs font-bold text-game-ink">
               {resolution.damageCue.damage}
             </div>
           )}
@@ -2367,7 +2367,7 @@ function BattleTopBar({
   return (
     <div className="mt-1 shrink-0 px-1 py-1 sm:mt-2">
       <div className="grid grid-cols-3 items-center gap-3">
-        <span className="inline-flex items-center gap-1 text-xs font-black text-[#f7ecd6]">
+        <span className="inline-flex items-center gap-1 text-xs font-black text-game-ink">
           <EnergyIcon
             type="Colorless"
             className={cn(
@@ -2378,7 +2378,7 @@ function BattleTopBar({
           {formatEnergyCap(attackCap)}
         </span>
         <div className="text-center leading-tight">
-          <div className="text-[11px] font-light tracking-[0.08em] text-[#d8d2c3]">
+          <div className="text-[11px] font-light tracking-[0.08em] text-game-muted">
             Round {state.turnNumber}
             {state.battleMode === 'pvp' && deadlineSeconds !== null
               ? ` · ${formatMatchClock(deadlineSeconds)}`
@@ -2403,7 +2403,7 @@ function BattleTopBar({
               type="button"
               size="icon"
               variant="ghost"
-              className="h-10 w-10 text-[#d8d2c3] hover:bg-[#f7ecd6]/10 hover:text-[#f7ecd6]"
+              className="h-10 w-10 text-game-muted hover:bg-game-surface hover:text-game-ink"
               aria-label="Surrender match"
               onClick={onSurrender}
             >
@@ -2425,9 +2425,9 @@ function EvolutionEnergyBurst() {
       transition={{ duration: 0.35, ease: 'easeOut' }}
       className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.75rem)] z-[70] mx-auto flex w-[min(92vw,780px)] items-center justify-center"
     >
-      <div className="relative overflow-hidden rounded-md border border-[#d3ad63]/40 bg-[#172733]/90 px-4 py-3 text-center backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-md border border-game-ochre/40 bg-game-surface-raised/95 px-4 py-3 text-center backdrop-blur-md">
         <div className="pointer-events-none absolute inset-0 animate-[tcg-energy-sweep_900ms_ease-out] bg-[linear-gradient(to_right,transparent,rgba(211,173,99,0.18),transparent)]" />
-        <p className="relative text-xs font-black uppercase tracking-[0.18em] text-[#f1cf7a] sm:text-sm">
+        <p className="relative text-xs font-black uppercase tracking-[0.18em] text-game-ochre sm:text-sm">
           A burst of Evolution Energy sweeps across the battlefield
         </p>
       </div>
@@ -2453,9 +2453,9 @@ function EnergyCardActivationBurst({ state }: { state: TcgBattleState }) {
       transition={{ duration: 0.35, ease: 'easeOut' }}
       className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+6.75rem)] z-[70] mx-auto flex w-[min(92vw,860px)] items-center justify-center"
     >
-      <div className="relative overflow-hidden rounded-md border border-[#b8c894]/40 bg-[#172733]/90 px-4 py-3 text-center backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-md border border-game-moss/40 bg-game-surface-raised/95 px-4 py-3 text-center backdrop-blur-md">
         <div className="pointer-events-none absolute inset-0 animate-[tcg-energy-sweep_900ms_ease-out] bg-[linear-gradient(to_right,transparent,rgba(184,200,148,0.16),transparent)]" />
-        <p className="relative text-[11px] font-black uppercase tracking-[0.12em] text-[#c9d8a7] sm:text-xs">
+        <p className="relative text-[11px] font-black uppercase tracking-[0.12em] text-game-moss-strong sm:text-xs">
           {detail}
         </p>
       </div>
@@ -2479,7 +2479,7 @@ function TeamEnergyReadout({
   return (
     <div
       className={cn(
-        'inline-flex items-center justify-center gap-3 text-sm font-black text-[#f7ecd6] drop-shadow-[0_4px_12px_rgba(0,0,0,0.55)]',
+        'inline-flex items-center justify-center gap-3 rounded-md border border-game-border bg-game-surface-raised px-3 py-1.5 text-sm font-bold text-game-ink',
         position === 'opponent' ? 'mb-2 sm:mb-3' : 'mt-2 sm:mt-3',
         inverted && 'rotate-180',
       )}
@@ -2490,9 +2490,9 @@ function TeamEnergyReadout({
           {energy}/{cap}
         </span>
       </span>
-      <span className="inline-flex items-center gap-1.5 text-game-night-muted">
+      <span className="inline-flex items-center gap-1.5 text-game-muted">
         <span>Bench</span>
-        <span className="font-mono text-game-night-ink">{benchCount}</span>
+        <span className="font-mono text-game-ink">{benchCount}</span>
       </span>
     </div>
   )
@@ -2669,16 +2669,16 @@ function AttackChoiceDrawer({
             key={card.instanceId}
             onClick={() => onChange(card.instanceId)}
             className={cn(
-              'game-focus-ring min-h-11 rounded-md border bg-game-night-surface px-3 py-2 text-left text-game-night-ink transition-colors',
+              'game-focus-ring min-h-11 rounded-md border bg-game-surface-raised px-3 py-2 text-left text-game-ink transition-colors',
               value === card.instanceId
                 ? 'border-game-moss bg-game-moss/25'
-                : 'border-game-night-border/60 hover:border-game-moss/60',
+                : 'border-game-border/60 hover:border-game-moss/60',
             )}
           >
             <span className="block truncate text-sm font-semibold">
               {card.name}
             </span>
-            <span className="font-mono text-xs text-game-night-muted">
+            <span className="font-mono text-xs text-game-muted">
               {card.currentHp}/{card.hp} HP
             </span>
           </button>
@@ -2718,12 +2718,12 @@ function AttackChoiceDrawer({
         icon={<span className="text-xs font-bold uppercase tracking-wide">Target</span>}
         background="/backgrounds/tcg.avif"
         heroLabel="Card battle"
-        className="border-game-night-border bg-game-night-surface text-game-night-ink"
+        className="border-game-border bg-game-surface-raised text-game-ink"
       >
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
           {(effect.targetScope === 'bench' || effect.targetScope === 'any') && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-night-ink">
+              <h3 className="text-sm font-semibold text-game-ink">
                 Target
               </h3>
               {renderCardChoices(
@@ -2736,7 +2736,7 @@ function AttackChoiceDrawer({
           {(activeRequirement === 'opponentBench' ||
             activeRequirement === 'ownBench') && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-night-ink">
+              <h3 className="text-sm font-semibold text-game-ink">
                 {activeRequirement === 'ownBench'
                   ? 'Switch with'
                   : 'Bring forward'}
@@ -2750,7 +2750,7 @@ function AttackChoiceDrawer({
           )}
           {requirement === 'copyAttack' && target && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-night-ink">
+              <h3 className="text-sm font-semibold text-game-ink">
                 Attack to copy
               </h3>
               <div className="grid gap-2">
@@ -2780,14 +2780,14 @@ function AttackChoiceDrawer({
                         'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left transition-colors',
                         selectedAttackIndex === index
                           ? 'border-game-moss bg-game-moss/25'
-                          : 'border-game-night-border bg-game-night-canvas/50 hover:border-game-moss/60',
+                          : 'border-game-border bg-game-canvas/50 hover:border-game-moss/60',
                         unavailable && 'cursor-not-allowed opacity-40',
                       )}
                     >
                       <span className="block text-sm font-semibold">
                         {candidate.name}
                       </span>
-                      <span className="text-xs text-game-night-muted">
+                      <span className="text-xs text-game-muted">
                         {candidate.text || `${candidate.damage || 0} damage`}
                       </span>
                     </button>
@@ -2798,7 +2798,7 @@ function AttackChoiceDrawer({
           )}
           {activeRequirement === 'disableAttack' && target && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-night-ink">
+              <h3 className="text-sm font-semibold text-game-ink">
                 Attack to disable
               </h3>
               <div className="grid gap-2">
@@ -2820,7 +2820,7 @@ function AttackChoiceDrawer({
                         'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left transition-colors',
                         selectedIndex === index
                           ? 'border-game-moss bg-game-moss/25'
-                          : 'border-game-night-border bg-game-night-canvas/50 hover:border-game-moss/60',
+                          : 'border-game-border bg-game-canvas/50 hover:border-game-moss/60',
                       )}
                     >
                       <span className="block text-sm font-semibold">
@@ -2834,7 +2834,7 @@ function AttackChoiceDrawer({
           )}
           {activeRequirement === 'energyAmount' && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-night-ink">
+              <h3 className="text-sm font-semibold text-game-ink">
                 Extra Energy
               </h3>
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
@@ -2846,8 +2846,8 @@ function AttackChoiceDrawer({
                     className={cn(
                       'game-focus-ring min-h-11 rounded-md border font-mono text-sm',
                       energyAmount === amount
-                        ? 'border-game-moss bg-game-moss/25 text-game-night-ink'
-                        : 'border-game-night-border bg-game-night-canvas/50 text-game-night-muted',
+                        ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                        : 'border-game-border bg-game-canvas/50 text-game-muted',
                     )}
                   >
                     {amount}
@@ -2861,13 +2861,13 @@ function AttackChoiceDrawer({
           {activeRequirement === 'textureMagic' && (
             <>
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-game-night-ink">
+                <h3 className="text-sm font-semibold text-game-ink">
                   Your resistance
                 </h3>
                 {renderTypeChoices(resistanceType, setResistanceType)}
               </section>
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-game-night-ink">
+                <h3 className="text-sm font-semibold text-game-ink">
                   Target weakness
                 </h3>
                 {renderTypeChoices(weaknessType, setWeaknessType)}
@@ -2875,7 +2875,7 @@ function AttackChoiceDrawer({
             </>
           )}
         </div>
-        <DrawerFooter className="border-t border-game-night-border sm:flex-row sm:justify-end">
+        <DrawerFooter className="border-t border-game-border sm:flex-row sm:justify-end">
           <Button
             type="button"
             variant="outline"
@@ -2973,24 +2973,24 @@ function InlineAttackButtons({
             type="button"
             key={`${attack.name}-${index}`}
             className={cn(
-              'game-focus-ring group flex min-h-11 min-w-0 flex-1 basis-[10rem] items-center justify-between gap-2 rounded-md border border-[#b8c894]/30 bg-[#172733]/80 px-3 py-2 text-left backdrop-blur-md transition-colors hover:border-[#c9d8a7]/70 hover:bg-[#405d3d]/35',
+              'game-focus-ring group flex min-h-11 min-w-0 flex-1 basis-[10rem] items-center justify-between gap-2 rounded-md border border-game-moss/30 bg-game-surface-raised/95 px-3 py-2 text-left backdrop-blur-md transition-colors hover:border-game-moss-strong/70 hover:bg-game-moss/15',
               disabled &&
-                'cursor-default border-[#f7ecd6]/10 bg-[#172733]/55 opacity-40 hover:border-[#f7ecd6]/10 hover:bg-[#172733]/55',
+                'cursor-default border-game-border/70 bg-game-surface-raised/75 opacity-40 hover:border-game-border/70 hover:bg-game-surface-raised/75',
             )}
             disabled={disabled}
             onClick={() => onAttack(index)}
           >
             <span className="flex min-w-0 items-center gap-2">
               <span className="min-w-0">
-                <span className="block truncate text-[11px] font-black uppercase text-[#f7ecd6]">
+                <span className="block truncate text-[11px] font-black uppercase text-game-ink">
                   {attack.name}
                 </span>
-                <span className="mt-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-game-night-muted">
+                <span className="mt-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-game-muted">
                   {disabledReason || `${projectedDamage} damage`}
                 </span>
               </span>
             </span>
-            <span className="flex shrink-0 items-center gap-1.5 text-[10px] font-black text-[#f7ecd6]">
+            <span className="flex shrink-0 items-center gap-1.5 text-[10px] font-black text-game-ink">
               <EnergyCost cost={cost} types={attack.cost} />
               <span>{attack.damage}</span>
             </span>
@@ -3058,16 +3058,16 @@ function BattleCommandControls({
 
   if (state.phase === 'finished') {
     return (
-      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#081014]/90 p-4 backdrop-blur-md sm:p-6">
+      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-game-canvas/95 p-4 backdrop-blur-md sm:p-6">
         <div className="flex flex-col items-center gap-5 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full border border-game-danger/40 bg-game-danger/10 text-game-danger">
             <span aria-hidden="true" className="text-2xl font-semibold">!</span>
           </div>
           <div>
-            <p className="font-display text-2xl font-semibold text-[#f7ecd6]">
+            <p className="font-display text-2xl font-semibold text-game-ink">
               {getWinnerLabel(state.winner)}
             </p>
-            <p role="alert" className="mt-2 max-w-sm text-sm text-[#f7ecd6]/75">
+            <p role="alert" className="mt-2 max-w-sm text-sm text-game-ink/75">
               {claimError}
             </p>
             <Button
@@ -3090,7 +3090,7 @@ function BattleCommandControls({
           type="button"
           disabled={isPending}
           onClick={onPromote}
-          className="game-focus-ring min-h-12 rounded-md border border-game-ochre/50 bg-game-night-surface px-5 text-xs font-black uppercase tracking-wide text-game-night-ink hover:bg-game-ochre/15"
+          className="game-focus-ring min-h-12 rounded-md border border-game-ochre/50 bg-game-surface-raised px-5 text-xs font-black uppercase tracking-wide text-game-ink hover:bg-game-ochre/10"
         >
           Promote
         </Button>
@@ -3114,7 +3114,7 @@ function BattleCommandControls({
           <span className="relative inline-flex items-center justify-center">
             <EnergyIcon type="Colorless" className="h-[18px] w-[18px]" />
             {!atCap && (
-              <span className="absolute -right-5 -top-3 rounded border border-[#b8c894]/55 bg-[#5f794f]/30 px-1 py-[1px] text-[10px] font-black leading-none text-[#f7ecd6]">
+              <span className="absolute -right-5 -top-3 rounded border border-game-moss/55 bg-game-moss/10 px-1 py-[1px] text-[10px] font-black leading-none text-game-ink">
                 +{formatConfig.chargeGain}
               </span>
             )}
@@ -3144,7 +3144,7 @@ function LabeledCommandButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'game-focus-ring h-11 rounded-full border border-game-night-border/60 bg-game-night-surface/80 px-4 text-game-night-ink shadow-[0_12px_28px_rgba(0,0,0,0.4)] backdrop-blur-md transition-colors hover:border-game-moss/55 hover:bg-game-moss/20',
+        'game-focus-ring h-11 rounded-md border border-game-border bg-game-surface-raised px-4 text-game-ink shadow-sm transition-colors hover:border-game-moss/55 hover:bg-game-moss/10',
         'inline-flex items-center gap-2',
         disabled && 'opacity-35',
       )}
@@ -3160,14 +3160,14 @@ function LabeledCommandButton({
 function CardPreviewOverlay({ card }: { card: TcgBattleCardState }) {
   return (
     <motion.div
-      className="pointer-events-none fixed inset-0 z-[70] flex items-center justify-center bg-[#081014]/70 p-5 backdrop-blur-sm"
+      className="pointer-events-none fixed inset-0 z-[70] flex items-center justify-center bg-game-canvas/85 p-5 backdrop-blur-sm"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.14 }}
     >
       <motion.div
-        className="relative aspect-[240/330] h-[min(72dvh,34rem)] overflow-hidden rounded-xl shadow-[0_28px_80px_rgba(0,0,0,0.72)]"
+        className="relative aspect-[240/330] h-[min(72dvh,34rem)] overflow-hidden rounded-xl shadow-[0_10px_24px_rgba(24,35,39,0.2)]"
         initial={{ scale: 0.88, y: 18 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.92, y: 12 }}
@@ -3196,7 +3196,7 @@ function CoinFlipOverlay({ cue }: { cue: CoinCue }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.12 }}
     >
-      <div className="absolute inset-0 bg-[#081014]/30 backdrop-blur-[1px]" />
+      <div className="absolute inset-0 bg-game-surface-raised/80 backdrop-blur-[1px]" />
       <div className="relative flex flex-col items-center gap-4">
         <div className="flex items-center justify-center gap-3 sm:gap-5">
           {cue.results.slice(0, 6).map((result, index) => {
@@ -3228,24 +3228,24 @@ function CoinFlipOverlay({ cue }: { cue: CoinCue }) {
                   alt={result === 'heads' ? 'Coin heads' : 'Coin tails'}
                   fill
                   sizes="96px"
-                  className="object-contain drop-shadow-[0_12px_26px_rgba(0,0,0,0.65)]"
+                  className="object-contain drop-shadow-[0_8px_18px_rgba(24,35,39,0.22)]"
                   priority
                 />
               </motion.div>
             )
           })}
           {cue.results.length > 6 && (
-            <div className="flex h-20 min-w-20 items-center justify-center rounded-md border border-game-night-border bg-game-night-surface px-3 font-mono text-sm font-bold text-game-night-ink sm:h-24">
+            <div className="flex h-20 min-w-20 items-center justify-center rounded-md border border-game-border bg-game-surface-raised px-3 font-mono text-sm font-bold text-game-ink sm:h-24">
               +{cue.results.length - 6}
             </div>
           )}
         </div>
         <motion.div
           className={cn(
-            'border px-4 py-2 text-xs font-black uppercase tracking-[0.18em] shadow-2xl backdrop-blur-md',
+            'rounded-md border px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-md',
             cue.side === 'player'
-              ? 'border-game-charcoal/55 bg-game-charcoal/70 text-game-night-ink'
-              : 'border-game-clay/55 bg-game-clay-strong/70 text-game-night-ink',
+              ? 'border-game-charcoal/35 bg-game-surface-raised text-game-ink'
+              : 'border-game-clay/40 bg-game-surface-raised text-game-ink',
           )}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -3278,16 +3278,16 @@ function BattleHeader({
           : 'Opponent turn'
 
   return (
-    <header className="relative overflow-hidden rounded-md border border-[#f7ecd6]/15 bg-[#172733]/82 px-3 py-2 shadow-2xl backdrop-blur-md">
+    <header className="relative overflow-hidden rounded-md border border-game-border bg-game-surface-raised px-3 py-2 shadow-sm">
       <div className="grid grid-cols-[1fr_auto] items-center gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-[#d3ad63]" />
-            <h1 className="truncate text-sm font-black uppercase text-[#f7ecd6] sm:text-base">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-game-ochre" />
+            <h1 className="truncate text-sm font-black uppercase text-game-ink sm:text-base">
               {title}
             </h1>
           </div>
-          <div className="mt-1 flex min-w-0 items-center gap-2 text-[11px] text-[#b2b6a8]">
+          <div className="mt-1 flex min-w-0 items-center gap-2 text-[11px] text-game-muted">
             <span className="truncate">
               {subtitle || `Turn ${state.turnNumber} / ${phaseLabel}`}
             </span>
@@ -3328,14 +3328,14 @@ function SideScorePill({
   return (
     <div
       className={cn(
-        'min-w-[4.7rem] border px-2 py-1 shadow-inner',
+        'min-w-[4.7rem] rounded-md border px-2 py-1',
         tone === 'player'
-          ? 'border-game-charcoal/50 bg-game-charcoal/35'
-          : 'border-game-clay/50 bg-game-clay-strong/35',
+          ? 'border-game-charcoal/30 bg-game-charcoal/10'
+          : 'border-game-clay/30 bg-game-clay/10',
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="text-[10px] font-black uppercase tracking-[0.08em] text-[#b2b6a8]">
+        <div className="text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
           {label}
         </div>
         <div className="flex items-center gap-1 text-xs font-black text-game-ochre">
@@ -3343,7 +3343,7 @@ function SideScorePill({
           {energy}
         </div>
       </div>
-      <div className="mt-1 flex items-center justify-between gap-2 text-[10px] font-bold text-[#d8d2c3]">
+      <div className="mt-1 flex items-center justify-between gap-2 text-[10px] font-bold text-game-muted">
         <span>{side.front.length} front</span>
         <span>{living} live</span>
       </div>
@@ -3391,7 +3391,7 @@ function SetupRevealSlot({
         }}
       >
         <div
-          className="absolute inset-0 overflow-hidden rounded-md border border-[#f7ecd6]/15 bg-[#162147] shadow-[0_22px_48px_rgba(0,0,0,0.55)]"
+          className="absolute inset-0 overflow-hidden rounded-md border border-game-border bg-game-surface shadow-[0_8px_18px_rgba(24,35,39,0.18)]"
           style={{ backfaceVisibility: 'hidden' }}
         >
           <Image
@@ -3415,7 +3415,7 @@ function SetupRevealSlot({
         </div>
 
         <div
-          className="absolute inset-0 overflow-hidden rounded-md border border-[#d3ad63]/55 bg-[#0d1820] shadow-[0_24px_54px_rgba(0,0,0,0.58)]"
+          className="absolute inset-0 overflow-hidden rounded-md border border-game-ochre/55 bg-game-surface-raised shadow-[0_8px_18px_rgba(24,35,39,0.2)]"
           style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
         >
           {card ? (
@@ -3431,7 +3431,7 @@ function SetupRevealSlot({
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,transparent_28%,rgba(255,255,255,0.18)_45%,transparent_62%)] opacity-40" />
             </>
           ) : (
-            <div className="h-full w-full bg-[#162147]" />
+            <div className="h-full w-full bg-game-surface" />
           )}
         </div>
       </motion.div>
@@ -3460,10 +3460,10 @@ function SetupHandCard({
       data-haptic-manual="true"
       layout
       className={cn(
-        'tcg-motion group relative aspect-[240/330] w-[calc((100vw-4.5rem)/3.5)] max-w-[9rem] shrink-0 snap-center touch-manipulation overflow-hidden rounded-md border bg-[#0d1820] p-0 transition duration-200 active:scale-[0.97] sm:w-[clamp(7.5rem,15vw,9.5rem)]',
+        'tcg-motion group relative aspect-[240/330] w-[calc((100vw-4.5rem)/3.5)] max-w-[9rem] shrink-0 snap-center touch-manipulation overflow-hidden rounded-md border bg-game-surface-raised p-0 transition duration-200 active:scale-[0.97] sm:w-[clamp(7.5rem,15vw,9.5rem)]',
         selected
-          ? 'border-[#d3ad63] shadow-[0_0_0_3px_rgba(211,173,99,0.18)]'
-          : 'border-[#f7ecd6]/15 shadow-[0_12px_28px_rgba(0,0,0,0.42)] hover:border-[#d3ad63]/55',
+          ? 'border-game-ochre shadow-[0_0_0_3px_rgba(211,173,99,0.18)]'
+          : 'border-game-border shadow-[0_6px_14px_rgba(24,35,39,0.16)] hover:border-game-ochre/55',
         inactive ? 'cursor-default opacity-35 saturate-50' : 'cursor-pointer',
         disabled && 'pointer-events-none opacity-50',
       )}
@@ -3487,9 +3487,9 @@ function SetupHandCard({
           selected && 'opacity-[0.62] saturate-75',
         )}
       />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(8,16,20,0.45),transparent,rgba(247,236,214,0.06))]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-game-charcoal/35 via-transparent to-game-surface/10" />
       {selected && slotIndex !== undefined && (
-        <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#d3ad63] text-[10px] font-black text-[#172733] shadow-md">
+        <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-game-ochre text-[10px] font-black text-game-ink shadow-md">
           {slotIndex + 1}
         </div>
       )}
@@ -3609,17 +3609,17 @@ function CommandMatchup({
         className={cn(
           'flex h-10 min-w-16 flex-col items-center justify-center border px-2 shadow-inner',
           active
-            ? 'border-game-charcoal/50 bg-game-charcoal/20'
-            : 'border-[#f7ecd6]/15 bg-[#f7ecd6]/5',
+            ? 'border-game-ochre/45 bg-game-ochre/10'
+            : 'border-game-border bg-game-surface-raised',
         )}
       >
-        <div className="flex items-center gap-1 text-[10px] font-black uppercase text-game-night-ink">
-          <span className={canKnockOut ? 'text-game-danger' : 'text-game-night-muted'}>
+        <div className="flex items-center gap-1 text-[10px] font-black uppercase text-game-ink">
+          <span className={canKnockOut ? 'text-game-danger' : 'text-game-muted'}>
             {canKnockOut ? 'KO' : 'Damage'}
           </span>
           {bestDamage}
         </div>
-        <div className="text-[10px] font-bold uppercase tracking-[0.06em] text-[#b2b6a8]">
+        <div className="text-[10px] font-bold uppercase tracking-[0.06em] text-game-muted">
           cap {formatAttackCap(attackCap)}
         </div>
       </div>
@@ -3649,14 +3649,14 @@ function CombatantSummary({
   return (
     <div
       className={cn(
-        'grid min-w-0 grid-cols-[auto_1fr] items-center gap-2 border bg-[#081014]/35 p-1.5',
+        'grid min-w-0 grid-cols-[auto_1fr] items-center gap-2 border bg-game-surface-raised/80 p-1.5',
         tone === 'player' ? 'border-game-charcoal/35' : 'border-game-clay/35',
         align === 'right' && 'grid-cols-[1fr_auto]',
       )}
     >
       {align === 'left' && <CombatantThumb card={card} tone={tone} />}
       <div className={cn('min-w-0', align === 'right' && 'text-right')}>
-        <div className="truncate text-[11px] font-black uppercase text-[#f7ecd6]">
+        <div className="truncate text-[11px] font-black uppercase text-game-ink">
           {card?.name || fallback}
         </div>
         <div
@@ -3668,12 +3668,12 @@ function CombatantSummary({
           {card ? (
             <>
               <EnergyIcon type={type} className="h-3.5 w-3.5" />
-              <span className="text-[10px] font-bold text-[#b2b6a8]">
+              <span className="text-[10px] font-bold text-game-muted">
                 {card.currentHp}/{card.hp} HP
               </span>
             </>
           ) : (
-            <span className="text-[10px] font-bold text-[#b2b6a8]">
+            <span className="text-[10px] font-bold text-game-muted">
               No card selected
             </span>
           )}
@@ -3694,7 +3694,7 @@ function CombatantThumb({
   return (
     <div
       className={cn(
-        'relative h-9 w-7 shrink-0 overflow-hidden border bg-[#0d1820]',
+        'relative h-9 w-7 shrink-0 overflow-hidden border bg-game-surface-raised',
         tone === 'player' ? 'border-game-charcoal/40' : 'border-game-clay/40',
       )}
     >
@@ -3708,7 +3708,7 @@ function CombatantThumb({
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center">
-          <span className="px-0.5 text-[8px] font-bold uppercase text-game-night-muted">
+          <span className="px-0.5 text-[8px] font-bold uppercase text-game-muted">
             Empty
           </span>
         </div>
@@ -3736,9 +3736,9 @@ function AttackCommandButton({
     <Button
       type="button"
       className={cn(
-        'group relative h-12 overflow-hidden border border-game-moss/35 bg-game-night-surface/80 px-2 text-left text-game-night-ink hover:bg-game-moss/20',
+        'group relative h-12 overflow-hidden border border-game-moss/35 bg-game-surface-raised/80 px-2 text-left text-game-ink hover:bg-game-moss/20',
         disabled &&
-          'border-game-night-border/40 bg-game-night-surface/55 text-game-night-muted',
+          'border-game-border/40 bg-game-surface-raised/55 text-game-muted',
       )}
       disabled={disabled}
       onClick={onClick}
@@ -3748,7 +3748,7 @@ function AttackCommandButton({
           <span className="block truncate text-xs font-black">
             {attack.name}
           </span>
-          <span className="mt-0.5 flex items-center gap-1 text-[10px] font-medium text-game-night-muted">
+          <span className="mt-0.5 flex items-center gap-1 text-[10px] font-medium text-game-muted">
             {disabledReason ? (
               disabledReason
             ) : (
@@ -3760,7 +3760,7 @@ function AttackCommandButton({
         </span>
         <span className="flex shrink-0 flex-col items-end gap-0.5 text-xs font-black">
           <EnergyCost cost={cost} types={attack.cost} />
-          <span className="text-[10px] text-game-night-muted">
+          <span className="text-[10px] text-game-muted">
             {attack.damage}
           </span>
         </span>
@@ -3781,15 +3781,15 @@ function TinyHpPill({
   return (
     <div
       className={cn(
-        'border bg-[#081014]/35 px-2 py-1',
+        'border bg-game-surface-raised/80 px-2 py-1',
         tone === 'player' ? 'border-game-charcoal/35' : 'border-game-clay/35',
       )}
     >
-      <div className="flex items-center justify-between gap-1 text-[10px] font-black uppercase tracking-[0.06em] text-[#b2b6a8]">
+      <div className="flex items-center justify-between gap-1 text-[10px] font-black uppercase tracking-[0.06em] text-game-muted">
         <span>{label}</span>
         <span>{card ? `${card.currentHp}/${card.hp}` : '-'}</span>
       </div>
-      <div className="mt-1 h-1 overflow-hidden bg-[#172733]">
+      <div className="mt-1 h-1 overflow-hidden bg-game-border/60">
         <div
           className={cn('h-full transition-all', getHpTone(card))}
           style={{ width: `${getHpPercent(card)}%` }}
@@ -3821,15 +3821,15 @@ function BenchBar({
 
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] gap-1.5">
-      <div className="flex items-center justify-center gap-2 border border-game-clay/20 bg-[#081014]/35 py-2 text-xs text-game-night-muted">
+      <div className="flex items-center justify-center gap-2 border border-game-clay/20 bg-game-surface-raised/80 py-2 text-xs text-game-muted">
         Foe bench {opponentBenchCount}
       </div>
-      <div className="flex min-w-20 items-center justify-center border border-game-ochre/30 bg-game-ochre/15 px-2 py-2 text-xs font-black uppercase text-game-night-ink">
+      <div className="flex min-w-20 items-center justify-center border border-game-ochre/30 bg-game-ochre/10 px-2 py-2 text-xs font-black uppercase text-game-ink">
         {turnLabel}
       </div>
       <button
         type="button"
-        className="game-focus-ring flex items-center justify-center gap-2 border border-game-charcoal/35 bg-game-charcoal/20 py-2 text-xs font-black uppercase text-game-night-ink transition-colors hover:bg-game-charcoal/35"
+        className="game-focus-ring flex items-center justify-center gap-2 border border-game-charcoal/35 bg-game-charcoal/20 py-2 text-xs font-black uppercase text-game-ink transition-colors hover:bg-game-charcoal/35"
         onClick={onOpenBench}
       >
         Bench {playerBenchCount}
@@ -3886,13 +3886,13 @@ function BenchSheet({
       icon={icon}
       background="/backgrounds/tcg.avif"
       heroLabel="Card battle"
-      className="bg-game-night-surface text-game-night-ink"
+      className="bg-game-surface-raised text-game-ink"
     >
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
         <div className="mx-auto grid max-w-5xl grid-cols-3 place-items-center gap-2">
           {state.player.back.length === 0 ? (
             <div
-              className="col-span-3 flex h-32 w-full items-center justify-center rounded-md border border-dashed border-game-night-border bg-game-night-surface-raised text-sm font-bold text-game-night-muted"
+              className="col-span-3 flex h-32 w-full items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised text-sm font-bold text-game-muted"
               role="status"
               aria-live="polite"
             >
@@ -3984,8 +3984,8 @@ function CardImageButton({
       className={cn(
         'tcg-motion group relative aspect-[240/330] w-[clamp(82px,27vw,150px)] touch-manipulation overflow-visible bg-transparent p-0 text-left transition duration-200 sm:w-[clamp(108px,14vw,190px)]',
         selected
-          ? 'drop-shadow-[0_18px_28px_rgba(0,0,0,0.58)]'
-          : 'drop-shadow-[0_16px_26px_rgba(0,0,0,0.48)]',
+          ? 'drop-shadow-[0_8px_16px_rgba(24,35,39,0.2)]'
+          : 'drop-shadow-[0_6px_14px_rgba(24,35,39,0.16)]',
         battleRole === 'attacker' &&
           (side === 'player'
             ? 'animate-[tcg-player-lunge_520ms_ease-out]'
@@ -4039,7 +4039,7 @@ function CardImageButton({
           className={cn(
             'pointer-events-none absolute -inset-2 z-20 rounded-xl border-2',
             side === 'player'
-              ? 'border-[#d3ad63] bg-[#d3ad63]/[0.06]'
+              ? 'border-game-ochre bg-game-ochre/[0.06]'
               : 'border-red-200 bg-red-300/[0.06]',
           )}
         />
@@ -4047,7 +4047,7 @@ function CardImageButton({
       {isLocked && !knockedOut && (
         <div
           className={cn(
-            'pointer-events-none absolute z-30 flex items-center gap-1 rounded-full border border-[#d3ad63]/60 bg-[#172733]/90 px-2 py-1 text-[10px] font-black uppercase text-[#f1cf7a] shadow-md backdrop-blur-sm',
+            'pointer-events-none absolute z-30 flex items-center gap-1 rounded-full border border-game-ochre/60 bg-game-surface-raised/95 px-2 py-1 text-[10px] font-black uppercase text-game-ochre shadow-md backdrop-blur-sm',
             side === 'opponent' ? '-left-2 -top-2' : '-right-2 -top-2',
           )}
         >
@@ -4064,7 +4064,7 @@ function CardImageButton({
       )}
       <div
         className={cn(
-          'relative h-full w-full overflow-hidden rounded-md shadow-[0_18px_38px_rgba(0,0,0,0.5)]',
+          'relative h-full w-full overflow-hidden rounded-md shadow-[0_6px_14px_rgba(24,35,39,0.18)]',
           side === 'opponent' && 'rotate-180',
         )}
       >
@@ -4095,7 +4095,7 @@ function CardImageButton({
       {statuses.length > 0 && (
         <div
           className={cn(
-            'pointer-events-none absolute z-30 flex gap-1 rounded-full border border-[#f7ecd6]/15 bg-[#081014]/75 p-1 shadow-[0_8px_18px_rgba(0,0,0,0.5)] backdrop-blur-sm',
+            'pointer-events-none absolute z-30 flex gap-1 rounded-full border border-game-border bg-game-surface-raised p-1 shadow-sm',
             side === 'opponent'
               ? '-bottom-2 -right-2 rotate-180'
               : '-left-2 -top-2',
@@ -4121,7 +4121,7 @@ function CardImageButton({
       {card.markers?.includes('lightningRod') && (
         <div
           className={cn(
-            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-yellow-200/50 bg-[#172733]/90 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-yellow-100 shadow-md backdrop-blur-sm',
+            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-md border border-game-ochre/50 bg-game-surface-raised px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-game-ochre shadow-sm',
             side === 'opponent' && 'rotate-180',
           )}
           title="Lightning Rod marker"
@@ -4158,14 +4158,14 @@ function EnergyIcon({
       width={24}
       height={24}
       unoptimized
-      className={`${className} rounded-full ring-1 ring-[#081014]/30`}
+      className={`${className} rounded-full ring-1 ring-game-border-strong`}
     />
   )
 }
 
 function EnergyCost({ cost, types }: { cost: number; types?: string[] }) {
   if (cost === 0)
-    return <span className="text-[10px] text-[#b2b6a8]">Free</span>
+    return <span className="text-[10px] text-game-muted">Free</span>
   const symbols = (
     types && types.length > 0
       ? types

@@ -1,7 +1,7 @@
 'use client'
 
 import { useHaptics } from '@haptics/react'
-import { Flame, Hammer, PackageOpen, Sparkles, Wand2, Zap } from 'lucide-react'
+import { Flame, Hammer, PackageOpen, Sparkles, Wand2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
@@ -1083,7 +1083,11 @@ export function InventoryList() {
                 aria-label={`Open all ${selectedItem.name}`}
                 title={`Open all ${selectedItem.name}`}
               >
-                <Zap className="h-5 w-5" />
+                <TaskIconDisplay
+                  icon={{ type: 'item', id: 'master-ball' }}
+                  normalizeVisibleBounds
+                  className="h-7 w-7"
+                />
               </Button>
             </div>
           ) : selectedItem?.category === 'scratch-card' ? (
@@ -1360,7 +1364,11 @@ const InventoryItemCard = memo(function InventoryItemCard({
               aria-label={`Open all ${item.details.name}`}
               title={`Open all ${item.details.name}`}
             >
-              <Zap className="w-4 h-4" />
+              <TaskIconDisplay
+                icon={{ type: 'item', id: 'master-ball' }}
+                normalizeVisibleBounds
+                className="h-7 w-7"
+              />
             </Button>
           )}
         </div>

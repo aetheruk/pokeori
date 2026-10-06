@@ -106,7 +106,13 @@ export function TaskEnterDialog({
   }
 
   const iconElement = currentStep.icon ? (
-    <TaskIconDisplay icon={currentStep.icon} className="h-20 w-20 text-white md:h-24 md:w-24" priority />
+    <TaskIconDisplay
+      icon={currentStep.icon}
+      className="h-20 w-20 text-white md:h-24 md:w-24"
+      normalizeVisibleBounds
+      outlineVisiblePixels
+      priority
+    />
   ) : null
 
   return (

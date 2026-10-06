@@ -2184,8 +2184,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                   ?.quantity || 0
               const hasRope = ropeCount > 0
               const hasEscapeAbility =
-                encounter.activeAbility &&
-                encounter.activeAbility.effects?.some(
+                encounter.activeAbility?.effects?.some(
                   (effect) => effect.type === 'active-escape',
                 ) &&
                 !encounter.abilityEscapeAttempted
