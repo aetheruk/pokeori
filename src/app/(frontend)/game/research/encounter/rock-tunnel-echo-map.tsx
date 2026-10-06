@@ -151,14 +151,6 @@ export function RockTunnelEchoMapGame({
   const partnerName = partnerPokemon?.name || 'Pikachu'
   const movementEnabled = gameStarted && !gameEnded && introPhase === 'ready'
   const introBlocksMap = introPhase === 'partner' || introPhase === 'flash'
-  const introText =
-    introPhase === 'partner'
-      ? `${partnerName} used Flash!`
-      : introPhase === 'flash'
-        ? ''
-        : introPhase === 'reveal'
-          ? 'Remember the route.'
-          : ''
 
   const completeGame = useCallback(
     async (success: boolean, message: string) => {
@@ -582,15 +574,6 @@ export function RockTunnelEchoMapGame({
                 className="object-contain drop-shadow-[0_0_28px_rgba(199,210,254,0.55)] [image-rendering:pixelated]"
                 priority
               />
-            </div>
-          )}
-          {introText && (
-            <div
-              className="mt-6 rounded-full border border-[#f7ecd6]/15 bg-[#f7ecd6]/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#f7ecd6]"
-              role="status"
-              aria-live="polite"
-            >
-              {introText}
             </div>
           )}
         </div>
