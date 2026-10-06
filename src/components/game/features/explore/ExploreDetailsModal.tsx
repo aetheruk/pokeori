@@ -408,7 +408,14 @@ export function ExploreDetailsModal({
       bonusLabel={bonusLabel}
       background={modalBackground}
       iconClassName={getModalIconTone(item)}
-      icon={<TaskIconDisplay icon={modalIcon} className="w-8 h-8" />}
+      icon={
+        <TaskIconDisplay
+          icon={modalIcon}
+          className="w-8 h-8"
+          normalizeVisibleBounds
+          outlineVisiblePixels
+        />
+      }
       rewards={rewards}
       criteria={criteria}
       properties={properties}

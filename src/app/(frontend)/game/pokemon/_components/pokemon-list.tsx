@@ -1176,6 +1176,8 @@ export function PokemonList({
           <TaskIconDisplay
             icon={{ type: 'item', id: 'poke-ball' }}
             className="h-10 w-10"
+            normalizeVisibleBounds
+            outlineVisiblePixels
             priority
           />
         }
@@ -1656,6 +1658,7 @@ export function PokemonList({
               alt=""
               sizes="96px"
               className="h-20 w-20 md:h-24 md:w-24"
+              normalizeVisibleBounds
             />
           ) : undefined
         }

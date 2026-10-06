@@ -539,6 +539,7 @@ export default function MoveDexPage() {
               width={72}
               height={72}
               className="size-16 object-contain"
+              normalizeVisibleBounds
               priority
             />
           ) : undefined

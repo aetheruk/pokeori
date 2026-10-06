@@ -4,7 +4,6 @@ import { useEffect, useMemo } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Map as MapIcon, Package, Shield, Sparkles, Swords, Target, Trophy, Zap } from 'lucide-react'
-import Image from 'next/image'
 import confetti from 'canvas-confetti'
 
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -143,12 +142,14 @@ export function LevelUpModal({
               <div className="relative mb-8 mt-4 flex h-24 w-24 items-center justify-center md:h-28 md:w-28">
                 {skill?.iconId ? (
                   skill.iconId.match(/\.(?:avif|png|webp|jpe?g)$/) ? (
-                    <Image
-                      src={`/fallback/skills/${skill.iconId}`}
-                      alt={skillName}
-                      width={80}
-                      height={80}
+                    <TaskIconDisplay
+                      icon={{
+                        type: 'local',
+                        id: `/fallback/skills/${skill.iconId}`,
+                      }}
                       className="h-20 w-20 object-contain drop-shadow-[0_3px_2px_rgb(41_53_50_/_0.18)] md:h-24 md:w-24"
+                      normalizeVisibleBounds
+                      outlineVisiblePixels
                     />
                   ) : (
                     <ItemSprite
@@ -157,6 +158,7 @@ export function LevelUpModal({
                       width={80}
                       height={80}
                       className="h-20 w-20 object-contain pixelated drop-shadow-[0_3px_2px_rgb(41_53_50_/_0.18)] md:h-24 md:w-24"
+                      normalizeVisibleBounds
                     />
                   )
                 ) : (

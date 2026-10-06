@@ -181,7 +181,14 @@ export function VoyageSelectionModal({
       title={voyage.name}
       category={voyage.subCategory || 'VOYAGE'}
       description={voyage.description}
-      icon={<TaskIconDisplay icon={voyage.icon} className="w-10 h-10" />}
+      icon={
+        <TaskIconDisplay
+          icon={voyage.icon}
+          className="w-10 h-10"
+          normalizeVisibleBounds
+          outlineVisiblePixels
+        />
+      }
       background={voyage.background}
       properties={getFormattedProperties(mockItem)}
       rewards={getFormattedRewards(

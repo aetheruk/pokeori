@@ -42,6 +42,8 @@ export function CategoryTabs({
         <TaskIconDisplay
           icon={trainerIcon}
           className="h-20 w-20 text-white md:h-24 md:w-24"
+          normalizeVisibleBounds
+          outlineVisiblePixels
           priority
         />
       }
