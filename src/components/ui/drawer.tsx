@@ -132,8 +132,8 @@ const DrawerContent = React.forwardRef<
             )}
             <div className="relative z-10 flex w-full max-w-3xl flex-col items-center gap-3">
               <div className="relative">
-                <div className="game-icon-orb relative z-10 flex h-24 w-24 items-center justify-center border-white/55 !bg-white/10 text-white shadow-xl md:h-28 md:w-28">
-                  {icon}
+                <div className="relative z-10 flex h-24 w-24 items-center justify-center text-white drop-shadow-[0_3px_6px_rgba(24,35,39,0.22)] md:h-28 md:w-28">
+                  <div className="game-hero-icon-content">{icon}</div>
                 </div>
                 {heroBadge && (
                   <div className="absolute -bottom-2 -right-2 z-20">
