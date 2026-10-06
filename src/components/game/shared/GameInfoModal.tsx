@@ -266,9 +266,8 @@ export function GameInfoModal({
                   className={cn(
                     'relative flex shrink-0 items-center justify-center',
                     isResultLayout
-                      ? 'h-24 w-24 drop-shadow-[0_4px_8px_rgba(0,0,0,0.55)] md:h-28 md:w-28'
-                      : 'game-icon-orb h-14 w-14 border-game-border',
-                    !isResultLayout && isCaught && 'border-game-charcoal/60',
+                      ? 'h-24 w-24 drop-shadow-[0_3px_6px_rgba(24,35,39,0.22)] md:h-28 md:w-28'
+                      : 'h-14 w-14 text-game-charcoal-strong drop-shadow-[0_2px_5px_rgba(24,35,39,0.18)]',
                   )}
                 >
                   {!isResultLayout && (

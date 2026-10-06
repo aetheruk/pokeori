@@ -39,9 +39,9 @@ export interface ResponsivePanelProps {
   className?: string
   /** Scenic artwork for the full-screen title frame. */
   background?: string
-  /** Icon rendered in the large result-style orb. */
+  /** Icon rendered directly over the scenic title frame. */
   icon?: React.ReactNode
-  /** Additional classes for the result-style orb. */
+  /** Additional classes for the scenic icon container. */
   iconClassName?: string
   /** Small label shown in the upper-left of the title frame. */
   heroLabel?: React.ReactNode
@@ -184,7 +184,7 @@ export function ResponsivePanel({
                 <div className="relative">
                   <div
                     className={cn(
-                      'game-icon-orb relative z-10 flex h-24 w-24 items-center justify-center border-white/55 !bg-white/10 text-white shadow-xl md:h-28 md:w-28',
+                      'relative z-10 flex h-24 w-24 items-center justify-center text-white drop-shadow-[0_3px_6px_rgba(24,35,39,0.22)] md:h-28 md:w-28',
                       iconClassName,
                     )}
                   >
