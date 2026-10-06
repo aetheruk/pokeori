@@ -1076,6 +1076,9 @@ export function getTaskProgressForModal(
   const mapped = mapCriteriaToDisplayItem(mainCrit, {
     category: selectedItem.category,
     subCategory: selectedItem.subCategory,
+    activeCompanion: userData.pokemon.find(
+      (pokemon) => pokemon.isCompanion,
+    ),
   })
 
   return {
@@ -1712,6 +1715,9 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
               ...mapCriteriaToDisplayItem(requirement, {
                 category: item.category,
                 subCategory: item.subCategory,
+                activeCompanion: userData.pokemon.find(
+                  (pokemon) => pokemon.isCompanion,
+                ),
               }),
               completed: progress.completed,
               progress:

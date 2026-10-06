@@ -14,7 +14,6 @@ import {
   Fish,
   Flag,
   Hammer,
-  Heart,
   Microscope,
   Search,
   ShoppingBag,
@@ -227,7 +226,11 @@ function getWeatherRequirementLabel(targetId: TaskCondition['targetId']): {
 
 export function mapCriteriaToDisplayItem(
   condition: TaskCondition,
-  context: { category?: string; subCategory?: string } = {},
+  context: {
+    category?: string
+    subCategory?: string
+    activeCompanion?: { formId?: string; speciesId: number } | null
+  } = {},
 ): RewardItem {
   // Handle secret conditions
   if (condition.secret) {
@@ -666,9 +669,22 @@ export function mapCriteriaToDisplayItem(
     case 'companion': {
       const check = condition.companionCheck
       const label = condition.label?.trim()
+      const companionIcon = (
+        <TaskIconDisplay
+          icon={{
+            type: 'pokemon',
+            id: context.activeCompanion
+              ? context.activeCompanion.formId ||
+                String(context.activeCompanion.speciesId)
+              : '201-question',
+          }}
+          className="w-8 h-8"
+          normalizeVisibleBounds
+        />
+      )
       if (!check) {
         return {
-          icon: <Heart className="w-5 h-5 text-game-moss-strong" />,
+          icon: companionIcon,
           label: label || 'Companion Requirement',
           subLabel: 'Active Companion',
         }
@@ -700,7 +716,7 @@ export function mapCriteriaToDisplayItem(
       }
 
       return {
-        icon: <Heart className="w-5 h-5 text-game-moss-strong" />,
+        icon: companionIcon,
         label: label || `${description} as your companion`,
         subLabel: 'Active Companion',
       }

@@ -1856,7 +1856,11 @@ export function ArtisanPanel({
           const progress = getRequirementProgress(gameData, condition)
 
           return {
-            ...mapCriteriaToDisplayItem(condition),
+            ...mapCriteriaToDisplayItem(condition, {
+              activeCompanion: gameData.pokemon.find(
+                (pokemon) => pokemon.isCompanion,
+              ),
+            }),
             completed: progress.completed,
             progress:
               progress.target > 1
