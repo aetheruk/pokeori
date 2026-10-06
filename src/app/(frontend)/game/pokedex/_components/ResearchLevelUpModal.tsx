@@ -2,14 +2,13 @@
 
 import confetti from 'canvas-confetti'
 import { FlaskConical, Star } from 'lucide-react'
-import Image from 'next/image'
 import { useEffect } from 'react'
 import { StickyFooter } from '@/components/game/shared/StickyFooter'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { getSkill } from '@/data/skills'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import { RESEARCH_LEVEL_REWARDS } from '@/utilities/research/research-levels'
 
 interface ResearchLevelUpModalProps {
@@ -91,12 +90,11 @@ export function ResearchLevelUpModal({
 
             {/* Pokemon Sprite section */}
             <div className="relative mx-auto flex h-40 w-40 shrink-0 items-center justify-center">
-              <Image
-                src={getPokemonImageUrl(formId, 'sprite')}
-                alt={pokemonName}
-                width={160}
-                height={160}
-                className="h-40 w-40 object-contain pixelated drop-shadow-[0_3px_2px_rgb(41_53_50_/_0.18)]"
+              <TaskIconDisplay
+                icon={{ type: 'pokemon', id: formId }}
+                className="h-40 w-40 drop-shadow-[0_3px_2px_rgb(41_53_50_/_0.18)]"
+                normalizeVisibleBounds
+                outlineVisiblePixels
               />
             </div>
 

@@ -25,6 +25,7 @@ import {
   useState,
   useTransition,
 } from 'react'
+import type { CSSProperties, SyntheticEvent } from 'react'
 import { type CellComponentProps, Grid, useGridRef } from 'react-window'
 import { toast } from 'sonner'
 import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
@@ -89,6 +90,7 @@ import {
   type PokemonRarityId,
 } from '@/utilities/pokemon/rarity-effects'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
+import { getVisibleBoundsImageStyle } from '@/utilities/visible-image-bounds'
 import {
   getMaxResearchLevelForXp,
   getPokemonResearchLevelTmUnlocks,
@@ -1400,12 +1402,14 @@ function PokemonImage({
   progress,
   variant = 'normal',
   gender,
+  normalizeVisibleBounds = false,
 }: {
   formId: string
   pokemonName: string
   progress?: PokedexEntry
   variant?: 'normal' | 'shiny'
   gender?: 'male' | 'female'
+  normalizeVisibleBounds?: boolean
 }) {
   const isShiny = variant === 'shiny'
   const hasSeen = isShiny
@@ -1436,6 +1440,22 @@ function PokemonImage({
     })
   }
 
+  const imageSrc = spriteSources[sourceIndex] ?? spriteSources[0]
+  const [visibleBoundsStyle, setVisibleBoundsStyle] = useState<CSSProperties>()
+
+  useEffect(() => {
+    setVisibleBoundsStyle(undefined)
+  }, [imageSrc, normalizeVisibleBounds])
+
+  const handleImageLoad = useCallback(
+    (event: SyntheticEvent<HTMLImageElement>) => {
+      if (!normalizeVisibleBounds) return
+      const style = getVisibleBoundsImageStyle(event.currentTarget)
+      if (style) setVisibleBoundsStyle(style)
+    },
+    [normalizeVisibleBounds],
+  )
+
   if (!hasSeen) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center text-game-muted">
@@ -1447,8 +1467,6 @@ function PokemonImage({
     )
   }
 
-  const imageSrc = spriteSources[sourceIndex] ?? spriteSources[0]
-
   return (
     <div className="relative w-full h-full">
       <Image
@@ -1458,8 +1476,12 @@ function PokemonImage({
         sizes="(max-width: 640px) 100vw, 50vw"
         className="object-contain drop-shadow-xl"
         onError={handleError}
+        onLoad={normalizeVisibleBounds ? handleImageLoad : undefined}
         loading="lazy"
-        style={{ filter: hasCaught ? undefined : 'grayscale(1) opacity(0.5)' }}
+        style={{
+          filter: hasCaught ? undefined : 'grayscale(1) opacity(0.5)',
+          ...visibleBoundsStyle,
+        }}
       />
     </div>
   )

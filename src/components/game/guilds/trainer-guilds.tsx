@@ -70,7 +70,12 @@ export function TrainerGuilds() {
         background={selectedGuild?.background}
         icon={
           selectedGuild ? (
-            <TaskIconDisplay icon={selectedGuild.icon} className="h-12 w-12" />
+            <TaskIconDisplay
+              icon={selectedGuild.icon}
+              className="h-12 w-12"
+              normalizeVisibleBounds
+              outlineVisiblePixels
+            />
           ) : null
         }
       >

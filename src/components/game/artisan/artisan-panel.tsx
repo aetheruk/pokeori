@@ -624,6 +624,7 @@ function RecipeOutputIcon({
       width={48}
       height={48}
       className={className}
+      normalizeVisibleBounds
     />
   )
 }
@@ -1932,6 +1933,8 @@ export function ArtisanPanel({
           <TaskIconDisplay
             icon={{ type: 'local', id: '/fallback/skills/artisan-v2.png' }}
             className="h-10 w-10"
+            normalizeVisibleBounds
+            outlineVisiblePixels
           />
         }
         showEffects

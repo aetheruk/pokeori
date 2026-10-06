@@ -371,6 +371,8 @@ function ExpeditionModalContent({
         <TaskIconDisplay
           icon={item.icon}
           className="h-20 w-20 md:h-24 md:w-24"
+          normalizeVisibleBounds
+          outlineVisiblePixels
         />
       }
       heroLabel={

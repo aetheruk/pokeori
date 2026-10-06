@@ -1058,6 +1058,7 @@ function MountedPokemonDetailsDialog({
             alt=""
             sizes="112px"
             className="h-20 w-20 md:h-24 md:w-24"
+            normalizeVisibleBounds
             imageClassName="drop-shadow-[0_10px_16px_rgba(0,0,0,0.4)]"
           />
         }
@@ -2261,6 +2262,7 @@ function MountedPokemonDetailsDialog({
               width={72}
               height={72}
               className="h-16 w-16 object-contain md:h-20 md:w-20"
+              normalizeVisibleBounds
               priority
             />
           ) : undefined

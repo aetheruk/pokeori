@@ -2309,6 +2309,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
             width={56}
             height={56}
             className="size-14 object-contain"
+            normalizeVisibleBounds
           />
         }
         desktopWidth="min(34vw, 420px)"

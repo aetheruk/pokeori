@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUser } from '@/context/UserContext'
 import { usePokedex } from '@/hooks/usePokedex'
@@ -225,15 +226,14 @@ export default function AbilityDexPage() {
         }
         icon={
           selectedAbilityRepresentative ? (
-            <Image
-              src={getPokemonImageUrl(
-                selectedAbilityRepresentative.form.id,
-                'sprite',
-              )}
-              alt=""
-              fill
-              sizes="96px"
-              className="object-contain p-2"
+            <TaskIconDisplay
+              icon={{
+                type: 'pokemon',
+                id: selectedAbilityRepresentative.form.id,
+              }}
+              className="h-20 w-20"
+              normalizeVisibleBounds
+              outlineVisiblePixels
             />
           ) : (
             <CircleHelp className="h-14 w-14" aria-hidden="true" />

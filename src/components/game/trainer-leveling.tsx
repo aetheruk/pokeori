@@ -14,7 +14,8 @@ import {
   Zap,
 } from 'lucide-react'
 import Image from 'next/image'
-import { memo, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import type { CSSProperties, SyntheticEvent } from 'react'
 import { toast } from 'sonner'
 import { updateUserCustomization } from '@/app/(frontend)/game/actions'
 import { TrainerCard } from '@/components/game/battles/TrainerCard'
@@ -43,6 +44,7 @@ import {
   type SkillGuideUnlock,
 } from '@/data/skills/guide'
 import { getTotalExpForLevel } from '@/data/skills/xp'
+import { getVisibleBoundsImageStyle } from '@/utilities/visible-image-bounds'
 import {
   banners,
   getBanner,
@@ -79,13 +81,30 @@ function SkillDisplayIcon({
   fallbackClassName,
   width,
   height,
+  normalizeVisibleBounds = false,
 }: {
   skill: Pick<Skill, 'iconId' | 'name'>
   className: string
   fallbackClassName: string
   width: number
   height: number
+  normalizeVisibleBounds?: boolean
 }) {
+  const [visibleBoundsStyle, setVisibleBoundsStyle] = useState<CSSProperties>()
+
+  useEffect(() => {
+    setVisibleBoundsStyle(undefined)
+  }, [skill.iconId, normalizeVisibleBounds])
+
+  const handleImageLoad = useCallback(
+    (event: SyntheticEvent<HTMLImageElement>) => {
+      if (!normalizeVisibleBounds) return
+      const style = getVisibleBoundsImageStyle(event.currentTarget)
+      if (style) setVisibleBoundsStyle(style)
+    },
+    [normalizeVisibleBounds],
+  )
+
   if (skill.iconId?.match(/\.(?:avif|png|webp|jpe?g)$/)) {
     return (
       <Image
@@ -94,6 +113,8 @@ function SkillDisplayIcon({
         width={width}
         height={height}
         className={className}
+        onLoad={normalizeVisibleBounds ? handleImageLoad : undefined}
+        style={visibleBoundsStyle}
       />
     )
   }
@@ -669,6 +690,7 @@ export function TrainerLeveling({
               height={48}
               className="h-12 w-12 object-contain"
               fallbackClassName="h-8 w-8 text-game-muted"
+              normalizeVisibleBounds
             />
           ) : (
             <BookOpen className="h-8 w-8 text-game-muted" />
@@ -694,6 +716,8 @@ export function TrainerLeveling({
           <TaskIconDisplay
             icon={editorIcon?.icon || { type: 'pokemon', id: '132' }}
             className="h-20 w-20 md:h-24 md:w-24"
+            normalizeVisibleBounds
+            outlineVisiblePixels
             priority
           />
         }

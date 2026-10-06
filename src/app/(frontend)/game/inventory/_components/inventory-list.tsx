@@ -837,6 +837,8 @@ export function InventoryList() {
           <TaskIconDisplay
             icon={{ type: 'local', id: '/fallback/skills/inventory-v2.png' }}
             className="h-10 w-10"
+            normalizeVisibleBounds
+            outlineVisiblePixels
             priority
           />
         }
@@ -1009,6 +1011,7 @@ export function InventoryList() {
               width={64}
               height={64}
               className="w-12 h-12 object-contain"
+              normalizeVisibleBounds
             />
           ) : null
         }

@@ -420,6 +420,8 @@ export function PokemonSkeleton() {
         <TaskIconDisplay
           icon={{ type: 'item', id: 'poke-ball' }}
           className="h-10 w-10"
+          normalizeVisibleBounds
+          outlineVisiblePixels
         />
       }
     >
@@ -495,6 +497,8 @@ export function ArtisanSkeleton() {
         <TaskIconDisplay
           icon={{ type: 'local', id: '/fallback/skills/artisan-v2.png' }}
           className="h-10 w-10"
+          normalizeVisibleBounds
+          outlineVisiblePixels
         />
       }
     >
@@ -748,6 +752,8 @@ export function InventorySkeleton() {
         <TaskIconDisplay
           icon={{ type: 'local', id: '/fallback/skills/inventory-v2.png' }}
           className="h-10 w-10"
+          normalizeVisibleBounds
+          outlineVisiblePixels
         />
       }
     >

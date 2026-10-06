@@ -124,6 +124,8 @@ export function TrainerModal({
           <TaskIconDisplay
             icon={trainerIcon?.icon || { type: 'pokemon', id: '132' }}
             className="h-20 w-20 md:h-24 md:w-24"
+            normalizeVisibleBounds
+            outlineVisiblePixels
             priority
           />
         }

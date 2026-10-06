@@ -25,7 +25,14 @@ export function ShopModal({ shop, open, onOpenChange }: ShopModalProps) {
       title={shop.name}
       category={shop.guildId ? 'Guild charter' : shop.subCategory || 'SHOP'}
       background={shop.background}
-      icon={<TaskIconDisplay icon={shop.icon} className="w-10 h-10" />}
+      icon={
+        <TaskIconDisplay
+          icon={shop.icon}
+          className="w-10 h-10"
+          normalizeVisibleBounds
+          outlineVisiblePixels
+        />
+      }
       presentation="drawer"
     >
       {shop.guildId ? (
