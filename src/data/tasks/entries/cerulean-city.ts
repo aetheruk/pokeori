@@ -4405,6 +4405,11 @@ export const ceruleanCityTasks: Task[] = [
         targetId: 'hiker-clothes',
         inverse: true,
       },
+      {
+        type: 'task_completed',
+        targetId: 'route-9-assemble-hiker-outfit',
+        inverse: true,
+      },
     ],
     criteria: [],
     rewards: [],
