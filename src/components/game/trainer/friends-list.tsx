@@ -159,15 +159,15 @@ export function FriendsList() {
                         key={request.id}
                         className="flex items-center gap-3 rounded-md border border-game-border bg-game-surface p-3 transition-colors hover:bg-game-surface-raised"
                       >
-                        <div>
-                          <div className="game-icon-orb h-12 w-12">
-                            {iconData?.icon && (
-                              <TaskIconDisplay
-                                icon={iconData.icon}
-                                className="w-9 h-9"
-                              />
-                            )}
-                          </div>
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center">
+                          {iconData?.icon && (
+                            <TaskIconDisplay
+                              icon={iconData.icon}
+                              className="h-11 w-11"
+                              normalizeVisibleBounds
+                              outlineVisiblePixels
+                            />
+                          )}
                         </div>
 
                         <div className="flex-1 min-w-0">

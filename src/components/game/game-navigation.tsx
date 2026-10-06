@@ -133,14 +133,16 @@ export function GameNavigation() {
             prefetch={true}
             className="game-focus-ring relative flex items-center justify-center gap-3 overflow-hidden rounded-md px-2 py-2 transition-colors hover:bg-game-surface lg:justify-start"
           >
-            <div className="game-icon-orb relative h-8 w-8 shrink-0 overflow-hidden border-game-charcoal/30">
+            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
               {user ? (
                 <TaskIconDisplay
                   icon={
                     getIcon(user.icon || 'ditto')?.icon ||
                     ({ type: 'pokemon', id: '132' } as any)
                   }
-                  className="w-full h-full object-cover scale-110"
+                  className="h-full w-full"
+                  normalizeVisibleBounds
+                  outlineVisiblePixels
                 />
               ) : (
                 <span className="text-xs font-bold">TR</span>

@@ -139,31 +139,29 @@ export function LevelUpModal({
             {/* Main Result Card */}
             <div className="relative flex w-full flex-col items-center overflow-hidden rounded-xl border border-game-border bg-game-surface-raised p-6 text-center md:p-8">
 
-              {/* Icon Container with Orbital Glow */}
-              <div className="relative mb-8 mt-4">
-                <div className="game-icon-orb relative z-10 h-24 w-24 border-game-clay/40 text-game-clay-strong md:h-28 md:w-28">
-                  {skill?.iconId ? (
-                    skill.iconId.match(/\.(?:avif|png|webp|jpe?g)$/) ? (
-                      <Image
-                        src={`/fallback/skills/${skill.iconId}`}
-                        alt={skillName}
-                        width={80}
-                        height={80}
-                        className="h-20 w-20 object-contain md:h-24 md:w-24"
-                      />
-                    ) : (
-                      <ItemSprite
-                        itemId={skill.iconId}
-                        alt={skillName}
-                        width={80}
-                        height={80}
-                        className="h-20 w-20 object-contain pixelated md:h-24 md:w-24"
-                      />
-                    )
+              {/* Unframed skill icon with level badge */}
+              <div className="relative mb-8 mt-4 flex h-24 w-24 items-center justify-center md:h-28 md:w-28">
+                {skill?.iconId ? (
+                  skill.iconId.match(/\.(?:avif|png|webp|jpe?g)$/) ? (
+                    <Image
+                      src={`/fallback/skills/${skill.iconId}`}
+                      alt={skillName}
+                      width={80}
+                      height={80}
+                      className="h-20 w-20 object-contain drop-shadow-[0_3px_2px_rgb(41_53_50_/_0.18)] md:h-24 md:w-24"
+                    />
                   ) : (
-                    <DefaultIcon className="h-20 w-20 text-game-moss md:h-24 md:w-24" />
-                  )}
-                </div>
+                    <ItemSprite
+                      itemId={skill.iconId}
+                      alt={skillName}
+                      width={80}
+                      height={80}
+                      className="h-20 w-20 object-contain pixelated drop-shadow-[0_3px_2px_rgb(41_53_50_/_0.18)] md:h-24 md:w-24"
+                    />
+                  )
+                ) : (
+                  <DefaultIcon className="h-20 w-20 text-game-moss md:h-24 md:w-24" />
+                )}
 
                 {/* Level Badge Overlay */}
                 <div className="absolute left-1/2 bottom-0 transform translate-y-1/3 -translate-x-1/2 z-20">

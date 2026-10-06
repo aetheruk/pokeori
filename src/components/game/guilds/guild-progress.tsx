@@ -96,18 +96,17 @@ export function GuildProgressContent({
             >
               <div
                 className={cn(
-                  'game-icon-orb h-10 w-10 shrink-0',
+                  'flex h-10 w-10 shrink-0 items-center justify-center',
                   unlocked
-                    ? 'border-game-ochre/55 text-game-ochre'
-                    : 'border-game-border text-game-muted',
+                    ? 'text-game-ochre'
+                    : 'text-game-muted',
                 )}
               >
                 <TaskIconDisplay
                   icon={revealed ? definition.icon || guild.icon : { type: 'item', id: 'researchers-journal-page' }}
-                  className={cn(
-                    'h-8 w-8',
-                    (!unlocked || masked) && 'grayscale opacity-40',
-                  )}
+                  className={cn('h-10 w-10', (!unlocked || masked) && 'grayscale opacity-40')}
+                  normalizeVisibleBounds
+                  outlineVisiblePixels
                 />
               </div>
               <div className="min-w-0 flex-1">

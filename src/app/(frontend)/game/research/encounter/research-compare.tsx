@@ -206,7 +206,7 @@ function PokemonAnswerTile({
   return (
     <div
       className={cn(
-        'game-icon-orb game-icon-orb-art relative h-24 w-24 shrink-0 overflow-hidden border-game-charcoal/35 p-1.5 sm:h-32 sm:w-32',
+        'relative h-24 w-24 shrink-0 sm:h-32 sm:w-32',
         className,
       )}
     >
@@ -214,7 +214,7 @@ function PokemonAnswerTile({
         src={getPokemonImageUrl(pokemon.id.toString(), 'home')}
         alt={pokemon.name}
         fill
-        className="object-contain p-1"
+        className="object-contain"
       />
     </div>
   )

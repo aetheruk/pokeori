@@ -556,13 +556,13 @@ function LoadoutMoveRow({
         aria-label={`View ${entry.move.name} details`}
         className="group flex min-w-0 items-center gap-3 px-3 py-2 text-left outline-none hover:bg-game-moss/5 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-game-moss/60"
       >
-        <span className="game-icon-orb game-icon-orb-art relative flex size-10 shrink-0 items-center justify-center">
+        <span className="relative flex size-10 shrink-0 items-center justify-center">
           <ItemSprite
             itemId={getMoveTypeSpriteItemId(entry.move)}
             alt=""
-            width={32}
-            height={32}
-            className="size-8 object-contain"
+            width={40}
+            height={40}
+            className="size-10 object-contain"
           />
         </span>
         <span className="min-w-0 flex-1">

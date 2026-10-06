@@ -106,8 +106,11 @@ export function TrainerCollection() {
               }
             }
             className="h-10 w-10"
+            normalizeVisibleBounds
+            outlineVisiblePixels
           />
         }
+        iconUnframed
       />
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 md:px-6 md:py-6">
         <SectionDivider className="my-4" variant="chip">

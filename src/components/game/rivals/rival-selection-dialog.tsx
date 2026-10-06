@@ -164,11 +164,13 @@ export function RivalSelectionDialog({
                   disabled={!!selectingId}
                   className="flex w-full items-center gap-3 rounded-md border border-game-border bg-game-surface-raised p-3 text-left transition-colors hover:border-game-moss/50 hover:bg-game-moss/10 disabled:opacity-60"
                 >
-                  <div className="game-icon-orb h-12 w-12 shrink-0">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center">
                     {iconData?.icon ? (
                       <TaskIconDisplay
                         icon={iconData.icon}
-                        className="h-8 w-8"
+                        className="h-11 w-11"
+                        normalizeVisibleBounds
+                        outlineVisiblePixels
                       />
                     ) : (
                       <UserRound className="h-6 w-6 text-game-muted" />

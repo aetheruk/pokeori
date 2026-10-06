@@ -1032,11 +1032,13 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                   <div>
                     <SectionDivider>Trainer's Words</SectionDivider>
                     <div className="flex items-start gap-3 rounded-md border border-game-card-border bg-game-surface-raised p-4 text-left shadow-sm">
-                      <div className="game-icon-orb game-icon-orb-battle h-12 w-12 shrink-0 border-game-battle-orange/55">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center text-game-battle-orange">
                         {resultIcon ? (
                           <TaskIconDisplay
                             icon={resultIcon}
-                            className="h-10 w-10"
+                            className="h-12 w-12"
+                            normalizeVisibleBounds
+                            outlineVisiblePixels
                           />
                         ) : (
                           <Swords className="h-6 w-6" aria-hidden="true" />

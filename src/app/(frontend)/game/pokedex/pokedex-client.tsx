@@ -1356,14 +1356,14 @@ function ResearchTmUnlockCard({
       )}
     >
       <div className="flex items-center gap-3">
-        <div className="game-icon-orb h-10 w-10 shrink-0">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center">
           {isUnlocked && move ? (
             <ItemSprite
               itemId={getMoveTypeSpriteItemId(move)}
               alt={`${moveType} TM`}
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain"
+              width={40}
+              height={40}
+              className="h-10 w-10 object-contain"
             />
           ) : (
             <CircleHelp className="h-5 w-5 text-game-muted" />
