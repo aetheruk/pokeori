@@ -9,6 +9,7 @@ interface PremiumHeaderProps {
   titleClassName?: string
   subtitleClassName?: string
   showEffects?: boolean
+  iconUnframed?: boolean
 }
 
 export function PremiumHeader({
@@ -19,6 +20,7 @@ export function PremiumHeader({
   titleClassName,
   subtitleClassName,
   showEffects: _showEffects = false,
+  iconUnframed = false,
 }: PremiumHeaderProps) {
   return (
     <div
@@ -51,7 +53,10 @@ export function PremiumHeader({
       {icon ? (
         <div
           aria-hidden="true"
-          className="game-icon-orb relative h-12 w-12 shrink-0 text-game-charcoal-strong md:h-14 md:w-14"
+          className={cn(
+            'relative h-12 w-12 shrink-0 text-game-charcoal-strong md:h-14 md:w-14',
+            !iconUnframed && 'game-icon-orb',
+          )}
         >
           {icon}
         </div>

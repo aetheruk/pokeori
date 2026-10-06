@@ -91,15 +91,13 @@ export function ResearchLevelUpModal({
 
             {/* Pokemon Sprite section */}
             <div className="relative mx-auto flex h-40 w-40 shrink-0 items-center justify-center">
-              <div className="game-icon-orb relative z-10 h-36 w-36 overflow-hidden border-game-charcoal/45">
-                <Image
-                  src={getPokemonImageUrl(formId, 'sprite')}
-                  alt={pokemonName}
-                  width={160}
-                  height={160}
-                  className="h-32 w-32 object-contain pixelated"
-                />
-              </div>
+              <Image
+                src={getPokemonImageUrl(formId, 'sprite')}
+                alt={pokemonName}
+                width={160}
+                height={160}
+                className="h-40 w-40 object-contain pixelated drop-shadow-[0_3px_2px_rgb(41_53_50_/_0.18)]"
+              />
             </div>
 
             {/* Rewards section */}

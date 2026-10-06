@@ -25,9 +25,14 @@ export function TrainerRow({
   const content = (
     <>
       {prefix}
-      <span className="game-icon-orb h-11 w-11 shrink-0">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center">
         {icon?.icon ? (
-          <TaskIconDisplay icon={icon.icon} className="h-8 w-8" />
+          <TaskIconDisplay
+            icon={icon.icon}
+            className="h-10 w-10"
+            normalizeVisibleBounds
+            outlineVisiblePixels
+          />
         ) : null}
       </span>
       <span className="min-w-0 flex-1">

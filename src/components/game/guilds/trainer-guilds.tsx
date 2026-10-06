@@ -34,8 +34,13 @@ export function TrainerGuilds() {
               onClick={() => setSelectedGuildId(guild.id)}
               aria-label={`View ${guild.name} details`}
             >
-              <div className="game-icon-orb h-12 w-12 shrink-0 border-game-ochre/45">
-                <TaskIconDisplay icon={guild.icon} className="h-9 w-9" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center">
+                <TaskIconDisplay
+                  icon={guild.icon}
+                  className="h-11 w-11"
+                  normalizeVisibleBounds
+                  outlineVisiblePixels
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold text-game-ink">

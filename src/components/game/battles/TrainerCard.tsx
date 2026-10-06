@@ -68,10 +68,13 @@ export function TrainerCard({
       {/* Profile content */}
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-end px-6 pb-6 pt-8">
         {/* Icon */}
-        <div className="relative mb-3">
-          <div className="game-icon-orb h-14 w-14 overflow-hidden border-game-border/70 shadow-xl">
-            <TaskIconDisplay icon={iconData as any} className="w-10 h-10" />
-          </div>
+        <div className="relative mb-3 flex h-16 w-16 items-center justify-center">
+          <TaskIconDisplay
+            icon={iconData as any}
+            className="h-16 w-16"
+            normalizeVisibleBounds
+            outlineVisiblePixels
+          />
         </div>
         {/* Name */}
         <h2

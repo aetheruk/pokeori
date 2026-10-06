@@ -588,11 +588,11 @@ function IncensePickerDialog({
                       : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
                   )}
                 >
-                  <span className="game-icon-orb h-14 w-14">
+                  <span className="flex h-14 w-14 items-center justify-center">
                     <ItemSprite
                       itemId={incense.id}
                       alt={incense.name}
-                      className="h-10 w-10 object-contain"
+                      className="h-14 w-14 object-contain"
                     />
                   </span>
                   <span className="mt-2 min-h-8 max-w-full text-[11px] font-medium leading-4">
@@ -655,11 +655,11 @@ function OfferingPickerDialog({
                       : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
                   )}
                 >
-                  <span className="game-icon-orb h-12 w-12">
+                  <span className="flex h-12 w-12 items-center justify-center">
                     <ItemSprite
                       itemId={offering.itemId}
                       alt={itemName(offering.itemId)}
-                      className="h-8 w-8 object-contain"
+                      className="h-12 w-12 object-contain"
                     />
                   </span>
                   <span className="absolute right-1 top-1 rounded-full border border-game-border bg-game-canvas px-1 py-0.5 font-mono text-[10px] font-black leading-none text-game-ink">

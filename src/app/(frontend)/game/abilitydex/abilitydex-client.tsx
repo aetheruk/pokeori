@@ -354,14 +354,14 @@ function AbilityDexListItem({
           backgroundImage: `linear-gradient(to left, rgba(239,228,207,0.97), rgba(239,228,207,0.68) 56%, rgba(23,39,51,0.12)), url(${cardBackground})`,
         }}
       />
-      <div className="game-icon-orb game-icon-orb-art relative z-10 flex size-12 shrink-0 items-center justify-center">
+      <div className="relative z-10 flex size-12 shrink-0 items-center justify-center">
         {representative ? (
           <Image
             src={getPokemonImageUrl(representative.form.id, 'sprite')}
             alt=""
             fill
             sizes="48px"
-            className="object-contain p-1"
+            className="object-contain"
             style={{
               filter: isKnown ? undefined : 'grayscale(1) opacity(0.65)',
             }}
@@ -485,14 +485,14 @@ function AbilityDexLearnerRow({
 
   return (
     <li className="game-panel flex min-h-16 items-center gap-3 p-2.5">
-      <div className="game-icon-orb game-icon-orb-art relative flex size-11 shrink-0 items-center justify-center">
+      <div className="relative flex size-11 shrink-0 items-center justify-center">
         {hasSeen ? (
           <Image
             src={getPokemonImageUrl(learner.form.id, 'sprite')}
             alt=""
             fill
             sizes="44px"
-            className="object-contain p-1"
+            className="object-contain"
             style={{
               filter: hasCaught ? undefined : 'grayscale(1) opacity(0.75)',
             }}

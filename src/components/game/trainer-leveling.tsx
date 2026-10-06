@@ -750,13 +750,18 @@ export function TrainerLeveling({
                     aria-label={`Use ${icon.name} trainer avatar`}
                     title={icon.name}
                     className={cn(
-                      'game-focus-ring game-icon-orb mx-auto h-12 w-12',
+                      'game-focus-ring mx-auto flex h-12 w-12 items-center justify-center rounded-md border transition-colors',
                       selectedIcon === icon.id
-                        ? 'border-game-charcoal text-game-charcoal-strong'
-                        : 'border-game-border hover:border-game-charcoal',
+                        ? 'border-game-charcoal bg-game-charcoal/5 text-game-charcoal-strong'
+                        : 'border-game-border bg-game-surface hover:border-game-charcoal',
                     )}
                   >
-                    <TaskIconDisplay icon={icon.icon} className="h-9 w-9" />
+                    <TaskIconDisplay
+                      icon={icon.icon}
+                      className="h-11 w-11"
+                      normalizeVisibleBounds
+                      outlineVisiblePixels
+                    />
                   </button>
                 ))}
               </div>

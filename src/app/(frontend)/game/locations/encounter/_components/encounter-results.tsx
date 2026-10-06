@@ -169,10 +169,12 @@ export function EncounterResults({
       <div>
         <SectionDivider>Capture Notes</SectionDivider>
         <div className="flex items-start gap-3 rounded-md border border-game-border bg-game-surface-raised p-4 shadow-sm">
-          <div className="game-icon-orb game-icon-orb-catch h-12 w-12 shrink-0 border-game-danger/55">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center">
             <TaskIconDisplay
               icon={{ type: 'pokemon', id: capturePokemonFormId }}
-              className="h-10 w-10"
+              className="h-12 w-12"
+              normalizeVisibleBounds
+              outlineVisiblePixels
             />
           </div>
           <div className="flex min-h-12 flex-col justify-center gap-2">
