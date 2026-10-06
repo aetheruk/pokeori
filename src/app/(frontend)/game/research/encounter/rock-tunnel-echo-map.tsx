@@ -511,10 +511,6 @@ export function RockTunnelEchoMapGame({
             />
           </PixelGridBoard>
 
-          <p className="max-w-[min(92vw,32rem)] text-center text-xs font-semibold uppercase tracking-[0.16em] text-game-cream/85">
-            Reach the gold doorway in the back wall. Violet rifts are hazards — stepping on one ends the run.
-          </p>
-
           <div className="flex-none max-w-[200px] w-full z-40 mb-8">
             <div className="grid grid-cols-3 gap-2 mx-auto">
               <div />
