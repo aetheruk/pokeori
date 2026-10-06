@@ -106,7 +106,7 @@ function SkillUnlockCategoryIcon({
 }: {
   category: SkillGuideUnlock['category']
 }) {
-  const iconClassName = 'h-4 w-4 text-game-moss-strong'
+  const iconClassName = 'h-8 w-8 text-game-moss-strong'
 
   switch (category) {
     case 'battle':
@@ -132,7 +132,14 @@ function SkillUnlockIcon({ unlock }: { unlock: SkillGuideUnlock }) {
     (unlock.itemId ? { type: 'item' as const, id: unlock.itemId } : null)
 
   if (icon) {
-    return <TaskIconDisplay icon={icon} className="h-8 w-8" />
+    return (
+      <TaskIconDisplay
+        icon={icon}
+        normalizeVisibleBounds
+        outlineVisiblePixels
+        className="h-9 w-9"
+      />
+    )
   }
 
   return <SkillUnlockCategoryIcon category={unlock.category} />
@@ -171,22 +178,22 @@ const SkillUnlockList = memo(function SkillUnlockList({
               <div
                 key={`${unlock.source}:${unlock.level}:${unlock.label}:${unlock.itemId || ''}`}
                 className={cn(
-                  'flex min-h-16 items-center gap-3 rounded-md border px-3 py-2',
+                  'relative flex min-h-20 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border p-4',
                   unlocked
-                    ? 'border-game-moss/35 bg-game-moss/10 text-game-ink'
-                    : 'border-game-border bg-game-surface text-game-muted',
+                    ? 'border-game-moss/35 bg-game-surface-raised text-game-ink'
+                    : 'border-game-card-border bg-game-surface text-game-muted',
                 )}
               >
-                <div className="game-icon-orb h-11 w-11 shrink-0">
+                <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
                   <SkillUnlockIcon unlock={unlock} />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full border border-game-border bg-game-surface-raised px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
-                      Level {unlock.level}
-                    </span>
-                    <span className="truncate text-xs font-black uppercase tracking-tight">
+                <div className="relative z-10 min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-md rounded-tl-none bg-game-charcoal px-2 py-1 text-xs font-bold uppercase leading-tight tracking-[0.08em] text-white">
                       {unlock.label}
+                    </span>
+                    <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
+                      Level {unlock.level}
                     </span>
                   </div>
                   <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">
@@ -254,17 +261,22 @@ const SkillGuideTable = memo(function SkillGuideTable({
                 {rows.map((unlock) => (
                   <div
                     key={`${unlock.source}:${unlock.level}:${unlock.label}:${unlock.itemId || ''}`}
-                    className="flex min-w-0 items-start gap-3 rounded-xl border border-game-border bg-game-surface-raised px-3 py-2"
+                    className={cn(
+                      'relative flex min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border p-4',
+                      unlocked
+                        ? 'border-game-moss/30 bg-game-surface-raised'
+                        : 'border-game-card-border bg-game-surface',
+                    )}
                   >
-                    <div className="game-icon-orb h-9 w-9 shrink-0">
+                    <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
                       <SkillUnlockIcon unlock={unlock} />
                     </div>
-                    <div className="min-w-0 flex-1">
+                    <div className="relative z-10 min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-black uppercase tracking-tight text-game-ink">
+                        <span className="rounded-md rounded-tl-none bg-game-charcoal px-2 py-1 text-xs font-bold uppercase leading-tight tracking-[0.08em] text-white">
                           {unlock.label}
                         </span>
-                        <span className="rounded-full border border-game-border bg-game-surface px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
+                        <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
                           {getSkillUnlockCategoryLabel(unlock.category)}
                         </span>
                       </div>

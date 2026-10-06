@@ -780,7 +780,7 @@ describe('artisan recipes', () => {
 
     expect(recipe).toBeDefined()
     expect(recipe?.category).toBe('quests')
-    expect(recipe?.artisanLevel).toBe(15)
+    expect(recipe?.artisanLevel).toBe(12)
     expect(recipe?.costs).toEqual([{ id: 'terra-dust-t1', amount: 1 }])
     expect(recipe?.bulk).toBeUndefined()
     expect(recipe?.craftType).toBe('mix')

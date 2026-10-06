@@ -43,10 +43,17 @@ function SkillUnlockCategoryIcon({
   const unlockIcon = unlock.icon || (unlock.itemId ? { type: 'item' as const, id: unlock.itemId } : null)
 
   if (unlockIcon) {
-    return <TaskIconDisplay icon={unlockIcon} className="h-8 w-8" />
+    return (
+      <TaskIconDisplay
+        icon={unlockIcon}
+        normalizeVisibleBounds
+        outlineVisiblePixels
+        className="h-9 w-9"
+      />
+    )
   }
 
-  const iconClassName = 'h-5 w-5 text-game-moss-strong'
+  const iconClassName = 'h-8 w-8 text-game-moss-strong'
 
   switch (unlock.category) {
     case 'battle':
@@ -182,13 +189,13 @@ export function LevelUpModal({
                       {levelUnlocks.map((unlock) => (
                         <div
                           key={`${unlock.source}:${unlock.level}:${unlock.label}:${unlock.itemId || ''}`}
-                          className="flex min-h-16 items-center gap-3 rounded-md border border-game-moss/35 bg-game-moss/10 px-3 py-2 text-game-ink"
+                          className="relative flex min-h-20 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-moss/35 bg-game-surface-raised p-4 text-game-ink"
                         >
-                          <div className="game-icon-orb h-11 w-11 shrink-0">
+                          <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
                             <SkillUnlockCategoryIcon unlock={unlock} />
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-xs font-black uppercase tracking-tight text-game-ink">
+                          <div className="relative z-10 min-w-0 flex-1">
+                            <div className="rounded-md rounded-tl-none bg-game-charcoal px-2 py-1 text-xs font-bold uppercase leading-tight tracking-[0.08em] text-white">
                               {unlock.label}
                             </div>
                             <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">

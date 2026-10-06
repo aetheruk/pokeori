@@ -23,7 +23,13 @@ export function TaskExitDialog({ data, open, onOpenChange }: TaskExitDialogProps
   const rivalIconId = data.dynamicOpponent === 'rival' ? gameData?.rivalTrainer?.icon : undefined
   const displayIcon = (rivalIconId && getIcon(rivalIconId)?.icon) || data.icon
   const iconElement = displayIcon ? (
-    <TaskIconDisplay icon={displayIcon} className="h-20 w-20 text-white md:h-24 md:w-24" priority />
+    <TaskIconDisplay
+      icon={displayIcon}
+      className="h-20 w-20 text-white md:h-24 md:w-24"
+      normalizeVisibleBounds
+      outlineVisiblePixels
+      priority
+    />
   ) : null
 
   return (

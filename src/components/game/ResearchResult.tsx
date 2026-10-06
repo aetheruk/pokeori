@@ -161,52 +161,47 @@ export function GameResult({
             />
 
             <div className="relative z-10 flex w-full max-w-3xl flex-col items-center">
-              <div className="relative mb-3">
-                <div
-                  className={cn(
-                    'game-icon-orb relative z-10 h-24 w-24 border-white/55 !bg-white/10 text-white shadow-xl md:h-28 md:w-28',
-                    !success && 'border-game-danger/70',
-                  )}
-                >
-                  {/* If an icon is provided (string URL or ReactNode) render it inside, otherwise fall back to check/x */}
-                  {(() => {
-                    // TaskIcon Object -> Use TaskIconDisplay
-                    if (isTaskIcon(icon)) {
-                      return (
-                        <TaskIconDisplay
-                          icon={icon}
-                          className="h-20 w-20 md:h-24 md:w-24"
-                          priority
-                        />
-                      )
-                    }
-
-                    // Legacy String URL -> Image
-                    if (typeof icon === 'string') {
-                      return (
-                        <div className="relative w-24 h-24 md:w-32 md:h-32">
-                          <Image
-                            src={icon.startsWith('/') ? icon : `/${icon}`}
-                            alt={iconAlt}
-                            fill
-                            className="object-contain pixelated"
-                          />
-                        </div>
-                      )
-                    }
-
-                    // React Node or Check/X Fallback
-                    return icon ? (
-                      <div className="w-full h-full flex items-center justify-center drop-shadow-md">
-                        {icon}
-                      </div>
-                    ) : success ? (
-                      <Check className="h-16 w-16 text-white md:h-20 md:w-20" />
-                    ) : (
-                      <X className="h-16 w-16 text-white md:h-20 md:w-20" />
+              <div className="relative z-10 mb-3 flex h-24 w-24 items-center justify-center drop-shadow-[0_4px_8px_rgba(0,0,0,0.55)] md:h-28 md:w-28">
+                {/* If an icon is provided (string URL or ReactNode) render it inside, otherwise fall back to check/x */}
+                {(() => {
+                  // TaskIcon Object -> Use TaskIconDisplay
+                  if (isTaskIcon(icon)) {
+                    return (
+                      <TaskIconDisplay
+                        icon={icon}
+                        className="h-20 w-20 md:h-24 md:w-24"
+                        normalizeVisibleBounds
+                        outlineVisiblePixels
+                        priority
+                      />
                     )
-                  })()}
-                </div>
+                  }
+
+                  // Legacy String URL -> Image
+                  if (typeof icon === 'string') {
+                    return (
+                      <div className="relative h-full w-full">
+                        <Image
+                          src={icon.startsWith('/') ? icon : `/${icon}`}
+                          alt={iconAlt}
+                          fill
+                          className="object-contain pixelated"
+                        />
+                      </div>
+                    )
+                  }
+
+                  // React Node or Check/X Fallback
+                  return icon ? (
+                    <div className="flex h-full w-full items-center justify-center drop-shadow-md">
+                      {icon}
+                    </div>
+                  ) : success ? (
+                    <Check className="h-16 w-16 text-white md:h-20 md:w-20" />
+                  ) : (
+                    <X className="h-16 w-16 text-white md:h-20 md:w-20" />
+                  )
+                })()}
               </div>
 
               {/* Title Section */}

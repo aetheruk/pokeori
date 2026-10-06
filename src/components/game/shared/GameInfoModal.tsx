@@ -264,23 +264,19 @@ export function GameInfoModal({
               <div className="relative">
                 <div
                   className={cn(
-                    'game-icon-orb group relative shrink-0 overflow-hidden',
+                    'relative flex shrink-0 items-center justify-center',
                     isResultLayout
-                      ? 'h-24 w-24 border-white/55 !bg-white/10 shadow-xl md:h-28 md:w-28'
-                      : 'h-14 w-14 border-game-border',
-                    isCaught && 'border-game-charcoal/60',
+                      ? 'h-24 w-24 drop-shadow-[0_4px_8px_rgba(0,0,0,0.55)] md:h-28 md:w-28'
+                      : 'game-icon-orb h-14 w-14 border-game-border',
+                    !isResultLayout && isCaught && 'border-game-charcoal/60',
                   )}
                 >
-                  <div className="absolute inset-0 bg-game-charcoal/10 opacity-0 transition-opacity group-hover:opacity-100" />
-                  <div
-                    className={cn(
-                      isResultLayout
-                        ? 'game-hero-icon-content'
-                        : 'game-compact-icon-content scale-125',
-                    )}
-                  >
-                    {icon}
-                  </div>
+                  {!isResultLayout && (
+                    <div className="game-compact-icon-content scale-125">
+                      {icon}
+                    </div>
+                  )}
+                  {isResultLayout && icon}
                 </div>
                 {isCaught && (
                   <div className="absolute -bottom-2 -right-2 flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
