@@ -4381,6 +4381,35 @@ export const ceruleanCityTasks: Task[] = [
     ],
   },
   {
+    id: 'route-9-trail-clothes-reminder',
+    name: 'The Hike of Fashion',
+    description:
+      'It’s incredible, some fluff and feathers I found on the ground and my trusty general purpose crafting hammer and I’ll be ready to go!',
+    category: 'Kanto',
+    subCategory: 'Cerulean City',
+    background: '/backgrounds/rocky-path.avif',
+    icon: {
+      type: 'item',
+      id: 'hiker-clothes',
+    },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'auto',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'route-9-trail-clothes',
+      },
+      {
+        type: 'item_owned',
+        targetId: 'hiker-clothes',
+        inverse: true,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+  },
+  {
     id: 'route-9-climbing-gloves',
     name: 'Climbing Gloves',
     description:
