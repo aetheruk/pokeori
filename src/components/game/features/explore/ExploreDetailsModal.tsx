@@ -256,6 +256,9 @@ export function ExploreDetailsModal({
           ...mapCriteriaToDisplayItem(condition, {
             category: item.category,
             subCategory: item.subCategory,
+            activeCompanion: userData.pokemon.find(
+              (pokemon) => pokemon.isCompanion,
+            ),
           }),
           completed: progress.completed,
           progress:
