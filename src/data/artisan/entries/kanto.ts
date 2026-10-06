@@ -1475,7 +1475,8 @@ const QUEST_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-hiker-clothes',
     name: 'Trail Clothes',
-    description: 'Stitch warm, flexible trail clothes for crossing Route 9 Pass.',
+    description:
+      'It’s incredible, some fluff and feathers I found on the ground and my trusty general purpose crafting hammer and I’ll be ready to go!',
     artisanLevel: 15,
     costs: [
       { id: 'soft-fluff-t1', amount: 10 },

@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Route 9's Cerulean-side pass preparation tasks now use the revised comic Hiker dialogue and player descriptions, from the failed first crossing through collecting boots, making trail clothes, finding gloves, and assembling the outfit.
 - Unreleased (`0.43.86`): Prof's Scrip Shop charges 5 Professor Scrip for one League Ticket, up from 2.
 - Unreleased (`0.43.83`): Underground Society members earn 100 Guild XP for the Pewter School quiz Promo Meowth, 100 for the first Lost-and-Found tutorial battle victory, and 250 for each first victory against the Fire, Water, and Grass decks.
 - Unreleased (`0.43.82`): Underground Society membership is awarded only when the player hands over 500 Crystals with the Card Redistribution Box. Membership reward previews and rank-up summaries use the Society's authored trainer icon.

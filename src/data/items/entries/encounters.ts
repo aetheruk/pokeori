@@ -130,7 +130,7 @@ encounterItems.push({
 encounterItems.push({
   id: 'hiker-boots',
   name: 'Sturdy Hiking Boots',
-  description: 'Tough boots with soles made for loose stones and steep passes.',
+  description: 'Tough boots with spikes soles.',
   category: 'misc',
   spriteId: 'hiker-boots',
   unique: false,

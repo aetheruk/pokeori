@@ -4159,8 +4159,7 @@ export const ceruleanCityTasks: Task[] = [
   {
     id: 'route-9-mountain-pass-blocked',
     name: 'Mountain Pass',
-    description:
-      "The road east climbs into a narrow mountain pass. I can't keep my footing on the loose stones.",
+    description: 'Wow the terrain through here is brutal!',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     background: '/backgrounds/rocky-path.avif',
@@ -4171,7 +4170,7 @@ export const ceruleanCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Try the Pass',
+    completeButtonText: 'Continue Onward',
     requirements: [
       {
         type: 'task_completed',
@@ -4188,15 +4187,15 @@ export const ceruleanCityTasks: Task[] = [
         id: '/sprites/sign.avif',
       },
       message:
-        'The path narrows almost immediately. Gravel shifts under your shoes, and the wind pushes hard across the open ledge. A Hiker nearby is already watching you turn back.',
-      closeButtonText: 'Step Back',
+        'You take a few steps before slipping on some loose rocks. Determined not to give up you get back up take a few more steps before being blown off balance by the wind falling into a ditch.',
+      closeButtonText: 'Well this sucks.',
     },
   },
   {
     id: 'route-9-hiker-warning',
     name: 'Pass Advice',
     description:
-      'A Hiker by the Route 9 Pass looks like he has stopped a lot of unprepared Trainers. I should ask him what the problem is.',
+      'Well this is embarrassing, Not only am I covered in dirt I’m almost certain I’m about to receive some unsolicited advice',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     background: '/backgrounds/rocky-path.avif',
@@ -4207,7 +4206,7 @@ export const ceruleanCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Ask About the Pass',
+    completeButtonText: 'Wipe off dirt',
     requirements: [
       {
         type: 'task_completed',
@@ -4222,7 +4221,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 1,
         title: 'Route 9 Hiker',
         message:
-          "Hold up. That pass isn't blocked, but it might as well be if you go in dressed like that.",
+          'Seems you’ve taken a tumble there kid.',
         background: '/backgrounds/rocky-path.avif',
         icon: {
           type: 'trainer',
@@ -4230,7 +4229,7 @@ export const ceruleanCityTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'That bad?',
+            text: 'How Astute',
             type: 'navigate',
             id: 2,
           },
@@ -4240,7 +4239,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 2,
         title: 'Route 9 Hiker',
         message:
-          "Loose gravel first, then cold wind on the ledges, then handholds that chew through bare palms. Start with your footing. I've got an old spare pair of boots if you can make them trail-worthy.",
+          'Haha, Keep those spirits up aye. I may be able to help you out here, I’ve got a spare pair of climbing boots, they need a few repairs and some fresh lining but a little patch up and they’ll be good as new.',
         background: '/backgrounds/rocky-path.avif',
         icon: {
           type: 'trainer',
@@ -4248,7 +4247,7 @@ export const ceruleanCityTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Show me',
+            text: 'Thanks!',
             type: 'success',
           },
         ],
@@ -4257,9 +4256,9 @@ export const ceruleanCityTasks: Task[] = [
   },
   {
     id: 'route-9-sturdy-boots',
-    name: 'Repair Worn Boots',
+    name: 'The Worn Boots',
     description:
-      "The Hiker has a battered spare pair of boots. I can buy them cheaply and repair the soles for Route 9's loose gravel.",
+      'The Hiker has offered to sell me his old broken boots, Honestly I kinda thought he was offering them as a gift.',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     background: '/backgrounds/rocky-path.avif',
@@ -4314,15 +4313,15 @@ export const ceruleanCityTasks: Task[] = [
         id: 'hiker-boots',
       },
       message:
-        "The boots were cheap for a reason, but the repair holds. The Hiker digs a heel into the gravel, gives a sharp nod, and says the pass will punish loose clothing next.",
-      closeButtonText: 'Ask About Clothes',
+        'There we are! Good as new! Well sorta, they’re better than what you’re currently wearing anyway. Not sure I’ve ever seen anyone attempt this pass in brogues before… Wait kid before you head off..',
+      closeButtonText: 'Huh',
     },
   },
   {
     id: 'route-9-trail-clothes',
-    name: 'Trail Clothes Pattern',
+    name: 'Hikers Advice',
     description:
-      'The Hiker knows how trail clothes should be layered for the cold Route 9 ledges. I should ask him what to make.',
+      'More advice on how to be outdoors, this is getting embarrassing but I could use the help',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     background: '/backgrounds/rocky-path.avif',
@@ -4333,7 +4332,7 @@ export const ceruleanCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Discuss Clothes',
+    completeButtonText: 'What’s up?',
     requirements: [
       {
         type: 'task_completed',
@@ -4348,7 +4347,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 1,
         title: 'Route 9 Hiker',
         message:
-          "Boots will get you up the first slope. After that, the wind does the work. Baggy sleeves catch on stone, thin cloth chills fast.",
+          'Lemme give you some advice free of charge this time, You’re going to want to dress appropriately. It’s cold up on the pass that Sea Breeze isn’t kind when you’re this high up. You may not believe it, but there’s a dress code, why do you think all of us Hikers look alike',
         background: '/backgrounds/rocky-path.avif',
         icon: {
           type: 'trainer',
@@ -4366,7 +4365,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 2,
         title: 'Route 9 Hiker',
         message:
-          "Soft lining inside, feathered seams outside, close fit around the wrists. If you've got an Artisan bench, stitch it properly there. Roadside knots won't last a mile.",
+          'No need to spend any money, You look capable of making the getup yourself. Some fluff a few feathers, bobs your uncle, just like that you’ll find yourself with a lovely set of trail clothes',
         background: '/backgrounds/rocky-path.avif',
         icon: {
           type: 'trainer',
@@ -4374,7 +4373,7 @@ export const ceruleanCityTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Learn Pattern',
+            text: 'How Convenient',
             type: 'success',
           },
         ],
@@ -4385,7 +4384,7 @@ export const ceruleanCityTasks: Task[] = [
     id: 'route-9-climbing-gloves',
     name: 'Climbing Gloves',
     description:
-      'The Hiker says old climbing gloves sometimes turn up where Route 9 walkers stop to rest. I should study the trail closely.',
+      'The Hiker has some advice relating to handwear apparently a full outfit is easy to create myself. Gloves not so much… fortunately I should be able to find some lying around here apparently.',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     background: '/backgrounds/rocky-path.avif',
@@ -4424,8 +4423,8 @@ export const ceruleanCityTasks: Task[] = [
         id: 'hiker-gloves',
       },
       message:
-        "The Hiker checks the palms and flexes the fingers. They're scuffed, but the grip is good. Boots, clothes, gloves. That's enough to dress for the pass.",
-      closeButtonText: 'Get Ready',
+        'Nice work on finding them gloves kid, famously difficult to craft yourself are ol’ hiking gloves.',
+      closeButtonText: 'Weird',
     },
   },
   {
@@ -4493,8 +4492,8 @@ export const ceruleanCityTasks: Task[] = [
         id: 'hiker',
       },
       message:
-        'The Hiker gives the outfit one last look and steps aside. The gravel still shifts, but now you have the gear to handle it.',
-      closeButtonText: 'Head for the Pass',
+        'Well look at that! If you ain’t the spit of a veteran Hiker that gear will see you through no bother. I could swear it’s almost transformed you. I swear you used to be about 200lb smaller.',
+      closeButtonText: 'Onwards!',
     },
   },
 ]
