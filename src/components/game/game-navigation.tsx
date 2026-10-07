@@ -223,7 +223,7 @@ export function GameNavigation() {
                   <GridPlayerSprite
                     gender={user?.trainerGender}
                     className={cn(
-                      'h-8 w-8 drop-shadow-[0_0_1px_rgb(247_236_214_/_0.9)]',
+                      'mobile-nav-pixel-outline h-8 w-8',
                       user?.trainerGender === 'male' ||
                         user?.trainerGender === 'female'
                         ? '-translate-y-[3px]'
@@ -236,10 +236,8 @@ export function GameNavigation() {
                       type: 'local',
                       id: `/fallback/skills/${item.mobileSkillIcon}`,
                     }}
-                    className="h-8 w-8"
+                    className="mobile-nav-pixel-outline h-8 w-8"
                     normalizeVisibleBounds
-                    outlineVisiblePixels
-                    outlineColor="rgb(247 236 214 / 0.9)"
                   />
                 ) : (
                   <item.icon className="h-8 w-8" />
