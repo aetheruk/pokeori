@@ -486,6 +486,9 @@ export const pokemonTowerBattles: BattleConfig[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     title: 'Team Rocket',
+    winMessage: 'This is not over, old man! The boss will hear about this!',
+    loseMessage:
+      'You should have stayed away from the tower. The boss’s work carries on whether you stand or fall.',
     requirements: [
       {
         type: 'task_completed',
@@ -511,6 +514,10 @@ export const pokemonTowerBattles: BattleConfig[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     title: 'Team Rocket',
+    winMessage:
+      'You can knock me down, but you cannot stop the current. Those cables run all the way up!',
+    loseMessage:
+      'The machine needs time. Keep him here until the signal is ready!',
     requirements: [
       {
         type: 'task_completed',
@@ -539,6 +546,10 @@ export const pokemonTowerBattles: BattleConfig[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     title: 'Team Rocket',
+    winMessage:
+      'Tch. The device is already drawing power. You cannot stop it now, old man!',
+    loseMessage:
+      'The cables are holding, and the device is nearly ready. Keep the old man back!',
     requirements: [
       {
         type: 'task_completed',
@@ -546,7 +557,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
       },
     ],
     enemyTeam: [
-      { speciesId: 20, formId: '20', level: 27 },
+      { speciesId: 20, formId: '20', level: 26 },
       { speciesId: 88, formId: '88', level: 27 },
     ],
     rewards: [],
@@ -567,6 +578,10 @@ export const pokemonTowerBattles: BattleConfig[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     title: 'Team Rocket',
+    winMessage:
+      'Ariana will not let this go unanswered. You have just made a powerful enemy!',
+    loseMessage:
+      'You will not reach the top. The boss has already decided what happens here.',
     requirements: [
       {
         type: 'task_completed',
