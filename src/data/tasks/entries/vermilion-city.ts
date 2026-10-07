@@ -1469,7 +1469,7 @@ export const vermilionCityTasks: Task[] = [
         id: '7',
       },
       message:
-        'If you’re reading this the Squirtle Squad have taken a keen interest in you, they make their home along with many other Squirtle under Vermilion Docks. Said you do visit make sure to take plenty of sweet treats! ',
+        'If you’re reading this the Squirtle Squad have taken a keen interest in you, they make their home along with many other Squirtle under Vermilion Docks. If you do visit make sure to take plenty of sweet treats! ',
       closeButtonText: 'Check it out',
     },
   },
