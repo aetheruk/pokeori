@@ -31,6 +31,7 @@ import {
 import { tasks } from '@/data/tasks'
 import { acceptEventTask } from '@/utilities/events/actions'
 import { expeditions } from '@/data/expeditions'
+import { shouldUseCompletedExpeditionTaskReplay } from '@/utilities/expeditions/task-replay'
 import type { RequirementData } from '@/utilities/requirements'
 import type { ExploreItem } from '../types'
 import { ShopConfig } from '@/data/shops/types'
@@ -472,7 +473,11 @@ export function useExploreActions(
       // their rewards are granted on every run. Only already-completed,
       // non-repeatable tasks need the progress-only replay path.
       const isCompletedExpeditionReplay =
-        isExpeditionTaskFlow && isDone && !task.repeatable
+        shouldUseCompletedExpeditionTaskReplay({
+          isExpeditionTaskFlow,
+          isAlreadyCompleted: isDone,
+          repeatable: task.repeatable,
+        })
 
       if (task.rivalSelection && !isDoneForModalFlow) {
         if (isExpeditionTaskFlow) {
