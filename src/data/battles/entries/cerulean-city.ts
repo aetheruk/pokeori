@@ -476,9 +476,9 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'rival-cerulean',
-    name: 'Nugget Bridge Checkpoint',
+    name: 'Battle on the Big Bridge',
     description:
-      'After your clash with Misty, your rival catches you at the entrance to Nugget Bridge. Five trainers are waiting ahead, and they want proof you are ready to face them.',
+      'Oh great, them again. Do they not realise we’ve got a CODE BLUE on our hands?!',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     icon: {
@@ -486,12 +486,12 @@ export const ceruleanCityBattles: BattleConfig[] = [
       id: 'youngster',
     },
     background: '/backgrounds/cerulean.avif',
-    title: 'Nugget Bridge Checkpoint',
+    title: 'Battle on the Big Bridge',
     dynamicOpponent: 'rival',
     winMessage:
-      "All right, you earned the first step. Those five trainers won't care who won here, so keep that focus when you cross. And don't expect me to stay behind for long.",
+      'You’re strong okay I get it, but be careful there’s something weird about those guys ahead. Their pokemon are unnaturally strong',
     loseMessage:
-      "Misty's badge is proof you can win, not armor. Slow down, check your team, and be ready to switch plans—the five trainers on Nugget Bridge won't give you a second to catch your breath.",
+      'Expected. We’re leagues apart. I’m Pokemon League. You’re more Little League. If you can’t beat me you have no chance against those creeps ahead, there’s something really weird going on with their Pokemon',
     rivalLevel: 18,
     maxPokemon: 3,
     enemyAttackTelegraphChance: 2,

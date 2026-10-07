@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Optional rival battles use the revised titles and player-voiced descriptions/dialogue for `rival-pallet-town`, `rival-route-22`, `rival-cerulean`, and `rival-ss-anne`. Both `Choose Your Rival` tasks share the revised first-person description; battle and progression mechanics are unchanged.
 - Unreleased: Route 9's Cerulean-side pass preparation tasks now use the revised comic Hiker dialogue and player descriptions, from the failed first crossing through collecting boots, making trail clothes, finding gloves, and assembling the outfit.
 - Unreleased: After the Route 9 Hiker explains how to make Trail Clothes, the passive `The Hike of Fashion` reminder repeats the Artisan recipe description until the player owns the clothes, and stays hidden after assembling the outfit consumes them.
 - Unreleased (`0.43.86`): Prof's Scrip Shop charges 5 Professor Scrip for one League Ticket, up from 2.

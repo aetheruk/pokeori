@@ -87,9 +87,9 @@ export const viridianCityBattles: BattleConfig[] = [
   },
   {
     id: 'rival-route-22',
-    name: 'Route 22 Rematch',
+    name: 'Rival Rumble',
     description:
-      'Your rival has been testing their team against Route 22’s tougher wild Pokémon. Before either of you heads toward Cerulean, they want to see if you have caught up since the lab.',
+      'Ughh this joker again. I thought it was going to take way more time before I bumped into them again.',
     category: 'Kanto',
     subCategory: 'Viridian City',
     icon: {
@@ -97,12 +97,12 @@ export const viridianCityBattles: BattleConfig[] = [
       id: 'youngster',
     },
     background: '/backgrounds/rocky-path.avif',
-    title: 'Route 22 Rematch',
+    title: 'Rival Rumble',
     dynamicOpponent: 'rival',
     winMessage:
-      "That was close. You've started reading my team, so I'll have to change things up. Nugget Bridge is our next checkpoint. Don't get too comfortable in front.",
+      'Pfft you got Lucky. My Pokemon were tired from all of the training we’ve been doing. Next time It’ll be a different story. We’re already way beyond the Pokemon here. I’ll probably have 8 badges before you see me next.',
     loseMessage:
-      "A point for me this round. Route 22 was a warm-up; Nugget Bridge has five trainers waiting, and they won't give either of us time to regroup. Tune up your team, then meet me there.",
+      'Haha too easy! Have you considered Ranching, because battling is definitely not your strong point. We’re already way beyond the Pokemon here. I’ll probably have 8 badges before you see me next.',
     rivalLevel: 8,
     maxPokemon: 3,
     enemyAttackTelegraphChance: 50,
