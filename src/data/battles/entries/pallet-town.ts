@@ -68,9 +68,9 @@ export const palletTownBattles: BattleConfig[] = [
   },
   {
     id: 'rival-pallet-town',
-    name: 'First Lap',
+    name: 'Destined Rivals',
     description:
-      "You and your rival have barely left Professor Oak's lab before they turn your first stretch of road into a race. They want to see what your new partner can do.",
+      'I’ve just got my first Pokemon and Already I’ve got a life long bitter feud with a stranger. I’m not entirely sure how this happened, But I guess it makes more good training.',
     category: 'Kanto',
     subCategory: 'Pallet Town',
     icon: {
@@ -78,12 +78,12 @@ export const palletTownBattles: BattleConfig[] = [
       id: 'youngster',
     },
     background: '/backgrounds/grassy-route.avif',
-    title: 'First Lap',
+    title: 'Destined Rivals',
     dynamicOpponent: 'rival',
     winMessage:
-      "All right, that point is yours. Don't start posing for the trophy, though—Viridian is only the first checkpoint. I'll be there before you know it.",
+      'Not bad… not bad at all, I guess I won’t be holding back next time. Anyway laters I’m out of here',
     loseMessage:
-      "One point to me. No excuses—there's another match on Route 22. Get your team ready and try to catch up.",
+      'Wow. You’re really giving off I have no idea what I’m doing energy. If you could at least try next time it might make it a little more interesting. Anyway laters I’m out of here',
     rivalLevel: 5,
     maxPokemon: 3,
     enemyAttackTelegraphChance: 80,

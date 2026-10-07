@@ -385,9 +385,9 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'rival-ss-anne',
-    name: 'Dockside Tune-Up',
+    name: 'Rival Revels',
     description:
-      'While you helped repair the S.S. Anne, your rival kept training between the passenger decks. They are waiting on the Vermilion dock for one match before the next leg of your journey.',
+      'Phew! Repairing luxury cruise ships is tiring work, time to get some fo… oh no...',
     category: 'Kanto',
     subCategory: 'Vermilion City',
     icon: {
@@ -395,12 +395,12 @@ export const ssAnneBattles: BattleConfig[] = [
       id: 'youngster',
     },
     background: ssAnneBackground,
-    title: 'Dockside Tune-Up',
+    title: 'Rival Revels',
     dynamicOpponent: 'rival',
     winMessage:
-      "You spent the day hauling tools and still came out sharper. Fine, I'll give you that one. The ship's fixed; I'll be on the next road before you can claim a victory lap.",
+      'Well that didn’t go to plan. Then again not everyone gets personal training from a Gym Leader, check your privileges before you come at me with that attitude.',
     loseMessage:
-      "Long shift? I could see your legs giving out after all that work on deck. Get some rest. I'll be ready when we're both back on solid ground.",
+      'Okay that was a cheap shot, I saw you were tired but think of it this way. HAHAHA YOU LOSE! Laters Weako.',
     rivalLevel: 20,
     maxPokemon: 3,
     enemyAttackTelegraphChance: 2,

@@ -166,7 +166,8 @@ export const palletTownTasks: Task[] = [
   {
     id: 'pallet-orientation-rival-selection',
     name: 'Choose Your Rival',
-    description: 'Professor Oak asks who you expect to keep pace with you on the road ahead.',
+    description:
+      'The Professor is asking who my Rival is, I honestly can’t say that’s ever crossed my mind. What a strange question.',
     category: 'Secret',
     subCategory: 'Pallet Town',
     background: '/backgrounds/lab.avif',
@@ -350,7 +351,8 @@ export const palletTownTasks: Task[] = [
   {
     id: 'pallet-rival-selection-catch-up',
     name: 'Choose Your Rival',
-    description: 'Professor Oak wants to know who will keep turning your journey into a race.',
+    description:
+      'The Professor is asking who my Rival is, I honestly can’t say that’s ever crossed my mind. What a strange question.',
     category: 'Kanto',
     subCategory: 'Pallet Town',
     background: '/backgrounds/lab.avif',
