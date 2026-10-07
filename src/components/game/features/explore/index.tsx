@@ -70,6 +70,7 @@ import { parseText } from '@/utilities/text-parsing'
 import { voyages } from '@/data/voyages'
 import { expeditions } from '@/data/expeditions'
 import { completeTask, refreshDailyTasks } from '@/utilities/tasks/actions'
+import { shouldUseCompletedExpeditionTaskReplay } from '@/utilities/expeditions/task-replay'
 
 // Data
 import {
@@ -825,8 +826,12 @@ function ExploreListContent({
 
             try {
               const result =
-                isExpeditionTaskFlow && isAlreadyCompleted
-                  ? await completeCurrentUserExpeditionTaskStep(task.id)
+              shouldUseCompletedExpeditionTaskReplay({
+                isExpeditionTaskFlow,
+                isAlreadyCompleted,
+                repeatable: task.repeatable,
+              })
+                ? await completeCurrentUserExpeditionTaskStep(task.id)
                   : await completeTask(task.id, undefined, crypto.randomUUID())
               if (result.success) {
                 actions.setSelectedItem(null)

@@ -263,6 +263,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
     },
     background: '/backgrounds/beach.avif',
     maxLosses: 2,
+    canFail: false,
     chronicle: {
       playerName: 'Squirtle Squad',
       playerIcon: '7',
