@@ -400,6 +400,35 @@ export const pokemonTowerTasks: Task[] = [
     ],
   },
   {
+    id: 'pokemon-tower-spirit-channeling-reminder',
+    name: 'Spirit Channeling',
+    description:
+      'Let’s see if we can channel some spirits to help out with the search. I should go in my bag and get out the glasses to start.',
+    category: 'Kanto',
+    subCategory: 'Pokemon Tower',
+    icon: {
+      type: 'item',
+      id: 'fuji-glasses',
+    },
+    background: '/backgrounds/pkmn-tower.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'auto',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'pkmn-tower-channeling-2',
+      },
+      {
+        type: 'task_completed',
+        targetId: 'fuji-glasses-memory-revealed',
+        inverse: true,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+  },
+  {
     id: 'fuji-glasses-memory-revealed',
     name: "Fuji's Memory",
     description: "A memory inside Fuji's Glasses has answered the channeling.",
