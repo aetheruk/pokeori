@@ -55,6 +55,12 @@ export interface RewardDisplayItem {
 export interface RewardMappingContext {
   completedTasks?: string[] // IDs of completed tasks
   checkRequirements?: (requirements?: any[]) => boolean
+  contentId?: string
+  getRequirementProgress?: (requirement: any) => {
+    current: number
+    target: number
+    completed: boolean
+  }
   showLockedSecretReward?: boolean
   userInventory?: Record<string, number>
   user?: any
@@ -368,6 +374,31 @@ export function mapRewardToDisplayItem(
       const requirementsMet = context?.checkRequirements
         ? context.checkRequirements(requirementsToCheck)
         : true
+      const unmetRequirements = requirementsToCheck?.filter(
+        (requirement: any) =>
+          context?.checkRequirements?.([requirement]) === false,
+      )
+      const unmetVictoryRequirements = unmetRequirements?.filter(
+        (requirement: any) =>
+          (requirement.type === 'game_result' ||
+            requirement.type === 'field_research_result') &&
+          String(requirement.targetId) === context?.contentId &&
+          requirement.battleStatus !== 'loss' &&
+          !requirement.inverse,
+      )
+      const remainingVictories =
+        unmetRequirements?.length &&
+        unmetVictoryRequirements?.length === unmetRequirements.length &&
+        context?.getRequirementProgress
+          ? Math.max(
+              ...unmetVictoryRequirements.map((requirement: any) => {
+                const progress = context.getRequirementProgress?.(requirement)
+                return progress
+                  ? Math.max(0, progress.target - progress.current)
+                  : 0
+              }),
+            )
+          : undefined
 
       if (isCompleted && taskDef && !taskDef.repeatable) {
         return null // Don't show rewards for completed tasks
@@ -392,7 +423,10 @@ export function mapRewardToDisplayItem(
           }
         } else {
           // Requirements NOT met -> Lock
-          label = 'Requirements not met'
+          label =
+            typeof remainingVictories === 'number' && remainingVictories > 0
+              ? `Available after ${remainingVictories} more ${remainingVictories === 1 ? 'victory' : 'victories'}`
+              : 'Requirements not met'
           icon = <Lock className="w-6 h-6 text-game-muted" />
         }
       }
