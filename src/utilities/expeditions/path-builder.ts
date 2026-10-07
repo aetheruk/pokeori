@@ -12,6 +12,7 @@ import {
   type ExpeditionResultBranchResult,
   type ExpeditionTaskPoolEntry,
 } from '@/data/expeditions'
+import type { TaskIcon } from '@/data/tasks'
 import {
   checkRequirement,
   type RequirementData,
@@ -56,6 +57,13 @@ function getActivityDefinition(
   }
 
   return null
+}
+
+export function getExpeditionActivityIcon(
+  activityType: ExpeditionActivityType,
+  activityId: string,
+): TaskIcon | undefined {
+  return getActivityDefinition(activityType, activityId)?.icon
 }
 
 function weightedPick<T>(entries: T[], getWeight: (entry: T) => number): T {

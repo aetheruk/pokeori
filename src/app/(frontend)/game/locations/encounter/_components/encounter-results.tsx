@@ -9,7 +9,7 @@ import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { SectionDivider } from '@/components/ui/section-divider'
-import type { TaskExitModal } from '@/data/tasks'
+import type { TaskExitModal, TaskIcon } from '@/data/tasks'
 import type { TcgCard } from '@/data/tcg/types'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { startEncounter } from '../actions'
@@ -63,6 +63,7 @@ interface EncounterResultsProps {
       canFail?: boolean
       status: 'active' | 'ready_to_claim' | 'failed'
       progressed: boolean
+      stepIcon?: TaskIcon
     }
   } | null
   encounter: any
@@ -128,7 +129,16 @@ export function EncounterResults({
   const expeditionUpdateContent = expeditionProgress ? (
     <div className="flex items-start gap-3 rounded-md border border-game-border bg-game-surface p-4 text-left shadow-sm">
       <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
-        <MapIcon className="h-6 w-6" aria-hidden="true" />
+        {expeditionProgress.stepIcon ? (
+          <TaskIconDisplay
+            icon={expeditionProgress.stepIcon}
+            className="h-6 w-6"
+            normalizeVisibleBounds
+            outlineVisiblePixels
+          />
+        ) : (
+          <MapIcon className="h-6 w-6" aria-hidden="true" />
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-game-moss-strong">
