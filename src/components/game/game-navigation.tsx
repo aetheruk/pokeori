@@ -3,7 +3,7 @@
 import { BookOpen, Compass, Hammer, PackageOpen, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TbPokeball } from 'react-icons/tb'
 import { BrandLockup } from '@/components/game/shared/BrandLockup'
 import { NavigationPending } from '@/components/game/navigation-pending'
@@ -61,10 +61,22 @@ export function GameNavigation() {
   const pathname = usePathname()
   const { playSfx } = useAudio()
   const { user } = useUser()
+  const [tapPulse, setTapPulse] = useState<{
+    href: string
+    id: number
+  } | null>(null)
+  const tapPulseId = useRef(0)
+  const tapPulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     return scheduleBodyPointerEventsRestore()
   }, [pathname])
+
+  useEffect(() => {
+    return () => {
+      if (tapPulseTimeout.current) clearTimeout(tapPulseTimeout.current)
+    }
+  }, [])
 
   const isItemActive = (item: NavItem) => {
     return (
@@ -74,6 +86,13 @@ export function GameNavigation() {
   }
 
   const playSelectSfx = () => playSfx('select')
+  const handleMobileNavClick = (href: string) => {
+    playSelectSfx()
+    tapPulseId.current += 1
+    setTapPulse({ href, id: tapPulseId.current })
+    if (tapPulseTimeout.current) clearTimeout(tapPulseTimeout.current)
+    tapPulseTimeout.current = setTimeout(() => setTapPulse(null), 300)
+  }
   const pokedollars = getCurrency('pokedollars')
   const crystals = getCurrency('crystals')
 
@@ -162,7 +181,7 @@ export function GameNavigation() {
       {/* Mobile Bottom Nav */}
       <nav
         aria-label="Game sections"
-        className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-center justify-around bg-game-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-center justify-around border-t border-game-cream/15 bg-game-charcoal-strong/95 px-2 pb-[env(safe-area-inset-bottom)] text-game-cream shadow-[0_-8px_24px_rgb(29_37_34_/_0.18)] backdrop-blur-xl lg:hidden"
       >
         {navItems.map((item) => {
           const isActive = isItemActive(item)
@@ -176,7 +195,7 @@ export function GameNavigation() {
               key={item.href}
               href={item.href}
               prefetch={true}
-              onClick={playSelectSfx}
+              onClick={() => handleMobileNavClick(item.href)}
               onPointerDownCapture={(event) => {
                 event.currentTarget.setAttribute('data-pointer-focus', 'true')
               }}
@@ -187,34 +206,51 @@ export function GameNavigation() {
               aria-label={mobileLabel}
               title={mobileLabel}
               className={cn(
-                'game-focus-ring game-mobile-nav-link relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent px-0 transition-colors',
+                'game-focus-ring game-mobile-nav-link relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent px-0 text-game-cream/75 transition-colors hover:text-game-cream',
                 isActive
-                  ? 'bg-game-surface-raised text-game-charcoal-strong shadow-[0_-5px_12px_rgb(75_62_39_/_0.08)]'
-                  : 'text-game-muted hover:text-game-ink',
+                  ? 'text-game-cream'
+                  : '',
               )}
             >
-              {item.name === 'Trainer' ? (
-                <GridPlayerSprite
-                  gender={user?.trainerGender}
+              <span
+                className={cn(
+                  'flex h-11 w-11 items-center justify-center rounded-full border transition-colors',
+                  isActive
+                    ? 'border-game-cream/45 bg-game-cream/10 shadow-[0_0_12px_rgb(247_236_214_/_0.12)]'
+                    : 'border-game-cream/20 bg-game-cream/[0.035]',
+                )}
+              >
+                <span
+                  key={tapPulse?.href === item.href ? tapPulse.id : 'idle'}
                   className={cn(
-                    'h-8 w-8',
-                    user?.trainerGender === 'male' ||
-                      user?.trainerGender === 'female'
-                      ? '-translate-y-[3px]'
-                      : '-translate-y-2.5',
+                    'flex h-8 w-8 items-center justify-center',
+                    tapPulse?.href === item.href && 'mobile-nav-tap-pulse',
                   )}
-                />
-              ) : item.mobileSkillIcon ? (
-                <TaskIconDisplay
-                  icon={{
-                    type: 'local',
-                    id: `/fallback/skills/${item.mobileSkillIcon}`,
-                  }}
-                  className="h-8 w-8"
-                />
-              ) : (
-                <item.icon className="h-8 w-8" />
-              )}
+                >
+                  {item.name === 'Trainer' ? (
+                    <GridPlayerSprite
+                      gender={user?.trainerGender}
+                      className={cn(
+                        'h-8 w-8',
+                        user?.trainerGender === 'male' ||
+                          user?.trainerGender === 'female'
+                          ? '-translate-y-[3px]'
+                          : '-translate-y-2.5',
+                      )}
+                    />
+                  ) : item.mobileSkillIcon ? (
+                    <TaskIconDisplay
+                      icon={{
+                        type: 'local',
+                        id: `/fallback/skills/${item.mobileSkillIcon}`,
+                      }}
+                      className="h-8 w-8"
+                    />
+                  ) : (
+                    <item.icon className="h-8 w-8" />
+                  )}
+                </span>
+              </span>
               <NavigationPending />
             </Link>
           )

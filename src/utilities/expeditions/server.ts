@@ -10,7 +10,7 @@ import {
   type ExpeditionGeneratedStep,
   type ActiveExpeditionRun,
 } from '@/data/expeditions'
-import { tasks, type TaskExitModal } from '@/data/tasks'
+import { tasks, type TaskExitModal, type TaskIcon } from '@/data/tasks'
 import { checkRequirement } from '@/utilities/requirements'
 import { getGameUserData } from '@/utilities/game-data'
 import { grantRewards, type RewardSummary } from '@/utilities/rewards/reward-logic'
@@ -25,6 +25,7 @@ import {
 import {
   buildExpeditionSteps,
   cloneSteps,
+  getExpeditionActivityIcon,
   normalizeKidModeExpeditionSteps,
   renumberSteps,
   resolveResultBranchAfterStep,
@@ -90,6 +91,7 @@ export interface ExpeditionProgressSnapshot {
   canFail?: boolean
   status: 'active' | 'ready_to_claim' | 'failed'
   progressed: boolean
+  stepIcon?: TaskIcon
 }
 
 const EXPEDITION_PROGRESS_LOCK_TTL = 10
@@ -186,6 +188,7 @@ async function endExpeditionRun(
   currentStepIndex: number,
   canFail: boolean,
   status: 'ready_to_claim' | 'failed',
+  stepIcon?: TaskIcon,
   req?: PayloadRequest,
   revalidatePaths = true,
 ): Promise<{
@@ -208,6 +211,7 @@ async function endExpeditionRun(
     canFail,
     status,
     progressed: true,
+    stepIcon,
   }
 
   await consumeMapItem(payload, userId, run.mapItemId, req)
@@ -944,6 +948,11 @@ export async function recordExpeditionActivityResult(
       return { success: true, updated: false }
     }
 
+    const stepIcon = getExpeditionActivityIcon(
+      currentStep.activityType,
+      currentStep.activityId,
+    )
+
     const expeditionConfig = getExpedition(run.expeditionId)
     const canFail = expeditionConfig?.canFail !== false
 
@@ -965,6 +974,7 @@ export async function recordExpeditionActivityResult(
           nextStepIndex,
           canFail,
           routedResult.end === 'complete' ? 'ready_to_claim' : 'failed',
+          stepIcon,
           req,
           revalidatePaths,
         )
@@ -985,6 +995,7 @@ export async function recordExpeditionActivityResult(
           canFail,
           status: 'ready_to_claim',
           progressed: true,
+          stepIcon,
         }
 
         await consumeMapItem(payload, userId, run.mapItemId, req)
@@ -1023,6 +1034,7 @@ export async function recordExpeditionActivityResult(
         canFail,
         status: 'active',
         progressed: true,
+        stepIcon,
       }
 
       await (payload as any).update({
@@ -1060,6 +1072,7 @@ export async function recordExpeditionActivityResult(
           nextStepIndex,
           canFail,
           routedLoss.end === 'complete' ? 'ready_to_claim' : 'failed',
+          stepIcon,
           req,
           revalidatePaths,
         )
@@ -1080,6 +1093,7 @@ export async function recordExpeditionActivityResult(
           canFail,
           status: 'ready_to_claim',
           progressed: true,
+          stepIcon,
         }
 
         await consumeMapItem(payload, userId, run.mapItemId, req)
@@ -1118,6 +1132,7 @@ export async function recordExpeditionActivityResult(
         canFail,
         status: 'active',
         progressed: true,
+        stepIcon,
       }
 
       await (payload as any).update({
@@ -1152,6 +1167,7 @@ export async function recordExpeditionActivityResult(
         canFail,
         status: 'active',
         progressed: false,
+        stepIcon,
       }
 
       await (payload as any).update({
@@ -1186,6 +1202,7 @@ export async function recordExpeditionActivityResult(
         canFail,
         status: 'failed',
         progressed: false,
+        stepIcon,
       }
 
       await consumeMapItem(payload, userId, run.mapItemId, req)
@@ -1217,6 +1234,7 @@ export async function recordExpeditionActivityResult(
       canFail,
       status: 'active',
       progressed: false,
+      stepIcon,
     }
 
     await (payload as any).update({
