@@ -206,50 +206,44 @@ export function GameNavigation() {
               aria-label={mobileLabel}
               title={mobileLabel}
               className={cn(
-                'game-focus-ring game-mobile-nav-link relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent px-0 text-game-cream/75 transition-colors hover:text-game-cream',
+                'game-focus-ring game-mobile-nav-link relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent px-0 text-game-cream/75 transition-colors hover:bg-game-cream/[0.045] hover:text-game-cream',
                 isActive
-                  ? 'text-game-cream'
+                  ? 'bg-game-cream/10 text-game-cream'
                   : '',
               )}
             >
               <span
+                key={tapPulse?.href === item.href ? tapPulse.id : 'idle'}
                 className={cn(
-                  'flex h-11 w-11 items-center justify-center rounded-full border transition-colors',
-                  isActive
-                    ? 'border-game-cream/45 bg-game-cream/10 shadow-[0_0_12px_rgb(247_236_214_/_0.12)]'
-                    : 'border-game-cream/20 bg-game-cream/[0.035]',
+                  'flex h-8 w-8 items-center justify-center',
+                  tapPulse?.href === item.href && 'mobile-nav-tap-pulse',
                 )}
               >
-                <span
-                  key={tapPulse?.href === item.href ? tapPulse.id : 'idle'}
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center',
-                    tapPulse?.href === item.href && 'mobile-nav-tap-pulse',
-                  )}
-                >
-                  {item.name === 'Trainer' ? (
-                    <GridPlayerSprite
-                      gender={user?.trainerGender}
-                      className={cn(
-                        'h-8 w-8',
-                        user?.trainerGender === 'male' ||
-                          user?.trainerGender === 'female'
-                          ? '-translate-y-[3px]'
-                          : '-translate-y-2.5',
-                      )}
-                    />
-                  ) : item.mobileSkillIcon ? (
-                    <TaskIconDisplay
-                      icon={{
-                        type: 'local',
-                        id: `/fallback/skills/${item.mobileSkillIcon}`,
-                      }}
-                      className="h-8 w-8"
-                    />
-                  ) : (
-                    <item.icon className="h-8 w-8" />
-                  )}
-                </span>
+                {item.name === 'Trainer' ? (
+                  <GridPlayerSprite
+                    gender={user?.trainerGender}
+                    className={cn(
+                      'h-8 w-8 drop-shadow-[0_0_1px_rgb(247_236_214_/_0.9)]',
+                      user?.trainerGender === 'male' ||
+                        user?.trainerGender === 'female'
+                        ? '-translate-y-[3px]'
+                        : '-translate-y-2.5',
+                    )}
+                  />
+                ) : item.mobileSkillIcon ? (
+                  <TaskIconDisplay
+                    icon={{
+                      type: 'local',
+                      id: `/fallback/skills/${item.mobileSkillIcon}`,
+                    }}
+                    className="h-8 w-8"
+                    normalizeVisibleBounds
+                    outlineVisiblePixels
+                    outlineColor="rgb(247 236 214 / 0.9)"
+                  />
+                ) : (
+                  <item.icon className="h-8 w-8" />
+                )}
               </span>
               <NavigationPending />
             </Link>

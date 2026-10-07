@@ -274,7 +274,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
           formId: '7',
           name: 'Shade',
           level: 16,
-          assignedMoves: ['headbutt', 'wave-breaker'],
+          assignedMoves: ['headbutt'],
           heldItemId: 'sitrus-berry',
         },
         {
@@ -282,7 +282,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
           formId: '7',
           name: 'Ripple',
           level: 14,
-          assignedMoves: ['wave-breaker'],
+          assignedMoves: ['water-gun'],
           heldItemId: 'oran-berry',
         },
         {

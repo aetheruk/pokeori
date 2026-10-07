@@ -53,6 +53,7 @@ interface TaskIconDisplayProps {
   priority?: boolean
   normalizeVisibleBounds?: boolean
   outlineVisiblePixels?: boolean
+  outlineColor?: string
 }
 
 export function TaskIconDisplay({
@@ -61,10 +62,11 @@ export function TaskIconDisplay({
   priority = false,
   normalizeVisibleBounds = false,
   outlineVisiblePixels = false,
+  outlineColor = 'rgb(41 53 50 / 0.9)',
 }: TaskIconDisplayProps) {
   const [visibleImageStyle, setVisibleImageStyle] = useState<CSSProperties>()
   const visiblePixelOutlineStyle: CSSProperties | undefined = outlineVisiblePixels
-    ? { filter: 'drop-shadow(0 0 1px rgb(41 53 50 / 0.9))' }
+    ? { filter: `drop-shadow(0 0 1px ${outlineColor})` }
     : undefined
 
   useEffect(() => {
