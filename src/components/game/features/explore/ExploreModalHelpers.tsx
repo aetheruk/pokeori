@@ -821,6 +821,12 @@ export function getFormattedRewards(
                 subCategory: selectedItem.subCategory,
               }),
             ),
+          contentId: selectedItem.id,
+          getRequirementProgress: (requirement: any) =>
+            getRequirementProgress(userData, requirement, {
+              category: selectedItem.category,
+              subCategory: selectedItem.subCategory,
+            }),
           userInventory,
           user: userData.user,
           activeCompanionFormId,
@@ -930,6 +936,12 @@ export function getFormattedRewards(
               subCategory: selectedItem.subCategory,
             }),
           ),
+        contentId: selectedItem.id,
+        getRequirementProgress: (requirement: any) =>
+          getRequirementProgress(userData, requirement, {
+            category: selectedItem.category,
+            subCategory: selectedItem.subCategory,
+          }),
         userInventory,
         user: userData.user,
         activeCompanionFormId,
