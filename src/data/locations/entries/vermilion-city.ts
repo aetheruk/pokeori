@@ -73,7 +73,8 @@ export const vermilionCityLocations: Location[] = [
   {
     id: 'squirtle-squad-lost-member',
     name: 'Lost Squirtle',
-    description: 'Spray, the smallest Squad member, is hiding between the pier supports.',
+    description:
+      'You picture the Squirtles trying to find their friend by catching them in a Pokeball, Not realistic, but funny',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {

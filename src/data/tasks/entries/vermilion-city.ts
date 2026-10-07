@@ -1150,7 +1150,8 @@ export const vermilionCityTasks: Task[] = [
   {
     id: 'squirtle-squad-bench-by-the-pier',
     name: 'Bench by the Pier',
-    description: 'The pier is quiet enough to open the Squirtle diary.',
+    description:
+      'Although all the writing is mostly Scratches, Water stains and footprints, I can perfectly understand it. Strange.',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
@@ -1174,9 +1175,8 @@ export const vermilionCityTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        title: 'The Squirtle Squad',
-        message:
-          'The diary smells of seawater, smoke, and old berry candy. A tiny shell chip pins the first page flat against the wind.',
+        title: 'Sparkly Shinies',
+        message: 'Found Shinies. Good Day. Other Pokemon Jealous of my Shinies',
         background: '/backgrounds/beach.avif',
         icon: {
           type: 'item',
@@ -1184,7 +1184,7 @@ export const vermilionCityTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Read',
+            text: 'Turn Page',
             type: 'navigate',
             id: 2,
           },
@@ -1192,9 +1192,8 @@ export const vermilionCityTasks: Task[] = [
       },
       {
         id: 2,
-        title: 'The First Line',
-        message:
-          '"We were not lost. Everyone else was just bad at finding us." The words tilt across the page in careful, splashy scratches.',
+        title: 'Best Gang',
+        message: 'Squirtle Team Now. I lead with Shinies. Play Tricks on Magikarp Touchers. Very Fun',
         background: '/backgrounds/beach.avif',
         icon: {
           type: 'pokemon',
@@ -1211,8 +1210,8 @@ export const vermilionCityTasks: Task[] = [
   },
   {
     id: 'squirtle-squad-first-page',
-    name: 'The Abandoned Dock',
-    description: 'The diary begins before the Squad became dockside legends.',
+    name: 'Squirtle Shack',
+    description: 'The Diary Continues.',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
@@ -1236,9 +1235,8 @@ export const vermilionCityTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        title: 'Diary Page',
-        message:
-          'Five Squirtle made a home beneath Vermilion Pier, where the planks stayed warm after sunset and humans forgot their bait buckets.',
+        title: 'A New Home',
+        message: 'New House Today. Friends here too. Pier Under is cozy space. ',
         background: '/backgrounds/beach.avif',
         icon: {
           type: 'pokemon',
@@ -1246,7 +1244,7 @@ export const vermilionCityTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Keep Reading',
+            text: 'Turn Page',
             type: 'navigate',
             id: 2,
           },
@@ -1254,9 +1252,8 @@ export const vermilionCityTasks: Task[] = [
       },
       {
         id: 2,
-        title: 'Diary Page',
-        message:
-          'They were hungry, clever, and tired of being chased from every boat. Shade made a rule: if the pier could push them around, they could push back.',
+        title: 'Sneaky Steal',
+        message: 'Little Squirtle did Sneaky Steal. Magikarp Toucher Angry. Make Battle with Squirtle Squad. Bad Little Squirtle.',
         background: '/backgrounds/beach.avif',
         icon: {
           type: 'pokemon',
@@ -1264,7 +1261,7 @@ export const vermilionCityTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'The Rule',
+            text: 'Picture the Scene',
             type: 'success',
           },
         ],
@@ -1273,8 +1270,8 @@ export const vermilionCityTasks: Task[] = [
   },
   {
     id: 'squirtle-squad-stolen-lunch',
-    name: 'The Stolen Lunch',
-    description: 'A stolen lunch turns into panic when the smallest Squirtle disappears.',
+    name: 'Free Lunch',
+    description: 'The diary continues.',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
@@ -1286,7 +1283,7 @@ export const vermilionCityTasks: Task[] = [
     secret: true,
     completionTrigger: 'manual',
     chat: true,
-    completeButtonText: 'Search',
+    completeButtonText: 'Turn Page',
     requirements: [
       {
         type: 'item_owned',
@@ -1297,68 +1294,32 @@ export const vermilionCityTasks: Task[] = [
     rewards: [],
     exitModal: {
       background: '/backgrounds/beach.avif',
-      title: 'The Stolen Lunch',
+      title: 'Free Lunch',
       icon: {
         type: 'pokemon',
         id: '7',
       },
       message:
-        'The Squad ran off with a lunch pail and laughed until a whistle cut through the pier. When the echoes faded, Spray, the smallest Squirtle, was gone.',
-      closeButtonText: 'Find Them',
-    },
-  },
-  {
-    id: 'squirtle-squad-drainpipe-clue',
-    name: 'Drainpipe Clue',
-    description: 'The drainpipe trail shows the Squad was not the only trouble under the pier.',
-    category: 'Secret',
-    subCategory: 'Vermilion City',
-    icon: {
-      type: 'pokemon',
-      id: '19',
-    },
-    background: '/backgrounds/beach.avif',
-    repeatable: true,
-    secret: true,
-    completionTrigger: 'manual',
-    chat: true,
-    completeButtonText: 'Read Clue',
-    requirements: [
-      {
-        type: 'item_owned',
-        targetId: 'squirtle-squad',
-      },
-    ],
-    criteria: [],
-    rewards: [],
-    exitModal: {
-      background: '/backgrounds/beach.avif',
-      title: 'Drainpipe Clue',
-      icon: {
-        type: 'pokemon',
-        id: '19',
-      },
-      message:
-        "Rattata had dragged bright scraps through the pipe and left muddy prints beside the Squad's tracks. The Squirtle were trouble, but this was not their mess alone.",
-      closeButtonText: 'Follow Map',
+        'Yummy food. Little Squirtle Good. Many Snacks. But bad. lose Little Squirtle. Cant see',
+      closeButtonText: 'Turn Page',
     },
   },
   {
     id: 'squirtle-squad-boathouse-clue',
-    name: 'Boathouse Clue',
-    description: 'The boathouse trail points back toward the pier.',
+    name: 'Special Treasures',
+    description: 'The Diary Continues',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
       type: 'pokemon',
-      id: '52',
+      id: '4',
     },
     background: '/backgrounds/beach.avif',
     repeatable: true,
     secret: true,
     completionTrigger: 'manual',
     chat: true,
-    completeButtonText: 'Read Clue',
+    completeButtonText: 'Turn Page',
     requirements: [
       {
         type: 'item_owned',
@@ -1369,20 +1330,20 @@ export const vermilionCityTasks: Task[] = [
     rewards: [],
     exitModal: {
       background: '/backgrounds/beach.avif',
-      title: 'Boathouse Clue',
+      title: 'Special Treasure',
       icon: {
         type: 'pokemon',
-        id: '52',
+        id: '4',
       },
       message:
-        'A Meowth had been batting cracked lantern glass into the straw, then letting humans blame the Squirtle. The Squad copied every footprint and drew a crooked map of the pier.',
-      closeButtonText: 'Piece It Together',
+        'Charmander stink. Break Hidey Hole Map. Need big fix',
+      closeButtonText: 'Continue Reading',
     },
   },
   {
     id: 'squirtle-squad-fire-at-the-pier',
-    name: 'Fire at the Pier',
-    description: 'The page darkens where the diary reaches the night of the fire.',
+    name: 'Big very Bad',
+    description: 'The Diary Continues.',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
@@ -1394,7 +1355,7 @@ export const vermilionCityTasks: Task[] = [
     secret: true,
     completionTrigger: 'manual',
     chat: true,
-    completeButtonText: 'Run',
+    completeButtonText: 'Continue Reading',
     requirements: [
       {
         type: 'item_owned',
@@ -1406,9 +1367,8 @@ export const vermilionCityTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        title: 'Diary Page',
-        message:
-          'The map led back to the pier just as a lantern tipped into the straw. Smoke crawled under the boards first, quiet and mean, then the planks began to glow.',
+        title: 'Stinky Lizards',
+        message: 'Very Bad. Stinky Char, start fire on wood roof Squirtle house',
         background: '/backgrounds/beach.avif',
         icon: {
           type: 'item',
@@ -1416,7 +1376,7 @@ export const vermilionCityTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Read On',
+            text: 'Continue Reading',
             type: 'navigate',
             id: 2,
           },
@@ -1424,9 +1384,8 @@ export const vermilionCityTasks: Task[] = [
       },
       {
         id: 2,
-        title: 'Diary Page',
-        message:
-          'Shade wrote one line larger than the rest: "If we run, our home burns. If we stay, everyone sees who we are."',
+        title: 'Scared Pokemon',
+        message: 'Shinies make Leader. Must Help fire. But Scitchy Scratchers Scared',
         background: '/backgrounds/beach.avif',
         icon: {
           type: 'pokemon',
@@ -1434,7 +1393,7 @@ export const vermilionCityTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Stay',
+            text: 'Continue Reading',
             type: 'success',
           },
         ],
@@ -1443,8 +1402,8 @@ export const vermilionCityTasks: Task[] = [
   },
   {
     id: 'squirtle-squad-first-rescue',
-    name: 'First Rescue',
-    description: 'The Squad chooses what kind of reputation it wants.',
+    name: 'Big Rescue',
+    description: 'The Diary Continues.',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
@@ -1467,20 +1426,21 @@ export const vermilionCityTasks: Task[] = [
     rewards: [],
     exitModal: {
       background: '/backgrounds/beach.avif',
-      title: 'First Rescue',
+      title: 'Big Rescue',
       icon: {
         type: 'pokemon',
         id: '7',
       },
       message:
-        'The Squad drove panicked Pokemon toward the water, soaked the burning ropes, and dragged a crying child clear of the smoke. By morning, nobody called them thieves.',
+        'Fire Easy for Squirtle Squad. Little Karpcatcher went splash. Small Squirtle Rescue No problem! Many Sweet Treats Gift!',
       closeButtonText: 'Final Page',
     },
   },
   {
     id: 'squirtle-squad-final-page',
     name: 'The Hidden Cove',
-    description: 'The diary ends with a promise and a mark on the shoreline.',
+    description:
+      'The final page looks like it was written by someone else, Mostly because it’s fully legible.',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
@@ -1492,7 +1452,7 @@ export const vermilionCityTasks: Task[] = [
     secret: true,
     completionTrigger: 'manual',
     chat: true,
-    completeButtonText: 'Close Diary',
+    completeButtonText: 'Read Final Page',
     requirements: [
       {
         type: 'item_owned',
@@ -1503,14 +1463,14 @@ export const vermilionCityTasks: Task[] = [
     rewards: [],
     exitModal: {
       background: '/backgrounds/beach.avif',
-      title: 'The Hidden Cove',
+      title: 'The Squirtle Squad',
       icon: {
         type: 'pokemon',
         id: '7',
       },
       message:
-        'The last page marks a tucked-away cove north of the pier. "Friends can find us here. Troublemakers have to bring snacks."',
-      closeButtonText: 'Remember the Way',
+        'If you’re reading this the Squirtle Squad have taken a keen interest in you, they make their home along with many other Squirtle under Vermilion Docks. Said you do visit make sure to take plenty of sweet treats! ',
+      closeButtonText: 'Check it out',
     },
   },
   {

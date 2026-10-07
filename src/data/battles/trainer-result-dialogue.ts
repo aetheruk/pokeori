@@ -457,20 +457,16 @@ const STORY_DIALOGUE: Record<string, DialoguePair> = {
     loss: ['Your Metapod has the spirit, but not yet the patience. Harden your resolve, young trainer, and we shall meet again.'],
   },
   'squirtle-squad-dock-prank': {
-    win: ['That was not how I thought this prank would end. Fine, you got us. We’ll stop pinching supplies and find a better way to make people laugh.'],
-    loss: ['Ha! Nobody stops the Squirtle Squad from making a splash. We’ll be gone before anyone works out what happened.'],
-  },
-  'squirtle-squad-drainpipe-scrap': {
-    win: ['Okay, okay, you win. The drainpipe is off limits from now on—at least until we come up with a less soggy hiding place.'],
-    loss: ['You’ll never catch the Squirtle Squad in our own hideout! The pipe is ours, and the prank is still on.'],
+    win: ['Gah, Darn Squirtle always stealing our food!'],
+    loss: ['Let that be a lesson to you!'],
   },
   'squirtle-squad-boathouse-scrap': {
-    win: ['You found our boathouse and beat us fair. We’ll return what we borrowed and call the prank off.'],
-    loss: ['The boathouse stays ours for now! The Squad has a plan, and you’re not going to splash it away.'],
+    win: ['Char?'],
+    loss: ['Char Char!'],
   },
   'squirtle-squad-rescue-battle': {
-    win: ['You’ve stopped us. We went too far this time; we’ll help put things right and leave the wild Pokémon alone.'],
-    loss: ['You can’t stop the whole Squad! We’re getting out of here before the harbour patrol arrives.'],
+    win: ['Tatatatta Rattataaaa.'],
+    loss: ['Screeeeeee!.'],
   },
   'mt-moon-grunt-1': {
     win: ['You’re making this dig more trouble than it’s worth. The others have already moved the important crates.'],
