@@ -29,8 +29,8 @@ export const vermillionCityslidingPuzzleGames: SlidingPuzzleConfig[] = [
   },
   {
     id: 'squirtle-squad-torn-map',
-    name: 'Torn Pier Map',
-    description: 'Fit the damp map scraps together to find where the trail ends.',
+    name: 'Broken Map',
+    description: 'The Diary continues.',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {

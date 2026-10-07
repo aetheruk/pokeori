@@ -388,7 +388,7 @@ export const specialEventTasks: Task[] = [
     secret: false,
     isRandomEvent: true,
     completionTrigger: 'manual',
-    completeButtonText: 'Check on Squirtle',
+    completeButtonText: 'Hey Buddy',
     requirements: [
       {
         type: 'item_owned',
@@ -414,14 +414,14 @@ export const specialEventTasks: Task[] = [
     ],
     exitModal: {
       background: '/backgrounds/vermillion.avif',
-      title: 'My Friends the Squirtle Squad',
+      title: 'The Squirtle Squad',
       icon: {
         type: 'pokemon',
         id: '7',
       },
       message:
-        'The Squirtle presses a damp little book into your hand. Its cover reads "My Friends the Squirtle Squad."',
-      closeButtonText: 'Keep the Diary',
+        'The Squirtle presses a damp little book into your hand. Its cover reads “The Squirtle Squad.”',
+      closeButtonText: 'Take Diary',
     },
   },
   {

@@ -449,7 +449,7 @@ export const keyItems: Item[] = [
     id: 'squirtle-squad',
     name: 'Squirtle Squad',
     description:
-      'A small diary titled "My Friends the Squirtle Squad." The pages are damp but carefully kept.',
+      'A small diary titled “The Squirtle Squad.” The pages are damp and just about legible',
     category: 'key',
     spriteId: 'guide-book',
     hueRotate: 210,

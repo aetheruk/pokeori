@@ -904,8 +904,8 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'squirtle-squad-dock-prank',
-    name: 'Lunch Pail Scuffle',
-    description: 'The stolen lunch draws every hungry dockside scrapper at once.',
+    name: 'Sneaky Steal Gone Wrong',
+    description: 'I can just picture the moment the angry trainers battled the Squirtle Squad .',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
@@ -930,41 +930,14 @@ export const vermilionCityBattles: BattleConfig[] = [
     allowedItems: ['oran-berry', 'sitrus-berry'],
   },
   {
-    id: 'squirtle-squad-drainpipe-scrap',
-    name: 'Drainpipe Scrap',
-    description: 'The drainpipe shakes as the Squad follows the muddy trail.',
-    category: 'Secret',
-    subCategory: 'Vermilion City',
-    icon: {
-      type: 'pokemon',
-      id: '19',
-    },
-    background: '/backgrounds/beach.avif',
-    title: 'The Squirtle Squad',
-    requirements: [
-      {
-        type: 'item_owned',
-        targetId: 'squirtle-squad',
-      },
-    ],
-    enemyTeam: [
-      { speciesId: 19, formId: '19', level: 14 },
-      { speciesId: 23, formId: '23', level: 14 },
-    ],
-    rewards: [],
-    maxPokemon: 3,
-    enemyAttackTelegraphChance: 2,
-    allowedItems: ['oran-berry', 'sitrus-berry'],
-  },
-  {
     id: 'squirtle-squad-boathouse-scrap',
-    name: 'Boathouse Scrap',
-    description: 'The boathouse shadows hiss and chatter around the broken lantern scraps.',
+    name: 'Charmander Crew',
+    description: 'A battle with a rival gang breaks out, Wow this book has everything!',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {
       type: 'pokemon',
-      id: '52',
+      id: '4',
     },
     background: '/backgrounds/beach.avif',
     title: 'The Squirtle Squad',
@@ -975,8 +948,9 @@ export const vermilionCityBattles: BattleConfig[] = [
       },
     ],
     enemyTeam: [
-      { speciesId: 21, formId: '21', level: 14 },
-      { speciesId: 52, formId: '52', level: 14 },
+      { speciesId: 4, formId: '4', level: 14 },
+      { speciesId: 4, formId: '4', level: 14 },
+      { speciesId: 5, formId: '5', level: 14 },
     ],
     rewards: [],
     maxPokemon: 3,
@@ -986,7 +960,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   {
     id: 'squirtle-squad-rescue-battle',
     name: 'Pier Panic',
-    description: 'Smoke sends frightened Pokemon scattering through the pier supports.',
+    description: 'The Diary continues.',
     category: 'Secret',
     subCategory: 'Vermilion City',
     icon: {

@@ -253,7 +253,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
     id: 'squirtle-squad-chronicle',
     name: 'The Squirtle Squad',
     description:
-      "Settle on the pier bench and read the damp little diary the Squirtle left with you.",
+      'This seems like a nice spot to have a read of the book that Squirtle gave me.',
     category: 'Kanto',
     subCategory: 'Vermilion City',
     buttonText: 'Read the Diary',
@@ -324,7 +324,6 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
         'squirtle-squad-bench-by-the-pier',
         'squirtle-squad-first-page',
         'squirtle-squad-stolen-lunch',
-        'squirtle-squad-drainpipe-clue',
         'squirtle-squad-boathouse-clue',
         'squirtle-squad-fire-at-the-pier',
         'squirtle-squad-first-rescue',
@@ -332,7 +331,6 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
       ],
       battle: [
         'squirtle-squad-dock-prank',
-        'squirtle-squad-drainpipe-scrap',
         'squirtle-squad-boathouse-scrap',
         'squirtle-squad-rescue-battle',
       ],
@@ -376,50 +374,18 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
         secret: true,
       },
       {
-        type: 'branch',
-        id: 'squirtle-squad-step-6-search-branch',
-        branches: [
-          {
-            id: 'follow-the-drainpipe',
-            weight: 1,
-            nodes: [
-              {
-                type: 'activity',
-                id: 'squirtle-squad-step-6a-drainpipe-scrap',
-                activityType: 'battle',
-                activityId: 'squirtle-squad-drainpipe-scrap',
-                secret: true,
-              },
-              {
-                type: 'activity',
-                id: 'squirtle-squad-step-7a-drainpipe-clue',
-                activityType: 'task',
-                activityId: 'squirtle-squad-drainpipe-clue',
-                secret: true,
-              },
-            ],
-          },
-          {
-            id: 'check-the-boathouse',
-            weight: 1,
-            nodes: [
-              {
-                type: 'activity',
-                id: 'squirtle-squad-step-6b-boathouse-scrap',
-                activityType: 'battle',
-                activityId: 'squirtle-squad-boathouse-scrap',
-                secret: true,
-              },
-              {
-                type: 'activity',
-                id: 'squirtle-squad-step-7b-boathouse-clue',
-                activityType: 'task',
-                activityId: 'squirtle-squad-boathouse-clue',
-                secret: true,
-              },
-            ],
-          },
-        ],
+        type: 'activity',
+        id: 'squirtle-squad-step-6b-boathouse-scrap',
+        activityType: 'battle',
+        activityId: 'squirtle-squad-boathouse-scrap',
+        secret: true,
+      },
+      {
+        type: 'activity',
+        id: 'squirtle-squad-step-7b-boathouse-clue',
+        activityType: 'task',
+        activityId: 'squirtle-squad-boathouse-clue',
+        secret: true,
       },
       {
         type: 'activity',
