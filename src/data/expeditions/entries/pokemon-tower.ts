@@ -14,7 +14,7 @@ export const pokemonTowerExpeditions: ExpeditionConfig[] = [
       id: '/sprites/trainers/special/fuji.avif',
     },
     background: '/backgrounds/pkmn-tower.avif',
-    maxLosses: 3,
+    maxLosses: 6,
     chronicle: {
       playerName: 'Mr. Fuji',
       playerIcon: '/sprites/trainers/special/fuji.avif',
