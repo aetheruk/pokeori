@@ -136,6 +136,7 @@ import { ItemFlickQte } from './_components/item-flick-qte'
 import { QuestionPrompt } from './_components/question-prompt'
 import { SafariBallControl } from './_components/safari-ball-control'
 import { AlphaIcon } from '@/components/game/shared/alpha-icon'
+import { AlphaParticles } from '@/components/game/shared/alpha-particles'
 
 interface EncounterData {
   locationSnapshot?: import('@/data/types').Location
@@ -1887,6 +1888,9 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
             </div>
           )}
           <div ref={pokemonTargetRef} className="relative w-40 h-40">
+            {encounter.isAlpha && !isSilphScopeGhostLocked && (
+              <AlphaParticles className="-inset-x-5 -inset-y-8 z-0" />
+            )}
             {phase === 'capture' &&
               !isSafariEncounter &&
               !showCaptureAnimation &&
@@ -1988,7 +1992,10 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                   shiny={encounter.isShiny}
                   female={encounter.gender === 'female'}
                   alt="Pokemon"
-                  className="h-full w-full"
+                  className={cn(
+                    'h-full w-full',
+                    encounter.isAlpha && 'relative z-10',
+                  )}
                   imageClassName={cn(
                     'pixelated drop-shadow-2xl',
                     !hasAttemptedCapture && 'animate-bounce-slow',

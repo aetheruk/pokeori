@@ -118,6 +118,30 @@ export function applyAlphaCaptureXp(
   })
 }
 
+export function applyAlphaCaptureBonuses(
+  rewards: Reward[],
+  isAlpha: boolean,
+): Reward[] {
+  if (!isAlpha) return rewards
+
+  return rewards.map((reward) => {
+    const multiplier = reward.type === 'item' ? 3 : 1
+    if (multiplier === 1) return reward
+
+    const quantity = reward.quantity ?? 1
+    return {
+      ...reward,
+      quantity:
+        typeof quantity === 'number'
+          ? quantity * multiplier
+          : {
+              min: quantity.min * multiplier,
+              max: quantity.max * multiplier,
+            },
+    }
+  })
+}
+
 export function generateAlphaStats(
   baseHeight: number,
   baseWeight: number,

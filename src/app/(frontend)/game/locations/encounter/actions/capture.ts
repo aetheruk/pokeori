@@ -86,7 +86,11 @@ import { getTotalPokemonExperienceForLevel } from '@/utilities/pokemon/experienc
 import { replayCaptureSettlement, runCaptureSettlement, type CaptureSettlementContext } from './capture-settlement'
 import { getEncounterMechanicsLockKey } from './lock'
 import { verifyCaptureRingScale } from '@/utilities/pokemon/capture-timing'
-import { applyAlphaCaptureXp } from '@/utilities/pokemon/alpha'
+import {
+  ALPHA_RESEARCH_XP,
+  applyAlphaCaptureBonuses,
+  applyAlphaCaptureXp,
+} from '@/utilities/pokemon/alpha'
 
 import {
   calculatePokemonContentSkillXp,
@@ -902,7 +906,11 @@ export async function attemptCapture(
 
     const companionFormId = (activePoke.docs[0] as any)?.formId
     rewardsToGrant.push(
-      ...buildCaptureResearchXpRewards(state.formId, companionFormId),
+      ...buildCaptureResearchXpRewards(
+        state.formId,
+        companionFormId,
+        state.alphaPokemon ? ALPHA_RESEARCH_XP : undefined,
+      ),
     )
 
     const xpConfig = resolveSkillXpConfig('catching', level, location?.skillXp)
@@ -955,7 +963,10 @@ export async function attemptCapture(
 
     const { summary } = await grantRewards(
       user.id,
-      applyAlphaCaptureXp(rewardsToGrant, !!state.alphaPokemon),
+      applyAlphaCaptureBonuses(
+        applyAlphaCaptureXp(rewardsToGrant, !!state.alphaPokemon),
+        !!state.alphaPokemon,
+      ),
       {
         requirementContext: rewardRequirementContext,
         payload, req,

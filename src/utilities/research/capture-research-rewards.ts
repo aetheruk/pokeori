@@ -33,6 +33,7 @@ export function buildCaptureCrystalReward(
 export function buildCaptureResearchXpRewards(
   caughtFormId: string | number | null | undefined,
   companionFormId?: string | number | null,
+  targetResearchXp = CATCH_RESEARCH_XP_REWARD,
 ): LocationReward[] {
   const rewards: LocationReward[] = []
 
@@ -40,7 +41,7 @@ export function buildCaptureResearchXpRewards(
     rewards.push({
       type: 'pokemon_research_xp',
       targetId: caughtFormId,
-      quantity: CATCH_RESEARCH_XP_REWARD,
+      quantity: targetResearchXp,
       dropChance: 100,
     })
   }

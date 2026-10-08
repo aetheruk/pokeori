@@ -5,6 +5,7 @@ import {
   canRollAlpha,
   canRollCaptureAlpha,
   rollCaptureAlpha,
+  applyAlphaCaptureBonuses,
   applyAlphaCaptureXp,
   generateAlphaStats,
   rollAlpha,
@@ -18,6 +19,7 @@ import { buildAlphaCaptureEncounter } from '@/app/(frontend)/game/battles/helper
 import { buildBattleWinRewards } from '@/app/(frontend)/game/battles/helpers/win-rewards'
 import { initializeBattlePokemon } from '@/utilities/battle/battle-logic'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
+import { buildCaptureResearchXpRewards } from '@/utilities/research/capture-research-rewards'
 import { buildWildBattleSelectedTeam } from '@/utilities/battle/lead-selection'
 import {
   makeBattlePokemon,
@@ -110,6 +112,30 @@ describe('Alpha Pokémon', () => {
       rewards[4],
     ])
     expect(rewards[0].quantity).toBe(20)
+  })
+
+  test('successful Alpha captures grant battle-scale target Research XP and triple item drops', () => {
+    const rewards: Reward[] = [
+      { type: 'pokemon_research_xp', targetId: '19', quantity: 3 },
+      { type: 'pokemon_research_xp', targetId: '25', quantity: 2, isCompanion: true },
+      { type: 'item', targetId: 'escape-rope', quantity: 2, dropChance: 8 },
+      { type: 'item', targetId: 'repel', quantity: { min: 1, max: 2 }, dropChance: 5 },
+      { type: 'currency', targetId: 'crystals', quantity: 11 },
+    ]
+
+    expect(applyAlphaCaptureBonuses(rewards, false)).toBe(rewards)
+    expect(applyAlphaCaptureBonuses(rewards, true)).toEqual([
+      rewards[0],
+      rewards[1],
+      { ...rewards[2], quantity: 6 },
+      { ...rewards[3], quantity: { min: 3, max: 6 } },
+      rewards[4],
+    ])
+    expect(buildCaptureResearchXpRewards('19', '25', 15)).toEqual([
+      { type: 'pokemon_research_xp', targetId: '19', quantity: 15, dropChance: 100 },
+      { type: 'pokemon_research_xp', targetId: '25', quantity: 2, dropChance: 100, isCompanion: true },
+    ])
+    expect(rewards[0].quantity).toBe(3)
   })
   test('the capture actions preserve the defeated Pokémon and prevent duplicate or restarted captures', () => {
     const result = Bun.spawnSync({
