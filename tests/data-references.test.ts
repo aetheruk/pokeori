@@ -6436,7 +6436,7 @@ describe('static data references', () => {
         {
           type: 'skill_level',
           targetId: 'catching',
-          count: 25,
+          count: 20,
         },
         {
           type: 'battle_result',

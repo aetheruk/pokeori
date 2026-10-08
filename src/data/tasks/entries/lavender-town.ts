@@ -70,7 +70,7 @@ export const lavenderTownTasks: Task[] = [
       {
         type: 'skill_level',
         targetId: 'catching',
-        count: 25,
+        count: 20,
       },
       {
         type: 'battle_result',
@@ -799,8 +799,7 @@ export const lavenderTownTasks: Task[] = [
           type: 'trainer',
           id: 'youngster',
         },
-        message:
-          'A memory? With Team Rocket, a machine, and Mr. Fuji getting hurt? That is way bigger than a missing person poster.',
+        message: 'A memory? With Team Rocket, a machine, and Mr. Fuji getting hurt?',
         buttons: [
           {
             text: 'What now?',
