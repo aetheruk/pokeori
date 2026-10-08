@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: Detective Ray Choo’s Celadon skill-test battle now has dedicated result dialogue: he doubts the player is ready after a loss and praises their work after a win, with his name filled into both messages.
+
 - Unreleased: After exploring Pewter City, the `old-ron` task (titled `Ol Ron`) introduces Alpha Pokemon through a Hiker’s memories of Ol’ Ron. Completing it reveals `affable-alpha`; the player needs an Alpha as their active companion to complete the follow-up, which awards 20 Red Berry Candy plus 1,000 Explorer, Trainer, and Researcher XP.
 
 - Unreleased (`0.46.0`): Pokémon ownership, companion, and battle-team criteria can require Alpha status; task requirements display the Alpha trait in their description.

@@ -149,6 +149,9 @@ export const celadonCityBattles: BattleConfig[] = [
     id: 'det-ray-choo-skill-test',
     trainerClassId: 'detective',
     trainerName: 'Ray Choo',
+    loseMessage: 'Hmm, I’m not sure you’re ready for this {trainer}.',
+    winMessage:
+      'Magnificent Work {trainer}! I see a bit of my younger self in you.',
     name: 'Det. Ray Choo',
     description:
       'Detective Ray Choo wants to test your skills before the two of you begin your investigation.',
