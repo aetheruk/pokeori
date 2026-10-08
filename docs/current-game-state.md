@@ -1,7 +1,7 @@
 # Current Game State
 
 - Unreleased (`0.44.4`): Ordinary wild battles, location capture encounters, and fishing catches now each have a 1-in-30 chance to spawn an Alpha.
-- Unreleased (`0.44.5`): Ordinary wild route, cave, and tower battles can offer a post-victory capture for any non-normal rarity when `allowVariantCatches` is enabled. Variant captures use standard encounter timing, catch rate, and rewards; species, battle level, variant, gender, and background carry through while stats and ability use ordinary capture rolls. Special, secret, tutorial, and one-off encounters stay excluded.
+- Unreleased (`0.45.0`): Ordinary wild route, cave, and tower battles can offer a post-victory capture for any non-normal rarity when `allowVariantCatches` is enabled. Variant captures use standard encounter timing, catch rate, and rewards; species, battle level, variant, gender, and background carry through while stats and ability use ordinary capture rolls. Special, secret, tutorial, and one-off encounters stay excluded.
 - Release (`0.44.4`): Alpha spawn odds are now 1-in-30 in ordinary wild battles, location capture encounters, and fishing.
 - Release (`0.44.3`): Alpha capture attempts last 50 seconds instead of 30 seconds across defeated-battle captures, location encounters, and fishing.
 - Release (`0.44.2`): Capturing an Alpha awards 15 Research XP for the target and triples item drops. Alpha battle sprites are 15% larger with rising red particles behind them; Alpha capture encounters use the same particle treatment without replacing variant sprite effects.
