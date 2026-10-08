@@ -447,11 +447,8 @@ export const pewterCityTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Hey, Look!',
     chat: true,
-    requirements: [
-      { type: 'task_completed', targetId: 'old-ron' },
-      { type: 'companion', companionCheck: { isAlpha: true } },
-    ],
-    criteria: [],
+    requirements: [{ type: 'task_completed', targetId: 'old-ron' }],
+    criteria: [{ type: 'companion', companionCheck: { isAlpha: true } }],
     rewards: [
       { type: 'item', targetId: 'red-berry-candy', quantity: 20 },
       { type: 'xp', skill: 'catching', quantity: 1000 },
