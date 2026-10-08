@@ -217,7 +217,7 @@ describe('Alpha Pokémon', () => {
     expect(generatePokemonStats(100, 200, () => 0.999).size).toBe('XL')
   })
 
-  test('capture uses the original Alpha, starts at zero for exactly 30 seconds and cannot be restarted', () => {
+  test('capture uses the original Alpha, starts at zero for exactly 50 seconds and cannot be restarted', () => {
     const alpha = makeAlpha()
     const state = makePveBattleState({
       status: 'won',
@@ -227,7 +227,7 @@ describe('Alpha Pokémon', () => {
       enemyTeam: [makeBattlePokemon({ ...alpha, currentHp: 0 })],
     })
     const encounter = buildAlphaCaptureEncounter(state, config, 'owner', 1000)!
-    expect(encounter.expiry - encounter.startTime).toBe(30_000)
+    expect(encounter.expiry - encounter.startTime).toBe(50_000)
     expect(encounter.currentCatchRate).toBe(0)
     expect(encounter.baseCatchRate).toBe(0)
     expect(encounter.alphaPokemon).toEqual(alpha)
