@@ -7,12 +7,14 @@ import type { BattleConfig } from '@/data/types'
  */
 export const TRAINER_BATTLE_LEVEL_ADVANTAGE = 5
 export const WILD_BATTLE_LEVEL_ADVANTAGE = 10
+export const ALPHA_WILD_BATTLE_LEVEL_ADVANTAGE = 5
 
 export interface ResolveBattleLevelCapOptions {
   authoredLevelCap?: number | null
   badgeLevelCap?: number | null
   enemyLevels: number[]
   isWildBattle?: boolean
+  wildBattleLevelAdvantage?: number
 }
 
 /**
@@ -28,6 +30,7 @@ export function resolveBattleLevelCap({
   badgeLevelCap,
   enemyLevels,
   isWildBattle = false,
+  wildBattleLevelAdvantage,
 }: ResolveBattleLevelCapOptions): number | undefined {
   const authored = normalizeLevel(authoredLevelCap)
   const badgeCap = normalizeLevel(badgeLevelCap)
@@ -39,7 +42,7 @@ export function resolveBattleLevelCap({
   const derived = highestEnemyLevel > 0
     ? highestEnemyLevel +
       (isWildBattle
-        ? WILD_BATTLE_LEVEL_ADVANTAGE
+        ? (wildBattleLevelAdvantage ?? WILD_BATTLE_LEVEL_ADVANTAGE)
         : TRAINER_BATTLE_LEVEL_ADVANTAGE)
     : undefined
   const cap = authored ?? derived
@@ -58,11 +61,13 @@ export function getBattleLevelCap(
   battleConfig: Pick<BattleConfig, 'isWildBattle' | 'levelCap'>,
   enemyLevels: number[],
   badgeLevelCap?: number | null,
+  wildBattleLevelAdvantage?: number,
 ): number | undefined {
   return resolveBattleLevelCap({
     authoredLevelCap: battleConfig.levelCap,
     badgeLevelCap,
     enemyLevels,
     isWildBattle: battleConfig.isWildBattle,
+    wildBattleLevelAdvantage,
   })
 }

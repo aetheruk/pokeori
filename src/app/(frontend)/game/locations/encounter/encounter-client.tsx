@@ -19,7 +19,6 @@ import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import type { AbilityConfig } from '@/data/abilities'
 import { items } from '@/data/items'
-import { subCategories } from '@/data/sub-region-map'
 import {
   getEncounterSecondChanceModifier,
   getTypeLureAnswerEquivalent,
@@ -30,6 +29,7 @@ import {
 import { cn } from '@/lib/utils'
 import { recoverGameAction } from '@/utilities/games/action-recovery'
 import { getCaptureRingScale } from '@/utilities/pokemon/capture-timing'
+import { resolveEncounterMusic } from '@/utilities/pokemon/encounter-music'
 import { beginCaptureAim } from './actions/capture-aim'
 import {
   getPokemonForm,
@@ -99,17 +99,6 @@ import {
   getSafariFleeChance,
   SAFARI_BASE_FLEE_RATE,
 } from '@/utilities/pokemon/safari-catch'
-
-function getLocationMusicUrl(location: {
-  music?: string
-  subCategory?: string
-}) {
-  return (
-    location.music ||
-    subCategories[location.subCategory || '']?.music ||
-    '/music/battle.m4a'
-  )
-}
 
 // Dynamic import for LevelUpModal to avoid bundling canvas-confetti in initial load
 const LevelUpModal = nextDynamic(
@@ -742,11 +731,11 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
   const { playSfx, playMusic, stopMusic } = useAudio()
   const startLocationMusic = useCallback(() => {
     if (!currentLocation) return
-    playMusic(getLocationMusicUrl(currentLocation), {
+    playMusic(resolveEncounterMusic(currentLocation, encounter?.isAlpha === true), {
       loop: true,
       volume: 0.3,
     })
-  }, [currentLocation, playMusic])
+  }, [currentLocation, encounter?.isAlpha, playMusic])
 
   const exitExpiredEncounter = useCallback(
     (result?: any) => {

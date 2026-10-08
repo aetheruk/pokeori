@@ -43,8 +43,8 @@ const config: BattleConfig = {
 }
 
 function sizeRolls(heightRoll: number, weightRoll: number) {
-  // Six random IVs, nature, two unused normal size rolls, three perfect-IV picks.
-  const rolls = [...Array(12).fill(0.25), heightRoll, weightRoll]
+  // Six random IVs, nature and size, then one guaranteed-perfect-IV pick.
+  const rolls = [...Array(10).fill(0.25), heightRoll, weightRoll]
   return () => rolls.shift() ?? 0
 }
 
@@ -185,11 +185,11 @@ describe('Alpha Pokémon', () => {
     expect(canRollAlpha(config, { ...enemy, ivs: { hp: 31 } })).toBe(false)
   })
 
-  test('guarantees three distinct perfect IVs and 252 HP EVs, with remaining IVs still random', () => {
+  test('guarantees one perfect IV and 252 HP EVs, with remaining IVs still random', () => {
     const stats = generateAlphaStats(100, 100, () => 0.25)
-    expect(Object.values(stats.ivs).filter((iv) => iv === 31)).toHaveLength(3)
+    expect(Object.values(stats.ivs).filter((iv) => iv === 31)).toHaveLength(1)
     expect(Object.values(stats.ivs).filter((iv) => iv !== 31)).toEqual([
-      8, 8, 8,
+      8, 8, 8, 8, 8,
     ])
     expect(stats.evs).toEqual({
       hp: 252,

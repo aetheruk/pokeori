@@ -304,7 +304,7 @@ try {
   assert.equal(
     Object.values(directEncounter.alphaPokemon.ivs).filter((iv) => iv === 31)
       .length,
-    3,
+    1,
   )
   assert.equal(directEncounter.alphaPokemon.background, location.background)
   assert.equal(abilityRolls, 2)
