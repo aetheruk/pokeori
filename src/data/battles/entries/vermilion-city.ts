@@ -4,6 +4,7 @@ import { trainerPokeDollarReward } from '../trainer-payouts'
 export const vermilionCityBattles: BattleConfig[] = [
   {
     id: 'route-6-battle',
+    allowVariantCatches: true,
     name: 'Route 6',
     description: 'Ahh, the fresh smell of salty sea air lingers on the breeze!',
     category: 'Kanto',
@@ -263,6 +264,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-battle',
+    allowVariantCatches: true,
     name: 'Route 11',
     description: 'Wild Pokemon stalk the grass east of Vermilion City.',
     category: 'Kanto',

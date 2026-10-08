@@ -11,6 +11,7 @@ const rockShieldTmBattleDrop = {
 const mtMoonCoreBattles: BattleConfig[] = [
   {
     id: 'mt-moon-1f',
+    allowVariantCatches: true,
     name: 'Mt. Moon 1F',
     description: 'A complex cave system rumoured to be home of pokemon from another world.',
     category: 'Kanto',
@@ -57,6 +58,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'mt-moon-b1f',
+    allowVariantCatches: true,
     name: 'Mt. Moon B1F',
     description: 'Deeper down in the cave, so many Zubats!',
     category: 'Kanto',
@@ -102,6 +104,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'mt-moon-b2f',
+    allowVariantCatches: true,
     name: 'Mt. Moon B2F',
     description: 'Somehow the pokemon seem slightly tougher down here...',
     category: 'Kanto',
@@ -743,6 +746,7 @@ const mtMoonExpeditionWildBattles = mtMoonExpeditionWildBattleIds.reduce<BattleC
     battles.push({
       ...sourceBattle,
       id: `exp-${sourceBattle.id}-battle`,
+      allowVariantCatches: false,
       name: `${sourceBattle.name}`,
       description: `Expedition encounter in ${sourceBattle.name}.`,
       category: 'Secret',

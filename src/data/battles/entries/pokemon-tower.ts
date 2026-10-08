@@ -30,6 +30,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   // --- 3F ---
   {
     id: 'pokemon-tower-3f-wild',
+    allowVariantCatches: true,
     name: 'Pokemon Tower 3F',
     description: 'Wild Ghost Pokemon float silently among the gravestones on 3F.',
     category: 'Kanto',
@@ -120,6 +121,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   // --- 4F ---
   {
     id: 'pokemon-tower-4f-wild',
+    allowVariantCatches: true,
     name: 'Pokemon Tower 4F',
     description: 'Spirits and lonely Pokemon wander the 4th floor chambers.',
     category: 'Kanto',
@@ -198,6 +200,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   // --- 5F ---
   {
     id: 'pokemon-tower-5f-wild',
+    allowVariantCatches: true,
     name: 'Pokemon Tower 5F',
     description: 'Potent spectral energies swirl around the purified zone on 5F.',
     category: 'Kanto',
@@ -297,6 +300,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   // --- 6F ---
   {
     id: 'pokemon-tower-6f-wild',
+    allowVariantCatches: true,
     name: 'Pokemon Tower 6F',
     description: 'Strong Haunter and restless spirits drift across 6F.',
     category: 'Kanto',

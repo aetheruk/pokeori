@@ -4,6 +4,7 @@ import { trainerPokeDollarReward } from '../trainer-payouts'
 export const pewterCityBattles: BattleConfig[] = [
   {
     id: 'route-2-battle',
+    allowVariantCatches: true,
     name: 'Route 2',
     description: 'A route connecting Viridian City and Pewter City. Wild Pokémon roam here.',
     category: 'Kanto',
@@ -151,6 +152,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-battle',
+    allowVariantCatches: true,
     name: 'Route 3',
     description:
       'A rocky route leading towards Mt. Moon, faint singing can be heard in the distance.',

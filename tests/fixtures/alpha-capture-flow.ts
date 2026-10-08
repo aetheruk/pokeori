@@ -165,18 +165,18 @@ store.set(
     enemyTeam: [makeBattlePokemon({ ...alpha, currentHp: 0 } as any)],
   }),
 )
-const { attemptAlphaCapture } = await import(
+const { attemptBattleCapture } = await import(
   '@/app/(frontend)/game/battles/actions/alpha-capture'
 )
 const { attemptCapture } = await import(
   '@/app/(frontend)/game/locations/encounter/actions/capture'
 )
 
-assert.equal((await attemptAlphaCapture()).success, true)
+assert.equal((await attemptBattleCapture()).success, true)
 const encounter = store.get('encounter:owner')
 assert.equal(encounter.currentCatchRate, 0)
 assert.equal(encounter.expiry - encounter.startTime, 50_000)
-assert.equal((await attemptAlphaCapture()).success, true)
+assert.equal((await attemptBattleCapture()).success, true)
 assert.equal(store.get('encounter:owner').startTime, encounter.startTime)
 const result = await attemptCapture('master-ball', undefined, 'alpha-catch')
 assert.equal(result.caught, true)
@@ -227,7 +227,38 @@ assert.equal(
 assert.equal(creates, 1)
 assert.equal(grantedRewards.length, 1)
 assert.equal(inventory['master-ball'], 1)
-assert.equal((await attemptAlphaCapture()).success, false)
+assert.equal((await attemptBattleCapture()).success, false)
+
+const variant = { ...alpha, isAlpha: false, ability: 'run_away' }
+config.allowVariantCatches = true
+inventory['master-ball'] = 2
+store.delete('encounter:owner')
+store.set(
+  'battle:owner',
+  makePveBattleState({
+    status: 'won',
+    isWildBattle: true,
+    economyActionId: 'variant-session',
+    battleCapturePokemon: variant as any,
+    enemyTeam: [makeBattlePokemon({ ...variant, currentHp: 0 } as any)],
+  }),
+)
+assert.equal((await attemptBattleCapture()).success, true)
+const variantEncounter = store.get('encounter:owner')
+assert.equal(variantEncounter.expiry - variantEncounter.startTime, 30_000)
+assert.equal(variantEncounter.currentCatchRate, 127)
+assert.equal(variantEncounter.alphaPokemon, undefined)
+assert.equal(
+  (await attemptCapture('master-ball', undefined, 'variant-catch')).caught,
+  true,
+)
+assert.equal(creates, 2)
+assert.equal(ownedPokemon.isAlpha, false)
+assert.equal(ownedPokemon.rarity, 'shiny')
+assert.equal(ownedPokemon.level, variant.level)
+assert.equal(ownedPokemon.background, variant.background)
+assert.equal(abilityRolls, 1)
+assertExplorerXp(variant.level, 1)
 
 // Ordinary location captures roll and freeze an Alpha before the quiz begins.
 mock.module('next/headers', () => ({ headers: async () => new Headers() }))
@@ -276,17 +307,17 @@ try {
     3,
   )
   assert.equal(directEncounter.alphaPokemon.background, location.background)
-  assert.equal(abilityRolls, 1)
+  assert.equal(abilityRolls, 2)
   await startEncounter(location.id)
   assert.deepEqual(store.get('encounter:owner'), directEncounter)
-  assert.equal(abilityRolls, 1)
+  assert.equal(abilityRolls, 2)
   assert.equal(
     (await attemptCapture('master-ball', undefined, 'direct-alpha-catch'))
       .caught,
     true,
   )
-  assert.equal(creates, 2)
-  assert.equal(abilityRolls, 1)
+  assert.equal(creates, 3)
+  assert.equal(abilityRolls, 2)
   assertExplorerXp(9, 5)
   for (const field of [
     'level',
@@ -315,15 +346,15 @@ try {
   assert.equal(eventStarted.isAlpha, false)
   assert.equal(eventStarted.duration, 60)
   assert.equal(store.get('encounter:owner').baseCatchRate, 255)
-  assert.equal(abilityRolls, 1)
+  assert.equal(abilityRolls, 2)
   inventory = { 'master-ball': 1 }
   assert.equal(
     (await attemptCapture('master-ball', undefined, 'ordinary-catch')).caught,
     true,
   )
-  assert.equal(creates, 3)
+  assert.equal(creates, 4)
   assert.equal(ownedPokemon.isAlpha, false)
-  assert.equal(abilityRolls, 2)
+  assert.equal(abilityRolls, 3)
   assertExplorerXp(4, 1)
 } finally {
   Math.random = originalRandom

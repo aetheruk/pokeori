@@ -4,6 +4,7 @@ import { trainerPokeDollarReward } from '../trainer-payouts'
 export const ceruleanCityBattles: BattleConfig[] = [
   {
     id: 'route-5-battle',
+    allowVariantCatches: true,
     name: 'Route 5',
     description: 'Wild Pokemon roam the grassy road south of Cerulean City.',
     category: 'Kanto',
@@ -68,6 +69,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-battle',
+    allowVariantCatches: true,
     name: 'Route 9',
     description: 'Wild Pokemon roam the rocky road east of Cerulean City.',
     category: 'Kanto',
@@ -370,6 +372,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-4-battle',
+    allowVariantCatches: true,
     name: 'Route 4',
     description: 'A rocky path leading from Mt. Moon to Cerulean City.',
     category: 'Kanto',
@@ -757,6 +760,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-24-battle',
+    allowVariantCatches: true,
     name: 'Route 24',
     description:
       "A small route connecting Cerulean City to route 25 There's an ominous looking cave just across the water.",
@@ -844,6 +848,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-25-battle',
+    allowVariantCatches: true,
     name: 'Route 25',
     description: 'A lovely route with a sea view, leading to a beautiful cottage.',
     category: 'Kanto',

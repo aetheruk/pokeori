@@ -13,19 +13,19 @@ import {
   getBattleConfigForState,
 } from '../helpers/state-management'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
-import { buildAlphaCaptureEncounter } from '../helpers/alpha-capture'
+import { buildBattleCaptureEncounter } from '../helpers/alpha-capture'
 import {
   getEncounterRedisTtlSeconds,
   type EncounterState,
 } from '../../locations/encounter/actions/types'
 import { getEncounterMechanicsLockKey } from '../../locations/encounter/actions/lock'
 
-export async function attemptAlphaCapture() {
+export async function attemptBattleCapture() {
   const user = await getUser({ fresh: true })
   if (!user) return { success: false, error: 'Not authenticated' }
   const rate = await checkActionRateLimit(
     user.id,
-    'alpha-capture-start',
+    'battle-capture-start',
     30,
     60,
   )
@@ -57,9 +57,11 @@ export async function attemptAlphaCapture() {
         if (!battle)
           return { success: false, error: 'Battle results have expired.' }
         const battleIdentity = battle.economyActionId || battle.battleId
+        const activeCaptureIdentity =
+          active?.battleCaptureId || active?.alphaBattleId
         if (
-          battle.alphaCaptureStartedAt &&
-          active?.alphaBattleId === battleIdentity
+          (battle.battleCaptureStartedAt || battle.alphaCaptureStartedAt) &&
+          activeCaptureIdentity === battleIdentity
         ) {
           return { success: true }
         }
@@ -75,7 +77,7 @@ export async function attemptAlphaCapture() {
         const config = getBattleConfigForState(battle)
         const encounter =
           config &&
-          buildAlphaCaptureEncounter(battle, config, user.id, Date.now())
+          buildBattleCaptureEncounter(battle, config, user.id, Date.now())
         if (!encounter)
           return {
             success: false,
@@ -90,7 +92,13 @@ export async function attemptAlphaCapture() {
           },
           {
             key: battleKey,
-            value: { ...battle, alphaCaptureStartedAt: encounter.startTime },
+            value: {
+              ...battle,
+              battleCaptureStartedAt: encounter.startTime,
+              ...(encounter.alphaPokemon
+                ? { alphaCaptureStartedAt: encounter.startTime }
+                : {}),
+            },
             ttlSeconds: BATTLE_TTL,
           },
         ])

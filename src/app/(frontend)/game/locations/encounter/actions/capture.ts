@@ -183,6 +183,15 @@ export async function attemptCapture(
       return { success: false, message: 'Encounter expired or invalid' }
     }
 
+    const captureIdentityPokemon =
+      state.battleCapturePokemon || state.alphaPokemon
+    const preservedAlphaPokemon =
+      state.alphaPokemon ||
+      (state.battleCapturePokemon?.isAlpha
+        ? state.battleCapturePokemon
+        : undefined)
+    const isAlphaCapture = !!preservedAlphaPokemon
+
     const captureAttempt = state.captureAttempts || 0
     const captureResultKey = `encounter:capture:result:${user.id}:${state.locationId}:${state.startTime}:${captureAttempt}:${ballItemId}`
     const cachedCaptureResult = await getIdempotentResult<any>(captureResultKey)
@@ -431,13 +440,17 @@ export async function attemptCapture(
       })
     }
 
-    let level = state.alphaPokemon?.level ??
+    let level = preservedAlphaPokemon?.level ?? state.level ??
       (superRepelUsed || (repelUsed && Math.random() < 0.8)
         ? targetMaxLevel
         : Math.floor(Math.random() * (targetMaxLevel - targetMinLevel + 1)) +
           targetMinLevel)
 
-    if (state.levelModifier && !state.alphaPokemon) {
+    if (
+      state.levelModifier &&
+      !preservedAlphaPokemon &&
+      !state.battleCapturePokemon
+    ) {
       level += state.levelModifier
       level = Math.max(targetMinLevel, Math.min(targetMaxLevel, level))
     }
@@ -732,9 +745,9 @@ export async function attemptCapture(
       weight,
       size,
       messages: statMessages,
-    } = state.alphaPokemon
+    } = preservedAlphaPokemon
       ? {
-          ...state.alphaPokemon,
+          ...preservedAlphaPokemon,
           messages: ['This Pokémon is an Alpha!'],
         }
       : generatePokemonStats(formData?.height || 0, formData?.weight || 0)
@@ -746,7 +759,7 @@ export async function attemptCapture(
       state.formId,
     )
     let ivs = baseIvs
-    if (captureResearchLevel >= 4 && !state.alphaPokemon) {
+    if (captureResearchLevel >= 4 && !preservedAlphaPokemon) {
       const secondRoll = {
         hp: Math.floor(Math.random() * 32),
         attack: Math.floor(Math.random() * 32),
@@ -797,8 +810,8 @@ export async function attemptCapture(
       state.formId,
     )
     const researcherLevel = getSkillLevel(user.skills, 'researching')
-    const abilityId = state.alphaPokemon
-      ? state.alphaPokemon.ability || undefined
+    const abilityId = preservedAlphaPokemon
+      ? preservedAlphaPokemon.ability || undefined
       : rollAbility(
           state.formId,
           formData?.types || [],
@@ -815,14 +828,14 @@ export async function attemptCapture(
         user: user.id,
         speciesId: state.pokemonId,
         formId: state.formId,
-        name: state.alphaPokemon?.name || formData?.name || 'Unknown',
+        name: captureIdentityPokemon?.name || formData?.name || 'Unknown',
         level: level,
         experience: getTotalPokemonExperienceForLevel(
           formData?.growth_rate,
           level,
         ),
         rarity,
-        isAlpha: !!state.alphaPokemon,
+        isAlpha: isAlphaCapture,
         gender: state.gender || rollPokemonGender(state.pokemonId),
         identified: true,
         originalTrainer: user.id,
@@ -849,10 +862,11 @@ export async function attemptCapture(
         ability: abilityId,
         ...getPokemonRarityLegacyFields(rarity),
         ...resolveEncounterOrigin(state.locationId),
-        ...(state.alphaPokemon && location ? {
+        ...(captureIdentityPokemon && location ? {
           obtainedRegion: location?.category,
           obtainedLocation: location?.subCategory || location?.name,
-          obtainedSourceId: state.alphaBattleId || state.locationId,
+          obtainedSourceId:
+            state.battleCaptureId || state.alphaBattleId || state.locationId,
         } : {}),
       },
     })
@@ -909,7 +923,7 @@ export async function attemptCapture(
       ...buildCaptureResearchXpRewards(
         state.formId,
         companionFormId,
-        state.alphaPokemon ? ALPHA_RESEARCH_XP : undefined,
+        isAlphaCapture ? ALPHA_RESEARCH_XP : undefined,
       ),
     )
 
@@ -964,8 +978,8 @@ export async function attemptCapture(
     const { summary } = await grantRewards(
       user.id,
       applyAlphaCaptureBonuses(
-        applyAlphaCaptureXp(rewardsToGrant, !!state.alphaPokemon),
-        !!state.alphaPokemon,
+        applyAlphaCaptureXp(rewardsToGrant, isAlphaCapture),
+        isAlphaCapture,
       ),
       {
         requirementContext: rewardRequirementContext,

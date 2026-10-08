@@ -40,6 +40,7 @@ export const viridianCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-22-battle',
+    allowVariantCatches: true,
     name: 'Route 22',
     description: 'The Outskirts of Viridian City, wild Pokémon roam the grassy areas.',
     category: 'Kanto',

@@ -16,7 +16,7 @@ import {
 } from 'react'
 import { MdCatchingPokemon } from 'react-icons/md'
 import { toast } from 'sonner'
-import { attemptAlphaCapture } from '../actions/alpha-capture'
+import { attemptBattleCapture } from '../actions/alpha-capture'
 import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
@@ -1066,14 +1066,14 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
             }
             additionalContent={
               <div className="space-y-3">
-                {battleState.status === 'won' && battleState.alphaCapturePokemon && !battleState.alphaCaptureStartedAt && (
+                {battleState.status === 'won' && (battleState.battleCapturePokemon || battleState.alphaCapturePokemon) && !battleState.battleCaptureStartedAt && !battleState.alphaCaptureStartedAt && (
                   <div>
                     <Button size="lg" className="w-full" disabled={isCaptureStarting || isReplayLoading}
                       aria-busy={isCaptureStarting}
                       onClick={async () => {
                         setIsCaptureStarting(true)
                         try {
-                          const result = await attemptAlphaCapture()
+                          const result = await attemptBattleCapture()
                           if (result.success) router.push('/game/locations/encounter')
                           else toast.error(result.error || 'Could not start the capture attempt.')
                         } catch {
@@ -1082,7 +1082,9 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                           setIsCaptureStarting(false)
                         }
                       }}>
-                      <AlphaIcon />
+                      {(battleState.battleCapturePokemon || battleState.alphaCapturePokemon)?.isAlpha
+                        ? <AlphaIcon />
+                        : <MdCatchingPokemon aria-hidden="true" className="h-5 w-5" />}
                       {isCaptureStarting ? 'Starting capture…' : 'Attempt Capture'}
                     </Button>
                   </div>

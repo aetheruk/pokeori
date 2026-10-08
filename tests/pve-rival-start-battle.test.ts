@@ -171,6 +171,40 @@ describe('PVE battle start', () => {
     } finally { Math.random = originalRandom }
   })
 
+  test('opted-in wild battles snapshot a generated variant for the capture attempt', async () => {
+    const { startBattleFromConfig } = await import('@/app/(frontend)/game/battles/pve/start-battle')
+    const battleConfig: BattleConfig = {
+      id: 'variant-test-route', name: 'Route', description: '', category: 'Kanto',
+      icon: { type: 'pokemon', id: '19' }, background: '/backgrounds/grassy-route.avif',
+      maxPokemon: 1, isWildBattle: true, allowVariantCatches: true,
+      rarityChances: { shiny: 1 }, requirements: [], rewards: [],
+      enemyTeam: [{ speciesId: 19, level: { min: 4, max: 8 } }],
+    }
+    const originalRandom = Math.random
+    Math.random = () => 0.5
+    try {
+      const result = await startBattleFromConfig(playerUser, battleConfig)
+      expect(result.success).toBe(true)
+      expect(result.state?.battleCapturePokemon).toMatchObject({
+        speciesId: 19,
+        rarity: 'shiny',
+        shiny: true,
+        isAlpha: false,
+        background: battleConfig.background,
+      })
+      expect(result.state?.alphaCapturePokemon).toBeUndefined()
+      expect(result.state?.battleCapturePokemon?.ivs?.hp).toBe(
+        result.state?.enemyTeam[0].ivs?.hp ?? undefined,
+      )
+      expect(result.state?.battleCapturePokemon?.evs?.hp).toBe(
+        result.state?.enemyTeam[0].evs?.hp ?? undefined,
+      )
+    } finally {
+      Math.random = originalRandom
+      redisStore.clear()
+    }
+  })
+
   test('uses the dynamic rival team when the authored enemy team is empty', async () => {
     const { startBattleFromConfig } = await import(
       '@/app/(frontend)/game/battles/pve/start-battle'

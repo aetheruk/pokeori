@@ -3,6 +3,7 @@ import { BattleConfig } from '../../types'
 export const celadonCityBattles: BattleConfig[] = [
   {
     id: 'route-7-battle',
+    allowVariantCatches: true,
     name: 'Route 7',
     description: 'Wild Pokemon rustle in the grass just outside Celadon City.',
     category: 'Kanto',

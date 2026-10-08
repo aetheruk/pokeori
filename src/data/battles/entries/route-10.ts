@@ -4,6 +4,7 @@ import { trainerPokeDollarReward } from '../trainer-payouts'
 export const route10Battles: BattleConfig[] = [
   {
     id: 'route-10-battle',
+    allowVariantCatches: true,
     name: 'Route 10',
     description: 'Wild Pokemon patrol the rocky path near Rock Tunnel.',
     category: 'Kanto',

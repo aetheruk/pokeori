@@ -373,6 +373,9 @@ export interface PendingBattleSketch {
 }
 
 export interface BattleState {
+  battleCapturePokemon?: import('@/utilities/pokemon/alpha').BattleCapturePokemon
+  battleCaptureStartedAt?: number
+  battleCaptureId?: string
   alphaCapturePokemon?: import('@/utilities/pokemon/alpha').AlphaCapturePokemon
   alphaCaptureStartedAt?: number
   format?: 'single' | 'double'

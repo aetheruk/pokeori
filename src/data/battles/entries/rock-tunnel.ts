@@ -87,6 +87,7 @@ function totemReward(targetId: string) {
 export const rockTunnelBattles: BattleConfig[] = [
   {
     id: 'rock-tunnel-1f-ne',
+    allowVariantCatches: true,
     name: 'Rock Tunnel 1F Northeast',
     description: 'Wild Pokemon move through the first dark stretch of Rock Tunnel.',
     category: 'Kanto',
@@ -102,6 +103,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-b1f-se',
+    allowVariantCatches: true,
     name: 'Rock Tunnel B1F Southeast',
     description: 'Wild Pokemon defend the lower southeast passage.',
     category: 'Kanto',
@@ -117,6 +119,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-1f-west',
+    allowVariantCatches: true,
     name: 'Rock Tunnel 1F West',
     description: 'Wild Pokemon prowl the western corridor.',
     category: 'Kanto',
@@ -132,6 +135,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-b1f-nw',
+    allowVariantCatches: true,
     name: 'Rock Tunnel B1F Northwest',
     description: 'Wild Pokemon wait in the colder lower corridor.',
     category: 'Kanto',
@@ -147,6 +151,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-1f-south',
+    allowVariantCatches: true,
     name: 'Rock Tunnel 1F South',
     description: 'Wild Pokemon gather near the southern passage.',
     category: 'Kanto',

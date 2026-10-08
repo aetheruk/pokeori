@@ -3,6 +3,7 @@ import { BattleConfig } from '../../types'
 export const diglettsCaveBattles: BattleConfig[] = [
   {
     id: 'digletts-cave-battle',
+    allowVariantCatches: true,
     name: "Diglett's Cave",
     description: 'A narrow tunnel where Diglett and Dugtrio constantly churn the earth.',
     category: 'Kanto',
