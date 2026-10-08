@@ -13,6 +13,7 @@ import {
 } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 import {
   Carousel,
   CarouselContent,
@@ -272,6 +273,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
     speciesId?: number
     formId?: string
     isShiny?: boolean
+    isAlpha?: boolean
     itemId?: string
     currencyId?: string
     guildId?: string
@@ -399,6 +401,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
           speciesId: res.speciesId,
           formId: res.formId,
           isShiny: res.isShiny,
+          isAlpha: res.isAlpha,
           itemId: res.itemId,
           currencyId: res.currencyId,
           guildId: res.guildId,
@@ -741,9 +744,12 @@ export function FishingGame({ encounter }: FishingGameProps) {
                   </div>
 
                   <div className="flex flex-col items-center gap-1">
-                    <h3 className="line-clamp-1 font-display text-lg font-semibold tracking-wide text-game-ink">
-                      {hookedData.isShiny && 'Shiny '}
-                      {hookedPokemon.name}
+                    <h3 className="flex w-full max-w-full items-center justify-center gap-1 font-display text-lg font-semibold tracking-wide text-game-ink">
+                      <span className="line-clamp-1 min-w-0">
+                        {hookedData.isShiny && 'Shiny '}
+                        {hookedPokemon.name}
+                      </span>
+                      {hookedData.isAlpha && <AlphaIcon size={18} />}
                     </h3>
                   </div>
 

@@ -98,6 +98,7 @@ export interface FishingState {
     isShiny?: boolean
     rarity?: PokemonRarityId
     isSecret?: boolean
+    isAlpha?: boolean
   }
   reactionDeadline?: number // When the hook window ends
   phase: 'idle' | 'waiting' | 'nibble' | 'hooked' | 'missed'
@@ -147,8 +148,42 @@ function buildHookedResponse(fishingState: FishingState) {
     formId: pokemonEntry.formId,
     isShiny: result.isShiny,
     rarity: result.rarity,
+    isAlpha: result.isAlpha === true,
     symbol: pokemonEntry.symbol,
   }
+}
+
+function rollFishingEncounterAlpha(
+  encounter: FishingGameConfig,
+  result: NonNullable<FishingState['hookedResult']>,
+): boolean {
+  const pokemonEntry = result.entry as FishingPokemonEntry
+  return rollCaptureAlpha(
+    canRollCaptureAlpha(
+      {
+        ...encounter,
+        encounterMode: encounter.settings.safariCapture ? 'safari' : 'standard',
+      },
+      pokemonEntry.speciesId,
+      !!result.isSecret ||
+        pokemonEntry.allowAlpha === false ||
+        isExpeditionActivity('game', encounter.id),
+    ),
+  )
+}
+
+async function ensureHookedAlphaRoll(fishingState: FishingState): Promise<void> {
+  const result = fishingState.hookedResult
+  if (result?.type !== 'pokemon' || result.isAlpha !== undefined) return
+
+  const encounter = allGames.find(
+    (entry) => entry.id === fishingState.encounterId,
+  ) as FishingGameConfig | undefined
+  result.isAlpha =
+    encounter?.gameType === 'fishing'
+      ? rollFishingEncounterAlpha(encounter, result)
+      : false
+  await redis.set(`fishing:${fishingState.userId}`, fishingState, { ex: 300 })
 }
 
 function getReactionDeadline(fishingState: FishingState): number | null {
@@ -486,9 +521,21 @@ export async function attemptHook() {
         return { success: false, error: 'No active cast' }
       }
 
+      if (fishingState.phase === 'hooked') {
+        await ensureHookedAlphaRoll(fishingState)
+      }
+
       const hookResultKey = `fishing:hook-result:${user.id}:${fishingState.castTime}`
       const cachedHookResult = await getIdempotentResult<any>(hookResultKey)
       if (cachedHookResult) {
+        if (
+          cachedHookResult.type === 'pokemon' &&
+          cachedHookResult.isAlpha === undefined &&
+          fishingState.hookedResult.isAlpha !== undefined
+        ) {
+          cachedHookResult.isAlpha = fishingState.hookedResult.isAlpha
+          await setIdempotentResult(hookResultKey, cachedHookResult, 120)
+        }
         return cachedHookResult
       }
 
@@ -537,6 +584,15 @@ export async function attemptHook() {
       // Success! Update state
       fishingState.phase = 'hooked'
       fishingState.reactionDeadline = reactionDeadline
+      if (fishingState.hookedResult.type === 'pokemon') {
+        const encounter = allGames.find(
+          (entry) => entry.id === fishingState.encounterId,
+        ) as FishingGameConfig | undefined
+        fishingState.hookedResult.isAlpha =
+          encounter?.gameType === 'fishing'
+            ? rollFishingEncounterAlpha(encounter, fishingState.hookedResult)
+            : false
+      }
       await redis.set(`fishing:${user.id}`, fishingState, { ex: 300 }) // 5 min to decide
 
       const response = buildHookedResponse(fishingState)
@@ -831,20 +887,8 @@ export async function startFishingCatch() {
       const initialCatchRate = Math.floor(baseRate / 2)
       const modifiedBaseRate = Math.min(255, initialCatchRate + catchRateMod)
 
-      const isAlpha = rollCaptureAlpha(
-        canRollCaptureAlpha(
-          {
-            ...encounter,
-            encounterMode: encounter.settings.safariCapture
-              ? 'safari'
-              : 'standard',
-          },
-          speciesId,
-          !!result.isSecret ||
-            pokemonEntry.allowAlpha === false ||
-            isExpeditionActivity('game', encounter.id),
-        ),
-      )
+      const isAlpha =
+        result.isAlpha ?? rollFishingEncounterAlpha(encounter, result)
       const duration = isAlpha ? ALPHA_CAPTURE_SECONDS : rodConfig?.timer || 30
       const startTime = Date.now()
       const expiry = startTime + duration * 1000

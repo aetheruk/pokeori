@@ -121,6 +121,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Every fishing cast rolls Pokemon at 80% and items at 20%.
 - After a Pokemon result is rolled, any rod hook has a hidden 1:256 chance to replace that Pokemon with Feebas and a separate hidden 1:512 chance to replace it with Relicanth, with Relicanth taking priority when both rolls hit. These secret replacements are runtime-only and do not appear in Explore fishing previews.
 - Fishing item hooks grant the item immediately and return the player to the fishing screen. Pokemon hooks still start the catch encounter.
+- Successful fishing hooks roll Alpha status before the catch button is shown. Alpha Pokemon display the Alpha icon beside their name on the hooked-result panel, and the same roll carries into the capture encounter.
 - Day/night Pokemon filters use the fishing entry's authored category timezone, matching Explore region time.
 - Fishing sessions inherit the Mini Game entry's weather snapshot; Pokemon hooks pass that weather into the reused location-style catch state.
 - The fishing play screen is portrait-first and scene-led. Entries can author `settings.scene` with a portrait background, optional landscape background, water style, and waterline; the client adds time-of-day tinting plus subtle water shimmer/ripple overlays.
