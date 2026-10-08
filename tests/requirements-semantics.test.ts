@@ -12,6 +12,7 @@ import {
 } from '@/utilities/tasks/task-logic'
 import type { Task, TaskCondition } from '@/data/tasks'
 import { rockTunnelTasks } from '@/data/tasks/entries/rock-tunnel'
+import { pewterCityTasks } from '@/data/tasks/entries/pewter-city'
 import { palletTownBattles } from '@/data/battles/entries/pallet-town'
 import { isToday } from '@/utilities/date-utils'
 
@@ -82,6 +83,31 @@ describe('requirements and criteria semantics', () => {
     expect(checkTaskRequirements(unlockedData, task)).toBe(true)
     expect(checkTaskCriteria(unlockedData, task)).toBe(false)
     expect(checkTaskCriteria(completedData, task)).toBe(true)
+  })
+
+  test('Affable Alpha appears after Ol Ron and requires an Alpha companion to complete', () => {
+    const task = pewterCityTasks.find((entry) => entry.id === 'affable-alpha')
+    const unlockedData = {
+      ...baseRequirementData,
+      completedTasks: [
+        {
+          taskId: 'old-ron',
+          completedAt: new Date().toISOString(),
+          count: 1,
+        },
+      ],
+    } as RequirementData
+
+    expect(task).toBeDefined()
+    expect(checkTaskRequirements(unlockedData, task!)).toBe(true)
+    expect(checkTaskCriteria(unlockedData, task!)).toBe(false)
+
+    const alphaCompanionData = {
+      ...unlockedData,
+      pokemon: [{ speciesId: 95, formId: '95', isAlpha: true, isCompanion: true }],
+    } as unknown as RequirementData
+
+    expect(checkTaskCriteria(alphaCompanionData, task!)).toBe(true)
   })
 
   test('Mankey Size Study recognizes separate XS and XL Mankey', () => {
