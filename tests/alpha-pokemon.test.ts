@@ -19,6 +19,7 @@ import { buildAlphaCaptureEncounter } from '@/app/(frontend)/game/battles/helper
 import { buildBattleWinRewards } from '@/app/(frontend)/game/battles/helpers/win-rewards'
 import { initializeBattlePokemon } from '@/utilities/battle/battle-logic'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
+import { buildCaptureResearchXpRewards } from '@/utilities/research/capture-research-rewards'
 import { buildWildBattleSelectedTeam } from '@/utilities/battle/lead-selection'
 import {
   makeBattlePokemon,
@@ -122,13 +123,17 @@ describe('Alpha Pokémon', () => {
       { type: 'currency', targetId: 'crystals', quantity: 11 },
     ]
 
-    expect(applyAlphaCaptureBonuses(rewards, false, '19')).toBe(rewards)
-    expect(applyAlphaCaptureBonuses(rewards, true, '19')).toEqual([
-      { ...rewards[0], quantity: 15 },
+    expect(applyAlphaCaptureBonuses(rewards, false)).toBe(rewards)
+    expect(applyAlphaCaptureBonuses(rewards, true)).toEqual([
+      rewards[0],
       rewards[1],
       { ...rewards[2], quantity: 6 },
       { ...rewards[3], quantity: { min: 3, max: 6 } },
       rewards[4],
+    ])
+    expect(buildCaptureResearchXpRewards('19', '25', 15)).toEqual([
+      { type: 'pokemon_research_xp', targetId: '19', quantity: 15, dropChance: 100 },
+      { type: 'pokemon_research_xp', targetId: '25', quantity: 2, dropChance: 100, isCompanion: true },
     ])
     expect(rewards[0].quantity).toBe(3)
   })

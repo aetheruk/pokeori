@@ -121,16 +121,11 @@ export function applyAlphaCaptureXp(
 export function applyAlphaCaptureBonuses(
   rewards: Reward[],
   isAlpha: boolean,
-  targetFormId: string | number,
 ): Reward[] {
   if (!isAlpha) return rewards
 
   return rewards.map((reward) => {
-    const isAlphaResearchXp =
-      reward.type === 'pokemon_research_xp' &&
-      !reward.isCompanion &&
-      String(reward.targetId) === String(targetFormId)
-    const multiplier = reward.type === 'item' ? 3 : isAlphaResearchXp ? 5 : 1
+    const multiplier = reward.type === 'item' ? 3 : 1
     if (multiplier === 1) return reward
 
     const quantity = reward.quantity ?? 1

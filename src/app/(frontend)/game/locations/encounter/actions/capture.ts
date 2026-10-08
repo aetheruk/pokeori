@@ -87,6 +87,7 @@ import { replayCaptureSettlement, runCaptureSettlement, type CaptureSettlementCo
 import { getEncounterMechanicsLockKey } from './lock'
 import { verifyCaptureRingScale } from '@/utilities/pokemon/capture-timing'
 import {
+  ALPHA_RESEARCH_XP,
   applyAlphaCaptureBonuses,
   applyAlphaCaptureXp,
 } from '@/utilities/pokemon/alpha'
@@ -905,7 +906,11 @@ export async function attemptCapture(
 
     const companionFormId = (activePoke.docs[0] as any)?.formId
     rewardsToGrant.push(
-      ...buildCaptureResearchXpRewards(state.formId, companionFormId),
+      ...buildCaptureResearchXpRewards(
+        state.formId,
+        companionFormId,
+        state.alphaPokemon ? ALPHA_RESEARCH_XP : undefined,
+      ),
     )
 
     const xpConfig = resolveSkillXpConfig('catching', level, location?.skillXp)
@@ -961,7 +966,6 @@ export async function attemptCapture(
       applyAlphaCaptureBonuses(
         applyAlphaCaptureXp(rewardsToGrant, !!state.alphaPokemon),
         !!state.alphaPokemon,
-        state.formId,
       ),
       {
         requirementContext: rewardRequirementContext,
