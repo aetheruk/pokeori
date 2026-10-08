@@ -66,6 +66,7 @@ const route8TrainerBattle = ({
 const route8Battles: BattleConfig[] = [
   {
     id: 'route-8-battle',
+    allowVariantCatches: true,
     name: 'Route 8',
     description: 'Wild Pokemon prowl the long grass on the road to Celadon.',
     category: 'Kanto',
@@ -520,6 +521,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-12-battle',
+    allowVariantCatches: true,
     name: 'Route 12',
     description: 'Wild Pokemon roam the tall grass of Silence Bridge south of Lavender Town.',
     category: 'Kanto',

@@ -177,6 +177,7 @@ export const palletTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-1-battle',
+    allowVariantCatches: true,
     name: 'Route 1',
     description: 'Small Pokémon from the local area hide in the long grass around here.',
     category: 'Kanto',

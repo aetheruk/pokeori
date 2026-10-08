@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import type { User } from '@/payload-types'
 import type { BattleConfig, Location, Reward } from '@/data/types'
+import { battles } from '@/data/battles'
 import {
   canRollAlpha,
   canRollCaptureAlpha,
@@ -15,7 +16,7 @@ import {
   computeStats,
   generatePokemonStats,
 } from '@/utilities/pokemon/pokemon-mechanics'
-import { buildAlphaCaptureEncounter } from '@/app/(frontend)/game/battles/helpers/alpha-capture'
+import { buildBattleCaptureEncounter } from '@/app/(frontend)/game/battles/helpers/alpha-capture'
 import { buildBattleWinRewards } from '@/app/(frontend)/game/battles/helpers/win-rewards'
 import { initializeBattlePokemon } from '@/utilities/battle/battle-logic'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
@@ -226,7 +227,7 @@ describe('Alpha Pokémon', () => {
       alphaCapturePokemon: alpha,
       enemyTeam: [makeBattlePokemon({ ...alpha, currentHp: 0 })],
     })
-    const encounter = buildAlphaCaptureEncounter(state, config, 'owner', 1000)!
+    const encounter = buildBattleCaptureEncounter(state, config, 'owner', 1000)!
     expect(encounter.expiry - encounter.startTime).toBe(50_000)
     expect(encounter.currentCatchRate).toBe(0)
     expect(encounter.baseCatchRate).toBe(0)
@@ -249,13 +250,113 @@ describe('Alpha Pokémon', () => {
       { enemyTeam: [makeBattlePokemon({ ...alpha, currentHp: 1 })] },
     ])
       expect(
-        buildAlphaCaptureEncounter(
+        buildBattleCaptureEncounter(
           { ...state, ...override },
           config,
           'owner',
           1000,
         ),
       ).toBeNull()
+  })
+
+  test('opted-in wild routes offer standard capture rules for defeated variants', () => {
+    const shiny = { ...makeAlpha(), isAlpha: false, rarity: 'shiny' as const }
+    const wildConfig = { ...config, allowVariantCatches: true }
+    const state = makePveBattleState({
+      status: 'won',
+      isWildBattle: true,
+      economyActionId: 'variant-battle-session',
+      battleCapturePokemon: shiny,
+      enemyTeam: [makeBattlePokemon({ ...shiny, currentHp: 0 })],
+    })
+    const encounter = buildBattleCaptureEncounter(
+      state,
+      wildConfig,
+      'owner',
+      1000,
+    )!
+    expect(encounter.expiry - encounter.startTime).toBe(30_000)
+    expect(encounter.baseCatchRate).toBe(
+      Math.floor((getPokemonForm(shiny.formId)?.capture_rate || 100) / 2),
+    )
+    expect(encounter.currentCatchRate).toBe(encounter.baseCatchRate)
+    expect(encounter.alphaPokemon).toBeUndefined()
+    expect(encounter.battleCapturePokemon).toEqual(shiny)
+    expect(encounter).toMatchObject({
+      rarity: 'shiny',
+      isShiny: true,
+      level: shiny.level,
+      background: config.background,
+    })
+    expect(
+      buildBattleCaptureEncounter(
+        { ...state, battleCaptureStartedAt: 1000 },
+        wildConfig,
+        'owner',
+        1000,
+      ),
+    ).toBeNull()
+    expect(
+      buildBattleCaptureEncounter(
+        state,
+        config,
+        'owner',
+        1000,
+      ),
+    ).toBeNull()
+  })
+
+  test('only ordinary route and cave wild battles opt into variant catches', () => {
+    const enabled = battles
+      .filter((battle) => battle.allowVariantCatches)
+      .map((battle) => battle.id)
+      .sort()
+    expect(enabled).toEqual(
+      [
+        'digletts-cave-battle',
+        'mt-moon-1f',
+        'mt-moon-b1f',
+        'mt-moon-b2f',
+        'pokemon-tower-3f-wild',
+        'pokemon-tower-4f-wild',
+        'pokemon-tower-5f-wild',
+        'pokemon-tower-6f-wild',
+        'rock-tunnel-1f-ne',
+        'rock-tunnel-1f-south',
+        'rock-tunnel-1f-west',
+        'rock-tunnel-b1f-nw',
+        'rock-tunnel-b1f-se',
+        'route-1-battle',
+        'route-10-battle',
+        'route-11-battle',
+        'route-12-battle',
+        'route-13-battle',
+        'route-14-battle',
+        'route-15-battle',
+        'route-2-battle',
+        'route-22-battle',
+        'route-24-battle',
+        'route-25-battle',
+        'route-3-battle',
+        'route-4-battle',
+        'route-5-battle',
+        'route-6-battle',
+        'route-7-battle',
+        'route-8-battle',
+        'route-9-battle',
+        'viridian-forest-battle',
+      ].sort(),
+    )
+    expect(
+      battles
+        .filter(
+          (battle) =>
+            battle.category === 'Special' ||
+            battle.category === 'Secret' ||
+            battle.allowAlpha === false,
+        )
+        .every((battle) => !battle.allowVariantCatches),
+    ).toBe(true)
   })
 
   test('the battle and eventual owned Pokémon calculate the same base stats', () => {

@@ -386,6 +386,7 @@ export const viridianForestBattles: BattleConfig[] = [
   },
   {
     id: 'viridian-forest-battle',
+    allowVariantCatches: true,
     name: 'Viridian Forest',
     description: 'A deep and sprawling forest, home to many Bug-type Pokémon.',
     category: 'Kanto',

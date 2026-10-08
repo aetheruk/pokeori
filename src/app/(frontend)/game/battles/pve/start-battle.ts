@@ -31,6 +31,7 @@ import {
   resolveEnemyBattleEvs,
   resolveEnemyBattleIvs,
 } from '@/utilities/battle/enemy-stat-rolls'
+import { generatePokemonStats } from '@/utilities/pokemon/pokemon-mechanics'
 import { getObservedPreferredStance } from '@/utilities/battle/pokedex-observation'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import { getActiveChronicleContext } from '@/utilities/chronicles'
@@ -554,6 +555,38 @@ export async function startBattleFromConfig(
         }),
       )
   const alphaPokemon = enemyTeam.find((pokemon) => pokemon.isAlpha)
+  const variantPokemon = battleConfig.allowVariantCatches
+    ? enemyTeam.find((pokemon) => resolvePokemonRarity(pokemon) !== 'normal')
+    : undefined
+  const battleCaptureTarget = alphaPokemon || variantPokemon
+  const battleCapturePokemon = battleCaptureTarget
+    ? (() => {
+        const form = getPokemonForm(battleCaptureTarget.formId)
+        const variantStats = battleCaptureTarget.isAlpha
+          ? undefined
+          : generatePokemonStats(form?.height || 0, form?.weight || 0)
+        return {
+          speciesId: battleCaptureTarget.speciesId,
+          formId: battleCaptureTarget.formId,
+          name: battleCaptureTarget.name,
+          level: battleCaptureTarget.level,
+          gender: battleCaptureTarget.gender,
+          rarity: battleCaptureTarget.rarity,
+          shiny: battleCaptureTarget.shiny,
+          isShadow: battleCaptureTarget.isShadow,
+          isRadiant: battleCaptureTarget.isRadiant,
+          isAlpha: battleCaptureTarget.isAlpha === true,
+          ability: battleCaptureTarget.ability,
+          ivs: structuredClone(battleCaptureTarget.ivs) as PokemonIVs,
+          evs: structuredClone(battleCaptureTarget.evs) as PokemonIVs,
+          nature: battleCaptureTarget.nature || variantStats!.nature,
+          height: battleCaptureTarget.height ?? variantStats!.height,
+          weight: battleCaptureTarget.weight ?? variantStats!.weight,
+          size: battleCaptureTarget.size || variantStats!.size,
+          background: battleConfig.background,
+        }
+      })()
+    : undefined
   if (alphaPokemon) maxPokemon = 2
   if (battleConfig.format === 'double' && enemyTeam.length < 2) {
     return { success: false, error: 'Double battles need at least two opposing Pokemon.' }
@@ -680,26 +713,10 @@ export async function startBattleFromConfig(
         ? 'Wild Pokemon'
         : battleConfig.trainerName || battleConfig.name),
     isWildBattle: battleConfig.isWildBattle,
-    alphaCapturePokemon: alphaPokemon ? {
-      speciesId: alphaPokemon.speciesId,
-      formId: alphaPokemon.formId,
-      name: alphaPokemon.name,
-      level: alphaPokemon.level,
-      gender: alphaPokemon.gender,
-      rarity: alphaPokemon.rarity,
-      shiny: alphaPokemon.shiny,
-      isShadow: alphaPokemon.isShadow,
-      isRadiant: alphaPokemon.isRadiant,
-      isAlpha: true,
-      ability: alphaPokemon.ability,
-      ivs: structuredClone(alphaPokemon.ivs) as PokemonIVs,
-      evs: structuredClone(alphaPokemon.evs) as PokemonIVs,
-      nature: alphaPokemon.nature!,
-      height: alphaPokemon.height!,
-      weight: alphaPokemon.weight!,
-      size: alphaPokemon.size || 'XXL',
-      background: battleConfig.background,
-    } : undefined,
+    battleCapturePokemon,
+    alphaCapturePokemon: alphaPokemon
+      ? { ...battleCapturePokemon!, isAlpha: true }
+      : undefined,
     weather: weatherSnapshot,
     itemsUsedThisBattle: [],
     trainerItems: normalizeTrainerBattleItems(battleConfig.trainerItems),

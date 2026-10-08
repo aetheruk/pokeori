@@ -250,6 +250,8 @@ export interface BattleConfig {
   isWildBattle?: boolean // Whether this is a random encounter (pick one Pokemon from enemyTeam)
   /** Disable random Alphas for an authored special wild encounter. */
   allowAlpha?: boolean
+  /** Offer a post-victory capture for non-standard variants in this wild encounter. */
+  allowVariantCatches?: boolean
   // Limit Overrides
   movesPerBattle?: number // Optional per-Pokemon hard cap against the Trainer skill move-use limit
   enemyMovesPerBattle?: number // Optional per-enemy-Pokemon override for enemy TM/manual AI move uses

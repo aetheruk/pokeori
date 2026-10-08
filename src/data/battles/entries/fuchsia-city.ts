@@ -36,6 +36,7 @@ const gymTrialGate = {
 export const fuchsiaCityBattles: BattleConfig[] = [
   {
     id: 'route-13-battle',
+    allowVariantCatches: true,
     name: 'Route 13',
     description:
       'Wild Pokémon crowd the tall grass along the long east-west road toward Fuchsia City.',
@@ -386,6 +387,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-14-battle',
+    allowVariantCatches: true,
     name: 'Route 14',
     description: 'Wild Pokémon hide in the dense tall grass of the vertical Route 14.',
     category: 'Kanto',
@@ -948,6 +950,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-battle',
+    allowVariantCatches: true,
     name: 'Route 15',
     description: 'Wild Pokémon crowd the last stretch of grass before Fuchsia City.',
     category: 'Kanto',

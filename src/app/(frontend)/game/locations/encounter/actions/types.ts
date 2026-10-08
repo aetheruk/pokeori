@@ -16,6 +16,8 @@ export interface EncounterShieldState {
 }
 
 export interface EncounterState {
+  battleCapturePokemon?: import('@/utilities/pokemon/alpha').BattleCapturePokemon
+  battleCaptureId?: string
   alphaPokemon?: import('@/utilities/pokemon/alpha').AlphaCapturePokemon
   alphaBattleId?: string
   background?: string

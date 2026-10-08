@@ -13,7 +13,7 @@ export const ALPHA_RESEARCH_XP = 15
 export const ALPHA_CAPTURE_XP_MULTIPLIER = 5
 
 /** The original encounter, before temporary battle forms, stat stages or damage. */
-export type AlphaCapturePokemon = Pick<
+export type BattleCapturePokemon = Pick<
   Pokemon,
   | 'speciesId'
   | 'formId'
@@ -26,7 +26,9 @@ export type AlphaCapturePokemon = Pick<
   | 'ability'
   | 'background'
 > &
-  Omit<GeneratedPokemonStats, 'messages'> & { isAlpha: true; name: string }
+  Omit<GeneratedPokemonStats, 'messages'> & { isAlpha?: boolean; name: string }
+
+export type AlphaCapturePokemon = BattleCapturePokemon & { isAlpha: true }
 
 export function canRollAlpha(
   config: BattleConfig & {
