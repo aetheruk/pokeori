@@ -41,7 +41,7 @@ const CardDrawReveal = lazy(() =>
   })),
 )
 
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ResearchLevelUpModal } from '@/app/(frontend)/game/pokedex/_components/ResearchLevelUpModal'
 import { VSAnimation } from '@/components/game/battles/VSAnimation'
 import { LevelUpModal } from '@/components/game/level-up-modal'
@@ -226,6 +226,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
         : undefined
 
   const { playSfx, playMusic, stopMusic } = useAudio()
+  const [showAlphaIntro, setShowAlphaIntro] = useState(false)
+  const isAlphaBattle = initialState.enemyTeam.some((pokemon) => pokemon.isAlpha)
 
   useEffect(() => {
     isMountedRef.current = true
@@ -239,7 +241,9 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   useEffect(() => {
     if (initialState.status !== 'ongoing') return
 
-    const musicUrl = initialState.config?.music || '/music/battle.m4a'
+    const musicUrl = isAlphaBattle
+      ? '/music/battle.m4a'
+      : initialState.config?.music || '/music/battle.m4a'
     playMusic(musicUrl, { loop: true, volume: 0.3 })
 
     return () => {
@@ -248,10 +252,19 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   }, [
     initialState.battleId,
     initialState.config?.music,
+    isAlphaBattle,
     initialState.status,
     playMusic,
     stopMusic,
   ])
+
+  useEffect(() => {
+    if (!isAlphaBattle || initialState.status !== 'ongoing') return
+
+    setShowAlphaIntro(true)
+    const timeout = window.setTimeout(() => setShowAlphaIntro(false), 2100)
+    return () => window.clearTimeout(timeout)
+  }, [initialState.battleId, initialState.status, isAlphaBattle])
 
   useEffect(() => {
     if (battleState.status !== 'ongoing') {
@@ -900,6 +913,28 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     <BattleProvider value={contextValue}>
       <div className="game-desktop-activity-stage game-activity-chrome relative flex h-full min-h-0 flex-col overflow-hidden xl:my-4 xl:h-[calc(100%-2rem)]">
         <AnimatePresence>
+          {showAlphaIntro && (
+            <motion.div
+              key={`alpha-intro-${initialState.battleId}`}
+              className="pointer-events-none absolute inset-0 z-[90] flex items-center justify-center bg-game-night/55"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 0.45, 1, 0.45, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2.1, ease: 'easeInOut' }}
+              aria-hidden="true"
+            >
+              <motion.div
+                className="rounded-full bg-game-ochre/15 p-8 shadow-[0_0_90px_rgba(244,190,82,0.65)]"
+                initial={{ scale: 0.55, rotate: -12 }}
+                animate={{ scale: [0.55, 1.08, 1, 1.08, 1], rotate: 0 }}
+                transition={{ duration: 2.1, ease: 'easeOut' }}
+              >
+                <AlphaIcon size={144} className="object-contain" />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
           {showVsAnimation &&
             battleState.playerTrainer &&
             battleState.enemyTrainer && (
@@ -1032,10 +1067,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
             additionalContent={
               <div className="space-y-3">
                 {battleState.status === 'won' && battleState.alphaCapturePokemon && !battleState.alphaCaptureStartedAt && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-game-ink">
-                      <AlphaIcon /> The Alpha can now be captured. You have 30 seconds, starting at 0 catch rate.
-                    </p>
+                  <div>
                     <Button size="lg" className="w-full" disabled={isCaptureStarting || isReplayLoading}
                       aria-busy={isCaptureStarting}
                       onClick={async () => {
@@ -1050,6 +1082,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                           setIsCaptureStarting(false)
                         }
                       }}>
+                      <AlphaIcon />
                       {isCaptureStarting ? 'Starting capture…' : 'Attempt Capture'}
                     </Button>
                   </div>
