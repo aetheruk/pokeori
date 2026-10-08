@@ -394,7 +394,7 @@ mock.module('@/app/(frontend)/game/_shared/activity-actions', () => ({
 mock.module('@/utilities/game-data', () => ({
   getGameUserData: async () => ({}),
 }))
-const { castFishingLine, startFishingCatch } = await import(
+const { attemptHook, castFishingLine, startFishingCatch } = await import(
   '@/app/(frontend)/game/research/games/fishing'
 )
 store.set('game:owner', { encounterId: fishingConfig.id })
@@ -408,15 +408,24 @@ try {
     assert.equal((await castFishingLine(rodType)).success, true)
     const hooked = store.get('fishing:owner')
     assert.equal(hooked.hookedResult.isSecret, false)
-    hooked.phase = 'hooked'
+    assert.equal(hooked.hookedResult.isAlpha, undefined)
+    hooked.phase = 'nibble'
+    hooked.appearTime = Date.now() - 1
     hooked.castTime = ++castTime
     store.set('fishing:owner', hooked)
     Math.random = () => 0.005
+    const hookResult = await attemptHook()
+    assert.equal(hookResult.isAlpha, true)
+    assert.equal(store.get('fishing:owner').hookedResult.isAlpha, true)
+
+    // The catch start must preserve the status already shown on the hook result.
+    let catchRandomCalls = 0
+    Math.random = () => (catchRandomCalls++ === 0 ? 0.5 : 0.005)
     const start = await startFishingCatch()
     assert.equal(start.success, true)
     assert.equal(start.isAlpha, true)
     assert.equal(start.duration, 50)
-    assert.equal(start.level, 9)
+    assert.equal(start.level, 11)
     const fishingCapture = store.get('encounter:owner')
     assert.equal(fishingCapture.baseCatchRate, 0)
     assert.equal(fishingCapture.currentCatchRate, 0)
@@ -459,7 +468,7 @@ try {
     }
     assert.equal(ownedPokemon.obtainedRegion, 'Kanto')
     assert.equal(ownedPokemon.obtainedSourceId, fishingConfig.id)
-    assertExplorerXp(9, 5)
+    assertExplorerXp(11, 5)
     assert.equal(
       (await attemptCapture('master-ball', undefined, requestId)).caught,
       true,
