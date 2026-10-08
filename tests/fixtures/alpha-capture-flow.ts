@@ -37,8 +37,10 @@ const redis = {
   setManyIfValue: async (key: string, expected: any, writes: any[]) => {
     if (JSON.stringify(store.get(key)) !== JSON.stringify(expected))
       return false
-    for (const write of writes)
-      store.set(write.key, structuredClone(write.value))
+    for (const write of writes) {
+      if (write.value === null) store.delete(write.key)
+      else store.set(write.key, structuredClone(write.value))
+    }
     return true
   },
 }
@@ -394,7 +396,12 @@ mock.module('@/app/(frontend)/game/_shared/activity-actions', () => ({
 mock.module('@/utilities/game-data', () => ({
   getGameUserData: async () => ({}),
 }))
-const { attemptHook, castFishingLine, startFishingCatch } = await import(
+const {
+  attemptHook,
+  castFishingLine,
+  keepFishingCatch,
+  startFishingCatch,
+} = await import(
   '@/app/(frontend)/game/research/games/fishing'
 )
 store.set('game:owner', { encounterId: fishingConfig.id })
@@ -403,6 +410,33 @@ try {
   for (const rodType of ['old', 'good', 'super'] as const) {
     inventory[`${rodType}-rod`] = 1
     inventory['master-ball'] = 1
+    if (rodType === 'good') {
+      store.set(`fishing:keep-net:owner`, {
+        encounterId: fishingConfig.id,
+        entries: [
+          ...Array.from({ length: 8 }, (_, index) => ({
+            id: `magikarp-${index}`,
+            type: 'pokemon',
+            speciesId: 129,
+            formId: '129',
+            isShiny: false,
+            isAlpha: false,
+          })),
+          {
+            id: 'held-water-gem',
+            type: 'item',
+            itemId: 'water-gem',
+            quantity: 1,
+          },
+          {
+            id: 'held-pokedollars',
+            type: 'item',
+            currencyId: 'pokedollars',
+            quantity: 250,
+          },
+        ],
+      })
+    }
     // Avoid the separate secret replacement rolls while casting.
     Math.random = () => 0.5
     assert.equal((await castFishingLine(rodType)).success, true)
@@ -426,6 +460,8 @@ try {
     assert.equal(start.isAlpha, true)
     assert.equal(start.duration, 50)
     assert.equal(start.level, 11)
+    assert.equal(start.keepNetCount, rodType === 'good' ? 10 : 0)
+    assert.equal(start.explorerXpMultiplier, rodType === 'good' ? 3 : 1)
     const fishingCapture = store.get('encounter:owner')
     assert.equal(fishingCapture.baseCatchRate, 0)
     assert.equal(fishingCapture.currentCatchRate, 0)
@@ -468,7 +504,28 @@ try {
     }
     assert.equal(ownedPokemon.obtainedRegion, 'Kanto')
     assert.equal(ownedPokemon.obtainedSourceId, fishingConfig.id)
-    assertExplorerXp(11, 5)
+    assertExplorerXp(11, rodType === 'good' ? 15 : 5)
+    if (rodType === 'good') {
+      const captureRewards = grantedRewards.at(-1)!
+      assert.equal(
+        captureRewards.filter(
+          (reward) =>
+            reward.type === 'pokemon_research_xp' &&
+            reward.targetId === '129' &&
+            reward.quantity === 1,
+        ).length,
+        8,
+      )
+      assert.equal(
+        captureRewards.find(
+          (reward) =>
+            reward.type === 'currency' &&
+            reward.targetId === 'pokedollars',
+        )?.quantity,
+        250,
+      )
+      assert.equal(store.has('fishing:keep-net:owner'), false)
+    }
     assert.equal(
       (await attemptCapture('master-ball', undefined, requestId)).caught,
       true,
@@ -477,6 +534,72 @@ try {
     assert.equal(grantedRewards.length, grantsBeforeCatch + 1)
     assert.equal(inventory['master-ball'], 0)
   }
+
+  // Missing the bite forfeits the net, even when the client only records it on recast.
+  store.set('fishing:keep-net:owner', {
+    encounterId: fishingConfig.id,
+    entries: [
+      {
+        id: 'held-pokedollars',
+        type: 'item',
+        currencyId: 'pokedollars',
+        quantity: 250,
+      },
+    ],
+  })
+  Math.random = () => 0.5
+  assert.equal((await castFishingLine('old')).success, true)
+  const missedCast = store.get('fishing:owner')
+  missedCast.phase = 'nibble'
+  missedCast.appearTime = Date.now() + 1000
+  store.set('fishing:owner', missedCast)
+  assert.equal((await attemptHook()).hooked, false)
+  assert.equal(store.has('fishing:keep-net:owner'), false)
+
+  const fullNet = Array.from({ length: 10 }, (_, index) => ({
+    id: `slot-${index}`,
+    type: 'item',
+    itemId: 'water-gem',
+    quantity: 1,
+  }))
+  store.set('fishing:keep-net:owner', {
+    encounterId: fishingConfig.id,
+    entries: fullNet,
+  })
+  store.set('fishing:owner', {
+    userId: 'owner',
+    encounterId: fishingConfig.id,
+    selectedRod: 'old',
+    castId: 'swap-catch',
+    castTime: ++castTime,
+    appearTime: Date.now(),
+    phase: 'hooked',
+    hookedResult: {
+      type: 'item',
+      entry: {
+        currencyId: 'crystals',
+        quantity: 15,
+        weight: 1,
+        symbol: '✧✧',
+        reactionTime: 900,
+        appearTime: { min: 1, max: 1 },
+      },
+    },
+  })
+  const swapped = await keepFishingCatch(3)
+  assert.equal(swapped.success, true)
+  assert.equal(swapped.replaced, true)
+  assert.equal(swapped.keepNet.length, 10)
+  assert.deepEqual(swapped.keepNet[3], {
+    id: 'swap-catch',
+    type: 'item',
+    itemId: undefined,
+    currencyId: 'crystals',
+    guildId: undefined,
+    quantity: 15,
+  })
+  assert.equal(store.has('fishing:owner'), false)
+  store.delete('fishing:keep-net:owner')
 
   // Secret replacements are explicitly marked by the cast and cannot roll Alpha.
   Math.random = () => 0.005

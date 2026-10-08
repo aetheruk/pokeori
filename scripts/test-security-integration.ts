@@ -297,34 +297,23 @@ try {
     assert.equal((await redis.get<any>(stateKey)).roundData.simulation.tick, 60)
     assertions += 9
 
-    // Recreate the state left by a crash after Mongo commit but before Redis
-    // finalization. Retrying must replay both the item and activity-stat receipt.
+    // Fishing item catches are staged in Redis before capture now instead of
+    // being granted immediately by a separate claim action.
     await fetch(`${origin}/game/games/fishing`, { headers: { authorization: `JWT ${ownerToken}` } })
-    const fishingId = await actionId('src/app/(frontend)/game/research/games/fishing.ts', 'claimFishingItem')
+    const fishingId = await actionId('src/app/(frontend)/game/research/games/fishing.ts', 'keepFishingCatch')
     const fishingGame = allGames.find((entry) => entry.gameType === 'fishing')!
     const castTime = Date.now()
     const fishingStateKey = `fishing:${owner.id}`
-    const claimKey = `fishing:item-claim:${owner.id}:${castTime}`
-    const lastClaimKey = `fishing:item-claim:last:${owner.id}`
-    const fishingState = { phase: 'hooked', castTime, hookedResult: {type: 'item', entry: {itemId: 'potion'}} }
-    redisFixtures.push(fishingStateKey, claimKey, lastClaimKey, `${claimKey}:processing`)
+    const keepNetKey = `fishing:keep-net:${owner.id}`
+    const fishingState = { phase: 'hooked', encounterId: fishingGame.id, castTime, castId: `security-${castTime}`, hookedResult: {type: 'item', entry: {itemId: 'potion', quantity: 2}} }
+    redisFixtures.push(fishingStateKey, keepNetKey)
     await redis.set(stateKey, {...state, encounterId: fishingGame.id}, 120)
     await redis.set(fishingStateKey, fishingState, 120)
-    const { getUserInventoryMap, getUserActivityStatsMap } = await import('../src/utilities/user-state')
-    const beforeInventory = await getUserInventoryMap(payload, owner.id)
-    const firstClaim = await invoke('/game/games/fishing', fishingId, [], ownerToken)
-    assert.ok(firstClaim.body.includes('"claimed":true'), firstClaim.body)
-    await redis.del(claimKey)
-    await redis.del(lastClaimKey)
-    await redis.del(`${claimKey}:processing`)
-    await redis.set(fishingStateKey, fishingState, 120)
-    const retriedClaim = await invoke('/game/games/fishing', fishingId, [], ownerToken)
-    assert.ok(retriedClaim.body.includes('"claimed":true'), retriedClaim.body)
-    const afterInventory = await getUserInventoryMap(payload, owner.id)
-    assert.equal(afterInventory.potion, (beforeInventory.potion || 0) + 1)
-    const fishingStats = await getUserActivityStatsMap(payload, owner.id, ['gameResults'])
-    assert.equal(fishingStats.games?.[fishingGame.id]?.wins, 1)
-    assertions += 4
+    const firstKeep = await invoke('/game/games/fishing', fishingId, [], ownerToken)
+    assert.ok(firstKeep.body.includes('"success":true'), firstKeep.body)
+    assert.ok(firstKeep.body.includes('"quantity":2'), firstKeep.body)
+    assert.equal((await redis.get<any>(keepNetKey)).entries.length, 1)
+    assertions += 2
 
     const generatedDailyId = `${prefix}-daily`
     await payload.update({collection: 'users', id: owner.id, data: {
@@ -355,6 +344,7 @@ try {
     redisFixtures.push(milestoneKey, `game:complete-result:${owner.id}:${milestoneGame.id}:${milestoneStart}`, `game:complete-last-start:${owner.id}:${milestoneGame.id}`)
     const claimMilestoneId = await actionId('src/app/(frontend)/game/games/actions.ts', 'claimEndlessMilestone')
     const completeGameId = await actionId('src/app/(frontend)/game/games/actions.ts', 'completeGame')
+    const { getUserInventoryMap, getUserActivityStatsMap } = await import('../src/utilities/user-state')
     const milestoneInventory = await getUserInventoryMap(payload, owner.id)
     await Promise.all([
       invoke('/game/games/run', claimMilestoneId, [milestoneGame.id, 1200], ownerToken),

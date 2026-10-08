@@ -47,11 +47,19 @@ import {
 } from '@/utilities/requirements'
 import {
   attemptHook,
+  abandonFishing,
   castFishingLine,
-  claimFishingItem,
+  getFishingKeepNet,
+  keepFishingCatch,
   releaseFish,
   startFishingCatch,
 } from '../games/fishing'
+import {
+  FISHING_KEEP_NET_CAPACITY,
+  getFishingExplorerXpMultiplier,
+  getFishingItemChance,
+  type FishingKeepNetEntry,
+} from '@/utilities/fishing/keep-net'
 
 const itemNames = new Map(items.map((item) => [item.id, item.name]))
 
@@ -206,6 +214,97 @@ function FishingScene({
   )
 }
 
+function KeepNetSlot({
+  entry,
+  size = 28,
+}: {
+  entry: FishingKeepNetEntry
+  size?: number
+}) {
+  const title =
+    entry.type === 'pokemon'
+      ? `${entry.isShiny ? 'Shiny ' : ''}${getPokemonForm(entry.formId)?.name || 'Pokémon'}${entry.isAlpha ? ' (Alpha)' : ''}`
+      : entry.currencyId
+        ? `${entry.quantity} ${getCurrency(entry.currencyId)?.name || 'Currency'}`
+        : entry.guildId
+          ? `${entry.quantity} Guild XP`
+          : `${entry.quantity} ${itemNames.get(entry.itemId || '') || 'Item'}`
+
+  return (
+    <span
+      role="img"
+      className="relative flex shrink-0 items-center justify-center rounded-md border border-game-border/70 bg-game-surface-raised/90"
+      style={{ width: size, height: size }}
+      title={title}
+      aria-label={title}
+    >
+      {entry.type === 'pokemon' ? (
+        <>
+          <Image
+            src={getPokemonImageUrl(entry.formId, 'home', entry.isShiny)}
+            alt=""
+            fill
+            className="object-contain pixelated"
+          />
+          {entry.isAlpha && (
+            <span className="absolute -right-1 -top-1 rounded-full bg-game-surface p-px">
+              <AlphaIcon size={10} />
+            </span>
+          )}
+        </>
+      ) : entry.currencyId ? (
+        <CurrencySprite
+          currencyId={entry.currencyId}
+          alt=""
+          width={size - 7}
+          height={size - 7}
+        />
+      ) : (
+        <ItemSprite
+          itemId={entry.guildId ? 'researchers-journal-page' : entry.itemId || ''}
+          alt=""
+          width={size - 7}
+          height={size - 7}
+        />
+      )}
+    </span>
+  )
+}
+
+function KeepNetSwapPicker({
+  entries,
+  disabled,
+  onSelect,
+}: {
+  entries: FishingKeepNetEntry[]
+  disabled: boolean
+  onSelect: (index: number) => void
+}) {
+  return (
+    <div className="w-full rounded-lg border border-game-ochre/50 bg-game-ochre/10 p-3">
+      <p className="mb-2 text-center text-xs font-semibold text-game-ink">
+        Net is full. Choose a catch to swap out.
+      </p>
+      <div className="grid grid-cols-5 gap-2">
+        {entries.map((entry, index) => (
+          <Button
+            key={entry.id}
+            type="button"
+            variant="outline"
+            disabled={disabled}
+            className="h-auto min-h-14 flex-col gap-1 border-game-border bg-game-surface-raised p-1 text-[10px] text-game-ink"
+            onClick={() => onSelect(index)}
+            aria-label={`Swap out ${index + 1}: ${entry.type === 'pokemon' ? getPokemonForm(entry.formId)?.name || 'Pokémon' : entry.currencyId ? getCurrency(entry.currencyId)?.name || 'Currency' : itemNames.get(entry.itemId || '') || 'Item'}`}
+          >
+            <KeepNetSlot entry={entry} size={32} />
+            <span>Swap</span>
+          </Button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 interface FishingGameProps {
   encounter: FishingGameConfig
   initialState?: any
@@ -277,9 +376,12 @@ export function FishingGame({ encounter }: FishingGameProps) {
     itemId?: string
     currencyId?: string
     guildId?: string
+    quantity?: number
     symbol: string
   } | null>(null)
-  const [isClaimingItem, setIsClaimingItem] = useState(false)
+  const [keepNet, setKeepNet] = useState<FishingKeepNetEntry[]>([])
+  const [isKeepingCatch, setIsKeepingCatch] = useState(false)
+  const [showKeepNetSwap, setShowKeepNetSwap] = useState(false)
 
   // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -294,6 +396,20 @@ export function FishingGame({ encounter }: FishingGameProps) {
       if (reactionTimeoutRef.current) clearTimeout(reactionTimeoutRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    let active = true
+    void getFishingKeepNet().then((entries) => {
+      if (active) setKeepNet(entries)
+    })
+    const outcome = new URLSearchParams(window.location.search).get('outcome')
+    if (outcome === 'lost') {
+      toast.error('The Pokémon got away, and your keep net was lost.')
+    }
+    return () => {
+      active = false
+    }
+  }, [encounter.id])
 
   const handleSelectRod = useCallback((rod: RodType) => {
     setSelectedRod(rod)
@@ -405,11 +521,16 @@ export function FishingGame({ encounter }: FishingGameProps) {
           itemId: res.itemId,
           currencyId: res.currencyId,
           guildId: res.guildId,
+          quantity: res.quantity,
           symbol: res.symbol || '?',
         })
       } else {
         playSfx('bad')
+        setKeepNet([])
         setPhase('missed')
+        if (res.keepNetLost) {
+          toast.error('The hook was missed, and your keep net was lost.')
+        }
       }
     }
   }, [phase, handleCast])
@@ -422,37 +543,39 @@ export function FishingGame({ encounter }: FishingGameProps) {
     }
     setPhase('idle')
     setHookedData(null)
-    toast.success('Released back into the water.')
+    setShowKeepNetSwap(false)
+    toast.success('Tossed back into the water.')
   }, [])
 
-  const handleClaimItem = useCallback(async () => {
-    if (isClaimingItem) return
-    setIsClaimingItem(true)
+  const handleKeepCatch = useCallback(async (replaceIndex?: number) => {
+    if (isKeepingCatch) return
+    if (keepNet.length >= FISHING_KEEP_NET_CAPACITY && replaceIndex === undefined) {
+      setShowKeepNetSwap(true)
+      return
+    }
+
+    setIsKeepingCatch(true)
     try {
-      const res = await claimFishingItem()
+      const res = await keepFishingCatch(replaceIndex)
       if (!res.success) {
-        toast.error(res.error || 'Failed to claim item')
+        if (res.full) setShowKeepNetSwap(true)
+        toast.error(res.error || 'Failed to keep this catch')
         return
       }
 
-      refreshUser()
+      setKeepNet(res.keepNet || [])
       setPhase('idle')
       setHookedData(null)
       setCastTime(null)
       setAppearTime(null)
       setTimeUntilAppear(null)
       setNibbleSymbol(null)
-      toast.success(
-        res.guildId
-          ? 'Guild XP recorded.'
-          : res.currencyId
-            ? 'Currency added.'
-            : 'Item added to bag.',
-      )
+      setShowKeepNetSwap(false)
+      toast.success(res.replaced ? 'Catch swapped into the net.' : 'Added to the keep net.')
     } finally {
-      setIsClaimingItem(false)
+      setIsKeepingCatch(false)
     }
-  }, [isClaimingItem, refreshUser])
+  }, [isKeepingCatch, keepNet.length])
 
   const handleAttemptCatch = useCallback(async () => {
     const res = await startFishingCatch()
@@ -460,16 +583,28 @@ export function FishingGame({ encounter }: FishingGameProps) {
       toast.error(res.error || 'Failed to start catch')
       return
     }
-    router.push('/game/locations/encounter')
+    const returnPath = `${window.location.pathname}${window.location.search}`
+    router.push(
+      `/game/locations/encounter?returnTo=${encodeURIComponent(returnPath)}`,
+    )
   }, [router])
 
   const handleExit = useCallback(async () => {
+    const res = await abandonFishing()
+    if (!res.success) {
+      toast.error(res.error || 'Unable to leave fishing right now.')
+      return
+    }
     refreshUser()
     router.push('/game/explore')
   }, [refreshUser, router])
 
   const handleRecast = useCallback(async () => {
-    await releaseFish()
+    const res = await releaseFish()
+    setKeepNet([])
+    if (res.keepNetLost) {
+      toast.error('The hook was missed, and your keep net was lost.')
+    }
     setPhase('idle')
     setHookedData(null)
     setCastTime(null)
@@ -545,17 +680,49 @@ export function FishingGame({ encounter }: FishingGameProps) {
         {/* Rod chip */}
         <div className="pointer-events-auto">
           {selectedRod && phase !== 'select-rod' && (
-            <div className="flex items-center gap-1.5 rounded-full border border-game-night-border/60 bg-game-night-surface/75 px-3 py-1.5 shadow-lg backdrop-blur-md">
-              <ItemSprite
-                itemId={rodItemIds[selectedRod]}
-                alt={rodDisplayNames[selectedRod]}
-                width={16}
-                height={16}
-              />
-              <span className="text-xs font-medium text-game-night-ink">
-                {rodDisplayNames[selectedRod]}
-              </span>
-            </div>
+            <>
+              <div className="flex items-center gap-1.5 rounded-full border border-game-night-border/60 bg-game-night-surface/75 px-3 py-1.5 shadow-lg backdrop-blur-md">
+                <ItemSprite
+                  itemId={rodItemIds[selectedRod]}
+                  alt={rodDisplayNames[selectedRod]}
+                  width={16}
+                  height={16}
+                />
+                <span className="text-xs font-medium text-game-night-ink">
+                  {rodDisplayNames[selectedRod]}
+                </span>
+              </div>
+              <div className="mt-2 max-w-[calc(100vw-2rem)] rounded-xl border border-game-night-border/60 bg-game-night-surface/80 p-2 shadow-lg backdrop-blur-md">
+                <div className="flex items-center justify-between gap-2 text-[11px] font-semibold text-game-night-ink">
+                  <span>Keep Net {keepNet.length}/{FISHING_KEEP_NET_CAPACITY}</span>
+                  <span>{getFishingItemChance(keepNet.length)}% item chance</span>
+                  <span>Explorer XP ×{getFishingExplorerXpMultiplier(keepNet.length).toFixed(1)}</span>
+                </div>
+                <div className="mt-1.5 flex max-w-[calc(100vw-3rem)] items-center gap-1 overflow-x-auto pb-0.5">
+                  {Array.from({ length: FISHING_KEEP_NET_CAPACITY }, (_, index) => {
+                    const entry = keepNet[index]
+                    return entry ? (
+                      <KeepNetSlot key={entry.id} entry={entry} size={24} />
+                    ) : (
+                      <span
+                        key={`empty-${index}`}
+                        role="img"
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-dashed border-game-night-border/50 text-[10px] text-game-night-ink/50"
+                        aria-label="Empty keep net slot"
+                      >
+                        ·
+                      </span>
+                    )
+                  })}
+                </div>
+                <p className="mt-1 text-[10px] leading-tight text-game-night-ink/75">
+                  3 same species: +20% Alpha odds · 7: +10% Shiny odds
+                </p>
+                <p className="text-[10px] leading-tight text-game-danger">
+                  A missed hook, failed capture, or leaving forfeits the net.
+                </p>
+              </div>
+            </>
           )}
         </div>
 
@@ -758,16 +925,31 @@ export function FishingGame({ encounter }: FishingGameProps) {
                       className="h-11 w-full rounded-xl bg-game-charcoal text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
                       onClick={handleAttemptCatch}
                     >
-                      CATCH!
+                      Capture
                     </Button>
                     <Button
                       variant="outline"
                       className="h-11 w-full rounded-xl border-game-border bg-game-surface-raised text-sm text-game-muted hover:border-game-clay hover:text-game-clay-strong"
+                      onClick={() => handleKeepCatch()}
+                      disabled={isKeepingCatch}
+                    >
+                      {isKeepingCatch ? 'Adding...' : 'Keep in Net'}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="h-9 w-full text-sm text-game-muted"
                       onClick={handleRelease}
                     >
-                      Release
+                      Toss
                     </Button>
                   </div>
+                  {showKeepNetSwap && keepNet.length >= FISHING_KEEP_NET_CAPACITY && (
+                    <KeepNetSwapPicker
+                      entries={keepNet}
+                      disabled={isKeepingCatch}
+                      onSelect={(index) => handleKeepCatch(index)}
+                    />
+                  )}
                 </>
               )}
 
@@ -806,6 +988,9 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="flex flex-col items-center gap-1">
                     <h3 className="line-clamp-1 font-display text-lg font-semibold capitalize tracking-wide text-game-ink">
+                      {hookedData.quantity && hookedData.quantity > 1
+                        ? `${hookedData.quantity} `
+                        : ''}
                       {hookedData.guildId
                         ? 'Fuchsia Research Institute XP'
                         : hookedData.currencyId
@@ -816,14 +1001,30 @@ export function FishingGame({ encounter }: FishingGameProps) {
                   </div>
 
                   <div className="w-full">
-                    <Button
-                      className="h-11 w-full rounded-xl bg-game-charcoal text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
-                      onClick={handleClaimItem}
-                      disabled={isClaimingItem}
-                    >
-                      {isClaimingItem ? 'Adding...' : 'Nice!'}
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        className="h-11 w-full rounded-xl bg-game-charcoal text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                        onClick={() => handleKeepCatch()}
+                        disabled={isKeepingCatch}
+                      >
+                        {isKeepingCatch ? 'Adding...' : 'Keep in Net'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="h-9 w-full text-sm text-game-muted"
+                        onClick={handleRelease}
+                      >
+                        Toss
+                      </Button>
+                    </div>
                   </div>
+                  {showKeepNetSwap && keepNet.length >= FISHING_KEEP_NET_CAPACITY && (
+                    <KeepNetSwapPicker
+                      entries={keepNet}
+                      disabled={isKeepingCatch}
+                      onSelect={(index) => handleKeepCatch(index)}
+                    />
+                  )}
                 </>
               )}
             </div>

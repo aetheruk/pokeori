@@ -4,10 +4,15 @@ import type { FishingItemEntry } from '@/data/games/fishing/types'
 export function getAvailableFishingItemEntries(
   entries: FishingItemEntry[],
   inventory: Record<string, number>,
+  reservedItemIds: ReadonlySet<string> = new Set(),
 ): FishingItemEntry[] {
   return entries.filter((entry) => {
     if (!entry.itemId) return true
     const item = items.find((candidate) => candidate.id === entry.itemId)
-    return !item?.unique || (inventory[entry.itemId] || 0) <= 0
+    return (
+      !item?.unique ||
+      ((inventory[entry.itemId] || 0) <= 0 &&
+        !reservedItemIds.has(entry.itemId))
+    )
   })
 }

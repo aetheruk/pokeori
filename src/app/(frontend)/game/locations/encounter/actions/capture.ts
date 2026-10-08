@@ -91,6 +91,10 @@ import {
   applyAlphaCaptureBonuses,
   applyAlphaCaptureXp,
 } from '@/utilities/pokemon/alpha'
+import {
+  applyFishingExplorerXpMultiplier,
+  buildFishingKeepNetCaptureRewards,
+} from '@/utilities/fishing/keep-net'
 
 import {
   calculatePokemonContentSkillXp,
@@ -132,6 +136,19 @@ async function recordEncounterExpeditionResult(
   }
 
   return result
+}
+
+async function forfeitFishingNetOnFailure(
+  userId: string,
+  state: EncounterState,
+  redisClient: { del: (key: string) => Promise<number> },
+) {
+  if (!state.locationId.startsWith('fishing:')) return false
+  const keepNetLost = (state.fishingKeepNet?.length || 0) > 0
+  await redisClient.del(`fishing:keep-net:${userId}`)
+  state.fishingKeepNet = []
+  state.fishingExplorerXpMultiplier = 1
+  return keepNetLost
 }
 
 export async function attemptCapture(
@@ -263,6 +280,11 @@ export async function attemptCapture(
     const maxPokemon = user.maxPokemon || 50
     if (!isChronicle && pokemon + eggCount >= maxPokemon) {
       // Clear Redis
+      const keepNetLost = await forfeitFishingNetOnFailure(
+        user.id,
+        state,
+        redis,
+      )
       await redis.del(encounterId)
 
       // Update Location Stats (Loss)
@@ -289,7 +311,9 @@ export async function attemptCapture(
       const response = {
         success: true,
         caught: false,
-        failMessage: 'Pokemon Storage Full!',
+        failMessage: keepNetLost
+          ? 'Pokemon Storage Full! Your keep net was lost.'
+          : 'Pokemon Storage Full!',
         formId: state.formId,
         pokemonId: state.pokemonId,
         expeditionProgress: undefined as any,
@@ -477,6 +501,11 @@ export async function attemptCapture(
       Math.random() * 100 < secondChanceRate
 
     if (isSafari && !caught) {
+      const keepNetLost = await forfeitFishingNetOnFailure(
+        user.id,
+        state,
+        redis,
+      )
       const flee = resolveSafariFlee({
         baseFleeRate: state.fleeRate || SAFARI_BASE_FLEE_RATE,
       })
@@ -488,7 +517,9 @@ export async function attemptCapture(
           success: true,
           caught: false,
           encounterFailed: true,
-          failMessage: 'The Pokémon broke free and fled the reserve!',
+          failMessage: keepNetLost
+            ? 'The Pokémon broke free and fled the reserve. Your keep net was lost.'
+            : 'The Pokémon broke free and fled the reserve!',
           formId: state.formId,
           pokemonId: state.pokemonId,
           expeditionProgress,
@@ -509,8 +540,11 @@ export async function attemptCapture(
         success: true,
         caught: false,
         safariRetry: true,
+        keepNetLost,
         message:
-          'The Pokémon stayed nearby. You can throw again or try another approach.',
+          keepNetLost
+            ? 'The Pokémon stayed nearby, but your keep net was lost. You can throw again or try another approach.'
+            : 'The Pokémon stayed nearby. You can throw again or try another approach.',
         formId: state.formId,
         pokemonId: state.pokemonId,
         safari: state.safari,
@@ -587,6 +621,11 @@ export async function attemptCapture(
     }
 
     if (secondChanceTriggered) {
+      const keepNetLost = await forfeitFishingNetOnFailure(
+        user.id,
+        state,
+        redis,
+      )
       state.secondChanceUsed = true
       state.captureAttempts = captureAttempt + 1
       await redis.set(encounterId, state, {
@@ -597,7 +636,10 @@ export async function attemptCapture(
         success: true,
         caught: false,
         secondChance: true,
-        message: 'The Pokemon broke free, but it stayed nearby!',
+        keepNetLost,
+        message: keepNetLost
+          ? 'The Pokemon broke free, but your keep net was lost. It stayed nearby!'
+          : 'The Pokemon broke free, but it stayed nearby!',
         formId: state.formId,
         pokemonId: state.pokemonId,
         throwQuality,
@@ -671,6 +713,11 @@ export async function attemptCapture(
 
     // If NOT caught, return failure
     if (!caught) {
+      const keepNetLost = await forfeitFishingNetOnFailure(
+        user.id,
+        state,
+        redis,
+      )
       const rewardsToGrant: LocationReward[] = []
       const xpConfig = resolveSkillXpConfig(
         'catching',
@@ -709,7 +756,10 @@ export async function attemptCapture(
       const response = {
         success: true,
         caught: false,
-        message: 'The Pokemon broke free!',
+        message: keepNetLost
+          ? 'The Pokemon broke free. Your keep net was lost.'
+          : 'The Pokemon broke free!',
+        keepNetLost,
         rewards: summary,
         formId: state.formId,
         pokemonId: state.pokemonId,
@@ -956,6 +1006,9 @@ export async function attemptCapture(
       ),
     )
     rewardsToGrant.push(...calculateGemRewards(formData?.types || []))
+    rewardsToGrant.push(
+      ...buildFishingKeepNetCaptureRewards(state.fishingKeepNet || []),
+    )
 
     const abilityRewards = getCaptureAbilityRewards({
       state,
@@ -978,7 +1031,13 @@ export async function attemptCapture(
     const { summary } = await grantRewards(
       user.id,
       applyAlphaCaptureBonuses(
-        applyAlphaCaptureXp(rewardsToGrant, isAlphaCapture),
+        applyAlphaCaptureXp(
+          applyFishingExplorerXpMultiplier(
+            rewardsToGrant,
+            state.fishingExplorerXpMultiplier || 1,
+          ),
+          isAlphaCapture,
+        ),
         isAlphaCapture,
       ),
       {
@@ -986,6 +1045,9 @@ export async function attemptCapture(
         payload, req,
       },
     )
+    if (state.locationId.startsWith('fishing:')) {
+      await redis.del(`fishing:keep-net:${user.id}`)
+    }
 
     // Consolidate messages
     const messages = [...statMessages]

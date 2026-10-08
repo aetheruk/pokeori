@@ -25,6 +25,9 @@ export async function failEncounter(
   const encounterId = `encounter:${user.id}`
 
   await (transaction?.redis || redis).del(encounterId)
+  if (state.locationId.startsWith('fishing:')) {
+    await (transaction?.redis || redis).del(`fishing:keep-net:${user.id}`)
+  }
 
   if (activePokemonId) {
     await payload.update({

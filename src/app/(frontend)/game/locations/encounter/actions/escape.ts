@@ -68,6 +68,9 @@ async function performRunAway(
 
   // Clear encounter first to prevent duplicate action races.
   await redis.del(encounterId)
+  if (state.locationId.startsWith('fishing:')) {
+    await redis.del(`fishing:keep-net:${user.id}`)
+  }
 
   if (!trackLoss || state.chronicle) {
     const reference = getEncounterActivityReference(state)

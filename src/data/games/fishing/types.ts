@@ -36,6 +36,8 @@ export interface FishingItemEntry {
   itemId?: string
   currencyId?: string
   guildId?: string
+  /** A reward bundle is a single keep-net object, regardless of quantity. */
+  quantity?: number
   weight: number
   symbol: string
   reactionTime: number
@@ -45,11 +47,11 @@ export interface FishingItemEntry {
 
 export interface FishingRodConfig {
   encounters: {
-    chance?: number // Deprecated; fishing rolls Pokemon at a global 80% rate.
+    chance?: number // Deprecated; base fishing rolls are 70% Pokemon before keep-net modifiers.
     entries: FishingPokemonEntry[]
   }
   items?: {
-    chance?: number // Deprecated; fishing rolls items at a global 20% rate.
+    chance?: number // Deprecated; base fishing rolls are 30% items before keep-net modifiers.
     entries: FishingItemEntry[]
   }
   // Per-rod catch settings
