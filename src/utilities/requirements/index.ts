@@ -286,6 +286,11 @@ export function isPokemonEligible(
     return false
   if (criteria.shiny !== undefined && pokemon.shiny !== criteria.shiny)
     return false
+  if (
+    criteria.isAlpha !== undefined &&
+    (pokemon.isAlpha === true) !== criteria.isAlpha
+  )
+    return false
   if (criteria.isShadow !== undefined && pokemon.isShadow !== criteria.isShadow)
     return false
   if (
@@ -690,8 +695,9 @@ export function getRequirementProgress(
 
       // If position is specified (not 'any'), filter by position
       if (check.position !== 'any') {
+        const requiredPosition = Number(check.position)
         battleTeamPokemon = battleTeamPokemon.filter(
-          (p) => p.battleTeamPosition === check.position,
+          (p) => p.battleTeamPosition === requiredPosition,
         )
       }
 
@@ -706,6 +712,7 @@ export function getRequirementProgress(
         if (check.location !== undefined) criteria.location = check.location
         if (check.locationId !== undefined)
           criteria.locationId = check.locationId
+        if (check.isAlpha !== undefined) criteria.isAlpha = check.isAlpha
         if (check.isShadow !== undefined) criteria.isShadow = check.isShadow
         if (check.isRadiant !== undefined) criteria.isRadiant = check.isRadiant
         if (check.rarity !== undefined) criteria.rarity = check.rarity

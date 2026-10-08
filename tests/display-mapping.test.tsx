@@ -45,6 +45,31 @@ describe('display mapping copy', () => {
     expect(pokemonRequirement.label).toBe('Own Pikachu')
   })
 
+  test('Pokemon collection requirements identify Alpha Pokemon', () => {
+    const requirement = mapCriteriaToDisplayItem({
+      type: 'pokemon_owned',
+      targetId: 25,
+      count: 1,
+      pokemonCriteria: { isAlpha: true },
+    })
+
+    expect(requirement.label).toBe('Own Alpha Pikachu')
+  })
+
+  test('companion and battle-team requirements identify Alpha Pokemon', () => {
+    const companionRequirement = mapCriteriaToDisplayItem({
+      type: 'companion',
+      companionCheck: { isAlpha: true },
+    })
+    const battleTeamRequirement = mapCriteriaToDisplayItem({
+      type: 'battle_team',
+      battleTeamCheck: { position: 'any', isAlpha: true },
+    })
+
+    expect(companionRequirement.label).toBe('Set an Alpha Pokemon as your companion')
+    expect(battleTeamRequirement.label).toBe('Put Alpha Pokemon on your battle team')
+  })
+
   test('location and wild battle result criteria use activity-specific language', () => {
     const catchRequirement = mapCriteriaToDisplayItem({
       type: 'location_encounter_result',

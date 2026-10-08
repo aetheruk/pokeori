@@ -143,11 +143,13 @@ function getTcgSetCollectionLabel(setId?: string): string {
 
 function getPokemonTraitLabel(criteria?: {
   shiny?: boolean
+  isAlpha?: boolean
   isShadow?: boolean
   isRadiant?: boolean
 }): string {
   if (!criteria) return ''
   const traits = []
+  if (criteria.isAlpha) traits.push('Alpha')
   if (criteria.shiny) traits.push('Shiny')
   if (criteria.isShadow) traits.push('Shadow')
   if (criteria.isRadiant) traits.push('Radiant')
@@ -710,9 +712,9 @@ export function mapCriteriaToDisplayItem(
           subLabel: 'Active Companion',
         }
       } else if (check.type) {
-        description += ` a ${traitLabel}${check.type}-type Pokemon${originLabel}`
+        description += ` ${check.isAlpha ? 'an' : 'a'} ${traitLabel}${check.type}-type Pokemon${originLabel}`
       } else {
-        description += ` a ${traitLabel}Pokemon${originLabel}`
+        description += ` ${check.isAlpha ? 'an' : 'a'} ${traitLabel}Pokemon${originLabel}`
       }
 
       return {
