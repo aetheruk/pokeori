@@ -157,6 +157,7 @@ function LaneSprite({
         teraType={mon.teraTypeOverride}
         status={mon.status}
         isShadow={mon.isShadow}
+        isAlpha={!!mon.isAlpha}
         isRadiant={mon.isRadiant}
         shiny={!!mon.shiny}
         rarity={mon.rarity}

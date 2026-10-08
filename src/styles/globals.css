@@ -130,6 +130,96 @@
   }
 }
 
+.pokemon-alpha-particles {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.pokemon-alpha-particles span {
+  position: absolute;
+  bottom: 4%;
+  left: var(--alpha-particle-left);
+  width: 5px;
+  height: 9px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 50% 75%,
+    #ffb071 0%,
+    #f04438 52%,
+    #a81626 100%
+  );
+  box-shadow: 0 0 8px 2px rgb(240 68 56 / 55%);
+  opacity: 0;
+  animation:
+    pokemon-alpha-particle-rise var(--alpha-particle-duration) ease-out
+    var(--alpha-particle-delay) infinite;
+}
+
+.pokemon-alpha-particles span:nth-child(1) {
+  --alpha-particle-left: 12%;
+  --alpha-particle-delay: -0.2s;
+  --alpha-particle-duration: 1.15s;
+  --alpha-particle-drift: -8px;
+}
+
+.pokemon-alpha-particles span:nth-child(2) {
+  --alpha-particle-left: 24%;
+  --alpha-particle-delay: -1s;
+  --alpha-particle-duration: 1.45s;
+  --alpha-particle-drift: 5px;
+}
+
+.pokemon-alpha-particles span:nth-child(3) {
+  --alpha-particle-left: 38%;
+  --alpha-particle-delay: -0.65s;
+  --alpha-particle-duration: 1.25s;
+  --alpha-particle-drift: -4px;
+}
+
+.pokemon-alpha-particles span:nth-child(4) {
+  --alpha-particle-left: 53%;
+  --alpha-particle-delay: -1.25s;
+  --alpha-particle-duration: 1.55s;
+  --alpha-particle-drift: 8px;
+}
+
+.pokemon-alpha-particles span:nth-child(5) {
+  --alpha-particle-left: 66%;
+  --alpha-particle-delay: -0.45s;
+  --alpha-particle-duration: 1.3s;
+  --alpha-particle-drift: -6px;
+}
+
+.pokemon-alpha-particles span:nth-child(6) {
+  --alpha-particle-left: 79%;
+  --alpha-particle-delay: -0.9s;
+  --alpha-particle-duration: 1.5s;
+  --alpha-particle-drift: 4px;
+}
+
+.pokemon-alpha-particles span:nth-child(7) {
+  --alpha-particle-left: 90%;
+  --alpha-particle-delay: -0.1s;
+  --alpha-particle-duration: 1.2s;
+  --alpha-particle-drift: -3px;
+}
+
+@keyframes pokemon-alpha-particle-rise {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.55); }
+  15% { opacity: 0.95; }
+  78% { opacity: 0.75; }
+  100% { opacity: 0; transform: translate3d(var(--alpha-particle-drift), -80px, 0) scale(0.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pokemon-alpha-particles span {
+    animation: none;
+    opacity: 0.45;
+    transform: translateY(-16px);
+  }
+}
+
 .field-observation-drop-collect {
   animation: field-observation-drop-collect 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }

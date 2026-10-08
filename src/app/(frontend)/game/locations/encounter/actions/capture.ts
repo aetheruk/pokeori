@@ -86,7 +86,10 @@ import { getTotalPokemonExperienceForLevel } from '@/utilities/pokemon/experienc
 import { replayCaptureSettlement, runCaptureSettlement, type CaptureSettlementContext } from './capture-settlement'
 import { getEncounterMechanicsLockKey } from './lock'
 import { verifyCaptureRingScale } from '@/utilities/pokemon/capture-timing'
-import { applyAlphaCaptureXp } from '@/utilities/pokemon/alpha'
+import {
+  applyAlphaCaptureBonuses,
+  applyAlphaCaptureXp,
+} from '@/utilities/pokemon/alpha'
 
 import {
   calculatePokemonContentSkillXp,
@@ -955,7 +958,11 @@ export async function attemptCapture(
 
     const { summary } = await grantRewards(
       user.id,
-      applyAlphaCaptureXp(rewardsToGrant, !!state.alphaPokemon),
+      applyAlphaCaptureBonuses(
+        applyAlphaCaptureXp(rewardsToGrant, !!state.alphaPokemon),
+        !!state.alphaPokemon,
+        state.formId,
+      ),
       {
         requirementContext: rewardRequirementContext,
         payload, req,

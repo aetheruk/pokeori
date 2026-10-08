@@ -89,6 +89,7 @@ export function PokemonSpriteDisplay({
               teraType={playerTeraType}
               status={activePlayerMon.status}
               isShadow={activePlayerMon.isShadow}
+              isAlpha={activePlayerMon.isAlpha}
               isRadiant={activePlayerMon.isRadiant}
               shiny={!!activePlayerMon.shiny}
               rarity={activePlayerMon.rarity}
@@ -122,6 +123,7 @@ export function PokemonSpriteDisplay({
           teraType={enemyTeraType}
           status={activeEnemyMon.status}
           isShadow={activeEnemyMon.isShadow}
+          isAlpha={activeEnemyMon.isAlpha}
           isRadiant={activeEnemyMon.isRadiant}
           shiny={!!activeEnemyMon.shiny}
           rarity={activeEnemyMon.rarity}

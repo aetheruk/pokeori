@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { AlphaParticles } from '@/components/game/shared/alpha-particles'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
@@ -22,6 +23,7 @@ interface PokemonDisplayProps {
   teraType?: string
   status?: { id: string; counter: number }
   isShadow?: boolean
+  isAlpha?: boolean
   isRadiant?: boolean
   shiny?: boolean
   rarity?: PokemonRarityId | null
@@ -77,6 +79,7 @@ export function PokemonDisplay({
   teraType,
   status,
   isShadow,
+  isAlpha,
   isRadiant,
   shiny,
   rarity,
@@ -95,7 +98,9 @@ export function PokemonDisplay({
       className={cn(
         'relative w-16 h-16 transition-all duration-300',
         className,
-        isDynamaxed && 'scale-150', // Dynamaxed Pokemon are 50% larger
+        isDynamaxed
+          ? 'scale-150'
+          : isAlpha && !isSwitchingOut && !isSwitchingIn && 'scale-[1.15]',
         isAttacking &&
           (isPlayer ? 'translate-x-12 -translate-y-12' : '-translate-x-12 translate-y-12'),
         isHit && 'animate-shake opacity-80 grayscale-[0.5]',
@@ -127,6 +132,8 @@ export function PokemonDisplay({
       )}
       {isStanceWinner && <span className="battle-stance-win-glow" aria-hidden="true" />}
 
+      {isAlpha && <AlphaParticles className="-inset-x-3 -inset-y-5 z-0" />}
+
       <PokemonRaritySprite
         key={formId} // Force re-render when formId changes
         formId={formId}
@@ -137,7 +144,7 @@ export function PokemonDisplay({
         isRadiant={isRadiant}
         female={gender === 'female'}
         alt="Pokemon"
-        className={cn('!absolute inset-0', isStanceWinner && 'z-10')}
+        className={cn('!absolute inset-0', (isStanceWinner || isAlpha) && 'z-10')}
         imageClassName={cn(
           'drop-shadow-xl',
           isBoosting && 'battle-boost-sprite',
