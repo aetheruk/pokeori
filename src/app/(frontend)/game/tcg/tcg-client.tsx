@@ -30,6 +30,7 @@ import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { Button } from '@/components/ui/button'
+import { ItemSprite } from '@/components/ui/item-sprite'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { type TcgSetSummary, tcgSetSummaries } from '@/data/tcg/summaries'
@@ -499,28 +500,63 @@ export default function TcgExplorerPage({
   const selectedSet = sets.find((set) => set.id === scope.setId)
   const scopeTitle =
     selectedSet?.name || (scope.series === 'all' ? 'All sets' : scope.series)
+  const seriesSets = sets.filter(
+    (set) => scope.series === 'all' || set.series === scope.series,
+  )
+  const seriesProgress = seriesSets.reduce(
+    (progress, set) => ({
+      unique: progress.unique + (progressBySet.get(set.id)?.unique || 0),
+      total: progress.total + set.total,
+    }),
+    { unique: 0, total: 0 },
+  )
+  const allSeriesProgress = seriesGroups.reduce(
+    (progress, group) => ({
+      unique: progress.unique + group.unique,
+      total: progress.total + group.total,
+    }),
+    { unique: 0, total: 0 },
+  )
   const setOptions = [
     {
       id: 'all',
-      label:
-        scope.series === 'all' ? 'All unlocked sets' : `All ${scope.series}`,
-      icon: <Layers3 className="size-4 shrink-0 text-game-muted" aria-hidden="true" />,
+      label: `${scope.series === 'all' ? 'All unlocked sets' : `All ${scope.series}`} (${seriesProgress.unique}/${seriesProgress.total})`,
+      icon: (
+        <Layers3
+          className="size-4 shrink-0 text-game-muted"
+          aria-hidden="true"
+        />
+      ),
     },
-    ...sets
-      .filter((set) => scope.series === 'all' || set.series === scope.series)
-      .map((set) => ({
-        id: set.id,
-        label:
-          scope.series === 'all' ? `${set.series} · ${set.name}` : set.name,
-        icon: <TcgSetMark setId={set.id} kind="symbol" className="size-7 shrink-0" />,
-      })),
+    ...seriesSets.map((set) => ({
+      id: set.id,
+      label: `${scope.series === 'all' ? `${set.series} · ${set.name}` : set.name} (${progressBySet.get(set.id)?.unique || 0}/${set.total})`,
+      icon: (
+        <TcgSetMark setId={set.id} kind="symbol" className="size-7 shrink-0" />
+      ),
+    })),
   ]
   const seriesOptions = [
-    { id: 'all', label: 'All series', icon: <Library className="size-4 shrink-0 text-game-muted" aria-hidden="true" /> },
+    {
+      id: 'all',
+      label: `All series (${allSeriesProgress.unique}/${allSeriesProgress.total})`,
+      icon: (
+        <Library
+          className="size-4 shrink-0 text-game-muted"
+          aria-hidden="true"
+        />
+      ),
+    },
     ...seriesGroups.map((group) => ({
       id: group.series,
-      label: `${group.series} · ${group.sets.length}`,
-      icon: group.sets[0] ? <TcgSetMark setId={group.sets[0].id} kind="logo" className="h-7 w-10 shrink-0" /> : undefined,
+      label: `${group.series} (${group.unique}/${group.total})`,
+      icon: group.sets[0] ? (
+        <TcgSetMark
+          setId={group.sets[0].id}
+          kind="logo"
+          className="h-7 w-10 shrink-0"
+        />
+      ) : undefined,
     })),
   ]
   const selectedCardIndex = selectedCard
@@ -833,6 +869,15 @@ export default function TcgExplorerPage({
         onOpenChange={setMobileFiltersOpen}
         title="Browse the Carddex"
         description="Choose a series or set, then narrow the cards."
+        icon={
+          <ItemSprite
+            itemId="pack-base1"
+            alt=""
+            width={96}
+            height={96}
+            className="size-20 object-contain drop-shadow-xl md:size-24"
+          />
+        }
         desktopBreakpoint="lg"
         mobileMaxHeight="100dvh"
         className="gap-0 overflow-hidden bg-game-surface text-game-ink"
