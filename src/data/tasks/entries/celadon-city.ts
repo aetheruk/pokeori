@@ -1396,7 +1396,7 @@ export const celadonCityTasks: Task[] = [
         "type": "trainer",
         "id": "gym-kanto-erika"
       },
-      "message": "The Gym is fragrant with flowers and surprisingly strict: Fire- and Flying-type Pokemon are not permitted in a challenger's Battle Team. Erika's trainers are waiting.",
+      "message": "The Gym is fragrant with flowers and surprisingly strict: Fire-type and Flying-type Pokemon are not permitted in a challenger's Battle Team. Erika's trainers are waiting.",
       "closeButtonText": "Begin the Challenge"
     }
   },
