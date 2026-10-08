@@ -1,6 +1,6 @@
 # Current Game State
 
-- Unreleased: After exploring Pewter City, the `old-ron` conversation introduces Alpha Pokemon through a Hiker’s memories of Ol’ Ron. Once the player has an Alpha as their active companion, `affable-alpha` lets them show it to the Hiker and awards 20 Red Berry Candy plus 1,000 Explorer, Trainer, and Researcher XP.
+- Unreleased: After exploring Pewter City, the `old-ron` task (titled `Ol Ron`) introduces Alpha Pokemon through a Hiker’s memories of Ol’ Ron. Once the player has an Alpha as their active companion, `affable-alpha` lets them show it to the Hiker and awards 20 Red Berry Candy plus 1,000 Explorer, Trainer, and Researcher XP.
 
 - Unreleased (`0.46.0`): Pokémon ownership, companion, and battle-team criteria can require Alpha status; task requirements display the Alpha trait in their description.
 - Unreleased (`0.45.2`): Carddex series and set filters show unique collected cards over each option's total, and the mobile filter panel uses the Base Set booster sprite in its header.

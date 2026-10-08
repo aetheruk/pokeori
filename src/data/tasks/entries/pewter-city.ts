@@ -365,7 +365,7 @@ export const pewterCityTasks: Task[] = [
   },
   {
     id: 'old-ron',
-    name: 'Old Ron',
+    name: 'Ol Ron',
     description: 'That Hiker looks like he’s lost in his thoughts… I should bother him!',
     category: 'Kanto',
     subCategory: 'Pewter City',
@@ -427,7 +427,7 @@ export const pewterCityTasks: Task[] = [
     ],
     exitModal: {
       background: '/backgrounds/town.avif',
-      title: 'Old Ron',
+      title: 'Ol Ron',
       icon: { type: 'trainer', id: 'hiker' },
       message:
         'That Ol’ Ron sure sounds like an incredible Pokemon. Those Alphas sound pretty frightening, though. If I ever tame one, I’ll have to show the Hiker. I think it’ll make his day.',
