@@ -373,6 +373,8 @@ export interface PendingBattleSketch {
 }
 
 export interface BattleState {
+  alphaCapturePokemon?: import('@/utilities/pokemon/alpha').AlphaCapturePokemon
+  alphaCaptureStartedAt?: number
   format?: 'single' | 'double'
   /** Ordered active team indexes; null represents an unfilled doubles slot. */
   activePlayerSlots?: [number | null, number | null]

@@ -18,6 +18,8 @@ export interface FishingSceneConfig {
 }
 
 export interface FishingPokemonEntry {
+  /** Disable random Alphas for an authored special fishing target. */
+  allowAlpha?: boolean
   speciesId: number
   formId?: string
   requirements?: TaskCondition[]
@@ -58,6 +60,8 @@ export interface FishingRodConfig {
 }
 
 export interface FishingGameConfig extends BaseGameConfig {
+  /** Disable random Alphas for an authored special fishing encounter. */
+  allowAlpha?: boolean
   gameType: 'fishing'
   settings: {
     rods: {

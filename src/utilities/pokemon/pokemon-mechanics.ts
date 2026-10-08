@@ -25,7 +25,7 @@ export interface PokemonStats {
   speed: number
 }
 
-export type PokemonSize = 'XS' | 'S' | 'L' | 'XL' | null
+export type PokemonSize = 'XS' | 'S' | 'L' | 'XL' | 'XXL' | 'XXXL' | null
 
 export interface GeneratedPokemonStats {
   ivs: PokemonIVs
@@ -59,25 +59,25 @@ function getPokemonGrowthRate(speciesId: number, formId: string) {
 
 // --- Core Logic Functions (operate on the object) ---
 
-export function generatePokemonAttributes(baseHeight: number, baseWeight: number) {
+export function generatePokemonAttributes(baseHeight: number, baseWeight: number, random = Math.random) {
   // Generate IVs
   const ivs = {
-    hp: Math.floor(Math.random() * 32),
-    attack: Math.floor(Math.random() * 32),
-    defense: Math.floor(Math.random() * 32),
-    specialAttack: Math.floor(Math.random() * 32),
-    specialDefense: Math.floor(Math.random() * 32),
-    speed: Math.floor(Math.random() * 32),
+    hp: Math.floor(random() * 32),
+    attack: Math.floor(random() * 32),
+    defense: Math.floor(random() * 32),
+    specialAttack: Math.floor(random() * 32),
+    specialDefense: Math.floor(random() * 32),
+    speed: Math.floor(random() * 32),
   }
 
   // Generate Nature
   const natureKeys = Object.keys(NATURES) as NatureName[]
-  const nature = natureKeys[Math.floor(Math.random() * natureKeys.length)]
+  const nature = natureKeys[Math.floor(random() * natureKeys.length)]
 
   // Generate Size
   // Variance between -0.20 and +0.20
-  const heightVariance = Math.random() * 0.4 - 0.2
-  const weightVariance = Math.random() * 0.4 - 0.2
+  const heightVariance = random() * 0.4 - 0.2
+  const weightVariance = random() * 0.4 - 0.2
 
   // Keep 1 decimal place
   const height = Math.round(baseHeight * (1 + heightVariance) * 10) / 10
@@ -121,10 +121,12 @@ export function generatePokemonAttributes(baseHeight: number, baseWeight: number
 export function generatePokemonStats(
   baseHeight: number,
   baseWeight: number,
+  random = Math.random,
 ): GeneratedPokemonStats {
   const { ivs, nature, height, weight, size, messages } = generatePokemonAttributes(
     baseHeight,
     baseWeight,
+    random,
   )
 
   // Initial EVs are 0

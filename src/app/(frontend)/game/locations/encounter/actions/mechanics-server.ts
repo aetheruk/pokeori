@@ -221,7 +221,7 @@ export async function applyEncounterPromptResult({
         state.currentCatchRate + rateIncrease,
       )
     }
-    if (answerAbilityResult.timerDeltaMs) {
+    if (answerAbilityResult.timerDeltaMs && !state.alphaPokemon) {
       state.expiry = Math.max(
         Date.now() + 1000,
         state.expiry + answerAbilityResult.timerDeltaMs,
@@ -289,7 +289,7 @@ export async function applyEncounterPromptResult({
       )
     }
   }
-  if (answerAbilityResult.timerDeltaMs) {
+  if (answerAbilityResult.timerDeltaMs && !state.alphaPokemon) {
     state.expiry = Math.max(
       Date.now() + 1000,
       state.expiry + answerAbilityResult.timerDeltaMs,

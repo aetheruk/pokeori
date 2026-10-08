@@ -489,6 +489,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-12-furious-snorlax',
+    allowAlpha: false,
     name: 'Furious Snorlax',
     description: 'The woken Snorlax is furious and blocking Route 12.',
     category: 'Kanto',

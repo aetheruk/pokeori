@@ -86,6 +86,7 @@ import { getTotalPokemonExperienceForLevel } from '@/utilities/pokemon/experienc
 import { replayCaptureSettlement, runCaptureSettlement, type CaptureSettlementContext } from './capture-settlement'
 import { getEncounterMechanicsLockKey } from './lock'
 import { verifyCaptureRingScale } from '@/utilities/pokemon/capture-timing'
+import { applyAlphaCaptureXp } from '@/utilities/pokemon/alpha'
 
 import {
   calculatePokemonContentSkillXp,
@@ -426,13 +427,13 @@ export async function attemptCapture(
       })
     }
 
-    let level =
-      superRepelUsed || (repelUsed && Math.random() < 0.8)
+    let level = state.alphaPokemon?.level ??
+      (superRepelUsed || (repelUsed && Math.random() < 0.8)
         ? targetMaxLevel
         : Math.floor(Math.random() * (targetMaxLevel - targetMinLevel + 1)) +
-          targetMinLevel
+          targetMinLevel)
 
-    if (state.levelModifier) {
+    if (state.levelModifier && !state.alphaPokemon) {
       level += state.levelModifier
       level = Math.max(targetMinLevel, Math.min(targetMaxLevel, level))
     }
@@ -727,7 +728,12 @@ export async function attemptCapture(
       weight,
       size,
       messages: statMessages,
-    } = generatePokemonStats(formData?.height || 0, formData?.weight || 0)
+    } = state.alphaPokemon
+      ? {
+          ...state.alphaPokemon,
+          messages: ['This Pokémon is an Alpha!'],
+        }
+      : generatePokemonStats(formData?.height || 0, formData?.weight || 0)
 
     // Research Level 4+: Improved IVs (double-roll, take best of each)
     const captureResearchLevel = getPokemonResearchLevel(
@@ -736,7 +742,7 @@ export async function attemptCapture(
       state.formId,
     )
     let ivs = baseIvs
-    if (captureResearchLevel >= 4) {
+    if (captureResearchLevel >= 4 && !state.alphaPokemon) {
       const secondRoll = {
         hp: Math.floor(Math.random() * 32),
         attack: Math.floor(Math.random() * 32),
@@ -787,13 +793,15 @@ export async function attemptCapture(
       state.formId,
     )
     const researcherLevel = getSkillLevel(user.skills, 'researching')
-    const abilityId = rollAbility(
-      state.formId,
-      formData?.types || [],
-      catchResearchLvl,
-      getResearcherAbilityRolls(researcherLevel),
-      getResearcherHiddenAbilitiesUnlocked(researcherLevel),
-    )
+    const abilityId = state.alphaPokemon
+      ? state.alphaPokemon.ability || undefined
+      : rollAbility(
+          state.formId,
+          formData?.types || [],
+          catchResearchLvl,
+          getResearcherAbilityRolls(researcherLevel),
+          getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+        )
 
     const rarity = targetRarity
 
@@ -803,13 +811,14 @@ export async function attemptCapture(
         user: user.id,
         speciesId: state.pokemonId,
         formId: state.formId,
-        name: formData?.name || 'Unknown',
+        name: state.alphaPokemon?.name || formData?.name || 'Unknown',
         level: level,
         experience: getTotalPokemonExperienceForLevel(
           formData?.growth_rate,
           level,
         ),
         rarity,
+        isAlpha: !!state.alphaPokemon,
         gender: state.gender || rollPokemonGender(state.pokemonId),
         identified: true,
         originalTrainer: user.id,
@@ -836,6 +845,11 @@ export async function attemptCapture(
         ability: abilityId,
         ...getPokemonRarityLegacyFields(rarity),
         ...resolveEncounterOrigin(state.locationId),
+        ...(state.alphaPokemon && location ? {
+          obtainedRegion: location?.category,
+          obtainedLocation: location?.subCategory || location?.name,
+          obtainedSourceId: state.alphaBattleId || state.locationId,
+        } : {}),
       },
     })
     const abilityRegistration = await registerAbilityDexEntry(
@@ -939,10 +953,14 @@ export async function attemptCapture(
       })
     }
 
-    const { summary } = await grantRewards(user.id, rewardsToGrant, {
-      requirementContext: rewardRequirementContext,
-      payload, req,
-    })
+    const { summary } = await grantRewards(
+      user.id,
+      applyAlphaCaptureXp(rewardsToGrant, !!state.alphaPokemon),
+      {
+        requirementContext: rewardRequirementContext,
+        payload, req,
+      },
+    )
 
     // Consolidate messages
     const messages = [...statMessages]

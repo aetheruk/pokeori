@@ -100,6 +100,7 @@ export function BattleHeader({
               activeEnemyMon.name
             }
             level={activeEnemyMon.level}
+            isAlpha={activeEnemyMon.isAlpha}
             gender={activeEnemyMon.gender}
             align="right"
             status={activeEnemyMon.status}
@@ -121,6 +122,7 @@ export function BattleHeader({
                 activePlayerMon.name
               }
               level={activePlayerMon.level}
+              isAlpha={activePlayerMon.isAlpha}
               actualLevel={activePlayerMon.actualLevel}
               gender={activePlayerMon.gender}
               isPlayer

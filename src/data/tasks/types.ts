@@ -65,7 +65,7 @@ export interface PokemonCriteria {
   ballType?: string
   minLevel?: number
   maxLevel?: number
-  size?: 'XS' | 'S' | 'L' | 'XL'
+  size?: 'XS' | 'S' | 'L' | 'XL' | 'XXL' | 'XXXL'
   nature?: string | string[]
   shiny?: boolean
   rarity?: PokemonRarityId

@@ -672,7 +672,8 @@ export interface Pokemon {
   obtainedSourceId?: string | null;
   boxId?: string | null;
   locked?: boolean | null;
-  size?: ('XS' | 'S' | 'L' | 'XL') | null;
+  size?: ('XS' | 'S' | 'L' | 'XL' | 'XXL' | 'XXXL') | null;
+  isAlpha?: boolean | null;
   partner?: boolean | null;
   onBattleTeam?: boolean | null;
   battleTeamPosition?: number | null;
@@ -1474,6 +1475,7 @@ export interface PokemonSelect<T extends boolean = true> {
   boxId?: T;
   locked?: T;
   size?: T;
+  isAlpha?: T;
   partner?: T;
   onBattleTeam?: T;
   battleTeamPosition?: T;

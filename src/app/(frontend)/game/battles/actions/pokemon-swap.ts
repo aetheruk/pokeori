@@ -130,7 +130,7 @@ export async function swapPokemon(
         state.playerTeam = buildWildBattleSelectedTeam(
           state.playerTeam,
           newIndex,
-          battleConfig?.maxPokemon ?? state.config?.maxPokemon ?? 1,
+          state.config?.maxPokemon ?? battleConfig?.maxPokemon ?? 1,
         )
         state.activePlayerIndex = 0
       } else {

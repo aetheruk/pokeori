@@ -135,6 +135,7 @@ import { EncounterResults } from './_components/encounter-results'
 import { ItemFlickQte } from './_components/item-flick-qte'
 import { QuestionPrompt } from './_components/question-prompt'
 import { SafariBallControl } from './_components/safari-ball-control'
+import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 
 interface EncounterData {
   locationSnapshot?: import('@/data/types').Location
@@ -142,6 +143,7 @@ interface EncounterData {
   formId: string
   pokemonName: string
   isShiny: boolean
+  isAlpha?: boolean
   rarity?: PokemonRarityId
   gender?: 'male' | 'female' | 'genderless'
   startTime: number
@@ -2015,6 +2017,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                 {encounterRarity === 'normal'
                   ? encounter.pokemonName
                   : encounterRarityLabel}
+                {encounter.isAlpha && <AlphaIcon />}
               </motion.div>
             )}
           </AnimatePresence>

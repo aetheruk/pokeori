@@ -464,6 +464,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-16-furious-snorlax',
+    allowAlpha: false,
     name: 'Furious Snorlax',
     description: 'The woken Snorlax is furious and blocking Route 16.',
     category: 'Kanto',

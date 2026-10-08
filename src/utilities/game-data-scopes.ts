@@ -80,6 +80,7 @@ export const EXPLORE_POKEMON_SELECT = {
   nature: true,
   ballType: true,
   size: true,
+  isAlpha: true,
   shiny: true,
   isShadow: true,
   isRadiant: true,

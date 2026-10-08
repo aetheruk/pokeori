@@ -19,7 +19,11 @@ import {
 } from '@/utilities/pokemon/encounter-ability-runtime'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
-import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
+import {
+  getPokemonRarityLegacyFields,
+  resolvePokemonRarity,
+  type PokemonRarityId,
+} from '@/utilities/pokemon/rarity-effects'
 import {
   combinedShinyChance,
   resolveGeneratedPokemonRarity,
@@ -31,6 +35,8 @@ import {
 } from '@/utilities/pokemon/shiny-odds'
 import {
   getResearcherShinyModifier,
+  getResearcherAbilityRolls,
+  getResearcherHiddenAbilitiesUnlocked,
   getSkillLevel,
 } from '@/utilities/skills/unlocks'
 import type { Reward } from '@/utilities/rewards/reward-logic'
@@ -69,6 +75,15 @@ import type { WeatherSnapshot } from '@/utilities/weather'
 import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
 import { getAvailableFishingItemEntries } from '@/utilities/fishing/item-pool'
 import { SAFARI_BASE_FLEE_RATE } from '@/utilities/pokemon/safari-catch'
+import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
+import {
+  ALPHA_CAPTURE_SECONDS,
+  canRollCaptureAlpha,
+  generateAlphaStats,
+  rollCaptureAlpha,
+} from '@/utilities/pokemon/alpha'
+import { rollAbility } from '@/app/(frontend)/game/locations/encounter/actions/utils'
+import type { EncounterState } from '@/app/(frontend)/game/locations/encounter/actions/types'
 
 export interface FishingState {
   userId: string
@@ -82,6 +97,7 @@ export interface FishingState {
     entry: FishingPokemonEntry | FishingItemEntry
     isShiny?: boolean
     rarity?: PokemonRarityId
+    isSecret?: boolean
   }
   reactionDeadline?: number // When the hook window ends
   phase: 'idle' | 'waiting' | 'nibble' | 'hooked' | 'missed'
@@ -260,6 +276,7 @@ export async function castFishingLine(rodType: RodType) {
         Math.random() * (FISHING_POKEMON_CHANCE + FISHING_ITEM_CHANCE)
       let selectedEntry: FishingPokemonEntry | FishingItemEntry
       let resultType: 'pokemon' | 'item'
+      let isSecret = false
 
       if (poolRoll < FISHING_POKEMON_CHANCE) {
         // Pokemon pool - Apply time restrictions
@@ -296,10 +313,12 @@ export async function castFishingLine(rodType: RodType) {
           return { success: false, error: 'No eligible fishing encounters' }
         }
 
+        const ordinaryEntry = rollWeightedEntry(pool)
         selectedEntry = applySecretFishingPokemonReplacement({
           rodType,
-          entry: rollWeightedEntry(pool),
+          entry: ordinaryEntry,
         })
+        isSecret = selectedEntry !== ordinaryEntry
         resultType = 'pokemon'
       } else {
         // Item pool. Local entries are reserved for quest/location-specific drops.
@@ -401,6 +420,7 @@ export async function castFishingLine(rodType: RodType) {
           entry: selectedEntry,
           isShiny,
           rarity,
+          isSecret,
         },
         phase: 'waiting',
         weather: researchState.weather,
@@ -811,17 +831,32 @@ export async function startFishingCatch() {
       const initialCatchRate = Math.floor(baseRate / 2)
       const modifiedBaseRate = Math.min(255, initialCatchRate + catchRateMod)
 
-      const duration = rodConfig?.timer || 30
+      const isAlpha = rollCaptureAlpha(
+        canRollCaptureAlpha(
+          {
+            ...encounter,
+            encounterMode: encounter.settings.safariCapture
+              ? 'safari'
+              : 'standard',
+          },
+          speciesId,
+          !!result.isSecret ||
+            pokemonEntry.allowAlpha === false ||
+            isExpeditionActivity('game', encounter.id),
+        ),
+      )
+      const duration = isAlpha ? ALPHA_CAPTURE_SECONDS : rodConfig?.timer || 30
       const startTime = Date.now()
       const expiry = startTime + duration * 1000
 
       // Level calculation
       const levelRange = rodConfig?.levelRange || { min: 5, max: 25 }
-      const level = Math.floor(
+      const naturalLevel = Math.floor(
         Math.random() * (levelRange.max - levelRange.min + 1) + levelRange.min,
       )
+      const level = naturalLevel + (isAlpha ? 5 : 0)
 
-      const encounterState = {
+      const encounterState: EncounterState = {
         userId: user.id,
         locationId: `fishing:${fishingState.encounterId}`, // Prefix to identify as fishing
         background: encounter.background,
@@ -832,8 +867,8 @@ export async function startFishingCatch() {
         gender: rollPokemonGender(speciesId),
         startTime,
         expiry,
-        baseCatchRate: modifiedBaseRate,
-        currentCatchRate: modifiedBaseRate,
+        baseCatchRate: isAlpha ? 0 : modifiedBaseRate,
+        currentCatchRate: isAlpha ? 0 : modifiedBaseRate,
         questionsAnswered: [],
         itemsUsed: [],
         level,
@@ -859,6 +894,37 @@ export async function startFishingCatch() {
           : undefined,
       }
 
+      if (isAlpha) {
+        const payload = await getPayload({ config: configPromise })
+        const pokedexMap = await getUserPokedexMap(payload as any, user.id)
+        const researchLevel =
+          pokedexMap[speciesId.toString()]?.[formId]?.researchLevel || 0
+        const researcherLevel = getSkillLevel(user.skills, 'researching')
+        const rarity = resolvePokemonRarity(result)
+        encounterState.alphaPokemon = {
+          ...generateAlphaStats(
+            speciesData?.height || 0,
+            speciesData?.weight || 0,
+          ),
+          speciesId,
+          formId,
+          name: speciesData?.name || 'Unknown',
+          level,
+          gender: encounterState.gender,
+          rarity,
+          ...getPokemonRarityLegacyFields(rarity),
+          isAlpha: true,
+          ability: rollAbility(
+            formId,
+            speciesData?.types || [],
+            researchLevel,
+            getResearcherAbilityRolls(researcherLevel),
+            getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+          ),
+          background: encounter.background,
+        }
+      }
+
       // Store as location encounter for attemptCapture compatibility
       await redis.set(`encounter:${user.id}`, encounterState, {
         ex: duration + 60,
@@ -870,6 +936,7 @@ export async function startFishingCatch() {
         formId,
         isShiny: result.isShiny || false,
         rarity: result.rarity,
+        isAlpha,
         startTime,
         expiry,
         duration,
