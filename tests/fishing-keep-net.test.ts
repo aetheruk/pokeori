@@ -13,10 +13,10 @@ import {
 
 describe('fishing keep net', () => {
   test('scales item chance and caught-Pokemon Explorer XP with net occupancy', () => {
-    expect(getFishingItemChance(0)).toBe(20)
-    expect(getFishingItemChance(5)).toBe(25)
-    expect(getFishingItemChance(10)).toBe(30)
-    expect(getFishingItemChance(20)).toBe(30)
+    expect(getFishingItemChance(0)).toBe(30)
+    expect(getFishingItemChance(5)).toBe(35)
+    expect(getFishingItemChance(10)).toBe(40)
+    expect(getFishingItemChance(20)).toBe(40)
 
     expect(getFishingExplorerXpMultiplier(0)).toBe(1)
     expect(getFishingExplorerXpMultiplier(5)).toBe(2)

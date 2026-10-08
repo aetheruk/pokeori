@@ -1,5 +1,6 @@
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 import type { LocationReward } from '@/data/types'
+import { FISHING_ITEM_CHANCE } from '@/data/games/fishing/item-pools'
 
 export const FISHING_KEEP_NET_CAPACITY = 10
 export const FISHING_KEEP_NET_EXPLORER_XP_PER_SLOT = 0.2
@@ -30,7 +31,7 @@ export function getFishingExplorerXpMultiplier(keepNetCount: number): number {
 
 export function getFishingItemChance(keepNetCount: number): number {
   const count = Math.max(0, Math.min(FISHING_KEEP_NET_CAPACITY, keepNetCount))
-  return 20 + count
+  return FISHING_ITEM_CHANCE + count
 }
 
 export function getFishingAlphaChanceMultiplier(sameSpeciesCount: number): number {

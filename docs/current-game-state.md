@@ -1,6 +1,6 @@
 # Current Game State
 
-- Unreleased: Fishing now has a ten-slot keep net for held Pokemon and item bundles. Each occupied slot adds one percentage point to the item-roll chance, three matching Pokemon boost that species' Alpha odds by 20%, and seven boost its Shiny odds by 10%. A successful capture pays out kept items, one Research XP per kept Pokemon, and up to 3x Explorer XP based on net occupancy; a missed hook, failed capture, or leaving forfeits the net. Global rod pools now include weighted PokeDollars and Crystal bundles.
+- Unreleased: Fishing now has a ten-slot keep net for held Pokemon and item bundles. Casts start at 70% Pokemon and 30% items; each occupied slot adds one percentage point to the item-roll chance. Three matching Pokemon boost that species' Alpha odds by 20%, and seven boost its Shiny odds by 10%. A successful capture pays out kept items, one Research XP per kept Pokemon, and up to 3x Explorer XP based on net occupancy; a missed hook, failed capture, or leaving forfeits the net. Global rod pools now include weighted PokeDollars and Crystal bundles.
 
 - Unreleased: Fishing reveals whether a hooked Pokémon is Alpha by showing its icon beside its name before the player starts the capture encounter; the Alpha roll is preserved into that encounter.
 

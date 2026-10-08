@@ -2,8 +2,8 @@ import type { FishingItemEntry, RodType } from './types'
 
 const commonAppearTime = { min: 2000, max: 5000 }
 
-export const FISHING_POKEMON_CHANCE = 80
-export const FISHING_ITEM_CHANCE = 20
+export const FISHING_POKEMON_CHANCE = 70
+export const FISHING_ITEM_CHANCE = 30
 
 function goldenScaleEntries(reactionTime: number): FishingItemEntry[] {
   return Array.from({ length: 8 }, (_, index) => ({

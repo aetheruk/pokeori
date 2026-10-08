@@ -47,11 +47,11 @@ export interface FishingItemEntry {
 
 export interface FishingRodConfig {
   encounters: {
-    chance?: number // Deprecated; base fishing rolls are 80% Pokemon before keep-net modifiers.
+    chance?: number // Deprecated; base fishing rolls are 70% Pokemon before keep-net modifiers.
     entries: FishingPokemonEntry[]
   }
   items?: {
-    chance?: number // Deprecated; base fishing rolls are 20% items before keep-net modifiers.
+    chance?: number // Deprecated; base fishing rolls are 30% items before keep-net modifiers.
     entries: FishingItemEntry[]
   }
   // Per-rod catch settings
