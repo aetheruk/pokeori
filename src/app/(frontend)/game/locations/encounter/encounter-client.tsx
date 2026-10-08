@@ -605,6 +605,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
     encounterFailed?: boolean
     safariRetry?: boolean
     secondChance?: boolean
+    keepNetLost?: boolean
     throwQuality?: ThrowQuality
     throwStageBonus?: number
     formId?: string
@@ -644,6 +645,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
     rewards?: RewardSummary
     messages?: string[]
     secondChance?: boolean
+    keepNetLost?: boolean
     throwQuality?: ThrowQuality
     throwStageBonus?: number
     expeditionProgress?: {
@@ -1222,6 +1224,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
             rewards?: RewardSummary
             messages?: string[]
             secondChance?: boolean
+            keepNetLost?: boolean
             throwQuality?: ThrowQuality
             throwStageBonus?: number
             expeditionProgress?: {
@@ -1248,6 +1251,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
             safariRetry: (captureData as any).safariRetry,
             failMessage: (captureData as any).failMessage,
             secondChance: captureData.secondChance,
+            keepNetLost: captureData.keepNetLost,
             throwQuality: captureData.throwQuality,
             throwStageBonus: captureData.throwStageBonus,
             expeditionProgress: captureData.expeditionProgress,
@@ -1372,7 +1376,11 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
       }
 
       if (!captureAnimationData?.caught && captureAnimationData?.secondChance) {
-        toast.success('The Pokemon stayed nearby. Try again!')
+        if (captureAnimationData.keepNetLost) {
+          toast.error('Your keep net was lost. The Pokémon stayed nearby; try again.')
+        } else {
+          toast.success('The Pokemon stayed nearby. Try again!')
+        }
         setHasAttemptedCapture(false)
         setCaptureAnimationData(null)
         setCaptureBallContacted(false)
@@ -1388,7 +1396,11 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
       }
 
       if (!captureAnimationData?.caught && captureAnimationData?.safariRetry) {
-        toast.success('The Pokémon stayed nearby. You can try again.')
+        if (captureAnimationData.keepNetLost) {
+          toast.error('Your keep net was lost. The Pokémon stayed nearby; try again.')
+        } else {
+          toast.success('The Pokémon stayed nearby. You can try again.')
+        }
         setHasAttemptedCapture(false)
         setCaptureAnimationData(null)
         setCaptureBallContacted(false)
@@ -1410,7 +1422,11 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
         pokemonName: captureAnimationData?.pokemonName,
         rewards,
         messages: captureAnimationData?.messages,
-        failMessage: captureAnimationData?.failMessage,
+        failMessage:
+          captureAnimationData?.failMessage ||
+          (captureAnimationData?.keepNetLost
+            ? 'The Pokémon got away. Your keep net was lost.'
+            : undefined),
         encounterFailed: captureAnimationData?.encounterFailed,
         secondChance: captureAnimationData?.secondChance,
         expeditionProgress: captureAnimationData?.expeditionProgress,

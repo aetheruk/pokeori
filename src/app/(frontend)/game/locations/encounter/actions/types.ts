@@ -3,6 +3,7 @@ import type { EncounterQteState } from '@/utilities/pokemon/encounter-qte'
 import type { CaptureAimTiming } from '@/utilities/pokemon/capture-timing'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 import type { WeatherSnapshot } from '@/utilities/weather'
+import type { FishingKeepNetEntry } from '@/utilities/fishing/keep-net'
 import { SAFARI_ENCOUNTER_TTL_SECONDS } from '@/utilities/pokemon/safari-catch'
 
 export interface EncounterShieldState {
@@ -63,6 +64,9 @@ export interface EncounterState {
     ballsRemaining: number
     scope?: 'expedition' | 'encounter'
   }
+  /** Fishing haul to settle on capture or forfeit on a failed catch. */
+  fishingKeepNet?: FishingKeepNetEntry[]
+  fishingExplorerXpMultiplier?: number
 
   /** Override the default location activity for synthetic encounters. */
   expeditionActivityType?: 'location' | 'game'

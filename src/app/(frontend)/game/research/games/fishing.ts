@@ -46,11 +46,7 @@ import type {
   FishingPokemonEntry,
   FishingItemEntry,
 } from '@/data/games/fishing/types'
-import {
-  FISHING_ITEM_CHANCE,
-  FISHING_POKEMON_CHANCE,
-  globalFishingItemPools,
-} from '@/data/games/fishing/item-pools'
+import { globalFishingItemPools } from '@/data/games/fishing/item-pools'
 import {
   acquireActionLock,
   checkActionRateLimit,
@@ -74,13 +70,22 @@ import {
 import type { WeatherSnapshot } from '@/utilities/weather'
 import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
 import { getAvailableFishingItemEntries } from '@/utilities/fishing/item-pool'
+import {
+  FISHING_KEEP_NET_CAPACITY,
+  getFishingAlphaChanceMultiplier,
+  getFishingExplorerXpMultiplier,
+  getFishingItemChance,
+  getFishingShinyChanceMultiplier,
+  getSameSpeciesKeepNetCount,
+  type FishingKeepNetEntry,
+} from '@/utilities/fishing/keep-net'
 import { SAFARI_BASE_FLEE_RATE } from '@/utilities/pokemon/safari-catch'
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import {
+  ALPHA_CAPTURE_CHANCE,
   ALPHA_CAPTURE_SECONDS,
   canRollCaptureAlpha,
   generateAlphaStats,
-  rollCaptureAlpha,
 } from '@/utilities/pokemon/alpha'
 import { rollAbility } from '@/app/(frontend)/game/locations/encounter/actions/utils'
 import type { EncounterState } from '@/app/(frontend)/game/locations/encounter/actions/types'
@@ -105,10 +110,43 @@ export interface FishingState {
   weather?: WeatherSnapshot
 }
 
+interface FishingKeepNetState {
+  encounterId: string
+  entries: FishingKeepNetEntry[]
+}
+
 const FISHING_ACTION_LOCK_TTL = 10
+const FISHING_KEEP_NET_TTL = 900
 
 function getFishingActionLockKey(userId: string): string {
   return `lock:fishing:action:${userId}`
+}
+
+function getFishingKeepNetKey(userId: string): string {
+  return `fishing:keep-net:${userId}`
+}
+
+async function getFishingKeepNetState(
+  userId: string,
+  encounterId: string,
+): Promise<FishingKeepNetState> {
+  const key = getFishingKeepNetKey(userId)
+  const current = (await redis.get(key)) as FishingKeepNetState | null
+  if (current?.encounterId === encounterId) {
+    await redis.expire(key, FISHING_KEEP_NET_TTL)
+    return current
+  }
+
+  const freshState: FishingKeepNetState = { encounterId, entries: [] }
+  await redis.set(key, freshState, { ex: FISHING_KEEP_NET_TTL })
+  return freshState
+}
+
+async function forfeitFishingKeepNet(userId: string): Promise<boolean> {
+  const key = getFishingKeepNetKey(userId)
+  const state = (await redis.get(key)) as FishingKeepNetState | null
+  await redis.del(key)
+  return (state?.entries.length || 0) > 0
 }
 
 function getRodItemId(rodType: RodType): string {
@@ -135,6 +173,7 @@ function buildHookedResponse(fishingState: FishingState) {
       itemId: itemEntry.itemId,
       currencyId: itemEntry.currencyId,
       guildId: itemEntry.guildId,
+      quantity: itemEntry.quantity ?? 1,
       symbol: itemEntry.symbol,
     }
   }
@@ -153,22 +192,55 @@ function buildHookedResponse(fishingState: FishingState) {
   }
 }
 
+function toFishingKeepNetEntry(
+  result: NonNullable<FishingState['hookedResult']>,
+  id: string,
+): FishingKeepNetEntry {
+  if (result.type === 'pokemon') {
+    const entry = result.entry as FishingPokemonEntry
+    return {
+      id,
+      type: 'pokemon',
+      speciesId: entry.speciesId,
+      formId: entry.formId || String(entry.speciesId),
+      isShiny: result.isShiny === true,
+      isAlpha: result.isAlpha === true,
+      rarity: result.rarity,
+    }
+  }
+
+  const entry = result.entry as FishingItemEntry
+  return {
+    id,
+    type: 'item',
+    itemId: entry.itemId,
+    currencyId: entry.currencyId,
+    guildId: entry.guildId,
+    quantity: Math.max(1, Math.floor(entry.quantity ?? 1)),
+  }
+}
+
 function rollFishingEncounterAlpha(
   encounter: FishingGameConfig,
   result: NonNullable<FishingState['hookedResult']>,
+  matchingNetCount = 0,
 ): boolean {
   const pokemonEntry = result.entry as FishingPokemonEntry
-  return rollCaptureAlpha(
-    canRollCaptureAlpha(
-      {
-        ...encounter,
-        encounterMode: encounter.settings.safariCapture ? 'safari' : 'standard',
-      },
-      pokemonEntry.speciesId,
-      !!result.isSecret ||
-        pokemonEntry.allowAlpha === false ||
-        isExpeditionActivity('game', encounter.id),
-    ),
+  const eligible = canRollCaptureAlpha(
+    {
+      ...encounter,
+      encounterMode: encounter.settings.safariCapture ? 'safari' : 'standard',
+    },
+    pokemonEntry.speciesId,
+    !!result.isSecret ||
+      pokemonEntry.allowAlpha === false ||
+      isExpeditionActivity('game', encounter.id),
+  )
+  return (
+    eligible &&
+    Math.random() <
+      ALPHA_CAPTURE_CHANCE *
+        getFishingAlphaChanceMultiplier(matchingNetCount)
   )
 }
 
@@ -179,9 +251,21 @@ async function ensureHookedAlphaRoll(fishingState: FishingState): Promise<void> 
   const encounter = allGames.find(
     (entry) => entry.id === fishingState.encounterId,
   ) as FishingGameConfig | undefined
+  const keepNet = encounter
+    ? await getFishingKeepNetState(fishingState.userId, encounter.id)
+    : { entries: [] }
+  const pokemonEntry = result.entry as FishingPokemonEntry
   result.isAlpha =
     encounter?.gameType === 'fishing'
-      ? rollFishingEncounterAlpha(encounter, result)
+      ? rollFishingEncounterAlpha(
+          encounter,
+          result,
+          getSameSpeciesKeepNetCount(
+            keepNet.entries,
+            pokemonEntry.speciesId,
+            pokemonEntry.formId || String(pokemonEntry.speciesId),
+          ),
+        )
       : false
   await redis.set(`fishing:${fishingState.userId}`, fishingState, { ex: 300 })
 }
@@ -198,6 +282,7 @@ async function clearExpiredFishingCast(
 ): Promise<boolean> {
   if (fishingState.phase === 'missed') {
     await redis.del(`fishing:${userId}`)
+    await forfeitFishingKeepNet(userId)
     return true
   }
 
@@ -206,6 +291,7 @@ async function clearExpiredFishingCast(
   const reactionDeadline = getReactionDeadline(fishingState)
   if (reactionDeadline !== null && Date.now() > reactionDeadline) {
     await redis.del(`fishing:${userId}`)
+    await forfeitFishingKeepNet(userId)
     return true
   }
 
@@ -285,6 +371,11 @@ export async function castFishingLine(rodType: RodType) {
         return { success: false, error: 'Invalid fishing encounter' }
       }
 
+      const fishingKeepNet = await getFishingKeepNetState(
+        user.id,
+        researchState.encounterId,
+      )
+
       const payload = await getPayload({ config: configPromise })
       const inventory = await getUserInventoryMap(payload as any, user.id)
       const requiredRodItemId = getRodItemId(rodType)
@@ -306,14 +397,14 @@ export async function castFishingLine(rodType: RodType) {
         { payload },
       )
 
-      // Roll which pool (Pokemon vs items). Fishing uses a global 80/20 split.
-      const poolRoll =
-        Math.random() * (FISHING_POKEMON_CHANCE + FISHING_ITEM_CHANCE)
+      // A full keep net gradually shifts the usual 80/20 cast split toward items.
+      const itemChance = getFishingItemChance(fishingKeepNet.entries.length)
+      const poolRoll = Math.random() * 100
       let selectedEntry: FishingPokemonEntry | FishingItemEntry
       let resultType: 'pokemon' | 'item'
       let isSecret = false
 
-      if (poolRoll < FISHING_POKEMON_CHANCE) {
+      if (poolRoll < 100 - itemChance) {
         // Pokemon pool - Apply time restrictions
         const isDay = isDaytimeForFishingCategory(encounter.category)
 
@@ -362,11 +453,24 @@ export async function castFishingLine(rodType: RodType) {
             ? rodConfig.items.entries
             : undefined
         const availableConfiguredItemPool = configuredItemPool
-          ? getAvailableFishingItemEntries(configuredItemPool, inventory)
+          ? getAvailableFishingItemEntries(
+              configuredItemPool,
+              inventory,
+              new Set(
+                fishingKeepNet.entries.flatMap((entry) =>
+                  entry.type === 'item' && entry.itemId ? [entry.itemId] : [],
+                ),
+              ),
+            )
           : []
         const availableGlobalItemPool = getAvailableFishingItemEntries(
           globalFishingItemPools[rodType],
           inventory,
+          new Set(
+            fishingKeepNet.entries.flatMap((entry) =>
+              entry.type === 'item' && entry.itemId ? [entry.itemId] : [],
+            ),
+          ),
         )
         const itemPool =
           availableConfiguredItemPool.length > 0
@@ -398,7 +502,7 @@ export async function castFishingLine(rodType: RodType) {
           rodConfig.rarityChances,
           pokemonEntry.rarityChances,
         )
-        const shinyChance =
+        let shinyChance =
           rarityChances.shiny === 0
             ? 0
             : getShinyChance({
@@ -412,8 +516,17 @@ export async function castFishingLine(rodType: RodType) {
                   locationId: encounter.id,
                   targetTypes: speciesData?.types,
                   isNight: isNightHour(),
-                }),
-              })
+              }),
+            })
+        const sameSpeciesInNet = getSameSpeciesKeepNetCount(
+          fishingKeepNet.entries,
+          pokemonEntry.speciesId,
+          formId,
+        )
+        shinyChance = Math.min(
+          1,
+          shinyChance * getFishingShinyChanceMultiplier(sameSpeciesInNet),
+        )
         const pokedexMap = await getUserPokedexMap(payload as any, user.id)
         const researchLevel =
           pokedexMap[pokemonEntry.speciesId.toString()]?.[formId]
@@ -557,10 +670,12 @@ export async function attemptHook() {
       if (now < fishingState.appearTime) {
         // Pressed too early
         fishingState.phase = 'missed'
+        const keepNetLost = await forfeitFishingKeepNet(user.id)
         await redis.set(`fishing:${user.id}`, fishingState, { ex: 60 })
         const response = {
           success: true,
           hooked: false,
+          keepNetLost,
           message: 'Too early! The fish got away.',
         }
         await setIdempotentResult(hookResultKey, response, 120)
@@ -571,10 +686,12 @@ export async function attemptHook() {
       if (now > reactionDeadline) {
         // Too late
         fishingState.phase = 'missed'
+        const keepNetLost = await forfeitFishingKeepNet(user.id)
         await redis.set(`fishing:${user.id}`, fishingState, { ex: 60 })
         const response = {
           success: true,
           hooked: false,
+          keepNetLost,
           message: 'Too slow! The fish escaped.',
         }
         await setIdempotentResult(hookResultKey, response, 120)
@@ -588,9 +705,22 @@ export async function attemptHook() {
         const encounter = allGames.find(
           (entry) => entry.id === fishingState.encounterId,
         ) as FishingGameConfig | undefined
+        const keepNet = await getFishingKeepNetState(
+          user.id,
+          fishingState.encounterId,
+        )
+        const pokemonEntry = fishingState.hookedResult.entry as FishingPokemonEntry
         fishingState.hookedResult.isAlpha =
           encounter?.gameType === 'fishing'
-            ? rollFishingEncounterAlpha(encounter, fishingState.hookedResult)
+            ? rollFishingEncounterAlpha(
+                encounter,
+                fishingState.hookedResult,
+                getSameSpeciesKeepNetCount(
+                  keepNet.entries,
+                  pokemonEntry.speciesId,
+                  pokemonEntry.formId || String(pokemonEntry.speciesId),
+                ),
+              )
             : false
       }
       await redis.set(`fishing:${user.id}`, fishingState, { ex: 300 }) // 5 min to decide
@@ -691,9 +821,17 @@ export async function claimFishingItem() {
       const reward: Reward = itemEntry.guildId
         ? { type: 'guild_xp', targetId: itemEntry.guildId, quantity: 1 }
         : itemEntry.currencyId
-          ? { type: 'currency', targetId: itemEntry.currencyId, quantity: 1 }
-          : itemEntry.itemId
-          ? { type: 'item', targetId: itemEntry.itemId, quantity: 1 }
+        ? {
+            type: 'currency',
+            targetId: itemEntry.currencyId,
+            quantity: itemEntry.quantity ?? 1,
+          }
+        : itemEntry.itemId
+          ? {
+              type: 'item',
+              targetId: itemEntry.itemId,
+              quantity: itemEntry.quantity ?? 1,
+            }
           : (() => {
               throw new Error('Fishing item has no reward target')
             })()
@@ -751,6 +889,135 @@ export async function claimFishingItem() {
   }
 }
 
+export async function keepFishingCatch(replaceIndex?: number) {
+  const user = await getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+
+  const rateLimit = await checkActionRateLimit(
+    user.id,
+    'fishing-keep-catch',
+    60,
+    60,
+  )
+  if (!rateLimit.allowed) {
+    return { success: false, error: 'Too many keep-net actions. Please wait.' }
+  }
+
+  const actionLock = await acquireActionLock(
+    getFishingActionLockKey(user.id),
+    FISHING_ACTION_LOCK_TTL,
+  )
+  if (!actionLock.acquired) {
+    return {
+      success: false,
+      error: 'Another fishing action is already being processed',
+    }
+  }
+
+  try {
+    const fishingState = (await redis.get(
+      `fishing:${user.id}`,
+    )) as FishingState | null
+    if (fishingState?.phase !== 'hooked' || !fishingState.hookedResult) {
+      return { success: false, error: 'No hooked catch to keep' }
+    }
+
+    const resultKey = `fishing:keep:${user.id}:${fishingState.castTime}`
+    const cached = await getIdempotentResult<any>(resultKey)
+    if (cached) return cached
+
+    const keepNet = await getFishingKeepNetState(
+      user.id,
+      fishingState.encounterId,
+    )
+    if (keepNet.entries.length >= FISHING_KEEP_NET_CAPACITY) {
+      if (
+        replaceIndex === undefined ||
+        !Number.isInteger(replaceIndex) ||
+        replaceIndex < 0 ||
+        replaceIndex >= keepNet.entries.length
+      ) {
+        return {
+          success: false,
+          full: true,
+          error: 'Choose something in the keep net to swap out.',
+          keepNet: keepNet.entries,
+        }
+      }
+      keepNet.entries[replaceIndex] = toFishingKeepNetEntry(
+        fishingState.hookedResult,
+        fishingState.castId || String(fishingState.castTime),
+      )
+    } else {
+      keepNet.entries.push(
+        toFishingKeepNetEntry(
+          fishingState.hookedResult,
+          fishingState.castId || String(fishingState.castTime),
+        ),
+      )
+    }
+
+    await redis.set(getFishingKeepNetKey(user.id), keepNet, {
+      ex: FISHING_KEEP_NET_TTL,
+    })
+    await redis.del(`fishing:${user.id}`)
+    await redis.expire(`game:${user.id}`, FISHING_KEEP_NET_TTL)
+
+    const response = {
+      success: true,
+      keepNet: keepNet.entries,
+      replaced: replaceIndex !== undefined,
+    }
+    await setIdempotentResult(resultKey, response, 300)
+    return response
+  } catch (error) {
+    console.error('Error keeping fishing catch:', error)
+    return { success: false, error: 'Unable to add this catch to your net.' }
+  } finally {
+    await releaseActionLock(actionLock)
+  }
+}
+
+export async function getFishingKeepNet() {
+  const user = await getUser()
+  if (!user) return []
+
+  const researchState = (await redis.get(
+    `game:${user.id}`,
+  )) as GameActivityState | null
+  if (!researchState?.encounterId) return []
+
+  const encounter = allGames.find(
+    (entry) => entry.id === researchState.encounterId,
+  )
+  if (encounter?.gameType !== 'fishing') return []
+
+  const keepNet = await getFishingKeepNetState(user.id, researchState.encounterId)
+  return keepNet.entries
+}
+
+export async function abandonFishing() {
+  const user = await getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+  const actionLock = await acquireActionLock(
+    getFishingActionLockKey(user.id),
+    FISHING_ACTION_LOCK_TTL,
+  )
+  if (!actionLock.acquired) {
+    return {
+      success: false,
+      error: 'Another fishing action is already being processed',
+    }
+  }
+  try {
+    await redis.del(`fishing:${user.id}`)
+    await forfeitFishingKeepNet(user.id)
+    return { success: true }
+  } finally {
+    await releaseActionLock(actionLock)
+  }
+}
+
 export async function releaseFish() {
   try {
     const user = await getUser()
@@ -787,13 +1054,31 @@ export async function releaseFish() {
         `fishing:${user.id}`,
       )) as FishingState | null
 
+      const reactionDeadline = fishingState?.hookedResult
+        ? fishingState.appearTime + fishingState.hookedResult.entry.reactionTime
+        : null
+      const failedHook =
+        fishingState?.phase === 'missed' ||
+        (fishingState?.phase === 'waiting' &&
+          Date.now() < fishingState.appearTime) ||
+        (['waiting', 'nibble'].includes(fishingState?.phase || '') &&
+          reactionDeadline !== null &&
+          Date.now() > reactionDeadline)
+      const keepNetLost = failedHook
+        ? await forfeitFishingKeepNet(user.id)
+        : false
+
       // Clear fishing state, keep research session for continued fishing
       await redis.del(`fishing:${user.id}`)
 
       // Refresh research session TTL to keep it alive
       await redis.expire(`game:${user.id}`, 900) // 15 min expiry
 
-      return { success: true, message: 'Released back into the water.' }
+      return {
+        success: true,
+        keepNetLost,
+        message: 'Released back into the water.',
+      }
     } finally {
       await releaseActionLock(actionLock)
     }
@@ -859,6 +1144,10 @@ export async function startFishingCatch() {
       if (result?.type !== 'pokemon') {
         return { success: false, error: 'Not a Pokemon' }
       }
+      const keepNet = await getFishingKeepNetState(
+        user.id,
+        fishingState.encounterId,
+      )
 
       const pokemonEntry = result.entry as FishingPokemonEntry
       const encounter = allGames.find(
@@ -924,6 +1213,10 @@ export async function startFishingCatch() {
           chance: entry.weight,
         })),
         weather: fishingState.weather,
+        fishingKeepNet: keepNet.entries,
+        fishingExplorerXpMultiplier: getFishingExplorerXpMultiplier(
+          keepNet.entries.length,
+        ),
         encounterMode: encounter.settings.safariCapture ? 'safari' : 'standard',
         fleeRate: encounter.settings.safariCapture
           ? SAFARI_BASE_FLEE_RATE
@@ -985,6 +1278,10 @@ export async function startFishingCatch() {
         expiry,
         duration,
         level,
+        keepNetCount: keepNet.entries.length,
+        explorerXpMultiplier: getFishingExplorerXpMultiplier(
+          keepNet.entries.length,
+        ),
       }
 
       await setIdempotentResult(catchStartResultKey, response, 300)

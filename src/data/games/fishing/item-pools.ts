@@ -16,11 +16,33 @@ function goldenScaleEntries(reactionTime: number): FishingItemEntry[] {
   }))
 }
 
+function currencyEntries(reactionTime: number): FishingItemEntry[] {
+  const currencies: Array<{
+    currencyId: string
+    quantity: number
+    weight: number
+    symbol: string
+  }> = [
+    { currencyId: 'pokedollars', quantity: 100, weight: 12, symbol: '$' },
+    { currencyId: 'pokedollars', quantity: 250, weight: 4, symbol: '$$' },
+    { currencyId: 'pokedollars', quantity: 500, weight: 1, symbol: '$$$' },
+    { currencyId: 'crystals', quantity: 5, weight: 5, symbol: '✧' },
+    { currencyId: 'crystals', quantity: 15, weight: 2, symbol: '✧✧' },
+    { currencyId: 'crystals', quantity: 50, weight: 1, symbol: '✧✧✧' },
+  ]
+
+  return currencies.map((entry) => ({
+    ...entry,
+    reactionTime,
+    appearTime: commonAppearTime,
+  }))
+}
+
 export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
   old: [
     {
       itemId: 'water-gem',
-      weight: 79,
+      weight: 54,
       symbol: '!',
       reactionTime: 900,
       appearTime: commonAppearTime,
@@ -32,12 +54,13 @@ export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
       reactionTime: 900,
       appearTime: commonAppearTime,
     },
+    ...currencyEntries(900),
     ...goldenScaleEntries(900),
   ],
   good: [
     {
       itemId: 'water-gem',
-      weight: 80,
+      weight: 55,
       symbol: '!',
       reactionTime: 850,
       appearTime: commonAppearTime,
@@ -49,12 +72,13 @@ export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
       reactionTime: 850,
       appearTime: commonAppearTime,
     },
+    ...currencyEntries(850),
     ...goldenScaleEntries(850),
   ],
   super: [
     {
       itemId: 'water-gem',
-      weight: 75,
+      weight: 50,
       symbol: '!',
       reactionTime: 800,
       appearTime: commonAppearTime,
@@ -66,6 +90,7 @@ export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
       reactionTime: 800,
       appearTime: commonAppearTime,
     },
+    ...currencyEntries(800),
     ...goldenScaleEntries(800),
   ],
 }
