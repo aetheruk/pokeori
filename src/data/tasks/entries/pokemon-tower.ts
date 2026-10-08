@@ -951,7 +951,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 4,
         title: 'Ariana',
         message:
-          "Unlike you, Fuji, my work has led to great results. You may have even seen some of my creations on the way up here. Shadow Pokemon. Incredible power, and most importantly easy to control. If only you'd listened to my advice back then.",
+          "Unlike you, Fuji, my work has led to great results. If only you'd listened to my advice back then.",
         buttons: [
           {
             text: 'Hold Your Ground',
@@ -1047,7 +1047,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 2,
         title: 'Pokemon Tower',
         message:
-          'Arbok lunges forward and sinks its fangs into Kita. Fuji shouts before he can reach them.',
+          'Arbok lunges forward and sinks its fangs into Kita. Fuji shouts before he can reach her.',
         buttons: [
           {
             text: 'Wait',
@@ -1197,12 +1197,12 @@ export const pokemonTowerTasks: Task[] = [
     name: 'Celadon Police HQ',
     description: 'The nearest place to report what happened is Celadon.',
     category: 'Kanto',
-    subCategory: 'Pokemon Tower',
+    subCategory: 'Lavender Town',
     icon: {
       type: 'trainer',
       id: 'policeman',
     },
-    background: '/backgrounds/pkmn-tower.avif',
+    background: '/backgrounds/lavender.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -1228,7 +1228,7 @@ export const pokemonTowerTasks: Task[] = [
             type: 'success',
           },
         ],
-        background: '/backgrounds/pkmn-tower.avif',
+        background: '/backgrounds/lavender.avif',
         icon: {
           type: 'trainer',
           id: 'policeman',
