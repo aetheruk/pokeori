@@ -50,7 +50,10 @@ import {
 } from '@/utilities/battle/chronicle-budgets'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
 import { getPokemonLevelCap } from '@/utilities/pokemon/experience'
-import { getBattleLevelCap } from '@/utilities/battle/level-cap'
+import {
+  ALPHA_WILD_BATTLE_LEVEL_ADVANTAGE,
+  getBattleLevelCap,
+} from '@/utilities/battle/level-cap'
 import {
   getPokemonRarityLegacyFields,
   resolvePokemonRarity,
@@ -604,6 +607,9 @@ export async function startBattleFromConfig(
     battleConfig,
     enemyTeam.map((enemy) => enemy.level),
     badgeLevelCap,
+    alphaPokemon && battleConfig.isWildBattle
+      ? ALPHA_WILD_BATTLE_LEVEL_ADVANTAGE
+      : undefined,
   )
   const playerTeam = initializeTeamMoveUses(
     battleTeamDocs.map((p) =>

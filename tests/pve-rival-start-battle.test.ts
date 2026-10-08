@@ -161,6 +161,7 @@ describe('PVE battle start', () => {
       const result = await startBattleFromConfig(playerUser, battleConfig)
       expect(result.success).toBe(true)
       expect(result.state?.config?.maxPokemon).toBe(2)
+      expect(result.state?.config?.levelCap).toBe(14)
       expect(result.state?.enemyTeam[0]).toMatchObject({ level: 9, isAlpha: true, rarity: 'shiny', evs: { hp: 252 } })
       expect(result.state?.alphaCapturePokemon).toMatchObject({ level: 9, rarity: 'shiny', background: battleConfig.background, size: 'XXL' })
       redisStore.clear()

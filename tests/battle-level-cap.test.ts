@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  ALPHA_WILD_BATTLE_LEVEL_ADVANTAGE,
   getBattleLevelCap,
   resolveBattleLevelCap,
   TRAINER_BATTLE_LEVEL_ADVANTAGE,
@@ -26,6 +27,17 @@ describe('battle level caps', () => {
         [5, 8],
       ),
     ).toBe(8 + WILD_BATTLE_LEVEL_ADVANTAGE)
+  })
+
+  test('Alpha wild battles give a five-level advantage', () => {
+    expect(
+      getBattleLevelCap(
+        { isWildBattle: true },
+        [5, 8],
+        undefined,
+        ALPHA_WILD_BATTLE_LEVEL_ADVANTAGE,
+      ),
+    ).toBe(8 + 5)
   })
 
   test('the badge cap bounds a derived battle cap', () => {

@@ -151,11 +151,9 @@ export function generateAlphaStats(
 ): GeneratedPokemonStats {
   const stats = generatePokemonStats(baseHeight, baseWeight, random)
   const remaining = Object.keys(stats.ivs) as (keyof typeof stats.ivs)[]
-  for (let i = 0; i < 3; i++) {
-    const index = Math.floor(random() * remaining.length)
-    const [stat] = remaining.splice(index, 1)
-    stats.ivs[stat] = 31
-  }
+  const guaranteedStatIndex = Math.floor(random() * remaining.length)
+  const [guaranteedStat] = remaining.splice(guaranteedStatIndex, 1)
+  stats.ivs[guaranteedStat] = 31
   stats.evs.hp = 252
   // The normal maximum is +20%. Independently add up to 10% of that maximum.
   const heightRoll = random()
