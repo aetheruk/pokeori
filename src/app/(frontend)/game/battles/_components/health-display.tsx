@@ -5,11 +5,13 @@ import { getBattleStatusChip } from '@/utilities/battle/status-presentation'
 import type { BattleStance } from '@/utilities/battle/types'
 import { Mars, Venus } from 'lucide-react'
 import { BattleLevelSyncIndicator } from './battle-level-sync-indicator'
+import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 
 interface HealthDisplayProps {
   currentHp: number
   maxHp: number
   name: string
+  isAlpha?: boolean | null
   level: number
   actualLevel?: number
   showHpValues?: boolean
@@ -26,6 +28,7 @@ export function HealthDisplay({
   currentHp,
   maxHp,
   name,
+  isAlpha,
   level,
   actualLevel,
   showHpValues = false,
@@ -52,6 +55,7 @@ export function HealthDisplay({
       )}
     >
       <span className="min-w-0 truncate">{name}</span>
+      {isAlpha && <AlphaIcon />}
       <GenderBadge gender={gender} />
       {preferredStance && <StanceBadge stance={preferredStance} />}
       <span

@@ -16,6 +16,9 @@ export interface EncounterShieldState {
 }
 
 export interface EncounterState {
+  alphaPokemon?: import('@/utilities/pokemon/alpha').AlphaCapturePokemon
+  alphaBattleId?: string
+  background?: string
   locationSnapshot?: import('@/data/types').Location
   userId: string
   locationId: string

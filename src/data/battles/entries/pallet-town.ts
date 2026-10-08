@@ -287,6 +287,7 @@ export const palletTownBattles: BattleConfig[] = [
     ],
     rewards: [],
     id: 'tutorial-battle-4',
+    allowAlpha: false,
   },
   {
     name: 'Rocky Cave',

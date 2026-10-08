@@ -55,7 +55,10 @@ import {
 } from '@/utilities/expeditions/server'
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
-import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
+import {
+  getPokemonRarityLegacyFields,
+  resolvePokemonRarity,
+} from '@/utilities/pokemon/rarity-effects'
 import {
   SAFARI_BALL_ALLOWANCE,
   SAFARI_BASE_FLEE_RATE,
@@ -73,6 +76,8 @@ import { rollAbility, getUser } from './utils'
 import { refreshEncounterShield, serializeEncounterShield } from './shield'
 import {
   getItemSkillLockReason,
+  getResearcherAbilityRolls,
+  getResearcherHiddenAbilitiesUnlocked,
   getResearcherShinyModifier,
   getSkillLevel,
 } from '@/utilities/skills/unlocks'
@@ -90,6 +95,12 @@ import {
   resolveSubRegionWeather,
 } from '@/utilities/weather'
 import { serializeEncounterQte } from '@/utilities/pokemon/encounter-qte'
+import {
+  ALPHA_CAPTURE_SECONDS,
+  canRollCaptureAlpha,
+  rollCaptureAlpha,
+  generateAlphaStats,
+} from '@/utilities/pokemon/alpha'
 
 const REPEL_ITEM_IDS = ['repel', 'super-repel', 'max-repel'] as const
 type RepelItemId = (typeof REPEL_ITEM_IDS)[number]
@@ -313,6 +324,7 @@ export async function startEncounter(
         pokemonId: existingState.pokemonId,
         isShiny: existingState.isShiny,
         rarity: existingState.rarity,
+        isAlpha: !!existingState.alphaPokemon,
         startTime: existingState.startTime,
         expiry: existingState.expiry,
         duration: Math.floor(
@@ -684,6 +696,13 @@ export async function startEncounter(
       }))
     const encounterRarity = resolveGeneratedPokemonRarity(selectedEncounter, rarityChances)
     const isShiny = encounterRarity === 'shiny'
+    const isAlpha = rollCaptureAlpha(
+      canRollCaptureAlpha(
+        location,
+        pokemonId,
+        !!chronicleContext || isExpeditionActivityContent,
+      ),
+    )
 
     // Timer Modifier
     duration = Math.max(
@@ -700,6 +719,7 @@ export async function startEncounter(
         }),
     )
 
+    if (isAlpha) duration = ALPHA_CAPTURE_SECONDS
     const startTime = Date.now()
     const expiry =
       startTime +
@@ -799,6 +819,45 @@ export async function startEncounter(
         : undefined,
     }
 
+    if (isAlpha) {
+      const minLevel = location.levelRange?.min ?? 1
+      const maxLevel = location.levelRange?.max ?? 5
+      const naturalLevel =
+        repelItemId === 'super-repel' ||
+        (repelItemId === 'repel' && Math.random() < 0.8)
+          ? maxLevel
+          : Math.floor(Math.random() * (maxLevel - minLevel + 1)) + minLevel
+      const level =
+        Math.max(
+          minLevel,
+          Math.min(maxLevel, naturalLevel + (state.levelModifier || 0)),
+        ) + 5
+      state.alphaPokemon = {
+        ...generateAlphaStats(speciesData?.height || 0, speciesData?.weight || 0),
+        speciesId: pokemonId,
+        formId,
+        name: speciesData?.name || 'Unknown',
+        level,
+        gender: state.gender,
+        rarity: encounterRarity,
+        ...getPokemonRarityLegacyFields(encounterRarity),
+        isAlpha: true,
+        ability: rollAbility(
+          formId,
+          speciesData?.types || [],
+          formResearchLvl,
+          getResearcherAbilityRolls(researcherLevel),
+          getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+        ),
+        background: location.background,
+      }
+      state.level = level
+      state.levelModifier = 0
+      state.baseCatchRate = 0
+      state.currentCatchRate = 0
+      state.background = location.background
+    }
+
     // Handle Updates (Inventory for break chance, Pokedex for Seen)
     let breakMessage: string | undefined
     const updates: any = {}
@@ -870,6 +929,7 @@ export async function startEncounter(
       isShiny,
       rarity: encounterRarity,
       gender: state.gender,
+      isAlpha,
       startTime,
       expiry,
       duration,
@@ -989,7 +1049,7 @@ export const getEncounter = cache(async () => {
 
   let isEligibleForReplay = false
   const location = (state.locationSnapshot as any)?.eventContexts?.length ? await getEffectiveContent('location', state.locationId, user) : state.locationSnapshot || locations.find((l) => l.id === state.locationId)
-  if (location && !state.chronicle) {
+  if (location && !state.chronicle && !state.alphaBattleId) {
     isEligibleForReplay = await isActivityEligibleForReplay(
       user as User,
       location,
@@ -1001,6 +1061,7 @@ export const getEncounter = cache(async () => {
     pokemonId: state.pokemonId,
     formId: state.formId,
     pokemonName,
+    isAlpha: !!state.alphaPokemon,
     isShiny: state.isShiny,
     rarity: state.rarity,
     gender: state.gender,

@@ -307,7 +307,7 @@ export const TaskConditionBlock: Block = {
         {
           name: 'size',
           type: 'select',
-          options: ['XS', 'S', 'L', 'XL'],
+          options: ['XS', 'S', 'L', 'XL', 'XXL', 'XXXL'],
         },
         { name: 'shiny', type: 'checkbox' },
         { name: 'identified', type: 'checkbox' },

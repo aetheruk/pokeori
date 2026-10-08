@@ -16,6 +16,8 @@ import {
 } from 'react'
 import { MdCatchingPokemon } from 'react-icons/md'
 import { toast } from 'sonner'
+import { attemptAlphaCapture } from '../actions/alpha-capture'
+import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import type { BattleStance, BattleState } from '@/utilities/battle/types'
@@ -188,6 +190,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   const [isBattlePanelLoading, setIsBattlePanelLoading] = useState(false)
   const [isWaitingForServer, setIsWaitingForServer] = useState(false)
   const [isReplayLoading, setIsReplayLoading] = useState(false)
+  const [isCaptureStarting, setIsCaptureStarting] = useState(false)
   const [pendingBattleAction, setPendingBattleAction] =
     useState<PendingBattleAction | null>(null)
   const actionTokenRef = useRef(0)
@@ -1028,6 +1031,29 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
             }
             additionalContent={
               <div className="space-y-3">
+                {battleState.status === 'won' && battleState.alphaCapturePokemon && !battleState.alphaCaptureStartedAt && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-game-ink">
+                      <AlphaIcon /> The Alpha can now be captured. You have 30 seconds, starting at 0 catch rate.
+                    </p>
+                    <Button size="lg" className="w-full" disabled={isCaptureStarting || isReplayLoading}
+                      aria-busy={isCaptureStarting}
+                      onClick={async () => {
+                        setIsCaptureStarting(true)
+                        try {
+                          const result = await attemptAlphaCapture()
+                          if (result.success) router.push('/game/locations/encounter')
+                          else toast.error(result.error || 'Could not start the capture attempt.')
+                        } catch {
+                          toast.error('Could not start the capture attempt. Please try again.')
+                        } finally {
+                          setIsCaptureStarting(false)
+                        }
+                      }}>
+                      {isCaptureStarting ? 'Starting capture…' : 'Attempt Capture'}
+                    </Button>
+                  </div>
+                )}
                 {trainerResultMessage && (
                   <div>
                     <SectionDivider>Trainer's Words</SectionDivider>
@@ -1134,7 +1160,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                 <Button
                   size="lg"
                   type="button"
-                  disabled={isReplayLoading}
+                  disabled={isReplayLoading || isCaptureStarting}
                   aria-busy={isReplayLoading}
                   onClick={async () => {
                     setIsReplayLoading(true)

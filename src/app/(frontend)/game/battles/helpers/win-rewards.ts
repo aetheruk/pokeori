@@ -15,6 +15,7 @@ import { getBattleAbilityWinRewards } from '@/utilities/battle/abilities'
 import { getWildBattleCandyMultiplier } from '@/utilities/battle/held-items'
 import { getPokemonBattleExperience } from '@/utilities/pokemon/experience'
 import { getPersistentPokemonId } from '@/utilities/battle/pokemon-metrics'
+import { ALPHA_RESEARCH_XP } from '@/utilities/pokemon/alpha'
 
 export const BATTLE_PARTICIPANT_RESEARCH_XP = 1
 export const BATTLE_WILD_TARGET_RESEARCH_XP = 1
@@ -188,7 +189,7 @@ export function buildBattleWinRewards(
         rewardsToGrant.push({
           type: 'pokemon_research_xp',
           targetId: enemy.formId,
-          quantity: BATTLE_WILD_TARGET_RESEARCH_XP,
+          quantity: enemy.isAlpha ? ALPHA_RESEARCH_XP : BATTLE_WILD_TARGET_RESEARCH_XP,
           dropChance: 100,
         })
       }
@@ -241,5 +242,20 @@ export function buildBattleWinRewards(
   )
   rewardsToGrant.push(...candyRewards)
 
-  return rewardsToGrant
+  const defeatedAlpha =
+    battleConfig.isWildBattle === true &&
+    state.enemyTeam.some((enemy) => enemy.isAlpha && enemy.currentHp <= 0)
+  if (!defeatedAlpha) return rewardsToGrant
+
+  return rewardsToGrant.map((reward) => {
+    const multiplier = reward.type === 'xp' ? 5
+      : reward.type === 'pokemon_experience' ? 2
+        : reward.type === 'item' ? 3 : 1
+    if (multiplier === 1) return reward
+    const baseQuantity = reward.quantity ?? 1
+    const quantity = typeof baseQuantity === 'number'
+      ? baseQuantity * multiplier
+      : { min: baseQuantity.min * multiplier, max: baseQuantity.max * multiplier }
+    return { ...reward, quantity }
+  })
 }

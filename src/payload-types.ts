@@ -464,6 +464,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -672,7 +673,8 @@ export interface Pokemon {
   obtainedSourceId?: string | null;
   boxId?: string | null;
   locked?: boolean | null;
-  size?: ('XS' | 'S' | 'L' | 'XL') | null;
+  size?: ('XS' | 'S' | 'L' | 'XL' | 'XXL' | 'XXXL') | null;
+  isAlpha?: boolean | null;
   partner?: boolean | null;
   onBattleTeam?: boolean | null;
   battleTeamPosition?: number | null;
@@ -1302,6 +1304,7 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  resetPasswordRequestedAt?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -1474,6 +1477,7 @@ export interface PokemonSelect<T extends boolean = true> {
   boxId?: T;
   locked?: T;
   size?: T;
+  isAlpha?: T;
   partner?: T;
   onBattleTeam?: T;
   battleTeamPosition?: T;

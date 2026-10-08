@@ -154,6 +154,7 @@ import {
   toggleMarking,
 } from '../actions'
 import { RenameDialog } from './rename-dialog'
+import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 import { UseItemDialog } from './use-item-dialog'
 
 const POKEMON_LOADOUT_RESEARCH_LEVEL = 1
@@ -1044,7 +1045,10 @@ function MountedPokemonDetailsDialog({
           if (!open) setMoveWorkspaceOpen(false)
         }}
         trigger={panelTrigger}
-        title={pokemon.name || formInfo?.name || 'Pokemon'}
+        title={<span className="inline-flex items-center gap-2">
+          {pokemon.isAlpha && <AlphaIcon />}
+          {pokemon.name || formInfo?.name || 'Pokemon'}
+        </span>}
         description={formLabel}
         icon={
           <PokemonRaritySprite
@@ -1074,7 +1078,7 @@ function MountedPokemonDetailsDialog({
           />
         }
         desktopWidth="min(42vw, 620px)"
-        className="game-paper-first game-paper-background relative flex w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
+        className="game-paper-first game-paper-background flex w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
       >
         {/* Scrollable Content Area */}
         <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">

@@ -136,12 +136,39 @@ mock.module('payload', () => ({
     async update() {
       return {}
     },
+    async create({ data }: { data: unknown }) {
+      return data
+    },
   })),
 }))
 
-describe('PVE rival battle start', () => {
+describe('PVE battle start', () => {
   beforeEach(() => {
     redisStore.clear()
+  })
+
+  test('ordinary wild Alphas add five levels, keep their rarity and allow two team members', async () => {
+    const { startBattleFromConfig } = await import('@/app/(frontend)/game/battles/pve/start-battle')
+    const battleConfig: BattleConfig = {
+      id: 'alpha-test-route', name: 'Route', description: '', category: 'Kanto',
+      icon: { type: 'pokemon', id: '19' }, background: '/backgrounds/grassy-route.avif',
+      maxPokemon: 1, isWildBattle: true, requirements: [], rewards: [],
+      enemyTeam: [{ speciesId: 19, level: { min: 4, max: 8 }, rarity: 'shiny' }],
+    }
+    const originalRandom = Math.random
+    Math.random = () => 0.01
+    try {
+      const result = await startBattleFromConfig(playerUser, battleConfig)
+      expect(result.success).toBe(true)
+      expect(result.state?.config?.maxPokemon).toBe(2)
+      expect(result.state?.enemyTeam[0]).toMatchObject({ level: 9, isAlpha: true, rarity: 'shiny', evs: { hp: 252 } })
+      expect(result.state?.alphaCapturePokemon).toMatchObject({ level: 9, rarity: 'shiny', background: battleConfig.background, size: 'XXL' })
+      redisStore.clear()
+      const eventResult = await startBattleFromConfig(playerUser, { ...battleConfig, isRandomEvent: true })
+      expect(eventResult.state?.enemyTeam[0]).toMatchObject({ level: 4, isAlpha: false, rarity: 'shiny' })
+      expect(eventResult.state?.config?.maxPokemon).toBe(1)
+      expect(eventResult.state?.alphaCapturePokemon).toBeUndefined()
+    } finally { Math.random = originalRandom }
   })
 
   test('uses the dynamic rival team when the authored enemy team is empty', async () => {

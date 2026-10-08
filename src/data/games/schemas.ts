@@ -41,7 +41,7 @@ const pokemonCriteriaSchema = z
     ballType: z.string().optional(),
     minLevel: z.number().int().min(1).max(100).optional(),
     maxLevel: z.number().int().min(1).max(100).optional(),
-    size: z.enum(['XS', 'S', 'L', 'XL']).optional(),
+    size: z.enum(['XS', 'S', 'L', 'XL', 'XXL', 'XXXL']).optional(),
     shiny: z.boolean().optional(),
     rarity: z.string().refine(isPokemonRarityId, 'Invalid Pokemon rarity').optional(),
     isShadow: z.boolean().optional(),

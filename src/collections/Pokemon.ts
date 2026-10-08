@@ -544,8 +544,16 @@ export const Pokemon: CollectionConfig = {
         { label: 'S', value: 'S' },
         { label: 'L', value: 'L' },
         { label: 'XL', value: 'XL' },
+        { label: 'XXL', value: 'XXL' },
+        { label: 'XXXL', value: 'XXXL' },
       ],
       label: 'Size',
+    },
+    {
+      name: 'isAlpha',
+      type: 'checkbox',
+      label: 'Alpha Pokemon',
+      defaultValue: false,
     },
     {
       name: 'partner',

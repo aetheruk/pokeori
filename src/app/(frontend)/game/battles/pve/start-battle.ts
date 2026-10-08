@@ -90,6 +90,12 @@ import {
   KID_MODE_ACCESS_ERROR,
   KID_MODE_PVE_STAT_MULTIPLIER,
 } from '@/utilities/kid-mode'
+import {
+  canRollAlpha,
+  rollAlpha,
+  generateAlphaStats,
+} from '@/utilities/pokemon/alpha'
+import type { PokemonIVs } from '@/utilities/pokemon/pokemon-mechanics'
 
 export async function startBattle(
   battleId: string,
@@ -303,7 +309,7 @@ export async function startBattleFromConfig(
     dynamic?: boolean
   } = {},
 ): Promise<{ success: boolean; error?: string; state?: BattleState }> {
-  const maxPokemon = battleConfig.maxPokemon || 6
+  let maxPokemon = battleConfig.maxPokemon || 6
   const playerTeamLoadLimit = battleConfig.isWildBattle ? 6 : maxPokemon
 
   const payload = await getPayload({ config: configPromise })
@@ -472,12 +478,24 @@ export async function startBattleFromConfig(
         enemyTeamConfig.map(async (enemy) => {
           const formData = getPokemonForm(enemy.formId || enemy.speciesId)
           const name = enemy.name || formData?.name || 'Unknown'
-          const level =
+          const naturalLevel =
             typeof enemy.level === 'number'
               ? enemy.level
               : Math.floor(
                   Math.random() * (enemy.level.max - enemy.level.min + 1),
                 ) + enemy.level.min
+
+          const isAlpha = rollAlpha(
+            canRollAlpha(
+              battleConfig,
+              enemy,
+              !!(options.dynamic || chronicleContext || expeditionContext),
+            ),
+          )
+          const level = naturalLevel + (isAlpha ? 5 : 0)
+          const alphaStats = isAlpha
+            ? generateAlphaStats(formData?.height || 0, formData?.weight || 0)
+            : undefined
 
           const rarity = resolveGeneratedPokemonRarity(enemy, resolveRarityChances(battleConfig.rarityChances, enemy.rarityChances, battleConfig.isWildBattle === true))
           const rarityLegacyFields = getPokemonRarityLegacyFields(rarity)
@@ -488,13 +506,19 @@ export async function startBattleFromConfig(
             name: name,
             gender: enemy.gender || rollPokemonGender(enemy.speciesId),
             stats: null,
-            ivs: resolveEnemyBattleIvs({
+            isAlpha,
+            nature: alphaStats?.nature,
+            height: alphaStats?.height,
+            weight: alphaStats?.weight,
+            size: alphaStats?.size,
+            background: battleConfig.background,
+            ivs: alphaStats?.ivs ?? resolveEnemyBattleIvs({
               enemy,
               level,
               isWildBattle: battleConfig.isWildBattle,
               difficulty: battleConfig.enemyDifficulty,
             }),
-            evs: resolveEnemyBattleEvs({
+            evs: alphaStats?.evs ?? resolveEnemyBattleEvs({
               enemy,
               level,
               isWildBattle: battleConfig.isWildBattle,
@@ -529,6 +553,8 @@ export async function startBattleFromConfig(
           return initialized
         }),
       )
+  const alphaPokemon = enemyTeam.find((pokemon) => pokemon.isAlpha)
+  if (alphaPokemon) maxPokemon = 2
   if (battleConfig.format === 'double' && enemyTeam.length < 2) {
     return { success: false, error: 'Double battles need at least two opposing Pokemon.' }
   }
@@ -654,6 +680,26 @@ export async function startBattleFromConfig(
         ? 'Wild Pokemon'
         : battleConfig.trainerName || battleConfig.name),
     isWildBattle: battleConfig.isWildBattle,
+    alphaCapturePokemon: alphaPokemon ? {
+      speciesId: alphaPokemon.speciesId,
+      formId: alphaPokemon.formId,
+      name: alphaPokemon.name,
+      level: alphaPokemon.level,
+      gender: alphaPokemon.gender,
+      rarity: alphaPokemon.rarity,
+      shiny: alphaPokemon.shiny,
+      isShadow: alphaPokemon.isShadow,
+      isRadiant: alphaPokemon.isRadiant,
+      isAlpha: true,
+      ability: alphaPokemon.ability,
+      ivs: structuredClone(alphaPokemon.ivs) as PokemonIVs,
+      evs: structuredClone(alphaPokemon.evs) as PokemonIVs,
+      nature: alphaPokemon.nature!,
+      height: alphaPokemon.height!,
+      weight: alphaPokemon.weight!,
+      size: alphaPokemon.size || 'XXL',
+      background: battleConfig.background,
+    } : undefined,
     weather: weatherSnapshot,
     itemsUsedThisBattle: [],
     trainerItems: normalizeTrainerBattleItems(battleConfig.trainerItems),
