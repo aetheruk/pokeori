@@ -64,11 +64,11 @@ function makeAlpha() {
 }
 
 describe('Alpha Pokémon', () => {
-  test('ordinary capture encounters roll independently at one in 100 and exclude special content', () => {
+  test('ordinary capture encounters roll independently at one in 30 and exclude special content', () => {
     const location = { ...config, encounters: [] } as unknown as Location
     expect(canRollCaptureAlpha(location, 19)).toBe(true)
-    expect(rollCaptureAlpha(true, () => 0.009999)).toBe(true)
-    expect(rollCaptureAlpha(true, () => 0.01)).toBe(false)
+    expect(rollCaptureAlpha(true, () => 1 / 30 - 0.000001)).toBe(true)
+    expect(rollCaptureAlpha(true, () => 1 / 30)).toBe(false)
     expect(
       rollCaptureAlpha(false, () => {
         throw new Error('Must not roll')
@@ -147,10 +147,10 @@ describe('Alpha Pokémon', () => {
     expect(new TextDecoder().decode(result.stderr)).toBe('')
     expect(result.exitCode).toBe(0)
   })
-  test('has an independent one-in-50 roll with an exclusive upper boundary', () => {
+  test('has an independent one-in-30 roll with an exclusive upper boundary', () => {
     expect(rollAlpha(true, () => 0)).toBe(true)
-    expect(rollAlpha(true, () => 0.019999)).toBe(true)
-    expect(rollAlpha(true, () => 0.02)).toBe(false)
+    expect(rollAlpha(true, () => 1 / 30 - 0.000001)).toBe(true)
+    expect(rollAlpha(true, () => 1 / 30)).toBe(false)
     expect(
       rollAlpha(false, () => {
         throw new Error('Ineligible encounters must not roll')

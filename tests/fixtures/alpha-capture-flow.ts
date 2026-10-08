@@ -473,8 +473,8 @@ try {
     for (const key of Object.keys(fishingConfig)) delete fishingConfig[key]
     Object.assign(fishingConfig, originalConfig)
   }
-  // The exclusive 1-in-100 boundary preserves ordinary rod settings.
-  Math.random = () => 0.01
+  // The exclusive 1-in-30 boundary preserves ordinary rod settings.
+  Math.random = () => 1 / 30
   store.set('fishing:owner', {
     encounterId: fishingConfig.id,
     selectedRod: 'old',

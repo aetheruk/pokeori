@@ -6,8 +6,8 @@ import {
   type GeneratedPokemonStats,
 } from './pokemon-mechanics'
 
-export const ALPHA_CHANCE = 1 / 50
-export const ALPHA_CAPTURE_CHANCE = 1 / 100
+export const ALPHA_CHANCE = 1 / 30
+export const ALPHA_CAPTURE_CHANCE = 1 / 30
 export const ALPHA_CAPTURE_SECONDS = 50
 export const ALPHA_RESEARCH_XP = 15
 export const ALPHA_CAPTURE_XP_MULTIPLIER = 5
