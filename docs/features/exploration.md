@@ -17,6 +17,7 @@ Explore locations, mine for items, and discover Pokemon.
 - Mt. Moon's regular Explore encounters retain their existing result IDs for story requirements. Mt. Moon Expedition steps use separate expedition-only copies so the expedition server guard does not prevent normal Explore encounters from starting.
 - Per-player weather rolls persist for 30 minutes. The stored 1-20 weather slot is resolved through each active sub-region's `weatherSlots` map in `src/data/sub-region-map.ts`, defaulting to Clear when a slot is not authored.
 - Requirements and criteria can use `{ type: 'weather', targetId: 'rain' }` or a `targetId` array to gate or hide content by the active sub-region weather. Explore, battle starts, catch starts, catch encounter pools, research starts, and Field Observation internal pools validate the same weather server-side.
+- Pokémon ownership, companion, and battle-team criteria can require Alpha status alongside other Pokémon traits.
 - The Explore header shows the active sub-region weather beside the region-local time chip.
 - Individual catch encounters can define their own `requirements`; locked entries are removed from the roll pool until their gates are met.
 - Location modals still preview requirement-locked encounter entries as red unknown cards. Tapping a locked card shows the unmet requirements unless the encounter or one of its requirements is marked `secret`, in which case the modal keeps those requirements hidden.

@@ -601,6 +601,16 @@ export function TaskConditionForm({
 
               <div className="flex items-center space-x-2">
                 <Switch
+                  id="alpha-criteria"
+                  checked={condition.pokemonCriteria?.isAlpha}
+                  onCheckedChange={(c) =>
+                    handlePokemonCriteriaChange('isAlpha', c)
+                  }
+                />
+                <Label htmlFor="alpha-criteria">Alpha</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
                   id="shiny"
                   checked={condition.pokemonCriteria?.shiny}
                   onCheckedChange={(c) =>
@@ -706,6 +716,16 @@ export function TaskConditionForm({
                 />
               </div>
 
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="alpha-companion"
+                  checked={condition.companionCheck?.isAlpha}
+                  onCheckedChange={(c) =>
+                    handleCompanionCheckChange('isAlpha', c)
+                  }
+                />
+                <Label htmlFor="alpha-companion">Alpha</Label>
+              </div>
               <div className="flex items-center space-x-2">
                 <Switch
                   id="shiny-companion"
@@ -823,6 +843,19 @@ export function TaskConditionForm({
                 <p className="text-[10px] text-muted-foreground mt-1">
                   Filters the team for Pokemon of this type.
                 </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="alpha-battle-team"
+                  checked={condition.battleTeamCheck?.isAlpha}
+                  onCheckedChange={(c) =>
+                    handleChange('battleTeamCheck', {
+                      ...condition.battleTeamCheck,
+                      isAlpha: c,
+                    })
+                  }
+                />
+                <Label htmlFor="alpha-battle-team">Alpha</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Switch

@@ -76,6 +76,8 @@ export const TaskConditionBlock: Block = {
         { label: 'Item Owned', value: 'item_owned' },
         { label: 'Currency Owned', value: 'currency_owned' },
         { label: 'Pokemon Owned', value: 'pokemon_owned' },
+        { label: 'Battle Team', value: 'battle_team' },
+        { label: 'Companion', value: 'companion' },
         { label: 'Card Collected (Total)', value: 'card_collected_total' },
         { label: 'Card Collected (Set)', value: 'card_collected_set' },
         {
@@ -310,6 +312,7 @@ export const TaskConditionBlock: Block = {
           options: ['XS', 'S', 'L', 'XL', 'XXL', 'XXXL'],
         },
         { name: 'shiny', type: 'checkbox' },
+        { name: 'isAlpha', type: 'checkbox', label: 'Alpha' },
         { name: 'identified', type: 'checkbox' },
         {
           name: 'ivs',
@@ -322,6 +325,62 @@ export const TaskConditionBlock: Block = {
             { name: 'specialDefense', type: 'number' },
             { name: 'speed', type: 'number' },
           ],
+        },
+      ],
+    },
+    {
+      name: 'companionCheck',
+      type: 'group',
+      admin: {
+        condition: (_, siblingData) => siblingData.type === 'companion',
+      },
+      fields: [
+        { name: 'speciesId', type: 'number', label: 'Species ID' },
+        { name: 'formId', type: 'text', label: 'Form ID' },
+        { name: 'type', type: 'text', label: 'Type (e.g. Fire)' },
+        { name: 'minLevel', type: 'number' },
+        { name: 'maxLevel', type: 'number' },
+        {
+          name: 'size',
+          type: 'select',
+          options: ['XS', 'S', 'L', 'XL', 'XXL', 'XXXL'],
+        },
+        { name: 'shiny', type: 'checkbox' },
+        { name: 'isAlpha', type: 'checkbox', label: 'Alpha' },
+        { name: 'isShadow', type: 'checkbox', label: 'Shadow' },
+        { name: 'isRadiant', type: 'checkbox', label: 'Radiant' },
+      ],
+    },
+    {
+      name: 'battleTeamCheck',
+      type: 'group',
+      admin: {
+        condition: (_, siblingData) => siblingData.type === 'battle_team',
+      },
+      fields: [
+        {
+          name: 'position',
+          type: 'select',
+          defaultValue: 'any',
+          options: [
+            { label: 'Any Position', value: 'any' },
+            ...[1, 2, 3, 4, 5, 6].map((position) => ({
+              label: `Position ${position}`,
+              value: String(position),
+            })),
+          ],
+        },
+        { name: 'qty', type: 'number', defaultValue: 1 },
+        { name: 'speciesId', type: 'number', label: 'Species ID' },
+        { name: 'formId', type: 'text', label: 'Form ID' },
+        { name: 'type', type: 'text', label: 'Type (e.g. Fire)' },
+        { name: 'isAlpha', type: 'checkbox', label: 'Alpha' },
+        { name: 'isShadow', type: 'checkbox', label: 'Shadow' },
+        { name: 'isRadiant', type: 'checkbox', label: 'Radiant' },
+        {
+          name: 'rarity',
+          type: 'select',
+          options: POKEMON_RARITY_OPTIONS,
         },
       ],
     },

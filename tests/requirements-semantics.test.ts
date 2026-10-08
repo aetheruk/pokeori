@@ -551,6 +551,84 @@ describe('requirements and criteria semantics', () => {
     ).toBe(true)
   })
 
+  test('pokemon requirements can require Alpha status', () => {
+    const data = {
+      ...baseRequirementData,
+      pokemon: [
+        { speciesId: 25, formId: '25', level: 12, isAlpha: true },
+        { speciesId: 25, formId: '25', level: 12, isAlpha: false },
+        { speciesId: 25, formId: '25', level: 12 },
+      ],
+    } as unknown as RequirementData
+
+    expect(
+      checkRequirement(data, {
+        type: 'pokemon_owned',
+        count: 1,
+        pokemonCriteria: { speciesId: 25, isAlpha: true },
+      }),
+    ).toBe(true)
+    expect(
+      checkRequirement(data, {
+        type: 'pokemon_owned',
+        count: 2,
+        pokemonCriteria: { speciesId: 25, isAlpha: true },
+      }),
+    ).toBe(false)
+    expect(
+      checkRequirement(data, {
+        type: 'pokemon_owned',
+        count: 2,
+        pokemonCriteria: { speciesId: 25, isAlpha: false },
+      }),
+    ).toBe(true)
+  })
+
+  test('companion and battle-team checks can require Alpha status', () => {
+    const data = {
+      ...baseRequirementData,
+      pokemon: [
+        {
+          speciesId: 25,
+          formId: '25',
+          level: 12,
+          isAlpha: true,
+          isCompanion: true,
+          onBattleTeam: true,
+          battleTeamPosition: 1,
+        },
+        {
+          speciesId: 25,
+          formId: '25',
+          level: 12,
+          isAlpha: false,
+          onBattleTeam: true,
+          battleTeamPosition: 2,
+        },
+      ],
+    } as unknown as RequirementData
+
+    expect(
+      checkRequirement(data, {
+        type: 'companion',
+        companionCheck: { speciesId: 25, isAlpha: true },
+      }),
+    ).toBe(true)
+    expect(
+      checkRequirement(data, {
+        type: 'battle_team',
+        battleTeamCheck: { position: 'any', isAlpha: true },
+      }),
+    ).toBe(true)
+    expect(
+      checkRequirement(data, {
+        type: 'battle_team',
+        count: 2,
+        battleTeamCheck: { position: 'any', isAlpha: true, qty: 2 },
+      }),
+    ).toBe(false)
+  })
+
   test('pokemon criteria can require partner ownership', () => {
     const data = {
       ...baseRequirementData,

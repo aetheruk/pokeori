@@ -69,6 +69,7 @@ export interface PokemonCriteria {
   nature?: string | string[]
   shiny?: boolean
   rarity?: PokemonRarityId
+  isAlpha?: boolean
   isShadow?: boolean
   isRadiant?: boolean
   identified?: boolean
@@ -88,6 +89,7 @@ export interface BattleTeamCheck {
   region?: string | string[]
   location?: string | string[]
   locationId?: string | string[]
+  isAlpha?: boolean
   isShadow?: boolean
   isRadiant?: boolean
   rarity?: PokemonRarityId

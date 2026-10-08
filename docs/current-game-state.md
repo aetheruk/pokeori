@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.46.0`): Pokémon ownership, companion, and battle-team criteria can require Alpha status; task requirements display the Alpha trait in their description.
 - Unreleased (`0.45.2`): Carddex series and set filters show unique collected cards over each option's total, and the mobile filter panel uses the Base Set booster sprite in its header.
 - Unreleased (`0.44.4`): Ordinary wild battles, location capture encounters, and fishing catches now each have a 1-in-30 chance to spawn an Alpha.
 - Unreleased (`0.45.1`): Alpha wild battles now cap the player's team at five levels above the highest enemy (ordinary wild battles remain ten levels above); Alphas guarantee one perfect IV and keep the other five random. Alpha capture encounters retain battle music instead of switching to the location track.
