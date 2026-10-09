@@ -144,4 +144,45 @@ describe('secret fishing Pokemon replacements', () => {
       }).speciesId,
     ).toBe(349)
   })
+
+  test('five repeatable Golden Scales make a Gold Magikarp almost certain', () => {
+    const goldenScales = [
+      {
+        id: 'golden-scales',
+        type: 'item' as const,
+        itemId: 'golden-scale',
+        quantity: 5,
+      },
+    ]
+
+    expect(
+      applySecretFishingPokemonReplacement({
+        rodType: 'old',
+        entry: baseEntry,
+        keepNet: goldenScales,
+        random: (() => {
+          let rolls = 0
+          return () => (rolls++ === 0 ? 1 : 0)
+        })(),
+      }),
+    ).toMatchObject({ speciesId: 129, formId: '129', rarity: 'gold' })
+
+    expect(
+      applySecretFishingPokemonReplacement({
+        rodType: 'old',
+        entry: baseEntry,
+        keepNet: goldenScales,
+        random: () => 1,
+      }),
+    ).toBe(baseEntry)
+
+    expect(
+      applySecretFishingPokemonReplacement({
+        rodType: 'old',
+        entry: baseEntry,
+        keepNet: [{ ...goldenScales[0], quantity: 4 }],
+        random: () => 1,
+      }),
+    ).toBe(baseEntry)
+  })
 })

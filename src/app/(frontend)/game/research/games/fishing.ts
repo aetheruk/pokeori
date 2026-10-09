@@ -69,7 +69,10 @@ import {
 } from '@/utilities/user-state'
 import type { WeatherSnapshot } from '@/utilities/weather'
 import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
-import { getAvailableFishingItemEntries } from '@/utilities/fishing/item-pool'
+import {
+  addPostCollectionGoldenScaleDrop,
+  getAvailableFishingItemEntries,
+} from '@/utilities/fishing/item-pool'
 import {
   FISHING_KEEP_NET_CAPACITY,
   getFishingAlphaChanceMultiplier,
@@ -476,7 +479,10 @@ export async function castFishingLine(rodType: RodType) {
         const itemPool =
           availableConfiguredItemPool.length > 0
             ? availableConfiguredItemPool
-            : availableGlobalItemPool
+            : addPostCollectionGoldenScaleDrop(
+                availableGlobalItemPool,
+                inventory,
+              )
         selectedEntry = rollWeightedEntry(itemPool)
         resultType = 'item'
       }
