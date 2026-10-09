@@ -115,6 +115,30 @@ function FishingCatchIcon({ data, size }: { data: FishingHookedData; size: numbe
   return <ItemSprite itemId={data.guildId ? 'researchers-journal-page' : data.itemId || ''} alt="" width={size} height={size} />
 }
 
+function FishingContentsIcon({ data }: { data: FishingHookedData }) {
+  if (data.currencyId) {
+    return (
+      <CurrencySprite
+        currencyId={data.currencyId}
+        alt="Fishing contents"
+        width={96}
+        height={96}
+        className="h-full w-full object-contain"
+      />
+    )
+  }
+
+  return (
+    <ItemSprite
+      itemId={data.guildId ? 'researchers-journal-page' : data.itemId || ''}
+      alt="Fishing contents"
+      width={96}
+      height={96}
+      className="h-full w-full object-contain pixelated"
+    />
+  )
+}
+
 const DEFAULT_SCENE: FishingSceneConfig = {
   portraitBackground: '/backgrounds/fishing-pond-portrait.avif',
   waterStyle: 'pond',
@@ -418,6 +442,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
   const [isKeepingCatch, setIsKeepingCatch] = useState(false)
   const [isTakingItem, setIsTakingItem] = useState(false)
   const [takeResult, setTakeResult] = useState<GenericResult | null>(null)
+  const [takeResultIcon, setTakeResultIcon] = useState<React.ReactNode>(null)
   const [showTakeConfirm, setShowTakeConfirm] = useState(false)
   const [showKeepNetSwap, setShowKeepNetSwap] = useState(false)
 
@@ -611,6 +636,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
       if (!res.success) {
         return
       }
+      setTakeResultIcon(hookedData ? <FishingContentsIcon data={hookedData} /> : null)
       await refreshUser()
       setPhase('idle')
       setHookedData(null)
@@ -624,7 +650,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
     } finally {
       setIsTakingItem(false)
     }
-  }, [isTakingItem, refreshUser])
+  }, [hookedData, isTakingItem, refreshUser])
 
   const handleAttemptCatch = useCallback(async () => {
     const res = await startFishingCatch()
@@ -736,8 +762,11 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
       <RewardResultOverlay
         result={takeResult}
+        icon={takeResultIcon || undefined}
+        iconAlt="Fishing contents"
         onClose={() => {
           setTakeResult(null)
+          setTakeResultIcon(null)
           router.push('/game/explore')
         }}
         title="Fishing reward"
