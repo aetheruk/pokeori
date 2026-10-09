@@ -734,6 +734,19 @@ try {
   assert.equal(finalFailure.caught, false)
   assert.equal(finalFailure.keepNetLost, true)
   assert.equal(store.has('fishing:keep-net:owner'), false)
+
+  // An expired fishing session must recover out of the fishing screen on the next cast.
+  store.delete('game:owner')
+  store.delete('fishing:owner')
+  store.set('fishing:keep-net:owner', {
+    encounterId: fishingConfig.id,
+    entries: [{ id: 'expired-item', type: 'item', itemId: 'water-gem', quantity: 1 }],
+  })
+  const expiredSessionCast = await castFishingLine('old')
+  assert.equal(expiredSessionCast.success, false)
+  assert.equal(expiredSessionCast.recoverToExplore, true)
+  assert.equal(store.has('fishing:owner'), false)
+  assert.equal(store.has('fishing:keep-net:owner'), false)
 } finally {
   Math.random = originalRandom
 }
