@@ -363,7 +363,13 @@ export async function castFishingLine(rodType: RodType) {
         `game:${user.id}`,
       )) as GameActivityState | null
       if (!researchState) {
-        return { success: false, error: 'No active fishing session' }
+        await redis.del(`fishing:${user.id}`)
+        await forfeitFishingKeepNet(user.id)
+        return {
+          success: false,
+          error: 'Your fishing session expired. Returning to Explore.',
+          recoverToExplore: true,
+        }
       }
 
       const encounter = allGames.find(

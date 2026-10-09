@@ -485,6 +485,10 @@ export function FishingGame({ encounter }: FishingGameProps) {
       setPhase('waiting')
       const res = await castFishingLine(selectedRod)
       if (!res.success) {
+        if (res.recoverToExplore) {
+          router.replace('/game/explore')
+          return
+        }
         setPhase('idle')
         return
       }
@@ -520,7 +524,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
         })
       }, delay)
     }, 600) // Cast animation duration
-  }, [selectedRod])
+  }, [router, selectedRod])
 
   // Phase change side-effects
   useEffect(() => {
