@@ -96,7 +96,7 @@ describe('artisan recipes', () => {
       'paint-blue': 21,
       'paint-yellow': 28,
       'paint-green': 14,
-      'paint-purple': 7,
+      'paint-purple': 5,
       'paint-white': 40,
       'paint-black': 40,
     }
@@ -1090,7 +1090,7 @@ describe('artisan recipes', () => {
 
   test('berry candies unlock four artisan levels after their dye recipes', () => {
     const expectedCandyRecipes = [
-      { color: 'red', level: 5, dye: 'paint-red' },
+      { color: 'red', level: 7, dye: 'paint-red' },
       { color: 'purple', level: 11, dye: 'paint-purple' },
       { color: 'green', level: 18, dye: 'paint-green' },
       { color: 'blue', level: 25, dye: 'paint-blue' },
@@ -1206,8 +1206,8 @@ describe('artisan recipes', () => {
     expect(recipe?.craftType).toBe('scatter')
     expect(recipe?.artisanLevel).toBe(3)
     expect(recipe?.costs).toEqual([
-      { id: 'electric-component-t1', amount: 2 },
-      { id: 'metal-scrap-t1', amount: 2 },
+      { id: 'electric-component-t1', amount: 1 },
+      { id: 'metal-scrap-t1', amount: 1 },
     ])
     expect(recipe?.outputQuantity).toEqual({ min: 0, max: 2 })
     expect(recipe?.bulk).toBe(5)

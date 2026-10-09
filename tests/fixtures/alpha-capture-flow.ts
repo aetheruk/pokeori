@@ -609,6 +609,17 @@ try {
   store.delete('fishing:keep-net:owner')
 
   // Secret replacements are explicitly marked by the cast and cannot roll Alpha.
+  store.set('fishing:keep-net:owner', {
+    encounterId: fishingConfig.id,
+    entries: [
+      {
+        id: 'held-drake-scale',
+        type: 'item',
+        itemId: 'drake-scale-t1',
+        quantity: 1,
+      },
+    ],
+  })
   Math.random = () => 0.005
   store.set('game:owner', { encounterId: fishingConfig.id })
   assert.equal((await castFishingLine('old')).success, true)

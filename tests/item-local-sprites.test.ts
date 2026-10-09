@@ -150,29 +150,18 @@ describe('local item sprites', () => {
       'materials/candy-l',
       'materials/candy-xl',
     ])
-    expect(
-      candyItems
-        .filter((_, index) => index % 2 === 1)
-        .every((item) => item.hueRotate === 80),
-    ).toBe(true)
+    expect(candyItems.every((item) => item.hueRotate === 0)).toBe(true)
   })
 
   test('candy bags use layered candy sprites with the same tier palette swaps', () => {
     expect(candyBagItems.map((item) => item.spriteId)).toEqual([
       'materials/candy-bag-xs',
-      'materials/candy-bag-xs',
-      'materials/candy-bag-s',
       'materials/candy-bag-s',
       'materials/candy-bag-m',
-      'materials/candy-bag-m',
-      'materials/candy-bag-l',
       'materials/candy-bag-l',
       'materials/candy-bag-xl',
-      'materials/candy-bag-xl',
     ])
-    expect(candyBagItems.map((item) => item.hueRotate)).toEqual([
-      0, 80, 0, 80, 0, 80, 0, 80, 0, 80,
-    ])
+    expect(candyBagItems.map((item) => item.hueRotate)).toEqual([0, 0, 0, 0, 0])
     for (const item of candyBagItems) {
       expect(publicPathExists(getItemSpriteUrl(item.id))).toBe(true)
     }

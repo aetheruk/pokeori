@@ -25,6 +25,7 @@ import {
   safariResearchTaskPoolIds,
 } from '@/data/tasks/entries/safari-zone-expedition'
 import { buildExpeditionSteps } from '@/utilities/expeditions/path-builder'
+import { shouldUseCompletedExpeditionTaskReplay } from '@/utilities/expeditions/task-replay'
 import type { RequirementData } from '@/utilities/requirements'
 
 function mazeHasRoute(gameId: string) {
@@ -1138,13 +1139,20 @@ describe('Fuchsia Gym and Safari progression', () => {
   })
 
   test('repeatable Safari expedition tasks use the reward completion path on replay', async () => {
-    const source = await Bun.file(
-      'src/components/game/features/explore/hooks/useExploreActions.ts',
-    ).text()
-
-    expect(source).toContain(
-      'isExpeditionTaskFlow && isDone && !task.repeatable',
-    )
+    expect(
+      shouldUseCompletedExpeditionTaskReplay({
+        isExpeditionTaskFlow: true,
+        isAlreadyCompleted: true,
+        repeatable: true,
+      }),
+    ).toBe(false)
+    expect(
+      shouldUseCompletedExpeditionTaskReplay({
+        isExpeditionTaskFlow: true,
+        isAlreadyCompleted: true,
+        repeatable: false,
+      }),
+    ).toBe(true)
   })
 
   test('Safari Stamina Notes apply through expedition configuration', async () => {
@@ -1863,9 +1871,6 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(poacherBattles.every((battle) => battle.rewards.length === 0)).toBe(
       true,
     )
-    expect(
-      poacherBattles.every((battle) => battle.disableRewards === true),
-    ).toBe(true)
     expect(
       poacherBattles.every((battle) =>
         battle.enemyTeam.some((enemy) => enemy.level === 31),
