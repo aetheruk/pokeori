@@ -22,6 +22,10 @@ import { drawTcgBoosterPacks } from '@/utilities/tcg/tcg-card-draw'
 import type { TcgCard } from '@/data/tcg/types'
 import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
 import {
+  buildRandomPokemonMaterialRewards,
+  rollRandomPokemonMaterialCount,
+} from '@/utilities/artisan/material-drops'
+import {
   getUserCompletedTasksMap,
   getUserInventoryMap,
   setUserInventoryMap,
@@ -361,6 +365,43 @@ export async function useConsumable(
 
   const itemDef = items.find((i) => i.id === itemId)
   if (!itemDef) return { success: false, error: 'Item not found' }
+  if (itemDef.effects?.grantRandomPokemonMaterials) {
+    const { min, max } = itemDef.effects.grantRandomPokemonMaterials
+
+    try {
+      const response = await runEconomyAction(
+        { userId: user.id, action: 'use-material-pouch', requestId: clientActionId },
+        async ({ payload: transactionPayload, req }) => {
+          const inventory = await getUserInventoryMap(transactionPayload, user.id, { req })
+          const currentQty = inventory[itemId] || 0
+          if (currentQty < 1) return { success: false, error: 'You do not have this item' }
+          if (itemDef.consume !== false) {
+            inventory[itemId] = currentQty - 1
+            if (inventory[itemId] <= 0) delete inventory[itemId]
+            await setUserInventoryMap(transactionPayload, user.id, inventory, { req })
+          }
+
+          const materialCount = rollRandomPokemonMaterialCount(min, max)
+          const materialRewards = buildRandomPokemonMaterialRewards(materialCount)
+          const result = await grantRewards(user.id, materialRewards, {
+            source: 'consumable', payload: transactionPayload, req,
+          })
+          return {
+            success: true,
+            message: `Found ${materialCount} crafting ${materialCount === 1 ? 'material' : 'materials'}!`,
+            summary: result.summary,
+          }
+        },
+      )
+
+      revalidatePath('/game/inventory')
+      return response
+    } catch (error) {
+      console.error('Error opening material pouch:', error)
+      return { success: false, error: 'Failed to open item' }
+    }
+  }
+
   if (itemDef.effects?.grantSkillXp) {
     const { skill, amount } = itemDef.effects.grantSkillXp
 

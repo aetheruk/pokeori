@@ -54,6 +54,50 @@ export const TYPE_MATERIAL_CONFIG: Record<string, TypeMaterialConfig> = {
   fairy: { family: 'pixie-powder' },
 }
 
+export const TIER_ONE_POKEMON_MATERIAL_IDS = Array.from(
+  new Set(
+    Object.values(TYPE_MATERIAL_CONFIG).map(({ family }) =>
+      familyId(family, 1),
+    ),
+  ),
+)
+
+export function buildRandomPokemonMaterialRewards(
+  count: number,
+  options: MaterialRewardOptions = {},
+): LocationReward[] {
+  const rng = options.rng || Math.random
+  const rewardCounts = new Map<string, number>()
+  const materialIds = TIER_ONE_POKEMON_MATERIAL_IDS
+  const safeCount = Math.max(0, Math.floor(count))
+
+  for (let index = 0; index < safeCount; index += 1) {
+    const materialIndex = Math.min(
+      Math.floor(rng() * materialIds.length),
+      materialIds.length - 1,
+    )
+    const itemId = materialIds[materialIndex]
+    if (itemId) rewardCounts.set(itemId, (rewardCounts.get(itemId) || 0) + 1)
+  }
+
+  return Array.from(rewardCounts, ([targetId, quantity]) => ({
+    type: 'item',
+    targetId,
+    quantity,
+    dropChance: 100,
+  }))
+}
+
+export function rollRandomPokemonMaterialCount(
+  min: number,
+  max: number,
+  rng: () => number = Math.random,
+) {
+  const safeMin = Math.max(0, Math.ceil(min))
+  const safeMax = Math.max(safeMin, Math.floor(max))
+  return safeMin + Math.floor(rng() * (safeMax - safeMin + 1))
+}
+
 export function baseMaterialTierFromLevel(level: number): Tier {
   if (level >= MATERIAL_TIER_3_LEVEL) return 3
   if (level >= MATERIAL_TIER_2_LEVEL) return 2

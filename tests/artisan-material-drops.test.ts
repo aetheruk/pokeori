@@ -2,6 +2,9 @@ import { describe, expect, test } from 'bun:test'
 import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import {
   buildArtisanMaterialRewards,
+  buildRandomPokemonMaterialRewards,
+  rollRandomPokemonMaterialCount,
+  TIER_ONE_POKEMON_MATERIAL_IDS,
   buildBrokenBallRewards,
   CAPTURE_PRIMARY_MATERIAL_QUANTITY_ODDS,
   FIELD_OBSERVATION_PRIMARY_MATERIAL_DROP_CHANCE,
@@ -17,6 +20,27 @@ function rngSequence(...values: number[]) {
 }
 
 describe('artisan material drops', () => {
+  test('material pouch counts from one to five and independently rolls Tier 1 Pokemon materials', () => {
+    expect(rollRandomPokemonMaterialCount(1, 5, () => 0)).toBe(1)
+    expect(rollRandomPokemonMaterialCount(1, 5, () => 0.999)).toBe(5)
+    expect(TIER_ONE_POKEMON_MATERIAL_IDS).toContain('soft-fluff-t1')
+    expect(TIER_ONE_POKEMON_MATERIAL_IDS).toContain('pixie-powder-t1')
+    expect(buildRandomPokemonMaterialRewards(3, { rng: rngSequence(0, 1, 0) })).toEqual([
+      {
+        type: 'item',
+        targetId: 'soft-fluff-t1',
+        quantity: 2,
+        dropChance: 100,
+      },
+      {
+        type: 'item',
+        targetId: 'pixie-powder-t1',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ])
+  })
+
   test('Pikachu has an unconditional one-percent Light Ball roll', () => {
     expect(SPECIAL_POKEMON_DROPS['25']).toEqual([
       { itemId: 'light-ball', dropChance: 1 },

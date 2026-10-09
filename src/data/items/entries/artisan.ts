@@ -335,9 +335,32 @@ const tcgItems: Item[] = [
   },
 ]
 
+const fishingSalvageItems: Item[] = [
+  {
+    id: 'discarded-rubbish',
+    name: 'Discarded Rubbish',
+    description: 'Rubbish recovered from the water while fishing.',
+    category: 'misc',
+    spriteId: 'discarded-rubbish',
+    sellValue: 10,
+  },
+  {
+    id: 'pouch-of-materials',
+    name: 'Pouch of Materials',
+    description:
+      'Open this pouch for 1–5 random Tier 1 Pokémon crafting materials.',
+    category: 'misc',
+    spriteId: 'pouch-of-materials',
+    effects: {
+      grantRandomPokemonMaterials: { min: 1, max: 5 },
+    },
+  },
+]
+
 export const artisanItems: Item[] = [
   ...artisanConsumables,
   ...tcgItems,
+  ...fishingSalvageItems,
   ...tieredMaterial(
     'broken-ball',
     'Broken Ball',
