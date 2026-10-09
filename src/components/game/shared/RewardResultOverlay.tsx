@@ -110,7 +110,7 @@ interface RewardResultOverlayProps {
   onClose: () => void
   /** Scenic artwork for the result hero; the shared renderer falls back to the Lab. */
   background?: string
-  icon?: TaskIcon // Or similar icon type
+  icon?: TaskIcon | React.ReactNode
   iconAlt?: string // label for the icon
   title?: string
   message?: string | React.ReactNode
