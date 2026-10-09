@@ -2,7 +2,7 @@
 
 # Bun is the package manager, build runtime, and production runtime. Keep the
 # image on the same stable patch used by packageManager in package.json.
-FROM oven/bun:1.4.2-alpine AS base
+FROM mirror.gcr.io/oven/bun:1.4.2-alpine AS base
 WORKDIR /app
 
 # Refresh OS security packages when advancing this base stage. Bun's 1.4.2
