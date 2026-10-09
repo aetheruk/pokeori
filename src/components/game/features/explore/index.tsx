@@ -558,8 +558,8 @@ function ExploreListContent({
             activeExpedition={activeExpedition}
             selectedPokemonIds={actions.selectedPokemonIds}
             togglePokemonSelection={actions.togglePokemonSelection}
-            selectedRepelItemId={actions.selectedRepelItemId}
-            setSelectedRepelItemId={actions.setSelectedRepelItemId}
+            selectedEncounterItemId={actions.selectedEncounterItemId}
+            setSelectedEncounterItemId={actions.setSelectedEncounterItemId}
             handleConfirmTaskWithSelection={
               actions.handleConfirmTaskWithSelection
             }
@@ -596,8 +596,8 @@ function ExploreListContent({
             activeExpedition={activeExpedition}
             selectedPokemonIds={actions.selectedPokemonIds}
             togglePokemonSelection={actions.togglePokemonSelection}
-            selectedRepelItemId={actions.selectedRepelItemId}
-            setSelectedRepelItemId={actions.setSelectedRepelItemId}
+            selectedEncounterItemId={actions.selectedEncounterItemId}
+            setSelectedEncounterItemId={actions.setSelectedEncounterItemId}
             handleConfirmTaskWithSelection={
               actions.handleConfirmTaskWithSelection
             }

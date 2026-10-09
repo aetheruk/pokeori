@@ -409,6 +409,10 @@ export function getTypeLureTier(itemId: string): 1 | 2 | 3 {
   return 1
 }
 
+export function getTypeLureSpawnChancePercent(itemId: string): number {
+  return getTypeLureTier(itemId) * 5
+}
+
 export function getTypeLureAnswerEquivalent(itemId: string): number {
   const tier = getTypeLureTier(itemId)
   if (tier === 3) return 5
@@ -434,6 +438,16 @@ export function isSecondChanceEncounterItem(
 
 export function isPreEncounterOnlyItem(item: Pick<Item, 'id'>): boolean {
   return PRE_ENCOUNTER_ONLY_ITEM_IDS.has(item.id)
+}
+
+export function isRepelItemId(itemId: string): boolean {
+  return PRE_ENCOUNTER_ONLY_ITEM_IDS.has(itemId)
+}
+
+export function isEncounterSpawnItem(
+  item: Pick<Item, 'id' | 'category'>,
+): boolean {
+  return isRepelItemId(item.id) || isTypeLureItem(item)
 }
 
 export function isMidEncounterUsableItem(

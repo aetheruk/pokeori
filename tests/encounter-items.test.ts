@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { items } from '@/data/items'
 import {
   getTypeLureAnswerEquivalent,
+  getTypeLureSpawnChancePercent,
   getTypeLureType,
   getTypeLureTier,
   isEncounterItemUsableForPokemon,
@@ -31,6 +32,11 @@ import {
   isFocusCircleGesture,
   isFocusCircleProgressComplete,
 } from '@/utilities/pokemon/focus-qte'
+import {
+  applyTypeLureSpawnBoost,
+  getRepelMaximumLevel,
+  rollWeightedEncounter,
+} from '@/utilities/pokemon/encounter-spawn'
 
 function getItem(itemId: string) {
   const item = items.find((entry) => entry.id === itemId)
@@ -73,6 +79,9 @@ describe('encounter item filtering', () => {
     expect(getTypeLureAnswerEquivalent(bugLure.id)).toBe(2.5)
     expect(getTypeLureAnswerEquivalent(advancedBugLure.id)).toBe(3.5)
     expect(getTypeLureAnswerEquivalent(masterBugLure.id)).toBe(5)
+    expect(getTypeLureSpawnChancePercent(bugLure.id)).toBe(5)
+    expect(getTypeLureSpawnChancePercent(advancedBugLure.id)).toBe(10)
+    expect(getTypeLureSpawnChancePercent(masterBugLure.id)).toBe(15)
     expect(isTypeLureItem(lureBall)).toBe(false)
 
     expect(isMidEncounterUsableItem(bugLure)).toBe(true)
@@ -117,6 +126,55 @@ describe('encounter item filtering', () => {
     expect(isEncounterItemUsableForPokemon(bugLure, ['Bug', 'Poison'])).toBe(true)
     expect(isEncounterItemUsableForPokemon(chaosStone, ['Normal', 'Flying'])).toBe(true)
     expect(isEncounterItemUsableForPokemon(redBerryCandy, ['Normal', 'Flying'])).toBe(true)
+  })
+
+  test('lures add percentage points to the matching type spawn share and keep weights normalized', () => {
+    const pool = [
+      { speciesId: 10, chance: 30 },
+      { speciesId: 11, chance: 20 },
+      { speciesId: 16, chance: 50 },
+    ]
+
+    const boosted = applyTypeLureSpawnBoost(pool, 'advanced-bug-lure')
+    const total = boosted.reduce((sum, entry) => sum + entry.chance, 0)
+    const bugShare =
+      boosted
+        .filter((entry) => [10, 11].includes(entry.speciesId))
+        .reduce((sum, entry) => sum + entry.chance, 0) / total
+
+    expect(bugShare).toBeCloseTo(0.6)
+    expect(total).toBeCloseTo(100)
+    expect(boosted[0]?.chance).toBeCloseTo(36)
+    expect(boosted[1]?.chance).toBeCloseTo(24)
+    expect(boosted[2]?.chance).toBeCloseTo(40)
+  })
+
+  test('lures have no effect if the pool has no matching type and weighted rolls honor the boost', () => {
+    const pool = [
+      { speciesId: 16, chance: 70 },
+      { speciesId: 19, chance: 30 },
+    ]
+
+    expect(applyTypeLureSpawnBoost(pool, 'master-bug-lure')).toEqual([
+      { speciesId: 16, chance: 70 },
+      { speciesId: 19, chance: 30 },
+    ])
+
+    const boosted = applyTypeLureSpawnBoost(
+      [
+        { speciesId: 10, chance: 80 },
+        { speciesId: 16, chance: 20 },
+      ],
+      'bug-lure',
+    )
+    expect(rollWeightedEncounter(boosted, () => 0.9)?.speciesId).toBe(16)
+  })
+
+  test('wild battle Repels set the selected Pokemon level from its maximum', () => {
+    expect(getRepelMaximumLevel(24, 'repel')).toBe(24)
+    expect(getRepelMaximumLevel(24, 'super-repel')).toBe(29)
+    expect(getRepelMaximumLevel(24, 'max-repel')).toBe(34)
+    expect(getRepelMaximumLevel(24)).toBe(24)
   })
 })
 

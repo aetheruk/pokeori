@@ -18,7 +18,7 @@ import {
   Users,
 } from 'lucide-react'
 import Image from 'next/image'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
 import { SecretPokemonIcon } from '@/components/game/shared/SecretPokemonIcon'
 import type { TaskProgressData } from '@/components/game/shared/GameInfoModal'
@@ -32,6 +32,7 @@ import type {
   FishingItemEntry,
 } from '@/data/games/fishing/types'
 import { items } from '@/data/items'
+import { isEncounterSpawnItem } from '@/data/items/types'
 import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import { calculateContentSkillXp, resolveSkillXpConfig } from '@/data/skills/xp'
 import { cn } from '@/lib/utils'
@@ -58,6 +59,7 @@ import {
   isChronicleExploreItem,
 } from './utils'
 import { getVsSeekerDifficultyMultiplier } from '@/utilities/vs-seeker'
+import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 
 // Types for props
 interface ModalHelperProps {
@@ -85,19 +87,135 @@ function prizeRewardKey(reward: any) {
   })
 }
 
-const repelOptions = [
-  { id: 'repel', label: 'Repel', detail: 'Chance Max Level Pokemon Appear' },
-  {
-    id: 'super-repel',
-    label: 'Super Repel',
-    detail: 'Max Level Pokemon Appear',
-  },
-  {
-    id: 'max-repel',
-    label: 'Max Repel',
-    detail: 'Better Chance for Rare Pokemon',
-  },
-]
+interface EncounterItemChoice {
+  id: string
+  name: string
+  description: string
+  quantity: number
+}
+
+function EncounterItemIcon({
+  item,
+  selected,
+  onSelect,
+  onLongPress,
+}: {
+  item: EncounterItemChoice
+  selected: boolean
+  onSelect: () => void
+  onLongPress: () => void
+}) {
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const suppressClick = useRef(false)
+
+  useEffect(
+    () => () => {
+      if (holdTimer.current) clearTimeout(holdTimer.current)
+    },
+    [],
+  )
+
+  const handlePointerDown = () => {
+    suppressClick.current = false
+    holdTimer.current = setTimeout(() => {
+      suppressClick.current = true
+      onLongPress()
+    }, 500)
+  }
+  const clearHold = () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current)
+    holdTimer.current = null
+  }
+
+  return (
+    <button
+      type="button"
+      aria-label={`${item.name}, ${item.quantity} available${selected ? ', selected' : ''}. Hold for description.`}
+      aria-pressed={selected}
+      title={`${item.name}: ${item.description}`}
+      className={cn(
+        'relative flex h-11 w-11 shrink-0 items-center justify-center rounded-md border bg-game-surface-raised p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-charcoal',
+        selected
+          ? 'border-game-charcoal bg-game-canvas ring-2 ring-game-charcoal/30'
+          : 'border-game-border hover:border-game-charcoal/60',
+      )}
+      onPointerDown={handlePointerDown}
+      onPointerUp={clearHold}
+      onPointerLeave={clearHold}
+      onPointerCancel={clearHold}
+      onContextMenu={(event) => event.preventDefault()}
+      onClick={(event) => {
+        if (suppressClick.current) {
+          event.preventDefault()
+          suppressClick.current = false
+          return
+        }
+        onSelect()
+      }}
+    >
+      <ItemSprite
+        itemId={item.id}
+        alt=""
+        width={32}
+        height={32}
+        className="h-8 w-8 object-contain"
+      />
+    </button>
+  )
+}
+
+function EncounterItemRow({
+  choices,
+  selectedItemId,
+  onSelect,
+}: {
+  choices: EncounterItemChoice[]
+  selectedItemId: string | null
+  onSelect: (itemId: string | null) => void
+}) {
+  const [describedItem, setDescribedItem] = useState<EncounterItemChoice | null>(null)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(
+    () => () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current)
+    },
+    [],
+  )
+
+  const showDescription = (choice: EncounterItemChoice) => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    setDescribedItem(choice)
+    closeTimer.current = setTimeout(() => setDescribedItem(null), 3000)
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2 overflow-x-auto py-1 px-0.5 custom-scrollbar">
+        {choices.map((choice) => (
+          <EncounterItemIcon
+            key={choice.id}
+            item={choice}
+            selected={selectedItemId === choice.id}
+            onSelect={() =>
+              onSelect(selectedItemId === choice.id ? null : choice.id)
+            }
+            onLongPress={() => showDescription(choice)}
+          />
+        ))}
+      </div>
+      {describedItem && (
+        <div
+          role="tooltip"
+          className="rounded-md border border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-ink"
+        >
+          <span className="font-bold">{describedItem.name}:</span>{' '}
+          {describedItem.description}
+        </div>
+      )}
+    </div>
+  )
+}
 
 const pokemonMaterialFamilies = Array.from(
   new Set(Object.values(TYPE_MATERIAL_CONFIG).map((config) => config.family)),
@@ -1400,7 +1518,7 @@ export function ActionButton({
           item.handleConfirmEncounterWithSelection(
             {
               ...item.originalData,
-              selectedRepelItemId: item.selectedRepelItemId,
+              selectedEncounterItemId: item.selectedEncounterItemId,
             },
             totalRequired,
             item.type,
@@ -1472,6 +1590,26 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
   const [expandedLockedEncounterKey, setExpandedLockedEncounterKey] = useState<
     string | null
   >(null)
+
+  const getAvailableEncounterItemChoices = () =>
+    items
+      .filter((entry) => isEncounterSpawnItem(entry))
+      .map((entry) => ({
+        id: entry.id,
+        name: entry.name,
+        description: entry.description,
+        quantity: inventoryByItemId.get(entry.id) || 0,
+        item: entry,
+      }))
+      .filter(
+        (entry) =>
+          entry.quantity > 0 &&
+          canUseItemWithSkillRequirements(
+            entry.item,
+            (userData.user as any).skills,
+          ),
+      )
+      .map(({ item: _item, ...choice }) => choice)
 
   if (!item) return null
 
@@ -1740,24 +1878,16 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
     const encounters = item.originalData.encounters
     if (!encounters || encounters.length === 0) return null
 
-    const availableRepels = repelOptions
-      .map((repel) => {
-        const itemDef = items.find((entry) => entry.id === repel.id)
-        return {
-          ...repel,
-          itemDef,
-          quantity: inventoryByItemId.get(repel.id) || 0,
-        }
-      })
-      .filter(
-        (repel) =>
-          repel.quantity > 0 &&
-          !!repel.itemDef &&
-          canUseItemWithSkillRequirements(
-            repel.itemDef,
-            (userData.user as any).skills,
-          ),
-      )
+    const location = item.originalData
+    const supportsEncounterItems =
+      location.encounterMode !== 'safari' &&
+      !location.specialEncounter &&
+      !location.isRandomEvent &&
+      !location.expeditionOnly &&
+      !isExpeditionActivity('location', location.id)
+    const availableEncounterItems = supportsEncounterItems
+      ? getAvailableEncounterItemChoices()
+      : []
     const encounterPreviews: EncounterPreview[] = encounters
       .map((enc: any, index: number) => {
         const formId = getEncounterFormId(enc)
@@ -1823,54 +1953,14 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
 
     return (
       <div className="space-y-6 mt-6">
-        {availableRepels.length > 0 && (
+        {availableEncounterItems.length > 0 && (
           <div className="space-y-3">
             <SectionDivider>Encounter Item</SectionDivider>
-            <div className="grid grid-cols-1 gap-3">
-              {availableRepels.map((repel) => {
-                const isSelected = item.selectedRepelItemId === repel.id
-
-                return (
-                  <button
-                    key={repel.id}
-                    type="button"
-                    onClick={() =>
-                      item.setSelectedRepelItemId(isSelected ? null : repel.id)
-                    }
-                    aria-pressed={isSelected}
-                    className={cn(
-                      'h-full min-h-[92px] rounded-md border bg-game-surface-raised p-3 text-left text-game-ink transition-colors hover:border-game-moss',
-                      isSelected
-                        ? 'border-game-moss bg-game-moss/10'
-                        : 'border-game-border',
-                    )}
-                  >
-                    <div className="flex items-start gap-3">
-                      <ItemSprite
-                        itemId={repel.id}
-                        alt={repel.label}
-                        width={36}
-                        height={36}
-                        className="w-9 h-9 object-contain shrink-0"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm font-bold truncate">
-                            {repel.label}
-                          </span>
-                          <span className="font-mono text-xs text-game-muted">
-                            x{repel.quantity}
-                          </span>
-                        </div>
-                        <div className="mt-1 text-xs text-game-muted">
-                          {repel.detail}
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
+            <EncounterItemRow
+              choices={availableEncounterItems}
+              selectedItemId={item.selectedEncounterItemId}
+              onSelect={item.setSelectedEncounterItemId}
+            />
           </div>
         )}
 
@@ -1988,9 +2078,30 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
 
     const isWildBattle = item.originalData.isWildBattle
     const battleTitle = isWildBattle ? 'Encounters' : 'Enemy Team'
+    const battle = item.originalData
+    const supportsEncounterItems =
+      isWildBattle &&
+      !battle.isRandomEvent &&
+      !battle.expeditionOnly &&
+      !item.isChallenge &&
+      !isChronicleExploreItem(item) &&
+      !isExpeditionActivity('battle', battle.id)
+    const availableEncounterItems = supportsEncounterItems
+      ? getAvailableEncounterItemChoices()
+      : []
 
     return (
-      <div className="space-y-4 mt-6">
+      <div className="space-y-6 mt-6">
+        {availableEncounterItems.length > 0 && (
+          <div className="space-y-3">
+            <SectionDivider>Encounter Item</SectionDivider>
+            <EncounterItemRow
+              choices={availableEncounterItems}
+              selectedItemId={item.selectedEncounterItemId}
+              onSelect={item.setSelectedEncounterItemId}
+            />
+          </div>
+        )}
         <SectionDivider>{battleTitle}</SectionDivider>
         <div className="flex gap-3 overflow-x-auto pb-6 pt-2 custom-scrollbar px-1">
           {enemyTeam.map((member: any, i: number) => {

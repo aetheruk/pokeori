@@ -4,9 +4,16 @@ import configPromise from '@payload-config'
 import { redis } from '@/utilities/redis'
 import { revalidatePath } from 'next/cache'
 import { battles } from '@/data/battles'
+import { items } from '@/data/items'
+import { isEncounterSpawnItem, isTypeLureItem } from '@/data/items/types'
 import { resolveBattleMusic } from '@/utilities/battle/music'
 import { getEffectiveContent } from '@/utilities/events/server'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
+import {
+  applyTypeLureSpawnBoost,
+  getRepelMaximumLevel,
+  rollWeightedEncounter,
+} from '@/utilities/pokemon/encounter-spawn'
 import {
   initializeBattlePokemon,
   applyStatus,
@@ -38,6 +45,7 @@ import { getActiveChronicleContext } from '@/utilities/chronicles'
 import type { ExpeditionChroniclePokemonConfig } from '@/data/expeditions'
 import {
   getResearcherMoveSlotCount,
+  getItemSkillLockReason,
   getSkillLevel,
   resolveEnemyBattleMoveUseLimit,
   resolveTrainerBattleItemUseLimit,
@@ -107,12 +115,34 @@ import type { PokemonIVs } from '@/utilities/pokemon/pokemon-mechanics'
 export async function startBattle(
   battleId: string,
   consumedPokemonIds?: string[],
+  options?: { encounterItemId?: string },
 ): Promise<{ success: boolean; error?: string; state?: BattleState }> {
   const user = await getUser({ fresh: true })
   if (!user) return { success: false, error: 'Not authenticated' }
 
   const battleConfig = await getEffectiveContent('battle', battleId, user)
   if (!battleConfig) return { success: false, error: 'Battle not found' }
+
+  const encounterItemId = options?.encounterItemId
+  if (encounterItemId) {
+    if (
+      !battleConfig.isWildBattle ||
+      battleConfig.isRandomEvent ||
+      (battleConfig as any).expeditionOnly === true ||
+      isExpeditionActivity('battle', battleConfig.id)
+    ) {
+      return {
+        success: false,
+        error: 'Encounter items are only available in standard wild battles.',
+      }
+    }
+    const encounterItem = items.find((entry) => entry.id === encounterItemId)
+    if (!encounterItem || !isEncounterSpawnItem(encounterItem)) {
+      return { success: false, error: 'Invalid encounter item.' }
+    }
+    const lockReason = getItemSkillLockReason(encounterItem, user.skills)
+    if (lockReason) return { success: false, error: lockReason }
+  }
 
   const payload = await getPayload({ config: configPromise })
   const isExpeditionActivityContent =
@@ -305,6 +335,7 @@ export async function startBattle(
 
   return startBattleFromConfig(user as User, resolvedBattleConfig, {
     dynamic: isRivalBattleConfig(battleConfig),
+    encounterItemId,
   })
 }
 
@@ -313,6 +344,7 @@ export async function startBattleFromConfig(
   battleConfig: BattleConfig,
   options: {
     dynamic?: boolean
+    encounterItemId?: string
     fixedWildPokemon?: {
       speciesId: number
       formId: string
@@ -322,6 +354,13 @@ export async function startBattleFromConfig(
     }
   } = {},
 ): Promise<{ success: boolean; error?: string; state?: BattleState }> {
+  const existingBattle = options.encounterItemId
+    ? await redis.get<BattleState>(`battle:${user.id}`)
+    : null
+  if (existingBattle?.status === 'ongoing') {
+    return { success: true, state: existingBattle }
+  }
+
   let maxPokemon = battleConfig.maxPokemon || 6
   const playerTeamLoadLimit = battleConfig.isWildBattle ? 6 : maxPokemon
 
@@ -385,6 +424,23 @@ export async function startBattleFromConfig(
           expeditionName: activeExpedition.expeditionName,
         }
       : undefined
+  const selectedEncounterItem = options.encounterItemId
+    ? items.find((entry) => entry.id === options.encounterItemId)
+    : undefined
+  if (
+    options.encounterItemId &&
+    (!selectedEncounterItem ||
+      !isEncounterSpawnItem(selectedEncounterItem) ||
+      !battleConfig.isWildBattle ||
+      battleConfig.isRandomEvent ||
+      options.dynamic ||
+      chronicleContext ||
+      expeditionContext ||
+      (battleConfig as any).expeditionOnly === true ||
+      isExpeditionActivity('battle', battleConfig.id))
+  ) {
+    return { success: false, error: 'Encounter items cannot be used in this battle.' }
+  }
   const chronicleTeam = chronicleContext?.chronicle.battleTeam || []
 
   const shouldCheckTeamTypes =
@@ -482,8 +538,12 @@ export async function startBattleFromConfig(
 
     enemyTeamConfig = enemyTeamPool
     if (battleConfig.isWildBattle && enemyTeamPool.length > 1) {
-      const randomIndex = Math.floor(Math.random() * enemyTeamPool.length)
-      enemyTeamConfig = [enemyTeamPool[randomIndex]]
+      const weightedEnemyPool =
+        selectedEncounterItem && isTypeLureItem(selectedEncounterItem)
+          ? applyTypeLureSpawnBoost(enemyTeamPool, selectedEncounterItem.id)
+          : enemyTeamPool.map((enemy) => ({ ...enemy, chance: 1 }))
+      const selected = rollWeightedEncounter(weightedEnemyPool)
+      if (selected) enemyTeamConfig = [selected]
     }
   }
 
@@ -501,11 +561,21 @@ export async function startBattleFromConfig(
               : undefined
           const naturalLevel = fixedWildPokemon
             ? fixedWildPokemon.level
-            : typeof enemy.level === 'number'
-              ? enemy.level
-              : Math.floor(
-                  Math.random() * (enemy.level.max - enemy.level.min + 1),
-                ) + enemy.level.min
+            : (() => {
+                const minLevel = typeof enemy.level === 'number' ? enemy.level : enemy.level.min
+                const maxLevel = typeof enemy.level === 'number' ? enemy.level : enemy.level.max
+                if (selectedEncounterItem?.id === 'repel') return maxLevel
+                if (
+                  selectedEncounterItem?.id === 'super-repel' ||
+                  selectedEncounterItem?.id === 'max-repel'
+                ) {
+                  return getRepelMaximumLevel(
+                    maxLevel,
+                    selectedEncounterItem.id,
+                  )
+                }
+                return Math.floor(Math.random() * (maxLevel - minLevel + 1)) + minLevel
+              })()
 
           const isAlpha =
             fixedWildPokemon
@@ -844,6 +914,9 @@ export async function startBattleFromConfig(
     processBattleAbilitySuppressionForState(initialState)
   const initialFieldMessages = [
     ...playerStartingStatusMessages,
+    ...(selectedEncounterItem
+      ? [`You used ${selectedEncounterItem.name} before the wild encounter.`]
+      : []),
     ...(battleConfig.isWildBattle
       ? []
       : applyBattleRarityEntryEffects(
@@ -903,6 +976,15 @@ export async function startBattleFromConfig(
       await redis.set(`battle:${user.id}`, existingState, { ex: BATTLE_TTL })
     }
     return { success: true, state: existingState }
+  }
+
+  if (options.encounterItemId && selectedEncounterItem) {
+    const quantity = playerInventory[options.encounterItemId] || 0
+    if (quantity <= 0) {
+      return { success: false, error: "You don't have that encounter item." }
+    }
+    playerInventory[options.encounterItemId] = quantity - 1
+    await setUserInventoryMap(payload as any, user.id, playerInventory)
   }
 
   await redis.del(`battle:${user.id}`)
