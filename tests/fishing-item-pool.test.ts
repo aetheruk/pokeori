@@ -26,7 +26,10 @@ describe('fishing item pools', () => {
   test('Pouch of Materials is a consumable that grants mixed Tier 1 materials', () => {
     expect(items.find((item) => item.id === 'pouch-of-materials')).toMatchObject({
       name: 'Pouch of Materials',
-      effects: { grantRandomPokemonMaterials: { min: 1, max: 5 } },
+      effects: {
+        grantRandomPokemonMaterials: { min: 1, max: 5 },
+        grantRandomGems: { min: 1, max: 3 },
+      },
     })
   })
 

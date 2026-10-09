@@ -315,7 +315,6 @@ export function RewardResultOverlay({
   }
 
   if (!result) return null
-  if (typeof document === 'undefined') return null
 
   const rewardSummary = result.rewards || result.summary
   const showSecondaryAction = shouldShowRewardResultSecondaryAction(result)

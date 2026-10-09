@@ -22,6 +22,7 @@ import { drawTcgBoosterPacks } from '@/utilities/tcg/tcg-card-draw'
 import type { TcgCard } from '@/data/tcg/types'
 import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
 import {
+  buildRandomGemRewards,
   buildRandomPokemonMaterialRewards,
   rollRandomPokemonMaterialCount,
 } from '@/utilities/artisan/material-drops'
@@ -365,8 +366,12 @@ export async function useConsumable(
 
   const itemDef = items.find((i) => i.id === itemId)
   if (!itemDef) return { success: false, error: 'Item not found' }
-  if (itemDef.effects?.grantRandomPokemonMaterials) {
-    const { min, max } = itemDef.effects.grantRandomPokemonMaterials
+  if (
+    itemDef.effects?.grantRandomPokemonMaterials ||
+    itemDef.effects?.grantRandomGems
+  ) {
+    const materialRange = itemDef.effects.grantRandomPokemonMaterials
+    const gemRange = itemDef.effects.grantRandomGems
 
     try {
       const response = await runEconomyAction(
@@ -381,14 +386,30 @@ export async function useConsumable(
             await setUserInventoryMap(transactionPayload, user.id, inventory, { req })
           }
 
-          const materialCount = rollRandomPokemonMaterialCount(min, max)
-          const materialRewards = buildRandomPokemonMaterialRewards(materialCount)
-          const result = await grantRewards(user.id, materialRewards, {
+          const materialCount = materialRange
+            ? rollRandomPokemonMaterialCount(materialRange.min, materialRange.max)
+            : 0
+          const gemCount = gemRange
+            ? rollRandomPokemonMaterialCount(gemRange.min, gemRange.max)
+            : 0
+          const rewards = [
+            ...(materialRange
+              ? buildRandomPokemonMaterialRewards(materialCount)
+              : []),
+            ...(gemRange ? buildRandomGemRewards(gemCount) : []),
+          ]
+          const result = await grantRewards(user.id, rewards, {
             source: 'consumable', payload: transactionPayload, req,
           })
+          const rewardDetails = [
+            materialCount > 0
+              ? `${materialCount} crafting ${materialCount === 1 ? 'material' : 'materials'}`
+              : null,
+            gemCount > 0 ? `${gemCount} ${gemCount === 1 ? 'gem' : 'gems'}` : null,
+          ].filter(Boolean)
           return {
             success: true,
-            message: `Found ${materialCount} crafting ${materialCount === 1 ? 'material' : 'materials'}!`,
+            message: `Found ${rewardDetails.join(' and ')}!`,
             summary: result.summary,
           }
         },

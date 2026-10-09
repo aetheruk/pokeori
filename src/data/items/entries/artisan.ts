@@ -353,6 +353,7 @@ const fishingSalvageItems: Item[] = [
     spriteId: 'pouch-of-materials',
     effects: {
       grantRandomPokemonMaterials: { min: 1, max: 5 },
+      grantRandomGems: { min: 1, max: 3 },
     },
   },
 ]
