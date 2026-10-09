@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.48.6`): Great Balls in the global Fishing item pool now require at least three Poké Balls in the keep net to become eligible.
 - Unreleased (`0.48.5`): Global fishing catch pools support item-quantity requirements against the keep net. Feebas requires at least one Drake Scale and rolls at 1 in 32; Relicanth remains an ungated 1-in-512 replacement.
 - Unreleased (`0.48.4`): Fishing's Stay and Leave choices appear side by side, with contrasting paper and charcoal button treatments. The fixed Cast/Hook/Try Again button uses charcoal text for legibility against its light surface.
 - Unreleased (`0.48.3`): A Fishing keep net is preserved when a failed catch leaves the hooked Pokémon nearby for another attempt, and is forfeited only when the encounter ends with the Pokémon fleeing. The global Fishing item pool now includes common Broken Balls, Poké Balls, and Metal Scrap plus uncommon Great Balls and Drake Scales.

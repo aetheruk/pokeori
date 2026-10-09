@@ -26,7 +26,6 @@ describe('fishing item pools', () => {
       'broken-ball-t1',
       'poke-ball',
       'metal-scrap-t1',
-      'great-ball',
       'drake-scale-t1',
     ])
     expect(available.some((entry) => entry.currencyId === 'pokedollars')).toBe(true)
@@ -110,6 +109,32 @@ describe('fishing item pools', () => {
         },
       ]),
     ).toEqual(gatedEntries)
+  })
+
+  test('Great Balls require three Poké Balls in the keep net on every rod', () => {
+    const pokeballs = (count: number) =>
+      Array.from({ length: count }, (_, index) => ({
+        id: `pokeball-${index}`,
+        type: 'item' as const,
+        itemId: 'poke-ball',
+        quantity: 1,
+      }))
+
+    for (const pool of Object.values(globalFishingItemPools)) {
+      expect(
+        getAvailableFishingItemEntries(pool, {}, new Set(), pokeballs(2)).some(
+          (entry) => entry.itemId === 'great-ball',
+        ),
+      ).toBe(false)
+      expect(
+        getAvailableFishingItemEntries(
+          pool,
+          {},
+          new Set(),
+          pokeballs(3),
+        ).some((entry) => entry.itemId === 'great-ball'),
+      ).toBe(true)
+    }
   })
 
   test('global pools include multi-quantity PokeDollars and Crystal catches', () => {
