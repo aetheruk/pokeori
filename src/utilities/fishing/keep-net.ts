@@ -3,7 +3,7 @@ import type { LocationReward } from '@/data/types'
 import { FISHING_ITEM_CHANCE } from '@/data/games/fishing/item-pools'
 
 export const FISHING_KEEP_NET_CAPACITY = 10
-export const FISHING_KEEP_NET_EXPLORER_XP_PER_FORM = 0.4
+export const FISHING_KEEP_NET_CRYSTAL_MULTIPLIER_PER_FORM = 0.4
 
 export type FishingKeepNetEntry =
   | {
@@ -24,12 +24,27 @@ export type FishingKeepNetEntry =
       quantity: number
     }
 
-export function getFishingExplorerXpMultiplier(keepNetCount: number): number {
+export function getFishingCatchCrystalMultiplier(keepNetCount: number): number {
   const matchingForms = Math.max(
     0,
     Math.min(FISHING_KEEP_NET_CAPACITY, keepNetCount),
   )
-  return 1 + matchingForms * FISHING_KEEP_NET_EXPLORER_XP_PER_FORM
+  return 1 + matchingForms * FISHING_KEEP_NET_CRYSTAL_MULTIPLIER_PER_FORM
+}
+
+export function getFishingExplorerXpBonus(
+  pokemonLevel: number,
+  explorerLevel: number,
+  keepNet: FishingKeepNetEntry[],
+): number {
+  const safePokemonLevel = Math.max(1, Math.min(100, Math.floor(pokemonLevel)))
+  const safeExplorerLevel = Math.max(1, Math.min(100, Math.floor(explorerLevel)))
+  const pokemonCount = Math.min(
+    FISHING_KEEP_NET_CAPACITY,
+    keepNet.filter((entry) => entry.type === 'pokemon').length,
+  )
+
+  return Math.floor(safePokemonLevel + 1.1 * safeExplorerLevel * pokemonCount)
 }
 
 export function applyFishingCatchCrystalMultiplier(
@@ -78,29 +93,6 @@ export function getSameFormKeepNetCount(
   return keepNet.filter(
     (entry) => entry.type === 'pokemon' && entry.formId === formId,
   ).length
-}
-
-export function applyFishingExplorerXpMultiplier(
-  rewards: LocationReward[],
-  multiplier: number,
-): LocationReward[] {
-  const safeMultiplier = Math.max(1, Math.min(5, multiplier))
-  if (safeMultiplier === 1) return rewards
-
-  return rewards.map((reward) => {
-    if (reward.type !== 'xp' || reward.skill !== 'catching') return reward
-    const quantity = reward.quantity ?? 1
-    return {
-      ...reward,
-      quantity:
-        typeof quantity === 'number'
-          ? Math.floor(quantity * safeMultiplier)
-          : {
-              min: Math.floor(quantity.min * safeMultiplier),
-              max: Math.floor(quantity.max * safeMultiplier),
-            },
-    }
-  })
 }
 
 export function buildFishingKeepNetCaptureRewards(
