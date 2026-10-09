@@ -68,7 +68,13 @@ export type { PrizeWheelGameConfig } from './prize-wheel/types'
 export { chanseyEntries as prizeWheelGames } from './prize-wheel'
 
 // Fishing game
-export type { FishingGameConfig, RodType, FishingRodConfig } from './fishing/types'
+export type {
+  FishingGameConfig,
+  FishingKeepNetRequirement,
+  GlobalFishingItemEntry,
+  RodType,
+  FishingRodConfig,
+} from './fishing/types'
 export { fishingGames } from './fishing'
 
 // Match-3 game

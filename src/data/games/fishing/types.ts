@@ -17,6 +17,12 @@ export interface FishingSceneConfig {
   }
 }
 
+export interface FishingKeepNetRequirement {
+  itemId: string
+  /** Minimum total quantity across matching item bundles in the keep net. */
+  quantity?: number
+}
+
 export interface FishingPokemonEntry {
   /** Disable random Alphas for an authored special fishing target. */
   allowAlpha?: boolean
@@ -43,6 +49,11 @@ export interface FishingItemEntry {
   reactionTime: number
   appearTime: { min: number; max: number }
   secret?: boolean
+}
+
+/** Shared global item catches can be gated by items held in the keep net. */
+export interface GlobalFishingItemEntry extends FishingItemEntry {
+  keepNetRequirements?: FishingKeepNetRequirement[]
 }
 
 export interface FishingRodConfig {

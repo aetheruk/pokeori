@@ -11,6 +11,15 @@ const baseEntry: FishingPokemonEntry = {
   appearTime: { min: 500, max: 1500 },
 }
 
+const drakeScaleKeepNet = [
+  {
+    id: 'drake-scale',
+    type: 'item' as const,
+    itemId: 'drake-scale-t1',
+    quantity: 1,
+  },
+]
+
 describe('secret fishing Pokemon replacements', () => {
   const rodTypes = ['old', 'good', 'super'] as const
 
@@ -37,6 +46,7 @@ describe('secret fishing Pokemon replacements', () => {
         applySecretFishingPokemonReplacement({
           rodType,
           entry: baseEntry,
+          keepNet: drakeScaleKeepNet,
           random: () => (calls++ === 0 ? 1 / 512 : 1 / 512),
         }),
       ).toEqual({
@@ -83,13 +93,24 @@ describe('secret fishing Pokemon replacements', () => {
     }
   })
 
-  test('Feebas uses the new 1 in 128 replacement chance', () => {
+  test('Feebas requires a Drake Scale and then uses a 1 in 32 roll', () => {
     for (const rodType of rodTypes) {
+      let calls = 0
       expect(
         applySecretFishingPokemonReplacement({
           rodType,
           entry: baseEntry,
-          random: () => 1 / 256,
+          random: () => (calls++ === 0 ? 1 : 0),
+        }),
+      ).toBe(baseEntry)
+      expect(calls).toBe(1)
+
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          keepNet: drakeScaleKeepNet,
+          random: () => 1 / 64,
         }).speciesId,
       ).toBe(349)
 
@@ -97,9 +118,30 @@ describe('secret fishing Pokemon replacements', () => {
         applySecretFishingPokemonReplacement({
           rodType,
           entry: baseEntry,
-          random: () => 1 / 128,
+          keepNet: drakeScaleKeepNet,
+          random: () => 1 / 32,
         }).speciesId,
       ).toBe(129)
     }
+  })
+
+  test('Drake Scale quantities in bundles satisfy global catch requirements', () => {
+    const bundledScaleKeepNet = [
+      {
+        id: 'scale-bundle',
+        type: 'item' as const,
+        itemId: 'drake-scale-t1',
+        quantity: 3,
+      },
+    ]
+
+    expect(
+      applySecretFishingPokemonReplacement({
+        rodType: 'old',
+        entry: baseEntry,
+        keepNet: bundledScaleKeepNet,
+        random: () => 1 / 64,
+      }).speciesId,
+    ).toBe(349)
   })
 })
