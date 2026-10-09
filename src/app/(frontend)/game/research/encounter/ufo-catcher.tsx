@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
 } from 'react'
-import { toast } from 'sonner'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import {
@@ -151,6 +150,7 @@ export function UfoCatcherGame({
   const [lastResult, setLastResult] = useState<UfoCatcherAttemptResult | null>(
     null,
   )
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
 
   const holdRef = useRef<{
     axis: Axis
@@ -306,6 +306,7 @@ export function UfoCatcherGame({
 
   const startAttempt = async () => {
     if (phase !== 'idle' || !canAfford) return
+    setActionMessage(null)
     setResolution(null)
     setMotion('positioning')
     setPhase('resolving')
@@ -316,7 +317,7 @@ export function UfoCatcherGame({
       'The claw attempt could not be confirmed. Retry this same attempt.',
     )
     if (!result.success || !result.attempt) {
-      toast.error(result.error || 'Unable to start the claw')
+      setActionMessage(result.error || 'Unable to start the claw.')
       setPhase('idle')
       return
     }
@@ -353,7 +354,7 @@ export function UfoCatcherGame({
     if (remainingDescent > 0) await sleep(remainingDescent)
 
     if (!result.success || !result.outcome) {
-      toast.error(result.error || 'The claw failed to resolve')
+      setActionMessage(result.error || 'The claw failed to resolve.')
       setMotion('positioning')
       setPhase('idle')
       return
@@ -371,9 +372,6 @@ export function UfoCatcherGame({
       setMotion('delivering')
       await sleep(520)
       playSfx('good')
-      toast.success('Prize caught!', {
-        description: result.prize?.label,
-      })
       await sleep(500)
     } else if (result.outcome === 'slip') {
       setMotion('lifting')
@@ -381,17 +379,16 @@ export function UfoCatcherGame({
       setMotion('slipping')
       await sleep(560)
       playSfx('bad')
-      toast.info('So close!', { description: 'The prize slipped free.' })
       await sleep(350)
     } else {
       setMotion('lifting')
       await sleep(540)
       playSfx('bad')
-      toast.info('Miss', { description: 'No prize was inside the claw.' })
       await sleep(350)
     }
 
     setDisplayBalance(result.balance ?? null)
+    setActionMessage(null)
     setLastResult(result)
     setShutterOpen(false)
     await sleep(720)
@@ -407,7 +404,7 @@ export function UfoCatcherGame({
     const result = await actions.exit(encounter.id)
     setIsExiting(false)
     if (!result.success) {
-      toast.error(result.error || 'Unable to leave the UFO Catcher')
+      setActionMessage(result.error || 'Unable to leave the UFO Catcher.')
       return
     }
     setExitResult({
@@ -552,8 +549,8 @@ export function UfoCatcherGame({
         <section
           aria-label="UFO Catcher cabinet"
           className="relative"
-          style={{
-            width: `min(96vw, 620px, calc((100dvh - ${phase === 'idle' && lastResult ? 195 : 135}px) * 1.3333333333))`,
+            style={{
+            width: `min(96vw, 620px, calc((100dvh - ${phase === 'idle' && (lastResult || actionMessage) ? 195 : 135}px) * 1.3333333333))`,
             aspectRatio: '4 / 3',
           }}
         >
@@ -780,7 +777,9 @@ export function UfoCatcherGame({
 
       <footer className="relative z-30 mx-auto flex w-full max-w-[620px] flex-col items-center px-3 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-2">
         <div className="mb-3 text-center" aria-live="polite">
-          {phase === 'idle' && lastResult && (
+          {phase === 'idle' && actionMessage ? (
+            <p className="text-sm font-semibold text-game-danger">{actionMessage}</p>
+          ) : phase === 'idle' && lastResult ? (
             <div className="flex items-center justify-center gap-2 text-sm">
               {lastResult.prize && (
                 <PrizeSprite
@@ -806,7 +805,7 @@ export function UfoCatcherGame({
                 </p>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
         <Button
           type="button"
