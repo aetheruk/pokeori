@@ -46,7 +46,7 @@ ENCOUNTER_TYPES.forEach((type) => {
     encounterItems.push({
       id: `${tier.prefix}${type}-lure`,
       name: `${tier.label}${typeName} Lure`,
-      description: `Increases ${typeName}-type encounter odds by ${tier.spawnChancePercent} percentage points. Also improves catch rate for matching Pokemon.`,
+      description: `Attracts ${typeName} Pokemon & makes them easier to catch.`,
       category: 'misc',
       spriteId: `${type}-gem`,
       unique: false,
@@ -68,8 +68,7 @@ encounterItems.push({
 encounterItems.push({
   id: 'repel',
   name: 'Repel',
-  description:
-    "Guarantees the selected Pokemon's maximum level in capture encounters and wild battles.",
+  description: 'Keeps Away Weak Pokemon',
   category: 'misc',
   spriteId: 'repel',
   unique: false,
@@ -79,8 +78,7 @@ encounterItems.push({
 encounterItems.push({
   id: 'super-repel',
   name: 'Super Repel',
-  description:
-    "Adds 5 levels to the selected Pokemon's maximum level in capture encounters and wild battles.",
+  description: 'Keeps away all but strong Pokemon',
   category: 'misc',
   spriteId: 'super-repel',
   unique: false,
@@ -90,8 +88,7 @@ encounterItems.push({
 encounterItems.push({
   id: 'max-repel',
   name: 'Max Repel',
-  description:
-    "Adds 10 levels to the selected Pokemon's maximum level in capture encounters and wild battles.",
+  description: 'Keeps away all but the strongest Pokemon',
   category: 'misc',
   spriteId: 'max-repel',
   unique: false,
