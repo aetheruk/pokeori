@@ -22,6 +22,12 @@ export const globalFishingPokemonPool: GlobalFishingPokemonReplacement[] = [
     keepNetRequirements: [{ itemId: 'drake-scale-t1' }],
   },
   {
+    speciesId: 120,
+    formId: '120',
+    chance: 0.5,
+    keepNetRequirements: [{ itemId: 'cerulean-pool-scale', quantity: 10 }],
+  },
+  {
     speciesId: 129,
     formId: '129',
     chance: 0.99,
