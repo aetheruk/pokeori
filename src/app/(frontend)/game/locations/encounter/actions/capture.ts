@@ -92,6 +92,7 @@ import {
   applyAlphaCaptureXp,
 } from '@/utilities/pokemon/alpha'
 import {
+  applyFishingCatchCrystalMultiplier,
   applyFishingExplorerXpMultiplier,
   buildFishingKeepNetCaptureRewards,
 } from '@/utilities/fishing/keep-net'
@@ -972,7 +973,18 @@ export async function attemptCapture(
       speciesKey,
       formKey,
     )
-    rewardsToGrant.push(buildCaptureCrystalReward(level, formResearchLevel))
+    const captureCrystalReward = buildCaptureCrystalReward(
+      level,
+      formResearchLevel,
+    )
+    rewardsToGrant.push(
+      state.locationId.startsWith('fishing:')
+        ? applyFishingCatchCrystalMultiplier(
+            captureCrystalReward,
+            state.fishingExplorerXpMultiplier || 1,
+          )
+        : captureCrystalReward,
+    )
 
     const companionFormId = (activePoke.docs[0] as any)?.formId
     rewardsToGrant.push(
@@ -1013,10 +1025,7 @@ export async function attemptCapture(
     )
     rewardsToGrant.push(...calculateGemRewards(formData?.types || []))
     rewardsToGrant.push(
-      ...buildFishingKeepNetCaptureRewards(
-        state.fishingKeepNet || [],
-        state.formId,
-      ),
+      ...buildFishingKeepNetCaptureRewards(state.fishingKeepNet || []),
     )
 
     const abilityRewards = getCaptureAbilityRewards({

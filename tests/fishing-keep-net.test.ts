@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import type { Reward } from '@/data/types'
 import {
+  applyFishingCatchCrystalMultiplier,
   applyFishingExplorerXpMultiplier,
   buildFishingKeepNetCaptureRewards,
   getFishingAlphaChanceMultiplier,
@@ -55,16 +56,16 @@ describe('fishing keep net', () => {
       { id: '5', type: 'item', currencyId: 'crystals', quantity: 15 },
     ]
 
-    expect(buildFishingKeepNetCaptureRewards(entries, '129')).toEqual([
+    expect(buildFishingKeepNetCaptureRewards(entries)).toEqual([
       { type: 'pokemon_research_xp', targetId: '129', quantity: 1, dropChance: 100 },
       { type: 'pokemon_research_xp', targetId: '129', quantity: 1, dropChance: 100 },
       { type: 'item', targetId: 'water-gem', quantity: 1, dropChance: 100 },
       { type: 'currency', targetId: 'pokedollars', quantity: 250, dropChance: 100 },
-      { type: 'currency', targetId: 'crystals', quantity: 27, dropChance: 100 },
+      { type: 'currency', targetId: 'crystals', quantity: 15, dropChance: 100 },
     ])
   })
 
-  test('scales stored crystals by the captured form count up to five times', () => {
+  test('scales the normal catch crystal reward by matching form count up to five times', () => {
     const entries: FishingKeepNetEntry[] = [
       ...Array.from({ length: 10 }, (_, index) => ({
         id: `magikarp-${index}`,
@@ -77,13 +78,29 @@ describe('fishing keep net', () => {
       { id: 'crystals', type: 'item', currencyId: 'crystals', quantity: 5 },
     ]
 
-    expect(buildFishingKeepNetCaptureRewards(entries, '129').at(-1)).toEqual({
+    expect(applyFishingCatchCrystalMultiplier({
       type: 'currency',
       targetId: 'crystals',
-      quantity: 25,
+      quantity: 15,
+      dropChance: 100,
+    }, getFishingExplorerXpMultiplier(getSameFormKeepNetCount(entries, '129')))).toEqual({
+      type: 'currency',
+      targetId: 'crystals',
+      quantity: 75,
       dropChance: 100,
     })
-    expect(buildFishingKeepNetCaptureRewards(entries, '130').at(-1)).toEqual({
+    expect(applyFishingCatchCrystalMultiplier({
+      type: 'currency',
+      targetId: 'crystals',
+      quantity: 15,
+      dropChance: 100,
+    }, getFishingExplorerXpMultiplier(getSameFormKeepNetCount(entries, '130')))).toEqual({
+      type: 'currency',
+      targetId: 'crystals',
+      quantity: 15,
+      dropChance: 100,
+    })
+    expect(buildFishingKeepNetCaptureRewards(entries).at(-1)).toEqual({
       type: 'currency',
       targetId: 'crystals',
       quantity: 5,
