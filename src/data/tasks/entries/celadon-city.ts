@@ -1491,7 +1491,7 @@ export const celadonCityTasks: Task[] = [
         "type": "trainer",
         "id": "gym-kanto-erika"
       },
-      "message": "Hey {trainer} have i got something juicy for you! I was having a few drinks with the girls at Celadon heights recently when I overheard a senior Rocket official speaking rather freely. I didn't catch the full conversation but they said definitely said Operation Shadow Force was ahead of schedule, and that a full launch was expected within the next month. What that operation is, I cannot say, whatever it is it sounds dramatic, maybe a new activity at the Games Corner?",
+      "message": "Hey {trainer} have i got something juicy for you! I was having a few drinks with the girls at Celadon heights recently when I overheard a senior Rocket official speaking rather freely. I didn't catch the full conversation but they definitely said Operation Shadow Force was ahead of schedule, and that a full launch was expected within the next month. What that operation is, I cannot say, whatever it is it sounds dramatic, maybe a new activity at the Games Corner?",
       "closeButtonText": "Operation Shadow Force..."
     }
   },
