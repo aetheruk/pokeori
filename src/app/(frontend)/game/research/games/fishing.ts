@@ -1101,7 +1101,10 @@ export async function releaseFish() {
   }
 }
 
-export async function startFishingCatch() {
+export async function startFishingCatch(options?: {
+  keepNetEntryId: string
+  selectedRod: RodType
+}) {
   try {
     const user = await getUser()
     if (!user) {
@@ -1136,7 +1139,8 @@ export async function startFishingCatch() {
       const fishingState = (await redis.get(
         `fishing:${user.id}`,
       )) as FishingState | null
-      if (fishingState?.phase !== 'hooked') {
+      const startingFromKeepNet = options !== undefined
+      if (!startingFromKeepNet && fishingState?.phase !== 'hooked') {
         const recentCatchStart = await getIdempotentResult<any>(
           `fishing:catch-start:last:${user.id}`,
         )
@@ -1146,34 +1150,102 @@ export async function startFishingCatch() {
         return { success: false, error: 'No hooked Pokemon' }
       }
 
-      const catchStartResultKey = `fishing:catch-start:${user.id}:${fishingState.castTime}`
+      if (
+        startingFromKeepNet &&
+        fishingState &&
+        fishingState.phase !== 'idle'
+      ) {
+        return { success: false, error: 'Finish or release the active cast first' }
+      }
+      if (
+        startingFromKeepNet &&
+        (!options.keepNetEntryId ||
+          !['old', 'good', 'super'].includes(options.selectedRod))
+      ) {
+        return { success: false, error: 'Invalid keep-net catch selection' }
+      }
+
+      const researchState = (await redis.get(
+        `game:${user.id}`,
+      )) as GameActivityState | null
+      const encounterId = startingFromKeepNet
+        ? researchState?.encounterId
+        : fishingState?.encounterId || researchState?.encounterId
+      if (!encounterId) {
+        return { success: false, error: 'Your fishing session has expired' }
+      }
+      const encounter = allGames.find(
+        (entry) => entry.id === encounterId,
+      ) as FishingGameConfig | undefined
+      if (encounter?.gameType !== 'fishing') {
+        return { success: false, error: 'Invalid fishing encounter' }
+      }
+
+      const keepNet = await getFishingKeepNetState(
+        user.id,
+        encounterId,
+      )
+      const selectedNetPokemon = startingFromKeepNet
+        ? keepNet.entries.find(
+            (entry): entry is Extract<FishingKeepNetEntry, { type: 'pokemon' }> =>
+              entry.id === options.keepNetEntryId && entry.type === 'pokemon',
+          )
+        : undefined
+      if (startingFromKeepNet && !selectedNetPokemon) {
+        return {
+          success: false,
+          error: 'That Pokémon is no longer in your keep net',
+        }
+      }
+
+      const selectedRod = startingFromKeepNet
+        ? options.selectedRod
+        : fishingState!.selectedRod
+      const rodConfig = encounter.settings.rods[selectedRod]
+      if (!rodConfig) {
+        return { success: false, error: 'Invalid rod type' }
+      }
+      if (startingFromKeepNet) {
+        const payload = await getPayload({ config: configPromise })
+        const inventory = await getUserInventoryMap(payload as any, user.id)
+        if ((inventory[getRodItemId(selectedRod)] || 0) <= 0) {
+          return { success: false, error: 'You do not own the selected rod' }
+        }
+      }
+
+      const catchStartResultKey = startingFromKeepNet
+        ? `fishing:catch-start:${user.id}:net:${options.keepNetEntryId}`
+        : `fishing:catch-start:${user.id}:${fishingState!.castTime}`
       const cachedCatchStart =
         await getIdempotentResult<any>(catchStartResultKey)
       if (cachedCatchStart) {
         return cachedCatchStart
       }
 
-      const result = fishingState.hookedResult
+      const result = selectedNetPokemon
+        ? {
+            type: 'pokemon' as const,
+            entry: {
+              speciesId: selectedNetPokemon.speciesId,
+              formId: selectedNetPokemon.formId,
+              symbol: '🎣',
+              weight: 1,
+              reactionTime: 0,
+              appearTime: { min: 0, max: 0 },
+            },
+            isShiny: selectedNetPokemon.isShiny,
+            rarity: selectedNetPokemon.rarity,
+            isAlpha: selectedNetPokemon.isAlpha,
+          }
+        : fishingState!.hookedResult
       if (result?.type !== 'pokemon') {
         return { success: false, error: 'Not a Pokemon' }
       }
-      const keepNet = await getFishingKeepNetState(
-        user.id,
-        fishingState.encounterId,
-      )
 
       const pokemonEntry = result.entry as FishingPokemonEntry
-      const encounter = allGames.find(
-        (e) => e.id === fishingState.encounterId,
-      ) as FishingGameConfig | undefined
-
-      if (!encounter) {
-        return { success: false, error: 'Encounter not found' }
-      }
-
-      // Get rod config for per-rod settings
-      const selectedRod = fishingState.selectedRod
-      const rodConfig = encounter.settings.rods[selectedRod]
+      const keepNetForCapture = selectedNetPokemon
+        ? keepNet.entries.filter((entry) => entry.id !== selectedNetPokemon.id)
+        : keepNet.entries
 
       // Create location-style encounter state in Redis
       // This allows reusing the existing catch UI and attemptCapture logic
@@ -1204,7 +1276,7 @@ export async function startFishingCatch() {
 
       const encounterState: EncounterState = {
         userId: user.id,
-        locationId: `fishing:${fishingState.encounterId}`, // Prefix to identify as fishing
+        locationId: `fishing:${encounterId}`, // Prefix to identify as fishing
         background: encounter.background,
         pokemonId: speciesId,
         formId,
@@ -1225,10 +1297,10 @@ export async function startFishingCatch() {
           formId: entry.formId,
           chance: entry.weight,
         })),
-        weather: fishingState.weather,
-        fishingKeepNet: keepNet.entries,
+        weather: fishingState?.weather,
+        fishingKeepNet: keepNetForCapture,
         fishingCatchCrystalMultiplier: getFishingCatchCrystalMultiplier(
-          getSameFormKeepNetCount(keepNet.entries, formId),
+          getSameFormKeepNetCount(keepNetForCapture, formId),
         ),
         encounterMode: encounter.settings.safariCapture ? 'safari' : 'standard',
         fleeRate: encounter.settings.safariCapture
