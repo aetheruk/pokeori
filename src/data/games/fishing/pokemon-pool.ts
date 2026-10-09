@@ -25,7 +25,7 @@ export const globalFishingPokemonPool: GlobalFishingPokemonReplacement[] = [
     speciesId: 129,
     formId: '129',
     chance: 0.99,
-    rarity: 'shiny',
+    rarity: 'gold',
     keepNetRequirements: [{ itemId: 'golden-scale', quantity: 5 }],
   },
 ]

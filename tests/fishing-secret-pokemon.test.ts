@@ -145,7 +145,7 @@ describe('secret fishing Pokemon replacements', () => {
     ).toBe(349)
   })
 
-  test('five repeatable Golden Scales make a Shiny Magikarp almost certain', () => {
+  test('five repeatable Golden Scales make a Gold Magikarp almost certain', () => {
     const goldenScales = [
       {
         id: 'golden-scales',
@@ -165,7 +165,7 @@ describe('secret fishing Pokemon replacements', () => {
           return () => (rolls++ === 0 ? 1 : 0)
         })(),
       }),
-    ).toMatchObject({ speciesId: 129, formId: '129', rarity: 'shiny' })
+    ).toMatchObject({ speciesId: 129, formId: '129', rarity: 'gold' })
 
     expect(
       applySecretFishingPokemonReplacement({
