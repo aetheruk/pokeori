@@ -442,6 +442,7 @@ export async function castFishingLine(rodType: RodType) {
         selectedEntry = applySecretFishingPokemonReplacement({
           rodType,
           entry: ordinaryEntry,
+          keepNet: fishingKeepNet.entries,
         })
         isSecret = selectedEntry !== ordinaryEntry
         resultType = 'pokemon'
@@ -470,6 +471,7 @@ export async function castFishingLine(rodType: RodType) {
               entry.type === 'item' && entry.itemId ? [entry.itemId] : [],
             ),
           ),
+          fishingKeepNet.entries,
         )
         const itemPool =
           availableConfiguredItemPool.length > 0

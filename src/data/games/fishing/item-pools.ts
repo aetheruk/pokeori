@@ -1,11 +1,11 @@
-import type { FishingItemEntry, RodType } from './types'
+import type { GlobalFishingItemEntry, RodType } from './types'
 
 const commonAppearTime = { min: 2000, max: 5000 }
 
 export const FISHING_POKEMON_CHANCE = 70
 export const FISHING_ITEM_CHANCE = 30
 
-function goldenScaleEntries(reactionTime: number): FishingItemEntry[] {
+function goldenScaleEntries(reactionTime: number): GlobalFishingItemEntry[] {
   return Array.from({ length: 8 }, (_, index) => ({
     itemId: `golden-scale-${index + 1}`,
     weight: 1,
@@ -16,7 +16,7 @@ function goldenScaleEntries(reactionTime: number): FishingItemEntry[] {
   }))
 }
 
-function currencyEntries(reactionTime: number): FishingItemEntry[] {
+function currencyEntries(reactionTime: number): GlobalFishingItemEntry[] {
   const currencies: Array<{
     currencyId: string
     quantity: number
@@ -38,7 +38,7 @@ function currencyEntries(reactionTime: number): FishingItemEntry[] {
   }))
 }
 
-function genericItemEntries(reactionTime: number): FishingItemEntry[] {
+function genericItemEntries(reactionTime: number): GlobalFishingItemEntry[] {
   const items: Array<{
     itemId: string
     weight: number
@@ -58,7 +58,7 @@ function genericItemEntries(reactionTime: number): FishingItemEntry[] {
   }))
 }
 
-export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
+export const globalFishingItemPools: Record<RodType, GlobalFishingItemEntry[]> = {
   old: [
     {
       itemId: 'water-gem',

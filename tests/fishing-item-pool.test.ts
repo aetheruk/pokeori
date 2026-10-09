@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 import { globalFishingItemPools } from '@/data/games/fishing/item-pools'
-import type { FishingItemEntry } from '@/data/games/fishing/types'
+import type {
+  FishingItemEntry,
+  GlobalFishingItemEntry,
+} from '@/data/games/fishing/types'
 import { getAvailableFishingItemEntries } from '@/utilities/fishing/item-pool'
 
 describe('fishing item pools', () => {
@@ -82,6 +85,31 @@ describe('fishing item pools', () => {
         (entry) => entry.itemId,
       ),
     ).toEqual(['water-gem'])
+  })
+
+  test('filters keep-net-gated catches until the required item is stored', () => {
+    const gatedEntries: GlobalFishingItemEntry[] = [
+      {
+        itemId: 'golden-scale-1',
+        weight: 1,
+        symbol: '!!!',
+        reactionTime: 900,
+        appearTime: { min: 1, max: 1 },
+        keepNetRequirements: [{ itemId: 'drake-scale-t1' }],
+      },
+    ]
+
+    expect(getAvailableFishingItemEntries(gatedEntries, {})).toEqual([])
+    expect(
+      getAvailableFishingItemEntries(gatedEntries, {}, new Set(), [
+        {
+          id: 'drake-scale',
+          type: 'item',
+          itemId: 'drake-scale-t1',
+          quantity: 1,
+        },
+      ]),
+    ).toEqual(gatedEntries)
   })
 
   test('global pools include multi-quantity PokeDollars and Crystal catches', () => {
