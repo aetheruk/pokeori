@@ -38,6 +38,7 @@ import { createEconomyRequestId, getEconomyActionResult, runEconomyAction } from
 import { isDailyExcludedGameType } from '@/utilities/tasks/daily-activity'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
+import { shouldRestoreExistingGameActivity } from '@/utilities/games/activity-session'
 import {
   getAchievedUnclaimedMilestones,
   getEarnedRepeatingRewards,
@@ -628,7 +629,14 @@ export async function startGameActivity(
       const existingState = await getGameActivityStateForUser(user.id, domain)
 
       // If a session exists and we aren't forcing a reset, return it
-      if (existingState && !validatedForceReset) {
+      if (
+        existingState &&
+        shouldRestoreExistingGameActivity({
+          existingEncounterId: existingState.encounterId,
+          requestedEncounterId: validatedEncounterId,
+          forceReset: validatedForceReset ?? false,
+        })
+      ) {
         const isFieldObservation = encounter.gameType === 'field-observation'
         const restoredRoundUsesKidModeQuestion =
           existingState.roundData?.question?.type === 'kid-most-appeared'
