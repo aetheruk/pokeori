@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.49.2`): Keeping at least ten Cerulean Pool Scales enables Staryu as a global Fishing Pokemon replacement at 50% on any rod.
 - Unreleased (`0.49.1`): When leaving Fishing to take a hooked item, the reward result header displays that item's or currency's sprite instead of the generic success icon.
 - Unreleased (`0.49.0`): Shadow Pokemon no longer lose turns to pain. Every active Shadow Pokemon screams and takes 1/8 of its maximum HP as self-damage at turn end, and gains 10% Attack and Special Attack instead of the previous broad stat bonus.
 - Unreleased (`0.49.0`): Fishing adds a repeatable Golden Scale material to global item catches at exactly 1-in-50 after all eight numbered Golden Scales are owned. Keeping five Golden Scales makes a Gold-variant Magikarp a 99% global Pokemon replacement on any rod; capture uses the existing Gold rarity data and flow.

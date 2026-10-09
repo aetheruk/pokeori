@@ -125,6 +125,48 @@ describe('secret fishing Pokemon replacements', () => {
     }
   })
 
+  test('ten Cerulean Pool Scales give Staryu a 50% global replacement chance', () => {
+    const ceruleanScaleKeepNet = [
+      {
+        id: 'cerulean-scales',
+        type: 'item' as const,
+        itemId: 'cerulean-pool-scale',
+        quantity: 10,
+      },
+    ]
+
+    for (const rodType of rodTypes) {
+      let rolls = 0
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          keepNet: ceruleanScaleKeepNet,
+          random: () => [1, 0.49][rolls++],
+        }),
+      ).toMatchObject({ speciesId: 120, formId: '120' })
+
+      rolls = 0
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          keepNet: ceruleanScaleKeepNet,
+          random: () => [1, 0.5][rolls++],
+        }),
+      ).toBe(baseEntry)
+    }
+
+    expect(
+      applySecretFishingPokemonReplacement({
+        rodType: 'old',
+        entry: baseEntry,
+        keepNet: [{ ...ceruleanScaleKeepNet[0], quantity: 9 }],
+        random: () => 1,
+      }),
+    ).toBe(baseEntry)
+  })
+
   test('Drake Scale quantities in bundles satisfy global catch requirements', () => {
     const bundledScaleKeepNet = [
       {
