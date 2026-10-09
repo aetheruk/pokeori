@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased (`0.49.8`): Starting a different mini-game replaces the prior active encounter rather than restoring it. A pending paid Prize Wheel spin is settled before switching so its reward is preserved.
+
 - Unreleased (`0.49.3`): Generated Explorer/Catching XP now uses a 2.5x skill modifier, up from 1.8x. This increases generated XP for catches, including the existing half-XP award for failed throws; authored flat XP rewards are unchanged.
 - Unreleased (`0.49.2`): Keeping at least ten Cerulean Pool Scales enables Staryu as a global Fishing Pokemon replacement at 50% on any rod.
 - Unreleased (`0.49.1`): When leaving Fishing to take a hooked item, the reward result header displays that item's or currency's sprite instead of the generic success icon.

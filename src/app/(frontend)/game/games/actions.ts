@@ -4,11 +4,15 @@ import {
   claimGameActivityEndlessMilestone,
   completeGameActivity,
   getGameActivityState,
+  getGameActivityStateForUser,
+  getUser,
   startGameActivity,
   submitGameActivityAnswer,
   type GameActivityCompletionResult,
   type GameActivityState,
 } from '@/app/(frontend)/game/_shared/activity-actions'
+import { allGames } from '@/data/games'
+import { exitPrizeWheel } from '@/app/(frontend)/game/research/games/wheel'
 import { startBattleBets } from './battle-bets-actions'
 
 export type GameState = GameActivityState
@@ -19,6 +23,27 @@ export async function startGame(
   forceReset = false,
   consumedPokemonIds?: string[],
 ) {
+  const user = await getUser()
+  if (user) {
+    const existingState = await getGameActivityStateForUser(user.id, 'game')
+    if (existingState && existingState.encounterId !== gameId) {
+      const existingEncounter = allGames.find(
+        (encounter) => encounter.id === existingState.encounterId,
+      )
+      if (existingEncounter?.gameType === 'prize-wheel') {
+        const exitResult = await exitPrizeWheel(existingState.encounterId)
+        if (!exitResult.success) {
+          return {
+            success: false,
+            error:
+              ('error' in exitResult && exitResult.error) ||
+              'Unable to settle the previous Prize Wheel session.',
+          }
+        }
+      }
+    }
+  }
+
   if (gameId === 'celadon-high-stakes-battle-bets') {
     return startBattleBets(forceReset) as any
   }
