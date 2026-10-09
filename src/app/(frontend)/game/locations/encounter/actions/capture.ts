@@ -71,6 +71,7 @@ import { addPokedexCaughtRarity } from '@/utilities/user-state'
 import { getActiveEggCount } from '@/utilities/day-care/eggs'
 import {
   buildCaptureEscapeRopeReward,
+  buildCaptureMaterialPouchReward,
   buildCaptureCrystalReward,
   buildCaptureRepelRewards,
   buildCaptureResearchXpRewards,
@@ -1004,6 +1005,7 @@ export async function attemptCapture(
 
     if (location?.rewards) rewardsToGrant.push(...location.rewards)
     rewardsToGrant.push(buildCaptureEscapeRopeReward())
+    rewardsToGrant.push(buildCaptureMaterialPouchReward())
     rewardsToGrant.push(...buildCaptureRepelRewards(explorerLevel))
     rewardsToGrant.push(
       ...buildArtisanMaterialRewards(

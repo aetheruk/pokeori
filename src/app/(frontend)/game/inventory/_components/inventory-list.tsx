@@ -212,12 +212,14 @@ function getItemActionLabel(
   canChannel = false,
 ): string | null {
   if (canChannel) return 'Channel'
+  if (item.effects?.grantRandomPokemonMaterials) return 'Open'
   if (isArtisanIngredientItem(item)) return 'Craft'
   if (item.category === 'booster-pack') return 'Open'
   if (item.category === 'scratch-card') return 'Scratch'
   if (
     item.effects?.grantSkillXp ||
     item.effects?.grantPokemonResearchXp ||
+    item.effects?.grantRandomPokemonMaterials ||
     item.effects?.startBattle ||
     item.effects?.startEncounter ||
     item.effects?.startResearch ||
@@ -226,7 +228,9 @@ function getItemActionLabel(
     item.category === 'vitamin' ||
     item.category === 'candy'
   ) {
-    return item.effects?.startBattle
+    return item.effects?.grantRandomPokemonMaterials
+      ? 'Open'
+      : item.effects?.startBattle
       ? 'Battle'
       : item.effects?.startEncounter
         ? 'Encounter'
@@ -763,6 +767,7 @@ export function InventoryList() {
 
         if (
           item.effects?.grantSkillXp ||
+          item.effects?.grantRandomPokemonMaterials ||
           item.effects?.grantPokemonResearchXp?.formId ||
           item.effects?.startBattle ||
           item.effects?.startEncounter ||
@@ -1058,7 +1063,9 @@ export function InventoryList() {
                 Channel
               </span>
             </Button>
-          ) : selectedItem && isArtisanIngredientItem(selectedItem) ? (
+          ) : selectedItem &&
+            isArtisanIngredientItem(selectedItem) &&
+            !selectedItem.effects?.grantRandomPokemonMaterials ? (
             <Button
               className="w-full bg-game-charcoal font-bold text-game-cream hover:bg-game-charcoal-strong"
               onClick={() => openArtisanForItem(selectedItem)}
@@ -1102,6 +1109,7 @@ export function InventoryList() {
               {isUsing ? 'Scratching...' : 'Scratch!'}
             </Button>
           ) : selectedItem?.effects?.grantSkillXp ||
+            selectedItem?.effects?.grantRandomPokemonMaterials ||
             selectedItem?.effects?.grantPokemonResearchXp?.formId ||
             selectedItem?.effects?.startBattle ||
             selectedItem?.effects?.startEncounter ||
@@ -1112,7 +1120,11 @@ export function InventoryList() {
               disabled={isUsing}
               onClick={() => handleUseInventoryItem(selectedItem)}
             >
-              {isUsing ? 'Using...' : 'Use Item'}
+              {isUsing
+                ? 'Using...'
+                : selectedItem.effects?.grantRandomPokemonMaterials
+                  ? 'Open Pouch'
+                  : 'Use Item'}
             </Button>
           ) : selectedItem?.category === 'ability-patch' ||
             selectedItem?.category === 'vitamin' ||

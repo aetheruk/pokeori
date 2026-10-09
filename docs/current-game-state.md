@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: Discarded Rubbish is a common global item in all fishing rod pools. Every successful Pokémon capture has a global 1-in-10 chance to award a Pouch of Materials; opening it grants 1–5 independently random Tier 1 Pokémon crafting materials, so multiple materials can differ.
+
 - Unreleased (`0.50.0`): Explore encounter items appear as a compact icon row with descriptions available on press-and-hold. Standard capture locations and ordinary wild battle routes now accept one pre-encounter encounter item. Base, Advanced, and Master type Lures increase the matching type's spawn share by 5, 10, or 15 percentage points. Repel guarantees the selected Pokemon's maximum authored level, Super Repel adds 5 levels, and Max Repel adds 10 in capture locations and wild battles without changing which Pokemon is selected. Special, event, and expedition encounters remain excluded, and item ownership, skill access, and consumption are checked server-side.
 
 - Unreleased (`0.49.8`): Starting a different mini-game replaces the prior active encounter rather than restoring it. A pending paid Prize Wheel spin is settled before switching so its reward is preserved.

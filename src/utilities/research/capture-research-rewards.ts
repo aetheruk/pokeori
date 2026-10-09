@@ -7,6 +7,7 @@ export const CATCH_CRYSTAL_RESEARCH_BONUS_LEVEL = 3
 export const CATCH_ESCAPE_ROPE_DROP_CHANCE = 8
 export const CATCH_REPEL_DROP_CHANCE = 5
 export const CATCH_REPEL_UNLOCK_LEVEL = 20
+export const CAPTURE_MATERIAL_POUCH_DROP_CHANCE = 10
 
 export function getCaptureCrystalRewardAmount(
   caughtPokemonLevel: number,
@@ -65,6 +66,15 @@ export function buildCaptureEscapeRopeReward(): LocationReward {
     targetId: 'escape-rope',
     quantity: 1,
     dropChance: CATCH_ESCAPE_ROPE_DROP_CHANCE,
+  }
+}
+
+export function buildCaptureMaterialPouchReward(): LocationReward {
+  return {
+    type: 'item',
+    targetId: 'pouch-of-materials',
+    quantity: 1,
+    dropChance: CAPTURE_MATERIAL_POUCH_DROP_CHANCE,
   }
 }
 

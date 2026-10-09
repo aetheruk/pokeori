@@ -1,10 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 import {
   buildCaptureEscapeRopeReward,
+  buildCaptureMaterialPouchReward,
   buildCaptureCrystalReward,
   buildCaptureRepelRewards,
   buildCaptureResearchXpRewards,
   CATCH_ESCAPE_ROPE_DROP_CHANCE,
+  CAPTURE_MATERIAL_POUCH_DROP_CHANCE,
   CATCH_CRYSTAL_RESEARCH_BONUS,
   CATCH_COMPANION_RESEARCH_XP_REWARD,
   CATCH_REPEL_DROP_CHANCE,
@@ -66,6 +68,15 @@ describe('capture research XP rewards', () => {
       targetId: 'escape-rope',
       quantity: 1,
       dropChance: CATCH_ESCAPE_ROPE_DROP_CHANCE,
+    })
+  })
+
+  test('adds the global one-in-ten Pouch of Materials catch roll', () => {
+    expect(buildCaptureMaterialPouchReward()).toEqual({
+      type: 'item',
+      targetId: 'pouch-of-materials',
+      quantity: 1,
+      dropChance: CAPTURE_MATERIAL_POUCH_DROP_CHANCE,
     })
   })
 

@@ -207,6 +207,10 @@ export interface Item {
       amount: number | { min: number; max: number }
       minSkillLevel?: number
     }
+    grantRandomPokemonMaterials?: {
+      min: number
+      max: number
+    }
   }
   battleEffect?: BattleEffect // New: for battle-usable items
   enemyBattleUse?: BattleAiUseConfig
@@ -371,6 +375,7 @@ const ENCOUNTER_UTILITY_ITEMS = new Set([
 const ARTISAN_MATERIAL_PREFIXES = [
   'wood-scraps-',
   'broken-ball-',
+  'discarded-rubbish',
   'soft-fluff-',
   'wing-feather-',
   'metal-scrap-',
@@ -486,8 +491,15 @@ export function getInventoryDisplayPlacement(item: Item): {
   group: InventoryDisplayGroup
   subCategory: InventoryDisplaySubCategory
 } {
-  if (item.effects?.grantSkillXp || item.effects?.grantPokemonResearchXp) {
+  if (
+    item.effects?.grantSkillXp ||
+    item.effects?.grantPokemonResearchXp
+  ) {
     return { group: 'training', subCategory: 'trainer' }
+  }
+
+  if (item.effects?.grantRandomPokemonMaterials) {
+    return { group: 'crafting', subCategory: 'materials' }
   }
 
   if (item.id.includes('journal') || item.id === 'mt-moon-expedition-map') {

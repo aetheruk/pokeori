@@ -49,6 +49,7 @@ function genericItemEntries(reactionTime: number): GlobalFishingItemEntry[] {
     symbol: string
     keepNetRequirements?: GlobalFishingItemEntry['keepNetRequirements']
   }> = [
+    { itemId: 'discarded-rubbish', weight: 10, symbol: '!' },
     { itemId: 'broken-ball-t1', weight: 10, symbol: '!' },
     { itemId: 'poke-ball', weight: 10, symbol: '!' },
     { itemId: 'metal-scrap-t1', weight: 10, symbol: '!' },

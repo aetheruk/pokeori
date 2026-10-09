@@ -11,6 +11,25 @@ import {
 } from '@/utilities/fishing/item-pool'
 
 describe('fishing item pools', () => {
+  test('adds Discarded Rubbish as a common item to every global rod pool', () => {
+    for (const entries of Object.values(globalFishingItemPools)) {
+      expect(entries).toContainEqual(
+        expect.objectContaining({ itemId: 'discarded-rubbish', weight: 10 }),
+      )
+    }
+    expect(items.find((item) => item.id === 'discarded-rubbish')).toMatchObject({
+      name: 'Discarded Rubbish',
+      category: 'misc',
+    })
+  })
+
+  test('Pouch of Materials is a consumable that grants mixed Tier 1 materials', () => {
+    expect(items.find((item) => item.id === 'pouch-of-materials')).toMatchObject({
+      name: 'Pouch of Materials',
+      effects: { grantRandomPokemonMaterials: { min: 1, max: 5 } },
+    })
+  })
+
   test('does not offer owned unique Golden Scales again', () => {
     const owned = Object.fromEntries(
       Array.from({ length: 8 }, (_, index) => [
@@ -24,9 +43,10 @@ describe('fishing item pools', () => {
       owned,
     )
 
-    expect(available.filter((entry) => entry.itemId).map((entry) => entry.itemId)).toEqual([
+      expect(available.filter((entry) => entry.itemId).map((entry) => entry.itemId)).toEqual([
       'water-gem',
       'aqua-solvent-t1',
+      'discarded-rubbish',
       'broken-ball-t1',
       'poke-ball',
       'metal-scrap-t1',
@@ -200,7 +220,12 @@ describe('fishing item pools', () => {
           .map((entry) => [entry.itemId, entry]),
       )
 
-      for (const itemId of ['broken-ball-t1', 'poke-ball', 'metal-scrap-t1']) {
+      for (const itemId of [
+        'discarded-rubbish',
+        'broken-ball-t1',
+        'poke-ball',
+        'metal-scrap-t1',
+      ]) {
         expect(entries.get(itemId)?.weight).toBe(10)
         expect(entries.get(itemId)?.symbol).toBe('!')
       }
@@ -212,7 +237,7 @@ describe('fishing item pools', () => {
   })
 
   test('Golden Scales keep their authored weight after general items are added', () => {
-    const expected = { old: 8 / 145, good: 8 / 146, super: 8 / 146 }
+    const expected = { old: 8 / 155, good: 8 / 156, super: 8 / 156 }
     for (const [rod, pool] of Object.entries(globalFishingItemPools)) {
       const totalWeight = pool.reduce((total, entry) => total + entry.weight, 0)
       const goldenScaleWeight = pool
