@@ -3,7 +3,7 @@ import type { LocationReward } from '@/data/types'
 import { FISHING_ITEM_CHANCE } from '@/data/games/fishing/item-pools'
 
 export const FISHING_KEEP_NET_CAPACITY = 10
-export const FISHING_KEEP_NET_EXPLORER_XP_PER_SLOT = 0.2
+export const FISHING_KEEP_NET_EXPLORER_XP_PER_FORM = 0.4
 
 export type FishingKeepNetEntry =
   | {
@@ -25,8 +25,33 @@ export type FishingKeepNetEntry =
     }
 
 export function getFishingExplorerXpMultiplier(keepNetCount: number): number {
-  const count = Math.max(0, Math.min(FISHING_KEEP_NET_CAPACITY, keepNetCount))
-  return 1 + count * FISHING_KEEP_NET_EXPLORER_XP_PER_SLOT
+  const matchingForms = Math.max(
+    0,
+    Math.min(FISHING_KEEP_NET_CAPACITY, keepNetCount),
+  )
+  return 1 + matchingForms * FISHING_KEEP_NET_EXPLORER_XP_PER_FORM
+}
+
+export function applyFishingCatchCrystalMultiplier(
+  reward: LocationReward,
+  multiplier: number,
+): LocationReward {
+  if (reward.type !== 'currency' || reward.targetId !== 'crystals') {
+    return reward
+  }
+
+  const safeMultiplier = Math.max(1, Math.min(5, multiplier))
+  const quantity = reward.quantity ?? 1
+  return {
+    ...reward,
+    quantity:
+      typeof quantity === 'number'
+        ? Math.floor(quantity * safeMultiplier)
+        : {
+            min: Math.floor(quantity.min * safeMultiplier),
+            max: Math.floor(quantity.max * safeMultiplier),
+          },
+  }
 }
 
 export function getFishingItemChance(keepNetCount: number): number {
@@ -34,24 +59,24 @@ export function getFishingItemChance(keepNetCount: number): number {
   return FISHING_ITEM_CHANCE + count
 }
 
-export function getFishingAlphaChanceMultiplier(sameSpeciesCount: number): number {
-  return sameSpeciesCount >= 3 ? 1.2 : 1
+function getFormCount(count: number): number {
+  return Math.max(0, Math.min(FISHING_KEEP_NET_CAPACITY, count))
 }
 
-export function getFishingShinyChanceMultiplier(sameSpeciesCount: number): number {
-  return sameSpeciesCount >= 7 ? 1.1 : 1
+export function getFishingAlphaChanceMultiplier(sameFormCount: number): number {
+  return 1 + getFormCount(sameFormCount) / 100
 }
 
-export function getSameSpeciesKeepNetCount(
+export function getFishingShinyChanceMultiplier(sameFormCount: number): number {
+  return 1 + getFormCount(sameFormCount) / 100
+}
+
+export function getSameFormKeepNetCount(
   keepNet: FishingKeepNetEntry[],
-  speciesId: number,
-  formId?: string,
+  formId: string,
 ): number {
   return keepNet.filter(
-    (entry) =>
-      entry.type === 'pokemon' &&
-      entry.speciesId === speciesId &&
-      (!formId || entry.formId === formId),
+    (entry) => entry.type === 'pokemon' && entry.formId === formId,
   ).length
 }
 
@@ -59,7 +84,7 @@ export function applyFishingExplorerXpMultiplier(
   rewards: LocationReward[],
   multiplier: number,
 ): LocationReward[] {
-  const safeMultiplier = Math.max(1, Math.min(3, multiplier))
+  const safeMultiplier = Math.max(1, Math.min(5, multiplier))
   if (safeMultiplier === 1) return rewards
 
   return rewards.map((reward) => {
@@ -82,6 +107,7 @@ export function buildFishingKeepNetCaptureRewards(
   entries: FishingKeepNetEntry[],
 ): LocationReward[] {
   const rewards: LocationReward[] = []
+
   for (const entry of entries) {
     if (entry.type === 'pokemon') {
       rewards.push({

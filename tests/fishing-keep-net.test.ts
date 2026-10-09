@@ -1,13 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import type { Reward } from '@/data/types'
 import {
+  applyFishingCatchCrystalMultiplier,
   applyFishingExplorerXpMultiplier,
   buildFishingKeepNetCaptureRewards,
   getFishingAlphaChanceMultiplier,
   getFishingExplorerXpMultiplier,
   getFishingItemChance,
   getFishingShinyChanceMultiplier,
-  getSameSpeciesKeepNetCount,
+  getSameFormKeepNetCount,
   type FishingKeepNetEntry,
 } from '@/utilities/fishing/keep-net'
 
@@ -19,16 +20,19 @@ describe('fishing keep net', () => {
     expect(getFishingItemChance(20)).toBe(40)
 
     expect(getFishingExplorerXpMultiplier(0)).toBe(1)
-    expect(getFishingExplorerXpMultiplier(5)).toBe(2)
-    expect(getFishingExplorerXpMultiplier(10)).toBe(3)
-    expect(getFishingExplorerXpMultiplier(20)).toBe(3)
+    expect(getFishingExplorerXpMultiplier(1)).toBe(1.4)
+    expect(getFishingExplorerXpMultiplier(5)).toBe(3)
+    expect(getFishingExplorerXpMultiplier(10)).toBe(5)
+    expect(getFishingExplorerXpMultiplier(20)).toBe(5)
   })
 
-  test('applies matching-species Alpha and Shiny odds at the requested thresholds', () => {
-    expect(getFishingAlphaChanceMultiplier(2)).toBe(1)
-    expect(getFishingAlphaChanceMultiplier(3)).toBe(1.2)
-    expect(getFishingShinyChanceMultiplier(6)).toBe(1)
-    expect(getFishingShinyChanceMultiplier(7)).toBe(1.1)
+  test('scales Alpha and Shiny odds linearly by matching form count', () => {
+    expect(getFishingAlphaChanceMultiplier(1)).toBe(1.01)
+    expect(getFishingAlphaChanceMultiplier(10)).toBe(1.1)
+    expect(getFishingAlphaChanceMultiplier(20)).toBe(1.1)
+    expect(getFishingShinyChanceMultiplier(1)).toBe(1.01)
+    expect(getFishingShinyChanceMultiplier(10)).toBe(1.1)
+    expect(getFishingShinyChanceMultiplier(20)).toBe(1.1)
   })
 
   test('counts matching Pokemon by species form and ignores item slots', () => {
@@ -39,8 +43,8 @@ describe('fishing keep net', () => {
       { id: '4', type: 'item', itemId: 'water-gem', quantity: 1 },
     ]
 
-    expect(getSameSpeciesKeepNetCount(entries, 129, '129')).toBe(2)
-    expect(getSameSpeciesKeepNetCount(entries, 129, '129-alola')).toBe(1)
+    expect(getSameFormKeepNetCount(entries, '129')).toBe(2)
+    expect(getSameFormKeepNetCount(entries, '129-alola')).toBe(1)
   })
 
   test('pays stored items and one species Research XP per kept Pokemon on capture', () => {
@@ -61,7 +65,50 @@ describe('fishing keep net', () => {
     ])
   })
 
-  test('multiplies only Explorer XP and never exceeds three times', () => {
+  test('scales the normal catch crystal reward by matching form count up to five times', () => {
+    const entries: FishingKeepNetEntry[] = [
+      ...Array.from({ length: 10 }, (_, index) => ({
+        id: `magikarp-${index}`,
+        type: 'pokemon' as const,
+        speciesId: 129,
+        formId: '129',
+        isShiny: false,
+        isAlpha: false,
+      })),
+      { id: 'crystals', type: 'item', currencyId: 'crystals', quantity: 5 },
+    ]
+
+    expect(applyFishingCatchCrystalMultiplier({
+      type: 'currency',
+      targetId: 'crystals',
+      quantity: 15,
+      dropChance: 100,
+    }, getFishingExplorerXpMultiplier(getSameFormKeepNetCount(entries, '129')))).toEqual({
+      type: 'currency',
+      targetId: 'crystals',
+      quantity: 75,
+      dropChance: 100,
+    })
+    expect(applyFishingCatchCrystalMultiplier({
+      type: 'currency',
+      targetId: 'crystals',
+      quantity: 15,
+      dropChance: 100,
+    }, getFishingExplorerXpMultiplier(getSameFormKeepNetCount(entries, '130')))).toEqual({
+      type: 'currency',
+      targetId: 'crystals',
+      quantity: 15,
+      dropChance: 100,
+    })
+    expect(buildFishingKeepNetCaptureRewards(entries).at(-1)).toEqual({
+      type: 'currency',
+      targetId: 'crystals',
+      quantity: 5,
+      dropChance: 100,
+    })
+  })
+
+  test('multiplies only Explorer XP and never exceeds five times', () => {
     const rewards: Reward[] = [
       { type: 'xp', skill: 'catching', quantity: 10 },
       { type: 'xp', skill: 'catching', quantity: { min: 2, max: 3 } },
@@ -77,7 +124,7 @@ describe('fishing keep net', () => {
     ])
     expect(applyFishingExplorerXpMultiplier(rewards, 8)[0]).toEqual({
       ...rewards[0],
-      quantity: 30,
+      quantity: 50,
     })
     expect(rewards[0].quantity).toBe(10)
   })

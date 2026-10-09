@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { AlphaIcon } from '@/components/game/shared/alpha-icon'
+import { RewardResultOverlay, type GenericResult } from '@/components/game/shared/RewardResultOverlay'
 import {
   Carousel,
   CarouselContent,
@@ -51,17 +52,37 @@ import {
   castFishingLine,
   getFishingKeepNet,
   keepFishingCatch,
+  takeFishingItem,
   releaseFish,
   startFishingCatch,
 } from '../games/fishing'
 import {
   FISHING_KEEP_NET_CAPACITY,
-  getFishingExplorerXpMultiplier,
-  getFishingItemChance,
   type FishingKeepNetEntry,
 } from '@/utilities/fishing/keep-net'
 
 const itemNames = new Map(items.map((item) => [item.id, item.name]))
+
+interface FishingHookedData {
+  type: 'pokemon' | 'item'
+  speciesId?: number
+  formId?: string
+  isShiny?: boolean
+  isAlpha?: boolean
+  itemId?: string
+  currencyId?: string
+  guildId?: string
+  quantity?: number
+  symbol: string
+}
+
+function FishingCatchIcon({ data, size }: { data: FishingHookedData; size: number }) {
+  if (data.type === 'pokemon') {
+    return <Image src={getPokemonImageUrl(data.formId || data.speciesId?.toString() || '', 'home', data.isShiny)} alt="" width={size} height={size} className="pixelated" />
+  }
+  if (data.currencyId) return <CurrencySprite currencyId={data.currencyId} alt="" width={size} height={size} />
+  return <ItemSprite itemId={data.guildId ? 'researchers-journal-page' : data.itemId || ''} alt="" width={size} height={size} />
+}
 
 const DEFAULT_SCENE: FishingSceneConfig = {
   portraitBackground: '/backgrounds/fishing-pond-portrait.avif',
@@ -239,19 +260,12 @@ function KeepNetSlot({
       aria-label={title}
     >
       {entry.type === 'pokemon' ? (
-        <>
-          <Image
-            src={getPokemonImageUrl(entry.formId, 'home', entry.isShiny)}
-            alt=""
-            fill
-            className="object-contain pixelated"
-          />
-          {entry.isAlpha && (
-            <span className="absolute -right-1 -top-1 rounded-full bg-game-surface p-px">
-              <AlphaIcon size={10} />
-            </span>
-          )}
-        </>
+        <Image
+          src={getPokemonImageUrl(entry.formId, 'home', entry.isShiny)}
+          alt=""
+          fill
+          className="object-contain pixelated"
+        />
       ) : entry.currencyId ? (
         <CurrencySprite
           currencyId={entry.currencyId}
@@ -367,20 +381,11 @@ export function FishingGame({ encounter }: FishingGameProps) {
   const [nibbleSymbol, setNibbleSymbol] = useState<string | null>(null)
 
   // Hooked result
-  const [hookedData, setHookedData] = useState<{
-    type: 'pokemon' | 'item'
-    speciesId?: number
-    formId?: string
-    isShiny?: boolean
-    isAlpha?: boolean
-    itemId?: string
-    currencyId?: string
-    guildId?: string
-    quantity?: number
-    symbol: string
-  } | null>(null)
+  const [hookedData, setHookedData] = useState<FishingHookedData | null>(null)
   const [keepNet, setKeepNet] = useState<FishingKeepNetEntry[]>([])
   const [isKeepingCatch, setIsKeepingCatch] = useState(false)
+  const [isTakingItem, setIsTakingItem] = useState(false)
+  const [takeResult, setTakeResult] = useState<GenericResult | null>(null)
   const [showKeepNetSwap, setShowKeepNetSwap] = useState(false)
 
   // Refs
@@ -577,6 +582,29 @@ export function FishingGame({ encounter }: FishingGameProps) {
     }
   }, [isKeepingCatch, keepNet.length])
 
+  const handleTakeItem = useCallback(async () => {
+    if (isTakingItem) return
+    setIsTakingItem(true)
+    try {
+      const res = await takeFishingItem()
+      if (!res.success) {
+        toast.error(res.error || 'Failed to take the item')
+        return
+      }
+      await refreshUser()
+      setPhase('idle')
+      setHookedData(null)
+      setCastTime(null)
+      setAppearTime(null)
+      setTimeUntilAppear(null)
+      setNibbleSymbol(null)
+      setShowKeepNetSwap(false)
+      setTakeResult({ success: true, summary: res.summary })
+    } finally {
+      setIsTakingItem(false)
+    }
+  }, [isTakingItem, refreshUser])
+
   const handleAttemptCatch = useCallback(async () => {
     const res = await startFishingCatch()
     if (!res.success) {
@@ -677,28 +705,18 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
       {/* Header UI */}
       <div className="absolute top-0 left-0 right-0 px-4 pt-[max(1rem,env(safe-area-inset-top))] flex justify-between items-start z-50 pointer-events-none">
-        {/* Rod chip */}
+        {/* Rod and keep-net icon strip */}
         <div className="pointer-events-auto">
           {selectedRod && phase !== 'select-rod' && (
-            <>
-              <div className="flex items-center gap-1.5 rounded-full border border-game-night-border/60 bg-game-night-surface/75 px-3 py-1.5 shadow-lg backdrop-blur-md">
+            <section aria-label="Fishing rod and keep net" className="flex max-w-[calc(100vw-5rem)] items-center gap-2 overflow-x-auto rounded-xl border border-game-night-border/60 bg-game-night-surface/80 p-2 shadow-lg backdrop-blur-md">
                 <ItemSprite
                   itemId={rodItemIds[selectedRod]}
-                  alt={rodDisplayNames[selectedRod]}
-                  width={16}
-                  height={16}
+                  alt=""
+                  width={28}
+                  height={28}
                 />
-                <span className="text-xs font-medium text-game-night-ink">
-                  {rodDisplayNames[selectedRod]}
-                </span>
-              </div>
-              <div className="mt-2 max-w-[calc(100vw-2rem)] rounded-xl border border-game-night-border/60 bg-game-night-surface/80 p-2 shadow-lg backdrop-blur-md">
-                <div className="flex items-center justify-between gap-2 text-[11px] font-semibold text-game-night-ink">
-                  <span>Keep Net {keepNet.length}/{FISHING_KEEP_NET_CAPACITY}</span>
-                  <span>{getFishingItemChance(keepNet.length)}% item chance</span>
-                  <span>Explorer XP ×{getFishingExplorerXpMultiplier(keepNet.length).toFixed(1)}</span>
-                </div>
-                <div className="mt-1.5 flex max-w-[calc(100vw-3rem)] items-center gap-1 overflow-x-auto pb-0.5">
+                <span aria-hidden="true" className="h-7 w-px shrink-0 bg-game-night-border/70" />
+                <div className="flex items-center gap-1">
                   {Array.from({ length: FISHING_KEEP_NET_CAPACITY }, (_, index) => {
                     const entry = keepNet[index]
                     return entry ? (
@@ -706,23 +724,13 @@ export function FishingGame({ encounter }: FishingGameProps) {
                     ) : (
                       <span
                         key={`empty-${index}`}
-                        role="img"
-                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-dashed border-game-night-border/50 text-[10px] text-game-night-ink/50"
-                        aria-label="Empty keep net slot"
-                      >
-                        ·
-                      </span>
+                        aria-hidden="true"
+                        className="h-6 w-6 shrink-0 rounded-md border border-dashed border-game-night-border/50"
+                      />
                     )
                   })}
                 </div>
-                <p className="mt-1 text-[10px] leading-tight text-game-night-ink/75">
-                  3 same species: +20% Alpha odds · 7: +10% Shiny odds
-                </p>
-                <p className="text-[10px] leading-tight text-game-danger">
-                  A missed hook, failed capture, or leaving forfeits the net.
-                </p>
-              </div>
-            </>
+            </section>
           )}
         </div>
 
@@ -740,6 +748,12 @@ export function FishingGame({ encounter }: FishingGameProps) {
           </Button>
         </div>
       </div>
+
+      <RewardResultOverlay
+        result={takeResult}
+        onClose={() => setTakeResult(null)}
+        title="Fishing reward"
+      />
 
       {/* 
           GAME AREA 
@@ -920,27 +934,33 @@ export function FishingGame({ encounter }: FishingGameProps) {
                     </h3>
                   </div>
 
-                  <div className="flex flex-col gap-2 w-full">
-                    <Button
-                      className="h-11 w-full rounded-xl bg-game-charcoal text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
-                      onClick={handleAttemptCatch}
-                    >
-                      Capture
-                    </Button>
+                  <div className="grid w-full grid-cols-3 gap-2">
                     <Button
                       variant="outline"
-                      className="h-11 w-full rounded-xl border-game-border bg-game-surface-raised text-sm text-game-muted hover:border-game-clay hover:text-game-clay-strong"
+                      className="h-12 rounded-xl border-game-border bg-game-surface-raised text-sm text-game-muted hover:border-game-clay hover:text-game-clay-strong"
                       onClick={() => handleKeepCatch()}
                       disabled={isKeepingCatch}
+                      aria-label="Keep Pokémon in net"
                     >
-                      {isKeepingCatch ? 'Adding...' : 'Keep in Net'}
+                      <Image src={getPokemonImageUrl(hookedData.formId || hookedData.speciesId?.toString() || '', 'home', hookedData.isShiny)} alt="" width={24} height={24} className="pixelated" />
+                      <span>{isKeepingCatch ? 'Adding…' : 'Net'}</span>
+                    </Button>
+                    <Button
+                      className="h-12 rounded-xl bg-game-charcoal text-sm font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                      onClick={handleAttemptCatch}
+                      aria-label="Catch Pokémon"
+                    >
+                      <ItemSprite itemId="poke-ball" alt="" width={24} height={24} />
+                      <span>Catch</span>
                     </Button>
                     <Button
                       variant="ghost"
-                      className="h-9 w-full text-sm text-game-muted"
+                      className="h-12 rounded-xl text-sm text-game-muted"
                       onClick={handleRelease}
+                      aria-label="Release Pokémon"
                     >
-                      Toss
+                      <ItemSprite itemId={rodItemIds[selectedRod!]} alt="" width={24} height={24} />
+                      <span>Release</span>
                     </Button>
                   </div>
                   {showKeepNetSwap && keepNet.length >= FISHING_KEEP_NET_CAPACITY && (
@@ -1001,20 +1021,34 @@ export function FishingGame({ encounter }: FishingGameProps) {
                   </div>
 
                   <div className="w-full">
-                    <div className="flex flex-col gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <Button
-                        className="h-11 w-full rounded-xl bg-game-charcoal text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                        variant="outline"
+                        className="h-12 rounded-xl border-game-border bg-game-surface-raised text-sm text-game-muted hover:border-game-clay hover:text-game-clay-strong"
                         onClick={() => handleKeepCatch()}
                         disabled={isKeepingCatch}
+                        aria-label="Keep item in net"
                       >
-                        {isKeepingCatch ? 'Adding...' : 'Keep in Net'}
+                        <FishingCatchIcon data={hookedData} size={24} />
+                        <span>{isKeepingCatch ? 'Adding…' : 'Net'}</span>
+                      </Button>
+                      <Button
+                        className="h-12 rounded-xl bg-game-charcoal text-sm font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                        onClick={handleTakeItem}
+                        disabled={isTakingItem}
+                        aria-label="Take item"
+                      >
+                        <ItemSprite itemId="poke-ball" alt="" width={24} height={24} />
+                        <span>{isTakingItem ? 'Taking…' : 'Take'}</span>
                       </Button>
                       <Button
                         variant="ghost"
-                        className="h-9 w-full text-sm text-game-muted"
+                        className="h-12 rounded-xl text-sm text-game-muted"
                         onClick={handleRelease}
+                        aria-label="Release item"
                       >
-                        Toss
+                        <ItemSprite itemId={rodItemIds[selectedRod!]} alt="" width={24} height={24} />
+                        <span>Release</span>
                       </Button>
                     </div>
                   </div>

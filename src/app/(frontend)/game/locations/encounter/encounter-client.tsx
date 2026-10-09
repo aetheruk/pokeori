@@ -599,6 +599,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
     success: boolean
     caught: boolean
     pokemonName?: string
+    resultMessage?: string
     rewards?: RewardSummary
     messages?: string[]
     failMessage?: string
@@ -642,6 +643,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
     safariRetry?: boolean
     failMessage?: string
     pokemonName?: string
+    resultMessage?: string
     rewards?: RewardSummary
     messages?: string[]
     secondChance?: boolean
@@ -1221,8 +1223,10 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
             success: boolean
             caught: boolean
             pokemonName?: string
+            resultMessage?: string
             rewards?: RewardSummary
             messages?: string[]
+            failMessage?: string
             secondChance?: boolean
             keepNetLost?: boolean
             throwQuality?: ThrowQuality
@@ -1245,11 +1249,12 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
             status: captureData.caught ? 'caught' : 'failed',
             caught: captureData.caught,
             pokemonName: captureData.pokemonName,
+            resultMessage: captureData.resultMessage,
             rewards: captureData.rewards,
             messages: captureData.messages,
             encounterFailed: (captureData as any).encounterFailed,
             safariRetry: (captureData as any).safariRetry,
-            failMessage: (captureData as any).failMessage,
+            failMessage: captureData.failMessage,
             secondChance: captureData.secondChance,
             keepNetLost: captureData.keepNetLost,
             throwQuality: captureData.throwQuality,
@@ -1420,6 +1425,7 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
         success: true,
         caught: captureAnimationData?.caught || false,
         pokemonName: captureAnimationData?.pokemonName,
+        resultMessage: captureAnimationData?.resultMessage,
         rewards,
         messages: captureAnimationData?.messages,
         failMessage:

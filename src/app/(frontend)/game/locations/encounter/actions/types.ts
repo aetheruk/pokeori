@@ -66,6 +66,7 @@ export interface EncounterState {
   }
   /** Fishing haul to settle on capture or forfeit on a failed catch. */
   fishingKeepNet?: FishingKeepNetEntry[]
+  /** Explorer XP multiplier from matching forms stored in the fishing keep net. */
   fishingExplorerXpMultiplier?: number
 
   /** Override the default location activity for synthetic encounters. */

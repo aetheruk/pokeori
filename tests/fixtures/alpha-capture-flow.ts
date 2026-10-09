@@ -417,8 +417,8 @@ try {
           ...Array.from({ length: 8 }, (_, index) => ({
             id: `magikarp-${index}`,
             type: 'pokemon',
-            speciesId: 129,
-            formId: '129',
+            speciesId: 19,
+            formId: '19',
             isShiny: false,
             isAlpha: false,
           })),
@@ -460,9 +460,11 @@ try {
     assert.equal(start.isAlpha, true)
     assert.equal(start.duration, 50)
     assert.equal(start.level, 11)
-    assert.equal(start.keepNetCount, rodType === 'good' ? 10 : 0)
-    assert.equal(start.explorerXpMultiplier, rodType === 'good' ? 3 : 1)
     const fishingCapture = store.get('encounter:owner')
+    assert.equal(
+      fishingCapture.fishingExplorerXpMultiplier,
+      rodType === 'good' ? 4.2 : 1,
+    )
     assert.equal(fishingCapture.baseCatchRate, 0)
     assert.equal(fishingCapture.currentCatchRate, 0)
     assert.equal(fishingCapture.alphaPokemon.evs.hp, 252)
@@ -478,9 +480,11 @@ try {
     const requestId = `fishing-alpha-${rodType}`
     const createsBeforeCatch: number = creates
     const grantsBeforeCatch: number = grantedRewards.length
+    const captureResult = await attemptCapture('master-ball', undefined, requestId)
+    assert.equal(captureResult.caught, true)
     assert.equal(
-      (await attemptCapture('master-ball', undefined, requestId)).caught,
-      true,
+      captureResult.resultMessage,
+      'You take the items from your keep net and admire the Pokémon you caught before releasing them.',
     )
     for (const field of [
       'level',
@@ -504,14 +508,14 @@ try {
     }
     assert.equal(ownedPokemon.obtainedRegion, 'Kanto')
     assert.equal(ownedPokemon.obtainedSourceId, fishingConfig.id)
-    assertExplorerXp(11, rodType === 'good' ? 15 : 5)
+    assertExplorerXp(11, rodType === 'good' ? 21 : 5)
     if (rodType === 'good') {
       const captureRewards = grantedRewards.at(-1)!
       assert.equal(
         captureRewards.filter(
           (reward) =>
             reward.type === 'pokemon_research_xp' &&
-            reward.targetId === '129' &&
+            reward.targetId === '19' &&
             reward.quantity === 1,
         ).length,
         8,
