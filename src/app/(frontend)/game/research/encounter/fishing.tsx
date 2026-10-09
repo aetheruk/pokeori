@@ -12,6 +12,7 @@ import {
 } from 'react'
 import { Button } from '@/components/ui/button'
 import { AlphaIcon } from '@/components/game/shared/alpha-icon'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { RewardResultOverlay, type GenericResult } from '@/components/game/shared/RewardResultOverlay'
 import {
   Dialog,
@@ -44,9 +45,13 @@ import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import {
   getPokemonForm,
-  getPokemonImageUrl,
   getPokemonSpecies,
 } from '@/utilities/pokemon/pokedex'
+import {
+  getPokemonRarityEffect,
+  type PokemonRarityId,
+  resolvePokemonRarity,
+} from '@/utilities/pokemon/rarity-effects'
 import {
   getRegionTimeZone,
   getTimeZoneClockTime,
@@ -72,6 +77,7 @@ interface FishingHookedData {
   speciesId?: number
   formId?: string
   isShiny?: boolean
+  rarity?: PokemonRarityId
   isAlpha?: boolean
   itemId?: string
   currencyId?: string
@@ -80,9 +86,30 @@ interface FishingHookedData {
   symbol: string
 }
 
+function getFishingRarityPrefix(
+  rarity?: PokemonRarityId,
+  isShiny?: boolean,
+): string {
+  const resolvedRarity = resolvePokemonRarity({ rarity, shiny: isShiny })
+  return resolvedRarity === 'normal'
+    ? ''
+    : `${getPokemonRarityEffect(resolvedRarity).label} `
+}
+
 function FishingCatchIcon({ data, size }: { data: FishingHookedData; size: number }) {
   if (data.type === 'pokemon') {
-    return <Image src={getPokemonImageUrl(data.formId || data.speciesId?.toString() || '', 'home', data.isShiny)} alt="" width={size} height={size} className="pixelated" />
+    return (
+      <PokemonRaritySprite
+        formId={data.formId || data.speciesId?.toString() || ''}
+        view="home"
+        rarity={data.rarity}
+        shiny={data.isShiny}
+        alt=""
+        className="relative size-6 shrink-0"
+        imageClassName="pixelated"
+        sizes={`${size}px`}
+      />
+    )
   }
   if (data.currencyId) return <CurrencySprite currencyId={data.currencyId} alt="" width={size} height={size} />
   return <ItemSprite itemId={data.guildId ? 'researchers-journal-page' : data.itemId || ''} alt="" width={size} height={size} />
@@ -248,7 +275,7 @@ function KeepNetSlot({
 }) {
   const title =
     entry.type === 'pokemon'
-      ? `${entry.isShiny ? 'Shiny ' : ''}${getPokemonForm(entry.formId)?.name || 'Pokémon'}${entry.isAlpha ? ' (Alpha)' : ''}`
+      ? `${getFishingRarityPrefix(entry.rarity, entry.isShiny)}${getPokemonForm(entry.formId)?.name || 'Pokémon'}${entry.isAlpha ? ' (Alpha)' : ''}`
       : entry.currencyId
         ? `${entry.quantity} ${getCurrency(entry.currencyId)?.name || 'Currency'}`
         : entry.guildId
@@ -263,11 +290,14 @@ function KeepNetSlot({
       aria-label={title}
     >
       {entry.type === 'pokemon' ? (
-        <Image
-          src={getPokemonImageUrl(entry.formId, 'home', entry.isShiny)}
+        <PokemonRaritySprite
+          formId={entry.formId}
+          view="home"
+          rarity={entry.rarity}
+          shiny={entry.isShiny}
           alt=""
-          fill
-          className="object-contain pixelated"
+          className="h-full w-full"
+          imageClassName="object-contain pixelated"
         />
       ) : entry.currencyId ? (
         <CurrencySprite
@@ -519,6 +549,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
           speciesId: res.speciesId,
           formId: res.formId,
           isShiny: res.isShiny,
+          rarity: res.rarity,
           isAlpha: res.isAlpha,
           itemId: res.itemId,
           currencyId: res.currencyId,
@@ -890,7 +921,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                 {hookedData.type === 'pokemon' && hookedPokemon ? (
                   <>
                     <span className="line-clamp-1 min-w-0">
-                      {hookedData.isShiny && 'Shiny '}
+                      {getFishingRarityPrefix(hookedData.rarity, hookedData.isShiny)}
                       {hookedPokemon.name}
                     </span>
                     {hookedData.isAlpha && <AlphaIcon size={18} />}
@@ -913,19 +944,19 @@ export function FishingGame({ encounter }: FishingGameProps) {
                 <>
                   <div className="relative flex h-[150px] w-[150px] items-center justify-center">
                     <div className="relative h-full w-full">
-                      <Image
-                        src={getPokemonImageUrl(
-                          hookedData.formId ||
-                            hookedData.speciesId?.toString() ||
-                            '',
-                          'home',
-                          hookedData.isShiny,
-                        )}
+                      <PokemonRaritySprite
+                        formId={hookedData.formId || hookedData.speciesId?.toString() || ''}
+                        view="home"
+                        rarity={hookedData.rarity}
+                        shiny={hookedData.isShiny}
                         alt={hookedPokemon.name}
-                        fill
-                        className="object-contain pixelated drop-shadow-xl"
+                        className="h-full w-full"
+                        imageClassName="object-contain pixelated drop-shadow-xl"
                       />
-                      {hookedData.isShiny && (
+                      {resolvePokemonRarity({
+                        rarity: hookedData.rarity,
+                        shiny: hookedData.isShiny,
+                      }) === 'shiny' && (
                         <span className="absolute top-0 right-0 text-3xl animate-pulse">
                           ✨
                         </span>
@@ -950,7 +981,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                       disabled={isKeepingCatch}
                       aria-label="Keep Pokémon in net"
                     >
-                      <Image src={getPokemonImageUrl(hookedData.formId || hookedData.speciesId?.toString() || '', 'home', hookedData.isShiny)} alt="" width={24} height={24} className="pixelated" />
+                      <FishingCatchIcon data={hookedData} size={24} />
                       <span>{isKeepingCatch ? 'Adding…' : 'Net'}</span>
                     </Button>
                     <Button

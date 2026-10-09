@@ -4,6 +4,10 @@ const commonAppearTime = { min: 2000, max: 5000 }
 
 export const FISHING_POKEMON_CHANCE = 70
 export const FISHING_ITEM_CHANCE = 30
+export const NUMBERED_GOLDEN_SCALE_IDS = Array.from(
+  { length: 8 },
+  (_, index) => `golden-scale-${index + 1}`,
+)
 
 function goldenScaleEntries(reactionTime: number): GlobalFishingItemEntry[] {
   return Array.from({ length: 8 }, (_, index) => ({

@@ -1,10 +1,14 @@
 import { describe, expect, test } from 'bun:test'
+import { items } from '@/data/items'
 import { globalFishingItemPools } from '@/data/games/fishing/item-pools'
 import type {
   FishingItemEntry,
   GlobalFishingItemEntry,
 } from '@/data/games/fishing/types'
-import { getAvailableFishingItemEntries } from '@/utilities/fishing/item-pool'
+import {
+  addPostCollectionGoldenScaleDrop,
+  getAvailableFishingItemEntries,
+} from '@/utilities/fishing/item-pool'
 
 describe('fishing item pools', () => {
   test('does not offer owned unique Golden Scales again', () => {
@@ -30,6 +34,45 @@ describe('fishing item pools', () => {
     ])
     expect(available.some((entry) => entry.currencyId === 'pokedollars')).toBe(true)
     expect(available.some((entry) => entry.currencyId === 'crystals')).toBe(true)
+  })
+
+  test('unlocks repeatable Golden Scales only after all numbered scales and sets a 1-in-50 item roll', () => {
+    const eligible = getAvailableFishingItemEntries(
+      globalFishingItemPools.old,
+      {},
+    )
+    expect(
+      addPostCollectionGoldenScaleDrop(eligible, {}).some(
+        (entry) => entry.itemId === 'golden-scale',
+      ),
+    ).toBe(false)
+
+    const owned = Object.fromEntries(
+      Array.from({ length: 8 }, (_, index) => [
+        `golden-scale-${index + 1}`,
+        1,
+      ]),
+    )
+    const available = getAvailableFishingItemEntries(
+      globalFishingItemPools.old,
+      owned,
+    )
+    const withGoldenScale = addPostCollectionGoldenScaleDrop(available, owned)
+    const totalWeight = withGoldenScale.reduce(
+      (total, entry) => total + entry.weight,
+      0,
+    )
+    const goldenScaleWeight = withGoldenScale.find(
+      (entry) => entry.itemId === 'golden-scale',
+    )?.weight
+
+    expect(goldenScaleWeight).toBeDefined()
+    expect(goldenScaleWeight! / totalWeight).toBeCloseTo(1 / 50)
+    expect(items.find((item) => item.id === 'golden-scale')).toMatchObject({
+      name: 'Golden Scale',
+      category: 'misc',
+      spriteId: 'golden-scale',
+    })
   })
 
   test('keeps unowned unique items and repeatable items available', () => {
