@@ -10,7 +10,11 @@ describe('fishing keep-net requirements', () => {
       (entry.keepNetRequirements || []).map((requirement) => requirement.itemId),
     )
 
-    expect(requirementIds).toEqual(['drake-scale-t1', 'golden-scale'])
+    expect(requirementIds).toEqual([
+      'drake-scale-t1',
+      'cerulean-pool-scale',
+      'golden-scale',
+    ])
     expect(requirementIds.every((itemId) => itemIds.has(itemId))).toBe(true)
   })
 

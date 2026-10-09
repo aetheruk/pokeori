@@ -53,7 +53,7 @@ describe('skill unlock helpers', () => {
     expect(getContentSkillBaseXp(100)).toBe(218)
     expect(getContentSkillBaseXp(200)).toBe(218)
     expect(calculateContentSkillXp('battling', 59)).toBe(136)
-    expect(calculateContentSkillXp('catching', 20)).toBe(104)
+    expect(calculateContentSkillXp('catching', 20)).toBe(145)
     expect(calculateContentSkillXp('artisan', 10)).toBe(38)
     expect(calculateContentSkillXp('researching', 10, 0.4)).toBe(22)
   })
@@ -65,8 +65,8 @@ describe('skill unlock helpers', () => {
     expect(getPokemonBaseExperienceXpModifier(40)).toBeCloseTo(0.8875)
     expect(getPokemonBaseExperienceXpModifier(306)).toBeCloseTo(1.136875)
     expect(getPokemonBaseExperienceXpModifier(608)).toBe(1.15)
-    expect(calculatePokemonContentSkillXp('catching', 20, 50)).toBe(94)
-    expect(calculatePokemonContentSkillXp('catching', 20, 50, 0.5)).toBe(47)
+    expect(calculatePokemonContentSkillXp('catching', 20, 50)).toBe(130)
+    expect(calculatePokemonContentSkillXp('catching', 20, 50, 0.5)).toBe(65)
     expect(
       getAveragePokemonBaseExperienceXpModifier([40, 160, 608]),
     ).toBeCloseTo(1.0125)
