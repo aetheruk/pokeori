@@ -76,7 +76,7 @@ import {
   getFishingExplorerXpMultiplier,
   getFishingItemChance,
   getFishingShinyChanceMultiplier,
-  getSameSpeciesKeepNetCount,
+  getSameFormKeepNetCount,
   type FishingKeepNetEntry,
 } from '@/utilities/fishing/keep-net'
 import { SAFARI_BASE_FLEE_RATE } from '@/utilities/pokemon/safari-catch'
@@ -260,9 +260,8 @@ async function ensureHookedAlphaRoll(fishingState: FishingState): Promise<void> 
       ? rollFishingEncounterAlpha(
           encounter,
           result,
-          getSameSpeciesKeepNetCount(
+          getSameFormKeepNetCount(
             keepNet.entries,
-            pokemonEntry.speciesId,
             pokemonEntry.formId || String(pokemonEntry.speciesId),
           ),
         )
@@ -518,14 +517,13 @@ export async function castFishingLine(rodType: RodType) {
                   isNight: isNightHour(),
               }),
             })
-        const sameSpeciesInNet = getSameSpeciesKeepNetCount(
+        const sameFormInNet = getSameFormKeepNetCount(
           fishingKeepNet.entries,
-          pokemonEntry.speciesId,
           formId,
         )
         shinyChance = Math.min(
           1,
-          shinyChance * getFishingShinyChanceMultiplier(sameSpeciesInNet),
+          shinyChance * getFishingShinyChanceMultiplier(sameFormInNet),
         )
         const pokedexMap = await getUserPokedexMap(payload as any, user.id)
         const researchLevel =
@@ -715,9 +713,8 @@ export async function attemptHook() {
             ? rollFishingEncounterAlpha(
                 encounter,
                 fishingState.hookedResult,
-                getSameSpeciesKeepNetCount(
+                getSameFormKeepNetCount(
                   keepNet.entries,
-                  pokemonEntry.speciesId,
                   pokemonEntry.formId || String(pokemonEntry.speciesId),
                 ),
               )
@@ -738,7 +735,7 @@ export async function attemptHook() {
   }
 }
 
-export async function claimFishingItem() {
+export async function takeFishingItem() {
   try {
     const user = await getUser()
     if (!user) {
@@ -1215,7 +1212,7 @@ export async function startFishingCatch() {
         weather: fishingState.weather,
         fishingKeepNet: keepNet.entries,
         fishingExplorerXpMultiplier: getFishingExplorerXpMultiplier(
-          keepNet.entries.length,
+          getSameFormKeepNetCount(keepNet.entries, formId),
         ),
         encounterMode: encounter.settings.safariCapture ? 'safari' : 'standard',
         fleeRate: encounter.settings.safariCapture
@@ -1278,10 +1275,6 @@ export async function startFishingCatch() {
         expiry,
         duration,
         level,
-        keepNetCount: keepNet.entries.length,
-        explorerXpMultiplier: getFishingExplorerXpMultiplier(
-          keepNet.entries.length,
-        ),
       }
 
       await setIdempotentResult(catchStartResultKey, response, 300)

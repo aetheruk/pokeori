@@ -47,6 +47,7 @@ interface EncounterResultsProps {
     success: boolean
     caught: boolean
     pokemonName?: string
+    resultMessage?: string
     rewards?: RewardSummary
     messages?: string[]
     failMessage?: string
@@ -291,11 +292,12 @@ export function EncounterResults({
         }
         title={captureResult.caught ? 'Caught!' : 'Escaped'}
         message={
-          captureResult.caught
+          captureResult.resultMessage ||
+          (captureResult.caught
             ? `You caught ${encounter.isShiny ? 'Shiny ' : ''}${captureResult.pokemonName || encounter.pokemonName}!`
             : captureResult.failMessage ||
               (captureResult as any).message ||
-              'The wild Pokemon fled.'
+              'The wild Pokemon fled.')
         }
         rewardSummary={captureResult.rewards}
         icon={{ type: 'pokemon', id: capturePokemonFormId }}

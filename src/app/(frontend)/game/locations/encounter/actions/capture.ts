@@ -759,6 +759,12 @@ export async function attemptCapture(
         message: keepNetLost
           ? 'The Pokemon broke free. Your keep net was lost.'
           : 'The Pokemon broke free!',
+        resultMessage: state.locationId.startsWith('fishing:')
+          ? `The ${formData?.name || 'Pokémon'} flees, tearing through your keep net and releasing everything.`
+          : undefined,
+        failMessage: state.locationId.startsWith('fishing:')
+          ? `The ${formData?.name || 'Pokémon'} flees, tearing through your keep net and releasing everything.`
+          : undefined,
         keepNetLost,
         rewards: summary,
         formId: state.formId,
@@ -1007,7 +1013,10 @@ export async function attemptCapture(
     )
     rewardsToGrant.push(...calculateGemRewards(formData?.types || []))
     rewardsToGrant.push(
-      ...buildFishingKeepNetCaptureRewards(state.fishingKeepNet || []),
+      ...buildFishingKeepNetCaptureRewards(
+        state.fishingKeepNet || [],
+        state.formId,
+      ),
     )
 
     const abilityRewards = getCaptureAbilityRewards({
@@ -1091,6 +1100,9 @@ export async function attemptCapture(
       success: true,
       caught: true,
       pokemonName: formData?.name,
+      resultMessage: state.locationId.startsWith('fishing:')
+        ? 'You take the items from your keep net and admire the Pokémon you caught before releasing them.'
+        : undefined,
       rewards: summary,
       messages,
       levelUp: summary.levelUp,

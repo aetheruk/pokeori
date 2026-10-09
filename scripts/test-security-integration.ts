@@ -297,10 +297,10 @@ try {
     assert.equal((await redis.get<any>(stateKey)).roundData.simulation.tick, 60)
     assertions += 9
 
-    // Fishing item catches are staged in Redis before capture now instead of
-    // being granted immediately by a separate claim action.
+    // Taking a hooked fishing item grants that one result and clears the cast,
+    // while the separate keep-net contents remain intact.
     await fetch(`${origin}/game/games/fishing`, { headers: { authorization: `JWT ${ownerToken}` } })
-    const fishingId = await actionId('src/app/(frontend)/game/research/games/fishing.ts', 'keepFishingCatch')
+    const fishingId = await actionId('src/app/(frontend)/game/research/games/fishing.ts', 'takeFishingItem')
     const fishingGame = allGames.find((entry) => entry.gameType === 'fishing')!
     const castTime = Date.now()
     const fishingStateKey = `fishing:${owner.id}`
@@ -309,11 +309,16 @@ try {
     redisFixtures.push(fishingStateKey, keepNetKey)
     await redis.set(stateKey, {...state, encounterId: fishingGame.id}, 120)
     await redis.set(fishingStateKey, fishingState, 120)
-    const firstKeep = await invoke('/game/games/fishing', fishingId, [], ownerToken)
-    assert.ok(firstKeep.body.includes('"success":true'), firstKeep.body)
-    assert.ok(firstKeep.body.includes('"quantity":2'), firstKeep.body)
+    await redis.set(keepNetKey, { entries: [{id: 'net-pokemon', type: 'pokemon', speciesId: 19, formId: '19', isShiny: false, isAlpha: false}] }, 120)
+    const beforeTake = (await payload.findByID({collection: 'users', id: owner.id})).items?.find((entry: any) => entry.itemId === 'potion')?.quantity || 0
+    const firstTake = await invoke('/game/games/fishing', fishingId, [], ownerToken)
+    assert.ok(firstTake.body.includes('"success":true'), firstTake.body)
+    assert.ok(firstTake.body.includes('"quantity":2'), firstTake.body)
+    assert.equal(await redis.get<any>(fishingStateKey), null)
     assert.equal((await redis.get<any>(keepNetKey)).entries.length, 1)
-    assertions += 2
+    const afterTake = (await payload.findByID({collection: 'users', id: owner.id})).items?.find((entry: any) => entry.itemId === 'potion')?.quantity || 0
+    assert.equal(afterTake, beforeTake + 2)
+    assertions += 4
 
     const generatedDailyId = `${prefix}-daily`
     await payload.update({collection: 'users', id: owner.id, data: {
