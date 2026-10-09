@@ -297,8 +297,8 @@ try {
     assert.equal((await redis.get<any>(stateKey)).roundData.simulation.tick, 60)
     assertions += 9
 
-    // Taking a hooked fishing item grants that one result and clears the cast,
-    // while the separate keep-net contents remain intact.
+    // Taking a hooked fishing item grants that result and ends the fishing run,
+    // forfeiting any contents that were already in the keep net.
     await fetch(`${origin}/game/games/fishing`, { headers: { authorization: `JWT ${ownerToken}` } })
     const fishingId = await actionId('src/app/(frontend)/game/research/games/fishing.ts', 'takeFishingItem')
     const fishingGame = allGames.find((entry) => entry.gameType === 'fishing')!
@@ -310,13 +310,14 @@ try {
     await redis.set(stateKey, {...state, encounterId: fishingGame.id}, 120)
     await redis.set(fishingStateKey, fishingState, 120)
     await redis.set(keepNetKey, { entries: [{id: 'net-pokemon', type: 'pokemon', speciesId: 19, formId: '19', isShiny: false, isAlpha: false}] }, 120)
-    const beforeTake = (await payload.findByID({collection: 'users', id: owner.id})).items?.find((entry: any) => entry.itemId === 'potion')?.quantity || 0
+    const { getUserInventoryMap } = await import('../src/utilities/user-state')
+    const beforeTake = (await getUserInventoryMap(payload, owner.id)).potion || 0
     const firstTake = await invoke('/game/games/fishing', fishingId, [], ownerToken)
     assert.ok(firstTake.body.includes('"success":true'), firstTake.body)
     assert.ok(firstTake.body.includes('"quantity":2'), firstTake.body)
     assert.equal(await redis.get<any>(fishingStateKey), null)
-    assert.equal((await redis.get<any>(keepNetKey)).entries.length, 1)
-    const afterTake = (await payload.findByID({collection: 'users', id: owner.id})).items?.find((entry: any) => entry.itemId === 'potion')?.quantity || 0
+    assert.equal(await redis.get<any>(keepNetKey), null)
+    const afterTake = (await getUserInventoryMap(payload, owner.id)).potion || 0
     assert.equal(afterTake, beforeTake + 2)
     assertions += 4
 
@@ -349,7 +350,7 @@ try {
     redisFixtures.push(milestoneKey, `game:complete-result:${owner.id}:${milestoneGame.id}:${milestoneStart}`, `game:complete-last-start:${owner.id}:${milestoneGame.id}`)
     const claimMilestoneId = await actionId('src/app/(frontend)/game/games/actions.ts', 'claimEndlessMilestone')
     const completeGameId = await actionId('src/app/(frontend)/game/games/actions.ts', 'completeGame')
-    const { getUserInventoryMap, getUserActivityStatsMap } = await import('../src/utilities/user-state')
+    const { getUserActivityStatsMap } = await import('../src/utilities/user-state')
     const milestoneInventory = await getUserInventoryMap(payload, owner.id)
     await Promise.all([
       invoke('/game/games/run', claimMilestoneId, [milestoneGame.id, 1200], ownerToken),

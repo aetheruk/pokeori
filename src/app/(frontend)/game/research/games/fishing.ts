@@ -872,6 +872,8 @@ export async function takeFishingItem() {
 
       // Clear fishing state
       await redis.del(`fishing:${user.id}`)
+      await redis.del(`fishing:keep-net:${user.id}`)
+      await redis.del(`game:${user.id}`)
 
       return response
     } finally {
@@ -1286,6 +1288,10 @@ export async function startFishingCatch() {
 
       // Clear fishing state
       await redis.del(`fishing:${user.id}`)
+      // Capture now owns the encounter and carries a snapshot of the keep net.
+      // Clearing the activity prevents the completed fishing session resuming
+      // after the capture result returns the player to Explore.
+      await redis.del(`game:${user.id}`)
 
       return response
     } finally {

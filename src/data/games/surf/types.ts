@@ -1,4 +1,4 @@
-import type { LocationReward } from '@/data/types'
+import type { BattleEnemy, LocationReward } from '@/data/types'
 import type { BaseGameConfig, EndlessScoreInterval } from '../shared'
 
 export interface SurfObstacleConfig {
@@ -11,6 +11,7 @@ export interface SurfObstacleConfig {
 }
 
 export interface SurfGameSettings {
+  mode?: 'course' | 'catch'
   speed: number
   maxSpeed?: number
   acceleration?: number
@@ -21,8 +22,13 @@ export interface SurfGameSettings {
   spriteFrameDistance?: number
   playerWidth?: number
   playerHeight?: number
-  obstacleFrequency: { min: number; max: number }
-  obstacles: SurfObstacleConfig[]
+  obstacleFrequency?: { min: number; max: number }
+  obstacles?: SurfObstacleConfig[]
+  /** Wild Pokémon that can be encountered in catch mode. */
+  pokemonPool?: Array<BattleEnemy & { weight: number }>
+  /** Seconds between Pokémon entering the surf course. */
+  pokemonSpawnFrequency?: { min: number; max: number }
+  allowAlpha?: boolean
   scene: {
     backdrop: string
     parallax?: {
