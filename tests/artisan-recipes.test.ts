@@ -1681,23 +1681,23 @@ describe('artisan recipes', () => {
 
   test('inferior elemental stone recipes require perfect quality and elemental costs', () => {
     const expected = new Map([
-      ['inferior-fire-stone', ['fire-gem', 'cinder-shard-t1']],
-      ['inferior-water-stone', ['water-gem', 'aqua-solvent-t1']],
-      ['inferior-leaf-stone', ['grass-gem', 'wood-scraps-t1']],
-      ['inferior-thunder-stone', ['electric-gem', 'electric-component-t1']],
-      ['inferior-shiny-stone', ['fairy-gem', 'pixie-powder-t1']],
-      ['inferior-ice-stone', ['ice-gem', 'frost-crystal-t1']],
-      ['inferior-dark-stone', ['dark-gem', 'shadow-fiber-t1']],
-      ['inferior-light-stone', ['dragon-gem', 'drake-scale-t1']],
+      ['inferior-fire-stone', ['fire-gem', 'cinder-shard-t1', 20]],
+      ['inferior-water-stone', ['water-gem', 'aqua-solvent-t1', 20]],
+      ['inferior-leaf-stone', ['grass-gem', 'wood-scraps-t1', 30]],
+      ['inferior-thunder-stone', ['electric-gem', 'electric-component-t1', 20]],
+      ['inferior-shiny-stone', ['fairy-gem', 'pixie-powder-t1', 40]],
+      ['inferior-ice-stone', ['ice-gem', 'frost-crystal-t1', 30]],
+      ['inferior-dark-stone', ['dark-gem', 'shadow-fiber-t1', 40]],
+      ['inferior-light-stone', ['dragon-gem', 'drake-scale-t1', 40]],
     ])
 
-    for (const [itemId, [gemId, materialId]] of expected) {
+    for (const [itemId, [gemId, materialId, artisanLevel]] of expected) {
       const recipe = artisanRecipes.find(
         (entry) => entry.id === `craft-${itemId}`,
       )
       expect(recipe, itemId).toBeDefined()
       expect(recipe?.category, itemId).toBe('held')
-      expect(recipe?.artisanLevel, itemId).toBe(30)
+      expect(recipe?.artisanLevel, itemId).toBe(Number(artisanLevel))
       expect(recipe?.minimumQuality, itemId).toBe('perfect')
       expect(recipe?.materialFail, itemId).toBeUndefined()
       expect(shouldFailCraft(recipe!, 'good'), itemId).toBe(true)
