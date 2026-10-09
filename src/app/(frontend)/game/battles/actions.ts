@@ -79,8 +79,9 @@ export async function clearBattleState() {
 export async function startBattle(
   battleId: string,
   consumedPokemonIds?: string[],
+  options?: { encounterItemId?: string },
 ): Promise<{ success: boolean; error?: string; state?: BattleState }> {
-  return startPveBattle(battleId, consumedPokemonIds)
+  return startPveBattle(battleId, consumedPokemonIds, options)
 }
 
 export async function startVsSeekerBattle(

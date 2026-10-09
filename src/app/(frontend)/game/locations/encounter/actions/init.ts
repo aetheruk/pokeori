@@ -7,6 +7,11 @@ import {
   type LocationReward,
 } from '@/data/locations'
 import { items } from '@/data/items'
+import {
+  isEncounterSpawnItem,
+  isRepelItemId,
+  isTypeLureItem,
+} from '@/data/items/types'
 import { getPokemonSpecies, getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
@@ -56,6 +61,11 @@ import {
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import {
+  applyTypeLureSpawnBoost,
+  getRepelMaximumLevel,
+  rollWeightedEncounter,
+} from '@/utilities/pokemon/encounter-spawn'
+import {
   getPokemonRarityLegacyFields,
   resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
@@ -102,31 +112,10 @@ import {
   generateAlphaStats,
 } from '@/utilities/pokemon/alpha'
 
-const REPEL_ITEM_IDS = ['repel', 'super-repel', 'max-repel'] as const
-type RepelItemId = (typeof REPEL_ITEM_IDS)[number]
 type StartEncounterOptions = {
-  repelItemId?: RepelItemId
-}
-
-function isRepelItemId(itemId: unknown): itemId is RepelItemId {
-  return (
-    typeof itemId === 'string' && REPEL_ITEM_IDS.includes(itemId as RepelItemId)
-  )
-}
-
-function rollEncounter<T extends { chance: number }>(encounters: T[]): T {
-  const totalChance = encounters.reduce(
-    (sum, encounter) => sum + encounter.chance,
-    0,
-  )
-  let roll = Math.random() * totalChance
-
-  for (const encounter of encounters) {
-    roll -= encounter.chance
-    if (roll <= 0) return encounter
-  }
-
-  return encounters[encounters.length - 1]
+  encounterItemId?: string
+  /** Backward-compatible alias for older Explore clients. */
+  repelItemId?: string
 }
 
 function getEligibleEncounters(
@@ -184,9 +173,9 @@ export async function startEncounter(
       consumedPokemonIds && consumedPokemonIds.length > 0
         ? [...consumedPokemonIds].sort().join(',')
         : 'none'
-    const repelItemId = options.repelItemId
-    const repelKey = repelItemId || 'none'
-    const startResultKey = `encounter:start:result:${user.id}:${locationId}:${consumedKey}:${repelKey}`
+    const encounterItemId = options.encounterItemId || options.repelItemId
+    const encounterItemKey = encounterItemId || 'none'
+    const startResultKey = `encounter:start:result:${user.id}:${locationId}:${consumedKey}:${encounterItemKey}`
 
     const encounterId = `encounter:${user.id}`
     const activeEncounterState = (await redis.get(
@@ -207,15 +196,23 @@ export async function startEncounter(
 
     const location = await getEffectiveContent('location', locationId, user)
     if (!location) throw new Error('Location not found')
-    if (repelItemId && !isRepelItemId(repelItemId)) {
+    if (encounterItemId && !items.some((item) => item.id === encounterItemId && isEncounterSpawnItem(item))) {
       throw new Error('Invalid encounter item')
     }
-    if (repelItemId) {
-      const repelItem = items.find((item) => item.id === repelItemId)
-      if (repelItem) {
-        const repelLockReason = getItemSkillLockReason(repelItem, user.skills)
-        if (repelLockReason) throw new Error(repelLockReason)
+    if (encounterItemId) {
+      const encounterItem = items.find((item) => item.id === encounterItemId)
+      if (!encounterItem) throw new Error('Invalid encounter item')
+      if (
+        location.encounterMode === 'safari' ||
+        location.specialEncounter ||
+        location.isRandomEvent ||
+        (location as any).expeditionOnly === true ||
+        isExpeditionActivity('location', location.id)
+      ) {
+        throw new Error('Encounter items cannot be used in this special encounter')
       }
+      const itemLockReason = getItemSkillLockReason(encounterItem, user.skills)
+      if (itemLockReason) throw new Error(itemLockReason)
     }
     const chronicleContext = await getActiveChronicleContext({
       userId: user.id,
@@ -521,8 +518,8 @@ export async function startEncounter(
       }
     }
 
-    if (repelItemId) {
-      itemsToConsume[repelItemId] = (itemsToConsume[repelItemId] || 0) + 1
+    if (encounterItemId) {
+      itemsToConsume[encounterItemId] = (itemsToConsume[encounterItemId] || 0) + 1
       hasConsumption = true
     }
 
@@ -592,19 +589,16 @@ export async function startEncounter(
       throw new Error('No eligible encounters found')
     }
 
-    // Roll for Pokemon
-    let selectedEncounter = rollEncounter(eligibleEncounters)
+    const selectedEncounterItem = encounterItemId
+      ? items.find((item) => item.id === encounterItemId)
+      : undefined
+    const weightedEncounters =
+      selectedEncounterItem && isTypeLureItem(selectedEncounterItem)
+        ? applyTypeLureSpawnBoost(eligibleEncounters, encounterItemId!)
+        : eligibleEncounters
 
-    if (repelItemId === 'max-repel') {
-      const candidates = [
-        selectedEncounter,
-        rollEncounter(eligibleEncounters),
-        rollEncounter(eligibleEncounters),
-      ]
-      selectedEncounter = candidates.reduce((rarest, candidate) =>
-        candidate.chance < rarest.chance ? candidate : rarest,
-      )
-    }
+    // Repels adjust the selected Pokemon's level rather than its selection odds.
+    let selectedEncounter = rollWeightedEncounter(weightedEncounters)
 
     if (!selectedEncounter) throw new Error('No encounter found')
 
@@ -742,7 +736,7 @@ export async function startEncounter(
       baseCatchRate: modifiedBaseRate,
       currentCatchRate: shieldConfig ? 0 : modifiedBaseRate,
       questionsAnswered: [],
-      itemsUsed: repelItemId ? [repelItemId] : [],
+      itemsUsed: encounterItemId ? [encounterItemId] : [],
       totalCorrectAnswers: 0,
       consecutiveCorrectAnswers: 0,
       shield: shieldConfig
@@ -758,7 +752,16 @@ export async function startEncounter(
         location.encounterMode === 'safari'
           ? SAFARI_BASE_FLEE_RATE
           : location.fleeRate,
-      levelRange: location.levelRange,
+      levelRange: (() => {
+        if (!encounterItemId || !isRepelItemId(encounterItemId)) {
+          return location.levelRange
+        }
+        const maximumLevel = getRepelMaximumLevel(
+          location.levelRange?.max ?? 5,
+          encounterItemId,
+        )
+        return { min: maximumLevel, max: maximumLevel }
+      })(),
       catchRateModifier: location.catchRateModifier || 0,
       captureAttempts: 0,
       secondChanceUsed: false,
@@ -820,13 +823,11 @@ export async function startEncounter(
     }
 
     if (isAlpha) {
-      const minLevel = location.levelRange?.min ?? 1
-      const maxLevel = location.levelRange?.max ?? 5
-      const naturalLevel =
-        repelItemId === 'super-repel' ||
-        (repelItemId === 'repel' && Math.random() < 0.8)
-          ? maxLevel
-          : Math.floor(Math.random() * (maxLevel - minLevel + 1)) + minLevel
+      const minLevel = state.levelRange?.min ?? location.levelRange?.min ?? 1
+      const maxLevel = state.levelRange?.max ?? location.levelRange?.max ?? 5
+      const naturalLevel = isRepelItemId(encounterItemId || '')
+        ? maxLevel
+        : Math.floor(Math.random() * (maxLevel - minLevel + 1)) + minLevel
       const level =
         Math.max(
           minLevel,

@@ -22,9 +22,19 @@ const ENCOUNTER_TYPES = [
 ] as const
 
 const LURE_TIERS = [
-  { prefix: '', label: '', skillLevel: 10 },
-  { prefix: 'advanced-', label: 'Advanced ', skillLevel: 40 },
-  { prefix: 'master-', label: 'Master ', skillLevel: 70 },
+  { prefix: '', label: '', skillLevel: 10, spawnChancePercent: 5 },
+  {
+    prefix: 'advanced-',
+    label: 'Advanced ',
+    skillLevel: 40,
+    spawnChancePercent: 10,
+  },
+  {
+    prefix: 'master-',
+    label: 'Master ',
+    skillLevel: 70,
+    spawnChancePercent: 15,
+  },
 ] as const
 
 export const encounterItems: Item[] = []
@@ -36,7 +46,7 @@ ENCOUNTER_TYPES.forEach((type) => {
     encounterItems.push({
       id: `${tier.prefix}${type}-lure`,
       name: `${tier.label}${typeName} Lure`,
-      description: `Catch Rate+ for ${typeName}-type Pokemon.`,
+      description: `Increases ${typeName}-type encounter odds by ${tier.spawnChancePercent} percentage points. Also improves catch rate for matching Pokemon.`,
       category: 'misc',
       spriteId: `${type}-gem`,
       unique: false,
@@ -58,7 +68,8 @@ encounterItems.push({
 encounterItems.push({
   id: 'repel',
   name: 'Repel',
-  description: 'A spray-type item that keeps weak pokemon away',
+  description:
+    "Guarantees the selected Pokemon's maximum level in capture encounters and wild battles.",
   category: 'misc',
   spriteId: 'repel',
   unique: false,
@@ -68,7 +79,8 @@ encounterItems.push({
 encounterItems.push({
   id: 'super-repel',
   name: 'Super Repel',
-  description: 'A stronger spray-type item that guarantees weak pokemon wont bother you',
+  description:
+    "Adds 5 levels to the selected Pokemon's maximum level in capture encounters and wild battles.",
   category: 'misc',
   spriteId: 'super-repel',
   unique: false,
@@ -78,7 +90,8 @@ encounterItems.push({
 encounterItems.push({
   id: 'max-repel',
   name: 'Max Repel',
-  description: 'A powerful spray-type item that keeps common pokemon away.',
+  description:
+    "Adds 10 levels to the selected Pokemon's maximum level in capture encounters and wild battles.",
   category: 'misc',
   spriteId: 'max-repel',
   unique: false,

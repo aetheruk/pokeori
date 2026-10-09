@@ -388,8 +388,12 @@ export async function attemptCapture(
       : 0
     const repelUsed = (state.itemsUsed || []).includes('repel')
     const superRepelUsed = (state.itemsUsed || []).includes('super-repel')
-    const repelLevelRange = repelUsed ? state.levelRange : undefined
-    const superRepelLevelRange = superRepelUsed ? state.levelRange : undefined
+    const maxRepelUsed = (state.itemsUsed || []).includes('max-repel')
+    const repelLevelRange =
+      repelUsed || superRepelUsed || maxRepelUsed
+        ? state.levelRange
+        : undefined
+    const superRepelLevelRange = repelLevelRange
 
     const hour = new Date().getHours()
     const isNight = hour >= 18 || hour < 6
@@ -466,7 +470,7 @@ export async function attemptCapture(
     }
 
     let level = preservedAlphaPokemon?.level ?? state.level ??
-      (superRepelUsed || (repelUsed && Math.random() < 0.8)
+      (repelUsed || superRepelUsed || maxRepelUsed
         ? targetMaxLevel
         : Math.floor(Math.random() * (targetMaxLevel - targetMinLevel + 1)) +
           targetMinLevel)

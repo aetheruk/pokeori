@@ -85,8 +85,8 @@ interface ExploreDetailsModalProps {
   activeExpedition: any
   selectedPokemonIds: string[]
   togglePokemonSelection: (id: string, max: number) => void
-  selectedRepelItemId: string | null
-  setSelectedRepelItemId: (itemId: string | null) => void
+  selectedEncounterItemId: string | null
+  setSelectedEncounterItemId: (itemId: string | null) => void
   handleConfirmTaskWithSelection: (task: any, totalRequired: number) => void
   handleConfirmEncounterWithSelection: (
     encounter: any,
@@ -116,8 +116,8 @@ export function ExploreDetailsModal({
   activeExpedition,
   selectedPokemonIds,
   togglePokemonSelection,
-  selectedRepelItemId,
-  setSelectedRepelItemId,
+  selectedEncounterItemId,
+  setSelectedEncounterItemId,
   handleConfirmTaskWithSelection,
   handleConfirmEncounterWithSelection,
   loadingId,
@@ -191,8 +191,8 @@ export function ExploreDetailsModal({
         : {}),
       selectedPokemonIds,
       togglePokemonSelection,
-      selectedRepelItemId,
-      setSelectedRepelItemId,
+      selectedEncounterItemId,
+      setSelectedEncounterItemId,
       handleConfirmTaskWithSelection,
       handleConfirmEncounterWithSelection,
       activeExpeditionRun:
@@ -211,8 +211,8 @@ export function ExploreDetailsModal({
       vsSeekerDifficultyOptions,
       selectedPokemonIds,
       togglePokemonSelection,
-      selectedRepelItemId,
-      setSelectedRepelItemId,
+      selectedEncounterItemId,
+      setSelectedEncounterItemId,
       handleConfirmTaskWithSelection,
       handleConfirmEncounterWithSelection,
       activeExpedition,

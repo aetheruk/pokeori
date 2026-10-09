@@ -100,7 +100,7 @@ export function useExploreActions(
 
   // Selection State (New)
   const [selectedPokemonIds, setSelectedPokemonIds] = useState<string[]>([])
-  const [selectedRepelItemId, setSelectedRepelItemId] = useState<string | null>(
+  const [selectedEncounterItemId, setSelectedEncounterItemId] = useState<string | null>(
     null,
   )
 
@@ -736,8 +736,8 @@ export function useExploreActions(
           const result = await startEncounter(
             item.id,
             undefined,
-            item.selectedRepelItemId
-              ? { repelItemId: item.selectedRepelItemId }
+            item.selectedEncounterItemId
+              ? { encounterItemId: item.selectedEncounterItemId }
               : undefined,
           )
           if (result.success) {
@@ -810,7 +810,13 @@ export function useExploreActions(
 
       case 'battle':
         try {
-          const result = await startBattle(item.id)
+          const result = await startBattle(
+            item.id,
+            undefined,
+            item.selectedEncounterItemId
+              ? { encounterItemId: item.selectedEncounterItemId }
+              : undefined,
+          )
           if (result.success) {
             router.push('/game/battles/encounter')
           } else {
@@ -978,13 +984,19 @@ export function useExploreActions(
         result = await startEncounter(
           encounter.id,
           selectedPokemonIds,
-          encounter.selectedRepelItemId
-            ? { repelItemId: encounter.selectedRepelItemId }
+          encounter.selectedEncounterItemId
+            ? { encounterItemId: encounter.selectedEncounterItemId }
             : undefined,
         )
         redirectPath = `/game/locations/encounter`
       } else if (type === 'battle') {
-        result = await startBattle(encounter.id, selectedPokemonIds)
+        result = await startBattle(
+          encounter.id,
+          selectedPokemonIds,
+          encounter.selectedEncounterItemId
+            ? { encounterItemId: encounter.selectedEncounterItemId }
+            : undefined,
+        )
         redirectPath = '/game/battles/encounter'
       } else if (type === 'field-research') {
         result = await startFieldResearch(encounter.id, false)
@@ -1036,7 +1048,7 @@ export function useExploreActions(
       }
       if (item) {
         setSelectedPokemonIds([])
-        setSelectedRepelItemId(null)
+        setSelectedEncounterItemId(null)
       }
     },
     activeShop,
@@ -1059,8 +1071,8 @@ export function useExploreActions(
     setSelectedTaskForCompletion,
     selectedPokemonIds,
     setSelectedPokemonIds,
-    selectedRepelItemId,
-    setSelectedRepelItemId,
+    selectedEncounterItemId,
+    setSelectedEncounterItemId,
     togglePokemonSelection,
     handleConfirmTaskWithSelection,
     handleConfirmEncounterWithSelection,
