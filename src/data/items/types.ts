@@ -211,6 +211,10 @@ export interface Item {
       min: number
       max: number
     }
+    grantRandomGems?: {
+      min: number
+      max: number
+    }
   }
   battleEffect?: BattleEffect // New: for battle-usable items
   enemyBattleUse?: BattleAiUseConfig
@@ -493,13 +497,10 @@ export function getInventoryDisplayPlacement(item: Item): {
 } {
   if (
     item.effects?.grantSkillXp ||
-    item.effects?.grantPokemonResearchXp
+    item.effects?.grantPokemonResearchXp ||
+    item.effects?.grantRandomPokemonMaterials
   ) {
     return { group: 'training', subCategory: 'trainer' }
-  }
-
-  if (item.effects?.grantRandomPokemonMaterials) {
-    return { group: 'crafting', subCategory: 'materials' }
   }
 
   if (item.id.includes('journal') || item.id === 'mt-moon-expedition-map') {

@@ -16,16 +16,18 @@ function item(id: string) {
 }
 
 describe('inventory placement', () => {
-  test('fishing salvage and material pouches appear in crafting materials', () => {
+  test('fishing salvage appears in crafting materials and material pouches appear under Training', () => {
     const rubbish = item('discarded-rubbish')
     expect(isCraftingMaterialItem(rubbish)).toBe(true)
     expect(getInventoryDisplayPlacement(rubbish)).toEqual({
       group: 'crafting',
       subCategory: 'materials',
     })
-    expect(getInventoryDisplayPlacement(item('pouch-of-materials'))).toEqual({
-      group: 'crafting',
-      subCategory: 'materials',
+    const pouch = item('pouch-of-materials')
+    expect(isCraftingMaterialItem(pouch)).toBe(false)
+    expect(getInventoryDisplayPlacement(pouch)).toEqual({
+      group: 'training',
+      subCategory: 'trainer',
     })
   })
 

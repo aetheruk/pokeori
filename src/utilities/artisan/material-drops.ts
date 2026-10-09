@@ -62,6 +62,10 @@ export const TIER_ONE_POKEMON_MATERIAL_IDS = Array.from(
   ),
 )
 
+export const RANDOM_GEM_ITEM_IDS = Object.keys(TYPE_MATERIAL_CONFIG).map(
+  (type) => `${type}-gem`,
+)
+
 export function buildRandomPokemonMaterialRewards(
   count: number,
   options: MaterialRewardOptions = {},
@@ -77,6 +81,31 @@ export function buildRandomPokemonMaterialRewards(
       materialIds.length - 1,
     )
     const itemId = materialIds[materialIndex]
+    if (itemId) rewardCounts.set(itemId, (rewardCounts.get(itemId) || 0) + 1)
+  }
+
+  return Array.from(rewardCounts, ([targetId, quantity]) => ({
+    type: 'item',
+    targetId,
+    quantity,
+    dropChance: 100,
+  }))
+}
+
+export function buildRandomGemRewards(
+  count: number,
+  options: MaterialRewardOptions = {},
+): LocationReward[] {
+  const rng = options.rng || Math.random
+  const rewardCounts = new Map<string, number>()
+  const safeCount = Math.max(0, Math.floor(count))
+
+  for (let index = 0; index < safeCount; index += 1) {
+    const gemIndex = Math.min(
+      Math.floor(rng() * RANDOM_GEM_ITEM_IDS.length),
+      RANDOM_GEM_ITEM_IDS.length - 1,
+    )
+    const itemId = RANDOM_GEM_ITEM_IDS[gemIndex]
     if (itemId) rewardCounts.set(itemId, (rewardCounts.get(itemId) || 0) + 1)
   }
 

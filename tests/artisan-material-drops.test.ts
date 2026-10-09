@@ -2,7 +2,9 @@ import { describe, expect, test } from 'bun:test'
 import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import {
   buildArtisanMaterialRewards,
+  buildRandomGemRewards,
   buildRandomPokemonMaterialRewards,
+  RANDOM_GEM_ITEM_IDS,
   rollRandomPokemonMaterialCount,
   TIER_ONE_POKEMON_MATERIAL_IDS,
   buildBrokenBallRewards,
@@ -38,6 +40,17 @@ describe('artisan material drops', () => {
         quantity: 1,
         dropChance: 100,
       },
+    ])
+  })
+
+  test('material pouches award one to three random type gems', () => {
+    expect(rollRandomPokemonMaterialCount(1, 3, () => 0)).toBe(1)
+    expect(rollRandomPokemonMaterialCount(1, 3, () => 0.999)).toBe(3)
+    expect(RANDOM_GEM_ITEM_IDS).toContain('normal-gem')
+    expect(RANDOM_GEM_ITEM_IDS).toContain('fairy-gem')
+    expect(buildRandomGemRewards(2, { rng: rngSequence(0, 0.999) })).toEqual([
+      { type: 'item', targetId: 'normal-gem', quantity: 1, dropChance: 100 },
+      { type: 'item', targetId: 'fairy-gem', quantity: 1, dropChance: 100 },
     ])
   })
 
