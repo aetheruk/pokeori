@@ -20,6 +20,11 @@ describe('fishing item pools', () => {
     expect(available.filter((entry) => entry.itemId).map((entry) => entry.itemId)).toEqual([
       'water-gem',
       'aqua-solvent-t1',
+      'broken-ball-t1',
+      'poke-ball',
+      'metal-scrap-t1',
+      'great-ball',
+      'drake-scale-t1',
     ])
     expect(available.some((entry) => entry.currencyId === 'pokedollars')).toBe(true)
     expect(available.some((entry) => entry.currencyId === 'crystals')).toBe(true)
@@ -91,8 +96,27 @@ describe('fishing item pools', () => {
     }
   })
 
-  test('adding currencies preserves the existing Golden Scale pool odds', () => {
-    const expected = { old: 8 / 107, good: 8 / 108, super: 8 / 108 }
+  test('global pools include the requested common and uncommon crafting and ball items', () => {
+    for (const pool of Object.values(globalFishingItemPools)) {
+      const entries = new Map(
+        pool
+          .filter((entry) => entry.itemId)
+          .map((entry) => [entry.itemId, entry]),
+      )
+
+      for (const itemId of ['broken-ball-t1', 'poke-ball', 'metal-scrap-t1']) {
+        expect(entries.get(itemId)?.weight).toBe(10)
+        expect(entries.get(itemId)?.symbol).toBe('!')
+      }
+      for (const itemId of ['great-ball', 'drake-scale-t1']) {
+        expect(entries.get(itemId)?.weight).toBe(4)
+        expect(entries.get(itemId)?.symbol).toBe('!!')
+      }
+    }
+  })
+
+  test('Golden Scales keep their authored weight after general items are added', () => {
+    const expected = { old: 8 / 145, good: 8 / 146, super: 8 / 146 }
     for (const [rod, pool] of Object.entries(globalFishingItemPools)) {
       const totalWeight = pool.reduce((total, entry) => total + entry.weight, 0)
       const goldenScaleWeight = pool

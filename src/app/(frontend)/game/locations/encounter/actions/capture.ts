@@ -502,17 +502,17 @@ export async function attemptCapture(
       Math.random() * 100 < secondChanceRate
 
     if (isSafari && !caught) {
-      const keepNetLost = await forfeitFishingNetOnFailure(
-        user.id,
-        state,
-        redis,
-      )
       const flee = resolveSafariFlee({
         baseFleeRate: state.fleeRate || SAFARI_BASE_FLEE_RATE,
       })
       state.captureAttempts = captureAttempt + 1
 
       if (flee.fled) {
+        const keepNetLost = await forfeitFishingNetOnFailure(
+          user.id,
+          state,
+          redis,
+        )
         const expeditionProgress = await failEncounter(user, state, undefined, transaction)
         const response = {
           success: true,
@@ -541,11 +541,8 @@ export async function attemptCapture(
         success: true,
         caught: false,
         safariRetry: true,
-        keepNetLost,
-        message:
-          keepNetLost
-            ? 'The Pokémon stayed nearby, but your keep net was lost. You can throw again or try another approach.'
-            : 'The Pokémon stayed nearby. You can throw again or try another approach.',
+        keepNetLost: false,
+        message: 'The Pokémon stayed nearby. You can throw again or try another approach.',
         formId: state.formId,
         pokemonId: state.pokemonId,
         safari: state.safari,
@@ -622,11 +619,6 @@ export async function attemptCapture(
     }
 
     if (secondChanceTriggered) {
-      const keepNetLost = await forfeitFishingNetOnFailure(
-        user.id,
-        state,
-        redis,
-      )
       state.secondChanceUsed = true
       state.captureAttempts = captureAttempt + 1
       await redis.set(encounterId, state, {
@@ -637,10 +629,8 @@ export async function attemptCapture(
         success: true,
         caught: false,
         secondChance: true,
-        keepNetLost,
-        message: keepNetLost
-          ? 'The Pokemon broke free, but your keep net was lost. It stayed nearby!'
-          : 'The Pokemon broke free, but it stayed nearby!',
+        keepNetLost: false,
+        message: 'The Pokemon broke free, but it stayed nearby!',
         formId: state.formId,
         pokemonId: state.pokemonId,
         throwQuality,

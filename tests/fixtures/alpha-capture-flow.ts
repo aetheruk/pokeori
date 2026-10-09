@@ -408,6 +408,8 @@ store.set('game:owner', { encounterId: fishingConfig.id })
 let castTime = Date.now()
 try {
   for (const rodType of ['old', 'good', 'super'] as const) {
+    // Starting a catch ends its Mini Game session, so each rod test starts a fresh one.
+    store.set('game:owner', { encounterId: fishingConfig.id })
     inventory[`${rodType}-rod`] = 1
     inventory['master-ball'] = 1
     if (rodType === 'good') {
@@ -552,6 +554,7 @@ try {
     ],
   })
   Math.random = () => 0.5
+  store.set('game:owner', { encounterId: fishingConfig.id })
   assert.equal((await castFishingLine('old')).success, true)
   const missedCast = store.get('fishing:owner')
   missedCast.phase = 'nibble'
@@ -607,6 +610,7 @@ try {
 
   // Secret replacements are explicitly marked by the cast and cannot roll Alpha.
   Math.random = () => 0.005
+  store.set('game:owner', { encounterId: fishingConfig.id })
   assert.equal((await castFishingLine('old')).success, true)
   const secretCast = store.get('fishing:owner')
   assert.equal(secretCast.hookedResult.entry.speciesId, 349)
@@ -654,6 +658,63 @@ try {
   assert.equal(ordinaryFish.duration, 60)
   assert.equal(ordinaryFish.level, 4)
   assert.equal(store.get('encounter:owner').baseCatchRate, 255)
+
+  const fishingKeepNet = [
+    {
+      id: 'held-water-gem',
+      type: 'item',
+      itemId: 'water-gem',
+      quantity: 1,
+    },
+  ]
+  inventory = { 'poke-ball': 2 }
+  store.set('fishing:keep-net:owner', {
+    encounterId: fishingConfig.id,
+    entries: fishingKeepNet,
+  })
+  store.set('encounter:owner', {
+    userId: 'owner',
+    locationId: `fishing:${fishingConfig.id}`,
+    pokemonId: 19,
+    formId: '19',
+    level: 5,
+    startTime: Date.now(),
+    expiry: Date.now() + 60_000,
+    baseCatchRate: 0,
+    currentCatchRate: 0,
+    questionsAnswered: [],
+    itemsUsed: [],
+    fishingKeepNet,
+    fishingExplorerXpMultiplier: 1,
+    captureAttempts: 0,
+  })
+  let failedThrowRoll = 0
+  Math.random = () => (failedThrowRoll++ === 0 ? 0.99 : 0)
+  const nearbyFailure = await attemptCapture(
+    'poke-ball',
+    undefined,
+    'fishing-nearby-failure',
+  )
+  assert.equal(nearbyFailure.secondChance, true)
+  assert.equal(nearbyFailure.keepNetLost, false)
+  assert.equal(store.has('fishing:keep-net:owner'), true)
+  assert.deepEqual(
+    store.get('encounter:owner').fishingKeepNet,
+    fishingKeepNet,
+  )
+
+  const retryState = store.get('encounter:owner')
+  retryState.secondChanceUsed = true
+  store.set('encounter:owner', retryState)
+  Math.random = () => 0.99
+  const finalFailure = await attemptCapture(
+    'poke-ball',
+    undefined,
+    'fishing-final-failure',
+  )
+  assert.equal(finalFailure.caught, false)
+  assert.equal(finalFailure.keepNetLost, true)
+  assert.equal(store.has('fishing:keep-net:owner'), false)
 } finally {
   Math.random = originalRandom
 }
