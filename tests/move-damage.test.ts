@@ -963,6 +963,7 @@ describe('move damage helpers', () => {
       attackerMetric: 'effective-stat:speed',
       defenderMetric: 'effective-stat:speed',
       comparison: 'greaterThan',
+      failIfCounteredByStance: true,
       success: {
         damageMultiplier: 1,
         preventCounter: true,
@@ -976,6 +977,72 @@ describe('move damage helpers', () => {
         message: '{attacker} was not faster, so {move} failed!',
       },
     })
+  })
+
+  test('the six stat-contest moves fail when the opposing stance counters them', () => {
+    const attacker = makeBattlePokemon({
+      name: 'Attacker',
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 50,
+        specialAttack: 100,
+        specialDefense: 50,
+        speed: 100,
+      },
+    })
+    const defender = makeBattlePokemon({
+      name: 'Defender',
+      stats: {
+        hp: 100,
+        attack: 10,
+        defense: 50,
+        specialAttack: 10,
+        specialDefense: 50,
+        speed: 10,
+      },
+    })
+    const moves = [
+      ['quick-attack', 'tech'],
+      ['slow-strike', 'tech'],
+      ['mighty-charge', 'speed'],
+      ['accidental-tap', 'speed'],
+      ['cunning-trap', 'power'],
+      ['play-dumb', 'power'],
+    ] as const
+
+    for (const [moveId, opposingStance] of moves) {
+      const move = getMove(moveId)!
+      const resolution = resolveMoveContest({
+        move,
+        attacker,
+        defender,
+        opposingStance,
+      })
+
+      expect(move.contest?.failIfCounteredByStance).toBe(true)
+      expect(resolution.counteredByStance).toBe(true)
+      expect(resolution.failMove).toBe(true)
+      expect(resolution.preventCounter).toBe(false)
+      expect(resolution.message).toContain('countered by the opposing')
+    }
+  })
+
+  test('a stat-contest move still succeeds against an uncountered stance', () => {
+    const resolution = resolveMoveContest({
+      move: getMove('quick-attack'),
+      attacker: makeBattlePokemon({
+        stats: { hp: 100, attack: 50, defense: 50, specialAttack: 50, specialDefense: 50, speed: 100 },
+      }),
+      defender: makeBattlePokemon({
+        stats: { hp: 100, attack: 50, defense: 50, specialAttack: 50, specialDefense: 50, speed: 10 },
+      }),
+      opposingStance: 'power',
+    })
+
+    expect(resolution.success).toBe(true)
+    expect(resolution.preventCounter).toBe(true)
+    expect(resolution.counteredByStance).toBe(false)
   })
 
   test('sucker punch is stance-win gated and prevents the counterattack', () => {

@@ -271,6 +271,8 @@ export interface MoveContestConfig {
   attackerMetric: MoveContestMetric
   defenderMetric?: MoveContestMetricValue
   comparison: MoveContestComparison
+  /** Also fail when the opposing stance counters this move's stance. */
+  failIfCounteredByStance?: boolean
   success?: MoveContestOutcomeConfig
   failure?: MoveContestOutcomeConfig
 }

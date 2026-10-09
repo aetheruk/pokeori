@@ -1067,6 +1067,7 @@ function scoreMove(params: {
       attacker: self,
       defender: opponent,
       attackType,
+      opposingStance: playerStance,
     })
     const stanceOutcome = contest.configured
       ? contest.result

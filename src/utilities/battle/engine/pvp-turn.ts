@@ -618,6 +618,8 @@ export function resolvePvpCombat(params: {
     defender,
     attackType: resolvedMoveType,
     terrain: state?.terrain?.terrain,
+    opposingStance:
+      attackerSide === 'player' ? enemyMove.stance : playerMove.stance,
     random: chanceRandom,
   })
   const outcome = contest.configured
