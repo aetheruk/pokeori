@@ -327,19 +327,23 @@ export function GameInfoModal({
                       {bonusLabel}
                     </div>
                   )}
-                  {sourceHint && (
-                    <div className="mt-3 flex items-start gap-2 border-t border-game-border pt-3 text-sm">
-                      <span className="shrink-0 font-bold uppercase tracking-wide text-game-moss-strong">
-                        Available at
-                      </span>
-                      <span className="text-game-muted">
-                        {sourceHint.replace(/^Available (at|from)\s+/i, '')}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
+
+          {sourceHint && !isResultLayout && (
+            <section aria-label="Available at">
+              <SectionDivider>AVAILABLE AT</SectionDivider>
+              <p
+                className={cn(
+                  'text-sm font-medium leading-relaxed text-game-muted',
+                  isDrawer ? 'text-left' : 'px-1',
+                )}
+              >
+                {sourceHint.replace(/^Available (at|from)\s+/i, '')}
+              </p>
+            </section>
+          )}
 
           {taskProgress ? (
             <div className="space-y-4">
