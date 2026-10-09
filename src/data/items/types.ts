@@ -267,7 +267,7 @@ export type InventoryDisplaySubCategory =
   | 'tms'
   | 'vitamins'
   | 'ability-patches'
-  | 'research-kits'
+  | 'trainer'
   | 'scratch-cards'
   | 'books'
 
@@ -299,7 +299,7 @@ export const INVENTORY_SUBCATEGORY_LABELS: Record<InventoryDisplaySubCategory, s
   tms: 'TMs',
   vitamins: 'Vitamins',
   'ability-patches': 'Ability Patches',
-  'research-kits': 'Research Kits',
+  trainer: 'Trainer',
   'scratch-cards': 'Scratch Cards',
   books: 'Books',
 }
@@ -327,7 +327,7 @@ export const INVENTORY_SUBCATEGORY_ORDER: Record<
     'evolution-items',
     'vitamins',
     'ability-patches',
-    'research-kits',
+    'trainer',
   ],
 }
 
@@ -472,8 +472,8 @@ export function getInventoryDisplayPlacement(item: Item): {
   group: InventoryDisplayGroup
   subCategory: InventoryDisplaySubCategory
 } {
-  if (item.id === 'research-kit') {
-    return { group: 'training', subCategory: 'research-kits' }
+  if (item.effects?.grantSkillXp || item.effects?.grantPokemonResearchXp) {
+    return { group: 'training', subCategory: 'trainer' }
   }
 
   if (item.id.includes('journal') || item.id === 'mt-moon-expedition-map') {

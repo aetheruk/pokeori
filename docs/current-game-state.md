@@ -27,6 +27,7 @@
 - Release `0.49.11` gives Daily Task source hints their own “Available at” section heading in the Explore details modal.
 - Release `0.49.12` removes the “Ready to claim” chip from Explore cards and removes the extra full-width top rule above Task Progress in drawers.
 - Release `0.49.13` lets players select a previously netted fishing Pokémon, review it in a modal, and start its normal catch attempt directly from the keep-net bar.
+- Release `0.49.14` groups skill-XP books and Pokémon Research XP items in Inventory under Training → Trainer.
 - Unreleased: Erika's Celadon Gym introduction spells out the Battle Team restriction as “Fire-type and Flying-type Pokémon” without the stray hyphen.
 
 - Unreleased: Detective Ray Choo’s Celadon skill-test battle now has dedicated result dialogue: he doubts the player is ready after a loss and praises their work after a win, with his name filled into both messages.

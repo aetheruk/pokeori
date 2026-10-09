@@ -115,7 +115,7 @@ const INVENTORY_SUBCATEGORY_ICON_PREFERENCES: Partial<
   badges: ['badge-kanto-boulder'],
   'evolution-items': ['fire-stone'],
   vitamins: ['hp-up'],
-  'research-kits': ['research-kit'],
+  trainer: ['research-kit'],
   'scratch-cards': ['rocket-scratch'],
   books: ['book-of-shouts'],
 }
@@ -315,8 +315,8 @@ function getEmptyMessage(
     case 'vitamins':
     case 'ability-patches':
       return 'No training items yet. These usually come from tougher shops and rewards.'
-    case 'research-kits':
-      return 'No Research Kits yet. Craft one from the Artisan menu.'
+    case 'trainer':
+      return 'No Trainer items yet. Journals and research supplies can grant skill experience.'
     case 'key-items':
       return 'No key items yet. Complete tasks and explore to find useful keepsakes.'
     case 'currency':

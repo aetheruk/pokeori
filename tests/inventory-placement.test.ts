@@ -34,7 +34,7 @@ describe('inventory placement', () => {
       'evolution-items',
       'vitamins',
       'ability-patches',
-      'research-kits',
+      'trainer',
     ])
     expect(INVENTORY_SUBCATEGORY_ORDER.crafting).toContain('berries')
     expect(INVENTORY_SUBCATEGORY_ORDER['key-items']).toEqual([
@@ -172,8 +172,8 @@ describe('inventory placement', () => {
       },
     )
     expect(getInventoryDisplayPlacement(item('researchers-journal-page'))).toEqual({
-      group: 'key-items',
-      subCategory: 'books',
+      group: 'training',
+      subCategory: 'trainer',
     })
     expect(getInventoryDisplayPlacement(item('mt-moon-expedition-map'))).toEqual({
       group: 'key-items',
@@ -181,10 +181,36 @@ describe('inventory placement', () => {
     })
   })
 
-  test('research kits display under training', () => {
+  test('all skill and Pokemon research XP items display under Training > Trainer', () => {
+    const xpGrantingItems = items.filter(
+      (definition) =>
+        definition.effects?.grantSkillXp ||
+        definition.effects?.grantPokemonResearchXp,
+    )
+
+    expect(xpGrantingItems.map(({ id }) => id).sort()).toEqual([
+      'champions-journal',
+      'explorers-journal',
+      'research-kit',
+      'researchers-journal',
+      'researchers-journal-archive',
+      'researchers-journal-compendium',
+      'researchers-journal-page',
+      'researchers-journal-volume',
+    ])
+
+    for (const definition of xpGrantingItems) {
+      expect(getInventoryDisplayPlacement(definition)).toEqual({
+        group: 'training',
+        subCategory: 'trainer',
+      })
+    }
+  })
+
+  test('research kits display under Training > Trainer', () => {
     expect(getInventoryDisplayPlacement(item('research-kit'))).toEqual({
       group: 'training',
-      subCategory: 'research-kits',
+      subCategory: 'trainer',
     })
   })
 
