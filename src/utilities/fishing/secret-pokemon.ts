@@ -28,6 +28,7 @@ export function applySecretFishingPokemonReplacement(params: {
         ...params.entry,
         speciesId: replacement.speciesId,
         formId: replacement.formId,
+        ...(replacement.rarity ? { rarity: replacement.rarity } : {}),
       }
     }
   }

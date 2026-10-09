@@ -4,6 +4,7 @@ export interface GlobalFishingPokemonReplacement {
   speciesId: number
   formId: string
   chance: number
+  rarity?: import('@/utilities/pokemon/rarity-effects').PokemonRarityId
   keepNetRequirements?: FishingKeepNetRequirement[]
 }
 
@@ -19,5 +20,12 @@ export const globalFishingPokemonPool: GlobalFishingPokemonReplacement[] = [
     formId: '349',
     chance: 1 / 32,
     keepNetRequirements: [{ itemId: 'drake-scale-t1' }],
+  },
+  {
+    speciesId: 129,
+    formId: '129',
+    chance: 0.99,
+    rarity: 'shiny',
+    keepNetRequirements: [{ itemId: 'golden-scale', quantity: 5 }],
   },
 ]

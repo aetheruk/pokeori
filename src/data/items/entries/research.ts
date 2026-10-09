@@ -2,6 +2,13 @@ import { Item } from '../types'
 
 export const researchItems: Item[] = [
   {
+    id: 'golden-scale',
+    name: 'Golden Scale',
+    description: 'A rare Golden scale found while fishing.',
+    category: 'misc',
+    spriteId: 'golden-scale',
+  },
+  {
     id: 'scrip',
     name: "Prof's Scrip",
     description: 'A voucher issued by Professor Oak for special trainer supplies.',

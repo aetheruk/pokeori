@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.49.0`): Fishing adds a repeatable Golden Scale material to global item catches at exactly 1-in-50 after all eight numbered Golden Scales are owned. Keeping five Golden Scales makes a Golden (Shiny) Magikarp a 99% global Pokemon replacement on any rod; capture uses the normal Shiny Magikarp data and flow.
 - Unreleased (`0.48.6`): Great Balls in the global Fishing item pool now require at least three Poké Balls in the keep net to become eligible.
 - Unreleased (`0.48.5`): Global fishing catch pools support item-quantity requirements against the keep net. Feebas requires at least one Drake Scale and rolls at 1 in 32; Relicanth remains an ungated 1-in-512 replacement.
 - Unreleased (`0.48.4`): Fishing's Stay and Leave choices appear side by side, with contrasting paper and charcoal button treatments. The fixed Cast/Hook/Try Again button uses charcoal text for legibility against its light surface.
