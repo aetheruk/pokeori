@@ -38,6 +38,26 @@ function currencyEntries(reactionTime: number): FishingItemEntry[] {
   }))
 }
 
+function genericItemEntries(reactionTime: number): FishingItemEntry[] {
+  const items: Array<{
+    itemId: string
+    weight: number
+    symbol: string
+  }> = [
+    { itemId: 'broken-ball-t1', weight: 10, symbol: '!' },
+    { itemId: 'poke-ball', weight: 10, symbol: '!' },
+    { itemId: 'metal-scrap-t1', weight: 10, symbol: '!' },
+    { itemId: 'great-ball', weight: 4, symbol: '!!' },
+    { itemId: 'drake-scale-t1', weight: 4, symbol: '!!' },
+  ]
+
+  return items.map((entry) => ({
+    ...entry,
+    reactionTime,
+    appearTime: commonAppearTime,
+  }))
+}
+
 export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
   old: [
     {
@@ -55,6 +75,7 @@ export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
       appearTime: commonAppearTime,
     },
     ...currencyEntries(900),
+    ...genericItemEntries(900),
     ...goldenScaleEntries(900),
   ],
   good: [
@@ -73,6 +94,7 @@ export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
       appearTime: commonAppearTime,
     },
     ...currencyEntries(850),
+    ...genericItemEntries(850),
     ...goldenScaleEntries(850),
   ],
   super: [
@@ -91,6 +113,7 @@ export const globalFishingItemPools: Record<RodType, FishingItemEntry[]> = {
       appearTime: commonAppearTime,
     },
     ...currencyEntries(800),
+    ...genericItemEntries(800),
     ...goldenScaleEntries(800),
   ],
 }
