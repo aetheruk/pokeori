@@ -64,6 +64,20 @@ describe('double battles',()=>{
     expect(next.turn).toBe(2)
     expect(next.presentation?.events.filter(event=>event.type==='attack'&&event.actorSide==='player')).toHaveLength(2)
   })
+  test('Shadow Pokemon keep their doubles actions and take end-of-turn pain damage',()=>{
+    const shadowBattle=state()
+    shadowBattle.playerTeam[0].isShadow=true
+    shadowBattle.enemyTeam[0].isShadow=true
+    const actions=[hit(0,0),hit(1,1)]
+
+    const next=resolveDoublesTurn(shadowBattle,actions,enemy,()=>0.1)
+
+    expect(next.presentation?.events.filter(event=>event.type==='attack'&&event.actorSide==='player')).toHaveLength(2)
+    expect(next.history[0].message).toContain('P0 screams out in pain!')
+    expect(next.history[0].message).toContain('E0 screams out in pain!')
+    expect(next.presentation?.events.filter(event=>event.type==='hp-change'&&event.message.includes('screams out in pain'))).toHaveLength(2)
+    expect(next.presentation?.events.filter(event=>event.type==='hp-change'&&event.message.includes('[icon:damage:125]'))).toHaveLength(2)
+  })
   test('resolves ordered lane exchanges and lets a later lane be skipped after a KO',()=>{
     const battle=state()
     battle.enemyTeam[1].currentHp=1

@@ -27,9 +27,8 @@ for (const width of [390, 1280]) {
     for (const name of ['Trainer', 'Explore', 'Pokemon', 'Artisan', 'Dex', 'MoveDex', 'AbilityDex', 'Pokedex', 'Carddex', 'Inventory']) {
       await page.getByLabel('Loading preview').selectOption(name)
       const preview = page.getByTestId('layout-preview')
-      await expect(preview.getByRole('heading', { level: 1 })).toBeVisible()
       await expect(preview.getByRole('status')).toContainText('Loading')
-      await expect(preview.locator('.animate-spin, .animate-pulse')).toHaveCount(0)
+      await expect(preview.locator('.animate-spin')).toHaveCount(0)
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     }
   })

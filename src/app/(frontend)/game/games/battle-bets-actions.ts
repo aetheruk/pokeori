@@ -30,10 +30,6 @@ import {
 import { initializeTeamMoveUses } from '@/utilities/battle/move-uses'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 import {
-  applyShadowScreamDamage,
-  shouldShadowScream,
-} from '@/utilities/battle/shadow-pokemon'
-import {
   applyTrainerItemIfTriggered,
   normalizeTrainerBattleItems,
 } from '@/utilities/battle/trainer-items'
@@ -583,14 +579,6 @@ function chooseSideMove(params: {
 
   const enemyMon = view.enemyTeam[view.activeEnemyIndex]
   const playerMon = view.playerTeam[view.activePlayerIndex]
-  if (shouldShadowScream(enemyMon, params.random)) {
-    const damage = applyShadowScreamDamage(enemyMon)
-    return {
-      stance: 'tech',
-      skipAction: true,
-      spectatorMessage: `${view.enemyName}'s ${enemyMon.name} screams out in pain! [icon:damage:${damage}]`,
-    }
-  }
   return enemyActionToPvpMove(
     chooseEnemyBattleAction({
       state: view,

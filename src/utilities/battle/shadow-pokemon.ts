@@ -1,13 +1,9 @@
 import type { BattlePokemon } from './types'
 
-export const SHADOW_SCREAM_CHANCE = 0.2
 export const SHADOW_SCREAM_DAMAGE_DIVISOR = 8
 
-export function shouldShadowScream(
-  pokemon: Pick<BattlePokemon, 'isShadow'>,
-  random: () => number = Math.random,
-): boolean {
-  return Boolean(pokemon.isShadow) && random() < SHADOW_SCREAM_CHANCE
+export function shouldShadowScream(pokemon: Pick<BattlePokemon, 'isShadow'>) {
+  return Boolean(pokemon.isShadow)
 }
 
 export function applyShadowScreamDamage(
@@ -19,4 +15,14 @@ export function applyShadowScreamDamage(
   )
   pokemon.currentHp = Math.max(0, pokemon.currentHp - damage)
   return damage
+}
+
+export function applyShadowTurnPain(
+  pokemon: Pick<BattlePokemon, 'isShadow' | 'currentHp' | 'maxHp' | 'name'>,
+  trainerName: string,
+): string | undefined {
+  if (!shouldShadowScream(pokemon) || pokemon.currentHp <= 0) return undefined
+
+  const damage = applyShadowScreamDamage(pokemon)
+  return `${trainerName}'s ${pokemon.name} screams out in pain! [icon:damage:${damage}]`
 }

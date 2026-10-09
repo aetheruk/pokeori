@@ -4,9 +4,9 @@ for (const width of [390, 1280]) {
   test(`events use an Explore card and scrollable details at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 740 })
     await page.goto('/ui-test/event-card')
-    const card = page.getByRole('button', { name: 'Open Active Events', exact: true })
+    const card = page.getByRole('button', { name: 'View events: Active Events', exact: true })
     await expect(card).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Open VS Seeker' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Battle: VS Seeker' })).toBeVisible()
     await expect(page.getByText('Upcoming and active events')).toHaveCount(0)
     await expect(page.getByText('Route 1 outbreak')).toHaveCount(0)
     await page.screenshot({ path: `/tmp/events-card-${width}.png` })

@@ -92,6 +92,24 @@ function withFailOnStance<T extends 'loss' | 'tie'>(
 }
 
 describe('PVP turn engine helpers', () => {
+  test('Shadow Pokemon both act and take one eighth maximum HP damage at turn end', async () => {
+    const state = makeBattleState()
+    state.playerTeam[0].isShadow = true
+    state.enemyTeam[0].isShadow = true
+
+    const resolved = await resolvePvpTurn(
+      state,
+      { stance: 'power', attackType: 'normal' },
+      { stance: 'tech', attackType: 'normal' },
+      { persist: false, random: () => 0.99 },
+    )
+
+    expect(resolved.history[0].playerExecutedAttack).toBe(true)
+    expect(resolved.history[0].enemyExecutedAttack).toBe(true)
+    expect(resolved.history[0].message).toContain('Player One screams out in pain! [icon:damage:13]')
+    expect(resolved.history[0].message).toContain('Enemy One screams out in pain! [icon:damage:13]')
+  })
+
   test('basic stance attacks use accuracy and evasion stages when resolving hits', () => {
     const attacker = makePokemon({
       name: 'Attacker',

@@ -42,7 +42,7 @@ describe('Pokemon origin metadata', () => {
     expect(resolveEncounterOrigin('fishing:pallet-town-seafront')).toMatchObject({
       obtainedMethod: 'caught',
       obtainedRegion: 'Kanto',
-      obtainedLocation: 'Pallet Town',
+      obtainedLocation: 'Pallet Town Coastline',
       obtainedSourceId: 'pallet-town-seafront',
     })
   })

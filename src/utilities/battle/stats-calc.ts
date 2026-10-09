@@ -225,6 +225,7 @@ export function calculateStats(
   if (
     !levelCap &&
     !trainerLevel &&
+    !(pokemon as any).isShadow &&
     pokemon.stats?.hp &&
     pokemon.stats?.attack &&
     pokemon.stats?.defense &&
@@ -329,13 +330,10 @@ export function calculateStats(
     ),
   }
 
-  // Shadow Pokemon: +20% Stats
+  // Shadow Pokemon: +10% Attack and Special Attack.
   if ((pokemon as any).isShadow) {
-    stats.attack = Math.floor(stats.attack * 1.2)
-    stats.defense = Math.floor(stats.defense * 1.2)
-    stats.specialAttack = Math.floor(stats.specialAttack * 1.2)
-    stats.specialDefense = Math.floor(stats.specialDefense * 1.2)
-    stats.speed = Math.floor(stats.speed * 1.2)
+    stats.attack = Math.floor(stats.attack * 1.1)
+    stats.specialAttack = Math.floor(stats.specialAttack * 1.1)
   }
 
   const rarity = resolvePokemonRarity(pokemon)

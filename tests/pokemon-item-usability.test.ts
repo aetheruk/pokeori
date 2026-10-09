@@ -43,6 +43,9 @@ describe('Pokemon item usability', () => {
     ).toBe('This candy can only be used from level 20.')
     expect(
       getPokemonItemUnavailableReason(item('rare-candy-m'), { level: 30 }),
+    ).toBeNull()
+    expect(
+      getPokemonItemUnavailableReason(item('rare-candy-m'), { level: 40 }),
     ).toBe('This candy can only be used up to level 39.')
     expect(
       getPokemonItemUnavailableReason(item('rare-candy-m'), { level: 20 }),

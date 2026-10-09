@@ -18,9 +18,17 @@ import {
   processBattleAbilityWeatherTypeChangesForState,
 } from './abilities'
 import { processBattleRarityTurnEnd } from './rarity-effects'
+import { applyShadowTurnPain } from './shadow-pokemon'
 
 export function processTurnEnd(state: BattleState): string[] {
-  const messages = processEndTurnStatusDamage(state, 'damage')
+  const { playerTeam, enemyTeam, activePlayerIndex, activeEnemyIndex } = state
+  const playerMon = playerTeam[activePlayerIndex]
+  const enemyMon = enemyTeam[activeEnemyIndex]
+  const messages = [
+    applyShadowTurnPain(playerMon, state.playerName),
+    applyShadowTurnPain(enemyMon, state.enemyName),
+  ].filter((message): message is string => Boolean(message))
+  messages.push(...processEndTurnStatusDamage(state, 'damage'))
   messages.push(...processEndTurnWeatherDamageForState(state))
   messages.push(...processSecondaryStatusesForTurnEnd(state))
   messages.push(...processDelayedMoveDamage(state))
@@ -28,10 +36,6 @@ export function processTurnEnd(state: BattleState): string[] {
   // healing helper guards against 0 HP, so a residual KO cannot be undone.
   messages.push(...processEndTurnStatusDamage(state, 'healing'))
   messages.push(...processTerrainTurnEffects(state))
-  const { playerTeam, enemyTeam, activePlayerIndex, activeEnemyIndex } = state
-  const playerMon = playerTeam[activePlayerIndex]
-  const enemyMon = enemyTeam[activeEnemyIndex]
-
   const playerStanceMessage = tickDisabledStance(playerMon, state.turn)
   if (playerStanceMessage) messages.push(playerStanceMessage)
 
