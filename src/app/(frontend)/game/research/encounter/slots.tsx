@@ -7,11 +7,11 @@ import {
   Check,
   Coins,
   DoorOpen,
+  Gift,
   Info,
   LogOut,
   Play,
   Sparkles,
-  Trophy,
   X,
 } from 'lucide-react'
 import Image from 'next/image'
@@ -164,11 +164,11 @@ function PrizesModal({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className="min-h-11 border-game-border bg-game-surface-raised text-game-ink hover:border-game-ochre hover:text-game-ochre"
+          size="icon"
+          className="pointer-events-auto h-10 w-10 rounded-full border border-game-night-border/60 bg-game-night-surface/85 text-game-night-ink shadow-lg transition-colors hover:bg-game-night-surface-raised hover:text-game-night-ink"
+          aria-label="View slot prizes"
         >
-          <Trophy className="mr-2 h-4 w-4 text-game-ochre" />
-          Prizes
+          <Gift className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="game-paper-background w-[95%] max-w-md rounded-xl border-game-border bg-game-surface p-6 text-game-ink">
@@ -356,27 +356,39 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
 
       {/* UI Header */}
       <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-start z-50">
+        <div className="absolute top-4 left-4">
+          <PrizesModal
+            encounter={encounter}
+            currentWinRate={initialState?.slotsSession?.currentWinRate}
+          />
+        </div>
         {/* Balance - Teal Chip Style */}
         <div className="flex flex-col gap-2 items-center w-full pointer-events-none">
-          <div className="flex -translate-y-2 items-center gap-3 rounded-full border border-game-border bg-game-surface-raised px-4 py-1.5 shadow-lg backdrop-blur-sm">
-            <div className="flex items-center gap-1.5 font-mono text-sm font-bold text-game-ink">
+          <div
+            className="flex -translate-y-2 items-center gap-3 rounded-full border px-4 py-1.5 shadow-lg backdrop-blur-sm"
+            style={{
+              backgroundColor: themeColour,
+              borderColor: `color-mix(in srgb, ${themeColour} 70%, white)`,
+            }}
+          >
+            <div className="flex items-center gap-1.5 font-mono text-sm font-bold text-game-cream">
               {currencyConfig ? (
                 <CurrencySprite
                   currencyId={currencyConfig.id}
-                  alt={currencyConfig.name}
+                  alt=""
                   className="w-5 h-5 object-contain pixelated"
                   width={20}
                   height={20}
                 />
               ) : (
-                <Coins className="h-3.5 w-3.5 text-game-ochre" />
+                <Coins className="h-3.5 w-3.5 text-game-cream" />
               )}
               {user?.currency?.[
                 encounter.settings.cost.currencyType
               ]?.toLocaleString()}
             </div>
-            <div className="h-3 w-px bg-game-border" />
-            <div className="text-xs font-bold uppercase tracking-wider text-game-muted">
+            <div className="h-3 w-px bg-game-night-border/60" />
+            <div className="text-xs font-bold uppercase tracking-wider text-game-cream">
               BET: {encounter.settings.cost.amount}
             </div>
           </div>
@@ -439,12 +451,6 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
       </div>
       {/* Controls Section (Fixed Bottom) */}
       <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-4 px-4 z-50 pb-safe">
-        {/* Prizes Button */}
-        <PrizesModal
-          encounter={encounter}
-          currentWinRate={initialState?.slotsSession?.currentWinRate}
-        />
-
         {/* Spin Button - Prominent at Bottom */}
         <Button
           type="button"
