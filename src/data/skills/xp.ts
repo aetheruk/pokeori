@@ -134,7 +134,7 @@ export interface SkillXpConfig {
 }
 
 export const SKILL_XP_MODIFIERS: Record<CoreSkillId, number> = {
-  catching: 1.8,
+  catching: 2.5,
   battling: 1,
   artisan: 1,
   researching: 1.45,
