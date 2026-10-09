@@ -369,7 +369,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                 pokemon.progress,
               )
               const opacity = getSurfEmergenceOpacity(pokemon.progress)
-              const size = 76 * position.scale
+              const size = 114 * position.scale
               return (
                 <div
                   key={pokemon.id}
@@ -392,7 +392,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                   />
                   {pokemon.isAlpha ? (
                     <AlphaIcon
-                      size={Math.max(8, Math.round(18 * position.scale))}
+                      size={Math.max(12, Math.round(27 * position.scale))}
                       className="absolute right-0 top-0 z-10 drop-shadow-md"
                     />
                   ) : null}
@@ -464,17 +464,19 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           </div>
         </div>
 
-        <header className="pointer-events-none absolute inset-x-0 top-0 z-40 grid grid-cols-[minmax(2.75rem,1fr)_auto_minmax(2.75rem,1fr)] items-start gap-3 px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <header
+          className={`pointer-events-none absolute inset-x-0 top-0 z-40 grid items-start gap-3 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] ${
+            settings.mode === 'catch'
+              ? 'grid-cols-[minmax(2.75rem,1fr)_minmax(2.75rem,1fr)]'
+              : 'grid-cols-[minmax(2.75rem,1fr)_auto_minmax(2.75rem,1fr)]'
+          }`}
+        >
           <div className="min-w-11">
             {settings.timeLimit ? (
               <GameTimer timeLeft={timeLeft} totalTime={settings.timeLimit} />
             ) : null}
           </div>
-          {settings.mode === 'catch' ? (
-            <div className="rounded-md border border-game-border/70 bg-game-surface/90 px-4 py-2 text-center text-sm font-semibold text-game-ink shadow-lg backdrop-blur-md">
-              Wild Encounters
-            </div>
-          ) : (
+          {settings.mode !== 'catch' ? (
             <div className="rounded-md border border-game-border/70 bg-game-surface/90 px-4 py-2 text-center text-game-ink shadow-lg backdrop-blur-md">
               <p className="text-[10px] font-semibold text-game-muted">
                 Distance
@@ -486,7 +488,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                   : ''}
               </p>
             </div>
-          )}
+          ) : null}
           <Button
             type="button"
             size="icon"

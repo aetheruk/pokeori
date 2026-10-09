@@ -560,7 +560,26 @@ export function getFormattedProperties(selectedItem: any) {
       ...Object.values(res.settings?.rods || {}).map(
         (rod: any) => rod?.levelRange,
       ),
+      ...(res.gameType === 'surf' && res.settings?.mode === 'catch'
+        ? (res.settings?.pokemonPool || []).map((entry: any) => entry.level)
+        : []),
     )
+    const surfEncounters =
+      res.gameType === 'surf' && res.settings?.mode === 'catch'
+        ? (res.settings?.pokemonPool || [])
+        : []
+    const surfEncounterCount = new Set(
+      surfEncounters
+        .map((entry: any) => getEncounterFormId(entry))
+        .filter(Boolean),
+    ).size
+    if (surfEncounterCount > 0) {
+      props.push({
+        icon: <Users className="w-4 h-4" />,
+        label: 'Possible Encounters',
+        value: surfEncounterCount,
+      })
+    }
     if (levelRange) {
       props.push({
         icon: <BarChart className="w-4 h-4" />,
@@ -1653,6 +1672,65 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
             </div>
           </div>
         ))}
+      </div>
+    )
+  }
+
+  if (
+    item.type === 'game' &&
+    item.originalData.gameType === 'surf' &&
+    item.originalData.settings?.mode === 'catch'
+  ) {
+    const encounters = item.originalData.settings.pokemonPool || []
+    const uniqueEncounters = Array.from(
+      new Map(
+        encounters
+          .map((encounter: any) => {
+            const formId = getEncounterFormId(encounter)
+            return formId ? [formId, encounter] : null
+          })
+          .filter((entry: any): entry is [string, any] => entry !== null),
+      ).values(),
+    )
+
+    if (uniqueEncounters.length === 0) return null
+
+    return (
+      <div className="mt-6 space-y-4">
+        <SectionDivider>Possible Encounters</SectionDivider>
+        <div
+          className="flex gap-3 overflow-x-auto px-1 pb-6 pt-2 custom-scrollbar"
+        >
+          {uniqueEncounters.map((encounter: any, index) => {
+            const formId = getEncounterFormId(encounter)!
+            const pokedexEntry = pokedexByFormId.get(formId)
+            const pokemon =
+              getPokemonForm(formId) || getPokemonSpecies(encounter.speciesId)
+            const isCaught = pokedexEntry?.caught
+            const isSeen = pokedexEntry?.seen
+
+            return (
+              <div
+                key={`${formId}-${index}`}
+                className="flex h-20 w-20 shrink-0 items-center justify-center"
+                title={
+                  isCaught
+                    ? `${pokemon?.name || 'Pokémon'} caught`
+                    : isSeen
+                      ? `${pokemon?.name || 'Pokémon'} seen`
+                      : 'Unseen Pokémon'
+                }
+              >
+                <PokemonSpritePreview
+                  formId={formId}
+                  isCaught={isCaught}
+                  isSeen={isSeen}
+                  alt={pokemon?.name || 'Surf encounter'}
+                />
+              </div>
+            )
+          })}
+        </div>
       </div>
     )
   }
