@@ -32,14 +32,14 @@ export function PremiumHeader({
       <div className="pointer-events-none absolute bottom-4 left-0 top-4 w-1 rounded-r-sm bg-game-moss" />
       <div className="relative min-w-0 flex-1 pl-3 md:pl-4">
         {subtitle && (
-          <p
+          <div
             className={cn(
               'game-field-label mb-1.5 truncate before:hidden',
               subtitleClassName,
             )}
           >
             {subtitle}
-          </p>
+          </div>
         )}
         <h1
           className={cn(
