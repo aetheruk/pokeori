@@ -2,7 +2,7 @@
 import { recoverGameAction } from '@/utilities/games/action-recovery'
 import { getPendingPaidAction, clearPendingPaidAction, hasPendingPaidAction } from '@/utilities/games/pending-paid-action'
 
-import { ChevronDown, DoorOpen, Loader2, Trophy } from 'lucide-react'
+import { ChevronDown, DoorOpen, Gift, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -53,11 +53,11 @@ function PrizesModal({ slots }: { slots: PrizeWheelSlot[] }) {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className="min-h-11 border-game-border bg-game-surface-raised text-game-ink hover:border-game-ochre hover:text-game-ochre"
+          size="icon"
+          className="pointer-events-auto h-10 w-10 rounded-full border border-game-night-border/60 bg-game-night-surface/85 text-game-night-ink shadow-lg transition-colors hover:bg-game-night-surface-raised hover:text-game-night-ink"
+          aria-label="View prize wheel prizes"
         >
-          <Trophy className="w-4 h-4 mr-2 text-game-ochre" />
-          Prizes
+          <Gift className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="game-paper-background w-[95%] max-w-md rounded-xl border-game-border bg-game-surface p-6 text-game-ink">
@@ -337,6 +337,45 @@ export function PrizeWheelGame({
         </Button>
       </div>
 
+      {/* HUD */}
+      <div className="absolute left-0 right-0 top-0 z-40 flex justify-center px-16 pt-4 pointer-events-none">
+        <div
+          className="flex items-center gap-3 rounded-full border px-4 py-1.5 shadow-lg backdrop-blur-sm"
+          style={{
+            backgroundColor: encounter.settings.themeColour || '#293532',
+            borderColor: encounter.settings.themeColour
+              ? `color-mix(in srgb, ${encounter.settings.themeColour} 70%, white)`
+              : '#52605b',
+          }}
+        >
+          <div className="flex items-center gap-1.5 font-mono text-sm font-bold text-game-cream">
+            {costCurrency ? (
+              <CurrencySprite
+                currencyId={costCurrency.id}
+                alt=""
+                className="h-5 w-5 object-contain pixelated"
+                width={20}
+                height={20}
+              />
+            ) : null}
+            {userBalance.toLocaleString()}
+          </div>
+          {cost ? (
+            <>
+              <div className="h-3 w-px bg-game-night-border/60" />
+              <div className="text-xs font-bold uppercase tracking-wider text-game-cream">
+                BET: {cost.amount}
+              </div>
+            </>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Prize list control */}
+      <div className="absolute left-4 top-4 z-50">
+        <PrizesModal slots={slots} />
+      </div>
+
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 pb-32">
         {/* Pointer */}
@@ -436,30 +475,6 @@ export function PrizeWheelGame({
 
       {/* Controls Section (Fixed Bottom) */}
       <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-4 px-4 z-50 pb-safe">
-        {/* Prizes Modal */}
-        <PrizesModal slots={slots} />
-
-        {cost && costCurrency && !canClaim ? (
-          <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-4 py-2 text-sm font-semibold text-game-ink shadow-sm">
-            <CurrencySprite
-              currencyId={costCurrency.id}
-              alt={costCurrency.name}
-              className="h-5 w-5"
-            />
-            <span>
-              {cost.amount} {costCurrency.name}
-            </span>
-            <span
-              className={cn(
-                'text-game-muted',
-                !canAfford && 'text-game-clay-strong',
-              )}
-            >
-              {userBalance} held
-            </span>
-          </div>
-        ) : null}
-
         {canClaim ? (
           <Button
             type="button"

@@ -2,12 +2,11 @@
 
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 
-import { ChevronDown, Coins, DoorOpen, Trophy } from 'lucide-react'
+import { ChevronDown, Coins, DoorOpen, Gift } from 'lucide-react'
 import Matter from 'matter-js'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
 import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
@@ -58,11 +57,26 @@ function getRewardLabel(reward: any) {
   return reward?.label || reward?.targetId || reward?.type || 'Prize'
 }
 
-function getAwardedRewardLabel(summary: any) {
+function getAwardedReward(summary: any) {
+  const itemReward = summary?.items?.[0]
+  if (itemReward?.id) {
+    return {
+      kind: 'item' as const,
+      id: String(itemReward.id),
+      name: itemReward.name || String(itemReward.id),
+      quantity: itemReward.quantity || 1,
+    }
+  }
+
   const currencyReward = summary?.currency?.[0]
   if (currencyReward?.type && currencyReward?.quantity) {
     const currency = getCurrency(currencyReward.type)
-    return `${currencyReward.quantity} ${currency?.name || currencyReward.type}`
+    return {
+      kind: 'currency' as const,
+      id: String(currencyReward.type),
+      name: currency?.name || String(currencyReward.type),
+      quantity: currencyReward.quantity,
+    }
   }
 
   return null
@@ -75,11 +89,11 @@ function PrizesModal({ buckets }: { buckets: any[] }) {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className="min-h-11 border-game-border bg-game-surface-raised text-game-ink hover:border-game-ochre hover:text-game-ochre"
+          size="icon"
+          className="pointer-events-auto h-10 w-10 rounded-full border border-game-night-border/60 bg-game-night-surface/85 text-game-night-ink shadow-lg transition-colors hover:bg-game-night-surface-raised hover:text-game-night-ink"
+          aria-label="View Pachinko prizes"
         >
-          <Trophy className="mr-2 h-4 w-4 text-game-ochre" />
-          Prizes
+          <Gift className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="game-paper-background w-[95%] max-w-md rounded-xl border-game-border bg-game-surface p-6 text-game-ink">
@@ -144,14 +158,9 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   const [arrowPosition, setArrowPosition] = useState(50) // Percentage 0-100
   const directionRef = useRef(1) // 1 = right, -1 = left
 
-  const [sessionSummary, setSessionSummary] = useState<any>(
-    state?.pachinkoSession?.totalRewards || {},
-  )
-  const [sessionCost, setSessionCost] = useState<number>(
-    state?.pachinkoSession?.totalCost || 0,
-  )
   const [pendingDrops, setPendingDrops] = useState(0)
   const [isBonusDrop, setIsBonusDrop] = useState(false)
+  const [lastDropReward, setLastDropReward] = useState<ReturnType<typeof getAwardedReward>>(null)
   const [lastDropMessage, setLastDropMessage] = useState(
     'Line up the marker and drop.',
   )
@@ -159,11 +168,6 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   const config = encounter.settings as PachinkoGameSettings
   const cost = encounter.settings.cost
   const themeColour = config.themeColour || '#14b8a6' // Default to teal
-  const rewardCount = Object.values(sessionSummary || {}).reduce<number>(
-    (total, value) => total + (Array.isArray(value) ? value.length : 0),
-    0,
-  )
-
   // Animate arrow left-right
   useEffect(() => {
     const interval = setInterval(() => {
@@ -450,12 +454,14 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     if (roundPendingRef.current || !engineRef.current) return
     const currentBalance = (user?.currency as any)?.[cost?.currencyType || 'pokedollars'] || 0
     if (currentBalance - pendingDrops * (cost?.amount || 0) < (cost?.amount || 0)) {
-      toast.error('Insufficient funds')
+      setLastDropReward(null)
+      setLastDropMessage('Not enough currency to play.')
       return
     }
     roundPendingRef.current = true
     setIsDropping(true)
     setPendingDrops((previous) => previous + 1)
+    setLastDropReward(null)
     setLastDropMessage('Preparing drop…')
     // Retain one immutable request through response-loss retries. Outcomes and
     // animation frames come from the already-settled server receipt.
@@ -467,23 +473,22 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
         (response) => response.error || undefined,
       )
       if (!result.success) {
-        toast.error(result.error || 'Drop failed')
+        setLastDropReward(null)
         setLastDropMessage(result.error || 'Drop failed')
         return
       }
       setLastDropMessage('Dropping…')
       if (result.playback) await playRound(result.playback)
       if (!engineRef.current) return
-      setSessionSummary(result.summary || {})
-      setSessionCost(
-        (current) => result.totalCost ?? current + (cost?.amount || 0),
-      )
       refreshUser(false)
 
       if (result.rewards) {
         playSfx('good')
-        const rewardLabel =
-          getAwardedRewardLabel(result.rewards) || 'Added to session winnings'
+        const awardedReward = getAwardedReward(result.rewards)
+        setLastDropReward(awardedReward)
+        const rewardLabel = awardedReward
+          ? `${awardedReward.quantity} ${awardedReward.name}`
+          : 'Added to session winnings'
         const hitCopy =
           result.isBonus && result.hitCount
             ? ` from ${result.hitCount} ${
@@ -494,23 +499,16 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
         setLastDropMessage(
           result.isBonus
             ? `Bonus Drop: ${rewardLabel}${hitCopy}`
-            : `Prize: ${rewardLabel}`,
+            : `${rewardLabel}${hitCopy}`,
         )
-        toast.success(result.isBonus ? 'Bonus prize!' : 'Prize!', {
-          description: `${rewardLabel}${hitCopy}`,
-        })
       } else {
         playSfx('bad')
+        setLastDropReward(null)
         setLastDropMessage(
           result.isBonus
             ? 'Bonus Drop complete — all five balls missed.'
             : 'Missed the prize slots.',
         )
-        toast.info('Miss', {
-          description: result.isBonus
-            ? 'No prize from the five bonus balls.'
-            : 'No prize this drop.',
-        })
       }
     } finally {
       setBonusTargetsActive(true)
@@ -554,6 +552,9 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
 
       {/* UI Header */}
       <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-start z-50">
+        <div className="absolute top-4 left-4">
+          <PrizesModal buckets={config.board.buckets} />
+        </div>
         <div className="flex flex-col gap-2 items-center w-full pointer-events-none">
           <div
             className="border rounded-full px-4 py-1.5 flex items-center gap-3 backdrop-blur-sm shadow-lg transform -translate-y-2"
@@ -580,7 +581,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
               )?.toLocaleString() || '0'}
             </div>
             <div className="h-3 w-px bg-game-night-border/60" />
-            <div className="text-xs font-bold uppercase tracking-wider text-game-night-ink">
+            <div className="text-xs font-bold uppercase tracking-wider text-game-cream">
               BET: {cost?.amount || 0}
             </div>
           </div>
@@ -672,24 +673,20 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
             role="status"
             aria-live="polite"
           >
-            {lastDropMessage}
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-xs font-bold uppercase tracking-wide text-game-muted">
-            <div className="rounded-md border border-game-border bg-game-surface-raised px-3 py-2">
-              Spent {sessionCost.toLocaleString()}
-            </div>
-            <div className="rounded-md border border-game-border bg-game-surface-raised px-3 py-2">
-              Prizes {rewardCount}
-            </div>
+            <span className="flex items-center justify-center gap-2">
+              {lastDropReward?.kind === 'currency' ? (
+                <CurrencySprite currencyId={lastDropReward.id} alt="" width={24} height={24} />
+              ) : lastDropReward?.kind === 'item' ? (
+                <ItemSprite itemId={lastDropReward.id} alt="" width={24} height={24} />
+              ) : null}
+              {lastDropMessage}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Controls Section (Fixed Bottom) */}
       <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-4 px-4 z-50 pb-safe">
-        {/* Prizes Button */}
-        <PrizesModal buckets={config.board.buckets} />
-
         {/* Drop Button */}
         <Button
           type="button"
