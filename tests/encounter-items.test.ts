@@ -45,6 +45,22 @@ function getItem(itemId: string) {
 }
 
 describe('encounter item filtering', () => {
+  test('encounter item descriptions stay short and consistent across tiers', () => {
+    expect(getItem('bug-lure').description).toBe(
+      'Attracts Bug Pokemon & makes them easier to catch.',
+    )
+    expect(getItem('advanced-water-lure').description).toBe(
+      'Attracts Water Pokemon & makes them easier to catch.',
+    )
+    expect(getItem('repel').description).toBe('Keeps Away Weak Pokemon')
+    expect(getItem('super-repel').description).toBe(
+      'Keeps away all but strong Pokemon',
+    )
+    expect(getItem('max-repel').description).toBe(
+      'Keeps away all but the strongest Pokemon',
+    )
+  })
+
   test('mid-encounter item helpers exclude quest misc items and pre-encounter repels', () => {
     const bugLure = getItem('bug-lure')
     const advancedBugLure = getItem('advanced-bug-lure')
