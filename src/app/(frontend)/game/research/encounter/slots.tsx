@@ -17,7 +17,6 @@ import {
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
@@ -239,6 +238,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
   // Game State
   const [spinning, setSpinning] = useState(false)
   const [reels, setReels] = useState<string[]>(['?', '?', '?'])
+  const [spinMessage, setSpinMessage] = useState('Line up the symbols and spin.')
   const [result, setResult] = useState<any | null>(null)
 
   const [timeLeft, setTimeLeft] = useState(encounter.settings.timeLimit || 0)
@@ -277,12 +277,12 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
     const cost = encounter.settings.cost
     const balance = user?.currency?.[cost.currencyType] || 0
     if (balance < cost.amount) {
-      // Show error? For now just return
-      // Ideally toast or shake animation
+      setSpinMessage('Not enough currency to spin.')
       return
     }
 
     setSpinning(true)
+    setSpinMessage('Spinning…')
 
     // Call API
     const res = await spinSlotMachine(crypto.randomUUID())
@@ -290,7 +290,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
     if (!res.success) {
       console.error(res.error)
       setSpinning(false)
-      // Handle error
+      setSpinMessage(res.error || 'The spin could not be completed. Try again.')
       return
     }
 
@@ -316,9 +316,9 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
           label = payline.rewards[0].label
         }
 
-        toast.success(label, {
-          description: 'Added to your session winnings',
-        })
+        setSpinMessage(`${label} Added to your session winnings.`)
+      } else {
+        setSpinMessage('No prize this spin.')
       }
     }, 1500)
   }
@@ -447,6 +447,13 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
               backgroundColor: `color-mix(in srgb, ${themeColour} 50%, transparent)`,
             }}
           />
+        </div>
+        <div
+          className="mt-6 flex min-h-11 w-full max-w-md items-center justify-center rounded-md border border-game-border bg-game-surface-raised px-3 py-2 text-center text-sm font-semibold text-game-ink shadow-sm"
+          role="status"
+          aria-live="polite"
+        >
+          {spinMessage}
         </div>
       </div>
       {/* Controls Section (Fixed Bottom) */}
