@@ -351,7 +351,7 @@ export function GameInfoModal({
               <div
                 className={cn(
                   isDrawer
-                    ? 'border-y border-game-border/75 py-4'
+                    ? 'border-b border-game-border/75 py-4'
                     : 'rounded-md border border-game-border bg-game-surface-raised p-4',
                 )}
               >

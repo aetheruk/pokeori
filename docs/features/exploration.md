@@ -1,5 +1,7 @@
 # Exploration System
 
+- Release `0.49.12`: Explore cards no longer show a “Ready to claim” chip. Task Progress drawers also omit the extra full-width top rule because the section title already has divider lines.
+
 Explore locations, mine for items, and discover Pokemon.
 
 ## Locations
