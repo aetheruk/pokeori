@@ -391,37 +391,6 @@ function ExploreCardComponent({
             })}
           </div>
         )}
-        {isActiveExpedition && activeExpedition?.status === 'ready_to_claim' && (
-          <div
-            className={cn(
-              isGrouped
-                ? 'mt-2 text-[10px] font-bold uppercase tracking-wider truncate'
-                : 'mt-1.5 text-[10px] font-bold uppercase tracking-wider truncate',
-              isHighlighted ? 'text-game-ochre' : 'text-game-muted',
-            )}
-          >
-            {(() => {
-              if (
-                expeditionItem &&
-                activeExpedition &&
-                activeExpedition.expeditionId === expeditionItem.id
-              ) {
-                if (activeExpedition.status === 'ready_to_claim') {
-                  return (
-                    <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
-                      <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
-                      Ready to claim
-                    </div>
-                  )
-                }
-
-                return null
-              }
-
-              return null
-            })()}
-          </div>
-        )}
       </div>
     </Card>
   )

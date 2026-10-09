@@ -25,6 +25,7 @@
 - Release `0.49.9` fixes a duplicated word in a Celadon City task dialogue: “they definitely said Operation Shadow Force”.
 - Release `0.49.10` moves Inferior Fire, Water, and Thunder Stone crafting to Artisan 20, and Inferior Dusk, Sun, and Shiny Stone crafting to Artisan 40. Inferior Leaf and Ice Stone recipes remain at Artisan 30.
 - Release `0.49.11` gives Daily Task source hints their own “Available at” section heading in the Explore details modal.
+- Release `0.49.12` removes the “Ready to claim” chip from Explore cards and removes the extra full-width top rule above Task Progress in drawers.
 - Unreleased: Erika's Celadon Gym introduction spells out the Battle Team restriction as “Fire-type and Flying-type Pokémon” without the stray hyphen.
 
 - Unreleased: Detective Ray Choo’s Celadon skill-test battle now has dedicated result dialogue: he doubts the player is ready after a loss and praises their work after a win, with his name filled into both messages.
