@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.48.2`): Fishing hook results appear directly over the fishing scene without a solid result card. Hook result actions use charcoal text on raised paper buttons for legible labels.
 - Unreleased (`0.48.1`): Surf Catch's Explore details now preview the possible encounters, their count, and level range using the player's caught/seen visibility. Encounter sprites are 1.5× larger in the Surf game, and the top title chip has been removed.
 - Unreleased (`0.48.0`): Surf now supports a server-verified Catch mode alongside obstacle courses. The Kanto/Test Surf Catch entry generates batches of 20 weighted wild Pokemon, shows their authored variants and Alpha icon as they approach, and lets the player steer around them or collide to choose Battle or Capture. Collisions pause and discard the remaining batch; when a full batch passes without a collision, a fresh server-generated batch enters the same run. Catch mode has no obstacles, item pickups, points, or Surf rewards. Encounter identity, level, variant, Alpha status, and capture/battle handoff are read from the server's verified arcade session; after the selected encounter resolves, the player returns to Explore.
 

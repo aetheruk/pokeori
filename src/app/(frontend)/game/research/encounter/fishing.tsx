@@ -885,7 +885,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
         {/* CATCH RESULT UI (Appears immediately) */}
         {phase === 'hooked' && hookedData && (
           <div className="pointer-events-auto absolute inset-x-3 bottom-3 pb-[env(safe-area-inset-bottom)]">
-            <div className="game-paper-background mx-auto flex max-w-sm animate-in flex-col items-center gap-4 rounded-xl border border-game-border bg-game-surface p-4 text-game-ink shadow-xl fade-in slide-in-from-bottom-6 duration-300 lg:max-w-lg">
+            <div className="mx-auto flex max-w-sm animate-in flex-col items-center gap-4 px-2 py-3 fade-in slide-in-from-bottom-6 duration-300 lg:max-w-lg">
               <h2 className="flex max-w-[92%] items-center gap-1 text-center text-lg font-bold leading-tight tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                 {hookedData.type === 'pokemon' && hookedPokemon ? (
                   <>
@@ -935,6 +935,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="grid w-full grid-cols-3 gap-2">
                     <Button
+                      variant="outline"
                       className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                       onClick={handleRelease}
                       aria-label="Release Pokémon"
@@ -943,6 +944,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                       <span>Release</span>
                     </Button>
                     <Button
+                      variant="outline"
                       className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                       onClick={() => handleKeepCatch()}
                       disabled={isKeepingCatch}
@@ -952,6 +954,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                       <span>{isKeepingCatch ? 'Adding…' : 'Net'}</span>
                     </Button>
                     <Button
+                      variant="outline"
                       className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                       onClick={handleAttemptCatch}
                       aria-label="Catch Pokémon"
@@ -1002,6 +1005,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                   <div className="w-full">
                     <div className="grid grid-cols-3 gap-2">
                       <Button
+                        variant="outline"
                         className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                         onClick={handleRelease}
                         aria-label="Release item"
@@ -1010,6 +1014,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                         <span>Release</span>
                       </Button>
                       <Button
+                        variant="outline"
                         className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                         onClick={() => handleKeepCatch()}
                         disabled={isKeepingCatch}
@@ -1019,6 +1024,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                         <span>{isKeepingCatch ? 'Adding…' : 'Net'}</span>
                       </Button>
                       <Button
+                        variant="outline"
                         className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                         onClick={() => setShowTakeConfirm(true)}
                         disabled={isTakingItem}
