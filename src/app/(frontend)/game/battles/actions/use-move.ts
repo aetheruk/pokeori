@@ -71,10 +71,6 @@ import {
   applyHeldAttackBreak,
   applyHeldItemChargeOnHit,
 } from '@/utilities/battle/held-items'
-import {
-  applyShadowScreamDamage,
-  shouldShadowScream,
-} from '@/utilities/battle/shadow-pokemon'
 import type { MoveConfig } from '@/data/moves'
 import {
   applyEnemyAiMoveEffects,
@@ -625,36 +621,6 @@ export async function useMove(
 
     // --- PVE LOGIC ---
     const isZMove = isBasicAttack && !!playerMon.zMoveReady
-
-    if (shouldShadowScream(playerMon)) {
-      const screamDamage = applyShadowScreamDamage(playerMon)
-      const screamMessage = `${state.playerName}'s ${playerMon.name} screams out in pain! [icon:damage:${screamDamage}]`
-
-      if (playerMon.currentHp > 0) {
-        await processEnemyAttackOnly(
-          state,
-          playerMon,
-          enemyMon,
-          user,
-          screamMessage,
-          resolvedMoveStance,
-          { playerInventory: userInventory },
-        )
-      } else {
-        state.history.unshift({
-          turn: state.turn,
-          playerStance: resolvedMoveStance,
-          enemyStance: 'tech',
-          result: 'loss',
-          damageDealt: 0,
-          damageTaken: 0,
-          message: screamMessage,
-        })
-        await finalizeTurn(state, user.id, user)
-      }
-
-      return { success: true, state }
-    }
 
     const playerStatusCheck = resolveBeforeMoveStatus(playerMon)
     const playerAbilityCheck = playerStatusCheck.canMove

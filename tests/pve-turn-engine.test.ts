@@ -18,6 +18,7 @@ import {
 import { resolveMoveContest } from '@/utilities/battle/move-contest'
 import { resolveBeforeMoveStatus } from '@/utilities/battle/status-effects-logic'
 import { processTurnEnd } from '@/utilities/battle/turn-logic'
+import { calculateStats } from '@/utilities/battle/stats-calc'
 import {
   applySecondaryStatusesFromMove,
   getSecondaryStatusSwitchPreventionMessage,
@@ -149,17 +150,80 @@ describe('PVE turn engine helpers', () => {
     )
   })
 
-  test('shadow scream rolls at 20% and deals one eighth max HP to self', () => {
+  test('Shadow Pokemon scream every turn and take one eighth max HP damage without an action check', () => {
     const shadow = makePokemon({ isShadow: true, maxHp: 101, currentHp: 80 })
     const normal = makePokemon({ isShadow: false })
 
-    expect(shouldShadowScream(shadow, () => 0.19)).toBe(true)
-    expect(shouldShadowScream(shadow, () => 0.2)).toBe(false)
-    expect(shouldShadowScream(normal, () => 0)).toBe(false)
+    expect(shouldShadowScream(shadow)).toBe(true)
+    expect(shouldShadowScream(normal)).toBe(false)
 
     const damage = applyShadowScreamDamage(shadow)
     expect(damage).toBe(13)
     expect(shadow.currentHp).toBe(67)
+  })
+
+  test('end of turn applies Shadow pain to both active Pokemon without skipping the turn', () => {
+    const player = makePokemon({ name: 'Player Shadow', isShadow: true, maxHp: 101, currentHp: 80 })
+    const enemy = makePokemon({ id: 'enemy', name: 'Enemy Shadow', isShadow: true, maxHp: 120, currentHp: 100 })
+    const state = makeState(player, enemy)
+    state.history.push({
+      turn: state.turn,
+      playerStance: 'power',
+      enemyStance: 'tech',
+      result: 'win',
+      damageDealt: 20,
+      damageTaken: 10,
+      message: 'Player Shadow used Tackle.',
+    })
+
+    const messages = processTurnEnd(state)
+
+    expect(player.currentHp).toBe(67)
+    expect(enemy.currentHp).toBe(85)
+    expect(messages).toEqual([
+      "Player's Player Shadow screams out in pain! [icon:damage:13]",
+      "Enemy's Enemy Shadow screams out in pain! [icon:damage:15]",
+    ])
+    expect(state.history[0].message).toContain('used Tackle')
+  })
+
+  test('Shadow Pokemon gain ten percent Attack and Special Attack only', () => {
+    const basePokemon = {
+      formId: '1',
+      level: 50,
+      ivs: {
+        hp: 0,
+        attack: 0,
+        defense: 0,
+        specialAttack: 0,
+        specialDefense: 0,
+        speed: 0,
+      },
+      evs: {
+        hp: 0,
+        attack: 0,
+        defense: 0,
+        specialAttack: 0,
+        specialDefense: 0,
+        speed: 0,
+      },
+    } as Parameters<typeof calculateStats>[0]
+    const normal = calculateStats(basePokemon)
+    const shadow = calculateStats({ ...basePokemon, isShadow: true })
+
+    expect(shadow.attack).toBe(Math.floor(normal.attack * 1.1))
+    expect(shadow.specialAttack).toBe(Math.floor(normal.specialAttack * 1.1))
+    expect(shadow.defense).toBe(normal.defense)
+    expect(shadow.specialDefense).toBe(normal.specialDefense)
+    expect(shadow.speed).toBe(normal.speed)
+    expect(shadow.hp).toBe(normal.hp)
+
+    const shadowWithCachedStats = calculateStats({
+      ...basePokemon,
+      isShadow: true,
+      stats: normal,
+    })
+    expect(shadowWithCachedStats).toEqual(shadow)
   })
 
   test('calculates and applies PVE damage exchange', () => {

@@ -64,6 +64,7 @@ import {
 } from '@/utilities/battle/move-effects'
 import { decrementFaintedPokemonFriendship } from '@/utilities/battle/friendship'
 import { processBattleRarityTurnEnd } from '@/utilities/battle/rarity-effects'
+import { applyShadowTurnPain } from '@/utilities/battle/shadow-pokemon'
 import {
   beginBattlePresentation,
   finalizeBattlePresentation,
@@ -301,7 +302,7 @@ export async function resolvePvpTurn(
   const p1Mon = state.playerTeam[state.activePlayerIndex]
   const p2Mon = state.enemyTeam[state.activeEnemyIndex]
   if (p1Mon.currentHp <= 0 || p2Mon.currentHp <= 0) {
-    // A pre-action effect (for example a Shadow scream in a spectator battle)
+    // A pre-action effect (for example a battle power)
     // can knock out its user before combat. Let faint resolution handle it
     // without either side attacking an already-fainted Pokemon.
     p1UsedPower = true
@@ -764,6 +765,20 @@ export async function resolvePvpTurn(
   ]
   if (rarityTurnEndMessages.length > 0) {
     logMessage += `\n${rarityTurnEndMessages.join('\n')}`
+  }
+
+  const shadowPainMessages = [
+    applyShadowTurnPain(
+      state.playerTeam[state.activePlayerIndex],
+      state.playerName,
+    ),
+    applyShadowTurnPain(
+      state.enemyTeam[state.activeEnemyIndex],
+      state.enemyName,
+    ),
+  ].filter((message): message is string => Boolean(message))
+  if (shadowPainMessages.length > 0) {
+    logMessage += `\n${shadowPainMessages.join('\n')}`
   }
 
   const p1FaintedMon = state.playerTeam[state.activePlayerIndex]

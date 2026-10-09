@@ -125,7 +125,7 @@ describe('Battle Bets', () => {
     expect(resolved.enemyTeam[0].currentHp).toBe(resolved.enemyTeam[0].maxHp)
   })
 
-  test('does not attack a Shadow Pokemon that faints before combat', async () => {
+  test('does not attack a Pokemon that has fainted before combat', async () => {
     const state = makePvpBattleState()
     state.playerTeam = [state.playerTeam[0]]
     state.enemyTeam = [state.enemyTeam[0]]
@@ -137,8 +137,7 @@ describe('Battle Bets', () => {
       {
         stance: 'tech',
         skipAction: true,
-        spectatorMessage:
-          "Rocket Grunt F's P1 Mon screams out in pain! [icon:damage:15]",
+        spectatorMessage: 'The Pokemon fainted before combat.',
       },
       { stance: 'power', attackType: 'normal' },
       { persist: false, random: () => 0.99 },
@@ -146,6 +145,6 @@ describe('Battle Bets', () => {
 
     expect(resolved.enemyTeam[0].currentHp).toBe(maleHp)
     expect(resolved.status).toBe('lost')
-    expect(resolved.history[0]?.message).toContain('screams out in pain')
+    expect(resolved.history[0]?.message).toContain('fainted before combat')
   })
 })

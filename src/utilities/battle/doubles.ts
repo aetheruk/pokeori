@@ -22,6 +22,7 @@ import { tickDisabledStance } from './stance-disable'
 import { processBattleAbilityTurnEndEffects, processBattleAbilitySuppressionForState, processBattleAbilityWeatherSet, processBattleAbilityTerrainSet } from './abilities'
 import { processBattleAbilitySwitchOut } from './switching'
 import { processBattleRarityTurnEnd } from './rarity-effects'
+import { applyShadowTurnPain } from './shadow-pokemon'
 import { markPlayerPokemonInvolved } from './participants'
 import { resetBattleTypeChange } from './tera'
 import { clearZMoveCharge } from './z-move'
@@ -603,6 +604,24 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     const berry=restoreConsumedBerryByAbility(mon,state.weather?.weather)
     if(berry.applied) messages.push(berry.message)
     messages.push(...processBattleRarityTurnEnd(mon))
+    const hpBeforeShadowPain = mon.currentHp
+    const shadowPainMessage = applyShadowTurnPain(
+      mon,
+      state.playerTeam.includes(mon) ? state.playerName : state.enemyName,
+    )
+    if (shadowPainMessage) {
+      messages.push(shadowPainMessage)
+      const side = state.playerTeam.includes(mon) ? 'player' : 'enemy'
+      pushEvent({
+        type: 'hp-change',
+        side,
+        pokemonIndex: getDoublesTeam(state, side).indexOf(mon),
+        kind: 'damage',
+        amount: hpBeforeShadowPain - mon.currentHp,
+        hpAfter: mon.currentHp,
+        message: shadowPainMessage,
+      })
+    }
     advanceTeraDuration(mon,state.turn)
     advanceBattleTypeChangeDuration(mon)
     if(mon.nextDamageModifier?.sourceMoveName==='Helping Hand') mon.nextDamageModifier=undefined
