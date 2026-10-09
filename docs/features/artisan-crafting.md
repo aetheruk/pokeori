@@ -1,5 +1,7 @@
 # Artisan Crafting
 
+- Release `0.49.10`: Inferior Fire, Water, and Thunder Stone recipes unlock at Artisan 20; Inferior Dusk, Sun, and Shiny Stone recipes unlock at Artisan 40. Inferior Leaf and Ice Stone recipes stay at Artisan 30.
+
 Artisan introduces a dedicated material and recipe loop in `/game/artisan`.
 
 ## Core Loop
