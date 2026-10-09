@@ -726,11 +726,11 @@ export function FishingGame({ encounter }: FishingGameProps) {
               in your keep net, you’ll need to successfully capture a Pokémon.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter className="flex-row justify-end gap-2">
             <Button
               type="button"
               variant="outline"
-              className="border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface"
+              className="flex-1 border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface"
               disabled={isTakingItem}
               onClick={() => setShowTakeConfirm(false)}
             >
@@ -738,7 +738,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
             </Button>
             <Button
               type="button"
-              className="border border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface"
+              className="flex-1 border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
               disabled={isTakingItem}
               onClick={() => void handleTakeItem()}
             >
@@ -1057,6 +1057,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
         <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-4 px-4 z-50 pb-safe pointer-events-auto">
           <Button
             size="lg"
+            variant="outline"
             className={cn(
               'h-12 w-full max-w-md border border-game-border bg-game-surface-raised text-base !text-game-ink shadow-lg hover:bg-game-surface',
             )}

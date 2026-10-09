@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.48.4`): Fishing's Stay and Leave choices appear side by side, with contrasting paper and charcoal button treatments. The fixed Cast/Hook/Try Again button uses charcoal text for legibility against its light surface.
 - Unreleased (`0.48.3`): A Fishing keep net is preserved when a failed catch leaves the hooked Pokémon nearby for another attempt, and is forfeited only when the encounter ends with the Pokémon fleeing. The global Fishing item pool now includes common Broken Balls, Poké Balls, and Metal Scrap plus uncommon Great Balls and Drake Scales.
 - Unreleased (`0.48.2`): Fishing hook results appear directly over the fishing scene without a solid result card. Hook result actions use charcoal text on raised paper buttons for legible labels.
 - Unreleased (`0.48.1`): Surf Catch's Explore details now preview the possible encounters, their count, and level range using the player's caught/seen visibility. Encounter sprites are 1.5× larger in the Surf game, and the top title chip has been removed.
