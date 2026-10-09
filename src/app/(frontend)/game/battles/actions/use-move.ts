@@ -882,6 +882,7 @@ export async function useMove(
       defender: enemyMon,
       attackType: resolvedMoveType,
       terrain: state.terrain?.terrain,
+      opposingStance: enemyStance,
       random: Math.random,
     })
     const stanceOutcome = contest.configured
@@ -912,6 +913,7 @@ export async function useMove(
             defender: playerMon,
             attackType: enemyAiMove.attackType,
             terrain: state.terrain?.terrain,
+            opposingStance: resolvedMoveStance,
             random: Math.random,
           })
         : undefined

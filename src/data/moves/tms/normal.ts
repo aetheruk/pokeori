@@ -673,6 +673,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
       attackerMetric: 'effective-stat:speed',
       defenderMetric: 'effective-stat:speed',
       comparison: 'greaterThan',
+      failIfCounteredByStance: true,
       success: {
         damageMultiplier: 1,
         preventCounter: true,
@@ -703,6 +704,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
       attackerMetric: 'effective-stat:speed',
       defenderMetric: 'effective-stat:speed',
       comparison: 'lessThan',
+      failIfCounteredByStance: true,
       success: {
         damageMultiplier: 1,
         preventCounter: true,
@@ -733,6 +735,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
       attackerMetric: 'effective-stat:attack',
       defenderMetric: 'effective-stat:attack',
       comparison: 'greaterThan',
+      failIfCounteredByStance: true,
       success: {
         damageMultiplier: 1,
         preventCounter: true,
@@ -763,6 +766,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
       attackerMetric: 'effective-stat:attack',
       defenderMetric: 'effective-stat:attack',
       comparison: 'lessThan',
+      failIfCounteredByStance: true,
       success: {
         damageMultiplier: 1,
         preventCounter: true,
@@ -793,6 +797,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
       attackerMetric: 'effective-stat:specialAttack',
       defenderMetric: 'effective-stat:specialAttack',
       comparison: 'greaterThan',
+      failIfCounteredByStance: true,
       success: {
         damageMultiplier: 1,
         preventCounter: true,
@@ -823,6 +828,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
       attackerMetric: 'effective-stat:specialAttack',
       defenderMetric: 'effective-stat:specialAttack',
       comparison: 'lessThan',
+      failIfCounteredByStance: true,
       success: {
         damageMultiplier: 1,
         preventCounter: true,

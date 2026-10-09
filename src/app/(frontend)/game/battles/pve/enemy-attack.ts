@@ -465,6 +465,7 @@ export async function processEnemyAttackOnly(
         defender: playerMon,
         attackType: enemyBattleAction.attackType,
         terrain: state.terrain?.terrain,
+        opposingStance: playerStanceForMetrics ?? 'tech',
         random: Math.random,
       })
       enemyMoveFailed = enemyContest.failMove

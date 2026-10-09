@@ -843,6 +843,54 @@ describe('PVP turn engine helpers', () => {
     expect(result.message).toContain('avoided the counterattack')
   })
 
+  test('Quick Attack fails when the opponent counters its stance despite a Speed advantage', () => {
+    const attacker = makePokemon({
+      name: 'Fast Attacker',
+      stats: {
+        hp: 100,
+        attack: 50,
+        defense: 50,
+        specialAttack: 50,
+        specialDefense: 50,
+        speed: 100,
+      },
+    })
+    const defender = makePokemon({
+      name: 'Defender',
+      currentHp: 100,
+      maxHp: 100,
+      stats: {
+        hp: 100,
+        attack: 50,
+        defense: 50,
+        specialAttack: 50,
+        specialDefense: 50,
+        speed: 10,
+      },
+    })
+
+    const result = resolvePvpCombat({
+      attacker,
+      defender,
+      move: {
+        stance: 'speed',
+        attackType: 'normal',
+        specialMoveId: 'quick-attack',
+      },
+      attackerName: 'Player',
+      attackerSide: 'player',
+      playerMove: { stance: 'speed', specialMoveId: 'quick-attack' },
+      enemyMove: { stance: 'tech' },
+    })
+
+    expect(result.didAttack).toBe(false)
+    expect(result.result).toBe('loss')
+    expect(result.dmg).toBe(0)
+    expect(result.preventsOpponentDamage).toBe(false)
+    expect(defender.currentHp).toBe(100)
+    expect(result.message).toContain('countered by the opposing tech stance')
+  })
+
   test('Stall prevents priority moves from avoiding counter damage', () => {
     const attacker = makePokemon({
       name: 'Sableye',

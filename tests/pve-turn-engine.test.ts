@@ -631,6 +631,19 @@ describe('PVE turn engine helpers', () => {
     expect(fasterChoice?.move.id).toBe('quick-attack')
     expect(fasterChoice?.basePower).toBeGreaterThan(0)
     expect(state.enemyMoveUsesRemaining).toBe(0)
+
+    const counterState = makeState(player, enemy)
+    counterState.enemyMoveUsesRemaining = 1
+    counterState.ai = { version: 1, profile: 'boss' }
+    const counteredChoice = chooseEnemyAiMove({
+      state: counterState,
+      enemyMon: enemy,
+      playerMon: player,
+      playerStance: 'tech',
+      random: () => 0.5,
+    })
+    expect(counteredChoice).toBeUndefined()
+    expect(counterState.enemyMoveUsesRemaining).toBe(1)
   })
 
   test('enemy AI applies authored stance disable effects', () => {

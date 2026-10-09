@@ -7,6 +7,7 @@ import type {
 } from '@/data/moves/types'
 import type { TerrainType } from '@/data/terrain'
 import type { BattlePokemon } from './types'
+import type { BattleStance } from './types'
 import {
   DEFAULT_STAT_STAGES,
   getStatStageMultiplier,
@@ -16,6 +17,7 @@ import {
   getTerrainMoveBlockMessage,
   getTerrainPriorityBlockMessage,
 } from './terrain-effects'
+import { resolveStance } from './turn-resolution'
 
 type ContestBattleStat =
   | 'attack'
@@ -30,6 +32,7 @@ export interface MoveContestResolution {
   damageMultiplier?: number
   failMove: boolean
   preventCounter: boolean
+  counteredByStance?: boolean
   result: 'win' | 'loss' | 'tie'
   message: string
 }
@@ -122,6 +125,7 @@ export function resolveMoveContest(params: {
   defender: BattlePokemon
   attackType?: string
   terrain?: TerrainType
+  opposingStance?: BattleStance
   random?: () => number
 }): MoveContestResolution {
   const { move, attacker, defender } = params
@@ -192,7 +196,13 @@ export function resolveMoveContest(params: {
   const attackerValue = getPokemonFieldValue(attacker, contest.attackerMetric)
   const defenderMetric = contest.defenderMetric ?? contest.attackerMetric
   const defenderValue = getPokemonFieldValue(defender, defenderMetric)
-  const success = compareValues(
+  const counteredByStance = Boolean(
+    contest.failIfCounteredByStance &&
+      params.opposingStance &&
+      move.stance !== 'random' &&
+      resolveStance(move.stance, params.opposingStance).result === 'loss',
+  )
+  const success = !counteredByStance && compareValues(
     attackerValue,
     defenderValue,
     contest.comparison,
@@ -203,15 +213,18 @@ export function resolveMoveContest(params: {
     configured: true,
     success,
     damageMultiplier: outcome?.damageMultiplier,
-    failMove: outcome?.failMove ?? false,
-    preventCounter: outcome?.preventCounter ?? false,
-    result: outcome?.result ?? (success ? 'win' : 'loss'),
-    message: formatContestMessage(outcome?.message, {
-      attacker,
-      defender,
-      move,
-      attackerValue,
-      defenderValue,
-    }),
+    failMove: counteredByStance || (outcome?.failMove ?? false),
+    preventCounter: counteredByStance ? false : (outcome?.preventCounter ?? false),
+    counteredByStance,
+    result: counteredByStance ? 'loss' : (outcome?.result ?? (success ? 'win' : 'loss')),
+    message: counteredByStance
+      ? `${move.name} was countered by the opposing ${params.opposingStance} stance!`
+      : formatContestMessage(outcome?.message, {
+          attacker,
+          defender,
+          move,
+          attackerValue,
+          defenderValue,
+        }),
   }
 }
