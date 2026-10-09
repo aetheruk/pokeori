@@ -199,6 +199,13 @@ function assertExplorerXp(level: number, multiplier: number) {
     ) * multiplier,
   )
 }
+function assertFishingExplorerXpBonus(level: number, pokemonCount: number) {
+  const rewards = grantedRewards.at(-1)!
+  const bonus = rewards
+    .filter((reward) => reward.type === 'xp' && reward.skill === 'catching')
+    .at(-1)
+  assert.equal(bonus?.quantity, Math.floor(level + 1.1 * pokemonCount))
+}
 assertExplorerXp(alpha.level, 5)
 for (const field of [
   'level',
@@ -464,7 +471,7 @@ try {
     assert.equal(start.level, 11)
     const fishingCapture = store.get('encounter:owner')
     assert.equal(
-      fishingCapture.fishingExplorerXpMultiplier,
+      fishingCapture.fishingCatchCrystalMultiplier,
       rodType === 'good' ? 4.2 : 1,
     )
     assert.equal(fishingCapture.baseCatchRate, 0)
@@ -510,7 +517,8 @@ try {
     }
     assert.equal(ownedPokemon.obtainedRegion, 'Kanto')
     assert.equal(ownedPokemon.obtainedSourceId, fishingConfig.id)
-    assertExplorerXp(11, rodType === 'good' ? 21 : 5)
+    assertExplorerXp(11, 5)
+    assertFishingExplorerXpBonus(11, rodType === 'good' ? 8 : 0)
     if (rodType === 'good') {
       const captureRewards = grantedRewards.at(-1)!
       assert.equal(
@@ -696,7 +704,7 @@ try {
     questionsAnswered: [],
     itemsUsed: [],
     fishingKeepNet,
-    fishingExplorerXpMultiplier: 1,
+    fishingCatchCrystalMultiplier: 1,
     captureAttempts: 0,
   })
   let failedThrowRoll = 0

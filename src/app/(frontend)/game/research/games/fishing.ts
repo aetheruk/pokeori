@@ -76,7 +76,7 @@ import {
 import {
   FISHING_KEEP_NET_CAPACITY,
   getFishingAlphaChanceMultiplier,
-  getFishingExplorerXpMultiplier,
+  getFishingCatchCrystalMultiplier,
   getFishingItemChance,
   getFishingShinyChanceMultiplier,
   getSameFormKeepNetCount,
@@ -1221,7 +1221,7 @@ export async function startFishingCatch() {
         })),
         weather: fishingState.weather,
         fishingKeepNet: keepNet.entries,
-        fishingExplorerXpMultiplier: getFishingExplorerXpMultiplier(
+        fishingCatchCrystalMultiplier: getFishingCatchCrystalMultiplier(
           getSameFormKeepNetCount(keepNet.entries, formId),
         ),
         encounterMode: encounter.settings.safariCapture ? 'safari' : 'standard',

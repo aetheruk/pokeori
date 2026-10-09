@@ -93,7 +93,7 @@ import {
 } from '@/utilities/pokemon/alpha'
 import {
   applyFishingCatchCrystalMultiplier,
-  applyFishingExplorerXpMultiplier,
+  getFishingExplorerXpBonus,
   buildFishingKeepNetCaptureRewards,
 } from '@/utilities/fishing/keep-net'
 
@@ -148,7 +148,7 @@ async function forfeitFishingNetOnFailure(
   const keepNetLost = (state.fishingKeepNet?.length || 0) > 0
   await redisClient.del(`fishing:keep-net:${userId}`)
   state.fishingKeepNet = []
-  state.fishingExplorerXpMultiplier = 1
+  state.fishingCatchCrystalMultiplier = 1
   return keepNetLost
 }
 
@@ -971,7 +971,7 @@ export async function attemptCapture(
       state.locationId.startsWith('fishing:')
         ? applyFishingCatchCrystalMultiplier(
             captureCrystalReward,
-            state.fishingExplorerXpMultiplier || 1,
+            state.fishingCatchCrystalMultiplier || 1,
           )
         : captureCrystalReward,
     )
@@ -1036,18 +1036,26 @@ export async function attemptCapture(
       })
     }
 
+    const rewardsWithAlphaModifiers = applyAlphaCaptureBonuses(
+      applyAlphaCaptureXp(rewardsToGrant, isAlphaCapture),
+      isAlphaCapture,
+    )
+    if (state.locationId.startsWith('fishing:')) {
+      rewardsWithAlphaModifiers.push({
+        type: 'xp',
+        skill: 'catching',
+        quantity: getFishingExplorerXpBonus(
+          level,
+          explorerLevel,
+          state.fishingKeepNet || [],
+        ),
+        dropChance: 100,
+      })
+    }
+
     const { summary } = await grantRewards(
       user.id,
-      applyAlphaCaptureBonuses(
-        applyAlphaCaptureXp(
-          applyFishingExplorerXpMultiplier(
-            rewardsToGrant,
-            state.fishingExplorerXpMultiplier || 1,
-          ),
-          isAlphaCapture,
-        ),
-        isAlphaCapture,
-      ),
+      rewardsWithAlphaModifiers,
       {
         requirementContext: rewardRequirementContext,
         payload, req,
