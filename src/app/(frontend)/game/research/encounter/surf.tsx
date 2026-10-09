@@ -3,20 +3,37 @@
 import { DoorOpen } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
+import {
+  type PointerEvent as ReactPointerEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
+import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 import { Button } from '@/components/ui/button'
 import type { SurfGameConfig } from '@/data/games/surf/types'
+import { chooseSurfPokemon } from '@/app/(frontend)/game/research/games/surf-catch'
+import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { useArcadeSession } from '@/hooks/use-arcade-session'
-import { clampSurfPlayerX, getSurfCoursePosition, getSurfEmergenceOpacity, getSurfParallaxFrames } from '@/utilities/research/surf'
+import {
+  clampSurfPlayerX,
+  getSurfCoursePosition,
+  getSurfEmergenceOpacity,
+  getSurfParallaxFrames,
+} from '@/utilities/research/surf'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 
 const DESIGN_WIDTH = 390
 const DESIGN_HEIGHT = 844
 const PLAYER_Y = 0.79
-interface SurfGameProps { encounter: SurfGameConfig; initialState?: any }
+interface SurfGameProps {
+  encounter: SurfGameConfig
+  initialState?: any
+}
 
 export function SurfGame({ encounter, initialState }: SurfGameProps) {
   useGameMusic(encounter)
@@ -28,6 +45,8 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const targetXRef = useRef(0.5)
   const playerXRef = useRef(0.5)
   const [spriteFramesFailed, setSpriteFramesFailed] = useState(false)
+  const [choicePending, setChoicePending] = useState(false)
+  const [choiceError, setChoiceError] = useState<string | null>(null)
   const playerX = simulation?.playerX ?? 0.5
   playerXRef.current = playerX
   targetXRef.current = simulation?.targetX ?? 0.5
@@ -35,6 +54,8 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const score = simulation?.score || 0
   const obstacles = simulation?.surfObstacles || []
   const collectibles = simulation?.collectibles || []
+  const surfPokemon = simulation?.surfPokemon || []
+  const pendingPokemon = simulation?.pendingSurfPokemon
   const gameEnded = Boolean(simulation && simulation.status !== 'playing')
   const startError: string | null = null
   const isEndlessMode = settings.endless?.enabled === true
@@ -43,26 +64,65 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const normalizedPlayerWidth = playerWidth / DESIGN_WIDTH
   const normalizedPlayerHeight = playerHeight / DESIGN_HEIGHT
   const spriteFrameIndex = settings.spriteFrames?.length
-    ? Math.floor(waterOffset / (settings.spriteFrameDistance || 24)) % settings.spriteFrames.length : 0
+    ? Math.floor(waterOffset / (settings.spriteFrameDistance || 24)) %
+      settings.spriteFrames.length
+    : 0
   const replay = session.replay
+
+  const chooseEncounter = async (choice: 'battle' | 'capture') => {
+    if (!pendingPokemon || !session.sessionId || choicePending) return
+    setChoicePending(true)
+    setChoiceError(null)
+    const response = await chooseSurfPokemon(
+      encounter.id,
+      session.sessionId,
+      choice,
+    )
+    if (response.success) {
+      router.push(response.redirect)
+      return
+    }
+    setChoiceError(response.error)
+    setChoicePending(false)
+  }
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, [role="dialog"]')) return
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest('input, textarea, select, button, [role="dialog"]')
+      )
+        return
       if (!['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(event.key)) return
       event.preventDefault()
       if (event.repeat) return
-      session.sendInput('steer', event.type === 'keyup' ? playerXRef.current : ['ArrowLeft', 'a'].includes(event.key) ? 0 : 1)
+      session.sendInput(
+        'steer',
+        event.type === 'keyup'
+          ? playerXRef.current
+          : ['ArrowLeft', 'a'].includes(event.key)
+            ? 0
+            : 1,
+      )
     }
     window.addEventListener('keydown', onKey)
     window.addEventListener('keyup', onKey)
-    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKey) }
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('keyup', onKey)
+    }
   }, [session.sendInput])
 
   const steerToPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (gameEnded || countdown > 0) return
     const bounds = event.currentTarget.getBoundingClientRect()
-    session.sendInput('steer', clampSurfPlayerX((event.clientX - bounds.left) / bounds.width, normalizedPlayerWidth))
+    session.sendInput(
+      'steer',
+      clampSurfPlayerX(
+        (event.clientX - bounds.left) / bounds.width,
+        normalizedPlayerWidth,
+      ),
+    )
   }
 
   const waterMotionOffset = waterOffset % 2400
@@ -302,6 +362,45 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           )
         })}
 
+        {settings.mode === 'catch'
+          ? surfPokemon.map((pokemon) => {
+              const position = getSurfCoursePosition(
+                pokemon.x,
+                pokemon.progress,
+              )
+              const opacity = getSurfEmergenceOpacity(pokemon.progress)
+              const size = 76 * position.scale
+              return (
+                <div
+                  key={pokemon.id}
+                  className="absolute z-30 -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    left: `${position.x * 100}%`,
+                    top: `${position.y * 100}%`,
+                    width: size,
+                    height: size,
+                    opacity,
+                  }}
+                >
+                  <PokemonRaritySprite
+                    formId={pokemon.formId}
+                    view="front"
+                    rarity={pokemon.rarity}
+                    alt={`Wild Pokémon ${pokemon.speciesId}`}
+                    className="h-full w-full"
+                    sizes={`${Math.ceil(size)}px`}
+                  />
+                  {pokemon.isAlpha ? (
+                    <AlphaIcon
+                      size={Math.max(8, Math.round(18 * position.scale))}
+                      className="absolute right-0 top-0 z-10 drop-shadow-md"
+                    />
+                  ) : null}
+                </div>
+              )
+            })
+          : null}
+
         <div
           aria-hidden
           className="absolute z-30 -translate-x-1/2 -translate-y-1/2"
@@ -371,17 +470,23 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
               <GameTimer timeLeft={timeLeft} totalTime={settings.timeLimit} />
             ) : null}
           </div>
-          <div className="rounded-md border border-game-border/70 bg-game-surface/90 px-4 py-2 text-center text-game-ink shadow-lg backdrop-blur-md">
-            <p className="text-[10px] font-semibold text-game-muted">
-              Distance
-            </p>
-            <p className="font-mono text-lg font-bold leading-none">
-              {Math.floor(score)}
-              {!isEndlessMode && settings.winScore
-                ? ` / ${settings.winScore}`
-                : ''}
-            </p>
-          </div>
+          {settings.mode === 'catch' ? (
+            <div className="rounded-md border border-game-border/70 bg-game-surface/90 px-4 py-2 text-center text-sm font-semibold text-game-ink shadow-lg backdrop-blur-md">
+              Wild Encounters
+            </div>
+          ) : (
+            <div className="rounded-md border border-game-border/70 bg-game-surface/90 px-4 py-2 text-center text-game-ink shadow-lg backdrop-blur-md">
+              <p className="text-[10px] font-semibold text-game-muted">
+                Distance
+              </p>
+              <p className="font-mono text-lg font-bold leading-none">
+                {Math.floor(score)}
+                {!isEndlessMode && settings.winScore
+                  ? ` / ${settings.winScore}`
+                  : ''}
+              </p>
+            </div>
+          )}
           <Button
             type="button"
             size="icon"
@@ -424,6 +529,59 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           </div>
         ) : null}
       </div>
+
+      {settings.mode === 'catch' && pendingPokemon ? (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-[#071923]/65 p-5 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-xl border border-game-border bg-game-surface p-5 text-center text-game-ink shadow-2xl">
+            <div className="relative mx-auto mb-3 h-32 w-32">
+              <PokemonRaritySprite
+                formId={pendingPokemon.formId}
+                view="front"
+                rarity={pendingPokemon.rarity}
+                alt={`Wild Pokémon ${pendingPokemon.speciesId}`}
+                className="h-full w-full"
+                sizes="128px"
+              />
+              {pendingPokemon.isAlpha ? (
+                <AlphaIcon size={24} className="absolute right-1 top-1 z-10" />
+              ) : null}
+            </div>
+            <p className="font-semibold">
+              A wild {getPokemonForm(pendingPokemon.formId)?.name || 'Pokémon'}{' '}
+              appeared!
+            </p>
+            <p className="mt-1 text-sm text-game-muted">
+              Choose how to approach it.
+            </p>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <Button
+                className="min-h-11"
+                disabled={choicePending}
+                onClick={() => void chooseEncounter('battle')}
+              >
+                Battle
+              </Button>
+              <Button
+                className="min-h-11"
+                disabled={choicePending}
+                onClick={() => void chooseEncounter('capture')}
+              >
+                Capture
+              </Button>
+            </div>
+            {choicePending ? (
+              <p role="status" className="mt-3 text-sm text-game-muted">
+                Preparing encounter…
+              </p>
+            ) : null}
+            {choiceError ? (
+              <p role="alert" className="mt-3 text-sm text-game-clay">
+                {choiceError}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {result ? (
         <RewardResultOverlay

@@ -1100,6 +1100,7 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
     .passthrough(),
   surf: z
     .object({
+      mode: z.enum(['course', 'catch']).optional(),
       speed: z.number().positive(),
       maxSpeed: z.number().positive().optional(),
       acceleration: z.number().nonnegative().optional(),
@@ -1113,7 +1114,7 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
       obstacleFrequency: z.object({
         min: z.number().positive(),
         max: z.number().positive(),
-      }),
+      }).optional(),
       obstacles: z
         .array(
           z
@@ -1127,7 +1128,33 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
             })
             .strict(),
         )
-        .min(1),
+        .optional(),
+      pokemonPool: z.array(z.object({
+        speciesId: z.number().int().positive(),
+        formId: z.string().optional(),
+        level: z.union([
+          z.number().int().min(1).max(100),
+          z
+            .object({
+              min: z.number().int().min(1).max(100),
+              max: z.number().int().min(1).max(100),
+            })
+            .strict()
+            .refine((range) => range.max >= range.min),
+        ]),
+        weight: z.number().positive(),
+        rarity: z.string().refine(isPokemonRarityId).optional(),
+        rarityChances: z.record(z.string(), z.number().min(0).max(1)).optional(),
+        shiny: z.boolean().optional(),
+        isShadow: z.boolean().optional(),
+        isRadiant: z.boolean().optional(),
+        gender: z.enum(['male', 'female', 'genderless']).optional(),
+      }).passthrough()).optional(),
+      pokemonSpawnFrequency: z.object({
+        min: z.number().positive(),
+        max: z.number().positive(),
+      }).optional(),
+      allowAlpha: z.boolean().optional(),
       scene: z
         .object({
           backdrop: z.string().min(1),
@@ -1145,8 +1172,14 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
     })
     .passthrough()
     .refine(
-      (settings) => settings.obstacleFrequency.max >= settings.obstacleFrequency.min,
+      (settings) => settings.mode === 'catch'
+        ? Boolean(settings.pokemonPool?.length && settings.pokemonSpawnFrequency && settings.pokemonSpawnFrequency.max >= settings.pokemonSpawnFrequency.min)
+        : Boolean(settings.obstacleFrequency && settings.obstacles?.length && settings.obstacleFrequency.max >= settings.obstacleFrequency.min),
       { path: ['obstacleFrequency'], message: 'Surf obstacle frequency max must be at least min.' },
+    )
+    .refine(
+      (settings) => settings.mode !== 'catch' || (settings.obstacles?.length ?? 0) === 0,
+      { path: ['obstacles'], message: 'Surf catch mode cannot include obstacles.' },
     )
     .refine(
       (settings) => !settings.maxSpeed || settings.maxSpeed >= settings.speed,

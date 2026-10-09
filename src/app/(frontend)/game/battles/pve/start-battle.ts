@@ -88,7 +88,10 @@ import {
   processBattleAbilityWeatherSet,
 } from '@/utilities/battle/abilities'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
-import { resolveGeneratedPokemonRarity, resolveRarityChances } from '@/utilities/pokemon/rarity-chances'
+import {
+  resolveGeneratedPokemonRarity,
+  resolveRarityChances,
+} from '@/utilities/pokemon/rarity-chances'
 import { getBattleMoveOptions } from '@/utilities/pokemon/pokemon-moves'
 import {
   KID_MODE_ACCESS_ERROR,
@@ -116,13 +119,12 @@ export async function startBattle(
     (battleConfig as any).expeditionOnly === true ||
     isExpeditionActivity('battle', battleConfig.id)
   if (isExpeditionActivityContent) {
-    const expeditionStepStatus =
-      await getExpeditionActivityStepStatusForUser(
-        payload,
-        user.id,
-        'battle',
-        battleConfig.id,
-      )
+    const expeditionStepStatus = await getExpeditionActivityStepStatusForUser(
+      payload,
+      user.id,
+      'battle',
+      battleConfig.id,
+    )
     if (expeditionStepStatus !== 'current') {
       return {
         success: false,
@@ -311,6 +313,13 @@ export async function startBattleFromConfig(
   battleConfig: BattleConfig,
   options: {
     dynamic?: boolean
+    fixedWildPokemon?: {
+      speciesId: number
+      formId: string
+      level: number
+      rarity: import('@/utilities/pokemon/rarity-effects').PokemonRarityId
+      isAlpha: boolean
+    }
   } = {},
 ): Promise<{ success: boolean; error?: string; state?: BattleState }> {
   let maxPokemon = battleConfig.maxPokemon || 6
@@ -321,13 +330,12 @@ export async function startBattleFromConfig(
     (battleConfig as any).expeditionOnly === true ||
     isExpeditionActivity('battle', battleConfig.id)
   if (isExpeditionActivityContent) {
-    const expeditionStepStatus =
-      await getExpeditionActivityStepStatusForUser(
-        payload,
-        user.id,
-        'battle',
-        battleConfig.id,
-      )
+    const expeditionStepStatus = await getExpeditionActivityStepStatusForUser(
+      payload,
+      user.id,
+      'battle',
+      battleConfig.id,
+    )
     if (expeditionStepStatus !== 'current') {
       return {
         success: false,
@@ -433,7 +441,10 @@ export async function startBattleFromConfig(
     }
   }
   if (battleConfig.format === 'double' && battleTeamDocs.length < 2) {
-    return { success: false, error: 'Double battles need at least two Pokemon on your Battle Team.' }
+    return {
+      success: false,
+      error: 'Double battles need at least two Pokemon on your Battle Team.',
+    }
   }
 
   const trainerLevel = getSkillLevel(user.skills, 'battling')
@@ -482,26 +493,53 @@ export async function startBattleFromConfig(
         enemyTeamConfig.map(async (enemy) => {
           const formData = getPokemonForm(enemy.formId || enemy.speciesId)
           const name = enemy.name || formData?.name || 'Unknown'
-          const naturalLevel =
-            typeof enemy.level === 'number'
+          const fixedWildPokemon =
+            options.fixedWildPokemon?.speciesId === enemy.speciesId &&
+            options.fixedWildPokemon.formId ===
+              (enemy.formId || String(enemy.speciesId))
+              ? options.fixedWildPokemon
+              : undefined
+          const naturalLevel = fixedWildPokemon
+            ? fixedWildPokemon.level
+            : typeof enemy.level === 'number'
               ? enemy.level
               : Math.floor(
                   Math.random() * (enemy.level.max - enemy.level.min + 1),
                 ) + enemy.level.min
 
-          const isAlpha = rollAlpha(
-            canRollAlpha(
-              battleConfig,
-              enemy,
-              !!(options.dynamic || chronicleContext || expeditionContext),
-            ),
-          )
-          const level = naturalLevel + (isAlpha ? 5 : 0)
+          const isAlpha =
+            fixedWildPokemon
+              ? fixedWildPokemon.isAlpha
+              : rollAlpha(
+                  canRollAlpha(
+                    battleConfig,
+                    enemy,
+                    !!(
+                      options.dynamic ||
+                      chronicleContext ||
+                      expeditionContext
+                    ),
+                  ),
+                )
+          const level =
+            fixedWildPokemon
+              ? fixedWildPokemon.level
+              : naturalLevel + (isAlpha ? 5 : 0)
           const alphaStats = isAlpha
             ? generateAlphaStats(formData?.height || 0, formData?.weight || 0)
             : undefined
 
-          const rarity = resolveGeneratedPokemonRarity(enemy, resolveRarityChances(battleConfig.rarityChances, enemy.rarityChances, battleConfig.isWildBattle === true))
+          const rarity =
+            fixedWildPokemon
+              ? fixedWildPokemon.rarity
+              : resolveGeneratedPokemonRarity(
+                  enemy,
+                  resolveRarityChances(
+                    battleConfig.rarityChances,
+                    enemy.rarityChances,
+                    battleConfig.isWildBattle === true,
+                  ),
+                )
           const rarityLegacyFields = getPokemonRarityLegacyFields(rarity)
           const mockPokemon = {
             speciesId: enemy.speciesId,
@@ -516,18 +554,22 @@ export async function startBattleFromConfig(
             weight: alphaStats?.weight,
             size: alphaStats?.size,
             background: battleConfig.background,
-            ivs: alphaStats?.ivs ?? resolveEnemyBattleIvs({
-              enemy,
-              level,
-              isWildBattle: battleConfig.isWildBattle,
-              difficulty: battleConfig.enemyDifficulty,
-            }),
-            evs: alphaStats?.evs ?? resolveEnemyBattleEvs({
-              enemy,
-              level,
-              isWildBattle: battleConfig.isWildBattle,
-              difficulty: battleConfig.enemyDifficulty,
-            }),
+            ivs:
+              alphaStats?.ivs ??
+              resolveEnemyBattleIvs({
+                enemy,
+                level,
+                isWildBattle: battleConfig.isWildBattle,
+                difficulty: battleConfig.enemyDifficulty,
+              }),
+            evs:
+              alphaStats?.evs ??
+              resolveEnemyBattleEvs({
+                enemy,
+                level,
+                isWildBattle: battleConfig.isWildBattle,
+                difficulty: battleConfig.enemyDifficulty,
+              }),
             rarity,
             ...rarityLegacyFields,
             heldItemId: enemy.heldItemId,
@@ -592,7 +634,10 @@ export async function startBattleFromConfig(
     : undefined
   if (alphaPokemon) maxPokemon = 2
   if (battleConfig.format === 'double' && enemyTeam.length < 2) {
-    return { success: false, error: 'Double battles need at least two opposing Pokemon.' }
+    return {
+      success: false,
+      error: 'Double battles need at least two opposing Pokemon.',
+    }
   }
   const enemyMoveUseLimit = resolveEnemyBattleMoveUseLimit(
     enemyTeam.map((enemy) => enemy.level),
@@ -638,7 +683,8 @@ export async function startBattleFromConfig(
   if (playerTeam[0] && !battleConfig.isWildBattle) {
     playerTeam[0].activeTurnStarted = 1
   }
-  if (battleConfig.format === 'double' && playerTeam[1]) playerTeam[1].activeTurnStarted = 1
+  if (battleConfig.format === 'double' && playerTeam[1])
+    playerTeam[1].activeTurnStarted = 1
 
   // Register seen Pokemon in Pokedex
   const pokedexUpdate: Record<string, any> = pokedex
@@ -674,7 +720,8 @@ export async function startBattleFromConfig(
   if (enemyTeam[0]) {
     enemyTeam[0].activeTurnStarted = 1
   }
-  if (battleConfig.format === 'double' && enemyTeam[1]) enemyTeam[1].activeTurnStarted = 1
+  if (battleConfig.format === 'double' && enemyTeam[1])
+    enemyTeam[1].activeTurnStarted = 1
   const aiProfile = resolveBattleAiProfile(battleConfig)
   const researcherMoveSlots = chronicleContext
     ? undefined
@@ -702,7 +749,11 @@ export async function startBattleFromConfig(
     enemyTeam,
     activePlayerIndex: 0,
     activeEnemyIndex: 0,
-    playerParticipantIndexes: battleConfig.isWildBattle ? [] : battleConfig.format==='double' ? [0,1] : [0],
+    playerParticipantIndexes: battleConfig.isWildBattle
+      ? []
+      : battleConfig.format === 'double'
+        ? [0, 1]
+        : [0],
     turn: 1,
     history: [],
     status: 'ongoing',
@@ -780,7 +831,12 @@ export async function startBattleFromConfig(
           title: rivalContext?.trainer?.title || battleConfig.title,
         }
       : undefined,
-    dynamicBattleConfig: options.dynamic || (battleConfig as BattleConfig & { eventContexts?: unknown[] }).eventContexts?.length ? battleConfig : undefined,
+    dynamicBattleConfig:
+      options.dynamic ||
+      (battleConfig as BattleConfig & { eventContexts?: unknown[] })
+        .eventContexts?.length
+        ? battleConfig
+        : undefined,
   }
   initializeEnemyAiMoveLoadouts({ state: initialState, profile: aiProfile })
   normalizeChronicleBattleBudgets(initialState, battleConfig)
@@ -826,7 +882,9 @@ export async function startBattleFromConfig(
       ownerName: initialState.enemyName,
     }),
   ]
-  if (battleConfig.format==='double') for (const side of ['player','enemy'] as const) initialFieldMessages.push(...processDoublesEntry(initialState,side,1))
+  if (battleConfig.format === 'double')
+    for (const side of ['player', 'enemy'] as const)
+      initialFieldMessages.push(...processDoublesEntry(initialState, side, 1))
   if (initialFieldMessages.length) {
     initialState.history.unshift({
       turn: initialState.turn,

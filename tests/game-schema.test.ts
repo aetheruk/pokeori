@@ -465,6 +465,25 @@ describe('generated game data schemas', () => {
     expect(game?.settings.obstacles).toHaveLength(3)
   })
 
+  test('Surf Catch Test is an obstacle-free weighted encounter course', () => {
+    const game = allGames.find(
+      (entry) => entry.id === 'kanto-surf-catch-test',
+    ) as SurfGameConfig | undefined
+
+    expect(
+      allGames.find((entry) => entry.id === 'kanto-surf-catch-test')?.gameType,
+    ).toBe('surf')
+    expect(game?.subCategory).toBe('Test')
+    expect(game?.settings.mode).toBe('catch')
+    expect(game?.settings.allowAlpha).toBe(true)
+    expect(game?.settings.pokemonPool?.map((entry) => entry.speciesId)).toEqual(
+      [129, 54, 60, 72],
+    )
+    expect(game?.settings.pokemonSpawnFrequency).toEqual({ min: 2, max: 4 })
+    expect(game?.settings.obstacles).toEqual([])
+    expect(game?.settings.winScore).toBeUndefined()
+  })
+
   test('Brick Breaker has a strict replayable endless Test configuration', () => {
     const game = allGames.find((entry) => entry.id === 'brick-breaker-test')
     const settings = game?.settings as
@@ -553,14 +572,13 @@ describe('generated game data schemas', () => {
 
     const overlappingObstacle = structuredClone(game)
     if (overlappingObstacle) {
-      overlappingObstacle.settings.obstacles = [
-        { x: 195, y: 380, radius: 20 },
-      ]
+      overlappingObstacle.settings.obstacles = [{ x: 195, y: 380, radius: 20 }]
     }
     expect(validateGameItem(overlappingObstacle).success).toBe(false)
 
     const unsafeSpawnDistance = structuredClone(game)
-    if (unsafeSpawnDistance) unsafeSpawnDistance.settings.minimumSpawnDistance = 20
+    if (unsafeSpawnDistance)
+      unsafeSpawnDistance.settings.minimumSpawnDistance = 20
     expect(validateGameItem(unsafeSpawnDistance).success).toBe(false)
 
     const oversizedBoundaryRadius = structuredClone(game)

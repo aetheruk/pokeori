@@ -310,7 +310,7 @@ export function EncounterResults({
         onReturn={() => {
           markExpeditionReturn(expeditionProgress?.expeditionId)
           refreshUser()
-          if (returnPath) {
+          if (returnPath && !encounter.locationId?.startsWith('fishing:')) {
             const separator = returnPath.includes('?') ? '&' : '?'
             router.push(
               `${returnPath}${separator}outcome=${captureResult.caught ? 'won' : 'lost'}`,

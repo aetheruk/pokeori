@@ -14,6 +14,14 @@ import { Button } from '@/components/ui/button'
 import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 import { RewardResultOverlay, type GenericResult } from '@/components/game/shared/RewardResultOverlay'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -380,6 +388,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
   const [isKeepingCatch, setIsKeepingCatch] = useState(false)
   const [isTakingItem, setIsTakingItem] = useState(false)
   const [takeResult, setTakeResult] = useState<GenericResult | null>(null)
+  const [showTakeConfirm, setShowTakeConfirm] = useState(false)
   const [showKeepNetSwap, setShowKeepNetSwap] = useState(false)
 
   // Refs
@@ -579,6 +588,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
       setTimeUntilAppear(null)
       setNibbleSymbol(null)
       setShowKeepNetSwap(false)
+      setShowTakeConfirm(false)
       setTakeResult({ success: true, summary: res.summary })
     } finally {
       setIsTakingItem(false)
@@ -695,9 +705,48 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
       <RewardResultOverlay
         result={takeResult}
-        onClose={() => setTakeResult(null)}
+        onClose={() => {
+          setTakeResult(null)
+          router.push('/game/explore')
+        }}
         title="Fishing reward"
       />
+
+      <Dialog
+        open={showTakeConfirm}
+        onOpenChange={(open) => {
+          if (!isTakingItem) setShowTakeConfirm(open)
+        }}
+      >
+        <DialogContent className="game-paper-background border-game-border bg-game-surface text-game-ink sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display">Leave fishing?</DialogTitle>
+            <DialogDescription>
+              By taking this item, you forfeit your keep net. To claim all items
+              in your keep net, you’ll need to successfully capture a Pokémon.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface"
+              disabled={isTakingItem}
+              onClick={() => setShowTakeConfirm(false)}
+            >
+              Stay
+            </Button>
+            <Button
+              type="button"
+              className="border border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface"
+              disabled={isTakingItem}
+              onClick={() => void handleTakeItem()}
+            >
+              {isTakingItem ? 'Taking…' : 'Leave'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* 
           GAME AREA 
@@ -706,11 +755,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
         {/* ROD SELECTION PHASE */}
         {phase === 'select-rod' && (
           <div className="pointer-events-auto absolute inset-x-3 bottom-3 pb-[env(safe-area-inset-bottom)]">
-            <div className="game-paper-background relative mx-auto max-w-md animate-in rounded-xl border border-game-border bg-game-surface p-5 pt-14 text-game-ink shadow-xl fade-in slide-in-from-bottom-6 duration-300 lg:max-w-xl">
-              <h2 className="absolute right-0 top-0 z-10 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right text-sm font-bold leading-tight tracking-wide text-white">
-                Select your rod
-              </h2>
-
+            <div className="relative mx-auto max-w-md animate-in text-game-ink fade-in slide-in-from-bottom-6 duration-300 lg:max-w-xl">
               {availableRods.length > 0 ? (
                 <Carousel
                   className="w-full max-w-xs mx-auto px-12"
@@ -721,7 +766,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                       <CarouselItem key={rod} className="basis-full">
                         <div className="p-1">
                           <Button
-                            className="group flex h-auto w-full flex-col items-center gap-3 rounded-xl bg-game-charcoal py-7 text-game-cream transition-colors hover:bg-game-charcoal-strong"
+                            className="group flex h-auto w-full flex-col items-center gap-3 rounded-xl border border-game-border bg-game-surface-raised py-7 text-game-ink shadow-lg transition-colors hover:bg-game-surface"
                             onClick={() => handleSelectRod(rod)}
                           >
                             <div className="relative h-16 w-16">
@@ -733,10 +778,10 @@ export function FishingGame({ encounter }: FishingGameProps) {
                               />
                             </div>
                             <div className="space-y-1 text-center">
-                              <h3 className="font-display text-xl font-semibold text-game-cream">
+                              <h3 className="font-display text-xl font-semibold text-game-ink">
                                 {rodDisplayNames[rod]}
                               </h3>
-                              <p className="text-xs uppercase tracking-widest text-game-cream/75">
+                              <p className="text-xs uppercase tracking-widest text-game-muted">
                                 Tap to select
                               </p>
                             </div>
@@ -745,8 +790,8 @@ export function FishingGame({ encounter }: FishingGameProps) {
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="left-2 border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong hover:text-game-cream" />
-                  <CarouselNext className="right-2 border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong hover:text-game-cream" />
+                  <CarouselPrevious className="left-2 border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface hover:text-game-ink" />
+                  <CarouselNext className="right-2 border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface hover:text-game-ink" />
                 </Carousel>
               ) : (
                 <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-game-border bg-game-surface-raised p-8 text-center text-game-muted">
@@ -840,8 +885,8 @@ export function FishingGame({ encounter }: FishingGameProps) {
         {/* CATCH RESULT UI (Appears immediately) */}
         {phase === 'hooked' && hookedData && (
           <div className="pointer-events-auto absolute inset-x-3 bottom-3 pb-[env(safe-area-inset-bottom)]">
-            <div className="game-paper-background relative mx-auto flex max-w-sm animate-in flex-col items-center gap-4 rounded-xl border border-game-border bg-game-surface p-4 pt-14 text-game-ink shadow-xl fade-in slide-in-from-bottom-6 duration-300 lg:max-w-lg">
-              <h2 className="absolute right-0 top-0 z-10 flex max-w-[92%] items-center gap-1 rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right text-sm font-bold leading-tight tracking-wide text-white">
+            <div className="game-paper-background mx-auto flex max-w-sm animate-in flex-col items-center gap-4 rounded-xl border border-game-border bg-game-surface p-4 text-game-ink shadow-xl fade-in slide-in-from-bottom-6 duration-300 lg:max-w-lg">
+              <h2 className="flex max-w-[92%] items-center gap-1 text-center text-lg font-bold leading-tight tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                 {hookedData.type === 'pokemon' && hookedPokemon ? (
                   <>
                     <span className="line-clamp-1 min-w-0">
@@ -890,7 +935,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="grid w-full grid-cols-3 gap-2">
                     <Button
-                      className="h-12 rounded-xl bg-game-charcoal text-sm font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                      className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                       onClick={handleRelease}
                       aria-label="Release Pokémon"
                     >
@@ -898,7 +943,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                       <span>Release</span>
                     </Button>
                     <Button
-                      className="h-12 rounded-xl bg-game-charcoal text-sm font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                      className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                       onClick={() => handleKeepCatch()}
                       disabled={isKeepingCatch}
                       aria-label="Keep Pokémon in net"
@@ -907,7 +952,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                       <span>{isKeepingCatch ? 'Adding…' : 'Net'}</span>
                     </Button>
                     <Button
-                      className="h-12 rounded-xl bg-game-charcoal text-sm font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                      className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                       onClick={handleAttemptCatch}
                       aria-label="Catch Pokémon"
                     >
@@ -957,7 +1002,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                   <div className="w-full">
                     <div className="grid grid-cols-3 gap-2">
                       <Button
-                        className="h-12 rounded-xl bg-game-charcoal text-sm font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                        className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                         onClick={handleRelease}
                         aria-label="Release item"
                       >
@@ -965,7 +1010,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                         <span>Release</span>
                       </Button>
                       <Button
-                        className="h-12 rounded-xl bg-game-charcoal text-sm font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+                        className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
                         onClick={() => handleKeepCatch()}
                         disabled={isKeepingCatch}
                         aria-label="Keep item in net"
@@ -974,8 +1019,8 @@ export function FishingGame({ encounter }: FishingGameProps) {
                         <span>{isKeepingCatch ? 'Adding…' : 'Net'}</span>
                       </Button>
                       <Button
-                        className="h-12 rounded-xl bg-game-charcoal text-sm font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-charcoal-strong"
-                        onClick={handleTakeItem}
+                        className="h-12 rounded-xl border border-game-border bg-game-surface-raised text-sm font-semibold tracking-wide text-game-ink shadow-sm hover:bg-game-surface"
+                        onClick={() => setShowTakeConfirm(true)}
                         disabled={isTakingItem}
                         aria-label="Take item"
                       >
@@ -1007,7 +1052,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
           <Button
             size="lg"
             className={cn(
-              'h-12 w-full max-w-md bg-game-charcoal text-base !text-game-cream hover:bg-game-charcoal-strong',
+              'h-12 w-full max-w-md border border-game-border bg-game-surface-raised text-base !text-game-ink shadow-lg hover:bg-game-surface',
             )}
             onClick={
               phase === 'missed' || phase === 'early'
