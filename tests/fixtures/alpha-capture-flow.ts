@@ -549,6 +549,59 @@ try {
     assert.equal(inventory['master-ball'], 0)
   }
 
+  // A previously netted Pokemon can begin its catch attempt from the net bar.
+  inventory['old-rod'] = 1
+  store.set('game:owner', { encounterId: fishingConfig.id })
+  store.set('fishing:keep-net:owner', {
+    encounterId: fishingConfig.id,
+    entries: [
+      {
+        id: 'stored-alpha',
+        type: 'pokemon',
+        speciesId: 19,
+        formId: '19',
+        isShiny: true,
+        isAlpha: true,
+        rarity: 'shiny',
+      },
+      {
+        id: 'stored-magikarp',
+        type: 'pokemon',
+        speciesId: 129,
+        formId: '129',
+        isShiny: false,
+        isAlpha: false,
+      },
+      {
+        id: 'held-water-gem',
+        type: 'item',
+        itemId: 'water-gem',
+        quantity: 1,
+      },
+    ],
+  })
+  Math.random = () => 0.5
+  const netCatch = await startFishingCatch({
+    keepNetEntryId: 'stored-alpha',
+    selectedRod: 'old',
+  })
+  assert.equal(netCatch.success, true)
+  assert.equal(netCatch.isAlpha, true)
+  assert.equal(netCatch.duration, 50)
+  const netCatchEncounter = store.get('encounter:owner')
+  assert.equal(netCatchEncounter.formId, '19')
+  assert.equal(netCatchEncounter.isShiny, true)
+  assert.equal(netCatchEncounter.rarity, 'shiny')
+  assert.equal(netCatchEncounter.fishingKeepNet.length, 2)
+  assert.equal(
+    netCatchEncounter.fishingKeepNet.some(
+      (entry: any) => entry.id === 'stored-alpha',
+    ),
+    false,
+  )
+  assert.equal(netCatchEncounter.fishingCatchCrystalMultiplier, 1)
+  store.delete('encounter:owner')
+
   // Missing the bite forfeits the net, even when the client only records it on recast.
   store.set('fishing:keep-net:owner', {
     encounterId: fishingConfig.id,

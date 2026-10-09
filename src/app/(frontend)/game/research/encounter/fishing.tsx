@@ -139,6 +139,18 @@ function FishingContentsIcon({ data }: { data: FishingHookedData }) {
   )
 }
 
+function getFishingKeepNetEntryTitle(entry: FishingKeepNetEntry): string {
+  if (entry.type !== 'pokemon') {
+    return entry.currencyId
+      ? `${entry.quantity} ${getCurrency(entry.currencyId)?.name || 'Currency'}`
+      : entry.guildId
+        ? `${entry.quantity} Guild XP`
+        : `${entry.quantity} ${itemNames.get(entry.itemId || '') || 'Item'}`
+  }
+
+  return `${getFishingRarityPrefix(entry.rarity, entry.isShiny)}${getPokemonForm(entry.formId)?.name || getPokemonSpecies(entry.speciesId)?.name || 'Pokémon'}${entry.isAlpha ? ' (Alpha)' : ''}`
+}
+
 const DEFAULT_SCENE: FishingSceneConfig = {
   portraitBackground: '/backgrounds/fishing-pond-portrait.avif',
   waterStyle: 'pond',
@@ -297,14 +309,7 @@ function KeepNetSlot({
   entry: FishingKeepNetEntry
   size?: number
 }) {
-  const title =
-    entry.type === 'pokemon'
-      ? `${getFishingRarityPrefix(entry.rarity, entry.isShiny)}${getPokemonForm(entry.formId)?.name || 'Pokémon'}${entry.isAlpha ? ' (Alpha)' : ''}`
-      : entry.currencyId
-        ? `${entry.quantity} ${getCurrency(entry.currencyId)?.name || 'Currency'}`
-        : entry.guildId
-          ? `${entry.quantity} Guild XP`
-          : `${entry.quantity} ${itemNames.get(entry.itemId || '') || 'Item'}`
+  const title = getFishingKeepNetEntryTitle(entry)
 
   return (
     <span
@@ -445,6 +450,9 @@ export function FishingGame({ encounter }: FishingGameProps) {
   const [takeResultIcon, setTakeResultIcon] = useState<React.ReactNode>(null)
   const [showTakeConfirm, setShowTakeConfirm] = useState(false)
   const [showKeepNetSwap, setShowKeepNetSwap] = useState(false)
+  const [netPokemonToCatch, setNetPokemonToCatch] =
+    useState<FishingKeepNetEntry | null>(null)
+  const [isStartingNetCatch, setIsStartingNetCatch] = useState(false)
 
   // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -667,6 +675,32 @@ export function FishingGame({ encounter }: FishingGameProps) {
     )
   }, [router])
 
+  const handleAttemptNetCatch = useCallback(async () => {
+    if (
+      netPokemonToCatch?.type !== 'pokemon' ||
+      !selectedRod ||
+      isStartingNetCatch
+    ) {
+      return
+    }
+
+    setIsStartingNetCatch(true)
+    try {
+      const res = await startFishingCatch({
+        keepNetEntryId: netPokemonToCatch.id,
+        selectedRod,
+      })
+      if (!res.success) return
+
+      const returnPath = `${window.location.pathname}${window.location.search}`
+      router.push(
+        `/game/locations/encounter?returnTo=${encodeURIComponent(returnPath)}`,
+      )
+    } finally {
+      setIsStartingNetCatch(false)
+    }
+  }, [isStartingNetCatch, netPokemonToCatch, router, selectedRod])
+
   const handleRecast = useCallback(async () => {
     await releaseFish()
     setKeepNet([])
@@ -753,16 +787,88 @@ export function FishingGame({ encounter }: FishingGameProps) {
             <div className="grid h-8 min-w-0 flex-1 grid-cols-10 gap-1">
               {Array.from({ length: FISHING_KEEP_NET_CAPACITY }, (_, index) => {
                 const entry = keepNet[index]
-                return entry ? (
-                  <KeepNetSlot key={entry.id} entry={entry} size={24} />
-                ) : (
-                  <span key={`empty-${index}`} aria-hidden="true" className="h-8 min-w-0" />
+                if (!entry) {
+                  return (
+                    <span key={`empty-${index}`} aria-hidden="true" className="h-8 min-w-0" />
+                  )
+                }
+
+                if (entry.type !== 'pokemon') {
+                  return <KeepNetSlot key={entry.id} entry={entry} size={24} />
+                }
+
+                return (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    disabled={phase !== 'idle'}
+                    aria-label={`Catch ${getFishingKeepNetEntryTitle(entry)} from keep net`}
+                    title={`${getFishingKeepNetEntryTitle(entry)} · tap to catch`}
+                    className="relative flex h-8 min-w-0 flex-1 items-center justify-center rounded-sm transition-colors hover:bg-game-night-surface/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-cream/80 disabled:cursor-default disabled:opacity-60"
+                    onClick={() => setNetPokemonToCatch(entry)}
+                  >
+                    <KeepNetSlot entry={entry} size={24} />
+                  </button>
                 )
               })}
             </div>
           </section>
         )}
       </div>
+
+      <Dialog
+        open={netPokemonToCatch !== null}
+        onOpenChange={(open) => {
+          if (!open && !isStartingNetCatch) setNetPokemonToCatch(null)
+        }}
+      >
+        <DialogContent className="game-paper-background border-game-border bg-game-surface text-game-ink sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display">Catch from your net?</DialogTitle>
+            <DialogDescription>
+              Start a normal fishing catch with this Pokémon. It leaves the net
+              for the attempt; the rest of your keep-net contents follow the
+              usual catch rules.
+            </DialogDescription>
+          </DialogHeader>
+          {netPokemonToCatch?.type === 'pokemon' && (
+            <div className="flex items-center justify-center gap-3 rounded-md border border-game-border bg-game-surface-raised p-3">
+              <PokemonRaritySprite
+                formId={netPokemonToCatch.formId}
+                view="home"
+                rarity={netPokemonToCatch.rarity}
+                shiny={netPokemonToCatch.isShiny}
+                alt=""
+                className="h-14 w-14 shrink-0"
+                imageClassName="object-contain pixelated"
+              />
+              <div className="flex items-center gap-1.5 font-bold text-game-ink">
+                {getFishingKeepNetEntryTitle(netPokemonToCatch)}
+                {netPokemonToCatch.isAlpha && <AlphaIcon size={18} />}
+              </div>
+            </div>
+          )}
+          <DialogFooter className="flex-row justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 border-game-border bg-game-surface-raised text-game-ink hover:bg-game-surface"
+              disabled={isStartingNetCatch}
+              onClick={() => setNetPokemonToCatch(null)}
+            >
+              Stay
+            </Button>
+            <Button
+              type="button"
+              className="flex-1 border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
+              disabled={isStartingNetCatch || !selectedRod}
+              onClick={() => void handleAttemptNetCatch()}
+            >
+              {isStartingNetCatch ? 'Starting…' : 'Attempt capture'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <RewardResultOverlay
         result={takeResult}
