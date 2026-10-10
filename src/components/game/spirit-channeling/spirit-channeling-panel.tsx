@@ -401,9 +401,19 @@ export function SpiritChannelingPanel() {
                     {Object.entries(offeredEnergy).map(([type, amount]) => (
                       <span
                         key={type}
-                        className="rounded-full border border-game-border bg-game-surface px-3 py-1 font-mono text-xs font-black uppercase tracking-[0.08em] text-game-ink"
+                        role="img"
+                        aria-label={`${type} energy: ${amount}`}
+                        title={`${type} energy: ${amount}`}
+                        className="inline-flex items-center gap-1 rounded-full border border-game-border bg-game-surface px-1.5 py-0.5 font-mono text-[10px] font-black leading-none text-game-ink"
                       >
-                        {type} energy: {amount}
+                        <ItemSprite
+                          itemId={`${type}-gem`}
+                          alt={`${type} Gem`}
+                          width={16}
+                          height={16}
+                          className="h-4 w-4"
+                        />
+                        <span>{amount}</span>
                       </span>
                     ))}
                   </div>
@@ -543,11 +553,7 @@ function IncenseSelector({
         )}
       </button>
       <div className="mt-2 min-h-4 max-w-24 truncate px-1 text-center text-xs font-medium text-game-ink">
-        {disabled
-          ? 'No Incense'
-          : selectedIncenseId
-            ? selectedIncenseName
-            : 'Select Incense'}
+        Incense
       </div>
     </div>
   )
@@ -639,14 +645,21 @@ function OfferingPickerDialog({
   slotIndex: number
   onSelect: (itemId: string) => void
 }) {
+  const [activeTab, setActiveTab] = useState<'materials' | 'gems'>('materials')
+  const visibleOfferings = offerings.filter((offering) =>
+    activeTab === 'materials'
+      ? offering.kind === 'material'
+      : offering.kind === 'gem',
+  )
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl"
+        className="game-paper-modal game-paper-background flex max-h-[85vh] max-w-sm flex-col overflow-hidden rounded-xl border-0 bg-game-surface p-0 shadow-xl"
       >
-        <div className="max-h-[85vh] overflow-y-auto px-4 pb-5 pt-0">
-          <div className="-mr-4 flex justify-end">
+        <div className="flex max-h-[85vh] min-h-0 flex-col px-4 pb-5 pt-0">
+          <div className="-mr-4 flex shrink-0 justify-end">
             <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
               Offering {slotIndex + 1}
             </DialogTitle>
@@ -655,13 +668,42 @@ function OfferingPickerDialog({
             Choose an offering for this slot.
           </DialogDescription>
 
+          <div
+            role="tablist"
+            aria-label="Offering type"
+            className="mt-4 grid shrink-0 grid-cols-2 gap-1 rounded-md border border-game-border bg-game-canvas/60 p-1"
+          >
+            {(['materials', 'gems'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
+                data-haptic-manual="true"
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  'min-h-9 rounded-sm px-3 py-2 text-xs font-black uppercase tracking-[0.12em] transition-colors',
+                  activeTab === tab
+                    ? 'bg-game-charcoal text-white shadow-sm'
+                    : 'text-game-muted hover:bg-game-surface-raised hover:text-game-ink',
+                )}
+              >
+                {tab === 'materials' ? 'Materials' : 'Gems'}
+              </button>
+            ))}
+          </div>
+
           {offerings.length === 0 ? (
-            <div className="rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
+            <div className="mt-4 rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
               No offerings available
             </div>
+          ) : visibleOfferings.length === 0 ? (
+            <div className="mt-4 rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
+              No {activeTab} available
+            </div>
           ) : (
-            <div className="mt-5 grid max-h-[60vh] grid-cols-4 gap-2 overflow-y-auto pr-1">
-              {offerings.map((offering) => (
+            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+              {visibleOfferings.map((offering) => (
                 <button
                   key={offering.itemId}
                   type="button"
@@ -669,24 +711,28 @@ function OfferingPickerDialog({
                   data-haptic-manual="true"
                   aria-pressed={selectedItemId === offering.itemId}
                   className={cn(
-                    'relative flex min-w-0 flex-col items-center rounded-md border px-1.5 py-2 text-center transition-colors',
+                    'relative flex min-h-[76px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border p-3 text-left transition-colors',
                     selectedItemId === offering.itemId
-                      ? 'border-game-moss bg-game-moss/10 text-game-ink'
-                      : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
+                      ? 'border-game-moss/60 bg-game-moss/10 text-game-ink'
+                      : 'border-game-card-border bg-game-surface text-game-ink hover:border-game-moss/45',
                   )}
                 >
-                  <span className="flex h-12 w-12 items-center justify-center">
+                  <span className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
                     <ItemSprite
                       itemId={offering.itemId}
                       alt={itemName(offering.itemId)}
-                      className="h-12 w-12 object-contain"
+                      width={56}
+                      height={56}
+                      className="h-14 w-14 object-contain"
                     />
                   </span>
-                  <span className="absolute right-1 top-1 rounded-full border border-game-border bg-game-canvas px-1 py-0.5 font-mono text-[10px] font-black leading-none text-game-ink">
-                    {inventoryMap[offering.itemId] || 0}
-                  </span>
-                  <span className="mt-1.5 min-h-8 max-w-full text-[10px] font-black uppercase leading-tight tracking-[0.08em]">
-                    {itemName(offering.itemId)}
+                  <span className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+                    <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
+                      {itemName(offering.itemId)}
+                    </span>
+                    <span className="mt-auto pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
+                      Owned ×{inventoryMap[offering.itemId] || 0}
+                    </span>
                   </span>
                 </button>
               ))}
@@ -747,11 +793,7 @@ function ChannelerSelector({
           'mt-2 min-h-4 max-w-28 truncate px-1 text-center text-xs font-medium text-game-ink',
         )}
       >
-        {disabled
-          ? 'No Pokemon'
-          : pokemon
-            ? `${pokemonDisplayName(pokemon)} LVL ${pokemon.level}`
-            : 'Select Pokemon'}
+        Channeller
       </div>
     </div>
   )
@@ -999,7 +1041,7 @@ function OfferingSlotControl({
           type="button"
           onClick={() => onActivate(index)}
           className={cn(
-            'game-focus-ring relative flex h-[72px] w-[72px] items-center justify-center rounded-full border transition-colors',
+            'game-focus-ring relative flex h-[72px] w-[72px] items-center justify-center rounded-md border transition-colors',
             slot.itemId
               ? 'border-game-moss/60 bg-game-moss/10'
               : 'border-game-border bg-game-surface/55 hover:border-game-moss/45',
@@ -1007,7 +1049,6 @@ function OfferingSlotControl({
           aria-label={`Select offering slot ${index + 1}`}
           title={`Offering slot ${index + 1}`}
         >
-          <span className="absolute inset-[10%] rounded-full border border-game-border/60" />
           {slot.itemId ? (
             <ItemSprite
               itemId={slot.itemId}
@@ -1017,9 +1058,6 @@ function OfferingSlotControl({
           ) : (
             <Plus className="relative h-5 w-5 text-game-muted" />
           )}
-          <span className="absolute bottom-1.5 rounded-full border border-game-border bg-game-canvas/90 px-1.5 py-0.5 text-[10px] font-black uppercase leading-none tracking-[0.08em] text-game-muted">
-            {index + 1}
-          </span>
         </button>
         {slot.itemId && (
           <button
@@ -1035,7 +1073,7 @@ function OfferingSlotControl({
           </button>
         )}
       </div>
-      <div className="mt-2 min-h-5 max-w-full truncate px-1 text-center text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
+      <div className="mt-2 min-h-4 max-w-28 truncate px-1 text-center text-xs font-medium text-game-ink">
         {slot.itemId ? itemName(slot.itemId) : 'Empty'}
       </div>
       <div className="mt-1.5 flex h-9 w-full max-w-28 items-center justify-center gap-0.5 rounded-full border border-game-border bg-game-canvas/55">

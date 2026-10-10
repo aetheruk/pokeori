@@ -20,7 +20,7 @@ export function PremiumHeader({
   titleClassName,
   subtitleClassName,
   showEffects: _showEffects = false,
-  iconUnframed = false,
+  iconUnframed = true,
 }: PremiumHeaderProps) {
   return (
     <div
