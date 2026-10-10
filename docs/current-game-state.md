@@ -1,6 +1,6 @@
 # Current Game State
 
-- Release `0.51.10` includes each Pokemon's saved background in the slim Spirit Channeling data snapshot, fixing channeller picker cards that remained plain despite the scenic card styling.
+- Release `0.51.10` includes each Pokemon's saved background in the slim Spirit Channeling data snapshot, fixing channeller picker cards that remained plain despite the scenic card styling. Incense picker cards show only the artwork and name, without description text.
 
 - Release `0.51.9` gives Spirit Channeling picker cards Explore's scenic background and paper fade: incense uses Pokemon Tower, materials and gems use Inventory, and each channeller uses its Pokemon's saved background.
 
