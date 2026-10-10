@@ -279,7 +279,12 @@ export function isPokemonEligible(
   if (criteria.ballType && pokemon.ballType !== criteria.ballType) return false
   if (criteria.minLevel && pokemon.level < criteria.minLevel) return false
   if (criteria.maxLevel && pokemon.level > criteria.maxLevel) return false
-  if (criteria.size && pokemon.size !== criteria.size) return false
+  if (
+    criteria.size &&
+    (Array.isArray(criteria.size)
+      ? !pokemon.size || !criteria.size.includes(pokemon.size)
+      : pokemon.size !== criteria.size)
+  ) return false
   if (criteria.nature && !matchesPokemonOriginValue(pokemon.nature, criteria.nature))
     return false
   if (criteria.rarity && resolvePokemonRarity(pokemon) !== criteria.rarity)

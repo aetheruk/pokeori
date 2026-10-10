@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import type { User } from '@/payload-types'
 import type { BattleConfig, Location, Reward } from '@/data/types'
 import { battles } from '@/data/battles'
+import { items } from '@/data/items'
 import {
   canRollAlpha,
   canRollCaptureAlpha,
@@ -121,6 +122,7 @@ describe('Alpha Pokémon', () => {
       { type: 'pokemon_research_xp', targetId: '25', quantity: 2, isCompanion: true },
       { type: 'item', targetId: 'escape-rope', quantity: 2, dropChance: 8 },
       { type: 'item', targetId: 'repel', quantity: { min: 1, max: 2 }, dropChance: 5 },
+      { type: 'item', targetId: 'golden-scale-1', quantity: 1, dropChance: 5 },
       { type: 'currency', targetId: 'crystals', quantity: 11 },
     ]
 
@@ -131,6 +133,7 @@ describe('Alpha Pokémon', () => {
       { ...rewards[2], quantity: 6 },
       { ...rewards[3], quantity: { min: 3, max: 6 } },
       rewards[4],
+      rewards[5],
     ])
     expect(buildCaptureResearchXpRewards('19', '25', 15)).toEqual([
       { type: 'pokemon_research_xp', targetId: '19', quantity: 15, dropChance: 100 },
@@ -400,6 +403,7 @@ describe('Alpha Pokémon', () => {
           dropChance: 25,
         },
         { type: 'item', targetId: 'potion', dropChance: 25 },
+        { type: 'item', targetId: 'golden-scale-1', quantity: 1, dropChance: 25 },
         { type: 'xp', skill: 'battling', quantity: 10 },
       ],
     }
@@ -429,7 +433,8 @@ describe('Alpha Pokémon', () => {
             ? 5
             : before.type === 'pokemon_experience'
               ? 2
-              : before.type === 'item'
+              : before.type === 'item' &&
+                  !items.find((item) => item.id === before.targetId)?.unique
                 ? 3
                 : 1
         expect(after.dropChance).toBe(before.dropChance)

@@ -1,5 +1,6 @@
 import type { BattleConfig, BattleEnemy, Location, Reward } from '@/data/types'
 import type { Pokemon } from '@/payload-types'
+import { items } from '@/data/items'
 import { getPokemonForm, getPokemonSpecies } from './pokedex'
 import {
   generatePokemonStats,
@@ -127,7 +128,10 @@ export function applyAlphaCaptureBonuses(
   if (!isAlpha) return rewards
 
   return rewards.map((reward) => {
-    const multiplier = reward.type === 'item' ? 3 : 1
+    const isUniqueItem =
+      reward.type === 'item' &&
+      items.some((item) => item.id === reward.targetId && item.unique)
+    const multiplier = reward.type === 'item' && !isUniqueItem ? 3 : 1
     if (multiplier === 1) return reward
 
     const quantity = reward.quantity ?? 1
