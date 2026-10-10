@@ -1289,7 +1289,9 @@ const InventoryItemCard = memo(function InventoryItemCard({
   const isUsable = !!actionLabel && actionLabel !== 'Battle Only'
   const actionIcon: TaskIcon = isCrafting
     ? { type: 'local', id: '/fallback/skills/artisan-v2.png' }
-    : { type: 'item', id: 'poke-ball' }
+    : item.canChannel
+      ? { type: 'pokemon', id: '92' }
+      : { type: 'item', id: 'poke-ball' }
   const showBulkOpen =
     item.details.category === 'booster-pack' &&
     item.quantity > 1 &&
