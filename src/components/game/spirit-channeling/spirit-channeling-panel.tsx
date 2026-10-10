@@ -678,9 +678,6 @@ function IncensePickerDialog({
                     <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.08em] text-white">
                       {incense.name}
                     </span>
-                    <span className="mt-auto pt-2 text-xs leading-4 text-game-ink">
-                      {incense.description}
-                    </span>
                   </span>
                 </button>
               ))}

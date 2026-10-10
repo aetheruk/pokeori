@@ -59,6 +59,7 @@ describe('game data sync scopes', () => {
       formId: true,
       level: true,
       gender: true,
+      background: true,
     })
   })
 

@@ -28,6 +28,36 @@ function databaseProbe() {
 }
 
 describe('scoped game snapshot loading', () => {
+  test('channeling snapshots preserve saved Pokemon backgrounds for picker cards', async () => {
+    const probe = databaseProbe()
+    const pokemon = {
+      id: 'channeler',
+      speciesId: 25,
+      formId: '25',
+      level: 12,
+      background: '/backgrounds/forest.avif',
+    }
+    const result = await getGameUserData(
+      { id: 'player' } as any,
+      ['pokemon'],
+      {
+        pokemonPayload: 'channeling',
+        payload: {
+          async find(args: any) {
+            if (args.collection !== 'pokemon') return probe.payload.find(args)
+            return {
+              docs: [Object.fromEntries(
+                Object.entries(pokemon).filter(([key]) => args.select[key]),
+              )],
+            }
+          },
+        } as any,
+      },
+    )
+
+    expect(result.pokemon?.[0]?.background).toBe(pokemon.background)
+  })
+
   test('overlaps independent reads and reuses completed tasks for story state', async () => {
     const probe = databaseProbe()
     const result = await getGameUserData(
