@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.51.9` gives Spirit Channeling picker cards Explore's scenic background and paper fade: incense uses Pokemon Tower, materials and gems use Inventory, and each channeller uses its Pokemon's saved background.
+
 - Release `0.51.8` makes the full fishing net's swap prompt white over the scene and displays catches as transparent, unframed icon buttons without visible Swap labels. Keyboard focus and accessible catch names remain available.
 
 - Unreleased: The Rock Tunnel Mankey Size Study accepts XL, XXL, or XXXL as its large Mankey. Discarded Rubbish is a common global item in all fishing rod pools. Every successful Pokémon capture has a global 1-in-10 chance to award a Pouch of Materials. The pouch appears under Training → Trainer and opens for 1–5 independently random Tier 1 Pokémon crafting materials plus 1–3 independently random type gems. Alpha battle and capture item-drop bonuses triple repeatable items only; unique items retain their normal quantity. Fishing item rolls exclude unique items already reserved in the keep net.
