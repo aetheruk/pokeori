@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  ArrowLeft,
   Flame,
   Loader2,
   Minus,
@@ -597,30 +596,6 @@ function IncenseSelector({
   )
 }
 
-function PickerScreenHeader({
-  title,
-  onBack,
-}: {
-  title: string
-  onBack: () => void
-}) {
-  return (
-    <div className="flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-game-border py-2">
-      <button
-        type="button"
-        onClick={onBack}
-        className="game-focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-game-border bg-game-surface-raised text-game-ink transition-colors hover:bg-game-canvas"
-        aria-label="Back to Spirit Channeling"
-      >
-        <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-      </button>
-      <DialogTitle className="max-w-[80%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
-        {title}
-      </DialogTitle>
-    </div>
-  )
-}
-
 function IncensePickerDialog({
   open,
   onOpenChange,
@@ -640,8 +615,8 @@ function IncensePickerDialog({
         showCloseButton={false}
         className={FULLSCREEN_PICKER_CLASS}
       >
-        <div className="flex h-full min-h-0 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[env(safe-area-inset-top)]">
-          <PickerScreenHeader title="Incense" onBack={() => onOpenChange(false)} />
+        <div className="flex h-full min-h-0 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[calc(env(safe-area-inset-top)+1rem)]">
+          <DialogTitle className="sr-only">Incense</DialogTitle>
           <DialogDescription className="sr-only">
             Choose an incense for the channeling.
           </DialogDescription>
@@ -651,7 +626,7 @@ function IncensePickerDialog({
               No incense available
             </div>
           ) : (
-            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pb-2">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pb-2">
               {incenses.map((incense) => (
                 <button
                   key={incense.id}
@@ -719,50 +694,22 @@ function OfferingPickerDialog({
         showCloseButton={false}
         className={FULLSCREEN_PICKER_CLASS}
       >
-        <div className="flex h-full min-h-0 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[env(safe-area-inset-top)]">
-          <PickerScreenHeader
-            title={`Offering ${slotIndex + 1}`}
-            onBack={() => onOpenChange(false)}
-          />
+        <div className="flex h-full min-h-0 flex-col px-4 pt-[calc(env(safe-area-inset-top)+1rem)]">
+          <DialogTitle className="sr-only">Offering {slotIndex + 1}</DialogTitle>
           <DialogDescription className="sr-only">
             Choose an offering for this slot.
           </DialogDescription>
 
-          <div
-            role="tablist"
-            aria-label="Offering type"
-            className="mt-4 grid shrink-0 grid-cols-2 gap-1 rounded-md border border-game-border bg-game-canvas/60 p-1"
-          >
-            {(['materials', 'gems'] as const).map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                role="tab"
-                aria-selected={activeTab === tab}
-                data-haptic-manual="true"
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  'min-h-9 rounded-sm px-3 py-2 text-xs font-black uppercase tracking-[0.12em] transition-colors',
-                  activeTab === tab
-                    ? 'bg-game-charcoal text-white shadow-sm'
-                    : 'text-game-muted hover:bg-game-surface-raised hover:text-game-ink',
-                )}
-              >
-                {tab === 'materials' ? 'Materials' : 'Gems'}
-              </button>
-            ))}
-          </div>
-
           {offerings.length === 0 ? (
-            <div className="mt-4 rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
+            <div className="min-h-0 flex-1 overflow-y-auto py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
               No offerings available
             </div>
           ) : visibleOfferings.length === 0 ? (
-            <div className="mt-4 rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
+            <div className="min-h-0 flex-1 overflow-y-auto py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
               No {activeTab} available
             </div>
           ) : (
-            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pb-4 pr-1">
               {visibleOfferings.map((offering) => (
                 <button
                   key={offering.itemId}
@@ -788,17 +735,43 @@ function OfferingPickerDialog({
                     />
                   </span>
                   <span className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
-                    <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
-                      {itemName(offering.itemId)}
-                    </span>
-                    <span className="mt-auto pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-game-ink">
-                      Owned ×{inventoryMap[offering.itemId] || 0}
+                    <span className="-mr-3 -mt-3 inline-flex w-fit max-w-full items-start gap-1.5 rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
+                      <span className="min-w-0 line-clamp-2">{itemName(offering.itemId)}</span>
+                      <span className="shrink-0 font-mono tracking-normal text-game-battle-orange">
+                        x{inventoryMap[offering.itemId] || 0}
+                      </span>
                     </span>
                   </span>
                 </button>
               ))}
             </div>
           )}
+          <div className="shrink-0 border-t border-game-border bg-game-surface pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+            <div
+              role="tablist"
+              aria-label="Offering type"
+              className="grid grid-cols-2 gap-1 rounded-md border border-game-border bg-game-canvas/60 p-1"
+            >
+              {(['materials', 'gems'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === tab}
+                  data-haptic-manual="true"
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
+                    'game-focus-ring min-h-11 rounded-sm px-3 py-2 text-xs font-black uppercase tracking-[0.12em] transition-colors',
+                    activeTab === tab
+                      ? 'bg-game-charcoal text-white shadow-sm'
+                      : 'text-game-muted hover:bg-game-surface-raised hover:text-game-ink',
+                  )}
+                >
+                  {tab === 'materials' ? 'Materials' : 'Gems'}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -898,37 +871,22 @@ function PokemonPickerDialog({
         showCloseButton={false}
         className={FULLSCREEN_PICKER_CLASS}
       >
-        <div className="flex h-full min-h-0 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[env(safe-area-inset-top)]">
-          <PickerScreenHeader title="Channeler" onBack={() => onOpenChange(false)} />
-          <DialogDescription className="mt-1 pr-8 text-left text-xs text-game-muted">
-            Choose a Pokemon to channel this memory.
+        <div className="flex h-full min-h-0 flex-col px-4 pt-[calc(env(safe-area-inset-top)+1rem)]">
+          <DialogTitle className="sr-only">Channeller</DialogTitle>
+          <DialogDescription className="sr-only">
+            Owned Pokemon available for channeling.
           </DialogDescription>
 
-          <div className="relative mt-4 shrink-0">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-game-muted"
-              aria-hidden="true"
-            />
-            <Input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search name, form, or type"
-              aria-label="Search owned Pokemon"
-              className="pl-9"
-            />
-          </div>
-
           {pokemon.length === 0 ? (
-            <div className="mt-5 rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
+            <div className="min-h-0 flex-1 overflow-y-auto py-8 text-center text-xs font-black uppercase tracking-[0.18em] text-game-muted">
               No Pokemon available
             </div>
           ) : filteredPokemon.length === 0 ? (
-            <div className="mt-5 rounded-md border border-dashed border-game-border bg-game-surface-raised/55 py-8 text-center text-sm text-game-muted">
+            <div className="min-h-0 flex-1 overflow-y-auto py-8 text-center text-sm text-game-muted">
               No Pokemon match that search.
             </div>
           ) : (
-            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pb-2 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pb-4 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
               {filteredPokemon.map((entry) => {
                 const imageUrl = getPokemonImageUrl(
                   entry.formId,
@@ -963,11 +921,11 @@ function PokemonPickerDialog({
                       />
                     </span>
                     <span className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
-                      <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.08em] text-white">
-                        {pokemonDisplayName(entry)}
-                      </span>
-                      <span className="mt-auto pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-game-ink">
-                        Level {entry.level}
+                      <span className="-mr-3 -mt-3 inline-flex w-fit max-w-full items-start gap-1.5 rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.08em] text-white">
+                        <span className="min-w-0 line-clamp-2">{pokemonDisplayName(entry)}</span>
+                        <span className="shrink-0 font-mono tracking-normal text-game-battle-orange">
+                          Lv. {entry.level}
+                        </span>
                       </span>
                     </span>
                   </button>
@@ -975,6 +933,22 @@ function PokemonPickerDialog({
               })}
             </div>
           )}
+          <div className="shrink-0 border-t border-game-border bg-game-surface pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-game-muted"
+                aria-hidden="true"
+              />
+              <Input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search name, form, or type"
+                aria-label="Search owned Pokemon"
+                className="h-11 pl-9"
+              />
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -1201,19 +1175,19 @@ function CeremonyDisplay({
     : ''
 
   return (
-    <div className="absolute inset-0 flex items-end justify-between overflow-hidden px-[8%] pb-5">
+    <div className="absolute inset-0 overflow-hidden">
       {incenseItemId && (
         <>
-          <div className="absolute bottom-5 left-[8%] h-6 w-20 rounded-full bg-game-charcoal/45 blur-md" />
+          <div className="absolute bottom-5 left-1/2 h-6 w-20 -translate-x-1/2 rounded-full bg-game-charcoal/45 blur-md" />
           <ItemSprite
             itemId={incenseItemId}
             alt="Incense"
-            className="relative z-10 mb-2 h-16 w-16 object-contain drop-shadow-lg sm:h-20 sm:w-20"
+            className="absolute bottom-7 left-1/2 z-10 h-16 w-16 -translate-x-1/2 object-contain drop-shadow-lg sm:h-20 sm:w-20"
           />
         </>
       )}
       {pokemon && (
-        <div className="relative z-10 mb-1 h-32 w-32 shrink-0 drop-shadow-xl sm:h-40 sm:w-40">
+        <div className="absolute bottom-6 right-[8%] z-10 h-32 w-32 shrink-0 drop-shadow-xl sm:h-40 sm:w-40">
           <Image
             src={pokemonImageUrl}
             alt={pokemonDisplayName(pokemon)}

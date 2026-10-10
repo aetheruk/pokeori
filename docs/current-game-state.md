@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.51.11` starts Spirit Channeling pickers directly with their cards, pins Pokemon search and the materials/gems toggle to the bottom, and moves Pokemon levels and offering quantities into orange title-tab metadata. Ceremony incense is centered beneath the smoke while the Pokemon remains on the right.
+
 - Release `0.51.10` includes each Pokemon's saved background in the slim Spirit Channeling data snapshot, fixing channeller picker cards that remained plain despite the scenic card styling. Incense picker cards show only the artwork and name, without description text.
 
 - Release `0.51.9` gives Spirit Channeling picker cards Explore's scenic background and paper fade: incense uses Pokemon Tower, materials and gems use Inventory, and each channeller uses its Pokemon's saved background.
