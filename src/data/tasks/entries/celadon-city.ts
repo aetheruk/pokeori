@@ -1885,7 +1885,7 @@ export const celadonCityTasks: Task[] = [
   {
     "id": "celadon-poison-dead-drop",
     "name": "Intercepting the Toxin",
-    "description": "Use your foreknowledge of the Rocket delivery to retrieve the sealed neurotoxin before the assassin can collect it.",
+    "description": "Use your foreknowledge of the Rocket delivery to retrieve the sealed poison before the assassin can collect it.",
     "category": "Kanto",
     "subCategory": "Celadon City",
     "background": "/backgrounds/celadon.avif",
@@ -1895,7 +1895,7 @@ export const celadonCityTasks: Task[] = [
     },
     "secret": false,
     "completionTrigger": "manual",
-    "completeButtonText": "Intercept Delivery",
+    "completeButtonText": "Grab the Package",
     "repeatable": false,
     "requirements": [
       {
@@ -1939,7 +1939,7 @@ export const celadonCityTasks: Task[] = [
       {
         "id": 2,
         "title": "Intercepting the Drop",
-        "message": "You pry open the iron drainage grate. The courier has just stashed the heavy, sealed vial wrapped in weatherproof casing. You retrieve it from the drop point just moments before the Rocket assassin arrives for collection!",
+        "message": "You pry open the iron drainage grate. The courier has just stashed the heavy, sealed vials wrapped in weatherproof casing. You retrieve it and leave as fast as you arrived.",
         "background": "/backgrounds/celadon.avif",
         "icon": {
           "type": "item",
@@ -1947,7 +1947,7 @@ export const celadonCityTasks: Task[] = [
         },
         "buttons": [
           {
-            "text": "Intercept Toxin",
+            "text": "Leave Area",
             "type": "success"
           }
         ]
@@ -1955,9 +1955,9 @@ export const celadonCityTasks: Task[] = [
     ],
     "exitModal": {
       "background": "/backgrounds/celadon.avif",
-      "title": "Toxin Intercepted",
-      "message": "You intercepted the Sealed Rocket Toxin, dismantling Team Rocket's assassination plot before the hitman could retrieve it. Its synthetic formulation is far beyond ordinary Kanto medicines. Master Koga of Fuchsia City, the authority on ninjutsu toxins, may be able to analyze it.",
-      "closeButtonText": "Keep it Safe",
+      "title": "Safe? For now?",
+      "message": "Poison in hand the immediate threat is over, but you don’t feel particularly safe. Ray suggests we have it looked into by Koga of Fuchsia City. But first I need to head back to Pokemon Tower. I know what I need to do.",
+      "closeButtonText": "To Pokemon Tower",
       "icon": {
         "type": "item",
         "id": "rocket-poison-vial"

@@ -52,7 +52,9 @@ describe('Saffron knockout task data', () => {
     expect(task?.category).toBe('Kanto')
     expect(task?.subCategory).toBe('Saffron City')
     expect(task?.enterModal).toHaveLength(1)
-    expect(task?.enterModal?.[0]?.message).toContain('Choo will be right behind me')
+    expect(task?.enterModal?.[0]?.title).toBe('Going on Ahead')
+    expect(task?.enterModal?.[0]?.buttons?.[0]?.text).toBe('Enter Gym')
+    expect(task?.enterModal?.[0]?.message).toContain('where’s Ray')
     expect(task?.exitModal?.message).toContain('Hello is anyo')
   })
 })
@@ -134,7 +136,7 @@ describe('blackout golden glow tasks', () => {
     )
     expect(task?.enterModal).toHaveLength(6)
     expect(task?.enterModal?.[0]?.message).toBe(
-      'Well now, Quite the spirit in you {Trainer}',
+      'Well now, quite the spirit in you {Trainer}',
     )
     expect(task?.enterModal?.[5]?.buttons?.[0]?.text).toBe('No')
     expect(task?.exitModal?.message).toBe(
@@ -173,6 +175,25 @@ describe('blackout void chronicles and time divergence', () => {
         targetId: 'chronicle-rocket-assassination',
         expeditionStatus: 'completed',
       }),
+    )
+    expect(rocketExp?.name).toBe('Before the End Pt.1')
+    expect(rocketExp?.buttonText).toBe('Recall')
+    expect(chooExp?.name).toBe('Before the End Pt.2')
+    expect(chooExp?.buttonText).toBe('Continue')
+  })
+
+  test('Ariana and Ray Choo Chronicle activities use the revised scene titles and Continue buttons', () => {
+    expect(tasks.find((entry) => entry.id === 'rocket-chronicle-saffron-ambush-set')?.name).toBe(
+      'Moments Before',
+    )
+    expect(tasks.find((entry) => entry.id === 'choo-chronicle-approaching-saffron')?.name).toBe(
+      'Arriving at Saffron',
+    )
+    expect(tasks.find((entry) => entry.id === 'choo-chronicle-witnessing-the-strike')?.name).toBe(
+      'Arrival',
+    )
+    expect(tasks.find((entry) => entry.id === 'entity-reflections')?.name).toBe(
+      'A Mighty Roar',
     )
   })
 

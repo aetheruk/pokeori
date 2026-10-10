@@ -3,12 +3,11 @@ import type { ExpeditionConfig } from '../types'
 export const blackoutChronicleExpeditions: ExpeditionConfig[] = [
   {
     id: 'chronicle-rocket-assassination',
-    name: 'Team Rocket: Order to Eliminate',
-    description:
-      'A recollection of shadow command: from the quiet top of Pokemon Tower to the order issued against an interfering trainer.',
+    name: 'Before the End Pt.1',
+    description: 'Shapes and patterns form around you.',
     category: '???',
     subCategory: '???',
-    buttonText: 'Recall Memory',
+    buttonText: 'Recall',
     icon: {
       type: 'trainer',
       id: 'ariana',
@@ -122,11 +121,11 @@ export const blackoutChronicleExpeditions: ExpeditionConfig[] = [
   },
   {
     id: 'chronicle-ray-choo-pursuit',
-    name: 'Detective Choo: The Saffron Pursuit',
-    description: 'Follow Detective Ray Choo as he races toward Saffron City with his Arcanine.',
+    name: 'Before the End Pt.2',
+    description: 'Familiar shapes start to form.',
     category: '???',
     subCategory: '???',
-    buttonText: 'Recall Memory',
+    buttonText: 'Continue',
     icon: {
       type: 'trainer',
       id: 'detective',
