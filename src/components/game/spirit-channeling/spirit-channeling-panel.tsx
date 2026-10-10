@@ -69,6 +69,33 @@ function pokemonDisplayName(pokemon: Pokemon): string {
   return pokemon.name || getPokemonForm(pokemon.formId)?.name || 'Pokemon'
 }
 
+function normalizePokemonBackgroundPath(path?: string | null) {
+  const filename = path?.split('/').pop()
+  if (!filename) return null
+
+  return `/backgrounds/${filename
+    .replace(/\.(png|jpe?g|webp)$/i, '.avif')
+    .replaceAll('_', '-')}`
+}
+
+function PickerCardBackground({ background }: { background?: string | null }) {
+  if (!background) return null
+
+  return (
+    <>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-70"
+        style={{ backgroundImage: `url(${background})` }}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-game-surface-raised/76 via-game-surface/56 to-game-surface/10"
+      />
+    </>
+  )
+}
+
 function isChannelingComplete(
   gameResults:
     | NonNullable<ReturnType<typeof useUser>['gameData']>['gameResults']
@@ -633,24 +660,25 @@ function IncensePickerDialog({
                   data-haptic-manual="true"
                   aria-pressed={selectedIncenseId === incense.id}
                   className={cn(
-                    'relative flex min-h-[88px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-card-border bg-game-surface p-3 text-left text-game-ink transition-colors hover:border-game-moss/45',
+                    'game-focus-ring relative flex min-h-[88px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-3 text-left text-game-ink transition-colors hover:border-game-charcoal/45',
                     selectedIncenseId === incense.id
-                      ? 'border-game-moss/70 bg-game-moss/10'
-                      : '',
+                      ? 'border-game-charcoal/65 ring-1 ring-game-charcoal/15'
+                      : 'border-game-card-border',
                   )}
                 >
-                  <span className="flex h-16 w-16 shrink-0 items-center justify-center">
+                  <PickerCardBackground background="/backgrounds/pkmn-tower.avif" />
+                  <span className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center">
                     <ItemSprite
                       itemId={incense.id}
                       alt={incense.name}
                       className="h-16 w-16 object-contain"
                     />
                   </span>
-                  <span className="flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+                  <span className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
                     <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.08em] text-white">
                       {incense.name}
                     </span>
-                    <span className="mt-auto pt-2 text-xs leading-4 text-game-muted">
+                    <span className="mt-auto pt-2 text-xs leading-4 text-game-ink">
                       {incense.description}
                     </span>
                   </span>
@@ -746,12 +774,13 @@ function OfferingPickerDialog({
                   data-haptic-manual="true"
                   aria-pressed={selectedItemId === offering.itemId}
                   className={cn(
-                    'relative flex min-h-[76px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border p-3 text-left transition-colors',
+                    'game-focus-ring relative flex min-h-[76px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-3 text-left text-game-ink transition-colors hover:border-game-charcoal/45',
                     selectedItemId === offering.itemId
-                      ? 'border-game-moss/60 bg-game-moss/10 text-game-ink'
-                      : 'border-game-card-border bg-game-surface text-game-ink hover:border-game-moss/45',
+                      ? 'border-game-charcoal/65 ring-1 ring-game-charcoal/15'
+                      : 'border-game-card-border',
                   )}
                 >
+                  <PickerCardBackground background="/backgrounds/inventory.avif" />
                   <span className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
                     <ItemSprite
                       itemId={offering.itemId}
@@ -765,7 +794,7 @@ function OfferingPickerDialog({
                     <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
                       {itemName(offering.itemId)}
                     </span>
-                    <span className="mt-auto pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
+                    <span className="mt-auto pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-game-ink">
                       Owned ×{inventoryMap[offering.itemId] || 0}
                     </span>
                   </span>
@@ -918,13 +947,16 @@ function PokemonPickerDialog({
                     data-haptic-manual="true"
                     aria-pressed={selectedPokemonId === entry.id}
                     className={cn(
-                      'relative flex min-h-[88px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-card-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/45',
+                      'game-focus-ring relative flex min-h-[88px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-3 text-left text-game-ink transition-colors hover:border-game-charcoal/45',
                       selectedPokemonId === entry.id
-                        ? 'border-game-moss/70 bg-game-moss/10 text-game-ink'
-                        : 'text-game-ink',
+                        ? 'border-game-charcoal/65 ring-1 ring-game-charcoal/15'
+                        : 'border-game-card-border',
                     )}
                   >
-                    <span className="relative h-16 w-16 shrink-0">
+                    <PickerCardBackground
+                      background={normalizePokemonBackgroundPath(entry.background)}
+                    />
+                    <span className="relative z-10 h-16 w-16 shrink-0">
                       <Image
                         src={imageUrl}
                         alt={pokemonDisplayName(entry)}
@@ -933,11 +965,11 @@ function PokemonPickerDialog({
                         className="object-contain pixelated"
                       />
                     </span>
-                    <span className="flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+                    <span className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
                       <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.08em] text-white">
                         {pokemonDisplayName(entry)}
                       </span>
-                      <span className="mt-auto pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
+                      <span className="mt-auto pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-game-ink">
                         Level {entry.level}
                       </span>
                     </span>
