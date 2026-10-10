@@ -117,6 +117,7 @@ export const CHANNELING_POKEMON_SELECT = {
   shiny: true,
   rarity: true,
   gender: true,
+  background: true,
   stats: true,
   fusedIntoPokemonId: true,
 } as const
