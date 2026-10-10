@@ -375,7 +375,7 @@ export function SpiritChannelingPanel() {
               </Section>
 
               <Section title="Offerings">
-                  <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {offeringSlots.map((slot, index) => (
                     <OfferingSlotControl
                       key={index}
@@ -410,15 +410,14 @@ export function SpiritChannelingPanel() {
                 )}
               </Section>
 
-              <Section title="Channeling">
-                <div ref={ceremonySectionRef}>
-                  <InlineCeremonyPanel
-                    state={ceremonyState}
-                    incenseItemId={selectedIncenseId}
-                    message={ceremonyMessage}
-                  />
-                </div>
-              </Section>
+              <div ref={ceremonySectionRef}>
+                <InlineCeremonyPanel
+                  state={ceremonyState}
+                  incenseItemId={selectedIncenseId}
+                  pokemon={selectedPokemon}
+                  message={ceremonyMessage}
+                />
+              </div>
 
               <div className="hidden md:block">
                 <ChannelingButton
@@ -569,11 +568,14 @@ function IncensePickerDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+      <DialogContent
+        showCloseButton={false}
+        className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl"
+      >
         <div className="max-h-[85vh] overflow-y-auto px-4 pb-5 pt-0">
           <div className="-mr-4 flex justify-end">
             <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
-            Incense
+              Incense
             </DialogTitle>
           </div>
           <DialogDescription className="sr-only">
@@ -639,11 +641,14 @@ function OfferingPickerDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+      <DialogContent
+        showCloseButton={false}
+        className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl"
+      >
         <div className="max-h-[85vh] overflow-y-auto px-4 pb-5 pt-0">
           <div className="-mr-4 flex justify-end">
             <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
-            Offering {slotIndex + 1}
+              Offering {slotIndex + 1}
             </DialogTitle>
           </div>
           <DialogDescription className="sr-only">
@@ -786,11 +791,14 @@ function PokemonPickerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="game-paper-modal game-paper-background h-[min(720px,calc(100dvh-2rem))] max-w-md overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+      <DialogContent
+        showCloseButton={false}
+        className="game-paper-modal game-paper-background h-[min(720px,calc(100dvh-2rem))] max-w-md overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl"
+      >
         <div className="flex h-full min-h-0 flex-col px-4 pb-5 pt-0">
           <div className="-mr-4 flex shrink-0 justify-end">
             <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
-            Channeler
+              Channeler
             </DialogTitle>
           </div>
           <DialogDescription className="mt-1 pr-8 text-left text-xs text-game-muted">
@@ -874,10 +882,12 @@ function PokemonPickerDialog({
 function InlineCeremonyPanel({
   state,
   incenseItemId,
+  pokemon,
   message,
 }: {
   state: CeremonyState
   incenseItemId: string
+  pokemon: Pokemon | undefined
   message: string
 }) {
   const status =
@@ -889,12 +899,26 @@ function InlineCeremonyPanel({
         : '')
 
   return (
-    <div className="mx-auto w-full max-w-xs">
-      <div className="relative h-32 overflow-hidden rounded-md border border-game-border bg-game-surface/45">
-        <CeremonyDisplay state={state} incenseItemId={incenseItemId} />
-      </div>
+    <div className="relative h-56 w-full overflow-hidden rounded-md border border-game-border bg-game-charcoal sm:h-64">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: 'url(/backgrounds/pkmn-tower.avif)' }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-game-charcoal/25"
+      />
+      <h2 className="absolute right-0 top-0 z-20 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
+        Channeling
+      </h2>
+      <CeremonyDisplay
+        state={state}
+        incenseItemId={incenseItemId}
+        pokemon={pokemon}
+      />
       {status && (
-        <div className="mt-3 text-center text-xs font-black uppercase tracking-[0.16em] text-game-ink">
+        <div className="absolute inset-x-0 bottom-0 z-20 bg-game-charcoal/75 px-3 py-2 text-center text-xs font-black uppercase tracking-[0.16em] text-white">
           {status}
         </div>
       )}
@@ -1063,32 +1087,54 @@ function OfferingSlotControl({
 function CeremonyDisplay({
   state,
   incenseItemId,
+  pokemon,
 }: {
   state: CeremonyState
   incenseItemId: string
+  pokemon: Pokemon | undefined
 }) {
+  const pokemonImageUrl = pokemon
+    ? getPokemonImageUrl(
+        pokemon.formId,
+        'sprite',
+        !!pokemon.shiny,
+        getOwnedPokemonGender(pokemon),
+      )
+    : ''
+
   return (
-    <div className="absolute inset-0 flex items-end justify-center overflow-hidden bg-game-canvas">
+    <div className="absolute inset-0 flex items-end justify-between overflow-hidden px-[8%] pb-5">
       {incenseItemId && (
         <>
-          <div className="absolute bottom-4 h-6 w-24 rounded-full bg-game-ink/10 blur-md" />
+          <div className="absolute bottom-5 left-[8%] h-6 w-20 rounded-full bg-game-charcoal/45 blur-md" />
           <ItemSprite
             itemId={incenseItemId}
             alt="Incense"
-            className="relative z-10 mb-3 h-12 w-12 object-contain drop-shadow-sm"
+            className="relative z-10 mb-2 h-16 w-16 object-contain drop-shadow-lg sm:h-20 sm:w-20"
           />
         </>
       )}
+      {pokemon && (
+        <div className="relative z-10 mb-1 h-32 w-32 shrink-0 drop-shadow-xl sm:h-40 sm:w-40">
+          <Image
+            src={pokemonImageUrl}
+            alt={pokemonDisplayName(pokemon)}
+            fill
+            sizes="(min-width: 640px) 160px, 128px"
+            className="object-contain pixelated"
+          />
+        </div>
+      )}
       {(state === 'smoke' || state === 'ghost') && (
         <>
-          <div className="absolute bottom-14 h-20 w-10 motion-safe:animate-pulse rounded-full bg-game-moss/18 blur-2xl" />
-          <div className="absolute bottom-20 ml-7 h-14 w-14 motion-safe:animate-pulse rounded-full bg-game-ochre/14 blur-2xl" />
-          <div className="absolute bottom-20 -ml-8 h-12 w-12 motion-safe:animate-pulse rounded-full bg-game-surface-raised/70 blur-xl" />
-          <div className="absolute bottom-14 ml-1 h-24 w-4 motion-safe:animate-pulse rounded-full bg-game-surface-raised/60 blur-lg" />
+          <div className="absolute bottom-10 left-1/2 h-20 w-10 -translate-x-1/2 motion-safe:animate-pulse rounded-full bg-game-moss/35 blur-2xl" />
+          <div className="absolute bottom-16 left-1/2 ml-7 h-14 w-14 -translate-x-1/2 motion-safe:animate-pulse rounded-full bg-game-ochre/35 blur-2xl" />
+          <div className="absolute bottom-16 left-1/2 -ml-8 h-12 w-12 -translate-x-1/2 motion-safe:animate-pulse rounded-full bg-game-surface-raised/80 blur-xl" />
+          <div className="absolute bottom-10 left-1/2 h-24 w-4 -translate-x-1/2 motion-safe:animate-pulse rounded-full bg-game-surface-raised/70 blur-lg" />
         </>
       )}
       {state === 'ghost' && (
-        <div className="absolute bottom-12 h-20 w-20 animate-pulse">
+        <div className="absolute bottom-10 left-1/2 z-20 h-24 w-24 -translate-x-1/2 animate-pulse">
           <Image
             src={getPokemonImageUrl('92', 'sprite')}
             alt="Gastly"

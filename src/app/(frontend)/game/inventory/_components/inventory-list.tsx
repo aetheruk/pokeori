@@ -167,7 +167,10 @@ function InventoryNavChip({
           : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
       )}
     >
-      <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center">
+      <span
+        aria-hidden="true"
+        className="flex h-8 w-8 shrink-0 items-center justify-center"
+      >
         {all ? (
           <TaskIconDisplay
             icon={{ type: 'local', id: '/fallback/skills/inventory-v2.png' }}
@@ -231,14 +234,14 @@ function getItemActionLabel(
     return item.effects?.grantRandomPokemonMaterials
       ? 'Open'
       : item.effects?.startBattle
-      ? 'Battle'
-      : item.effects?.startEncounter
-        ? 'Encounter'
-        : item.effects?.startResearch
-          ? 'Research'
-          : item.effects?.startMinigame
-            ? 'Play'
-            : 'Use'
+        ? 'Battle'
+        : item.effects?.startEncounter
+          ? 'Encounter'
+          : item.effects?.startResearch
+            ? 'Research'
+            : item.effects?.startMinigame
+              ? 'Play'
+              : 'Use'
   }
 
   if (item.battleEffect) return 'Battle Only'
@@ -581,12 +584,7 @@ export function InventoryList() {
               : undefined,
         }
       }),
-    [
-      activeGroup,
-      currencyBalances,
-      inventoryWithDetails,
-      subCategories,
-    ],
+    [activeGroup, currencyBalances, inventoryWithDetails, subCategories],
   )
 
   useEffect(() => {
@@ -858,19 +856,19 @@ export function InventoryList() {
             <div className="flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
               {groupNavOptions.map(
                 ({ group, label, itemId, all, quantity, countLabel }) => (
-                <InventoryNavChip
-                  key={group}
-                  label={label}
-                  itemId={itemId}
-                  all={all}
-                  quantity={quantity}
-                  countLabel={countLabel}
-                  isSelected={activeGroup === group}
-                  onSelect={() => {
-                    triggerHaptic('selection')
-                    setActiveGroup(group)
-                  }}
-                />
+                  <InventoryNavChip
+                    key={group}
+                    label={label}
+                    itemId={itemId}
+                    all={all}
+                    quantity={quantity}
+                    countLabel={countLabel}
+                    isSelected={activeGroup === group}
+                    onSelect={() => {
+                      triggerHaptic('selection')
+                      setActiveGroup(group)
+                    }}
+                  />
                 ),
               )}
             </div>
@@ -883,7 +881,13 @@ export function InventoryList() {
             >
               <div className="flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
                 {subCategoryNavOptions.map(
-                  ({ subCategory, itemId, currencyId, quantity, countLabel }) => (
+                  ({
+                    subCategory,
+                    itemId,
+                    currencyId,
+                    quantity,
+                    countLabel,
+                  }) => (
                     <InventoryNavChip
                       key={subCategory}
                       label={getInventorySubCategoryLabel(subCategory)}
@@ -928,7 +932,8 @@ export function InventoryList() {
           {searchQuery.trim() ? 'Search Results' : activeDisplayLabel}
         </SectionDivider>
 
-        {filteredInventory.length === 0 && filteredCurrencyBalances.length === 0 ? (
+        {filteredInventory.length === 0 &&
+        filteredCurrencyBalances.length === 0 ? (
           <div
             className="mx-auto max-w-xl rounded-md border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"
             role="status"
@@ -1087,17 +1092,22 @@ export function InventoryList() {
               <Button
                 type="button"
                 size="icon"
-                className="h-11 w-11 rounded-xl bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
+                className="relative h-11 w-11 rounded-xl bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                 disabled={isUsing || selectedItemQuantity <= 0}
                 onClick={() => handleOpenAllBoosterPacks(selectedItem)}
                 aria-label={`Open all ${selectedItem.name}`}
                 title={`Open all ${selectedItem.name}`}
               >
-                <TaskIconDisplay
-                  icon={{ type: 'item', id: 'master-ball' }}
-                  normalizeVisibleBounds
-                  className="h-7 w-7"
-                />
+                <span className="relative flex h-7 w-7 items-center justify-center">
+                  <TaskIconDisplay
+                    icon={{ type: 'item', id: 'empty-foil-pack' }}
+                    normalizeVisibleBounds
+                    className="h-7 w-7"
+                  />
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-sm bg-game-charcoal px-1 text-[7px] font-black leading-tight text-white">
+                    ALL
+                  </span>
+                </span>
               </Button>
             </div>
           ) : selectedItem?.category === 'scratch-card' ? (
@@ -1287,11 +1297,16 @@ const InventoryItemCard = memo(function InventoryItemCard({
   const actionLabel = getItemActionLabel(item.details, item.canChannel)
   const isCrafting = isArtisanIngredientItem(item.details)
   const isUsable = !!actionLabel && actionLabel !== 'Battle Only'
-  const actionIcon: TaskIcon = isCrafting
-    ? { type: 'local', id: '/fallback/skills/artisan-v2.png' }
-    : item.canChannel
-      ? { type: 'pokemon', id: '92' }
-      : { type: 'item', id: 'poke-ball' }
+  const actionIcon: TaskIcon =
+    item.details.category === 'booster-pack'
+      ? { type: 'item', id: 'empty-foil-pack' }
+      : item.details.category === 'scratch-card'
+        ? { type: 'item', id: item.itemId }
+        : isCrafting
+          ? { type: 'local', id: '/fallback/skills/artisan-v2.png' }
+          : item.canChannel
+            ? { type: 'pokemon', id: '92' }
+            : { type: 'item', id: 'poke-ball' }
   const showBulkOpen =
     item.details.category === 'booster-pack' &&
     item.quantity > 1 &&
@@ -1328,25 +1343,23 @@ const InventoryItemCard = memo(function InventoryItemCard({
           </span>
         </h3>
         <div className="relative z-20 mt-auto flex max-w-full flex-wrap justify-end gap-2 pt-3">
-          {!isCrafting && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              data-haptic-manual="true"
-              className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
-              onClick={() => onClick(item.details)}
-              aria-haspopup="dialog"
-              aria-label={`View ${item.details.name}`}
-              title={`View ${item.details.name}`}
-            >
-              <TaskIconDisplay
-                icon={{ type: 'item', id: 'explorers-journal' }}
-                normalizeVisibleBounds
-                className="h-7 w-7"
-              />
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            data-haptic-manual="true"
+            className="size-11 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
+            onClick={() => onClick(item.details)}
+            aria-haspopup="dialog"
+            aria-label={`View ${item.details.name}`}
+            title={`View ${item.details.name}`}
+          >
+            <TaskIconDisplay
+              icon={{ type: 'item', id: 'explorers-journal' }}
+              normalizeVisibleBounds
+              className="h-7 w-7"
+            />
+          </Button>
           {isUsable && (
             <Button
               type="button"
@@ -1381,11 +1394,16 @@ const InventoryItemCard = memo(function InventoryItemCard({
               aria-label={`Open all ${item.details.name}`}
               title={`Open all ${item.details.name}`}
             >
-              <TaskIconDisplay
-                icon={{ type: 'item', id: 'master-ball' }}
-                normalizeVisibleBounds
-                className="h-7 w-7"
-              />
+              <span className="relative flex h-7 w-7 items-center justify-center">
+                <TaskIconDisplay
+                  icon={{ type: 'item', id: 'empty-foil-pack' }}
+                  normalizeVisibleBounds
+                  className="h-7 w-7"
+                />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-sm bg-game-charcoal px-1 text-[7px] font-black leading-tight text-white">
+                  ALL
+                </span>
+              </span>
             </Button>
           )}
         </div>
