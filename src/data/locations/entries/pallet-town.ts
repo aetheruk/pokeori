@@ -114,6 +114,16 @@ export const palletTownLocations: Location[] = [
     ],
     rewards: [
       {
+        type: 'item',
+        targetId: 'kanto-histories-vol-1',
+        quantity: 1,
+        dropChance: 1,
+        secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'kanto-histories-vol-1', inverse: true },
+        ],
+      },
+      {
         type: 'task_complete',
         dropChance: 15,
         targetId: 'rattatas-burrow',

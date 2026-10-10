@@ -527,7 +527,7 @@ export const rockTunnelBattles: BattleConfig[] = [
         formId: '208',
         level: 40,
         name: 'The Beast',
-        shiny: true,
+        shiny: false,
         evs: beastStats,
         ivs: beastIvs,
       },
