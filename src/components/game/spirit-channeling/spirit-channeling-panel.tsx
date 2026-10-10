@@ -335,6 +335,15 @@ export function SpiritChannelingPanel() {
       <PremiumHeader
         title={headerTitle}
         subtitle={selectedMementoId ? 'Channeling' : undefined}
+        icon={
+          selectedMementoId ? (
+            <ItemSprite
+              itemId={selectedMementoId}
+              alt={itemName(selectedMementoId)}
+              className="h-10 w-10 object-contain"
+            />
+          ) : undefined
+        }
       />
 
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
@@ -366,7 +375,7 @@ export function SpiritChannelingPanel() {
               </Section>
 
               <Section title="Offerings">
-                <div className="flex flex-wrap justify-center gap-x-6 gap-y-4">
+                  <div className="grid grid-cols-3 gap-2">
                   {offeringSlots.map((slot, index) => (
                     <OfferingSlotControl
                       key={index}
@@ -560,11 +569,13 @@ function IncensePickerDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
-        <div className="px-4 pb-5 pt-5">
-          <DialogTitle className="text-left font-display text-lg font-semibold text-game-ink">
+      <DialogContent showCloseButton={false} className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+        <div className="max-h-[85vh] overflow-y-auto px-4 pb-5 pt-0">
+          <div className="-mr-4 flex justify-end">
+            <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
             Incense
-          </DialogTitle>
+            </DialogTitle>
+          </div>
           <DialogDescription className="sr-only">
             Choose an incense for the channeling.
           </DialogDescription>
@@ -580,6 +591,7 @@ function IncensePickerDialog({
                   key={incense.id}
                   type="button"
                   onClick={() => onSelect(incense.id)}
+                  data-haptic-manual="true"
                   aria-pressed={selectedIncenseId === incense.id}
                   className={cn(
                     'flex min-w-0 flex-col items-center rounded-md border px-2 py-3 text-center transition-colors',
@@ -627,11 +639,13 @@ function OfferingPickerDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
-        <div className="px-4 pb-5 pt-5">
-          <DialogTitle className="text-left font-display text-lg font-semibold text-game-ink">
+      <DialogContent showCloseButton={false} className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+        <div className="max-h-[85vh] overflow-y-auto px-4 pb-5 pt-0">
+          <div className="-mr-4 flex justify-end">
+            <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
             Offering {slotIndex + 1}
-          </DialogTitle>
+            </DialogTitle>
+          </div>
           <DialogDescription className="sr-only">
             Choose an offering for this slot.
           </DialogDescription>
@@ -647,6 +661,7 @@ function OfferingPickerDialog({
                   key={offering.itemId}
                   type="button"
                   onClick={() => onSelect(offering.itemId)}
+                  data-haptic-manual="true"
                   aria-pressed={selectedItemId === offering.itemId}
                   className={cn(
                     'relative flex min-w-0 flex-col items-center rounded-md border px-1.5 py-2 text-center transition-colors',
@@ -771,11 +786,13 @@ function PokemonPickerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="game-paper-modal game-paper-background h-[min(720px,calc(100dvh-2rem))] max-w-md overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
-        <div className="flex h-full min-h-0 flex-col px-4 pb-5 pt-5">
-          <DialogTitle className="text-left font-display text-lg font-semibold text-game-ink">
+      <DialogContent showCloseButton={false} className="game-paper-modal game-paper-background h-[min(720px,calc(100dvh-2rem))] max-w-md overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+        <div className="flex h-full min-h-0 flex-col px-4 pb-5 pt-0">
+          <div className="-mr-4 flex shrink-0 justify-end">
+            <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
             Channeler
-          </DialogTitle>
+            </DialogTitle>
+          </div>
           <DialogDescription className="mt-1 pr-8 text-left text-xs text-game-muted">
             Choose a Pokemon to channel this memory.
           </DialogDescription>
@@ -817,6 +834,7 @@ function PokemonPickerDialog({
                     key={entry.id}
                     type="button"
                     onClick={() => onSelect(entry.id)}
+                    data-haptic-manual="true"
                     aria-pressed={selectedPokemonId === entry.id}
                     className={cn(
                       'flex min-h-16 w-full min-w-0 items-center gap-3 rounded-md border p-2 text-left transition-colors',
@@ -951,7 +969,7 @@ function OfferingSlotControl({
   const quantityMax = slot.itemId ? inventoryMap[slot.itemId] || 1 : 1
 
   return (
-    <div className="flex w-36 flex-col items-center">
+    <div className="flex w-full min-w-0 flex-col items-center">
       <div className="relative h-[72px] w-[72px]">
         <button
           type="button"
@@ -996,12 +1014,12 @@ function OfferingSlotControl({
       <div className="mt-2 min-h-5 max-w-full truncate px-1 text-center text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
         {slot.itemId ? itemName(slot.itemId) : 'Empty'}
       </div>
-      <div className="mt-1.5 flex h-10 w-full items-center justify-between rounded-full border border-game-border bg-game-canvas/55">
+      <div className="mt-1.5 flex h-9 w-full max-w-28 items-center justify-center gap-0.5 rounded-full border border-game-border bg-game-canvas/55">
         <Button
           type="button"
           size="icon-sm"
           variant="ghost"
-          className="h-10 w-10 rounded-full"
+          className="h-8 w-7 rounded-full p-0"
           disabled={!slot.itemId || slot.quantity <= 1}
           onClick={(event) => {
             event.stopPropagation()
@@ -1021,13 +1039,13 @@ function OfferingSlotControl({
           onChange={(event) => onQuantitySet(index, Number(event.target.value))}
           onFocus={(event) => event.currentTarget.select()}
           aria-label={`Offering ${index + 1} quantity`}
-          className="h-8 w-14 border-0 bg-transparent px-1 text-center font-mono text-xs font-black text-game-ink shadow-none focus-visible:ring-1 focus-visible:ring-game-moss"
+          className="h-8 w-8 border-0 bg-transparent px-0 text-center font-mono text-xs font-black text-game-ink shadow-none focus-visible:ring-1 focus-visible:ring-game-moss"
         />
         <Button
           type="button"
           size="icon-sm"
           variant="ghost"
-          className="h-10 w-10 rounded-full"
+          className="h-8 w-7 rounded-full p-0"
           disabled={!slot.itemId || slot.quantity >= quantityMax}
           onClick={(event) => {
             event.stopPropagation()
