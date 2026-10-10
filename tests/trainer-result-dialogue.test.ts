@@ -22,4 +22,28 @@ describe('trainer battle result dialogue', () => {
       'Magnificent Work Ray Choo! I see a bit of my younger self in you.',
     )
   })
+
+  test('Ariana’s Chronicle ambush drill has authored victory and defeat dialogue', () => {
+    const battle = battles.find(({ id }) => id === 'rocket-chronicle-ambush-drill')
+    const dialogue = getTrainerBattleResultDialogue(battle)
+
+    expect(dialogue.winMessage).toBe(
+      "You went a few rounds against me, I'm impressed.",
+    )
+    expect(dialogue.loseMessage).toBe(
+      'Impeccable performance.',
+    )
+  })
+
+  test('Ray Choo’s Chronicle battle has authored victory and defeat dialogue', () => {
+    const battle = battles.find(({ id }) => id === 'choo-chronicle-gate-grunt-battle')
+    const dialogue = getTrainerBattleResultDialogue(battle)
+
+    expect(dialogue.winMessage).toBe(
+      'Sorry boy, Now’s not the time.',
+    )
+    expect(dialogue.loseMessage).toBe(
+      'A minor setback.',
+    )
+  })
 })

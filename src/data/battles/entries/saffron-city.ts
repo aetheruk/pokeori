@@ -6,7 +6,9 @@ export const saffronCityBattles: BattleConfig[] = [
     trainerClassId: 'rocket-grunt',
     name: 'Perimeter Guard',
     description:
-      'Detective Ray Choo breaks through the Rocket guard blocking the Saffron perimeter.',
+      'No further words were spoken before Ray orders his Arcanine to attack.',
+    winMessage: 'Sorry boy, Now’s not the time.',
+    loseMessage: 'A minor setback.',
     category: 'Secret',
     subCategory: 'Saffron City',
     icon: {
@@ -35,7 +37,9 @@ export const saffronCityBattles: BattleConfig[] = [
     trainerClassId: 'rocket-grunt',
     name: 'Ambush Strike Squad',
     description:
-      'Executive Ariana tests the readiness of her Saffron ambush unit.',
+      'The vision continues. Ariana is checking the readiness of the strike squad.',
+    winMessage: "You went a few rounds against me, I'm impressed.",
+    loseMessage: 'Impeccable performance.',
     category: 'Secret',
     subCategory: 'Saffron City',
     icon: {
