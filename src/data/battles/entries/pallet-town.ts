@@ -247,7 +247,18 @@ export const palletTownBattles: BattleConfig[] = [
         ],
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'kanto-histories-vol-1',
+        quantity: 1,
+        dropChance: 1,
+        secret: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'kanto-histories-vol-1', inverse: true },
+        ],
+      },
+    ],
     enemyAttackTelegraphChance: 80,
   },
   {

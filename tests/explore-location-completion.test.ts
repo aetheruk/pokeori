@@ -361,7 +361,7 @@ describe('Explore location completion star', () => {
       isLocationEntryMastered(
         route1Entry,
         makeUserData({
-          inventory: [],
+          inventory: [{ itemId: 'kanto-histories-vol-1', quantity: 1 }],
           completedTasks: [
             {
               taskId: 'rattatas-burrow',
@@ -421,7 +421,7 @@ describe('Explore location completion star', () => {
       isLocationEntryMastered(
         route1Entry,
         makeUserData({
-          inventory: [],
+          inventory: [{ itemId: 'kanto-histories-vol-1', quantity: 1 }],
           completedTasks: [
             {
               taskId: 'rattatas-burrow',
@@ -482,7 +482,7 @@ describe('Explore location completion star', () => {
       isLocationEntryMastered(
         route1Entry,
         makeUserData({
-          inventory: [],
+          inventory: [{ itemId: 'kanto-histories-vol-1', quantity: 1 }],
           completedTasks: [
             {
               taskId: 'rattatas-burrow',

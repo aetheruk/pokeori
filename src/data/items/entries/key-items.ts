@@ -1051,6 +1051,21 @@ export const keyItems: Item[] = [
     consume: false,
   },
   {
+    id: 'kanto-histories-vol-1',
+    name: 'Kanto Histories Vol: 1',
+    description: `Kanto is a land rich in many natural resources, from abundant forests, Mineral rich mines and bountiful fish but one material eludes its beautiful natural landscapes, Iron.
+
+In ancient times Land owners that managed to find Iron ore would be as rich as kings, the demand was so high and the Availability so low they could claim any price they demanded.
+
+Tales from that era are uncommon but some texts still survive.
+
+One such tale was that of Merchant Feron, Who bought up the Iron from all of the surrounding areas and hoarded it. This made it so scarce the people had no choice but to buy it back from him at ten times the price. Unfortunately for Feron, his plan had caught the Ire of many locals and in the dead of night several banded together dragged him from his home, and sealed him in a cave deep underground, with nothing but his precious Iron to keep him company.`,
+    category: 'books',
+    spriteId: 'guide-book',
+    unique: true,
+    consume: false,
+  },
+  {
     id: 'manics-journal-pg-322',
     name: "Manic's Journal Pg 322",
     description:

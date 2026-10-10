@@ -198,6 +198,46 @@ const eachReward = (
 }
 
 describe('static data references', () => {
+  test('Route 1 hides the unique Kanto history book in all three activity drop pools', () => {
+    const bookId = 'kanto-histories-vol-1'
+    const book = items.find((entry) => entry.id === bookId)
+    expect(book).toMatchObject({
+      name: 'Kanto Histories Vol: 1',
+      category: 'books',
+      spriteId: 'guide-book',
+      unique: true,
+      consume: false,
+    })
+    expect(book?.description.split('\n\n')).toHaveLength(4)
+    expect(book?.description).toContain('Merchant Feron')
+    const requirements: TaskCondition[] = [
+      { type: 'item_owned', targetId: bookId, inverse: true },
+    ]
+    const reward: Reward = {
+      type: 'item',
+      targetId: bookId,
+      quantity: 1,
+      dropChance: 1,
+      secret: true,
+      requirements,
+    }
+    expect(locations.find((entry) => entry.id === 'tutorial-1')?.rewards)
+      .toContainEqual(reward)
+    expect(battles.find((entry) => entry.id === 'route-1-battle')?.rewards)
+      .toContainEqual(reward)
+    const study = allGames.find((entry) => entry.id === 'route-1-field-observation')
+    expect(study?.gameType).toBe('field-observation')
+    if (study?.gameType !== 'field-observation') throw new Error('Missing Route 1 study')
+    expect(study.settings.itemDrops).toContainEqual({
+      id: 'route-1-kanto-histories-vol-1',
+      itemId: bookId,
+      quantity: 1,
+      dropChance: 1,
+      secret: true,
+      requirements,
+    })
+  })
+
   test('move-granting TMs have unique move and item IDs', () => {
     const duplicateMoveIds = ALL_TM_MOVES.map((move) => move.id).filter(
       (id, index, all) => all.indexOf(id) !== index,
@@ -5746,7 +5786,7 @@ describe('static data references', () => {
         formId: '208',
         level: 40,
         name: 'The Beast',
-        shiny: true,
+        shiny: false,
       }),
     )
     expect(beast?.rewards).toEqual(
