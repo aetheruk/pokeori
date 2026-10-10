@@ -1,6 +1,15 @@
 'use client'
 
-import { Flame, Loader2, Minus, Plus, Search, Sparkles, X } from 'lucide-react'
+import {
+  ArrowLeft,
+  Flame,
+  Loader2,
+  Minus,
+  Plus,
+  Search,
+  Sparkles,
+  X,
+} from 'lucide-react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -45,6 +54,8 @@ type CeremonyState = 'idle' | 'smoke' | 'ghost'
 type IncenseOption = (typeof SPIRIT_CHANNELING_INCENSE_ITEMS)[number]
 
 const EMPTY_SLOT: OfferingSlot = { itemId: '', quantity: 1 }
+const FULLSCREEN_PICKER_CLASS =
+  'game-paper-modal game-paper-background fixed inset-0 left-0 top-0 z-50 flex h-[100dvh] max-h-none w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 bg-game-surface p-0 text-game-ink shadow-none sm:max-w-none sm:p-0'
 
 function itemName(itemId: string) {
   return items.find((item) => item.id === itemId)?.name || itemId
@@ -559,6 +570,30 @@ function IncenseSelector({
   )
 }
 
+function PickerScreenHeader({
+  title,
+  onBack,
+}: {
+  title: string
+  onBack: () => void
+}) {
+  return (
+    <div className="flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-game-border py-2">
+      <button
+        type="button"
+        onClick={onBack}
+        className="game-focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-game-border bg-game-surface-raised text-game-ink transition-colors hover:bg-game-canvas"
+        aria-label="Back to Spirit Channeling"
+      >
+        <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+      </button>
+      <DialogTitle className="max-w-[80%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
+        {title}
+      </DialogTitle>
+    </div>
+  )
+}
+
 function IncensePickerDialog({
   open,
   onOpenChange,
@@ -576,14 +611,10 @@ function IncensePickerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl"
+        className={FULLSCREEN_PICKER_CLASS}
       >
-        <div className="max-h-[85vh] overflow-y-auto px-4 pb-5 pt-0">
-          <div className="-mr-4 flex justify-end">
-            <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
-              Incense
-            </DialogTitle>
-          </div>
+        <div className="flex h-full min-h-0 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[env(safe-area-inset-top)]">
+          <PickerScreenHeader title="Incense" onBack={() => onOpenChange(false)} />
           <DialogDescription className="sr-only">
             Choose an incense for the channeling.
           </DialogDescription>
@@ -593,7 +624,7 @@ function IncensePickerDialog({
               No incense available
             </div>
           ) : (
-            <div className="mt-5 grid grid-cols-3 gap-3">
+            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pb-2">
               {incenses.map((incense) => (
                 <button
                   key={incense.id}
@@ -602,21 +633,26 @@ function IncensePickerDialog({
                   data-haptic-manual="true"
                   aria-pressed={selectedIncenseId === incense.id}
                   className={cn(
-                    'flex min-w-0 flex-col items-center rounded-md border px-2 py-3 text-center transition-colors',
+                    'relative flex min-h-[88px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-card-border bg-game-surface p-3 text-left text-game-ink transition-colors hover:border-game-moss/45',
                     selectedIncenseId === incense.id
-                      ? 'border-game-moss bg-game-moss/10 text-game-ink'
-                      : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
+                      ? 'border-game-moss/70 bg-game-moss/10'
+                      : '',
                   )}
                 >
-                  <span className="flex h-14 w-14 items-center justify-center">
+                  <span className="flex h-16 w-16 shrink-0 items-center justify-center">
                     <ItemSprite
                       itemId={incense.id}
                       alt={incense.name}
-                      className="h-14 w-14 object-contain"
+                      className="h-16 w-16 object-contain"
                     />
                   </span>
-                  <span className="mt-2 min-h-8 max-w-full text-[11px] font-medium leading-4">
-                    {incense.name}
+                  <span className="flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+                    <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.08em] text-white">
+                      {incense.name}
+                    </span>
+                    <span className="mt-auto pt-2 text-xs leading-4 text-game-muted">
+                      {incense.description}
+                    </span>
                   </span>
                 </button>
               ))}
@@ -656,14 +692,13 @@ function OfferingPickerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="game-paper-modal game-paper-background flex max-h-[85vh] max-w-sm flex-col overflow-hidden rounded-xl border-0 bg-game-surface p-0 shadow-xl"
+        className={FULLSCREEN_PICKER_CLASS}
       >
-        <div className="flex max-h-[85vh] min-h-0 flex-col px-4 pb-5 pt-0">
-          <div className="-mr-4 flex shrink-0 justify-end">
-            <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
-              Offering {slotIndex + 1}
-            </DialogTitle>
-          </div>
+        <div className="flex h-full min-h-0 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[env(safe-area-inset-top)]">
+          <PickerScreenHeader
+            title={`Offering ${slotIndex + 1}`}
+            onBack={() => onOpenChange(false)}
+          />
           <DialogDescription className="sr-only">
             Choose an offering for this slot.
           </DialogDescription>
@@ -835,14 +870,10 @@ function PokemonPickerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="game-paper-modal game-paper-background h-[min(720px,calc(100dvh-2rem))] max-w-md overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl"
+        className={FULLSCREEN_PICKER_CLASS}
       >
-        <div className="flex h-full min-h-0 flex-col px-4 pb-5 pt-0">
-          <div className="-mr-4 flex shrink-0 justify-end">
-            <DialogTitle className="max-w-[88%] rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-3 py-2 text-right font-display text-base font-semibold leading-tight text-game-cream">
-              Channeler
-            </DialogTitle>
-          </div>
+        <div className="flex h-full min-h-0 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[env(safe-area-inset-top)]">
+          <PickerScreenHeader title="Channeler" onBack={() => onOpenChange(false)} />
           <DialogDescription className="mt-1 pr-8 text-left text-xs text-game-muted">
             Choose a Pokemon to channel this memory.
           </DialogDescription>
@@ -871,7 +902,7 @@ function PokemonPickerDialog({
               No Pokemon match that search.
             </div>
           ) : (
-            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
+            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pb-2 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
               {filteredPokemon.map((entry) => {
                 const imageUrl = getPokemonImageUrl(
                   entry.formId,
@@ -887,13 +918,13 @@ function PokemonPickerDialog({
                     data-haptic-manual="true"
                     aria-pressed={selectedPokemonId === entry.id}
                     className={cn(
-                      'flex min-h-16 w-full min-w-0 items-center gap-3 rounded-md border p-2 text-left transition-colors',
+                      'relative flex min-h-[88px] w-full min-w-0 items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-card-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/45',
                       selectedPokemonId === entry.id
-                        ? 'border-game-moss bg-game-moss/10 text-game-ink'
-                        : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
+                        ? 'border-game-moss/70 bg-game-moss/10 text-game-ink'
+                        : 'text-game-ink',
                     )}
                   >
-                    <span className="relative h-14 w-14 shrink-0 rounded-md border border-game-border bg-game-canvas/45">
+                    <span className="relative h-16 w-16 shrink-0">
                       <Image
                         src={imageUrl}
                         alt={pokemonDisplayName(entry)}
@@ -902,12 +933,12 @@ function PokemonPickerDialog({
                         className="object-contain pixelated"
                       />
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-xs font-black uppercase text-game-ink">
+                    <span className="flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+                      <span className="-mr-3 -mt-3 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.08em] text-white">
                         {pokemonDisplayName(entry)}
                       </span>
-                      <span className="mt-1 block font-mono text-xs font-bold text-game-muted">
-                        LVL {entry.level}
+                      <span className="mt-auto pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
+                        Level {entry.level}
                       </span>
                     </span>
                   </button>
