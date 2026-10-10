@@ -470,6 +470,7 @@ export async function castFishingLine(rodType: RodType) {
                   entry.type === 'item' && entry.itemId ? [entry.itemId] : [],
                 ),
               ),
+              fishingKeepNet.entries,
             )
           : []
         const availableGlobalItemPool = getAvailableFishingItemEntries(

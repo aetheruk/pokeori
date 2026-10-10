@@ -15,6 +15,12 @@ export function getAvailableFishingItemEntries(
   reservedItemIds: ReadonlySet<string> = new Set(),
   keepNet: readonly FishingKeepNetEntry[] = [],
 ): FishingItemEntry[] {
+  const netItemIds = new Set([
+    ...reservedItemIds,
+    ...keepNet.flatMap((entry) =>
+      entry.type === 'item' && entry.itemId ? [entry.itemId] : [],
+    ),
+  ])
   return entries.filter((entry) => {
     if (
       !meetsFishingKeepNetRequirements(
@@ -29,7 +35,7 @@ export function getAvailableFishingItemEntries(
     return (
       !item?.unique ||
       ((inventory[entry.itemId] || 0) <= 0 &&
-        !reservedItemIds.has(entry.itemId))
+        !netItemIds.has(entry.itemId))
     )
   })
 }

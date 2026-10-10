@@ -558,8 +558,17 @@ export function TaskConditionForm({
               <div className="space-y-2">
                 <Label>Size</Label>
                 <Select
-                  value={condition.pokemonCriteria?.size || ''}
-                  onValueChange={(v) => handlePokemonCriteriaChange('size', v)}
+                  value={
+                    Array.isArray(condition.pokemonCriteria?.size)
+                      ? 'XL+'
+                      : condition.pokemonCriteria?.size || ''
+                  }
+                  onValueChange={(v) =>
+                    handlePokemonCriteriaChange(
+                      'size',
+                      v === 'XL+' ? ['XL', 'XXL', 'XXXL'] : v,
+                    )
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Any" />
@@ -569,6 +578,9 @@ export function TaskConditionForm({
                     <SelectItem value="S">S</SelectItem>
                     <SelectItem value="L">L</SelectItem>
                     <SelectItem value="XL">XL</SelectItem>
+                    <SelectItem value="XL+">XL or larger</SelectItem>
+                    <SelectItem value="XXL">XXL</SelectItem>
+                    <SelectItem value="XXXL">XXXL</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -675,8 +687,17 @@ export function TaskConditionForm({
               <div className="space-y-2">
                 <Label>Size</Label>
                 <Select
-                  value={condition.companionCheck?.size || ''}
-                  onValueChange={(v) => handleCompanionCheckChange('size', v)}
+                  value={
+                    Array.isArray(condition.companionCheck?.size)
+                      ? 'XL+'
+                      : condition.companionCheck?.size || ''
+                  }
+                  onValueChange={(v) =>
+                    handleCompanionCheckChange(
+                      'size',
+                      v === 'XL+' ? ['XL', 'XXL', 'XXXL'] : v,
+                    )
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Any" />
@@ -686,6 +707,9 @@ export function TaskConditionForm({
                     <SelectItem value="S">S</SelectItem>
                     <SelectItem value="L">L</SelectItem>
                     <SelectItem value="XL">XL</SelectItem>
+                    <SelectItem value="XL+">XL or larger</SelectItem>
+                    <SelectItem value="XXL">XXL</SelectItem>
+                    <SelectItem value="XXXL">XXXL</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -16,6 +16,7 @@ import { getWildBattleCandyMultiplier } from '@/utilities/battle/held-items'
 import { getPokemonBattleExperience } from '@/utilities/pokemon/experience'
 import { getPersistentPokemonId } from '@/utilities/battle/pokemon-metrics'
 import { ALPHA_RESEARCH_XP } from '@/utilities/pokemon/alpha'
+import { items } from '@/data/items'
 
 export const BATTLE_PARTICIPANT_RESEARCH_XP = 1
 export const BATTLE_WILD_TARGET_RESEARCH_XP = 1
@@ -248,9 +249,12 @@ export function buildBattleWinRewards(
   if (!defeatedAlpha) return rewardsToGrant
 
   return rewardsToGrant.map((reward) => {
+    const isUniqueItem =
+      reward.type === 'item' &&
+      items.some((item) => item.id === reward.targetId && item.unique)
     const multiplier = reward.type === 'xp' ? 5
       : reward.type === 'pokemon_experience' ? 2
-        : reward.type === 'item' ? 3 : 1
+        : reward.type === 'item' && !isUniqueItem ? 3 : 1
     if (multiplier === 1) return reward
     const baseQuantity = reward.quantity ?? 1
     const quantity = typeof baseQuantity === 'number'

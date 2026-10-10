@@ -146,7 +146,14 @@ describe('fishing item pools', () => {
     ]
 
     expect(
-      getAvailableFishingItemEntries(entries, {}, new Set(['golden-scale-1'])).map(
+      getAvailableFishingItemEntries(entries, {}, new Set(), [
+        {
+          id: 'reserved-golden-scale',
+          type: 'item',
+          itemId: 'golden-scale-1',
+          quantity: 1,
+        },
+      ]).map(
         (entry) => entry.itemId,
       ),
     ).toEqual(['water-gem'])

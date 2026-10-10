@@ -249,7 +249,7 @@ export const rockTunnelTasks: Task[] = [
         count: 1,
         pokemonCriteria: {
           speciesId: 56,
-          size: 'XL',
+          size: ['XL', 'XXL', 'XXXL'],
         },
       },
     ],

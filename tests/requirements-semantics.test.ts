@@ -110,7 +110,7 @@ describe('requirements and criteria semantics', () => {
     expect(checkTaskCriteria(alphaCompanionData, task!)).toBe(true)
   })
 
-  test('Mankey Size Study recognizes separate XS and XL Mankey', () => {
+  test('Mankey Size Study recognizes a tiny Mankey and any XL-or-larger Mankey', () => {
     const task = rockTunnelTasks.find(
       (entry) => entry.id === 'rock-tunnel-mankey-size-study',
     )
@@ -118,12 +118,20 @@ describe('requirements and criteria semantics', () => {
       ...baseRequirementData,
       pokemon: [
         { id: 1, speciesId: 56, formId: '56', level: 20, size: 'XS' },
-        { id: 2, speciesId: 56, formId: '56', level: 20, size: 'XL' },
+        { id: 2, speciesId: 56, formId: '56', level: 20, size: 'XXXL' },
       ],
     } as unknown as RequirementData
 
     expect(task).toBeDefined()
     expect(checkTaskCriteria(data, task!)).toBe(true)
+
+    for (const size of ['XL', 'XXL', 'XXXL'] as const) {
+      const largeMankeyData = {
+        ...data,
+        pokemon: [data.pokemon[0], { ...data.pokemon[1], size }],
+      }
+      expect(checkTaskCriteria(largeMankeyData, task!)).toBe(true)
+    }
   })
 
   test('progress reports current values without mutating state', () => {
