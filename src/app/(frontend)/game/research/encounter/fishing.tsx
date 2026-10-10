@@ -357,8 +357,8 @@ function KeepNetSwapPicker({
   onSelect: (index: number) => void
 }) {
   return (
-    <div className="w-full rounded-lg border border-game-ochre/50 bg-game-ochre/10 p-3">
-      <p className="mb-2 text-center text-xs font-semibold text-game-ink">
+    <div className="w-full p-3">
+      <p className="mb-2 text-center text-xs font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
         Net is full. Choose a catch to swap out.
       </p>
       <div className="grid grid-cols-5 gap-2">
@@ -366,13 +366,13 @@ function KeepNetSwapPicker({
           <Button
             key={entry.id}
             type="button"
+            variant="ghost"
             disabled={disabled}
-            className="h-auto min-h-14 flex-col gap-1 rounded-xl bg-game-charcoal p-1 text-[10px] font-semibold text-game-cream hover:bg-game-charcoal-strong"
+            className="h-14 border-0 bg-transparent p-1 shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-white focus-visible:ring-offset-0"
             onClick={() => onSelect(index)}
-            aria-label={`Swap out ${index + 1}: ${entry.type === 'pokemon' ? getPokemonForm(entry.formId)?.name || 'Pokémon' : entry.currencyId ? getCurrency(entry.currencyId)?.name || 'Currency' : itemNames.get(entry.itemId || '') || 'Item'}`}
+            aria-label={`Swap out ${index + 1}: ${getFishingKeepNetEntryTitle(entry)}`}
           >
             <KeepNetSlot entry={entry} size={32} />
-            <span>Swap</span>
           </Button>
         ))}
       </div>
