@@ -2396,6 +2396,9 @@ function processBattleAbilityEntryMoveScout(params: {
     (effect) => effect.type === 'battle-entry-move-scout',
   )
   if (!hasMoveScout) return []
+  if (pokemon.battleAbilityState?.lastForewarnedOpponent === opposingPokemon.id) {
+    return []
+  }
 
   let strongestMove: MoveConfig | undefined
   let strongestScore = -Infinity
@@ -2409,6 +2412,9 @@ function processBattleAbilityEntryMoveScout(params: {
     }
   }
   if (!strongestMove) return []
+
+  pokemon.battleAbilityState ??= {}
+  pokemon.battleAbilityState.lastForewarnedOpponent = opposingPokemon.id
 
   return [
     `${pokemon.name}'s ${getAbilityName(pokemon)} alerted it to ${opposingPokemon.name}'s ${strongestMove.name}!`,
@@ -2660,6 +2666,9 @@ export function restoreBattleAbilityMutationOnSwitchOut(
   }
   if (pokemon.battleAbilityState?.lastIntimidatedOpponent) {
     pokemon.battleAbilityState.lastIntimidatedOpponent = undefined
+  }
+  if (pokemon.battleAbilityState?.lastForewarnedOpponent) {
+    pokemon.battleAbilityState.lastForewarnedOpponent = undefined
   }
   const originalTransform = pokemon.battleAbilityState?.originalTransform
   if (originalTransform) {

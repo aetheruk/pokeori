@@ -668,6 +668,42 @@ describe('canonical battle abilities', () => {
     expect(processBattleAbilityEntryCopiesForState(state)).toEqual([
       "Drowzee's Forewarn alerted it to Blastoise's Hydro Pump!",
     ])
+    expect(processBattleAbilityEntryCopiesForState(state)).toEqual([])
+  })
+
+  test('Forewarn triggers again when either side sends out a different Pokemon', () => {
+    const forewarnUser = makeBattlePokemon({
+      id: 'drowzee',
+      name: 'Drowzee',
+      ability: 'forewarn',
+    })
+    const firstOpponent = makeBattlePokemon({
+      id: 'blastoise',
+      name: 'Blastoise',
+      aiMoveLoadout: ['hydro-pump'],
+    })
+    const secondOpponent = makeBattlePokemon({
+      id: 'charizard',
+      name: 'Charizard',
+      aiMoveLoadout: ['fire-blast'],
+    })
+    const state = makePveBattleState({
+      playerTeam: [forewarnUser],
+      enemyTeam: [firstOpponent, secondOpponent],
+    })
+
+    processBattleAbilityEntryCopiesForState(state)
+    state.activeEnemyIndex = 1
+    expect(processBattleAbilityEntryCopiesForState(state)).toEqual([
+      "Drowzee's Forewarn alerted it to Charizard's Fire Blast!",
+    ])
+    expect(processBattleAbilityEntryCopiesForState(state)).toEqual([])
+
+    processBattleAbilitySwitchOut(forewarnUser)
+    state.activeEnemyIndex = 0
+    expect(processBattleAbilityEntryCopiesForState(state)).toEqual([
+      "Drowzee's Forewarn alerted it to Blastoise's Hydro Pump!",
+    ])
   })
 
   test('Forewarn no longer reduces incoming super-effective damage', () => {
