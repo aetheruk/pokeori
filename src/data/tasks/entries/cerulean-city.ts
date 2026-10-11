@@ -2410,19 +2410,19 @@ export const ceruleanCityTasks: Task[] = [
         id: 2,
         title: 'Alolan Meowth',
         message:
-          "Listen, it's simple. You scratch my back, I scratch yours. I got cash if you got Konban.",
+          "Listen, it's simple. You scratch my back, I scratch yours. I got cash if you got Koban.",
         background: '/backgrounds/grassy-route.avif',
         icon: {
           type: 'pokemon',
           id: '10107',
         },
-        buttons: [{ text: 'Konban?', type: 'navigate', id: 3 }],
+        buttons: [{ text: 'Koban?', type: 'navigate', id: 3 }],
       },
       {
         id: 3,
         title: 'Alolan Meowth',
         message:
-          "Keep up, kid. Konban! The shiny coins of my people. Anyway, no more questions. I'll be around. Konban. Kash. Got it?",
+          "Keep up, kid. Koban! The shiny coins of my people. Anyway, no more questions. I'll be around. Koban. Kash. Got it?",
         background: '/backgrounds/grassy-route.avif',
         icon: {
           type: 'pokemon',
@@ -2433,7 +2433,7 @@ export const ceruleanCityTasks: Task[] = [
     ],
     exitModal: {
       background: '/backgrounds/grassy-route.avif',
-      title: 'Konbans?',
+      title: 'Kobans?',
       icon: {
         type: 'pokemon',
         id: '10107',
@@ -2444,7 +2444,7 @@ export const ceruleanCityTasks: Task[] = [
   },
   {
     id: 'konban-kash',
-    name: 'Konban Kash',
+    name: 'Koban Kash',
     description: "I'm not entirely sure I'm comfortable with this, but I need the money.",
     category: 'Kanto',
     subCategory: 'Cerulean City',
@@ -2456,7 +2456,7 @@ export const ceruleanCityTasks: Task[] = [
     repeatable: true,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Hand Over a Konban',
+    completeButtonText: 'Hand Over a Koban',
     requirements: [
       {
         type: 'task_completed',

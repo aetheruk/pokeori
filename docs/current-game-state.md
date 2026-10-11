@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.51.16` corrects Shiny Koban, Koban Kash, and their related item description, dialogue, modal title, and turn-in button spelling. Existing item/task IDs and sprite paths are retained so held coins, unlocks, and repeat turn-in progress remain compatible.
+
 - Release `0.51.15` converts level candies into Exp. Candies: XS grants 100 XP at any level, S grants 800 XP at level 20+, M grants 3,000 XP at 40+, L grants 10,000 XP at 60+, and XL grants 30,000 XP at 80+. Smaller candies remain usable above their former tier ceilings. Candy Bags use the same minimum levels and grant 10× those values. All use the standard Pokemon XP reward/results flow, including species growth curves, stat recalculation, badge/level-100 caps, and actual XP gained. Items that cannot grant XP are not consumed; item use and reward settlement share one replay-safe transaction. Existing friendship candies, stored item IDs, and Candy Bag crafting costs/unlocks are unchanged.
 
 - Release `0.51.15` also adds Bag of Treats: an Artisan 38 Balance recipe consumes one each of Red, Purple, Green, Blue, and Yellow Berry Candy and creates one bag on Good or Perfect; Bad creates nothing and preserves ingredients. Using the bag grants +10 friendship, capped at 255. Wild battle candy rolls are now independent by eligible tier: XS 15% at any level, S 9% at 20+, M 5% at 40+, L 3% at 60+, with no XL wild drop. Lucky Egg/Alpha quantity modifiers and the existing PokePowder roll remain; release rewards and VS Seeker guarantees retain their separate level-matched rules.
@@ -106,7 +108,7 @@
 - Unreleased: TM items appear in the main Rewards section of activity results, including TMs granted by Pokémon Research level-ups. Research XP, breakthroughs, and Sketch learned moves remain grouped under Research.
 - Unreleased: Brock's Pewter Gym TM reward now describes Wave Breaker as the perfect move for a Rock trainer dealing with pesky Water types, replacing the inaccurate defence-boosting description.
 - Unreleased: Cyndaquil-line evolution rules now distinguish Hisui-origin Pokémon: Cyndaquil evolves at level 17 there and Quilava becomes Hisuian Typhlosion at level 36. Other origins use the standard level 14 and level 36 path. Evolution choices are filtered by obtained region in both the Pokémon screen and server action, and the generator preserves these overrides.
-- Unreleased: Route 5 Field Research can reveal a secret talking Alolan Meowth at a 15% chance. Its `Kitty KONtraBANd` conversation unlocks repeatable `Konban Kash` turn-ins for one Shiny Konban and 500 Pokédollars; the Alolan Meowth profile icon unlocks on the tenth turn-in.
+- Unreleased: Route 5 Field Research can reveal a secret talking Alolan Meowth at a 15% chance. Its `Kitty KONtraBANd` conversation unlocks repeatable `Koban Kash` turn-ins for one Shiny Koban and 500 Pokédollars; the Alolan Meowth profile icon unlocks on the tenth turn-in.
 - Unreleased: Non-chat task result flows show queued exit dialogue before level-ups, card reveals, research breakthroughs, and the reward summary. After the dialogue closes, the existing reward sequence continues. Non-expedition `chat: true` tasks with exit dialogue skip the result screen and open the dialogue directly; expedition chat steps keep their progress result screen.
 - Unreleased: Task entry dialogue stays visible until the reward result or chat exit dialogue is ready, and result/exit surfaces cover Explore cards throughout their transitions.
 - Unreleased: The Pewter School task description now correctly says the player could learn “a thing or two.”
@@ -126,7 +128,7 @@
 
 - Unreleased: All five Candy-to-PokePowder Artisan recipes now require one matching Candy instead of two.
 - Unreleased: Feathered Gauntlet rematches, Safari Zone's Poacher Watch expedition, and the Vermilion Gym Challenge now grant normal Pokémon, Research, and Battling XP after trainer wins. Their battles have no individual cash rewards; expedition payouts remain at completion.
-- Unreleased: Kanto Meowth can drop the non-unique Shiny Konban key item at a 20% chance. Its new gold coin sprite is at `public/sprites/items/key/shiny-konban.avif`.
+- Unreleased: Kanto Meowth can drop the non-unique Shiny Koban key item at a 20% chance. Its gold coin sprite remains at `public/sprites/items/key/shiny-konban.avif` for compatibility.
 - Unreleased: After the Pallet Town tutorial chain, the one-time `pallet-pokemon-power-pitch` conversation introduces a Lass pitching a crystallised Pokémon energy scheme. The player can walk away without buying in.
 - Unreleased: After completing the Pallet Town orientation, the one-time `pallet-show-me-your-moves` conversation gives an overview of stance attacks, move teaching, and Pokémon research. The Researcher awards 300 Researching XP.
 
