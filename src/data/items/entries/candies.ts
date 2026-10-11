@@ -3,71 +3,66 @@ import { Item } from '../types'
 const baseCandyItems: Item[] = [
   {
     id: 'rare-candy-xs',
-    name: 'XS Candy',
+    name: 'Exp. Candy XS',
     description:
-      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 20.',
+      'Grants 100 XP to a single Pokémon of any level.',
     category: 'candy',
     spriteId: 'materials/candy-xs',
     hueRotate: 0,
     effects: {
-      increaseLevel: 1,
-      maxLevel: 19,
+      grantPokemonExperience: 100,
       minLevel: 1,
     },
   },
   {
     id: 'rare-candy-m',
-    name: 'S Candy',
+    name: 'Exp. Candy S',
     description:
-      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 40.',
+      'Grants 800 XP to a single Pokémon at level 20 or higher.',
     category: 'candy',
     spriteId: 'materials/candy-s',
     hueRotate: 0,
     effects: {
-      increaseLevel: 1,
-      maxLevel: 39,
+      grantPokemonExperience: 800,
       minLevel: 20,
     },
   },
   {
     id: 'rare-candy-xl',
-    name: 'M Candy',
+    name: 'Exp. Candy M',
     description:
-      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 60.',
+      'Grants 3,000 XP to a single Pokémon at level 40 or higher.',
     category: 'candy',
     spriteId: 'materials/candy-m',
     hueRotate: 0,
     effects: {
-      increaseLevel: 1,
-      maxLevel: 59,
+      grantPokemonExperience: 3000,
       minLevel: 40,
     },
   },
   {
     id: 'rare-candy-mega',
-    name: 'L Candy',
+    name: 'Exp. Candy L',
     description:
-      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 80.',
+      'Grants 10,000 XP to a single Pokémon at level 60 or higher.',
     category: 'candy',
     spriteId: 'materials/candy-l',
     hueRotate: 0,
     effects: {
-      increaseLevel: 1,
-      maxLevel: 79,
+      grantPokemonExperience: 10000,
       minLevel: 60,
     },
   },
   {
     id: 'rare-candy-tera',
-    name: 'XL Candy',
+    name: 'Exp. Candy XL',
     description:
-      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 100.',
+      'Grants 30,000 XP to a single Pokémon at level 80 or higher.',
     category: 'candy',
     spriteId: 'materials/candy-xl',
     hueRotate: 0,
     effects: {
-      increaseLevel: 1,
-      maxLevel: 99,
+      grantPokemonExperience: 30000,
       minLevel: 80,
     },
   },
@@ -75,8 +70,7 @@ const baseCandyItems: Item[] = [
 
 export const candyBagItems: Item[] = baseCandyItems.map((candy) => {
   const minLevel = candy.effects?.minLevel || 1
-  const maxLevel = candy.effects?.maxLevel || 99
-  const targetLevel = maxLevel + 1
+  const experience = (candy.effects?.grantPokemonExperience || 0) * 10
   const spriteId = candy.spriteId?.replace(
     'materials/candy-',
     'materials/candy-bag-',
@@ -85,13 +79,12 @@ export const candyBagItems: Item[] = baseCandyItems.map((candy) => {
   return {
     id: `${candy.id}-bag`,
     name: `${candy.name} Bag`,
-    description: `A carefully portioned bag of ${candy.name.toLowerCase()}. It raises a single Pokémon to level ${targetLevel}.`,
+    description: `Grants ${experience.toLocaleString('en-US')} XP to a single Pokémon${minLevel > 1 ? ` at level ${minLevel} or higher` : ' of any level'}.`,
     category: 'candy' as const,
     spriteId,
     hueRotate: candy.hueRotate,
     effects: {
-      setLevel: targetLevel,
-      maxLevel,
+      grantPokemonExperience: experience,
       minLevel,
     },
   }

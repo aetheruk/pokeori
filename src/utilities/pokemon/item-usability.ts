@@ -10,6 +10,10 @@ import {
   type SkillDataMap,
 } from '@/utilities/skills/unlocks'
 import { canPokemonUseFusionItem } from '@/utilities/pokemon/fusion'
+import {
+  getPokemonExperienceCap,
+  getTotalPokemonExperienceForLevel,
+} from '@/utilities/pokemon/experience'
 
 type PokemonStatName =
   | 'hp'
@@ -67,6 +71,7 @@ export type PokemonItemUseTarget = {
   speciesId?: number | null
   formId?: string | null
   level?: number | null
+  experience?: number | null
   evs?: Partial<
     Record<
       | 'hp'
@@ -103,7 +108,11 @@ export type PokemonItemUseTarget = {
 export function getPokemonItemPickerGroup(item: Item): PokemonItemPickerGroup {
   const effects = item.effects
 
-  if (effects?.increaseLevel || effects?.setLevel !== undefined)
+  if (
+    effects?.grantPokemonExperience ||
+    effects?.increaseLevel ||
+    effects?.setLevel !== undefined
+  )
     return 'level-candy'
   if (effects?.increaseFriendship) return 'friendship'
   if (
@@ -168,6 +177,10 @@ function formatNatureLabel(nature: string): string {
 export function getPokemonItemEffectLabel(item: Item): string {
   const effects = item.effects
   if (!effects) return 'Pokemon effect'
+
+  if (effects.grantPokemonExperience) {
+    return `XP +${effects.grantPokemonExperience.toLocaleString('en-US')}`
+  }
 
   if (effects.increaseLevel) {
     return `Level +${effects.increaseLevel}`
@@ -245,6 +258,27 @@ export function getPokemonItemUnavailableReason(
   if (!effects) return `${item.name} has no Pokemon effect.`
 
   const level = Math.max(1, Math.floor(pokemon.level || 1))
+
+  if (effects.grantPokemonExperience) {
+    if (level >= 100) return 'Pokemon is already at max level.'
+    if (effects.minLevel !== undefined && level < effects.minLevel) {
+      return `This candy can only be used from level ${effects.minLevel}.`
+    }
+    const growthRate =
+      getPokemonForm(pokemon.formId || String(pokemon.speciesId))?.growth_rate ||
+      getPokemonSpecies(pokemon.speciesId || 0)?.growth_rate
+    const experience = Math.max(
+      getTotalPokemonExperienceForLevel(growthRate, level),
+      pokemon.experience || 0,
+    )
+    const levelCap = pokemon.levelCap ?? 100
+    if (
+      level <= levelCap &&
+      experience >= getPokemonExperienceCap(growthRate, levelCap)
+    ) {
+      return 'This Pokemon cannot gain more XP until more badges are earned.'
+    }
+  }
 
   if (effects.increaseLevel || effects.setLevel !== undefined) {
     if (level >= 100) return 'Pokemon is already at max level.'

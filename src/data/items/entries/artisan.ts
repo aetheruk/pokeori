@@ -185,6 +185,16 @@ const artisanConsumables: Item[] = [
     },
   },
   {
+    id: 'bag-of-treats',
+    name: 'Bag of Treats',
+    description: 'A colourful assortment of berry candies that raises the friendship of a single Pokemon by 10.',
+    category: 'candy',
+    spriteId: 'evolution/sachet',
+    effects: {
+      increaseFriendship: 10,
+    },
+  },
+  {
     id: 'token-of-fire',
     name: 'Token of Fire',
     description: 'A rare ember-bright material left by Entei.',

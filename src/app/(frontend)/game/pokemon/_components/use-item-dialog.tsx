@@ -115,13 +115,17 @@ export function UseItemDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  const loadItems = async (levelOverride?: number) => {
+  const loadItems = async (
+    levelOverride?: number,
+    experienceOverride?: number | null,
+  ) => {
     setLoading(true)
     try {
       const result = await getUsableItems({
         speciesId: pokemon.speciesId,
         formId: pokemon.formId,
         level: levelOverride ?? currentLevel,
+        experience: experienceOverride ?? pokemon.experience,
         evs: pokemon.evs,
         ivs: pokemon.ivs,
         nature: pokemon.nature,
@@ -226,7 +230,7 @@ export function UseItemDialog({
         setCurrentLevel(newLevel)
         onUpdate?.(result.pokemon)
         refreshUser()
-        loadItems(newLevel) // Reload items to update quantity and level checks
+        loadItems(newLevel, result.pokemon.experience) // Reload items to update quantity and XP checks
         setSelectedItemForStat(null) // Reset selection view
         setSelectedFusionItem(null)
         setFusionPartnerOptions([])

@@ -136,11 +136,11 @@ describe('local item sprites', () => {
 
   test('level-up candies use the XS to XL visual tier ladder', () => {
     expect(candyItems.map((item) => item.name)).toEqual([
-      'XS Candy',
-      'S Candy',
-      'M Candy',
-      'L Candy',
-      'XL Candy',
+      'Exp. Candy XS',
+      'Exp. Candy S',
+      'Exp. Candy M',
+      'Exp. Candy L',
+      'Exp. Candy XL',
     ])
 
     expect(candyItems.map((item) => item.spriteId)).toEqual([

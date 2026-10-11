@@ -157,6 +157,7 @@ export interface Item {
     }
     increaseLevel?: number
     setLevel?: number
+    grantPokemonExperience?: number
     maxLevel?: number // Item can only be used if pokemon level is less than or equal to this (actually, usually it's "less than", but let's define it as "up to this level")
     minLevel?: number
     changeNature?: NatureName

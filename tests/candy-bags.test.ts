@@ -12,20 +12,19 @@ import {
 } from '@/utilities/artisan/rewards'
 
 const BAG_CONFIGS = [
-  ['rare-candy-xs-bag', 20, 1, 19, 2, 'rare-candy-xs'],
-  ['rare-candy-m-bag', 40, 20, 39, 20, 'rare-candy-m'],
-  ['rare-candy-xl-bag', 60, 40, 59, 40, 'rare-candy-xl'],
-  ['rare-candy-mega-bag', 80, 60, 79, 60, 'rare-candy-mega'],
-  ['rare-candy-tera-bag', 100, 80, 99, 80, 'rare-candy-tera'],
+  ['rare-candy-xs-bag', 1000, 1, 2, 'rare-candy-xs'],
+  ['rare-candy-m-bag', 8000, 20, 20, 'rare-candy-m'],
+  ['rare-candy-xl-bag', 30000, 40, 40, 'rare-candy-xl'],
+  ['rare-candy-mega-bag', 100000, 60, 60, 'rare-candy-mega'],
+  ['rare-candy-tera-bag', 300000, 80, 80, 'rare-candy-tera'],
 ] as const
 
 describe('Candy Bags', () => {
-  test('define every candy tier as a capped level-setting item', () => {
+  test('define every bag with ten candies worth of XP and the same minimum level', () => {
     for (const [
       itemId,
-      targetLevel,
+      experience,
       minLevel,
-      maxLevel,
       artisanLevel,
       candyId,
     ] of BAG_CONFIGS) {
@@ -36,14 +35,13 @@ describe('Candy Bags', () => {
 
       expect(item).toMatchObject({
         id: itemId,
-        name: expect.stringContaining('Bag'),
         category: 'candy',
         effects: {
-          setLevel: targetLevel,
+          grantPokemonExperience: experience,
           minLevel,
-          maxLevel,
         },
       })
+      expect(item?.name).toContain('Bag')
       expect(recipe).toMatchObject({
         artisanLevel,
         costs: [{ id: candyId, amount: 10 }],
@@ -81,16 +79,37 @@ describe('Candy Bags', () => {
     })
   })
 
-  test('bags only appear for Pokemon inside their candy tier', () => {
+  test('XS bags remain available above the former tier ceiling', () => {
     const bag = items.find((item) => item.id === 'rare-candy-xs-bag')
     expect(bag).toBeDefined()
     if (!bag) return
 
-    expect(getPokemonItemEffectLabel(bag)).toBe('Level → 20')
+    expect(getPokemonItemEffectLabel(bag)).toBe('XP +1,000')
     expect(getPokemonItemUnavailableReason(bag, { level: 1 })).toBeNull()
     expect(getPokemonItemUnavailableReason(bag, { level: 19 })).toBeNull()
-    expect(getPokemonItemUnavailableReason(bag, { level: 20 })).toContain(
-      'up to level 19',
-    )
+    expect(getPokemonItemUnavailableReason(bag, { level: 20 })).toBeNull()
+    expect(getPokemonItemUnavailableReason(bag, { level: 99 })).toBeNull()
+  })
+})
+
+describe('Bag of Treats', () => {
+  test('uses one of each coloured candy at Artisan 38 and creates one bag on Good or Perfect', () => {
+    const item = items.find((entry) => entry.id === 'bag-of-treats')!
+    const recipe = artisanRecipes.find((entry) => entry.id === 'craft-bag-of-treats')!
+    expect(item.effects).toEqual({ increaseFriendship: 10 })
+    expect(item.category).toBe('candy')
+    expect(getPokemonItemEffectLabel(item)).toBe('Friendship + 10')
+    expect(recipe.artisanLevel).toBe(38)
+    expect(recipe.costs).toEqual(['red', 'purple', 'green', 'blue', 'yellow'].map((color) => ({ id: `${color}-berry-candy`, amount: 1 })))
+    expect(shouldFailCraft(recipe, 'bad')).toBe(true)
+    expect(shouldConsumeCraftCosts(recipe, 'bad')).toBe(false)
+    expect(resolveCraftRewards(recipe, 'bad')).toEqual([])
+    for (const quality of ['good', 'perfect'] as const) {
+      expect(shouldFailCraft(recipe, quality)).toBe(false)
+      expect(shouldConsumeCraftCosts(recipe, quality)).toBe(true)
+      expect(resolveCraftRewards(recipe, quality).filter((reward) => reward.type === 'item')).toEqual([{ type: 'item', targetId: 'bag-of-treats', quantity: 1, dropChance: 100 }])
+    }
+    expect(getPokemonItemUnavailableReason(item, { level: 100, friendship: 245 })).toBeNull()
+    expect(getPokemonItemUnavailableReason(item, { friendship: 255 })).not.toBeNull()
   })
 })
