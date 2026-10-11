@@ -35,6 +35,15 @@ describe('local item sprites', () => {
     expect(getItemSpriteUrl('health-feather')).toBe(
       '/sprites/items/health-feather.avif',
     )
+    expect(getItemSpriteUrl('greasy-spark-plug')).toBe(
+      '/sprites/items/pouch-of-materials.avif',
+    )
+    expect(getItemSpriteUrl('bent-carburetor')).toBe(
+      '/sprites/items/pouch-of-materials.avif',
+    )
+    expect(getItemSpriteUrl('snapped-chain-link')).toBe(
+      '/sprites/items/pouch-of-materials.avif',
+    )
     expect(getItemSpriteUrl('zap-n-scratch')).toBe(
       '/sprites/items/scratchcard.avif',
     )
