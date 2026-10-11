@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.51.25` makes Forewarn reveal an opposing active Pokemon's strongest loaded move only when the holder or opponent enters battle, rather than repeating on later turn processing.
+
 - Release `0.51.24` removes the full-width move-row click target from the move assigner so vertical gestures can scroll the list. Assign/remove and move-information actions now use separate compact controls, with plus/trash and the standard journal sprite respectively.
 
 - Release `0.51.23` applies explicit CSS dimensions to Alpha icons so image optimization cannot override their requested size. Battle name and level chips display the Alpha marker at 10px for both player and enemy health displays, including doubles.

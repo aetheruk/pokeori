@@ -118,6 +118,7 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
     heldItemLost?: boolean
     suppressed?: boolean
     lastIntimidatedOpponent?: string
+    lastForewarnedOpponent?: string
     lastBeforeMoveSkipTurn?: number
     beforeAttackTypeChangeActivated?: boolean
     illusionMask?: {
