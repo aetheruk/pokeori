@@ -429,6 +429,12 @@ export const fuchsiaCityBattles: BattleConfig[] = [
         dropChance: 10,
         requirements: [
           {
+            type: 'battle_result',
+            targetId: 'route-14-biker-gerald',
+            battleStatus: 'win',
+            count: 1,
+          },
+          {
             type: 'task_completed',
             targetId: 'route-14-biker-fetch-1',
             inverse: true,
@@ -835,6 +841,8 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     trainerName: 'Gerald',
     name: 'Biker Gerald',
     description: 'The loud leader of the Junkyard Crew, blocking the road south.',
+    winMessage:
+      'Not bad, kid, but hey, don’t say I said anything. This is quite embarrassing. I got in a bind with a local Oddish and it ran off with a Spark Plug. Any chance you could help me find it?',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -863,7 +871,9 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     trainerClassId: 'biker',
     trainerName: 'Malik',
     name: 'Biker Malik',
-    description: 'A paranoid Biker convinced everyone is after his bike parts.',
+    description: 'A paranoid Biker convinced everyone is out to get him.',
+    winMessage:
+      'Hey, so I’m kinda in a bind. Any chance you can help me find my carburetor? A wild Pokémon attacked and ran off with it.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -892,7 +902,9 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     trainerClassId: 'biker',
     trainerName: 'Isaac',
     name: 'Biker Isaac',
-    description: 'The laziest member of the Junkyard Crew, guarding the middle of the road.',
+    description: 'I can’t tell if this guy is trying to be intimidating or just cross-eyed.',
+    winMessage:
+      'You gotta do me a solid here, kid. My chain came off and a Pokémon ran away with it. Don’t tell the boys…',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {

@@ -291,7 +291,7 @@ export const fuchsiaCityTasks: Task[] = [
     id: 'route-14-biker-intro',
     name: 'The Junkyard Crew',
     description:
-      'A gang of Bikers has blocked the road south, and their leader wants to see you try.',
+      'Oh no this looks like trouble a group of bikers are blocking the road south.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -317,10 +317,10 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "Hold it right there, Trainer. Road's closed. Junkyard Crew business, and this stretch of Route 14 is ours. You want past? You'll have to beat all four of us. And even then, I'm not promising anything.",
+          "Hold it right there, Trainer. Road’s closed. Junkyard Crew business, and this stretch of Route 14 is ours. You want past? You’ll have to get through all four of us.",
         buttons: [
           {
-            text: 'Beat all four of you?',
+            text: 'Can’t you just move?',
             type: 'navigate',
             id: 2,
           },
@@ -335,7 +335,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "Me, then Malik, then Isaac, then Lukas. That's the order. Try not to break your Pokeballs on the first one.",
+          'No chance, kid!',
         buttons: [
           {
             text: 'Fine',
@@ -351,7 +351,7 @@ export const fuchsiaCityTasks: Task[] = [
         type: 'trainer',
         id: 'biker',
       },
-      message: "Gerald revs his bike and grins. 'First up is me. Hope you're ready.'",
+      message: 'Looks like the only way I’m getting through is with force.',
       closeButtonText: 'Battle Gerald',
     },
   },
@@ -359,12 +359,12 @@ export const fuchsiaCityTasks: Task[] = [
     id: 'route-14-biker-fetch-1',
     name: 'A Spark of Goodwill',
     description:
-      'The Junkyard Crew blocks Route 14, but Gerald says he will let you pass if you fix his bike; it will not start without a spark plug.',
+      'Against my better judgement I agreed to help find Gerald’s Spark Plug so he can start his bike.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
-      type: 'trainer',
-      id: 'biker',
+      type: 'item',
+      id: 'pouch-of-materials',
     },
     background: '/backgrounds/grassy-route.avif',
     repeatable: false,
@@ -412,10 +412,10 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "Oi! You're the one who cleared the road up north, right? My bike won't start, and I know why. The spark plug's gone. The wild Pokémon keep kicking 'em out of the tall grass. Go shake one loose in a battle and bring it back.",
+          'Oi! Kid, what do you think you’re doing with my Spark Plug? Give that ’ere right now!',
         buttons: [
           {
-            text: 'Fine',
+            text: 'Huh?!',
             type: 'success',
           },
         ],
@@ -429,20 +429,19 @@ export const fuchsiaCityTasks: Task[] = [
         id: 'biker',
       },
       message:
-        "Gerald squints at the greasy spark plug, nods once, and waves you past. 'Malik's your problem now.'",
+        'Past. Sorry, kid, gotta keep up appearances.',
       closeButtonText: 'Move On',
     },
   },
   {
     id: 'route-14-biker-fetch-2',
     name: 'A Clogged Carburetor',
-    description:
-      'Malik is blocking the road too, and he will not move until his clogged carburetor is replaced.',
+    description: 'I’m starting to sense a pattern here...',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
-      type: 'trainer',
-      id: 'biker',
+      type: 'item',
+      id: 'pouch-of-materials',
     },
     background: '/backgrounds/grassy-route.avif',
     repeatable: false,
@@ -486,7 +485,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "Don't come any closer. I saw what you did to Gerald's bike. ... Fine. My carburetor's clogged. A Pokémon coughed it up somewhere in the grass. Go catch something and check what it was carrying.",
+          'Hey listen up you little runt! Nobody touches Malik’s Wheels, you get that?! (Psst, thank you so much)',
         buttons: [
           {
             text: 'Whatever',
@@ -503,7 +502,7 @@ export const fuchsiaCityTasks: Task[] = [
         id: 'biker',
       },
       message:
-        "Malik reluctantly waves you past. 'Isaac's up ahead. He's the lazy one. Good luck.'",
+        'Absolute jokers, these guys…',
       closeButtonText: 'Move On',
     },
   },
@@ -511,12 +510,12 @@ export const fuchsiaCityTasks: Task[] = [
     id: 'route-14-biker-fetch-3',
     name: 'The Missing Chain Link',
     description:
-      'Isaac\u2019s snapped chain link rolled off into the study spots; he expects you to fetch it before letting you through.',
+      'I’m starting to think these guys aren’t blocking the way by choice…',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
-      type: 'trainer',
-      id: 'biker',
+      type: 'item',
+      id: 'pouch-of-materials',
     },
     background: '/backgrounds/grassy-route.avif',
     repeatable: false,
@@ -560,7 +559,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "Ugh. Do I look like I'm in a hurry? My chain snapped and one of the links rolled off into the study spots. Go poke around the tall grass with that notebook of yours and find it. I'd do it myself but... I'm resting.",
+          'You little thief! What do you think you’re doing with that?!',
         buttons: [
           {
             text: 'Seriously?',
@@ -577,7 +576,7 @@ export const fuchsiaCityTasks: Task[] = [
         id: 'biker',
       },
       message:
-        "'Yeah yeah, you found it. Lukas is the last one. He's quiet. Watch your back.'",
+        'Sorry, kid… Can’t let Gerald know I messed up.',
       closeButtonText: 'Move On',
     },
   },
@@ -585,7 +584,7 @@ export const fuchsiaCityTasks: Task[] = [
     id: 'route-14-biker-confront-lukas',
     name: 'The Quiet One',
     description:
-      'Biker Lukas steps onto the road. He does not say much, and that is worse.',
+      'Biker Lukas steps onto the road… Lemme guess, your bike’s broken too?',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -617,10 +616,10 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "...You got the parts. All of them. Gerald said you didn't complain once. ...We'll see if that's true after you fight me.",
+          'What did you say, you cheeky little twerp?',
         buttons: [
           {
-            text: 'I\u2019m ready',
+            text: 'Oh guess not.',
             type: 'success',
           },
         ],
@@ -633,7 +632,7 @@ export const fuchsiaCityTasks: Task[] = [
         type: 'trainer',
         id: 'biker',
       },
-      message: 'Lukas just nods and steps onto the road.',
+      message: 'Lukas looks pretty mad at my comment.',
       closeButtonText: 'Battle Lukas',
     },
   },
@@ -641,7 +640,7 @@ export const fuchsiaCityTasks: Task[] = [
     id: 'route-14-bikers-cleared',
     name: 'The Road South',
     description:
-      'The Junkyard Crew finally admits why they blocked the road in the first place.',
+      'I’ll be glad to see the back of these guys.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -681,47 +680,10 @@ export const fuchsiaCityTasks: Task[] = [
           type: 'trainer',
           id: 'biker',
         },
-        message:
-          "You got the parts. You did the work. Nobody's ever done the work without complaining before.",
+        message: 'You know what, kid? You’re not half bad.',
         buttons: [
           {
-            text: 'So... why block the road?',
-            type: 'navigate',
-            id: 2,
-          },
-        ],
-      },
-      {
-        id: 2,
-        background: '/backgrounds/grassy-route.avif',
-        title: 'Biker Lukas',
-        icon: {
-          type: 'trainer',
-          id: 'biker',
-        },
-        message:
-          "Truth is, we didn't block it for fun. A pack of wild Pokémon tore through our camp and wrecked every single bike. We couldn't chase them off and we were too proud to ask for help. So we just... blocked the road.",
-        buttons: [
-          {
-            text: 'You fixed it yourselves',
-            type: 'navigate',
-            id: 3,
-          },
-        ],
-      },
-      {
-        id: 3,
-        background: '/backgrounds/grassy-route.avif',
-        title: 'Biker Lukas',
-        icon: {
-          type: 'trainer',
-          id: 'biker',
-        },
-        message:
-          "You fixed our bikes and beat all four of us. The road south is open. If anyone asks, we fixed it ourselves.",
-        buttons: [
-          {
-            text: 'The road south is open',
+            text: 'Thanks?',
             type: 'success',
           },
         ],
