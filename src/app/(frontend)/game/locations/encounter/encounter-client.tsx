@@ -1019,7 +1019,6 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
         return
       }
 
-      toast.error('The Safari Balls are gone. The expedition has ended.')
       setCaptureResult({
         success: true,
         caught: false,
