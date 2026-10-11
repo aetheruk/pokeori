@@ -883,7 +883,7 @@ export const viridianForestTasks: Task[] = [
       {
         type: 'location_encounter_result',
         targetId: 'viridian-secret-garden',
-        count: 5,
+        count: 3,
       },
     ],
     criteria: [],

@@ -1434,7 +1434,7 @@ export const ceruleanCityTasks: Task[] = [
       {
         type: 'location_encounter_result',
         targetId: 'charmander-den',
-        count: 5,
+        count: 3,
       },
     ],
     rewards: [],

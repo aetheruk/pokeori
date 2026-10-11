@@ -1499,7 +1499,7 @@ export const vermilionCityTasks: Task[] = [
       {
         type: 'location_encounter_result',
         targetId: 'vermilion-squirtle-cove',
-        count: 5,
+        count: 3,
       },
     ],
     criteria: [],

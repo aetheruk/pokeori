@@ -1,5 +1,7 @@
 # Testing Strategy
 
+- Starter area unlocks: `bun test tests/data-references.test.ts tests/requirements-semantics.test.ts` checks that Garden Trust, Growlithe Knows the Way, and Cove Regular require three successful catches from their own area, exclude failed attempts, accept existing catch totals, and unlock variants without item or time entry criteria.
+
 - Chansey wheel daily gates: `bun test tests/game-schema.test.ts tests/requirements-semantics.test.ts tests/prize-wheel.test.ts` verifies all six wheels retain their ticket costs, reject a second same-day completion, reopen the next UTC day, and keep each wheel's daily lock independent.
 
 - Doubles sprite-grounding checks in `e2e/double-battle-layout.pw.ts` compare player/opponent shadow offsets and widths at 320px, 390px, and 1280px; visual screenshots are saved under `test-results/` for mobile and desktop review.

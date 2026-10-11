@@ -3365,7 +3365,7 @@ describe('static data references', () => {
     expect(shortcutTask?.requirements).toContainEqual({
       type: 'location_encounter_result',
       targetId: 'charmander-den',
-      count: 5,
+      count: 3,
     })
     expect(shortcutDen).toMatchObject({
       name: "Charmander's Den",
@@ -3387,7 +3387,7 @@ describe('static data references', () => {
     })
   })
 
-  test('starter side locations lift candy and time gates after five catches', () => {
+  test('starter side locations lift candy and time gates after three catches', () => {
     const gardenTrustTask = tasks.find(
       (task) => task.id === 'secret-garden-trust',
     )
@@ -3436,12 +3436,12 @@ describe('static data references', () => {
     expect(gardenTrustTask?.requirements).toContainEqual({
       type: 'location_encounter_result',
       targetId: 'viridian-secret-garden',
-      count: 5,
+      count: 3,
     })
     expect(coveRegularTask?.requirements).toContainEqual({
       type: 'location_encounter_result',
       targetId: 'vermilion-squirtle-cove',
-      count: 5,
+      count: 3,
     })
 
     expect(openSecretGarden).toMatchObject({
