@@ -1143,8 +1143,8 @@ One such tale was that of Merchant Feron, Who bought up the Iron from all of the
   },
   {
     id: 'shiny-konban',
-    name: 'Shiny Konban',
-    description: 'A gleaming gold konban a Meowth seems to have left behind.',
+    name: 'Shiny Koban',
+    description: 'A gleaming gold koban a Meowth seems to have left behind.',
     category: 'key',
     spriteId: 'key/shiny-konban',
     unique: false,
