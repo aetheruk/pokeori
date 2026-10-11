@@ -15,6 +15,7 @@ import { rockTunnelTasks } from '@/data/tasks/entries/rock-tunnel'
 import { pewterCityTasks } from '@/data/tasks/entries/pewter-city'
 import { palletTownBattles } from '@/data/battles/entries/pallet-town'
 import { isToday } from '@/utilities/date-utils'
+import { allGames } from '@/data/games'
 
 const baseRequirementData = {
   user: { id: 'user-1' },
@@ -48,6 +49,36 @@ describe('requirements and criteria semantics', () => {
     expect(
       isToday('2026-05-12T23:30:00.000Z', '2026-05-13T00:15:00.000Z'),
     ).toBe(false)
+  })
+
+  test('each Chansey wheel blocks a second daily spin and reopens on the next UTC day', () => {
+    const wheels = allGames.filter((game) => game.id.startsWith('chansey-wheel-'))
+    expect(wheels).toHaveLength(6)
+    const today = new Date().toISOString()
+    const yesterday = new Date(Date.now() - 86_400_000).toISOString()
+
+    for (const wheel of wheels) {
+      const dailyGate = wheel.requirements.find(
+        (requirement) => requirement.type === 'daily_not_completed',
+      )!
+      expect(checkRequirement(baseRequirementData, dailyGate)).toBe(true)
+      const result = { gameId: wheel.id, wins: 1, losses: 0, lastPlayed: today }
+      expect(
+        checkRequirement({ ...baseRequirementData, gameResults: [result] }, dailyGate),
+      ).toBe(false)
+      expect(
+        checkRequirement({
+          ...baseRequirementData,
+          gameResults: [{ ...result, lastPlayed: yesterday }],
+        }, dailyGate),
+      ).toBe(true)
+      expect(
+        checkRequirement({
+          ...baseRequirementData,
+          gameResults: [{ ...result, gameId: 'another-wheel' }],
+        }, dailyGate),
+      ).toBe(true)
+    }
   })
 
   test('requirements gate access while criteria gate completion', () => {

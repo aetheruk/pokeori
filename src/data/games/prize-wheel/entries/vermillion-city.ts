@@ -11,14 +11,18 @@ export const vermillionCitychanseyEntries: PrizeWheelGameConfig[] = [
     subCategory: 'Vermilion City',
     background: '/backgrounds/chansey.avif',
     icon: { type: 'pokemon', id: '113' },
+    daily: true,
     requirements: [
       {
         type: 'task_completed',
         targetId: 'explore-vermilion-city',
       },
+      {
+        type: 'daily_not_completed',
+        targetId: 'chansey-wheel-vermilion',
+      },
     ],
-    criteria: [
-    ],
+    criteria: [],
     rewards: [],
     settings: {
       spinTime: { min: 5, max: 10 },

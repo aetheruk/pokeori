@@ -11,14 +11,18 @@ export const lavenderTownchanseyEntries: PrizeWheelGameConfig[] = [
     subCategory: 'Lavender Town',
     background: '/backgrounds/chansey.avif',
     icon: { type: 'pokemon', id: '113' },
+    daily: true,
     requirements: [
       {
         type: 'task_completed',
         targetId: 'explore-lavender-town',
       },
+      {
+        type: 'daily_not_completed',
+        targetId: 'chansey-wheel-lavender',
+      },
     ],
-    criteria: [
-    ],
+    criteria: [],
     rewards: [],
     settings: {
       spinTime: { min: 5, max: 10 },

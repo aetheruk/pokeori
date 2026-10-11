@@ -15,12 +15,16 @@ export const fuchsiaCitychanseyEntries: PrizeWheelGameConfig[] = [
     name: 'Fuchsia Chansey Wheel',
     gameType: 'prize-wheel',
     description:
-      'Visit Chansey in the Fuchsia City Pokémon Center for battle tonics and a rare chance to discover a Revive recipe.',
+      'Visit Chansey in the Fuchsia City Pokémon Center each day for battle tonics and a rare chance to discover a Revive recipe.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     background: '/backgrounds/chansey.avif',
     icon: { type: 'pokemon', id: '113' },
-    requirements: [{ type: 'task_completed', targetId: 'explore-fuchsia-city' }],
+    daily: true,
+    requirements: [
+      { type: 'task_completed', targetId: 'explore-fuchsia-city' },
+      { type: 'daily_not_completed', targetId: 'chansey-wheel-fuchsia' },
+    ],
     criteria: [],
     rewards: [],
     settings: {

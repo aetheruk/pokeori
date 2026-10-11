@@ -11,14 +11,18 @@ export const ceruleanCitychanseyEntries: PrizeWheelGameConfig[] = [
     subCategory: 'Cerulean City',
     background: '/backgrounds/chansey.avif',
     icon: { type: 'pokemon', id: '113' },
+    daily: true,
     requirements: [
       {
         type: 'task_completed',
         targetId: 'explore-cerulean-city',
       },
+      {
+        type: 'daily_not_completed',
+        targetId: 'chansey-wheel-cerulean',
+      },
     ],
-    criteria: [
-    ],
+    criteria: [],
     rewards: [],
     settings: {
       spinTime: { min: 5, max: 10 },

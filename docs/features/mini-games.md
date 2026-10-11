@@ -226,7 +226,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - `art-academy-test` is a no-requirement Kanto Test entry using Pikachu, a three-minute timer, an 8-colour palette, and a 50% passing threshold. The player sees a live similarity preview until the final 30 seconds, when it is hidden, and can submit at any time.
 
 ## Prize Wheel
-- Prize Wheel entries can require an authored currency cost before a spin starts. Current Chansey wheels spend League Tickets, are available anytime, do not use daily completion gates, and show their ticket cost plus prize pool odds in Explore modals.
+- Prize Wheel entries can require an authored currency cost before a spin starts. All six Chansey wheels spend League Tickets and allow one spin per wheel per UTC calendar day. Each uses the standard daily completion gate; Explore modals show the ticket cost and prize pool odds.
 - Chansey wheel faces show reward icons without printed segment labels; reward names remain in the Prizes modal and assistive text. Non-Chansey prize wheels retain their authored face labels.
 - Celadon's standard Rocket Prize Wheel costs 25 Fun Tokens and gives no prize at 66.49%, 25 Fun Tokens at 18%, 100 at 10%, 200 at 5%, one Rocket Scratch Card at 0.5%, and a 50,000-token Ultra Jackpot at 0.01% (1 in 10,000). Its 125-token High Stakes counterpart keeps the same odds while multiplying every prize by five: 125/500/1,000 tokens, five cards, or a 250,000-token Ultra Jackpot. Valuing cards at their authored 100-token shop price gives both wheels exactly 120% long-run RTP; ordinary token outcomes return 98%. The prize modal preserves enough decimal precision to show ultra-rare odds rather than rounding them to zero. The leave action remains server-backed and idempotent.
 
