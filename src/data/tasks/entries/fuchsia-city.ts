@@ -735,10 +735,10 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'detective',
         },
         message:
-          "There you are. Mind if I sit? ... Thanks. I've chased worse leads than Team Rocket, but my legs haven't been this tired since before the old precinct replaced its chairs. Don't get old, {Trainer}.",
+          "There you are. Mind if I sit? … Thanks, {Trainer}. Truth is, I’ve been investigating Team Rocket for years now—so long, in fact, I’m beginning to get on, and I can’t keep up the pace like I used to.",
         buttons: [
           {
-            text: 'You\u2019ve earned it',
+            text: 'Rest, You’ve earned it',
             type: 'navigate',
             id: 2,
           },
@@ -753,15 +753,10 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'detective',
         },
         message:
-          "Route 15's just ahead, and Fuchsia after that. I keep picturing how we're going to walk those steps: quiet and careful, like a proper investigation, or loud and fast, the way you seem to do everything. Which is it going to be?",
+          "Route 15’s just ahead, and Fuchsia after that. I can’t picture where we’ll go from here. Koga should be able to help… I hope. But do we tell him the full truth?",
         buttons: [
           {
-            text: 'Quiet and careful',
-            type: 'navigate',
-            id: 3,
-          },
-          {
-            text: 'Loud and fast',
+            text: 'I guess so',
             type: 'navigate',
             id: 3,
           },
@@ -812,7 +807,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'detective',
         },
         message:
-          "Yeah. That's the thing, isn't it. You went through the impossible and came out the other side, and now we're standing on a road south of everything Team Rocket thinks it controls. Whatever's down there, I'm glad you're the one walking it with me.",
+          "Yeah. That’s the thing, isn’t it. You went through the impossible and came out the other side… All without any of it ever happening. Whatever happens next, I’m glad you’re the one walking it with me.",
         buttons: [
           {
             text: 'Let\u2019s go',
@@ -829,7 +824,7 @@ export const fuchsiaCityTasks: Task[] = [
         id: 'detective',
       },
       message:
-        'Choo stands, brushes the grass off his coat, and nods toward the road ahead. Whatever comes next, he will be right behind you.',
+        'Choo stands, brushes the grass off his coat, and nods toward the road ahead.',
       closeButtonText: 'Head for Route 15',
     },
   },
