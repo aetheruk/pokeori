@@ -1498,7 +1498,7 @@ export const celadonCityTasks: Task[] = [
   {
     "id": "erikas-sweet-tooth",
     "name": "Erika's Sweet Tooth",
-    "description": "Erika would like a few Yellow Berry Candies to enjoy while she tends the Gym.",
+    "description": "Erika would like a few Green Berry Candies to enjoy while she tends the Gym.",
     "category": "Kanto",
     "subCategory": "Celadon City",
     "background": "/backgrounds/gym-grass.avif",
@@ -1524,7 +1524,7 @@ export const celadonCityTasks: Task[] = [
     "criteria": [
       {
         "type": "item_owned",
-        "targetId": "yellow-berry-candy",
+        "targetId": "green-berry-candy",
         "count": 3,
         "consume": true
       },
@@ -1600,7 +1600,7 @@ export const celadonCityTasks: Task[] = [
         "type": "trainer",
         "id": "gym-kanto-erika"
       },
-      "message": "How thoughtful, {Trainer}. These Yellow Berry Candies are a wonderful little treat between tending the flowers.",
+      "message": "How thoughtful, {Trainer}. These Green Berry Candies are a wonderful little treat between tending the flowers.",
       "closeButtonText": "Receive Pack"
     }
   },
