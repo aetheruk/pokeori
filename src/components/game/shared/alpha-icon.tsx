@@ -13,7 +13,8 @@ export function AlphaIcon({ size = 20, className }: AlphaIconProps) {
       height={size}
       alt="Alpha"
       title="Alpha Pokémon"
-      className={`inline-block h-auto w-auto shrink-0 align-middle ${className || ''}`}
+      className={`inline-block shrink-0 align-middle ${className || ''}`}
+      style={{ width: Math.round(size * 0.95), height: size }}
     />
   )
 }

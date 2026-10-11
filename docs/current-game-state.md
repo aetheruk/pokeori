@@ -1,6 +1,6 @@
 # Current Game State
 
-- Release `0.51.22` reduces the Alpha marker beside Pokémon names in battle name and level chips to half its previous size for both player and enemy health displays, including doubles.
+- Release `0.51.23` applies explicit CSS dimensions to Alpha icons so image optimization cannot override their requested size. Battle name and level chips display the Alpha marker at 10px for both player and enemy health displays, including doubles.
 
 - Release `0.51.21` labels successful Field Research requirements as `Research {study name}` instead of `Complete {study name}`. Failed-study requirements continue to say `Fail`.
 
