@@ -36,6 +36,7 @@ Every Pokémon Power requires three successful stance-matchup wins from a shared
 Arming a Z-Move is immediate and does not spend a turn. It survives other actions and failed/missed attacks until the next successful basic stance attack, or until switching/fainting/battle end. That attack is named `{Type} {Strike|Tackle|Gambit} Z` and has base power 250 before modifiers; an active Dynamax stance is named `MAX {Type} {Attack}` with base power 100. Z takes precedence for one attack if both states overlap. Successful attackers on both sides advance even when they lose the stance comparison; only the stance winner gets a bright gold halo and sprite glow during the exchange. Failed or blocked actors remain still. The battle log marks stance wins green, draws blue, and losses red.
 
 ### Battle Types
+- Berries are held-only battle effects. They are excluded from manual battle inventory and cannot be used as player or trainer item actions, including doubles and Chronicles. Eligible held berries still trigger, apply their effects, and consume normally.
 - **PvE**: Battle against gym leaders, wild Pokemon, NPCs
 - **PvP**: Battle against other players (via `/game/battles/pvp/[id]`)
 - Ranked PvP uses a standard two-player Elo rating. Every trainer starts at 1000; each ranked result applies a zero-sum K=32 update from the two ratings and records a win, loss, or draw. Ranked PvP has no skill level or skill experience, and the result screen shows the rating change. Friendly PvP remains unrated and does not change the Rankings record.

@@ -879,6 +879,27 @@ describe('PVE turn engine helpers', () => {
     }
   })
 
+  test('loose berries cannot be used as trainer battle items', () => {
+    const berries = items.filter((item) => item.category === 'berry')
+    expect(berries.length).toBeGreaterThan(0)
+
+    for (const berry of berries) {
+      const enemy = makePokemon({
+        id: 'enemy',
+        currentHp: 1,
+        maxHp: 100,
+        status: { id: 'poison', counter: 0 },
+      })
+      const state = makeState(makePokemon({ id: 'player' }), enemy)
+      state.trainerItems = [{ itemId: berry.id, quantity: 1 }]
+
+      expect(applyTrainerBattleItemById(state, berry.id).used, berry.id).toBe(false)
+      expect(enemy.currentHp, berry.id).toBe(1)
+      expect(enemy.status?.id, berry.id).toBe('poison')
+      expect(state.trainerItems[0].quantity, berry.id).toBe(1)
+    }
+  })
+
   test('trainer healing item application requires missing HP', () => {
     const enemy = makePokemon({
       id: 'enemy',
