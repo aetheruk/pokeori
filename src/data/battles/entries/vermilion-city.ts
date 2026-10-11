@@ -929,7 +929,7 @@ export const vermilionCityBattles: BattleConfig[] = [
     rewards: [],
     maxPokemon: 3,
     enemyAttackTelegraphChance: 2,
-    allowedItems: ['oran-berry', 'sitrus-berry'],
+    itemsPerBattle: 0,
   },
   {
     id: 'squirtle-squad-boathouse-scrap',
@@ -957,7 +957,7 @@ export const vermilionCityBattles: BattleConfig[] = [
     rewards: [],
     maxPokemon: 3,
     enemyAttackTelegraphChance: 2,
-    allowedItems: ['oran-berry', 'sitrus-berry'],
+    itemsPerBattle: 0,
   },
   {
     id: 'squirtle-squad-rescue-battle',
@@ -985,6 +985,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     rewards: [],
     maxPokemon: 3,
     enemyAttackTelegraphChance: 2,
-    allowedItems: ['oran-berry', 'sitrus-berry'],
+    itemsPerBattle: 0,
   },
 ]

@@ -1,5 +1,7 @@
 # Testing Strategy
 
+- Held-only berries: `bun test tests/battle-item-effects.test.ts tests/pve-turn-engine.test.ts tests/generated-data-integrity.test.ts` checks that berries have no manual player/trainer effects, loose berries cannot be consumed as trainer items, and existing automatic held healing/status effects, berry ability interactions, and consumption persistence remain covered.
+
 - Starter area unlocks: `bun test tests/data-references.test.ts tests/requirements-semantics.test.ts` checks that Garden Trust, Growlithe Knows the Way, and Cove Regular require three successful catches from their own area, exclude failed attempts, accept existing catch totals, and unlock variants without item or time entry criteria.
 
 - Chansey wheel daily gates: `bun test tests/game-schema.test.ts tests/requirements-semantics.test.ts tests/prize-wheel.test.ts` verifies all six wheels retain their ticket costs, reject a second same-day completion, reopen the next UTC day, and keep each wheel's daily lock independent.

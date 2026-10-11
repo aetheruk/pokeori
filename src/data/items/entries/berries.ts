@@ -10,13 +10,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/oran',
     berryPower: 10,
-    battleEffect: {
-      type: 'heal',
-      healAmount: 10,
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'hp-at-or-below', target: 'self', thresholdPercent: 50 }],
-    },
     heldConfig: {
       trigger: { type: 'hp-at-or-below', thresholdPercent: 25 },
       consumeOnUse: true,
@@ -34,13 +27,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/sitrus',
     berryPower: 30,
-    battleEffect: {
-      type: 'heal',
-      healAmount: 30,
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'hp-at-or-below', target: 'self', thresholdPercent: 50 }],
-    },
     heldConfig: {
       trigger: { type: 'hp-at-or-below', thresholdPercent: 25 },
       consumeOnUse: true,
@@ -60,13 +46,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/cheri',
     berryPower: 10,
-    battleEffect: {
-      type: 'heal',
-      clearStatus: 'paralysis',
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'status', target: 'self', status: 'paralysis' }],
-    },
     heldConfig: {
       trigger: { type: 'status', status: 'paralysis' },
       consumeOnUse: true,
@@ -84,13 +63,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/chesto',
     berryPower: 10,
-    battleEffect: {
-      type: 'heal',
-      clearStatus: 'sleep',
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'status', target: 'self', status: 'sleep' }],
-    },
     heldConfig: {
       trigger: { type: 'status', status: 'sleep' },
       consumeOnUse: true,
@@ -108,13 +80,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/pecha',
     berryPower: 10,
-    battleEffect: {
-      type: 'heal',
-      clearStatus: ['poison', 'bad-poison'],
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'status', target: 'self', status: ['poison', 'bad-poison'] }],
-    },
     heldConfig: {
       trigger: { type: 'status', status: ['poison', 'bad-poison'] },
       consumeOnUse: true,
@@ -132,13 +97,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/rawst',
     berryPower: 10,
-    battleEffect: {
-      type: 'heal',
-      clearStatus: 'burn',
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'status', target: 'self', status: 'burn' }],
-    },
     heldConfig: {
       trigger: { type: 'status', status: 'burn' },
       consumeOnUse: true,
@@ -156,13 +114,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/aspear',
     berryPower: 10,
-    battleEffect: {
-      type: 'heal',
-      clearStatus: ['freeze', 'frostbite'],
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'status', target: 'self', status: ['freeze', 'frostbite'] }],
-    },
     heldConfig: {
       trigger: { type: 'status', status: ['freeze', 'frostbite'] },
       consumeOnUse: true,
@@ -188,13 +139,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/persim',
     berryPower: 10,
-    battleEffect: {
-      type: 'heal',
-      clearStatus: 'confusion',
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'status', target: 'self', status: 'confusion' }],
-    },
     heldConfig: {
       trigger: { type: 'status', status: 'confusion' },
       consumeOnUse: true,
@@ -212,13 +156,6 @@ export const berryItems: Item[] = [
     category: 'berry',
     spriteId: 'berries/lum',
     berryPower: 30,
-    battleEffect: {
-      type: 'heal',
-      clearStatus: 'all',
-    },
-    enemyBattleUse: {
-      conditions: [{ type: 'status', target: 'self', status: 'all' }],
-    },
     heldConfig: {
       trigger: { type: 'status', status: 'all' },
       consumeOnUse: true,

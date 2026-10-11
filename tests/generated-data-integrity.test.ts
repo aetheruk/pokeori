@@ -360,6 +360,7 @@ describe('generated data integrity', () => {
 
     for (const item of heldItems) {
       if (
+        item.category !== 'berry' &&
         item.heldConfig?.effect.type !== 'damage-block' &&
         item.heldConfig?.effect.type !== 'ev-training' &&
         item.heldConfig?.effect.type !== 'type-damage-boost' &&
@@ -766,11 +767,13 @@ describe('generated data integrity', () => {
     })
   })
 
-  test('berries are authored only as materials, battle items, or held items', () => {
+  test('berries are authored only as materials or held items', () => {
     const berries = items.filter((item) => item.category === 'berry')
     expect(berries.length).toBeGreaterThan(0)
 
     for (const berry of berries) {
+      expect(berry.battleEffect, berry.id).toBeUndefined()
+      expect(berry.enemyBattleUse, berry.id).toBeUndefined()
       expect(berry.effects, berry.id).toBeUndefined()
       expect(berry.effects?.increaseFriendship, berry.id).toBeUndefined()
     }

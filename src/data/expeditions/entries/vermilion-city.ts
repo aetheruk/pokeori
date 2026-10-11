@@ -294,10 +294,6 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
           heldItemId: 'oran-berry',
         },
       ],
-      battleItems: {
-        'oran-berry': 2,
-        'sitrus-berry': 1,
-      },
       balls: {
         'poke-ball': 5,
         'great-ball': 2,
