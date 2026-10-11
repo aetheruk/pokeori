@@ -1,12 +1,12 @@
 'use client'
 
 import {
-  BookOpen,
-  Check,
+  Plus,
   RotateCcw,
   Search,
   SlidersHorizontal,
   Sparkles,
+  Trash2,
   X,
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
@@ -550,12 +550,7 @@ function LoadoutMoveRow({
         selected ? 'border-game-moss bg-game-moss/10' : 'border-game-border',
       )}
     >
-      <button
-        type="button"
-        onClick={onDetails}
-        aria-label={`View ${entry.move.name} details`}
-        className="group flex min-w-0 items-center gap-3 px-3 py-2 text-left outline-none hover:bg-game-moss/5 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-game-moss/60"
-      >
+      <div className="flex min-w-0 items-center gap-3 px-3 py-2">
         <span className="relative flex size-10 shrink-0 items-center justify-center">
           <ItemSprite
             itemId={getMoveTypeSpriteItemId(entry.move)}
@@ -570,10 +565,6 @@ function LoadoutMoveRow({
             <strong className="truncate font-display text-sm text-game-ink">
               {entry.move.name}
             </strong>
-            <BookOpen
-              className="size-3.5 shrink-0 text-game-muted group-hover:text-game-moss-strong"
-              aria-hidden="true"
-            />
           </span>
           <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-1.5 text-[11px] font-semibold text-game-muted">
             <span>{titleCase(presentation.identity.type)}</span>
@@ -610,13 +601,13 @@ function LoadoutMoveRow({
             ))}
           </span>
         </span>
-      </button>
+      </div>
 
-      <div className="flex items-center border-l border-game-border px-2">
+      <div className="flex items-center gap-1 border-l border-game-border px-1.5">
         <Button
           type="button"
-          size="sm"
-          variant={selected ? 'secondary' : 'outline'}
+          size="icon"
+          variant="ghost"
           onClick={onToggle}
           disabled={disabled}
           aria-pressed={selected}
@@ -627,18 +618,36 @@ function LoadoutMoveRow({
                 ? `No open move slot for ${entry.move.name}`
                 : `Assign ${entry.move.name}`
           }
-          className="min-h-11 min-w-20"
+          title={
+            selected ? `Remove ${entry.move.name}` : `Assign ${entry.move.name}`
+          }
+          className={cn(
+            'size-11 shrink-0 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none hover:border-game-charcoal/30 hover:bg-game-surface-raised/75',
+            selected ? 'text-game-clay-strong' : 'text-game-charcoal-strong',
+          )}
         >
           {selected ? (
-            <>
-              <Check className="size-4" aria-hidden="true" />
-              Added
-            </>
-          ) : disabled ? (
-            'Full'
+            <Trash2 className="size-4" aria-hidden="true" />
           ) : (
-            'Add'
+            <Plus className="size-4" aria-hidden="true" />
           )}
+        </Button>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={onDetails}
+          aria-label={`View ${entry.move.name} information`}
+          title={`View ${entry.move.name} information`}
+          className="size-11 shrink-0 rounded-md border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none hover:border-game-charcoal/30 hover:bg-game-surface-raised/75"
+        >
+          <ItemSprite
+            itemId="explorers-journal"
+            alt=""
+            width={28}
+            height={28}
+            className="size-7 object-contain"
+          />
         </Button>
       </div>
     </article>
