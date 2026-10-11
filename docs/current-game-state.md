@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.51.22` reduces the Alpha marker beside Pokémon names in battle name and level chips to half its previous size for both player and enemy health displays, including doubles.
+
 - Release `0.51.21` labels successful Field Research requirements as `Research {study name}` instead of `Complete {study name}`. Failed-study requirements continue to say `Fail`.
 
 - Release `0.51.20` makes berries held-only in battle: healing/status berries no longer appear in the battle item selector or support direct player/trainer item actions in singles, doubles, or Chronicles. Their existing held triggers, effects, consumption, and ability interactions remain unchanged. The Squirtle Squad Chronicle retains its team's held berries but no longer supplies loose battle berries.

@@ -55,7 +55,7 @@ export function HealthDisplay({
       )}
     >
       <span className="min-w-0 truncate">{name}</span>
-      {isAlpha && <AlphaIcon />}
+      {isAlpha && <AlphaIcon size={10} />}
       <GenderBadge gender={gender} />
       {preferredStance && <StanceBadge stance={preferredStance} />}
       <span
