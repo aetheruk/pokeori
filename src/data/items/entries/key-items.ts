@@ -1101,7 +1101,7 @@ One such tale was that of Merchant Feron, Who bought up the Iron from all of the
     description:
       'A spark plug caked in grime and engine oil. Somewhere out there, a Biker is missing this.',
     category: 'key',
-    spriteId: 'metal-alloy',
+    spriteId: 'pouch-of-materials',
     unique: false,
   },
   {
@@ -1110,7 +1110,7 @@ One such tale was that of Merchant Feron, Who bought up the Iron from all of the
     description:
       'A carburetor that has seen better days. A Biker might be able to hammer it back into shape.',
     category: 'key',
-    spriteId: 'iron',
+    spriteId: 'pouch-of-materials',
     unique: false,
   },
   {
@@ -1119,7 +1119,7 @@ One such tale was that of Merchant Feron, Who bought up the Iron from all of the
     description:
       'A broken link from a motorcycle chain. Somewhere out there, a bike is missing this.',
     category: 'key',
-    spriteId: 'metal-coat',
+    spriteId: 'pouch-of-materials',
     unique: false,
   },
   {
