@@ -878,6 +878,7 @@ export function PokemonList({
               speciesId: pokemon.speciesId,
               formId: pokemon.formId,
               level: pokemon.level,
+              experience: pokemon.experience,
               evs: pokemon.evs,
               ivs: pokemon.ivs,
               nature: pokemon.nature,

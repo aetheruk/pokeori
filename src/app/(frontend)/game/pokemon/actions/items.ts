@@ -227,7 +227,7 @@ export async function applyItemToPokemon(
         }
         const unavailableReason = getPokemonItemUnavailableReason(
           itemDef,
-          pokemon,
+          { ...pokemon, levelCap: pokemonLevelCap },
           user.skills,
         )
         if (unavailableReason) {
@@ -298,6 +298,31 @@ export async function applyItemToPokemon(
             stat,
             actualAmount,
           )
+        } else if (itemDef.effects.grantPokemonExperience) {
+          const rewardResult = await grantRewards(
+            user.id,
+            [
+              {
+                type: 'pokemon_experience',
+                targetId: pokemonId,
+                quantity: itemDef.effects.grantPokemonExperience,
+              },
+            ],
+            { source: 'pokemon-item', payload: basePayload, req },
+          )
+          if (
+            !rewardResult.success ||
+            !rewardResult.summary.pokemonExperience?.some(
+              (reward) => reward.pokemonId === pokemonId && reward.amount > 0,
+            )
+          ) {
+            throw new Error('This Pokemon cannot gain more XP.')
+          }
+          rewardSummary = rewardResult.summary
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
         } else if (itemDef.effects.setLevel !== undefined) {
           const { setLevel } = itemDef.effects
           const currentLevel = pokemon.level || 1

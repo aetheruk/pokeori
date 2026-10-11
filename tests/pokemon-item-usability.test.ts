@@ -46,7 +46,7 @@ describe('Pokemon item usability', () => {
     ).toBeNull()
     expect(
       getPokemonItemUnavailableReason(item('rare-candy-m'), { level: 40 }),
-    ).toBe('This candy can only be used up to level 39.')
+    ).toBeNull()
     expect(
       getPokemonItemUnavailableReason(item('rare-candy-m'), { level: 20 }),
     ).toBeNull()
@@ -63,8 +63,10 @@ describe('Pokemon item usability', () => {
       getPokemonItemUnavailableReason(item('rare-candy-xs'), {
         level: 19,
         levelCap: 19,
+        formId: '25',
+        experience: 7999,
       }),
-    ).toBe('This Pokemon cannot exceed level 19 until more badges are earned.')
+    ).toBe('This Pokemon cannot gain more XP until more badges are earned.')
     expect(
       getPokemonItemUnavailableReason(item('rare-candy-xs-bag'), {
         level: 19,
@@ -75,8 +77,10 @@ describe('Pokemon item usability', () => {
       getPokemonItemUnavailableReason(item('rare-candy-xs-bag'), {
         level: 19,
         levelCap: 19,
+        formId: '25',
+        experience: 7999,
       }),
-    ).toBe('This Pokemon cannot exceed level 19 until more badges are earned.')
+    ).toBe('This Pokemon cannot gain more XP until more badges are earned.')
   })
 
   test('hides stat items, ability patches, and research kits when they cannot apply', () => {
@@ -114,7 +118,7 @@ describe('Pokemon item usability', () => {
   })
 
   test('Pokemon item picker uses concise effect labels instead of item descriptions', () => {
-    expect(getPokemonItemEffectLabel(item('rare-candy-m'))).toBe('Level +1')
+    expect(getPokemonItemEffectLabel(item('rare-candy-m'))).toBe('XP +800')
     expect(getPokemonItemEffectLabel(item('protein'))).toBe('Attack EV + 10')
     expect(getPokemonItemEffectLabel(item('swift-feather'))).toBe(
       'Speed EV + 1',

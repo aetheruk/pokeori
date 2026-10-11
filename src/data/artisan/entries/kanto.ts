@@ -763,7 +763,7 @@ const POKE_POWDER_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) 
 const CANDY_BAG_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) => ({
   id: `craft-${candy.id}-bag`,
   name: `${candy.name} Bag`,
-  description: `Bundle 10 ${candy.name.toLowerCase()} into a level ${(candy.effects?.maxLevel || 0) + 1} portion.`,
+  description: `Bundle 10 ${candy.name} into a bag granting ${((candy.effects?.grantPokemonExperience || 0) * 10).toLocaleString('en-US')} XP.`,
   artisanLevel: POKE_POWDER_RECIPES[index].artisanLevel,
   costs: [{ id: candy.id, amount: 10 }],
   rewards: [{ type: 'item', targetId: `${candy.id}-bag`, quantity: 1, dropChance: 100 }],
