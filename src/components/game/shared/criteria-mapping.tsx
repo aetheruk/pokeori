@@ -472,7 +472,7 @@ export function mapCriteriaToDisplayItem(
         label:
           condition.battleStatus === 'loss'
             ? `Fail ${countLabel(count)}${study?.name || 'Field Research'}`
-            : `Complete ${countLabel(count)}${study?.name || 'Field Research'}`,
+            : `Research ${countLabel(count)}${study?.name || 'Field Research'}`,
         subLabel: 'Field Research Requirement',
       }
     }
