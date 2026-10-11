@@ -18,7 +18,7 @@ import {
   Users,
 } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { useHaptics } from '@haptics/react'
 import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
@@ -100,32 +100,18 @@ function EncounterItemIcon({
   item,
   selected,
   onSelect,
-  onLongPress,
 }: {
   item: EncounterItemChoice
   selected: boolean
   onSelect: () => void
-  onLongPress: () => void
 }) {
-  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const suppressClick = useRef(false)
   const pointerStart = useRef<{ x: number; y: number } | null>(null)
   const { trigger: triggerHaptic } = useHaptics()
 
-  useEffect(
-    () => () => {
-      if (holdTimer.current) clearTimeout(holdTimer.current)
-    },
-    [],
-  )
-
   const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
     suppressClick.current = false
     pointerStart.current = { x: event.clientX, y: event.clientY }
-    holdTimer.current = setTimeout(() => {
-      suppressClick.current = true
-      onLongPress()
-    }, 500)
   }
   const handlePointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (!pointerStart.current) return
@@ -133,20 +119,14 @@ function EncounterItemIcon({
     const deltaY = event.clientY - pointerStart.current.y
     if (Math.hypot(deltaX, deltaY) > 8) {
       suppressClick.current = true
-      clearHold()
     }
-  }
-  const clearHold = () => {
-    if (holdTimer.current) clearTimeout(holdTimer.current)
-    holdTimer.current = null
   }
 
   return (
     <button
       type="button"
-      aria-label={`${item.name}, ${item.quantity} available${selected ? ', selected' : ''}. Hold for description.`}
+      aria-label={`${item.name}, ${item.quantity} available${selected ? ', selected' : ''}`}
       aria-pressed={selected}
-      title={`${item.name}: ${item.description}`}
       data-haptic-manual="true"
       className={cn(
         'relative flex h-11 w-11 shrink-0 touch-pan-x items-center justify-center rounded-md border bg-game-surface-raised p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-charcoal',
@@ -157,18 +137,15 @@ function EncounterItemIcon({
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={() => {
-        clearHold()
         pointerStart.current = null
       }}
       onPointerLeave={() => {
-        clearHold()
         pointerStart.current = null
       }}
       onPointerCancel={() => {
-        clearHold()
+        suppressClick.current = true
         pointerStart.current = null
       }}
-      onContextMenu={(event) => event.preventDefault()}
       onClick={(event) => {
         if (suppressClick.current) {
           event.preventDefault()
@@ -199,21 +176,7 @@ function EncounterItemRow({
   selectedItemId: string | null
   onSelect: (itemId: string | null) => void
 }) {
-  const [describedItem, setDescribedItem] = useState<EncounterItemChoice | null>(null)
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(
-    () => () => {
-      if (closeTimer.current) clearTimeout(closeTimer.current)
-    },
-    [],
-  )
-
-  const showDescription = (choice: EncounterItemChoice) => {
-    if (closeTimer.current) clearTimeout(closeTimer.current)
-    setDescribedItem(choice)
-    closeTimer.current = setTimeout(() => setDescribedItem(null), 3000)
-  }
+  const describedItem = choices.find((choice) => choice.id === selectedItemId)
 
   return (
     <div className="space-y-2">
@@ -226,13 +189,12 @@ function EncounterItemRow({
             onSelect={() =>
               onSelect(selectedItemId === choice.id ? null : choice.id)
             }
-            onLongPress={() => showDescription(choice)}
           />
         ))}
       </div>
       {describedItem && (
         <div
-          role="tooltip"
+          role="status"
           className="rounded-md border border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-ink"
         >
           <span className="font-bold">{describedItem.name}:</span>{' '}

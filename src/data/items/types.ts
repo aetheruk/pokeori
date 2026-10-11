@@ -418,8 +418,11 @@ export function getTypeLureTier(itemId: string): 1 | 2 | 3 {
   return 1
 }
 
-export function getTypeLureSpawnChancePercent(itemId: string): number {
-  return getTypeLureTier(itemId) * 5
+export function getTypeLureEncounterRollCount(itemId: string): 2 | 3 | 5 {
+  const tier = getTypeLureTier(itemId)
+  if (tier === 3) return 5
+  if (tier === 2) return 3
+  return 2
 }
 
 export function getTypeLureAnswerEquivalent(itemId: string): number {

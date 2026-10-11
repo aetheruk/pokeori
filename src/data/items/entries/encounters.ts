@@ -22,18 +22,16 @@ const ENCOUNTER_TYPES = [
 ] as const
 
 const LURE_TIERS = [
-  { prefix: '', label: '', skillLevel: 10, spawnChancePercent: 5 },
+  { prefix: '', label: '', skillLevel: 10 },
   {
     prefix: 'advanced-',
     label: 'Advanced ',
     skillLevel: 40,
-    spawnChancePercent: 10,
   },
   {
     prefix: 'master-',
     label: 'Master ',
     skillLevel: 70,
-    spawnChancePercent: 15,
   },
 ] as const
 

@@ -37,10 +37,11 @@ Tiered material item ids stay stable as `-t1`, `-t2`, and `-t3`, but player-faci
 
 ## Lure Economy
 
+- Before standard captures and ordinary wild battles, Base lures draw 2 encounters, Advanced draw 3, and Master draw 5 from the ordinary eligible weighted pool. The first draw matching the lure's type is selected; if none match, the first draw is selected. Form types and both types of dual-type Pokemon count. Explore reveals the selected item's details beneath its icon row with a single tap, and keeps them visible until deselected or replaced.
 - Direct lure drops from Field Observation are removed.
 - Type lures are crafted from matching type gems, matching Pokemon material, and one level-relevant PokePowder, and use the Balance craft type. Base lures use two base gems, Advanced lures use five base gems, and Master lures use five pristine gems. Base and Advanced lures use base materials; Master lures use T3 materials. Each lure recipe shows an x3 bulk craft once the player is 5 Artisan levels above that recipe.
 - All base type lure recipes unlock at Artisan 10 and Researcher 10, all Advanced type lure recipes unlock at Artisan 40 and Researcher 40, and all Master type lure recipes unlock at Artisan 70 and Researcher 70.
-- Lure strength is item-tier based: base, Advanced, and Master lures apply 1x/2x/3x of the normal correct-answer catch-rate boost. Researcher no longer provides a passive lure multiplier.
+- During an encounter, Base, Advanced, and Master lures retain their catch-rate bonuses of 2.5, 3.5, and 5 correct-answer equivalents. Researcher does not provide a passive lure multiplier.
 - Explorer controls encounter item capacity automatically: 1 item at Explorer 1, 2 at 25, 3 at 50, 4 at 80, and 5 at 95.
 
 ## Ball Crafting Progression
