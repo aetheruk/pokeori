@@ -1432,13 +1432,14 @@ describe('generated game data schemas', () => {
     }
   })
 
-  test('Chansey wheels spend League Tickets at authored progression costs', () => {
+  test('Chansey wheels are daily and spend League Tickets at authored progression costs', () => {
     const expectedCosts = {
       'chansey-wheel-viridian': 2,
       'chansey-wheel-pewter': 2,
       'chansey-wheel-cerulean': 2,
       'chansey-wheel-vermilion': 5,
       'chansey-wheel-lavender': 2,
+      'chansey-wheel-fuchsia': 2,
     }
 
     for (const [gameId, amount] of Object.entries(expectedCosts)) {
@@ -1451,12 +1452,14 @@ describe('generated game data schemas', () => {
         amount,
         currencyType: 'league-ticket',
       })
-      expect(game!.daily).toBeUndefined()
+      expect(game!.daily).toBe(true)
       expect(
         game!.requirements.some(
-          (requirement) => requirement.type === 'daily_not_completed',
+          (requirement) =>
+            requirement.type === 'daily_not_completed' &&
+            requirement.targetId === gameId,
         ),
-      ).toBe(false)
+      ).toBe(true)
     }
   })
 

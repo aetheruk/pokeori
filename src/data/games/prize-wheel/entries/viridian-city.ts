@@ -11,14 +11,18 @@ export const viridianCitychanseyEntries: PrizeWheelGameConfig[] = [
     subCategory: 'Viridian City',
     background: '/backgrounds/chansey.avif',
     icon: { type: 'pokemon', id: '113' },
+    daily: true,
     requirements: [
       {
         type: 'task_completed',
         targetId: 'explore-viridian',
       },
+      {
+        type: 'daily_not_completed',
+        targetId: 'chansey-wheel-viridian',
+      },
     ],
-    criteria: [
-    ],
+    criteria: [],
     rewards: [],
     settings: {
       spinTime: { min: 5, max: 10 },
