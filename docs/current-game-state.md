@@ -1123,7 +1123,7 @@ Route 14 unlocks after the final Route 13 trainer (Bird Keeper Robert) is defeat
 
 ### 13. Route 15
 
-Route 15 unlocks after `route-15-choo-rest` (_Catching His Breath_), Detective Choo's roadside chat that follows the cleared Junkyard Crew (`route-14-bikers-cleared`). Choo needs a rest, asks how the player wants to approach the road ahead, and finally asks what it was like to die and how unbelievable all of it seems.
+Route 15 unlocks after `route-15-choo-rest` (_Catching His Breath_), Detective Choo's roadside chat that follows the cleared Junkyard Crew (`route-14-bikers-cleared`). Choo admits that age is slowing him down, asks whether they should tell Koga the full truth, reflects on the player's death and return, and ends by acknowledging that those events never happened.
 
 - Route 15 catch, wild battle, and Field Observation share a level 22-30 combined FireRed/LeafGreen grass pool: Oddish and Gloom, Bellsprout and Weepinbell, Venonat, Pidgey, Pidgeotto, and Ditto. The wild battle uses the shared dynamic wild sync rule. Route 15 catches have a 12% chance to drop the **Brown Belt** recipe (`brown-belt-recipe`), the low-tier Fighting held item.
 - Route 15 trainers use the FRLG roster in order, each appearing only after the previous one is defeated: Picnicker Becky, Crush Kin Ron & Mya, Picnicker Celia, Biker Ernest, Biker Alex, Beauty Grace, Beauty Olivia, Picnicker Kindra, Bird Keeper Chester, Bird Keeper Edwin, and Picnicker Yazmin. All eleven are one-time battles using the shared dynamic trainer sync rule, a two-Pokemon player team limit, and Kanto payout-formula Pokedollar rewards.
