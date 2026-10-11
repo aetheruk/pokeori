@@ -11,6 +11,8 @@ import {
   getTaskProgress,
 } from '@/utilities/tasks/task-logic'
 import type { Task, TaskCondition } from '@/data/tasks'
+import { tasks } from '@/data/tasks'
+import { locations } from '@/data/locations'
 import { rockTunnelTasks } from '@/data/tasks/entries/rock-tunnel'
 import { pewterCityTasks } from '@/data/tasks/entries/pewter-city'
 import { palletTownBattles } from '@/data/battles/entries/pallet-town'
@@ -382,6 +384,51 @@ describe('requirements and criteria semantics', () => {
       current: 2,
       completed: false,
     })
+  })
+
+  test('starter unrestricted-area tasks appear at three successful local catches', () => {
+    const pairs = [
+      ['secret-garden-trust', 'viridian-secret-garden', 'viridian-secret-garden-open'],
+      ['growlithe-knows-the-way', 'charmander-den', 'charmander-den-growlithe'],
+      ['squirtle-cove-regular', 'vermilion-squirtle-cove', 'vermilion-squirtle-cove-open'],
+    ]
+
+    for (const [taskId, locationId, openLocationId] of pairs) {
+      const task = tasks.find((entry) => entry.id === taskId)!
+      const openLocation = locations.find((entry) => entry.id === openLocationId)!
+      const data = {
+        ...baseRequirementData,
+        completedTasks: [
+          { taskId: 'bulbasaur-2', count: 1 },
+          { taskId: 'charred-hiker-4', count: 1 },
+        ],
+        expeditionResults: [{ expeditionId: 'squirtle-squad-chronicle', wins: 1, losses: 0 }],
+        locationEncounterResults: [{ locationId, wins: 2, losses: 20 }],
+      } as RequirementData
+
+      expect(checkTaskRequirements(data, task)).toBe(false)
+      expect(checkTaskRequirements({
+        ...data,
+        locationEncounterResults: [{ locationId: 'another-area', wins: 3, losses: 0 }],
+      } as RequirementData, task)).toBe(false)
+
+      for (const wins of [3, 5]) {
+        const eligibleData = {
+          ...data,
+          locationEncounterResults: [{ locationId, wins, losses: 20 }],
+        } as RequirementData
+        expect(checkTaskRequirements(eligibleData, task)).toBe(true)
+        expect(checkTaskCriteria(eligibleData, task)).toBe(true)
+      }
+
+      expect(openLocation.criteria).toEqual([])
+      expect(openLocation.requirements.every((requirement) =>
+        checkRequirement({
+          ...baseRequirementData,
+          completedTasks: [{ taskId, count: 1 }],
+        } as RequirementData, requirement),
+      )).toBe(true)
+    }
   })
 
   test('location result requirements can be satisfied by any authored target', () => {
