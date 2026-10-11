@@ -1,11 +1,19 @@
 import { BattleConfig, LocationReward } from '@/data/types'
 
 const LEVEL_TO_CANDY_MAP = [
-  { maxLevel: 20, id: 'rare-candy-xs', wildDropChance: 5 },
-  { maxLevel: 40, id: 'rare-candy-m', wildDropChance: 4 },
-  { maxLevel: 60, id: 'rare-candy-xl', wildDropChance: 3 },
-  { maxLevel: 80, id: 'rare-candy-mega', wildDropChance: 2 },
-  { maxLevel: 100, id: 'rare-candy-tera', wildDropChance: 1 },
+  { maxLevel: 20, id: 'rare-candy-xs' },
+  { maxLevel: 40, id: 'rare-candy-m' },
+  { maxLevel: 60, id: 'rare-candy-xl' },
+  { maxLevel: 80, id: 'rare-candy-mega' },
+  { maxLevel: 100, id: 'rare-candy-tera' },
+]
+
+// Eligible tiers roll independently; higher-level battles retain lower-tier drops.
+const WILD_BATTLE_CANDY_DROPS = [
+  { minLevel: 1, id: 'rare-candy-xs', dropChance: 15 },
+  { minLevel: 20, id: 'rare-candy-m', dropChance: 9 },
+  { minLevel: 40, id: 'rare-candy-xl', dropChance: 5 },
+  { minLevel: 60, id: 'rare-candy-mega', dropChance: 3 },
 ]
 
 export const WILD_BATTLE_CANDY_DUST_DROP_CHANCE = 35
@@ -39,11 +47,6 @@ export function getCandyIdsUpToLevel(level: number): string[] {
   return LEVEL_TO_CANDY_MAP.slice(0, maxIndex + 1).map((m) => m.id)
 }
 
-export function getWildBattleCandyDropChance(level: number): number {
-  const match = LEVEL_TO_CANDY_MAP.find((m) => level <= m.maxLevel)
-  return match?.wildDropChance ?? 1
-}
-
 /**
  * Level-matched PokePowder is a small consolation drop for wild battles.
  * Every wild level tier can drop one to three units.
@@ -64,23 +67,21 @@ export function calculateCandyRewards(
   if (enemyLevels.length === 0) return []
 
   const maxLevel = Math.max(...enemyLevels)
-  const candyId = getCandyIdForLevel(maxLevel)
 
   if (!battleConfig.isWildBattle) return []
 
-  const dropRate = getWildBattleCandyDropChance(maxLevel)
   const quantity = {
     min: Math.max(1, Math.floor(candyMultiplier)),
     max: Math.max(1, Math.floor(candyMultiplier)),
   }
-  const rewards: LocationReward[] = []
-
-  rewards.push({
-    type: 'item',
-    targetId: candyId,
-    quantity: quantity,
-    dropChance: dropRate,
-  })
+  const rewards: LocationReward[] = WILD_BATTLE_CANDY_DROPS
+    .filter((drop) => maxLevel >= drop.minLevel)
+    .map((drop) => ({
+      type: 'item',
+      targetId: drop.id,
+      quantity: { ...quantity },
+      dropChance: drop.dropChance,
+    }))
 
   rewards.push({
     type: 'item',

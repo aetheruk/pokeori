@@ -71,6 +71,8 @@ schema validation tests.
 
 `bun test tests/candy-leveling.test.ts tests/candy-bags.test.ts tests/pokemon-item-usability.test.ts` covers candy/bag XP amounts, minimum levels, removed tier ceilings, and unchanged friendship items. Its isolated candy fixture executes the real item action, XP reward logic, and economy settlement against an in-memory transactional adapter, checking partial/multiple levels, growth curves, capped awards, same-request writes, receipt replay, ownership/authentication, and rollback/retry after consumption failure.
 
+`bun test tests/candy-logic.test.ts tests/candy-bags.test.ts` covers inclusive wild-candy level thresholds, independent eligible-tier rates, XL exclusion, unchanged powder/separate reward paths, Lucky Egg quantities, and Bag of Treats ingredients, quality outcomes, and friendship cap.
+
 `bun test tests/encounter-items.test.ts` covers pre-encounter lure roll counts, authored weights, first matching/fallback selection, form and dual types, empty pools, and unchanged mid-encounter bonuses.
 
 ```bash

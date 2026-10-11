@@ -339,3 +339,40 @@ assert.equal(friendship.success, true)
 assert.equal(pokemon.friendship, 2)
 assert.equal(pokemon.level, 100)
 assert.equal(friendship.summary, undefined)
+
+reset(100, 'bag-of-treats')
+const treats = await applyItemToPokemon(
+  pokemonId,
+  'bag-of-treats',
+  undefined,
+  'treats',
+)
+assert.equal(treats.success, true)
+assert.equal(pokemon.friendship, 10)
+assert.equal(inventory['bag-of-treats'], 1)
+reset(100, 'bag-of-treats')
+pokemon.friendship = 250
+assert.equal(
+  (
+    await applyItemToPokemon(
+      pokemonId,
+      'bag-of-treats',
+      undefined,
+      'treats-cap',
+    )
+  ).success,
+  true,
+)
+assert.equal(pokemon.friendship, 255)
+assert.equal(
+  (
+    await applyItemToPokemon(
+      pokemonId,
+      'bag-of-treats',
+      undefined,
+      'full-friendship',
+    )
+  ).success,
+  false,
+)
+assert.equal(inventory['bag-of-treats'], 1)

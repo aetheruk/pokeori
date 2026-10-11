@@ -91,3 +91,25 @@ describe('Candy Bags', () => {
     expect(getPokemonItemUnavailableReason(bag, { level: 99 })).toBeNull()
   })
 })
+
+describe('Bag of Treats', () => {
+  test('uses one of each coloured candy at Artisan 38 and creates one bag on Good or Perfect', () => {
+    const item = items.find((entry) => entry.id === 'bag-of-treats')!
+    const recipe = artisanRecipes.find((entry) => entry.id === 'craft-bag-of-treats')!
+    expect(item.effects).toEqual({ increaseFriendship: 10 })
+    expect(item.category).toBe('candy')
+    expect(getPokemonItemEffectLabel(item)).toBe('Friendship + 10')
+    expect(recipe.artisanLevel).toBe(38)
+    expect(recipe.costs).toEqual(['red', 'purple', 'green', 'blue', 'yellow'].map((color) => ({ id: `${color}-berry-candy`, amount: 1 })))
+    expect(shouldFailCraft(recipe, 'bad')).toBe(true)
+    expect(shouldConsumeCraftCosts(recipe, 'bad')).toBe(false)
+    expect(resolveCraftRewards(recipe, 'bad')).toEqual([])
+    for (const quality of ['good', 'perfect'] as const) {
+      expect(shouldFailCraft(recipe, quality)).toBe(false)
+      expect(shouldConsumeCraftCosts(recipe, quality)).toBe(true)
+      expect(resolveCraftRewards(recipe, quality).filter((reward) => reward.type === 'item')).toEqual([{ type: 'item', targetId: 'bag-of-treats', quantity: 1, dropChance: 100 }])
+    }
+    expect(getPokemonItemUnavailableReason(item, { level: 100, friendship: 245 })).toBeNull()
+    expect(getPokemonItemUnavailableReason(item, { friendship: 255 })).not.toBeNull()
+  })
+})
