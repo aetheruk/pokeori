@@ -10,9 +10,8 @@ import { resolveBattleMusic } from '@/utilities/battle/music'
 import { getEffectiveContent } from '@/utilities/events/server'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import {
-  applyTypeLureSpawnBoost,
+  rollLuredEncounter,
   getRepelMaximumLevel,
-  rollWeightedEncounter,
 } from '@/utilities/pokemon/encounter-spawn'
 import {
   initializeBattlePokemon,
@@ -538,11 +537,12 @@ export async function startBattleFromConfig(
 
     enemyTeamConfig = enemyTeamPool
     if (battleConfig.isWildBattle && enemyTeamPool.length > 1) {
-      const weightedEnemyPool =
+      const selected = rollLuredEncounter(
+        enemyTeamPool,
         selectedEncounterItem && isTypeLureItem(selectedEncounterItem)
-          ? applyTypeLureSpawnBoost(enemyTeamPool, selectedEncounterItem.id)
-          : enemyTeamPool.map((enemy) => ({ ...enemy, chance: 1 }))
-      const selected = rollWeightedEncounter(weightedEnemyPool)
+          ? selectedEncounterItem.id
+          : undefined,
+      )
       if (selected) enemyTeamConfig = [selected]
     }
   }

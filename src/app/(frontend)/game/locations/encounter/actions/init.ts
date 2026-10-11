@@ -61,9 +61,8 @@ import {
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import {
-  applyTypeLureSpawnBoost,
+  rollLuredEncounter,
   getRepelMaximumLevel,
-  rollWeightedEncounter,
 } from '@/utilities/pokemon/encounter-spawn'
 import {
   getPokemonRarityLegacyFields,
@@ -592,13 +591,13 @@ export async function startEncounter(
     const selectedEncounterItem = encounterItemId
       ? items.find((item) => item.id === encounterItemId)
       : undefined
-    const weightedEncounters =
-      selectedEncounterItem && isTypeLureItem(selectedEncounterItem)
-        ? applyTypeLureSpawnBoost(eligibleEncounters, encounterItemId!)
-        : eligibleEncounters
-
     // Repels adjust the selected Pokemon's level rather than its selection odds.
-    let selectedEncounter = rollWeightedEncounter(weightedEncounters)
+    let selectedEncounter = rollLuredEncounter(
+      eligibleEncounters,
+      selectedEncounterItem && isTypeLureItem(selectedEncounterItem)
+        ? selectedEncounterItem.id
+        : undefined,
+    )
 
     if (!selectedEncounter) throw new Error('No encounter found')
 

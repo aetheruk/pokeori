@@ -68,6 +68,9 @@ schema validation tests.
   diagonals, opposing keys, and mixed aliases.
 
 ## Running Tests
+
+`bun test tests/encounter-items.test.ts` covers pre-encounter lure roll counts, authored weights, first matching/fallback selection, form and dual types, empty pools, and unchanged mid-encounter bonuses.
+
 ```bash
 bun test              # Run all tests
 bun run validate:data # Run Bun-backed schema, reference, and hygiene checks

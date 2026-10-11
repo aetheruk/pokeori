@@ -1,5 +1,5 @@
 import {
-  getTypeLureSpawnChancePercent,
+  getTypeLureEncounterRollCount,
   getTypeLureType,
 } from '@/data/items/types'
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
@@ -17,49 +17,34 @@ function getEntryTypes(entry: WeightedPokemonEncounter): string[] {
   return form?.types || []
 }
 
-/** Adds a lure's percentage-point bonus to its type's total spawn share. */
-export function applyTypeLureSpawnBoost<T extends WeightedPokemonEncounter>(
+/** Prefer the first matching-type draw from a lure's ordinary encounter rolls. */
+export function rollLuredEncounter<T extends WeightedPokemonEncounter>(
   entries: T[],
-  itemId: string,
-): (T & { chance: number })[] {
-  const targetType = getTypeLureType(itemId)
-  if (!targetType || entries.length === 0) {
-    return entries.map((entry) => ({ ...entry, chance: entry.chance ?? 1 }))
-  }
-
+  itemId?: string,
+  random: () => number = Math.random,
+): T | undefined {
+  if (entries.length === 0) return undefined
+  const targetType = itemId ? getTypeLureType(itemId) : null
+  const rollCount = targetType ? getTypeLureEncounterRollCount(itemId!) : 1
   const weightedEntries = entries.map((entry) => ({
     entry,
-    chance: Math.max(0, entry.chance ?? 1),
-    matches: getEntryTypes(entry).some(
-      (type) => type.toLowerCase() === targetType,
-    ),
+    chance: entry.chance ?? 1,
   }))
-  const totalChance = weightedEntries.reduce(
-    (total, entry) => total + entry.chance,
-    0,
-  )
-  const targetChance = weightedEntries.reduce(
-    (total, entry) => total + (entry.matches ? entry.chance : 0),
-    0,
-  )
-
-  if (totalChance <= 0 || targetChance <= 0) {
-    return weightedEntries.map(({ entry, chance }) => ({ ...entry, chance }))
+  let first: T | undefined
+  let matching: T | undefined
+  for (let roll = 0; roll < rollCount; roll++) {
+    const selected = rollWeightedEncounter(weightedEntries, random)?.entry
+    if (!selected) continue
+    first ??= selected
+    if (
+      !matching &&
+      targetType &&
+      getEntryTypes(selected).some((type) => type.toLowerCase() === targetType)
+    ) {
+      matching = selected
+    }
   }
-
-  const currentShare = targetChance / totalChance
-  const boostedShare = Math.min(
-    1,
-    currentShare + getTypeLureSpawnChancePercent(itemId) / 100,
-  )
-  const matchingScale = boostedShare / currentShare
-  const otherShare = 1 - currentShare
-  const otherScale = otherShare > 0 ? (1 - boostedShare) / otherShare : 0
-
-  return weightedEntries.map(({ entry, chance, matches }) => ({
-    ...entry,
-    chance: chance * (matches ? matchingScale : otherScale),
-  }))
+  return matching ?? first
 }
 
 export function rollWeightedEncounter<T extends { chance: number }>(
