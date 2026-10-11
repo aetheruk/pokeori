@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.51.19` removes routine expedition and Chronicle toast notifications when starting, choosing a branch, or abandoning a run. Safari Ball exhaustion also uses only the normal expedition result screen. Action errors, path updates, and reward results remain visible through their existing interfaces.
+
 - Release `0.51.18` makes all three Kanto starter side-area unlock tasks appear after three successful catches in their original area: Garden Trust (Bulbasaur), Growlithe Knows the Way (Charmander), and Cove Regular (Squirtle). Completing each task swaps in its existing unrestricted location, removing the Secret Garden's morning-only gate, Charmander's Charred Wood cost, or Squirtle Cove's Green Berry Candy cost. Existing story prerequisites and catch totals are preserved, so players with three or more catches already qualify without catching again.
 
 - Release `0.51.17` restores all six Chansey wheels (Viridian, Pewter, Cerulean, Vermilion, Lavender, and Fuchsia) as dailies: each wheel allows one spin per UTC calendar day through its own daily completion gate. Existing League Ticket costs, unlocks, prize pools, and the one-time Fuchsia Revive recipe prize are retained.

@@ -213,7 +213,6 @@ export function useExploreActions(
       }
 
       refreshUser()
-      toast.success(`${expeditionLabel} started`)
     } catch (error) {
       toast.error(`Failed to start ${expeditionLabel.toLowerCase()}`)
     } finally {
@@ -268,7 +267,6 @@ export function useExploreActions(
       }
 
       refreshUser()
-      toast.success(`${expeditionLabel} abandoned`)
       setIsAbandonExpeditionConfirmOpen(false)
       setSelectedItem(null)
     } catch (error) {
@@ -432,7 +430,6 @@ export function useExploreActions(
       }
 
       refreshUser()
-      toast.success('Branch selected')
     } catch (error) {
       toast.error('Failed to choose branch')
     } finally {
