@@ -748,7 +748,9 @@ export const safariZoneTasks: Task[] = ([
         icon: rangerIcon,
         message:
           'Then I cannot sign you into the reserve. Koga and Janine entered before sunrise under the Institute charter, which is why they were allowed beyond this gate.',
-        buttons: [{ text: 'They May Be in Danger', type: 'navigate', id: 3 }],
+        buttons: [
+          { text: 'Could You Help Me Find Them?', type: 'navigate', id: 3 },
+        ],
       },
       {
         id: 3,
