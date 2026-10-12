@@ -12,7 +12,7 @@ export const fuchsiaCityidentifyEntries: IdentifyConfig[] = [
     background: '/backgrounds/lab.avif',
     requirements: [
       { type: 'task_completed', targetId: 'fuchsia-research-institute-exam-briefing' },
-      { type: 'skill_level', targetId: 'researching', count: 30 },
+      { type: 'skill_level', targetId: 'researching', count: 25 },
       {
         type: 'game_result',
         targetId: 'fuchsia-research-institute-identify',
