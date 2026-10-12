@@ -20,8 +20,11 @@ export function applyShadowScreamDamage(
 export function applyShadowTurnPain(
   pokemon: Pick<BattlePokemon, 'isShadow' | 'currentHp' | 'maxHp' | 'name'>,
   trainerName: string,
+  didAttack: boolean,
 ): string | undefined {
-  if (!shouldShadowScream(pokemon) || pokemon.currentHp <= 0) return undefined
+  if (!didAttack || !shouldShadowScream(pokemon) || pokemon.currentHp <= 0) {
+    return undefined
+  }
 
   const damage = applyShadowScreamDamage(pokemon)
   return `${trainerName}'s ${pokemon.name} screams out in pain! [icon:damage:${damage}]`

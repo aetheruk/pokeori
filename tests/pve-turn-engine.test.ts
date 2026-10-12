@@ -150,7 +150,7 @@ describe('PVE turn engine helpers', () => {
     )
   })
 
-  test('Shadow Pokemon scream every turn and take one eighth max HP damage without an action check', () => {
+  test('Shadow Pokemon take one eighth max HP damage after attacking', () => {
     const shadow = makePokemon({ isShadow: true, maxHp: 101, currentHp: 80 })
     const normal = makePokemon({ isShadow: false })
 
@@ -162,7 +162,7 @@ describe('PVE turn engine helpers', () => {
     expect(shadow.currentHp).toBe(67)
   })
 
-  test('end of turn applies Shadow pain to both active Pokemon without skipping the turn', () => {
+  test('end of turn applies Shadow pain only to active Pokemon that attacked', () => {
     const player = makePokemon({ name: 'Player Shadow', isShadow: true, maxHp: 101, currentHp: 80 })
     const enemy = makePokemon({ id: 'enemy', name: 'Enemy Shadow', isShadow: true, maxHp: 120, currentHp: 100 })
     const state = makeState(player, enemy)
@@ -171,6 +171,8 @@ describe('PVE turn engine helpers', () => {
       playerStance: 'power',
       enemyStance: 'tech',
       result: 'win',
+      playerExecutedAttack: true,
+      enemyExecutedAttack: true,
       damageDealt: 20,
       damageTaken: 10,
       message: 'Player Shadow used Tackle.',
@@ -185,6 +187,29 @@ describe('PVE turn engine helpers', () => {
       "Enemy's Enemy Shadow screams out in pain! [icon:damage:15]",
     ])
     expect(state.history[0].message).toContain('used Tackle')
+  })
+
+  test('end of turn skips Shadow pain after non-attacking actions', () => {
+    const player = makePokemon({ name: 'Player Shadow', isShadow: true, maxHp: 101, currentHp: 80 })
+    const enemy = makePokemon({ id: 'enemy', name: 'Enemy Shadow', isShadow: true, maxHp: 120, currentHp: 100 })
+    const state = makeState(player, enemy)
+    state.history.push({
+      turn: state.turn,
+      playerStance: 'tech',
+      enemyStance: 'tech',
+      result: 'tie',
+      playerExecutedAttack: false,
+      enemyExecutedAttack: false,
+      damageDealt: 0,
+      damageTaken: 0,
+      message: 'The Pokemon switched and used an item.',
+    })
+
+    const messages = processTurnEnd(state)
+
+    expect(player.currentHp).toBe(80)
+    expect(enemy.currentHp).toBe(100)
+    expect(messages.some((message) => message.includes('screams out in pain'))).toBe(false)
   })
 
   test('Shadow Pokemon gain ten percent Attack and Special Attack only', () => {

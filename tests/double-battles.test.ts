@@ -78,6 +78,27 @@ describe('double battles',()=>{
     expect(next.presentation?.events.filter(event=>event.type==='hp-change'&&event.message.includes('screams out in pain'))).toHaveLength(2)
     expect(next.presentation?.events.filter(event=>event.type==='hp-change'&&event.message.includes('[icon:damage:125]'))).toHaveLength(2)
   })
+  test('Shadow Pokemon do not take pain damage when they switch or use an item',()=>{
+    const shadowBattle=state()
+    shadowBattle.playerTeam[0].isShadow=true
+    shadowBattle.playerTeam[1].isShadow=true
+    shadowBattle.playerTeam[2].isShadow=true
+    shadowBattle.trainerItems=[{itemId:'potion',quantity:1}]
+    const playerActions:DoublesAction[]=[
+      {slot:0,kind:'item',itemId:'potion'},
+      {slot:1,kind:'switch',pokemonIndex:2},
+    ]
+    const enemyActions:DoublesAction[]=[
+      {slot:0,kind:'item',itemId:'potion'},
+      {slot:1,kind:'switch',pokemonIndex:2},
+    ]
+
+    const next=resolveDoublesTurn(shadowBattle,playerActions,enemyActions,()=>0.1,({actor,action})=>`${actor.name} used ${action.kind === 'item' ? action.itemId : action.powerId}.`)
+
+    expect(next.playerTeam[0].currentHp).toBe(999)
+    expect(next.playerTeam[2].currentHp).toBe(999)
+    expect(next.history.some(entry=>entry.message.includes('screams out in pain'))).toBe(false)
+  })
   test('resolves ordered lane exchanges and lets a later lane be skipped after a KO',()=>{
     const battle=state()
     battle.enemyTeam[1].currentHp=1

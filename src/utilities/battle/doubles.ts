@@ -598,6 +598,11 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     if(!p||!e) continue
     messages.push(...processBattleAbilityTurnEndEffects({playerMon:p,enemyMon:e,playerName:state.playerName,enemyName:state.enemyName}))
   }
+  const attackedPokemon = new Set(
+    events
+      .filter((event): event is Extract<BattlePresentationEvent, { type: 'attack' }> => event.type === 'attack')
+      .map((event) => `${event.actorSide}:${event.actorIndex}`),
+  )
   for(const mon of active) {
     const lock=tickDisabledStance(mon,state.turn)
     if(lock) messages.push(lock)
@@ -608,6 +613,9 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     const shadowPainMessage = applyShadowTurnPain(
       mon,
       state.playerTeam.includes(mon) ? state.playerName : state.enemyName,
+      attackedPokemon.has(
+        `${state.playerTeam.includes(mon) ? 'player' : 'enemy'}:${(state.playerTeam.includes(mon) ? state.playerTeam : state.enemyTeam).indexOf(mon)}`,
+      ),
     )
     if (shadowPainMessage) {
       messages.push(shadowPainMessage)
