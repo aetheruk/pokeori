@@ -305,7 +305,7 @@ export function GameInfoModal({
           {description &&
             !descriptionInHero &&
             (isResultLayout ? (
-              <div className="mx-auto max-w-2xl px-2 py-5 text-center text-base font-medium leading-relaxed text-game-ink md:text-lg">
+              <div className="mx-auto max-w-2xl px-2 py-5 text-left text-base font-medium leading-relaxed text-game-ink md:text-lg">
                 {description}
               </div>
             ) : (
