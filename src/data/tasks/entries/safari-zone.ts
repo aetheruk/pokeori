@@ -859,7 +859,7 @@ export const safariZoneTasks: Task[] = ([
     completionTrigger: 'manual',
     completeButtonText: 'Present Research Record',
     requirements: [{ type: 'task_completed', targetId: 'fuchsia-research-institute-enquiry' }],
-    criteria: [{ type: 'skill_level', targetId: 'researching', count: 30 }],
+    criteria: [{ type: 'skill_level', targetId: 'researching', count: 25 }],
     rewards: [],
     enterModal: [
       {

@@ -172,7 +172,16 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(
       tasks.find((task) => task.id === 'fuchsia-research-institute-credentials')
         ?.criteria,
-    ).toEqual([{ type: 'skill_level', targetId: 'researching', count: 30 }])
+    ).toEqual([{ type: 'skill_level', targetId: 'researching', count: 25 }])
+    expect(
+      identifyEntries.find(
+        (entry) => entry.id === 'fuchsia-research-institute-identify',
+      )?.requirements,
+    ).toContainEqual({
+      type: 'skill_level',
+      targetId: 'researching',
+      count: 25,
+    })
     expect(
       tasks.find(
         (task) => task.id === 'fuchsia-research-institute-exam-results',
