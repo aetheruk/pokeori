@@ -260,6 +260,29 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(admissionProse).toContain('Pay 2,000 PokéDollars')
   })
 
+  test('Safari story habitat surveys unlock in investigation order', () => {
+    const expectedGates = [
+      ['central', 'safari-clue-last-sign-out'],
+      ['east', 'safari-discovery-east'],
+      ['west', 'safari-discovery-west'],
+      ['north', 'safari-discovery-north'],
+    ] as const
+
+    for (const [area, taskId] of expectedGates) {
+      const survey = fieldObservationGames.find(
+        (entry) => entry.id === `safari-${area}-field-observation`,
+      )
+      expect(survey?.requirements, area).toContainEqual({
+        type: 'item_owned',
+        targetId: 'safari-research-pass',
+      })
+      expect(survey?.requirements, area).toContainEqual({
+        type: 'task_completed',
+        targetId: taskId,
+      })
+    }
+  })
+
   test('Koga Gym uses the FRLG trainers around solvable invisible mazes', () => {
     const trial = expeditions.find(
       (entry) => entry.id === 'fuchsia-gym-trial-expedition',
@@ -1378,9 +1401,12 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
 
     for (const study of searchStudies) {
-      expect(study.requirements).toEqual([
+      expect(study.requirements).toContainEqual(
         { type: 'item_owned', targetId: 'safari-research-pass' },
-      ])
+      )
+      expect(
+        study.requirements.some((requirement) => requirement.type === 'task_completed'),
+      ).toBe(true)
       expect(study.hide).toBeUndefined()
     }
 
