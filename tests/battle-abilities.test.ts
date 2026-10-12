@@ -74,6 +74,7 @@ import {
   getEffectiveBattleSpeed,
 } from '@/utilities/battle/stats-calc'
 import {
+  applyStatus,
   canApplyStatus,
   resolveBeforeMoveStatus,
 } from '@/utilities/battle/status-effects-logic'
@@ -2291,6 +2292,26 @@ describe('canonical battle abilities', () => {
     expect(canApplyStatus(persian, 'burn')).toBe(true)
     expect(canApplyStatus(muk, 'poison')).toBe(false)
     expect(canApplyStatus(muk, 'bad-poison')).toBe(false)
+    const snorlax = makeBattlePokemon({
+      name: 'Snorlax',
+      types: ['Normal'],
+      ability: 'immunity',
+    })
+    expect(canApplyStatus(snorlax, 'poison', undefined, { force: true })).toBe(
+      false,
+    )
+    expect(
+      applyStatus(snorlax, 'poison', undefined, { force: true }).applied,
+    ).toBe(false)
+
+    const alreadyBurned = makeBattlePokemon({
+      name: 'Already Burned',
+      status: { id: 'burn', counter: 0 },
+    })
+    expect(
+      applyStatus(alreadyBurned, 'poison', undefined, { force: true }).applied,
+    ).toBe(true)
+    expect(alreadyBurned.status?.id).toBe('poison')
   })
 
   test('corrosion bypasses poison immunities when applying poison statuses', () => {
