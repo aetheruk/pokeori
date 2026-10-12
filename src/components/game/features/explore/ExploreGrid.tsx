@@ -18,6 +18,7 @@ interface ExploreGridProps {
   activeCategory: string
   activeVoyages: { voyageId: string; endTime: string }[]
   activeExpedition: any | null
+  activeExpeditionItem: ExploreItem | null
   trainerName: string
   userData: RequirementData
   hideEmptyState?: boolean
@@ -36,6 +37,7 @@ function ExploreGridComponent({
   activeCategory,
   activeVoyages,
   activeExpedition,
+  activeExpeditionItem,
   trainerName,
   userData,
   hideEmptyState = false,
@@ -274,7 +276,13 @@ function ExploreGridComponent({
     })
   }, [filteredItems])
 
-  if (filteredItems.length === 0 && !randomEvent && !vsSeekerEvent && !eventsCard) {
+  if (
+    filteredItems.length === 0 &&
+    !randomEvent &&
+    !vsSeekerEvent &&
+    !eventsCard &&
+    !(activeCategory === 'Dailies' && activeExpeditionItem)
+  ) {
     if (hideEmptyState) return null
     return (
       <div
@@ -295,6 +303,26 @@ function ExploreGridComponent({
       )}
     >
       {eventsCard}
+      {activeCategory === 'Dailies' && activeExpeditionItem && (
+        <div>
+          <SectionDivider className="mb-6" variant="chip">
+            Active Expedition
+          </SectionDivider>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            <ExploreCard
+              entry={{ kind: 'single', item: activeExpeditionItem }}
+              trainerName={trainerName}
+              userData={userData}
+              activeVoyages={activeVoyages}
+              activeExpedition={activeExpedition}
+              onAction={onAction}
+              playSelectSfx={playSelectSfx}
+              setActiveShop={setActiveShop}
+              setSelectedItem={setSelectedItem}
+            />
+          </div>
+        </div>
+      )}
       {vsSeekerEvent && (
         <div>
           <SectionDivider className="mb-6" variant="chip">
@@ -396,6 +424,7 @@ export const ExploreGrid = memo(
     prev.activeCategory === next.activeCategory &&
     prev.activeVoyages === next.activeVoyages &&
     prev.activeExpedition === next.activeExpedition &&
+    prev.activeExpeditionItem === next.activeExpeditionItem &&
     prev.trainerName === next.trainerName &&
     prev.userData === next.userData &&
     prev.takeoverStyle === next.takeoverStyle,

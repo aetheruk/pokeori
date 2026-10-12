@@ -15,6 +15,7 @@ Fuchsia's `Build in bulk` task appears alongside the Billiam storage side task a
 ## Task Types
 
 - **Daily Tasks**: Reset on the UTC calendar day after `tutorial-16`. Six generated challenges are selected from player-accessible catches, battles, Mini Games, Field Research, fishing, Artisan work, shops, voyages, TCG, and renewable resource deliveries.
+- The Dailies view also shows the player's active or reward-ready expedition in its own section, with the normal continue/claim flow available from the card.
 - **Special Tasks**: One-time, multi-step tasks
 - **Research Tasks**: Pokemon-specific research
 
