@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { tasks } from '@/data/tasks'
 import { generateDailyTasks } from '@/utilities/tasks/daily-generator'
+import { getDailyTaskTitle } from '@/utilities/tasks/daily-task-title'
 
 const userData = {
   user: {},
@@ -25,6 +26,34 @@ function getDailyScripRewards(date: Date) {
 }
 
 describe('daily task generator', () => {
+  test('Field Research challenge titles say Research for generated and saved tasks', () => {
+    let seed = 2
+    const generated = generateDailyTasks(userData, {
+      date: new Date('2026-05-27T12:00:00'),
+      random: () => {
+        seed = (seed * 48271) % 2147483647
+        return seed / 2147483647
+      },
+    })
+    const fieldResearchTask = generated.find(
+      (task) => task.dailyMetadata?.family === 'field-research',
+    )
+
+    expect(fieldResearchTask?.name.startsWith('Research ')).toBe(true)
+    expect(
+      getDailyTaskTitle({
+        name: 'Complete Route 13',
+        dailyMetadata: { family: 'field-research' },
+      }),
+    ).toBe('Research Route 13')
+    expect(
+      getDailyTaskTitle({
+        name: 'Complete Viridian Forest',
+        dailyMetadata: { family: 'game' },
+      }),
+    ).toBe('Complete Viridian Forest')
+  })
+
   test('creates six source-hinted challenges with typed daily activity criteria', () => {
     const generated = generateDailyTasks(userData, {
       date: new Date('2026-05-27T12:00:00'),

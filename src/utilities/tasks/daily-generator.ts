@@ -391,7 +391,7 @@ function buildCandidates(
       family: 'field-research',
       templateId: 'field-research-win',
       signature: `field-research:${study.id}`,
-      name: `Complete ${study.name}`,
+      name: `Research ${study.name}`,
       description: `Complete one Field Research study at ${study.name}.`,
       icon: study.icon,
       criteria: [
