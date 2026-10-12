@@ -96,6 +96,16 @@ describe('Fuchsia Gym and Safari progression', () => {
     ).toContainEqual(emptyGymRequirement)
   })
 
+  test('the player asks the Ranger to help find Koga and Janine', () => {
+    const entryTask = tasks.find(
+      (task) => task.id === 'safari-zone-entry-denied',
+    )
+
+    expect(entryTask?.enterModal?.[1]?.buttons?.[0]?.text).toBe(
+      'Could You Help Me Find Them?',
+    )
+  })
+
   test('Fuchsia includes the FRLG gatehouse Golduck-for-Lickitung trade', () => {
     const trade = tasks.find((task) => task.id === 'fuchsia-trade-lickitung')!
 
