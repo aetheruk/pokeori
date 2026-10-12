@@ -104,6 +104,13 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(entryTask?.enterModal?.[1]?.buttons?.[0]?.text).toBe(
       'Could You Help Me Find Them?',
     )
+
+    const rayFollowUp = tasks.find(
+      (task) => task.id === 'safari-zone-report-to-ray',
+    )
+    expect(rayFollowUp?.enterModal?.[1]?.message).toContain(
+      'ask the Ranger whether she noticed anything else',
+    )
   })
 
   test('Fuchsia includes the FRLG gatehouse Golduck-for-Lickitung trade', () => {

@@ -794,7 +794,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          'Go to the Fuchsia Research Institute and find out how to get a Researcher’s Pass. I will stay here and ask the Ranger whether he noticed anything else.',
+          'Go to the Fuchsia Research Institute and find out how to get a Researcher’s Pass. I will stay here and ask the Ranger whether she noticed anything else.',
         buttons: [{ text: 'Visit the Institute', type: 'success' }],
       },
     ],
