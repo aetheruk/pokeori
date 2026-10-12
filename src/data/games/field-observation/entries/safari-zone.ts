@@ -199,6 +199,11 @@ const passRequirement = {
   targetId: 'safari-research-pass',
 }
 
+const completedStoryTask = (targetId: string) => ({
+  type: 'task_completed' as const,
+  targetId,
+})
+
 const catchingPermitRequirement = {
   type: 'item_owned' as const,
   targetId: 'safari-catching-permit',
@@ -213,7 +218,10 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '111',
     pokemonPool: centralPool,
     category: 'Kanto',
-    requirements: [passRequirement],
+    requirements: [
+      passRequirement,
+      completedStoryTask('safari-clue-last-sign-out'),
+    ],
     rewards: [
       discoveryReward('safari-discovery-east'),
     ],
@@ -227,7 +235,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '115',
     pokemonPool: eastPool,
     category: 'Kanto',
-    requirements: [passRequirement],
+    requirements: [passRequirement, completedStoryTask('safari-discovery-east')],
     rewards: [
       discoveryReward('safari-discovery-west'),
     ],
@@ -241,7 +249,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '123',
     pokemonPool: westPool,
     category: 'Kanto',
-    requirements: [passRequirement],
+    requirements: [passRequirement, completedStoryTask('safari-discovery-west')],
     rewards: [
       discoveryReward('safari-discovery-north'),
     ],
@@ -255,7 +263,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '128',
     pokemonPool: northPool,
     category: 'Kanto',
-    requirements: [passRequirement],
+    requirements: [passRequirement, completedStoryTask('safari-discovery-north')],
     rewards: [
       discoveryReward('safari-discovery-search-complete'),
     ],
