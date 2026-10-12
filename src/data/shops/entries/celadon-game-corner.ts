@@ -162,6 +162,27 @@ export const celadonGameCornerShops: ShopConfig[] = [
           },
         ],
       },
+      {
+        id: 'game-corner-rotom',
+        name: 'Rotom',
+        description: 'A level 20 Rotom caught in a Poké Ball.',
+        icon: { type: 'pokemon', id: '479' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 99999 }],
+        rewards: [
+          {
+            type: 'pokemon',
+            targetId: 479,
+            quantity: 1,
+            dropChance: 100,
+            pokemonData: {
+              formId: '479',
+              level: 20,
+              ballType: 'poke-ball',
+              background: '/backgrounds/celadon-game-corner-prize-exchange.avif',
+            },
+          },
+        ],
+      },
     ],
   },
 ]

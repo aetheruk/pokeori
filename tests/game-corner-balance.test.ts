@@ -168,6 +168,24 @@ describe('Celadon Game Corner balance and presentation', () => {
     )
   })
 
+  test('offers Rotom for 99,999 Fun Tokens', () => {
+    const prizeExchange = celadonGameCornerShops.find(
+      (shop) => shop.id === 'celadon-game-corner-prize-exchange',
+    )
+    const rotom = prizeExchange?.items.find(
+      (item) => item.id === 'game-corner-rotom',
+    )
+
+    expect(rotom?.cost).toEqual([
+      { type: 'currency', id: 'fun-tokens', amount: 99999 },
+    ])
+    expect(rotom?.rewards[0]).toMatchObject({
+      type: 'pokemon',
+      targetId: 479,
+      pokemonData: { formId: '479', level: 20 },
+    })
+  })
+
   test('unlocks High Roller at 1,000 tokens and scales the fixed-payout games by five', () => {
     const highRoller = celadonGameCornerTasks.find(
       (task) => task.id === 'high-roller',
