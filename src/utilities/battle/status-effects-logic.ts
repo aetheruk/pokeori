@@ -39,10 +39,7 @@ export function canApplyStatus(
   ) {
     return false
   }
-  if (
-    !options?.force &&
-    blocksBattleStatusByAbility(pokemon, statusId, weather)
-  ) {
+  if (blocksBattleStatusByAbility(pokemon, statusId, weather)) {
     return false
   }
 
