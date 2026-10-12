@@ -271,4 +271,33 @@ export const celadonGameCornerTasks: Task[] = [
       closeButtonText: 'Try My Luck',
     },
   },
+  {
+    id: 'exceptional-demand',
+    name: 'Exceptional Demand',
+    description:
+      'A sign reads Token exchange is currently unavailable due to high demand. We’re working on making more tokens available for purchase.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    background: '/backgrounds/game-corner.avif',
+    icon: {
+      type: 'trainer',
+      id: 'maid',
+    },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'auto',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'when-the-fun-stops',
+      },
+      {
+        type: 'currency_owned',
+        targetId: 'fun-tokens',
+        count: 1001,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+  },
 ]
