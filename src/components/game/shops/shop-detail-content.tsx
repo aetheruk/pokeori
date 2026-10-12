@@ -329,7 +329,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
 
           {visibleItems.length === 0 && (
             <Card className="rounded-md border-game-border bg-game-surface p-6 text-center text-game-muted">
-              No items are currently available for your requirements.
+              No Products are currently available for Purchase
             </Card>
           )}
         </div>
