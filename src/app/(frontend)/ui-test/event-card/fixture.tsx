@@ -33,6 +33,7 @@ export function EventCardFixture() {
           activeCategory="Kanto"
           activeVoyages={[]}
           activeExpedition={null}
+          activeExpeditionItem={null}
           trainerName="Trainer"
           userData={userData}
           onAction={noop}

@@ -243,6 +243,20 @@ function ExploreListContent({
   const activeExpeditionConfig = activeExpedition
     ? expeditions.find((entry) => entry.id === activeExpedition.expeditionId)
     : null
+  const activeExpeditionCardItem = useMemo<ExploreItem | null>(() => {
+    if (
+      !activeExpeditionConfig ||
+      !['active', 'ready_to_claim'].includes(activeExpedition?.status)
+    ) {
+      return null
+    }
+
+    return {
+      ...activeExpeditionConfig,
+      type: 'expedition',
+      originalData: activeExpeditionConfig,
+    } as ExploreItem
+  }, [activeExpeditionConfig, activeExpedition?.status])
   const activeExpeditionLabel = activeExpeditionConfig?.chronicle
     ? 'Chronicle'
     : 'Expedition'
@@ -523,6 +537,7 @@ function ExploreListContent({
           takeoverStyle={isTakeover}
           activeVoyages={activeVoyages}
           activeExpedition={activeExpedition}
+          activeExpeditionItem={activeExpeditionCardItem}
           trainerName={trainerName}
           userData={userData}
           hideEmptyState={isTakeover}
