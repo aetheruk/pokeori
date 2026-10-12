@@ -9,6 +9,7 @@ import { celadonGameCornerSlotEntries } from '@/data/games/slots/entries/celadon
 import { scratchCards } from '@/data/scratchcards'
 import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner'
 import { celadonGameCornerTasks } from '@/data/tasks/entries/celadon-game-corner'
+import { checkShopItemRequirements } from '@/utilities/shops/requirements'
 import {
   getPachinkoBonusFan,
   getPachinkoBucketSensor,
@@ -212,6 +213,50 @@ describe('Celadon Game Corner balance and presentation', () => {
     )
     expect(celadonGameCornermatch3gamesEntries[0].settings.winScore).toBe(1000)
     expect(celadonGameCornermatch3gamesEntries[1].settings.winScore).toBe(1400)
+  })
+
+  test('token exchange stops selling bundles at 1,000 Fun Tokens and shows its notice above 1,000', () => {
+    const tokenExchange = celadonGameCornerShops.find(
+      (shop) => shop.id === 'celadon-game-corner-token-exchange',
+    )!
+    const tokenBundle = tokenExchange.items.find(
+      (item) => item.id === 'fun-token-bundle',
+    )!
+    const canBuyBundle = (balance: number) =>
+      checkShopItemRequirements(
+        {
+          user: { currency: { 'fun-tokens': balance } },
+          inventory: [],
+          pokemon: [],
+          tcg: [],
+          pokedex: [],
+          completedTasks: [],
+        } as any,
+        tokenExchange,
+        tokenBundle,
+      )
+
+    expect(canBuyBundle(999)).toBe(true)
+    expect(canBuyBundle(1000)).toBe(false)
+    expect(canBuyBundle(1001)).toBe(false)
+
+    const demandNotice = celadonGameCornerTasks.find(
+      (task) => task.id === 'exceptional-demand',
+    )
+    expect(demandNotice).toMatchObject({
+      name: 'Exceptional Demand',
+      completionTrigger: 'auto',
+      description:
+        'A sign reads Token exchange is currently unavailable due to high demand. We’re working on making more tokens available for purchase.',
+      rewards: [],
+    })
+    expect(
+      demandNotice?.requirements.find(
+        (requirement) =>
+          requirement.type === 'currency_owned' &&
+          requirement.targetId === 'fun-tokens',
+      ),
+    ).toMatchObject({ count: 1001 })
   })
 
   test('settles Pachinko token prizes at their authored gross value', () => {

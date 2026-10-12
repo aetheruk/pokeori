@@ -34,6 +34,14 @@ export const celadonGameCornerShops: ShopConfig[] = [
             amount: 1000,
           },
         ],
+        requirements: [
+          {
+            type: 'currency_owned',
+            targetId: 'fun-tokens',
+            count: 1000,
+            inverse: true,
+          },
+        ],
         rewards: [
           {
             type: 'currency',
