@@ -771,10 +771,12 @@ export async function resolvePvpTurn(
     applyShadowTurnPain(
       state.playerTeam[state.activePlayerIndex],
       state.playerName,
+      p1Resolution.didAttack || !!p1SimplePower?.effects.some((event) => event.type === 'attack'),
     ),
     applyShadowTurnPain(
       state.enemyTeam[state.activeEnemyIndex],
       state.enemyName,
+      p2Resolution.didAttack || !!p2SimplePower?.effects.some((event) => event.type === 'attack'),
     ),
   ].filter((message): message is string => Boolean(message))
   if (shadowPainMessages.length > 0) {

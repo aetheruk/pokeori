@@ -665,6 +665,13 @@ export async function processEnemyAttackOnly(
 
   state.history.unshift({
     turn: state.turn,
+    playerExecutedAttack: false,
+    enemyExecutedAttack:
+      enemyCanMove &&
+      !enemySwapped &&
+      !trainerItemResult.used &&
+      !enemyMoveFailed &&
+      !enemyBattleAction.effectOnly,
     playerStance,
     enemyStance: enemyBattleAction.stance,
     result: enemyCanMove && !enemyMoveMissed && !enemyMoveFailed ? 'loss' : 'win',

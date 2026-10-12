@@ -2569,8 +2569,8 @@ export async function useMove(
 
     state.history.unshift({
       turn: state.turn,
-      playerExecutedAttack: moveSucceeded,
-      enemyExecutedAttack: enemyCanMove && !enemySwapped && !trainerItemResult.skipsEnemyAction && !enemyMoveInterrupted && !enemyMoveMissed && !enemyMoveFailed,
+      playerExecutedAttack: !moveFailed && !continuousInterrupted,
+      enemyExecutedAttack: enemyCanMove && !enemySwapped && !trainerItemResult.skipsEnemyAction && !enemyMoveInterrupted && !enemyMoveFailed,
       playerStance: resolvedMoveStance,
       enemyStance: enemyStanceForLog,
       result: contest.configured

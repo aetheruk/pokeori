@@ -24,9 +24,18 @@ export function processTurnEnd(state: BattleState): string[] {
   const { playerTeam, enemyTeam, activePlayerIndex, activeEnemyIndex } = state
   const playerMon = playerTeam[activePlayerIndex]
   const enemyMon = enemyTeam[activeEnemyIndex]
+  const turnActions = state.history[0]?.turn === state.turn ? state.history[0] : undefined
   const messages = [
-    applyShadowTurnPain(playerMon, state.playerName),
-    applyShadowTurnPain(enemyMon, state.enemyName),
+    applyShadowTurnPain(
+      playerMon,
+      state.playerName,
+      turnActions?.playerExecutedAttack === true,
+    ),
+    applyShadowTurnPain(
+      enemyMon,
+      state.enemyName,
+      turnActions?.enemyExecutedAttack === true,
+    ),
   ].filter((message): message is string => Boolean(message))
   messages.push(...processEndTurnStatusDamage(state, 'damage'))
   messages.push(...processEndTurnWeatherDamageForState(state))

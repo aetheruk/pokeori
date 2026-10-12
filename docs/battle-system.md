@@ -42,7 +42,7 @@ Pokemon Powers are selected per owned Pokemon before battle. The Pokemon collect
 
 ## Special Pokemon
 
-Shadow Pokemon use the `isShadow` flag on Pokemon records and authored battle enemies. They receive the existing shadow visual treatment, gain 10% Attack and Special Attack, and cannot use battle powers. Each active Shadow Pokemon screams out in pain and takes 1/8 of its maximum HP as self-damage at the end of every turn; the damage does not interrupt its action.
+Shadow Pokemon use the `isShadow` flag on Pokemon records and authored battle enemies. They receive the existing shadow visual treatment, gain 10% Attack and Special Attack, and cannot use battle powers. A Shadow Pokemon that attacks takes 1/8 of its maximum HP as self-damage at the end of that turn and screams out in pain; switching or using an item does not trigger the damage.
 
 Radiant Pokemon use the `isRadiant` flag on Pokemon records, Pokemon rewards, authored battle enemies, and Pokemon criteria/team checks. They use a blue aura visual treatment and their attacks have a 10% chance to deal 1.1x damage. When this triggers, battle logs include `{pokemon}'s aura burns bright.`
 
