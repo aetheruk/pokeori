@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { getDailyTaskTitle } from '@/utilities/tasks/daily-task-title'
 // Data Imports
 import { battles } from '@/data/battles'
 import { expeditions } from '@/data/expeditions'
@@ -145,8 +146,10 @@ export function useExploreData(
     if (userData?.user && 'activeDailyTasks' in userData.user) {
       const dailyTasks = (userData.user.activeDailyTasks as any[]) || []
       dailyTasks.forEach((t) => {
+        const name = getDailyTaskTitle(t)
         items.push({
           ...t,
+          name,
           type: 'task',
           isChallenge: true,
           originalData: t,
