@@ -2128,8 +2128,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          '{Trainer}, How are you feeling? I mean really when you started your Pokémon journey I can’t imagine this is at all what you were expecting. I’ve been investigating Team Rocket for going on 2 years now and this has escalated more than I could have ever imagined.',
-        buttons: [{ text: 'I’m hanging in there', type: 'navigate', id: 2 }],
+          '{Trainer}, How are you feeling? I mean really when you started your Pokémon journey I can’t imagine this is at all what you were expecting. I also haven’t been completely honest with you. I’ve been investigating Team Rocket for a long time now… You could say I’m personally involved.',
+        buttons: [{ text: 'How so…', type: 'navigate', id: 2 }],
       },
       {
         id: 2,
@@ -2137,8 +2137,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          'I’ve been thinking a lot since meeting with Koga. As much as it pains me to admit it. We’re in over our heads here. I mean you quite literally met your maker once already, and although I can’t remember it by the sounds of it, it didn’t go particularly well for me either.',
-        buttons: [{ text: 'Yeah…', type: 'navigate', id: 3 }],
+          'It pains me to say it, but my wife was a research assistant working with Team Rocket, highly classified stuff. Unfortunately I don’t have any of the details, but just over two years ago, she never came home. No messages, no phone call, nothing. All of my leads have lead to dead ends. As far as Team Rocket are concerned they have no records she ever worked there.',
+        buttons: [{ text: 'Oh wow…', type: 'navigate', id: 3 }],
       },
       {
         id: 3,
@@ -2146,7 +2146,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          'Let’s take stock of where we’re at, it could help clear our heads. So from the top we have Fuji he’s still missing there was no trace at the tower and you said he had links with Team Rocket in the past right? We can only assume he’s with them wherever that is.',
+          'Anyway those are my burdens. Let’s take stock of where we’re at, it could help clear our heads. So from the top we have Fuji he’s still missing. There was no trace at the tower and you said he had links with Team Rocket in the past? We can only assume he’s with them wherever that is.',
         buttons: [{ text: 'Next', type: 'navigate', id: 4 }],
       },
       {
@@ -2155,7 +2155,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          'Then we have Operation Shadow Force. Could this be what ties everything together? Or is this something specific that’s being planned. What we do know is more of them seem to have those Shadowy Pokemon and I have a hunch the compound Koga found in the poison is either closely related or exactly the same thing given its effect on Pokemon energy.',
+          'Then we have Operation Shadow Force. Could this be what ties everything together? What we do know is more of them seem to have those Unusual Pokemon and I have a hunch the compound Koga found in the poison is either closely related or exactly the same thing given its effect on Pokemon energy.',
         buttons: [{ text: 'Makes Sense', type: 'navigate', id: 5 }],
       },
       {

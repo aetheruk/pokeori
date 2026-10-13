@@ -2207,8 +2207,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       ),
     ).toBe(true)
     expect(whatNow?.enterModal?.map((step) => step.buttons[0]?.text)).toEqual([
-      'I’m hanging in there',
-      'Yeah…',
+      'How so…',
+      'Oh wow…',
       'Next',
       'Makes Sense',
       'Right',
@@ -2217,6 +2217,13 @@ describe('Fuchsia Gym and Safari progression', () => {
       'Who?',
       'To Pallet Town',
     ])
+    expect(whatNow?.enterModal?.[1]?.message).toContain(
+      'my wife was a research assistant working with Team Rocket',
+    )
+    expect(whatNow?.enterModal?.[1]?.message).toContain(
+      'she never came home',
+    )
+    expect(whatNow?.enterModal?.[3]?.message).toContain('Unusual Pokemon')
   })
 
   test('Sealed Toxin unlocks Billiam storage, bulk candy, and the Good Rod side tasks', () => {
