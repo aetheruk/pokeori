@@ -116,7 +116,9 @@ export function PokemonSnapGame({
   const [success, setSuccess] = useState(false)
   const [nextRoundDelay, setNextRoundDelay] = useState(!!initialState) // Start round immediately if hydrated
   const [cameraFlash, setCameraFlash] = useState(false)
-  const [wrongPhotoId, setWrongPhotoId] = useState<number | null>(null)
+  const [wrongPhotoId, setWrongPhotoId] = useState<number | 'empty' | null>(
+    null,
+  )
   const [photographedPokemon, setPhotographedPokemon] = useState<
     { id: number; correct: boolean }[]
   >([])
@@ -251,16 +253,17 @@ export function PokemonSnapGame({
 
   // Handle snap button click
   const handleSnap = useCallback(async () => {
-    if (isProcessing || !roundActive || !currentPokemon) return
+    if (isProcessing || gameEnded || !gameStarted) return
     setIsProcessing(true)
 
     // Trigger camera flash effect
     setCameraFlash(true)
     setTimeout(() => setCameraFlash(false), 200)
 
-    // Submit valid answer to server
-    // We send the pokemon ID that was visible when they snapped
-    const snappedId = currentPokemon
+    // Submit null when the camera is fired between appearances. The server
+    // counts an empty frame as a wrong answer, just like an incorrect Pokemon.
+    const snappedId =
+      pokemonVisible && roundActive && currentPokemon ? currentPokemon : null
 
     if (isTargetMode) {
       targetGameEndedRef.current = true
@@ -298,7 +301,7 @@ export function PokemonSnapGame({
     if (isCorrect) playSfx('good')
     else {
       playSfx('bad')
-      setWrongPhotoId(snappedId)
+      setWrongPhotoId(snappedId ?? 'empty')
       if (wrongPhotoTimeoutRef.current)
         clearTimeout(wrongPhotoTimeoutRef.current)
       wrongPhotoTimeoutRef.current = setTimeout(() => {
@@ -307,7 +310,7 @@ export function PokemonSnapGame({
       }, 700)
     }
     setCorrectSnaps(result.wins || 0)
-    if (isCorrect) {
+    if (isCorrect && snappedId !== null) {
       setPhotographedPokemon((prev) => [
         ...prev,
         { id: snappedId, correct: true },
@@ -363,6 +366,9 @@ export function PokemonSnapGame({
     setIsProcessing(false)
   }, [
     isProcessing,
+    gameEnded,
+    gameStarted,
+    pokemonVisible,
     roundActive,
     currentPokemon,
     isTargetMode,
@@ -376,14 +382,14 @@ export function PokemonSnapGame({
   // Handle key press
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && pokemonVisible && !gameEnded && roundActive) {
+      if (e.code === 'Space' && gameStarted && !gameEnded) {
         e.preventDefault()
         handleSnap()
       }
     }
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [pokemonVisible, gameEnded, handleSnap, roundActive])
+  }, [gameStarted, gameEnded, handleSnap])
 
   // Auto-start the encounter on mount
   useEffect(() => {
@@ -709,7 +715,11 @@ export function PokemonSnapGame({
               {wrongPhotoId !== null && (
                 <motion.div
                   role="status"
-                  aria-label="Wrong Pokémon photographed"
+                  aria-label={
+                    wrongPhotoId === 'empty'
+                      ? 'Empty photo taken'
+                      : 'Wrong Pokémon photographed'
+                  }
                   initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-6"
@@ -724,17 +734,24 @@ export function PokemonSnapGame({
                         className="object-cover opacity-80"
                       />
                     )}
-                    <Image
-                      src={getPokemonImageUrl(
-                        wrongPhotoId.toString(),
-                        'sprite',
-                      )}
-                      alt=""
-                      width={240}
-                      height={240}
-                      unoptimized
-                      className="relative size-4/5 object-contain [image-rendering:pixelated]"
-                    />
+                    {wrongPhotoId === 'empty' ? (
+                      <Camera
+                        aria-hidden="true"
+                        className="relative size-1/3 text-game-cream"
+                      />
+                    ) : (
+                      <Image
+                        src={getPokemonImageUrl(
+                          wrongPhotoId.toString(),
+                          'sprite',
+                        )}
+                        alt=""
+                        width={240}
+                        height={240}
+                        unoptimized
+                        className="relative size-4/5 object-contain [image-rendering:pixelated]"
+                      />
+                    )}
                     <span className="absolute bottom-3 right-3 rounded bg-game-charcoal px-2 py-1 font-mono text-xs font-bold text-game-cream">
                       MISSED
                     </span>
@@ -804,7 +821,7 @@ export function PokemonSnapGame({
               </div>
               <Button
                 onClick={handleSnap}
-                disabled={!pokemonVisible || isProcessing || !roundActive}
+                disabled={!gameStarted || gameEnded || isProcessing}
                 aria-label={isProcessing ? 'Saving photo' : 'Snap photo'}
                 className="my-2 flex h-14 w-full shrink-0 items-center justify-center rounded-xl bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong disabled:opacity-50 sm:my-4 sm:h-16"
               >

@@ -10,6 +10,8 @@ describe('research input validation', () => {
   test('accepts only bounded id answers for id-based games', () => {
     expect(validateResearchAnswer('identify', 25).success).toBe(true)
     expect(validateResearchAnswer('identify', 'poke-ball').success).toBe(true)
+    expect(validateResearchAnswer('snap', null).success).toBe(true)
+    expect(validateResearchAnswer('snap', 25).success).toBe(true)
     expect(
       validateResearchAnswer('field-observation', 'species:16').success,
     ).toBe(true)

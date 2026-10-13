@@ -24,6 +24,7 @@ const fieldObservationAnswerSchema = z.union([
   idAnswerSchema,
   fieldObservationCountAnswerSchema,
 ])
+const snapAnswerSchema = z.union([idAnswerSchema, z.null()])
 
 const booleanAnswerSchema = z.boolean()
 
@@ -87,7 +88,7 @@ const artAcademyDrawingSchema = z
 const submitAnswerSchemas: Partial<Record<GameType, z.ZodType>> = {
   silhouette: idAnswerSchema,
   identify: idAnswerSchema,
-  snap: idAnswerSchema,
+  snap: snapAnswerSchema,
   cry: idAnswerSchema,
   compare: idAnswerSchema,
   run: booleanAnswerSchema,
