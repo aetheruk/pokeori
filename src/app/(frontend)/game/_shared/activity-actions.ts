@@ -1512,7 +1512,8 @@ export async function submitGameActivityAnswer(
 
     // Verification Logic
     if (encounter.gameType === 'snap') {
-      const snappedId = Number(validatedAnswer)
+      const snappedId =
+        validatedAnswer === null ? null : Number(validatedAnswer)
       if (snapTargetId !== undefined) {
         const targetStart =
           state.startTime + Number(state.roundData?.snapTargetAppearAtMs ?? 0)
@@ -1520,8 +1521,11 @@ export async function submitGameActivityAnswer(
           targetStart + (encounter.settings.successThreshold || 1500)
         const now = Date.now()
         const timingValid = now >= targetStart - 250 && now <= targetEnd + 1500
-        isCorrect = snappedId === snapTargetId && timingValid
-      } else if (snappedId === state.currentPokemonId) {
+        isCorrect = snappedId !== null && snappedId === snapTargetId && timingValid
+      } else if (
+        snappedId !== null &&
+        snappedId === state.currentPokemonId
+      ) {
         isCorrect = true
       } else {
         isCorrect = false
