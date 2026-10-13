@@ -504,12 +504,12 @@ describe('artisan recipes', () => {
 
     expect(recipe).toMatchObject({
       category: 'items',
-      artisanLevel: 1,
+      artisanLevel: 25,
       craftType: 'balance',
       costs: [
-        { id: 'wood-scraps-t1', amount: 100 },
+        { id: 'wood-scraps-t1', amount: 30 },
         { id: 'metal-scrap-t1', amount: 20 },
-        { id: 'soft-fluff-t1', amount: 10 },
+        { id: 'soft-fluff-t1', amount: 30 },
       ],
       outputQuantity: { min: 1, max: 1 },
       requirements: [

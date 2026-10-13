@@ -1001,9 +1001,17 @@ describe('Fuchsia Gym and Safari progression', () => {
       (task) => task.subCategory === 'Safari Zone',
     )
     expect(safariTasks.every((task) => task.icon.type !== 'lucide')).toBe(true)
+    const boardwalkCoinsTask = safariExpeditionContentTasks.find(
+      (task) => task.id === 'safari-item-coins-boardwalk',
+    )
+    expect(boardwalkCoinsTask?.icon).toEqual({ type: 'item', id: 'relic-gold' })
     expect(
       safariExpeditionContentTasks
-        .filter((task) => task.id.startsWith('safari-item-coins-'))
+        .filter(
+          (task) =>
+            task.id.startsWith('safari-item-coins-') &&
+            task.id !== 'safari-item-coins-boardwalk',
+        )
         .every(
           (task) =>
             task.icon.type === 'item' && task.icon.id === 'gimmighoul-coin',

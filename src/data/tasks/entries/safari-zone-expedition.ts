@@ -482,7 +482,7 @@ const gemTasks = gemIds.map((type) =>
 
 const currencyTasks = [
   itemTask('safari-item-coins-central', 'Coins in the Grass', 'A few coins shine beneath the central grass where a careless visitor dropped them.', { type: 'item', id: 'gimmighoul-coin' }, { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
-  itemTask('safari-item-coins-boardwalk', 'Coins under the Boardwalk', 'Something metallic glints between two boardwalk planks. I fish it out with my pencil.', { type: 'item', id: 'gimmighoul-coin' }, { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
+  itemTask('safari-item-coins-boardwalk', 'Coins under the Boardwalk', 'Something metallic glints between two boardwalk planks. I fish it out with my pencil.', { type: 'item', id: 'relic-gold' }, { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
   itemTask('safari-item-coins-north', 'Coins by the Cairn', 'A small handful of coins rests beside the northern stone cairn.', { type: 'item', id: 'gimmighoul-coin' }, { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
 ]
 

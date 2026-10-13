@@ -9,6 +9,7 @@ import type {
 } from '@/data/types'
 import type { WeatherSnapshot } from '@/utilities/weather'
 import type { TerrainType } from '@/data/terrain'
+import type { TaskIcon } from '@/data/tasks'
 import type { PvpRatingChange } from '@/utilities/battle/pvp-rating'
 import type {
   SecondaryStatusEffect,
@@ -27,6 +28,7 @@ export interface BattleExpeditionProgress {
   canFail?: boolean
   status: 'active' | 'ready_to_claim' | 'failed'
   progressed: boolean
+  stepIcon?: TaskIcon
 }
 
 export type BattleStance = 'power' | 'speed' | 'tech'

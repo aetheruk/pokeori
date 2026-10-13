@@ -5,7 +5,6 @@ import {
   Heart,
   HelpCircle,
   Lock,
-  Package,
   Scroll,
   Star,
 } from 'lucide-react'
@@ -493,14 +492,36 @@ export function mapRewardToDisplayItem(
     case 'increase_max_pokemon': {
       const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
       label = `+${qty} Pokemon Storage`
-      icon = <Package className="w-6 h-6 text-game-moss-strong" />
+      icon = (
+        <div className="relative w-8 h-8">
+          <ItemSprite
+            itemId="poke-ball"
+            alt="Poké Ball"
+            className="object-contain pixelated"
+            width={32}
+            height={32}
+            normalizeVisibleBounds
+          />
+        </div>
+      )
       subLabel = 'Storage Upgrade'
       break
     }
     case 'increase_max_boxes': {
       const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
       label = `+${qty} PC Box${qty > 1 ? 'es' : ''}`
-      icon = <Package className="w-6 h-6 text-game-moss-strong" />
+      icon = (
+        <div className="relative w-8 h-8">
+          <ItemSprite
+            itemId="poke-ball"
+            alt="Poké Ball"
+            className="object-contain pixelated"
+            width={32}
+            height={32}
+            normalizeVisibleBounds
+          />
+        </div>
+      )
       subLabel = 'Storage Upgrade'
       break
     }

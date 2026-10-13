@@ -201,6 +201,18 @@ describe('display mapping copy', () => {
     expect((reward?.icon as any)?.props.children.props.itemId).toBe('safari-ball')
   })
 
+  test('Pokemon storage and PC box rewards use the Poke Ball sprite', () => {
+    for (const rewardType of ['increase_max_pokemon', 'increase_max_boxes']) {
+      const reward = mapRewardToDisplayItem({
+        type: rewardType,
+        quantity: 1,
+      })
+
+      expect((reward?.icon as any)?.props.children.type).toBe(ItemSprite)
+      expect((reward?.icon as any)?.props.children.props.itemId).toBe('poke-ball')
+    }
+  })
+
   test('guild XP rewards use the target guild name', () => {
     const reward = mapRewardToDisplayItem({
       type: 'guild_xp',
