@@ -48,6 +48,7 @@ import { LevelUpModal } from '@/components/game/level-up-modal'
 import { GameResult } from '@/components/game/ResearchResult'
 import { markExpeditionReturn } from '@/components/game/features/explore/expedition-return'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { BattleExpeditionProgressIcon } from './battle-expedition-progress-icon'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
@@ -1133,7 +1134,9 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                 {expeditionProgress && (
                   <div className="flex items-start gap-3 rounded-md border border-game-border bg-game-surface p-4 text-left shadow-sm">
                     <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
-                      <MapIcon className="h-6 w-6" aria-hidden="true" />
+                      <BattleExpeditionProgressIcon
+                        icon={expeditionProgress.stepIcon}
+                      />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-black uppercase tracking-wide text-game-moss-strong">

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { BattleLog } from '@/app/(frontend)/game/battles/_components/battle-log'
+import { BattleExpeditionProgressIcon } from '@/app/(frontend)/game/battles/_components/battle-expedition-progress-icon'
 import { HealthDisplay } from '@/app/(frontend)/game/battles/_components/health-display'
 import { StanceSelector } from '@/app/(frontend)/game/battles/_components/stance-selector'
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
@@ -9,6 +10,7 @@ import {
   getMoveEffectivePower,
 } from '@/utilities/battle/move-presentation'
 import { getItemSpriteUrl } from '@/data/items'
+import { getTrainerSpriteUrl } from '@/data/trainers'
 import { getBattleStatusChip } from '@/utilities/battle/status-presentation'
 import type { BattleLogEntry } from '@/utilities/battle/types'
 
@@ -44,6 +46,25 @@ describe('battle UI stance styling', () => {
     expect(markup).not.toContain('>Attack<')
     expect(markup).not.toContain('>Sp. Atk<')
     expect(markup).not.toContain('animate-pulse')
+  })
+})
+
+describe('battle expedition progress icon', () => {
+  test('shows the trainer sprite supplied by the expedition battle step', () => {
+    const markup = renderToStaticMarkup(
+      <BattleExpeditionProgressIcon
+        icon={{ type: 'trainer', id: 'gym-kanto-brock' }}
+      />,
+    )
+
+    expect(markup).toContain(encodeURIComponent(getTrainerSpriteUrl('gym-kanto-brock')))
+    expect(markup).not.toContain('lucide-map')
+  })
+
+  test('keeps the map icon when expedition progress has no step icon', () => {
+    const markup = renderToStaticMarkup(<BattleExpeditionProgressIcon />)
+
+    expect(markup).toContain('lucide-map')
   })
 })
 

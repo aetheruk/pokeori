@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.51.41` raises the Good Rod recipe to Artisan 25 and changes its costs to 30 T1 Soft Fluff, 20 T1 Metal Scrap, and 30 T1 Wood Scraps. Pokémon Storage and PC Box capacity rewards use the Poké Ball sprite. Battle expedition progress notices use the current battle's trainer sprite. Coins under the Boardwalk uses the Pokedollar currency sprite instead of a Gimmighoul Coin.
+
 - Release `0.51.25` makes Forewarn reveal an opposing active Pokemon's strongest loaded move only when the holder or opponent enters battle, rather than repeating on later turn processing.
 
 - Release `0.51.24` removes the full-width move-row click target from the move assigner so vertical gestures can scroll the list. Assign/remove and move-information actions now use separate compact controls, with plus/trash and the standard journal sprite respectively.
