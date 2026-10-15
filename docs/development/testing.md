@@ -102,6 +102,8 @@ compilation.
 Verify the deployed `/api/health`, `/api/app-version`, and an already-open PWA
 using the [deployment guide](/docs/development/deployment.md).
 
+- `bun test tests/battle-bets-daily-settlement.test.ts` runs the Battle Bets result action against the real daily-progress matcher with isolated persistence. It checks winning and losing wagers, source-specific criteria, shared transaction requests, and stale-session receipt replay without duplicate payout or daily credit.
+
 ## Isolated browser and security integration
 
 `e2e/ufo-catcher.pw.ts` exercises the real UFO cabinet at mobile and desktop

@@ -60,6 +60,7 @@ import { checkRequirement } from '@/utilities/requirements'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { resolveEnemyBattleMoveUseLimit } from '@/utilities/skills/unlocks'
 import { incrementUserActivityResult } from '@/utilities/user-state'
+import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 import { runEconomyAction } from '@/utilities/economy/transactions'
 import {
   getSeenPokemonOptions,
@@ -1186,6 +1187,13 @@ async function settleBattleBetsResult(params: {
         won ? { wins: 1 } : { losses: 1 },
         { req },
       )
+      if (won) {
+        await recordDailyActivityProgress(
+          params.user.id,
+          { kind: 'game_win', sourceId: GAME_ID },
+          { payload: params.payload, req },
+        )
+      }
       return { tokenBalance, payout, won, activityRecorded: true }
     },
   )
