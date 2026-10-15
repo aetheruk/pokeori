@@ -193,6 +193,7 @@ export const eventBattleSchema = z
       .optional(),
     levelCap: level.optional(),
     bannedPlayerTypes: z.array(id).max(18).optional(),
+    allowedPlayerTypes: z.array(id).min(1).max(18).optional(),
     playerTeamInitialStatus: id.optional(),
     itemsPerBattle: z.number().int().nonnegative().optional(),
     allowedItems: z.array(id).max(100).optional(),

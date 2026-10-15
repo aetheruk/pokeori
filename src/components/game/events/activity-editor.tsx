@@ -27,6 +27,7 @@ const groups = [
       'isWildBattle',
       'maxPokemon',
       'levelCap',
+      'allowedPlayerTypes',
       'encounterMode',
       'timer',
       'fleeRate',

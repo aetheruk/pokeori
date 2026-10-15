@@ -619,6 +619,14 @@ export function getFormattedProperties(selectedItem: any) {
         value: bat.maxPokemon,
       })
     }
+    const rules: Array<[string, string]> = []
+    if (bat.allowedPlayerTypes?.length) rules.push(['Allowed types', bat.allowedPlayerTypes.join(' or ')])
+    if (bat.playerTeamInitialStatus) rules.push(['Starting status', bat.playerTeamInitialStatus])
+    if (bat.format === 'double') rules.push(['Battle format', 'Doubles — bring at least two Pokémon'])
+    if (bat.allowSwapping === false) rules.push(['Switching', 'No voluntary switches'])
+    if (typeof bat.itemsPerBattle === 'number') rules.push(['Battle items', `Up to ${bat.itemsPerBattle} uses; held items still work`])
+    if (typeof bat.movesPerBattle === 'number') rules.push(['Manual moves', `Up to ${bat.movesPerBattle} uses per Pokémon`])
+    for (const [label, value] of rules) props.push({ icon: <AlertCircle className="w-4 h-4" />, label, value })
     if (levelRange) {
       props.push({
         icon: <BarChart className="w-4 h-4" />,

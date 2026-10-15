@@ -1,5 +1,8 @@
 # Testing Strategy
 
+- Tower spirit trials: `bun test tests/pokemon-tower-trials.test.ts tests/pve-rival-start-battle.test.ts` checks all thirteen rules, the trainer chain and Shadow Surge handoff, resource caps, dual-type acceptance, participating-team selection, preserved full-team bans, rejected teams, starting status on reserves/immunity/non-persistence, and Angelica's double-battle entry.
+  `bun run test:e2e e2e/tower-trials.pw.ts` verifies the actual Explore drawer at phone and desktop widths, including the rule, ordered participant preview, excluded reserve slot, and team-management link.
+
 - Held-only berries: `bun test tests/battle-item-effects.test.ts tests/pve-turn-engine.test.ts tests/generated-data-integrity.test.ts` checks that berries have no manual player/trainer effects, loose berries cannot be consumed as trainer items, and existing automatic held healing/status effects, berry ability interactions, and consumption persistence remain covered.
 
 - Starter area unlocks: `bun test tests/data-references.test.ts tests/requirements-semantics.test.ts` checks that Garden Trust, Growlithe Knows the Way, and Cove Regular require three successful catches from their own area, exclude failed attempts, accept existing catch totals, and unlock variants without item or time entry criteria.

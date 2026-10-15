@@ -69,7 +69,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-hope',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Hope' }),
-    description: 'Channeler Hope gazes into the mist, possessed by restless spirits.',
+    description: "Hope's whispered prayer sends a shiver through your team. Your Pokémon start paralysed unless protected by an immunity or ability.",
+    playerTeamInitialStatus: 'paralysis',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -88,7 +89,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-patricia',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Patricia' }),
-    description: 'Channeler Patricia chants softly amidst the swirling vapors.',
+    description: "Roots curl between Patricia's memorial stones. Only Grass-type Pokémon may enter, including dual types.",
+    allowedPlayerTypes: ['grass'],
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -104,7 +106,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-carly',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Carly' }),
-    description: 'Channeler Carly stands guard before the stairs to 4F.',
+    description: "Carly calls for a single guardian at the stairway. Face her Gastly with just one Pokémon.",
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -115,7 +117,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
 
   // --- 4F ---
@@ -148,7 +150,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-laurel',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Laurel' }),
-    description: 'Channeler Laurel commands multiple apparitions.',
+    description: "Laurel's spirits hold your partner in place. You cannot switch voluntarily; replacements after fainting and move-driven switches still work.",
+    allowSwapping: false,
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -167,7 +170,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-jody',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Jody' }),
-    description: 'Channeler Jody whispers words in an ancient tongue.',
+    description: "Jody's ancient chant stirs a poisonous mist. Your Pokémon start poisoned unless protected by an immunity or ability.",
+    playerTeamInitialStatus: 'poison',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -183,7 +187,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-paula',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Paula' }),
-    description: 'Channeler Paula bars the stairway leading up to 5F.',
+    description: "Paula asks you to climb with a single offering. You may use a battle item only once during this encounter.",
+    itemsPerBattle: 1,
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -235,7 +240,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-ruth',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Ruth' }),
-    description: 'Channeler Ruth stands outside the magic sanctuary.',
+    description: "The sanctuary has quieted Ruth's restless Gastly. It begins the battle asleep, giving you a moment to act.",
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -244,14 +249,15 @@ export const pokemonTowerBattles: BattleConfig[] = [
       beatenBattle('pokemon-tower-channeler-paula'),
       unbeatenBattle('pokemon-tower-channeler-ruth'),
     ],
-    enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
+    enemyTeam: [{ speciesId: 92, formId: '92', level: 22, initialStatus: 'sleep' }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
     maxPokemon: 3,
   },
   {
     id: 'pokemon-tower-channeler-karina',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Karina' }),
-    description: 'Channeler Karina hovers near the cleansed circle.',
+    description: "Karina watches a circle of still, reflected moonlight. Only Water-type Pokémon may enter, including dual types.",
+    allowedPlayerTypes: ['water'],
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -267,7 +273,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-tammy',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Tammy' }),
-    description: 'Channeler Tammy guards the upper landing of 5F.',
+    description: "Tammy's ghostly candles flare as you approach. Your Pokémon start burned unless protected by an immunity or ability.",
+    playerTeamInitialStatus: 'burn',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -283,7 +290,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-janae',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Janae' }),
-    description: 'Channeler Janae guards the stairwell leading up to 6F.',
+    description: "Janae's overlapping chants leave her own Gastly bewildered. It starts confused; make use of the opening before it recovers.",
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -292,7 +299,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
       beatenBattle('pokemon-tower-channeler-tammy'),
       unbeatenBattle('pokemon-tower-channeler-janae'),
     ],
-    enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
+    enemyTeam: [{ speciesId: 92, formId: '92', level: 24, initialStatus: 'confusion' }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
     maxPokemon: 3,
   },
@@ -327,7 +334,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-angelica',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Angelica' }),
-    description: 'Channeler Angelica commands a trio of ghostly apparitions.',
+    description: "Angelica's apparitions gather in pairs. Bring at least two Pokémon for a double battle against her three Gastly.",
+    format: 'double',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -347,7 +355,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-jennifer',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Jennifer' }),
-    description: 'Channeler Jennifer senses the great disturbance above.',
+    description: "Jennifer seals away your battle supplies. Win without using battle items; held items still work.",
+    itemsPerBattle: 0,
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,
@@ -363,7 +372,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   {
     id: 'pokemon-tower-channeler-emilia',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Emilia' }),
-    description: 'Channeler Emilia stands before the final stairs to the summit.',
+    description: "Emilia's chant muffles elaborate commands. Each Pokémon may use a manual move only once; ordinary stance attacks remain available.",
+    movesPerBattle: 1,
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     background: towerBackground,

@@ -1,6 +1,8 @@
 'use client'
 
 import { Suspense, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
@@ -429,6 +431,22 @@ export function ExploreDetailsModal({
       presentation="drawer"
     >
       <Suspense fallback={<ExploreDetailSkeleton />}>
+        {item.type === 'battle' && item.originalData.allowedPlayerTypes?.length > 0 && (
+          <div className="space-y-3 text-sm text-game-ink">
+            <p>
+              Entering team: {userData.pokemon
+                .filter((pokemon) => pokemon.onBattleTeam)
+                .sort((a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0))
+                .slice(0, item.originalData.maxPokemon || 6)
+                .map((pokemon) => pokemon.name || `Pokémon ${pokemon.speciesId}`)
+                .join(', ') || 'No Pokémon on your Battle Team'}.
+              {' '}Only these participants must match the allowed type.
+            </p>
+            <Button asChild variant="outline">
+              <Link href="/game/pokemon">Manage Battle Team</Link>
+            </Button>
+          </div>
+        )}
         <ExploreModalContent item={itemForModal} userData={userData} />
       </Suspense>
     </GameInfoModal>

@@ -1,5 +1,11 @@
 # Battle System
 
+## Pokémon Tower spirit trials
+
+The thirteen Channelers on floors 3–6 each have a fixed, advertised rule: starting paralysis/poison/burn, Grass- or Water-only participants, solo or double battles, no voluntary switching, item-use caps, a manual-move cap, or enemy starting sleep/confusion. The existing enemy teams and progression chain remain intact. Starting ailments use normal immunity/ability/held-item handling and affect only the current battle instance.
+
+`allowedPlayerTypes` requires each actual participant to match at least one listed type; dual types qualify. Validation uses authoritative form types after the battle-size cap, while existing `bannedPlayerTypes` continues inspecting the complete Battle Team. Both restrictions must pass when combined. The Explore drawer lists rules and shows the entering ordered team with a team-management link for type trials. Resource limits cap the existing skill allowance; zero item uses does not disable held items. No voluntary switching still permits initial lead selection, replacements after fainting, and move-driven switches.
+
 Turn-based Pokemon battle system with advanced mechanics.
 
 ## Locations
