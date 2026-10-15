@@ -237,6 +237,8 @@ export interface BattleConfig {
   levelCap?: number // Optional level cap for player?
   /** Player Battle Team members with these types cannot enter this battle. */
   bannedPlayerTypes?: PokemonTypeName[]
+  /** Each participating player Pokemon must have at least one of these types. */
+  allowedPlayerTypes?: PokemonTypeName[]
   /** Battle-floor effect applied to every player Pokemon when the battle starts. */
   playerTeamInitialStatus?: StatusEffectId
   maxPokemon: number // Required, 1-6

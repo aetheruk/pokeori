@@ -50,7 +50,7 @@ export function validateEventReferences(
         if (!moveIds.has(id)) throw new Error(`Unknown move: ${id}`)
     for (const id of node.allowedItems || [])
       if (!itemIds.has(id)) throw new Error(`Unknown battle item: ${id}`)
-    for (const id of node.bannedPlayerTypes || [])
+    for (const id of [...(node.bannedPlayerTypes || []), ...(node.allowedPlayerTypes || [])])
       if (!POKEMON_TYPES.includes(id))
         throw new Error(`Unknown Pokémon type: ${id}`)
     for (const key of ['initialStatus', 'playerTeamInitialStatus'])

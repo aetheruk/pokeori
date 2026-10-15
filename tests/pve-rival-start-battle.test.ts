@@ -143,6 +143,80 @@ mock.module('payload', () => ({
 }))
 
 describe('PVE battle start', () => {
+  test('type-only trials accept dual types and ignore unused slots, while bans still check the full team', async () => {
+    const { startBattleFromConfig } = await import('@/app/(frontend)/game/battles/pve/start-battle')
+    const original = [...playerPokemon]
+    const config: BattleConfig = {
+      id: 'tower-type-test', name: 'Patricia', description: '', category: 'Kanto',
+      icon: { type: 'pokemon', id: '92' }, background: '/backgrounds/pkmn-tower.avif',
+      maxPokemon: 1, requirements: [], rewards: [], allowedPlayerTypes: ['grass'],
+      enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
+    }
+    try {
+      playerPokemon.splice(0, playerPokemon.length,
+        makePokemon('oddish', 'player-1', 43, 1),
+        makePokemon('charmander', 'player-1', 4, 2))
+      const accepted = await startBattleFromConfig(playerUser, config)
+      expect(accepted.success).toBe(true)
+      expect(accepted.state?.playerTeam).toHaveLength(1)
+      expect(accepted.state?.playerTeam[0].speciesId).toBe(43)
+      expect((await startBattleFromConfig(playerUser, { ...config, bannedPlayerTypes: ['fire'] })).success).toBe(false)
+      expect((await startBattleFromConfig(playerUser, { ...config, maxPokemon: 2 })).error).toContain('does not qualify')
+      expect((await startBattleFromConfig(playerUser, { ...config, allowedPlayerTypes: ['water'] })).success).toBe(false)
+      playerPokemon.splice(0)
+      expect((await startBattleFromConfig(playerUser, config)).success).toBe(false)
+    } finally {
+      playerPokemon.splice(0, playerPokemon.length, ...original)
+      redisStore.clear()
+    }
+  })
+
+  test('Tower starting statuses affect reserves but respect type immunity and never change owned Pokemon', async () => {
+    const { startBattleFromConfig } = await import('@/app/(frontend)/game/battles/pve/start-battle')
+    const original = [...playerPokemon]
+    const config: BattleConfig = {
+      id: 'tower-status-test', name: 'Hope', description: '', category: 'Kanto',
+      icon: { type: 'pokemon', id: '92' }, background: '/backgrounds/pkmn-tower.avif',
+      maxPokemon: 3, requirements: [], rewards: [], playerTeamInitialStatus: 'paralysis',
+      enemyTeam: [{ speciesId: 92, formId: '92', level: 22, initialStatus: 'sleep' }],
+    }
+    try {
+      playerPokemon.splice(0, playerPokemon.length,
+        makePokemon('bulbasaur', 'player-1', 1, 1),
+        makePokemon('squirtle', 'player-1', 7, 2),
+        makePokemon('pikachu', 'player-1', 25, 3))
+      const snapshot = structuredClone(playerPokemon)
+      const started = await startBattleFromConfig(playerUser, config)
+      expect(started.success).toBe(true)
+      expect(started.state?.playerTeam[0].status?.id).toBe('paralysis')
+      expect(started.state?.playerTeam[1].status?.id).toBe('paralysis')
+      expect(started.state?.playerTeam[2].status?.id).not.toBe('paralysis')
+      expect(started.state?.enemyTeam[0].status?.id).toBe('sleep')
+      expect(playerPokemon).toEqual(snapshot)
+    } finally {
+      playerPokemon.splice(0, playerPokemon.length, ...original)
+      redisStore.clear()
+    }
+  })
+
+  test('Angelica requires two participants and initializes all three enemies in doubles', async () => {
+    const { startBattleFromConfig } = await import('@/app/(frontend)/game/battles/pve/start-battle')
+    const { pokemonTowerBattles } = await import('@/data/battles/entries/pokemon-tower')
+    const config = pokemonTowerBattles.find((battle) => battle.id === 'pokemon-tower-channeler-angelica')!
+    const original = [...playerPokemon]
+    try {
+      expect((await startBattleFromConfig(playerUser, config)).error).toContain('at least two')
+      playerPokemon.push(makePokemon('squirtle', 'player-1', 7, 2))
+      const started = await startBattleFromConfig(playerUser, config)
+      expect(started.success).toBe(true)
+      expect(started.state?.enemyTeam).toHaveLength(3)
+      expect(started.state?.format).toBe('double')
+    } finally {
+      playerPokemon.splice(0, playerPokemon.length, ...original)
+      redisStore.clear()
+    }
+  })
+
   beforeEach(() => {
     redisStore.clear()
   })

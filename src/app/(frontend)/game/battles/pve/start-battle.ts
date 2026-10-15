@@ -487,6 +487,24 @@ export async function startBattleFromConfig(
     ? userPokemonDocs
     : userPokemonDocs.slice(0, playerTeamLoadLimit)
 
+  if (battleConfig.allowedPlayerTypes?.length) {
+    const allowedTypes = battleConfig.allowedPlayerTypes
+    const invalidPokemon = battleTeamDocs.find((pokemon) => {
+      const types = getPokemonForm(pokemon.formId)?.types || []
+      return !types.some((type) =>
+        allowedTypes.includes(type.toLowerCase() as (typeof allowedTypes)[number]),
+      )
+    })
+    if (invalidPokemon) {
+      const labels = allowedTypes.map((type) => `${type[0].toUpperCase()}${type.slice(1)}`)
+      const name = invalidPokemon.name || getPokemonForm(invalidPokemon.formId)?.name || 'A participating Pokemon'
+      return {
+        success: false,
+        error: `${battleConfig.name} allows only ${labels.join(' or ')}-type Pokemon. ${name} does not qualify.`,
+      }
+    }
+  }
+
   if (battleTeamDocs.length === 0) {
     return {
       success: false,

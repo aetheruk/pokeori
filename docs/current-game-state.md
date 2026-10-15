@@ -1070,8 +1070,9 @@ Pokemon Tower unlocks from Lavender Town after `lavender-missing-mountain`.
   - **FireRed Trainer Gauntlet**:
     - **3F Channelers**: Channeler Hope (Gastly Lv. 22), Channeler Patricia (Gastly Lv. 22), Channeler Carly (Gastly Lv. 24).
     - **4F Channelers**: Channeler Laurel (Gastly Lv. 23 x2), Channeler Jody (Gastly Lv. 22), Channeler Paula (Gastly Lv. 24).
-    - **5F Channelers**: Channeler Ruth (Gastly Lv. 22), Channeler Tammy (Haunter Lv. 23), Channeler Karina (Gastly Lv. 24), Channeler Janae (Gastly Lv. 22).
+    - **5F Channelers**: Channeler Ruth (Gastly Lv. 22), Channeler Karina (Haunter Lv. 23), Channeler Tammy (Haunter Lv. 24), Channeler Janae (Gastly Lv. 24).
     - **6F Channelers**: Channeler Angelica (Gastly Lv. 22 x3), Channeler Jennifer (Gastly Lv. 24), Channeler Emilia (Gastly Lv. 24).
+    - **Spirit trials**: Each Channeler now advertises a fixed rule. Hope starts the player team paralysed, Patricia admits only Grass-type participants, Carly allows one Pokémon, Laurel blocks voluntary switching, Jody starts the player team poisoned, and Paula allows at most one battle-item use. Ruth's Gastly starts asleep; Karina admits only Water-type participants; Tammy starts the player team burned; Janae's Gastly starts confused. Angelica is a double battle requiring two participants, Jennifer allows no battle-item uses, and Emilia caps manual moves at one use per Pokémon. Starting ailments respect existing immunities, abilities, and cures. Dual types qualify for type trials, which validate the first up-to-three ordered Battle Team members entering the encounter. Held items remain usable. Trainer IDs, enemy species/levels, rewards, and progression gates are retained.
     - **Upper Floors Shadow Gauntlet**:
       - `pokemon-tower-shadow-surge-1`: Shadow Gastly (Lv. 26), Shadow Raticate (Lv. 26). 1-time battle hidden after victory.
       - `pokemon-tower-shadow-surge-2`: Shadow Pidgeotto (Lv. 27), Shadow Gastly (Lv. 27). 1-time battle hidden after victory.
