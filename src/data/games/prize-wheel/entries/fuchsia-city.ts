@@ -15,7 +15,7 @@ export const fuchsiaCitychanseyEntries: PrizeWheelGameConfig[] = [
     name: 'Fuchsia Chansey Wheel',
     gameType: 'prize-wheel',
     description:
-      'Visit Chansey in the Fuchsia City Pokémon Center each day for battle tonics and a rare chance to discover a Revive recipe.',
+      'Visit Chansey in the Fuchsia City Pokémon Center each day for battle tonics and a rare chance to receive a Big Mushroom.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     background: '/backgrounds/chansey.avif',
@@ -43,22 +43,15 @@ export const fuchsiaCitychanseyEntries: PrizeWheelGameConfig[] = [
           rewards: [{ type: 'item' as const, targetId: slot.id, quantity: 1, dropChance: 100 }],
         })),
         {
-          id: 'revive-recipe',
-          label: 'Revive Recipe',
+          id: 'big-mushroom',
+          label: 'Big Mushroom',
           color: '#f7cf05',
           percentage: 5,
-          icon: { type: 'item' as const, id: 'revive' },
-          requirements: [
-            {
-              type: 'task_completed' as const,
-              targetId: 'revive-recipe',
-              inverse: true,
-            },
-          ],
+          icon: { type: 'item' as const, id: 'big-mushroom' },
           rewards: [
             {
-              type: 'task_complete' as const,
-              targetId: 'revive-recipe',
+              type: 'item' as const,
+              targetId: 'big-mushroom',
               quantity: 1,
               dropChance: 100,
             },

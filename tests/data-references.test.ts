@@ -2706,20 +2706,20 @@ describe('static data references', () => {
     })
   })
 
-  test('Fuchsia Chansey Wheel awards X items and a rare Revive recipe', () => {
+  test('Fuchsia Chansey Wheel awards X items and a rare Big Mushroom', () => {
     const wheel = allGames.find((game) => game.id === 'chansey-wheel-fuchsia')
     const slots =
       wheel?.gameType === 'prize-wheel'
         ? (wheel.settings as PrizeWheelGameConfig['settings']).slots
         : []
     const xItemIds = ['x-attack', 'x-defense', 'x-sp-atk', 'x-sp-def', 'x-speed', 'dire-hit']
-    const recipeSlot = slots.find((slot) => slot.id === 'revive-recipe')
+    const mushroomSlot = slots.find((slot) => slot.id === 'big-mushroom')
 
     expect(wheel?.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'explore-fuchsia-city',
     })
-    expect(slots.map((slot) => slot.id)).toEqual([...xItemIds, 'revive-recipe'])
+    expect(slots.map((slot) => slot.id)).toEqual([...xItemIds, 'big-mushroom'])
     expect(
       wheel?.gameType === 'prize-wheel'
         ? wheel.settings.showSlotLabels
@@ -2734,18 +2734,12 @@ describe('static data references', () => {
       '#E8F3E2',
       '#f7cf05',
     ])
-    expect(recipeSlot?.percentage).toBe(5)
-    expect(recipeSlot?.requirements).toEqual([
+    expect(mushroomSlot?.percentage).toBe(5)
+    expect(mushroomSlot?.requirements).toBeUndefined()
+    expect(mushroomSlot?.rewards).toEqual([
       {
-        type: 'task_completed',
-        targetId: 'revive-recipe',
-        inverse: true,
-      },
-    ])
-    expect(recipeSlot?.rewards).toEqual([
-      {
-        type: 'task_complete',
-        targetId: 'revive-recipe',
+        type: 'item',
+        targetId: 'big-mushroom',
         quantity: 1,
         dropChance: 100,
       },
