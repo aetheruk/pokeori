@@ -1,5 +1,7 @@
 # Current Game State
 
+Release `0.51.46` fixes timed rhythm games, including Razz Berry Crushing (20 seconds) and EX (60 seconds): score-milestone mode no longer removes their simulation deadline. Ability-adjusted timers remain authoritative. Saved rhythm sessions missing a deadline recover the authored duration without restarting or charging another entry; completed runs use the normal verified score and milestone settlement. Survival-style endless arcade sessions remain untimed.
+
 - Release `0.51.43` keeps Snap's camera shutter active between Pokemon appearances. An empty photo counts as an incorrect answer and uses the same loss and game-over rules as a wrong-Pokemon photo.
 
 - Release `0.51.41` raises the Good Rod recipe to Artisan 25 and changes its costs to 30 T1 Soft Fluff, 20 T1 Metal Scrap, and 30 T1 Wood Scraps. Pokémon Storage and PC Box capacity rewards use the Poké Ball sprite. Battle expedition progress notices use the current battle's trainer sprite. Coins under the Boardwalk uses the Pokedollar currency sprite instead of a Gimmighoul Coin.

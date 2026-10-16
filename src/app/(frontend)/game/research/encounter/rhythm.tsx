@@ -10,11 +10,11 @@ import type { RhythmConfig } from '@/data/games/rhythm/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { useArcadeSession } from '@/hooks/use-arcade-session'
 
-interface RhythmGameProps { encounter: RhythmConfig; initialState?: any }
+interface RhythmGameProps { encounter: RhythmConfig; initialState?: any; actions?: Parameters<typeof useArcadeSession>[2] }
 
-export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
+export function RhythmGame({ encounter, initialState, actions }: RhythmGameProps) {
   useGameMusic(encounter)
-  const session = useArcadeSession('rhythm', encounter)
+  const session = useArcadeSession('rhythm', encounter, actions)
   const { simulation, countdown, result, timeLeft } = session
   const gameStarted = Boolean(simulation)
   const gameEnded = Boolean(simulation && simulation.status !== 'playing')

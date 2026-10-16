@@ -265,6 +265,27 @@ function collectibleConfigs(settings: any) {
   ) as Array<{ index: number; everyScore: any; rewards: LocationReward[] }>
 }
 
+/** Rhythm uses endless milestones for rewards, but still has a timed round. */
+export function getArcadeSessionSettings(
+  gameType: ArcadeGameType,
+  settings: any,
+  sessionTimeLimit: number,
+) {
+  const timed = Boolean(settings.timeLimit) &&
+    (gameType === 'rhythm' || !settings.endless?.enabled)
+  return { ...settings, timeLimit: timed ? sessionTimeLimit : undefined }
+}
+
+/** Repair pre-fix rhythm snapshots without restarting or charging a new entry. */
+export function normalizeArcadeRound(
+  gameType: ArcadeGameType,
+  settings: any,
+  round: ArcadeRound,
+): ArcadeRound {
+  if (gameType !== 'rhythm' || round.settings?.timeLimit || !settings.timeLimit) return round
+  return { ...round, settings: { ...round.settings, timeLimit: settings.timeLimit } }
+}
+
 export function createArcadeRound(
   gameType: ArcadeGameType,
   settings: any,
@@ -820,6 +841,7 @@ export function verifyArcadeCheckpoint(
     typeof value !== 'object'
   )
     return fail()
+  round = normalizeArcadeRound(gameType, settings, round)
   settings = round.settings || settings
   const proof = value as ArcadeProof
   if (

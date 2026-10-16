@@ -146,7 +146,7 @@ import { createDiglettRound } from '@/utilities/research/diglett-authority'
 import type { DiglettTunnelTapSettings } from '@/data/games/diglett-tunnel-tap/types'
 import { getGameCompletionInvalidations } from '@/utilities/games/completion-invalidation'
 import { randomInt } from 'node:crypto'
-import { createArcadeRound, isArcadeGameType, verifyArcadeCheckpoint } from '@/utilities/research/arcade-authority'
+import { createArcadeRound, getArcadeSessionSettings, normalizeArcadeRound, isArcadeGameType, verifyArcadeCheckpoint } from '@/utilities/research/arcade-authority'
 
 const FIELD_OBSERVATION_FAILURE_REWARD_LOSS_CHANCE = 0.7
 
@@ -662,7 +662,9 @@ export async function startGameActivity(
             startTime: existingState.startTime,
             expiry: existingState.expiry,
             wins: existingState.wins,
-            roundData: existingState.roundData,
+            roundData: isArcadeGameType(encounter.gameType)
+              ? normalizeArcadeRound(encounter.gameType, encounter.settings, existingState.roundData)
+              : existingState.roundData,
           }
         }
       }
@@ -961,8 +963,7 @@ export async function startGameActivity(
 
       let roundData: any
       if (isArcadeGameType(encounter.gameType)) {
-        const timedArcade = !encounter.settings.endless?.enabled && Boolean(encounter.settings.timeLimit)
-        roundData = createArcadeRound(encounter.gameType, { ...encounter.settings, timeLimit: timedArcade ? sessionTimeLimit : undefined }, startTime, randomInt(0, 2 ** 32))
+        roundData = createArcadeRound(encounter.gameType, getArcadeSessionSettings(encounter.gameType, encounter.settings, sessionTimeLimit), startTime, randomInt(0, 2 ** 32))
         // Simulation time bounds gameplay; the durable lifetime also permits
         // paused tabs and network-recovery retries without consuming play time.
         expiry = startTime + 7_200_000
