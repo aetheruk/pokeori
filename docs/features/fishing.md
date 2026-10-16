@@ -18,7 +18,7 @@ All eligible entries have equal weight 1. Old, Good, and Super Rods share conten
 
 Common entries:
 
-- All eighteen base/Tier 1 Pokemon type materials, each in a uniform quantity of 1–2: Soft Fluff, Cinder Shard, Aqua Solvent, Electric Component, Wood Scraps, Frost Crystal, Grip Weave, Toxic Resin, Terra Dust, Wing Feather, Mind Thread, Chitin Fragment, Small Stone, Spirit Wisp, Drake Scale, Shadow Fiber, Metal Scrap, and Pixie Powder.
+- All eighteen base/Tier 1 Pokemon type materials, each in a uniform quantity of 1–2: Soft Fluff, Cinder Shard, Aqua Solvent, Electric Component, Wood Scraps, Frost Crystal, Grip Weave, Toxic Resin, Soft Clay, Wing Feather, Rune Stone, Chitin Fragment, Small Stone, Ectoplasm, Drake Scale, Shadow Cloth, Metal Scrap, and Fairy Charm.
 - Broken Ball T1, quantity 1–2.
 - 100 Pokedollars or 25 Crystals, one bundle each.
 - One Poke Ball when the net holds at least 2 Broken Ball T1 units, one Great Ball at 5 units, and one Ultra Ball at 8 units. Unlocks are cumulative and count total quantity across bundles, rather than occupied slots. Inventory quantities do not qualify.
@@ -44,10 +44,10 @@ A stone requires five distinct occupied keep-net slots of its mapped Tier 1 mate
 | Leaf Stone | Grass | Wood Scraps |
 | Ice Stone | Ice | Frost Crystal |
 | Sun Stone | Grass | Wood Scraps |
-| Moon Stone | Fairy | Pixie Powder |
-| Shiny Stone | Fairy | Pixie Powder |
-| Dusk Stone | Dark | Shadow Fiber |
-| Dawn Stone | Psychic | Mind Thread |
+| Moon Stone | Fairy | Fairy Charm |
+| Shiny Stone | Fairy | Fairy Charm |
+| Dusk Stone | Dark | Shadow Cloth |
+| Dawn Stone | Psychic | Rune Stone |
 | Oval Stone | Normal | Soft Fluff |
 
 ## Example probabilities
