@@ -28,6 +28,8 @@ function buildPools(reactionTime: number) {
     })),
     { ...base, currencyId: 'pokedollars', quantity: 100, symbol: '$' },
     { ...base, currencyId: 'crystals', quantity: 25, symbol: '✧' },
+    { ...base, currencyId: 'pokedollars', quantity: 500, symbol: '!!' },
+    { ...base, currencyId: 'crystals', quantity: 200, symbol: '!!' },
     ...(['poke-ball', 'great-ball', 'ultra-ball'] as const).map((itemId, index) => ({
       ...base, itemId, quantity: 1, symbol: '!!',
       keepNetRequirements: [{ itemId: 'broken-ball-t1', quantity: [2, 5, 8][index] }],
@@ -36,8 +38,6 @@ function buildPools(reactionTime: number) {
   const rare: GlobalFishingItemEntry[] = [
     ...NUMBERED_GOLDEN_SCALE_IDS.map((itemId) => ({ ...base, itemId, symbol: '!!!', secret: true })),
     { ...base, itemId: 'discarded-rubbish', symbol: '!!!' },
-    { ...base, currencyId: 'pokedollars', quantity: 500, symbol: '$$$' },
-    { ...base, currencyId: 'crystals', quantity: 200, symbol: '✧✧✧' },
     ...Object.entries(FISHING_EVOLUTION_STONE_TYPES).map(([itemId, type]) => ({
       ...base, itemId, symbol: '!!!',
       keepNetRequirements: [{ itemId: `${TYPE_MATERIAL_CONFIG[type].family}-t1`, slots: 5 }],

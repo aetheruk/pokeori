@@ -157,6 +157,8 @@ The fixture and query helper reject production database settings.
 
 ## Universal fishing markers
 
+Fishing item-pool tests verify both currency denominations remain on every rod's common table and no currencies remain on any rare table, including the revised eligible-entry counts.
+
 Secret replacement tests cover Staryu's five-Pool-Scale gate and 1-in-8 boundary, plus Gold Magikarp's ten-Golden-Scale gate and unchanged 99% boundary.
 
 Relicanth coverage also verifies the five-unit Rock material requirement across bundles and the exclusive 1-in-64 roll boundary on every rod.

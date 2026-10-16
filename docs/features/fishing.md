@@ -20,13 +20,13 @@ Common entries:
 
 - All eighteen base/Tier 1 Pokemon type materials, each in a uniform quantity of 1–2: Soft Fluff, Cinder Shard, Aqua Solvent, Electric Component, Wood Scraps, Frost Crystal, Grip Weave, Toxic Resin, Soft Clay, Wing Feather, Rune Stone, Chitin Fragment, Small Stone, Ectoplasm, Drake Scale, Shadow Cloth, Metal Scrap, and Fairy Charm.
 - Broken Ball T1, quantity 1–2.
-- 100 Pokedollars or 25 Crystals, one bundle each.
+- 100 Pokedollars, 500 Pokedollars, 25 Crystals, or 200 Crystals, each a separate equally weighted bundle.
 - One Poke Ball when the net holds at least 2 Broken Ball T1 units, one Great Ball at 5 units, and one Ultra Ball at 8 units. Unlocks are cumulative and count total quantity across bundles, rather than occupied slots. Inventory quantities do not qualify.
 
 Rare entries:
 
 - Golden Scale (1) through (8), each unique; already-owned or netted scales are filtered out.
-- One Discarded Rubbish, 500 Pokedollars, or 200 Crystals.
+- One Discarded Rubbish. Currency drops are exclusive to the common table.
 - One repeatable unnumbered Golden Scale while all eight numbered scales are owned in Inventory. It has the same weight as every other eligible rare entry, replacing the old fixed 1-in-50 global-item rate.
 - Each eligible evolution stone listed below, quantity one.
 
@@ -52,9 +52,9 @@ A stone requires five distinct occupied keep-net slots of its mapped Tier 1 mate
 
 ## Example probabilities
 
-At an empty net before numbered-scale collection, there are 21 eligible common entries and 11 eligible rare entries. Each common entry is `50% × 99% ÷ 21 = 2.3571%` per cast, while each rare entry is `50% × 1% ÷ 11 = 0.04545%` per cast.
+At an empty net before numbered-scale collection, there are 23 eligible common entries and 9 eligible rare entries. Each common entry is `50% × 99% ÷ 23 = 2.15217%` per cast, while each rare entry is `50% × 1% ÷ 9 = 0.05556%` per cast.
 
-After all numbered scales are owned, the ungated rare table has four entries: Rubbish, 500 Pokedollars, 200 Crystals, and Golden Scale. With one unnumbered scale in the net, item chance is 48%, rare-table chance is 2%, and each of those four rewards is `48% × 2% ÷ 4 = 0.24%` per cast. Eligible stones expand that equal-weight table without changing the rare-table selection chance.
+After all numbered scales are owned, the ungated rare table has two entries: Rubbish and Golden Scale. With one unnumbered scale in the net, item chance is 48%, rare-table chance is 2%, and each of those two rewards is `48% × 2% ÷ 2 = 0.48%` per cast. Eligible stones expand that equal-weight table without changing the rare-table selection chance.
 
 ## Persistence
 

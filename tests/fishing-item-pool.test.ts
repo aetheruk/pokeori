@@ -48,6 +48,8 @@ describe('fishing common and rare tables', () => {
       ).toBe(25)
       expect(has(pool, 'water-gem')).toBe(false)
       expect(has(pool, 'discarded-rubbish')).toBe(false)
+      expect(pool.filter((entry) => entry.currencyId === 'pokedollars').map((entry) => entry.quantity)).toEqual([100, 500])
+      expect(pool.filter((entry) => entry.currencyId === 'crystals').map((entry) => entry.quantity)).toEqual([25, 200])
     }
   })
 
@@ -139,30 +141,25 @@ describe('fishing common and rare tables', () => {
 
   test('unique scales are excluded when owned or netted and repeatable scale has equal rare weight', () => {
     const initial = getGlobalFishingItemTables('old', {}).rare
-    expect(initial).toHaveLength(11)
+    expect(initial).toHaveLength(9)
+    for (const pool of Object.values(globalFishingRareItemPools)) {
+      expect(pool.some((entry) => entry.currencyId)).toBe(false)
+    }
     expect(initial.every((entry) => entry.weight === 1)).toBe(true)
     expect(has(initial, 'golden-scale')).toBe(false)
     const partial = getGlobalFishingItemTables('old', { 'golden-scale-1': 1 }, [
       netItem('golden-scale-2'),
     ]).rare
-    expect(partial).toHaveLength(9)
+    expect(partial).toHaveLength(7)
     expect(has(partial, 'golden-scale-1')).toBe(false)
     expect(has(partial, 'golden-scale-2')).toBe(false)
     expect(has(partial, 'golden-scale')).toBe(false)
     const complete = getGlobalFishingItemTables('old', ownedScales).rare
     expect(complete.map((entry) => entry.itemId || entry.currencyId)).toEqual([
       'discarded-rubbish',
-      'pokedollars',
-      'crystals',
       'golden-scale',
     ])
     expect(complete.every((entry) => entry.weight === 1)).toBe(true)
-    expect(
-      complete.find((entry) => entry.currencyId === 'pokedollars')?.quantity,
-    ).toBe(500)
-    expect(
-      complete.find((entry) => entry.currencyId === 'crystals')?.quantity,
-    ).toBe(200)
     expect(
       getAvailableFishingItemEntries(
         globalFishingRareItemPools.old,
