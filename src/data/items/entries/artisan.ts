@@ -366,6 +366,22 @@ const fishingSalvageItems: Item[] = [
       grantRandomGems: { min: 1, max: 3 },
     },
   },
+  {
+    id: 'ball-bag',
+    name: 'Ball Bag',
+    description:
+      'Open for 1–3 Poké Balls, plus independent chances of one Great Ball (15%), one Ultra Ball (2%), and one Master Ball (1 in 1,000,000).',
+    category: 'misc',
+    spriteId: 'pouch-of-materials',
+    effects: {
+      openRewards: [
+        { type: 'item', targetId: 'poke-ball', quantity: { min: 1, max: 3 }, dropChance: 100 },
+        { type: 'item', targetId: 'great-ball', quantity: 1, dropChance: 15 },
+        { type: 'item', targetId: 'ultra-ball', quantity: 1, dropChance: 2 },
+        { type: 'item', targetId: 'master-ball', quantity: 1, dropChance: 0.0001 },
+      ],
+    },
+  },
 ]
 
 export const artisanItems: Item[] = [

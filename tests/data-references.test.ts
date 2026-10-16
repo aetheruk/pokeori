@@ -2549,21 +2549,24 @@ describe('static data references', () => {
     ])
   })
 
-  test('Cerulean Berry Trade sells a Berry Powder Poke Ball bundle', () => {
+  test('Cerulean Berry Trade sells openable ball bags and material pouches', () => {
     const shop = shops.find((entry) => entry.id === 'cerulean-berry-shop')
     const bundle = shop?.items.find((item) => item.id === 'poke-ball-bundle-bp')
 
     expect(bundle).toBeDefined()
-    expect(bundle?.name).toBe('Poké Ball Bundle')
-    expect(bundle?.icon).toEqual({ type: 'item', id: 'poke-ball' })
+    expect(bundle?.name).toBe('Ball Bag')
+    expect(bundle?.icon).toEqual({ type: 'item', id: 'ball-bag' })
     expect(bundle?.cost).toEqual([
       { type: 'currency', id: 'berry-powder', amount: 100 },
     ])
     expect(bundle?.stock).toBeUndefined()
     expect(bundle?.daily).toBeUndefined()
     expect(bundle?.rewards).toEqual([
-      { type: 'item', quantity: 5, targetId: 'poke-ball', dropChance: 100 },
+      { type: 'item', quantity: 1, targetId: 'ball-bag', dropChance: 100 },
     ])
+    const pouch = shop?.items.find((entry) => entry.id === 'pouch-of-materials-bp')
+    expect(pouch?.cost).toEqual([{ type: 'currency', id: 'berry-powder', amount: 150 }])
+    expect(pouch?.rewards).toEqual([{ type: 'item', targetId: 'pouch-of-materials', quantity: 1, dropChance: 100 }])
   })
 
   test('Misty Trainer level gate is on the Gym Leader battle instead of the first gym visit', () => {

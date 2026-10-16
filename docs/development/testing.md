@@ -1,5 +1,8 @@
 # Testing Strategy
 
+- `bun test tests/ball-bag.test.ts` checks Ball Bag odds and sprite reuse, actual inventory opening and reward rolls, independent bonuses including the one-in-a-million Master Ball, missing stock/authentication, receipt replay, and transaction rollback on reward failure.
+  `bun run test:e2e e2e/ball-bag.pw.ts` checks phone/desktop Inventory Open controls, the odds description, and drawer bounds.
+
 - Rhythm deadlines: `bun test tests/rhythm-timer.test.ts` verifies the 20-second Razz and 60-second EX rounds with server-verified scoring, adjusted timers, saved-session repair, and unchanged untimed survival modes. `bun run test:e2e e2e/rhythm-timer.pw.ts` verifies timed completion reaches the result screen exactly once and disables further hits.
 
 - Tower spirit trials: `bun test tests/pokemon-tower-trials.test.ts tests/pve-rival-start-battle.test.ts` checks all thirteen rules, the trainer chain and Shadow Surge handoff, resource caps, dual-type acceptance, participating-team selection, preserved full-team bans, rejected teams, starting status on reserves/immunity/non-persistence, and Angelica's double-battle entry.
