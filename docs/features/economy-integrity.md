@@ -13,7 +13,7 @@ so retries can recover committed results.
 
 ## Transaction contract
 
-Inventory containers may author `effects.openRewards` using the shared reward format. Opening consumes one container and independently rolls its rewards in the same economy transaction and durable action receipt, so a retry returns the original contents. Cerulean Berry Trade's Ball Bag costs 100 Berry Powder, always contains 1–3 Poké Balls, and independently adds one Great Ball at 15%, one Ultra Ball at 2%, and one Master Ball at 0.0001% (one in a million). Its 150-Berry-Powder material pouch retains its existing material/gem rolls.
+Inventory containers may author `effects.openRewards` using the shared reward format. Opening consumes one container and independently rolls its rewards in the same economy transaction and durable action receipt, so a retry returns the original contents. Cerulean Berry Trade's Ball Bag costs 150 Berry Powder, always contains 1–3 Poké Balls, and independently adds one Great Ball at 15%, one Ultra Ball at 2%, and one Master Ball at 0.0001% (one in a million). Its 150-Berry-Powder material pouch retains its existing material/gem rolls.
 
 - `runEconomyAction` serializes mutations per user, opens a Payload MongoDB
   transaction, and inserts an `economy-action-receipts` row in that same

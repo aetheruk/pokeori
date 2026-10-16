@@ -247,7 +247,7 @@ export const ceruleanCityShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'berry-powder',
-            amount: 100,
+            amount: 150,
           },
         ],
         rewards: [
