@@ -169,15 +169,15 @@ describe('fishing common and rare tables', () => {
     ).toBe(false)
   })
 
-  test('only unnumbered Golden Scales boost the rare roll by one percentage point each', () => {
+  test('only unnumbered Golden Scales boost the rare roll by 0.3 percentage points each', () => {
     expect(getFishingRareItemChance([])).toBe(1)
-    expect(getFishingRareItemChance([netItem('golden-scale')])).toBe(2)
+    expect(getFishingRareItemChance([netItem('golden-scale')])).toBe(1.3)
     expect(
       getFishingRareItemChance(Array(5).fill(netItem('golden-scale'))),
-    ).toBe(6)
+    ).toBe(2.5)
     expect(
       getFishingRareItemChance(Array(10).fill(netItem('golden-scale'))),
-    ).toBe(11)
+    ).toBe(4)
     expect(
       getFishingRareItemChance([
         netItem('golden-scale-1'),
@@ -206,7 +206,7 @@ describe('fishing common and rare tables', () => {
           rod,
           ownedScales,
           [netItem('golden-scale')],
-          rng(0.01999, 0.9999),
+          rng(0.01299, 0.9999),
         ).itemId,
       ).toBe('golden-scale')
       expect(
@@ -214,7 +214,7 @@ describe('fishing common and rare tables', () => {
           rod,
           ownedScales,
           [netItem('golden-scale')],
-          rng(0.02, 0),
+          rng(0.013, 0),
         ).itemId,
       ).toBe(TIER_ONE_POKEMON_MATERIAL_IDS[0])
       const available = getGlobalFishingItemTables(rod, {}).common

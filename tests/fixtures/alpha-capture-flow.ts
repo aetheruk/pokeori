@@ -407,6 +407,7 @@ const {
   attemptHook,
   castFishingLine,
   keepFishingCatch,
+  releaseFish,
   startFishingCatch,
 } = await import(
   '@/app/(frontend)/game/research/games/fishing'
@@ -653,7 +654,7 @@ try {
   assert.equal(netCatchEncounter.fishingCatchCrystalMultiplier, 1)
   store.delete('encounter:owner')
 
-  // Missing the bite forfeits the net, even when the client only records it on recast.
+  // Missing a bite loses one slot, even when recorded by recast cleanup.
   store.set('fishing:keep-net:owner', {
     encounterId: fishingConfig.id,
     entries: [
@@ -673,7 +674,54 @@ try {
   missedCast.appearTime = Date.now() + 1000
   store.set('fishing:owner', missedCast)
   assert.equal((await attemptHook()).hooked, false)
-  assert.equal(store.has('fishing:keep-net:owner'), false)
+  assert.equal(store.get('fishing:keep-net:owner').entries.length, 0)
+  await releaseFish()
+
+  // Keep manually authored cast identities separate from real Date.now() casts.
+  castTime += 100000
+  const penaltyEntries = [
+    { id: 'first', type: 'item', itemId: 'golden-scale', quantity: 1 },
+    { id: 'middle', type: 'pokemon', speciesId: 129, formId: '129', isShiny: false, isAlpha: false },
+    { id: 'last', type: 'item', itemId: 'small-stone-t1', quantity: 2 },
+  ]
+  for (const timing of ['early', 'late', 'release', 'recast'] as const) {
+    store.set('fishing:keep-net:owner', {
+      encounterId: fishingConfig.id,
+      entries: structuredClone(penaltyEntries),
+    })
+    store.set('fishing:owner', {
+      userId: user.id, encounterId: fishingConfig.id, selectedRod: 'old',
+      castTime: ++castTime, phase: 'waiting',
+      appearTime: Date.now() + (timing === 'early' || timing === 'release' ? 10000 : -10000),
+      hookedResult: { type: 'pokemon', entry: fishingEntry },
+    })
+    const penaltyRoll = timing === 'early' ? 0 : timing === 'release' ? 0.9999 : 0.5
+    Math.random = () => penaltyRoll
+    if (timing === 'early' || timing === 'late') {
+      assert.equal((await attemptHook()).hooked, false)
+      assert.equal((await attemptHook()).hooked, false)
+    } else if (timing === 'release') {
+      assert.equal((await releaseFish()).success, true)
+    } else {
+      assert.equal((await castFishingLine('old')).success, true)
+      // Release a successfully hooked result without another failure penalty.
+      const state = store.get('fishing:owner')
+      state.phase = 'hooked'
+      store.set('fishing:owner', state)
+    }
+    await releaseFish()
+    await releaseFish()
+    assert.deepEqual(store.get('fishing:keep-net:owner').entries,
+      penaltyEntries.filter((_, index) => index !== Math.floor(penaltyRoll * penaltyEntries.length)))
+  }
+  store.set('fishing:keep-net:owner', { encounterId: fishingConfig.id, entries: [] })
+  store.set('fishing:owner', {
+    userId: user.id, encounterId: fishingConfig.id, selectedRod: 'old',
+    castTime: ++castTime, phase: 'waiting', appearTime: Date.now() - 10000,
+    hookedResult: { type: 'pokemon', entry: fishingEntry },
+  })
+  assert.equal((await attemptHook()).keepNetLost, false)
+  await releaseFish()
 
   const fullNet = Array.from({ length: 10 }, (_, index) => ({
     id: `slot-${index}`,

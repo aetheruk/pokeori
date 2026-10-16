@@ -507,6 +507,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
       setReactionTime(res.reactionTime ?? 2000)
       setNibbleSymbol(res.symbol || null)
+      setKeepNet(res.keepNet || [])
 
       // Interval only updates the countdown for UI, does NOT control logic
       const updateTimer = () => {
@@ -597,7 +598,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
         })
       } else {
         playSfx('bad')
-        setKeepNet([])
+        setKeepNet(await getFishingKeepNet())
         setPhase('missed')
       }
     }
@@ -703,8 +704,9 @@ export function FishingGame({ encounter }: FishingGameProps) {
   }, [isStartingNetCatch, netPokemonToCatch, router, selectedRod])
 
   const handleRecast = useCallback(async () => {
-    await releaseFish()
-    setKeepNet([])
+    const res = await releaseFish()
+    if (!res.success) return
+    setKeepNet(await getFishingKeepNet())
     setPhase('idle')
     setHookedData(null)
     setCastTime(null)

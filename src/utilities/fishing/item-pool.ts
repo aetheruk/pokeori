@@ -87,7 +87,7 @@ export function getFishingRareItemChance(
           : 0),
       0,
     )
-  return Math.min(100, FISHING_RARE_ITEM_CHANCE + goldenScales)
+  return Math.min(100, FISHING_RARE_ITEM_CHANCE + goldenScales * 0.3)
 }
 
 export function getGlobalFishingItemTables(
