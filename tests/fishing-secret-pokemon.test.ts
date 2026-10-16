@@ -20,8 +20,27 @@ const drakeScaleKeepNet = [
   },
 ]
 
+const rockKeepNet = [{ id: 'rocks', type: 'item' as const, itemId: 'small-stone-t1', quantity: 5 }]
+
 describe('secret fishing Pokemon replacements', () => {
   const rodTypes = ['old', 'good', 'super'] as const
+
+  test('Relicanth requires five Rock material units and has an exclusive 1-in-64 boundary', () => {
+    for (const rodType of rodTypes) {
+      for (const quantity of [0, 1, 4]) {
+        expect(applySecretFishingPokemonReplacement({ rodType, entry: baseEntry,
+          keepNet: [{ ...rockKeepNet[0], quantity }], random: () => 0,
+        })).toBe(baseEntry)
+      }
+      expect(applySecretFishingPokemonReplacement({ rodType, entry: baseEntry,
+        keepNet: rockKeepNet, random: () => 1 / 64,
+      })).toBe(baseEntry)
+      expect(applySecretFishingPokemonReplacement({ rodType, entry: baseEntry,
+        keepNet: [{ ...rockKeepNet[0], quantity: 2 }, { ...rockKeepNet[0], id: 'more-rocks', quantity: 3 }],
+        random: () => 1 / 64 - Number.EPSILON,
+      })).toMatchObject({ speciesId: 369, fromKeepNet: true })
+    }
+  })
 
   test('any rod can secretly replace a Pokemon result with Relicanth', () => {
     for (const rodType of rodTypes) {
@@ -30,12 +49,13 @@ describe('secret fishing Pokemon replacements', () => {
           rodType,
           entry: baseEntry,
           random: () => 1 / 1024,
+          keepNet: rockKeepNet,
         }),
       ).toEqual({
         ...baseEntry,
         speciesId: 369,
         formId: '369',
-        fromKeepNet: false,
+        fromKeepNet: true,
       })
     }
   })
@@ -66,12 +86,13 @@ describe('secret fishing Pokemon replacements', () => {
           rodType,
           entry: baseEntry,
           random: () => 1 / 2048,
+          keepNet: [...rockKeepNet, ...drakeScaleKeepNet],
         }),
       ).toEqual({
         ...baseEntry,
         speciesId: 369,
         formId: '369',
-        fromKeepNet: false,
+        fromKeepNet: true,
       })
     }
   })
@@ -106,7 +127,7 @@ describe('secret fishing Pokemon replacements', () => {
           random: () => (calls++ === 0 ? 1 : 0),
         }),
       ).toBe(baseEntry)
-      expect(calls).toBe(1)
+      expect(calls).toBe(0)
 
       expect(
         applySecretFishingPokemonReplacement({
@@ -145,7 +166,7 @@ describe('secret fishing Pokemon replacements', () => {
           rodType,
           entry: baseEntry,
           keepNet: ceruleanScaleKeepNet,
-          random: () => [1, 0.49][rolls++],
+          random: () => [0.49][rolls++],
         }),
       ).toMatchObject({ speciesId: 120, formId: '120' })
 
@@ -155,7 +176,7 @@ describe('secret fishing Pokemon replacements', () => {
           rodType,
           entry: baseEntry,
           keepNet: ceruleanScaleKeepNet,
-          random: () => [1, 0.5][rolls++],
+          random: () => [0.5][rolls++],
         }),
       ).toBe(baseEntry)
     }
@@ -205,10 +226,7 @@ describe('secret fishing Pokemon replacements', () => {
         rodType: 'old',
         entry: baseEntry,
         keepNet: goldenScales,
-        random: (() => {
-          let rolls = 0
-          return () => (rolls++ === 0 ? 1 : 0)
-        })(),
+        random: () => 0,
       }),
     ).toMatchObject({ speciesId: 129, formId: '129', rarity: 'gold' })
 

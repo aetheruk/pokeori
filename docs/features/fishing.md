@@ -62,6 +62,8 @@ The server resolves a global material bundle's quantity once at cast creation an
 
 ## Universal bobber markers
 
-Every rod and location uses the rolled hook result for its bite marker. Normal Pokémon show `!`, common-table items show `!!`, rare-table items show `!!!`, and Pokémon unlocked by keep-net conditions show `?!`. Local override items show `!!` because they bypass the global table roll. Ungated secret Pokémon use `!`.
+Every rod and location uses the rolled hook result for its bite marker. Normal Pokémon show `!`, common-table items show `!!`, rare-table items show `!!!`, and Pokémon unlocked by keep-net conditions show `?!`. Local override items show `!!` because they bypass the global table roll.
+
+Relicanth requires five Tier 1 Rock material units (`small-stone-t1`) in the keep net and rolls at 1 in 64 after a Pokémon hook is selected. Quantities can be spread across bundles; five distinct slots are not required. It is checked before Feebas, Staryu, and Gold Magikarp and uses `?!` unless a rarity variant takes priority.
 
 Alpha Pokémon use the existing Alpha symbol. Rarity variants (including shiny, shadow, and gold) use the Lucide Sparkle icon. Alpha takes precedence over rarity, and rarity takes precedence over the net-condition marker. Alpha is rolled once at casting and retained through hooking, netting, and capture, so the bite can show its actual symbol. Legacy per-entry `symbol` settings are ignored.

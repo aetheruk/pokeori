@@ -1242,4 +1242,6 @@ The current authored game progression includes the full Saffron blackout void re
 
 ## Fishing bobber update (0.51.49)
 
+Relicanth now requires five Tier 1 Rock material units in the keep net and has a 1-in-64 replacement chance on Pokémon hooks across all rods and locations. It uses the net-conditioned bite marker.
+
 Fishing bite markers are universal: `!` ordinary Pokémon, `!!` common/local items, `!!!` rare-table items, `?!` net-conditioned Pokémon, the Alpha symbol for Alphas, and Lucide Sparkle for rarity variants. Alpha takes priority over rarity, then net conditions. Alpha now rolls once at casting so the marker is accurate before hooking; the result persists through capture.

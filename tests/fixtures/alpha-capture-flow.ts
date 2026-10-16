@@ -495,7 +495,7 @@ try {
     // Last cast roll determines Alpha; replacement and rarity rolls stay ordinary.
     Math.random = () => {
       const call = castRandomCalls++
-      return call === 0 ? 0.2 : call === 4 ? 0.005 : 0.5
+      return call === 0 ? 0.2 : call === 3 ? 0.005 : 0.5
     }
     const castResult = await castFishingLine(rodType)
     assert.equal(castResult.success, true)

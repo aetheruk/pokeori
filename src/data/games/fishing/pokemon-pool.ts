@@ -13,7 +13,8 @@ export const globalFishingPokemonPool: GlobalFishingPokemonReplacement[] = [
   {
     speciesId: 369,
     formId: '369',
-    chance: 1 / 512,
+    chance: 1 / 64,
+    keepNetRequirements: [{ itemId: 'small-stone-t1', quantity: 5 }],
   },
   {
     speciesId: 349,

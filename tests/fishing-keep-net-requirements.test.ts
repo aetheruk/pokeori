@@ -11,6 +11,7 @@ describe('fishing keep-net requirements', () => {
     )
 
     expect(requirementIds).toEqual([
+      'small-stone-t1',
       'drake-scale-t1',
       'cerulean-pool-scale',
       'golden-scale',
