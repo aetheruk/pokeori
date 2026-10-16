@@ -157,6 +157,8 @@ The fixture and query helper reject production database settings.
 
 ## Universal fishing markers
 
+Release 0.51.50 tests verify 0.3-point Golden Scale boosts and rare-roll boundaries, plus real early/late hooks, release/recast timeout cleanup, random occupied-slot selection, empty nets, and repeated failed-hook/release requests charging only one slot.
+
 Fishing item-pool tests verify both currency denominations remain on every rod's common table and no currencies remain on any rare table, including the revised eligible-entry counts.
 
 Secret replacement tests cover Staryu's five-Pool-Scale gate and 1-in-8 boundary, plus Gold Magikarp's ten-Golden-Scale gate and unchanged 99% boundary.
