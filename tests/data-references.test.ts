@@ -902,45 +902,12 @@ describe('static data references', () => {
     expect(broken).toEqual([])
   })
 
-  test('global fishing item pools include water materials alongside gems', () => {
-    expect(globalFishingItemPools.old.map((entry) => entry.itemId)).toEqual(
-      expect.arrayContaining(['water-gem', 'aqua-solvent-t1']),
-    )
-    expect(
-      globalFishingItemPools.old.map((entry) => entry.itemId),
-    ).not.toContain('aqua-solvent-t2')
-
-    expect(globalFishingItemPools.good.map((entry) => entry.itemId)).toEqual(
-      expect.arrayContaining(['water-gem', 'aqua-solvent-t1']),
-    )
-    expect(
-      globalFishingItemPools.good.map((entry) => entry.itemId),
-    ).not.toContain('shining-water-gem')
-    expect(
-      globalFishingItemPools.good.map((entry) => entry.itemId),
-    ).not.toContain('pristine-water-gem')
-    expect(
-      globalFishingItemPools.good.map((entry) => entry.itemId),
-    ).not.toContain('aqua-solvent-t2')
-    expect(
-      globalFishingItemPools.good.map((entry) => entry.itemId),
-    ).not.toContain('aqua-solvent-t3')
-
-    expect(globalFishingItemPools.super.map((entry) => entry.itemId)).toEqual(
-      expect.arrayContaining(['water-gem', 'aqua-solvent-t1']),
-    )
-    expect(
-      globalFishingItemPools.super.map((entry) => entry.itemId),
-    ).not.toContain('shining-water-gem')
-    expect(
-      globalFishingItemPools.super.map((entry) => entry.itemId),
-    ).not.toContain('pristine-water-gem')
-    expect(
-      globalFishingItemPools.super.map((entry) => entry.itemId),
-    ).not.toContain('aqua-solvent-t2')
-    expect(
-      globalFishingItemPools.super.map((entry) => entry.itemId),
-    ).not.toContain('aqua-solvent-t3')
+  test('global fishing catalogues contain base materials and no gem or upgraded-material drops', () => {
+    for (const pool of Object.values(globalFishingItemPools)) {
+      const itemIds = pool.map((entry) => entry.itemId)
+      expect(itemIds).toEqual(expect.arrayContaining(['aqua-solvent-t1', 'cinder-shard-t1', 'wood-scraps-t1', 'broken-ball-t1', 'ultra-ball', 'fire-stone']))
+      expect(itemIds.some((id) => id?.endsWith('-gem') || id?.endsWith('-t2') || id?.endsWith('-t3'))).toBe(false)
+    }
   })
 
   test('trainer battles do not author manual candy rewards', () => {

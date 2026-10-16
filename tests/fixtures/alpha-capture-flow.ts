@@ -414,6 +414,50 @@ const {
 store.set('game:owner', { encounterId: fishingConfig.id })
 let castTime = Date.now()
 try {
+  // The actual cast/hook/net path persists a concrete bundle quantity once.
+  inventory['old-rod'] = 1
+  let materialRolls = [0.9, 0.5, 0, 0.99, 0.5]
+  Math.random = () => materialRolls.shift() ?? 0.5
+  assert.equal((await castFishingLine('old')).success, true)
+  const materialHook = store.get('fishing:owner')
+  assert.equal(materialHook.hookedResult.entry.itemId, 'soft-fluff-t1')
+  assert.equal(materialHook.hookedResult.entry.quantity, 2)
+  materialHook.phase = 'nibble'
+  materialHook.appearTime = Date.now() - 1
+  store.set('fishing:owner', materialHook)
+  assert.equal((await attemptHook()).quantity, 2)
+  Math.random = () => { throw new Error('A hooked item must not reroll its quantity') }
+  assert.equal((await attemptHook()).quantity, 2)
+  assert.equal((await keepFishingCatch()).success, true)
+  assert.equal(store.get('fishing:keep-net:owner').entries[0].quantity, 2)
+  store.delete('fishing:owner')
+  store.delete('fishing:keep-net:owner')
+
+  const rareRolls = [0.9, 0.005, 0, 0.5]
+  Math.random = () => rareRolls.shift() ?? 0.5
+  assert.equal((await castFishingLine('old')).success, true)
+  assert.equal(store.get('fishing:owner').hookedResult.entry.itemId, 'golden-scale-1')
+  store.delete('fishing:owner')
+  store.delete('fishing:keep-net:owner')
+
+  // Special local pools still override the globals, with fallback once exhausted.
+  const oldRod = fishingConfig.settings.rods.old
+  oldRod.items = { entries: [{ itemId: 'unknown-tm', weight: 1, symbol: '!!!', reactionTime: 900, appearTime: { min: 2000, max: 5000 } }] }
+  Math.random = () => 0.9
+  assert.equal((await castFishingLine('old')).success, true)
+  assert.equal(store.get('fishing:owner').hookedResult.entry.itemId, 'unknown-tm')
+  store.delete('fishing:owner')
+  inventory['unknown-tm'] = 1
+  materialRolls = [0.9, 0.5, 0, 0.99, 0.5]
+  Math.random = () => materialRolls.shift() ?? 0.5
+  assert.equal((await castFishingLine('old')).success, true)
+  assert.equal(store.get('fishing:owner').hookedResult.entry.quantity, 2)
+  delete oldRod.items
+  delete inventory['unknown-tm']
+  store.delete('fishing:owner')
+  store.delete('fishing:keep-net:owner')
+  idempotentResults.clear()
+
   for (const rodType of ['old', 'good', 'super'] as const) {
     // Starting a catch ends its Mini Game session, so each rod test starts a fresh one.
     store.set('game:owner', { encounterId: fishingConfig.id })
@@ -447,11 +491,18 @@ try {
       })
     }
     // Avoid the separate secret replacement rolls while casting.
-    Math.random = () => 0.5
-    assert.equal((await castFishingLine(rodType)).success, true)
+    let castRandomCalls = 0
+    // Last cast roll determines Alpha; replacement and rarity rolls stay ordinary.
+    Math.random = () => {
+      const call = castRandomCalls++
+      return call === 0 ? 0.2 : call === 3 ? 0.005 : 0.5
+    }
+    const castResult = await castFishingLine(rodType)
+    assert.equal(castResult.success, true)
     const hooked = store.get('fishing:owner')
     assert.equal(hooked.hookedResult.isSecret, false)
-    assert.equal(hooked.hookedResult.isAlpha, undefined)
+    assert.equal(hooked.hookedResult.isAlpha, true)
+    assert.equal(castResult.symbol, 'alpha')
     hooked.phase = 'nibble'
     hooked.appearTime = Date.now() - 1
     hooked.castTime = ++castTime

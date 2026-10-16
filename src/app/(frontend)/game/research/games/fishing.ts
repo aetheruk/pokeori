@@ -46,7 +46,6 @@ import type {
   FishingPokemonEntry,
   FishingItemEntry,
 } from '@/data/games/fishing/types'
-import { globalFishingItemPools } from '@/data/games/fishing/item-pools'
 import {
   acquireActionLock,
   checkActionRateLimit,
@@ -69,8 +68,9 @@ import {
 } from '@/utilities/user-state'
 import type { WeatherSnapshot } from '@/utilities/weather'
 import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
+import { getFishingBiteMarker } from '@/utilities/fishing/bite-marker'
 import {
-  addPostCollectionGoldenScaleDrop,
+  rollGlobalFishingItem,
   getAvailableFishingItemEntries,
 } from '@/utilities/fishing/item-pool'
 import {
@@ -177,7 +177,7 @@ function buildHookedResponse(fishingState: FishingState) {
       currencyId: itemEntry.currencyId,
       guildId: itemEntry.guildId,
       quantity: itemEntry.quantity ?? 1,
-      symbol: itemEntry.symbol,
+      symbol: getFishingBiteMarker(result),
     }
   }
 
@@ -191,7 +191,7 @@ function buildHookedResponse(fishingState: FishingState) {
     isShiny: result.isShiny,
     rarity: result.rarity,
     isAlpha: result.isAlpha === true,
-    symbol: pokemonEntry.symbol,
+    symbol: getFishingBiteMarker(result),
   }
 }
 
@@ -405,8 +405,8 @@ export async function castFishingLine(rodType: RodType) {
         { payload },
       )
 
-      // A full keep net gradually shifts the usual 80/20 cast split toward items.
-      const itemChance = getFishingItemChance(fishingKeepNet.entries.length)
+      // Each occupied slot favours the opposite hook kind by two percentage points.
+      const itemChance = getFishingItemChance(fishingKeepNet.entries)
       const poolRoll = Math.random() * 100
       let selectedEntry: FishingPokemonEntry | FishingItemEntry
       let resultType: 'pokemon' | 'item'
@@ -473,24 +473,14 @@ export async function castFishingLine(rodType: RodType) {
               fishingKeepNet.entries,
             )
           : []
-        const availableGlobalItemPool = getAvailableFishingItemEntries(
-          globalFishingItemPools[rodType],
-          inventory,
-          new Set(
-            fishingKeepNet.entries.flatMap((entry) =>
-              entry.type === 'item' && entry.itemId ? [entry.itemId] : [],
-            ),
-          ),
-          fishingKeepNet.entries,
-        )
-        const itemPool =
+        selectedEntry =
           availableConfiguredItemPool.length > 0
-            ? availableConfiguredItemPool
-            : addPostCollectionGoldenScaleDrop(
-                availableGlobalItemPool,
+            ? rollWeightedEntry(availableConfiguredItemPool)
+            : rollGlobalFishingItem(
+                rodType,
                 inventory,
+                fishingKeepNet.entries,
               )
-        selectedEntry = rollWeightedEntry(itemPool)
         resultType = 'item'
       }
 
@@ -587,6 +577,17 @@ export async function castFishingLine(rodType: RodType) {
         weather: researchState.weather,
       }
 
+      if (resultType === 'pokemon') {
+        const entry = selectedEntry as FishingPokemonEntry
+        fishingState.hookedResult!.isAlpha = rollFishingEncounterAlpha(
+          encounter,
+          fishingState.hookedResult!,
+          getSameFormKeepNetCount(
+            fishingKeepNet.entries,
+            entry.formId || String(entry.speciesId),
+          ),
+        )
+      }
       await redis.set(`fishing:${user.id}`, fishingState, { ex: 120 }) // 2 min expiry
 
       // Refresh research session TTL to keep it alive while fishing
@@ -597,7 +598,7 @@ export async function castFishingLine(rodType: RodType) {
         castTime: now,
         appearTime: fishingState.appearTime,
         reactionTime: selectedEntry.reactionTime,
-        symbol: selectedEntry.symbol,
+        symbol: getFishingBiteMarker(fishingState.hookedResult!),
       }
     } finally {
       await releaseActionLock(actionLock)
@@ -714,7 +715,7 @@ export async function attemptHook() {
       // Success! Update state
       fishingState.phase = 'hooked'
       fishingState.reactionDeadline = reactionDeadline
-      if (fishingState.hookedResult.type === 'pokemon') {
+      if (fishingState.hookedResult.type === 'pokemon' && fishingState.hookedResult.isAlpha === undefined) {
         const encounter = allGames.find(
           (entry) => entry.id === fishingState.encounterId,
         ) as FishingGameConfig | undefined

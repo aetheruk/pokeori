@@ -1,130 +1,61 @@
 import type { GlobalFishingItemEntry, RodType } from './types'
+import { TIER_ONE_POKEMON_MATERIAL_IDS, TYPE_MATERIAL_CONFIG } from '@/utilities/artisan/material-drops'
 
-const commonAppearTime = { min: 2000, max: 5000 }
+export const FISHING_POKEMON_CHANCE = 50
+export const FISHING_ITEM_CHANCE = 50
+export const FISHING_RARE_ITEM_CHANCE = 1
+export const NUMBERED_GOLDEN_SCALE_IDS = Array.from({ length: 8 }, (_, index) => `golden-scale-${index + 1}`)
 
-export const FISHING_POKEMON_CHANCE = 70
-export const FISHING_ITEM_CHANCE = 30
-export const NUMBERED_GOLDEN_SCALE_IDS = Array.from(
-  { length: 8 },
-  (_, index) => `golden-scale-${index + 1}`,
-)
+export const FISHING_EVOLUTION_STONE_TYPES = {
+  'fire-stone': 'fire',
+  'water-stone': 'water',
+  'thunder-stone': 'electric',
+  'leaf-stone': 'grass',
+  'ice-stone': 'ice',
+  'sun-stone': 'grass',
+  'moon-stone': 'fairy',
+  'shiny-stone': 'fairy',
+  'dusk-stone': 'dark',
+  'dawn-stone': 'psychic',
+  'oval-stone': 'normal',
+} as const
 
-function goldenScaleEntries(reactionTime: number): GlobalFishingItemEntry[] {
-  return Array.from({ length: 8 }, (_, index) => ({
-    itemId: `golden-scale-${index + 1}`,
-    weight: 1,
-    symbol: '!!!',
-    reactionTime,
-    appearTime: commonAppearTime,
-    secret: true,
-  }))
-}
-
-function currencyEntries(reactionTime: number): GlobalFishingItemEntry[] {
-  const currencies: Array<{
-    currencyId: string
-    quantity: number
-    weight: number
-    symbol: string
-  }> = [
-    { currencyId: 'pokedollars', quantity: 100, weight: 12, symbol: '$' },
-    { currencyId: 'pokedollars', quantity: 250, weight: 4, symbol: '$$' },
-    { currencyId: 'pokedollars', quantity: 500, weight: 1, symbol: '$$$' },
-    { currencyId: 'crystals', quantity: 5, weight: 5, symbol: '✧' },
-    { currencyId: 'crystals', quantity: 15, weight: 2, symbol: '✧✧' },
-    { currencyId: 'crystals', quantity: 50, weight: 1, symbol: '✧✧✧' },
+function buildPools(reactionTime: number) {
+  const base = { weight: 1, reactionTime, appearTime: { min: 2000, max: 5000 } }
+  const common: GlobalFishingItemEntry[] = [
+    ...[...TIER_ONE_POKEMON_MATERIAL_IDS, 'broken-ball-t1'].map((itemId) => ({
+      ...base, itemId, symbol: '!', quantityRange: { min: 1, max: 2 },
+    })),
+    { ...base, currencyId: 'pokedollars', quantity: 100, symbol: '$' },
+    { ...base, currencyId: 'crystals', quantity: 25, symbol: '✧' },
+    { ...base, currencyId: 'pokedollars', quantity: 200, symbol: '!!' },
+    { ...base, currencyId: 'crystals', quantity: 50, symbol: '!!' },
+    ...(['poke-ball', 'great-ball', 'ultra-ball'] as const).map((itemId, index) => ({
+      ...base, itemId, quantity: 1, symbol: '!!',
+      keepNetRequirements: [{ itemId: 'broken-ball-t1', quantity: [2, 5, 8][index] }],
+    })),
   ]
-
-  return currencies.map((entry) => ({
-    ...entry,
-    reactionTime,
-    appearTime: commonAppearTime,
-  }))
-}
-
-function genericItemEntries(reactionTime: number): GlobalFishingItemEntry[] {
-  const items: Array<{
-    itemId: string
-    weight: number
-    symbol: string
-    keepNetRequirements?: GlobalFishingItemEntry['keepNetRequirements']
-  }> = [
-    { itemId: 'discarded-rubbish', weight: 10, symbol: '!' },
-    { itemId: 'broken-ball-t1', weight: 10, symbol: '!' },
-    { itemId: 'poke-ball', weight: 10, symbol: '!' },
-    { itemId: 'metal-scrap-t1', weight: 10, symbol: '!' },
-    {
-      itemId: 'great-ball',
-      weight: 4,
-      symbol: '!!',
-      keepNetRequirements: [{ itemId: 'poke-ball', quantity: 3 }],
-    },
-    { itemId: 'drake-scale-t1', weight: 4, symbol: '!!' },
+  const rare: GlobalFishingItemEntry[] = [
+    ...NUMBERED_GOLDEN_SCALE_IDS.map((itemId) => ({ ...base, itemId, symbol: '!!!', secret: true })),
+    { ...base, itemId: 'discarded-rubbish', symbol: '!!!' },
+    ...Object.entries(FISHING_EVOLUTION_STONE_TYPES).map(([itemId, type]) => ({
+      ...base, itemId, symbol: '!!!',
+      keepNetRequirements: [{ itemId: `${TYPE_MATERIAL_CONFIG[type].family}-t1`, slots: 5 }],
+    })),
   ]
-
-  return items.map((entry) => ({
-    ...entry,
-    reactionTime,
-    appearTime: commonAppearTime,
-  }))
+  return { common, rare }
 }
 
+const rodPools = { old: buildPools(900), good: buildPools(850), super: buildPools(800) }
+export const globalFishingCommonItemPools: Record<RodType, GlobalFishingItemEntry[]> = {
+  old: rodPools.old.common, good: rodPools.good.common, super: rodPools.super.common,
+}
+export const globalFishingRareItemPools: Record<RodType, GlobalFishingItemEntry[]> = {
+  old: rodPools.old.rare, good: rodPools.good.rare, super: rodPools.super.rare,
+}
+/** Combined catalogue for reference validation; runtime rolls common/rare separately. */
 export const globalFishingItemPools: Record<RodType, GlobalFishingItemEntry[]> = {
-  old: [
-    {
-      itemId: 'water-gem',
-      weight: 54,
-      symbol: '!',
-      reactionTime: 900,
-      appearTime: commonAppearTime,
-    },
-    {
-      itemId: 'aqua-solvent-t1',
-      weight: 20,
-      symbol: '!',
-      reactionTime: 900,
-      appearTime: commonAppearTime,
-    },
-    ...currencyEntries(900),
-    ...genericItemEntries(900),
-    ...goldenScaleEntries(900),
-  ],
-  good: [
-    {
-      itemId: 'water-gem',
-      weight: 55,
-      symbol: '!',
-      reactionTime: 850,
-      appearTime: commonAppearTime,
-    },
-    {
-      itemId: 'aqua-solvent-t1',
-      weight: 20,
-      symbol: '!',
-      reactionTime: 850,
-      appearTime: commonAppearTime,
-    },
-    ...currencyEntries(850),
-    ...genericItemEntries(850),
-    ...goldenScaleEntries(850),
-  ],
-  super: [
-    {
-      itemId: 'water-gem',
-      weight: 50,
-      symbol: '!',
-      reactionTime: 800,
-      appearTime: commonAppearTime,
-    },
-    {
-      itemId: 'aqua-solvent-t1',
-      weight: 25,
-      symbol: '!',
-      reactionTime: 800,
-      appearTime: commonAppearTime,
-    },
-    ...currencyEntries(800),
-    ...genericItemEntries(800),
-    ...goldenScaleEntries(800),
-  ],
+  old: [...rodPools.old.common, ...rodPools.old.rare],
+  good: [...rodPools.good.common, ...rodPools.good.rare],
+  super: [...rodPools.super.common, ...rodPools.super.rare],
 }

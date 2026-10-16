@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Sparkle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
   type CSSProperties,
@@ -1019,7 +1020,13 @@ export function FishingGame({ encounter }: FishingGameProps) {
                 (nibbleSymbol || hookedData?.symbol) && (
                   <div className="absolute -top-16 left-1/2 -translate-x-1/2 bg-white text-black px-4 py-2 rounded-xl shadow-lg border-2 border-zinc-200 animate-in zoom-in slide-in-from-bottom-4 duration-300 whitespace-nowrap z-50">
                     <div className="text-sm font-bold animate-bounce">
-                      {hookedData?.symbol || nibbleSymbol}
+                      {(hookedData?.symbol || nibbleSymbol) === 'alpha' ? (
+                        <AlphaIcon size={20} />
+                      ) : (hookedData?.symbol || nibbleSymbol) === 'variant' ? (
+                        <Sparkle size={20} aria-label="Rarity variant Pokémon" role="img" />
+                      ) : (
+                        hookedData?.symbol || nibbleSymbol
+                      )}
                     </div>
                     {/* Triangle pointer */}
                     <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r-2 border-b-2 border-zinc-200" />

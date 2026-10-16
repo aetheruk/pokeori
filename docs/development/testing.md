@@ -1,5 +1,7 @@
 # Testing Strategy
 
+- Fishing tables: `bun test tests/fishing-item-pool.test.ts tests/fishing-keep-net.test.ts tests/fishing-keep-net-requirements.test.ts tests/alpha-pokemon.test.ts` verifies 50/50 hook balance, opposing two-point slot shifts, common/rare table boundaries, all eighteen base materials, 1–2 quantities, Broken Ball gates, all eleven five-slot stone gates, unique reservations, equal rare weights, and Golden Scale rare boosts. The existing isolated capture fixture now also exercises real casts, hooks, stable bundle quantities, net storage, and local-pool override/fallback.
+
 - `bun test tests/razz-rhythm-balance.test.ts tests/rhythm-timer.test.ts` verifies standard/EX crushing opportunity counts, seeded perfect maxima, Good/Great/near-perfect reward tiers, and server-verified timed completion. The balance calculations are recorded in `docs/game-data/razz-berry-crushing-balance.md`.
 
 - `bun test tests/ball-bag.test.ts` checks Ball Bag odds and sprite reuse, actual inventory opening and reward rolls, independent bonuses including the one-in-a-million Master Ball, missing stock/authentication, receipt replay, and transaction rollback on reward failure.
@@ -152,3 +154,13 @@ Set `POKEORI_PROFILE_GAME_SYNC=1` when running the security integration to add a
 temporary 1,000-Pokemon fixture, record scoped HTTP timing/bytes and Mongo explain
 statistics, and compare every Explore read-model row with Payload's normal DTO.
 The fixture and query helper reject production database settings.
+
+## Universal fishing markers
+
+Fishing item-pool tests verify both currency denominations remain on every rod's common table and no currencies remain on any rare table, including the revised eligible-entry counts.
+
+Secret replacement tests cover Staryu's five-Pool-Scale gate and 1-in-8 boundary, plus Gold Magikarp's ten-Golden-Scale gate and unchanged 99% boundary.
+
+Relicanth coverage also verifies the five-unit Rock material requirement across bundles and the exclusive 1-in-64 roll boundary on every rod.
+
+`bun test tests/fishing-bite-marker.test.ts tests/fishing-secret-pokemon.test.ts tests/alpha-pokemon.test.ts` checks all shared bite markers, Alpha/rarity/net-condition priority, replacement provenance, and the cast-time Alpha result surviving hook and capture without rerolling.

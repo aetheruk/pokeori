@@ -26,6 +26,7 @@ export function applySecretFishingPokemonReplacement(params: {
     if (random() < replacement.chance) {
       return {
         ...params.entry,
+        fromKeepNet: !!replacement.keepNetRequirements?.length,
         speciesId: replacement.speciesId,
         formId: replacement.formId,
         ...(replacement.rarity ? { rarity: replacement.rarity } : {}),

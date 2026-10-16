@@ -21,9 +21,13 @@ export interface FishingKeepNetRequirement {
   itemId: string
   /** Minimum total quantity across matching item bundles in the keep net. */
   quantity?: number
+  /** Minimum occupied matching-item slots, independently of bundle quantity. */
+  slots?: number
 }
 
 export interface FishingPokemonEntry {
+  /** Runtime provenance for a shared replacement unlocked by the keep net. */
+  fromKeepNet?: boolean
   /** Disable random Alphas for an authored special fishing target. */
   allowAlpha?: boolean
   speciesId: number
@@ -32,20 +36,22 @@ export interface FishingPokemonEntry {
   rarity?: PokemonRarityId
   rarityChances?: PokemonRarityChances
   weight: number // Relative weight in pool
-  symbol: string // Emoji/icon shown when hooked (e.g., "🐟", "⭐")
+  symbol?: string // Legacy configuration; bobber markers are selected centrally.
   reactionTime: number // MS window to press hook
   appearTime: { min: number; max: number } // MS range before symbol appears
   time?: 'day' | 'night' // Optional time restriction (Day: 06:00-18:00, Night: 18:00-06:00)
 }
 
 export interface FishingItemEntry {
+  /** Runtime provenance of a global item-table roll. Local overrides default to common. */
+  dropTable?: 'common' | 'rare'
   itemId?: string
   currencyId?: string
   guildId?: string
   /** A reward bundle is a single keep-net object, regardless of quantity. */
   quantity?: number
   weight: number
-  symbol: string
+  symbol?: string // Legacy configuration; ignored by bobber markers.
   reactionTime: number
   appearTime: { min: number; max: number }
   secret?: boolean
@@ -53,16 +59,18 @@ export interface FishingItemEntry {
 
 /** Shared global item catches can be gated by items held in the keep net. */
 export interface GlobalFishingItemEntry extends FishingItemEntry {
+  /** Rolled once when casting, then persisted as a concrete quantity. */
+  quantityRange?: { min: number; max: number }
   keepNetRequirements?: FishingKeepNetRequirement[]
 }
 
 export interface FishingRodConfig {
   encounters: {
-    chance?: number // Deprecated; base fishing rolls are 70% Pokemon before keep-net modifiers.
+    chance?: number // Deprecated; the shared keep-net hook balance decides this.
     entries: FishingPokemonEntry[]
   }
   items?: {
-    chance?: number // Deprecated; base fishing rolls are 30% items before keep-net modifiers.
+    chance?: number // Deprecated; the shared keep-net hook balance decides this.
     entries: FishingItemEntry[]
   }
   // Per-rod catch settings
