@@ -87,7 +87,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 | Brick Breaker | `/game/games/brick-breaker` | Paddle-and-ball mineral survey with authored brick layouts, waves, and collectible rewards |
 | Onix Snake | `/game/games/snake` | Free-turning Onix cave survey with growth, speed progression, and collectible rewards |
 | Match 3 | `/game/games/match3` | Crystal swaps and cascades |
-| Rhythm | `/game/games/rhythm` | Timed matching inputs |
+| Rhythm | `/game/games/rhythm` | Timed matching inputs; score-milestone mode still ends at the authored deadline |
 | Sliding Puzzle | `/game/games/sliding-puzzle` | Restore a picture by moving tiles |
 | Procedure Order | `/game/games/procedure-order` | Arrange a procedure in the correct order |
 | TCG Inspection | `/game/games/tcg-inspection` | Study cards and answer inspection questions |

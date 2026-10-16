@@ -21,6 +21,7 @@ import {
   type ArcadeRound,
   type ArcadeSimulation,
   stepArcadeSimulation,
+  normalizeArcadeRound,
 } from '@/utilities/research/arcade-authority'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 import { normalizeArcadeInput } from '@/utilities/research/arcade-inputs'
@@ -187,7 +188,7 @@ export function useArcadeSession(
           },
         )
         if (disposed || !response.success) return
-        const acknowledged = response.roundData
+        const acknowledged = normalizeArcadeRound(gameType, encounter.settings, response.roundData)
         if ('restored' in response && response.restored) {
           roundRef.current = acknowledged
           settings = acknowledged.settings
@@ -358,7 +359,7 @@ export function useArcadeSession(
             : 'The saved run is unavailable. Retry or return to Explore.',
       )
       if (disposed) return
-      const round = response.roundData as ArcadeRound
+      const round = normalizeArcadeRound(gameType, encounter.settings, response.roundData as ArcadeRound)
       settings = round.settings
       roundRef.current = round
       checkpointTickRef.current = round.simulation.tick
