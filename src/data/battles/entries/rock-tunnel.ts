@@ -167,6 +167,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-pokemaniac-ashton',
+    winMessage: 'Hey turn that Pokemon off, it\'s too bright in here!',
     trainerClassId: 'pokemaniac',
     trainerName: 'Ashton',
     name: 'Pokemaniac Ashton',
@@ -189,6 +190,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-pokemaniac-winston',
+    winMessage: 'I love to Flash in Rock Tunnel! Wait what\'s a HM?',
     trainerClassId: 'pokemaniac',
     trainerName: 'Winston',
     name: 'Pokemaniac Winston',
@@ -208,6 +210,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-picnicker-martha',
+    winMessage: 'Do you know about the best picnic spot in Viridian Forest?',
     trainerClassId: 'picnicker',
     trainerName: 'Martha',
     name: 'Picnicker Martha',
@@ -231,6 +234,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-pokemaniac-steve',
+    winMessage: 'I miss old music, you know like violet drizzle.',
     trainerClassId: 'pokemaniac',
     trainerName: 'Steve',
     name: 'Pokemaniac Steve',
@@ -254,6 +258,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-hiker-allen',
+    winMessage: 'A-ha! That was a rocky start. I should’ve brought a second Geodude.',
     trainerClassId: 'hiker',
     trainerName: 'Allen',
     name: 'Hiker Allen',
@@ -274,6 +279,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-hiker-eric',
+    winMessage: 'Nobody around here respects my authority...',
     trainerClassId: 'hiker',
     trainerName: 'Eric',
     name: 'Hiker Eric',
@@ -297,6 +303,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-hiker-lenny',
+    winMessage: 'I only wanted to pet the little rock.',
     trainerClassId: 'hiker',
     trainerName: 'Lenny',
     name: 'Hiker Lenny',
@@ -321,6 +328,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-hiker-oliver',
+    winMessage: 'Please, sir… may I have some more Pokémon?',
     trainerClassId: 'hiker',
     trainerName: 'Oliver',
     name: 'Hiker Oliver',
@@ -345,6 +353,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-hiker-lucas',
+    winMessage: 'This gives me a great, idea picture this. Graveler uses rollout and you have to escape Rock Tunnel!',
     trainerClassId: 'hiker',
     trainerName: 'Lucas',
     name: 'Hiker Lucas',
@@ -368,6 +377,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-picnicker-sofia',
+    winMessage: 'Rock pokemon kinda all look the same....',
     trainerClassId: 'picnicker',
     trainerName: 'Sofia',
     name: 'Picnicker Sofia',
@@ -391,6 +401,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-hiker-dudley',
+    winMessage: 'Psychic Pokemon disgust me!',
     trainerClassId: 'hiker',
     trainerName: 'Dudley',
     name: 'Hiker Dudley',
@@ -415,6 +426,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-pokemaniac-cooper',
+    winMessage: 'Every day, once a day, give yourself a present',
     trainerClassId: 'pokemaniac',
     trainerName: 'Cooper',
     name: 'Pokemaniac Cooper',
@@ -439,6 +451,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-picnicker-leah',
+    winMessage: 'Sometimes I dream about flying around in Space with my Clefairy.',
     trainerClassId: 'picnicker',
     trainerName: 'Leah',
     name: 'Picnicker Leah',
@@ -461,6 +474,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-picnicker-ariana',
+    winMessage: 'People keep confusing me for someone else.',
     trainerClassId: 'picnicker',
     trainerName: 'Ariana',
     name: 'Picnicker Ariana',
@@ -486,6 +500,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-picnicker-dana',
+    winMessage: 'I’m calling this one: {trainer} wins by knockout.',
     trainerClassId: 'picnicker',
     trainerName: 'Dana',
     name: 'Picnicker Dana',
@@ -510,6 +525,7 @@ export const rockTunnelBattles: BattleConfig[] = [
   },
   {
     id: 'rock-tunnel-the-beast-below',
+    winMessage: 'KRRRRAAANG!',
     name: 'The Beast Below',
     description: 'A huge Steelix crashes through the hidden chamber wall.',
     category: 'Kanto',

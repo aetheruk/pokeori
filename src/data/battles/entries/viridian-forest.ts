@@ -4,6 +4,7 @@ import { trainerPokeDollarReward } from '../trainer-payouts'
 export const viridianForestBattles: BattleConfig[] = [
   {
     id: 'samurai-showdown',
+    winMessage: 'What a magnificent battle! You\'re no Metapod anymore. You have emerged a beautiful Butterfree!',
     trainerClassId: 'bug-catcher',
     trainerName: 'Samurai',
     name: 'Samurai Showdown',
@@ -49,6 +50,7 @@ export const viridianForestBattles: BattleConfig[] = [
   // The Buggy 4 Battles
   {
     id: 'buggy-4-battle-1',
+    winMessage: 'Oh wait, Speed beats Power! I always get that wrong!',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Barry',
     description:
@@ -84,6 +86,7 @@ export const viridianForestBattles: BattleConfig[] = [
   },
   {
     id: 'buggy-4-battle-2',
+    winMessage: 'Stance battles are dumb, My Dad said back in his day he used to battle with his PP.',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Billy',
     description: 'Barry was a breeze, Ill be out of this forest in no time!',
@@ -119,6 +122,7 @@ export const viridianForestBattles: BattleConfig[] = [
   },
   {
     id: 'buggy-4-battle-3',
+    winMessage: 'I\'m starting to think maybe we should have varied our Pokemon types.',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Berry',
     description: 'Im not sure Berry is a real name...',
@@ -153,6 +157,7 @@ export const viridianForestBattles: BattleConfig[] = [
   },
   {
     id: 'buggy-4-battle-4',
+    winMessage: 'Did you know there\'s a secret area in Viridian Forest... Actually two!',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Benny',
     description: 'Only Benny to go and I can finally leave this place!',
@@ -206,6 +211,7 @@ export const viridianForestBattles: BattleConfig[] = [
   },
   {
     id: 'buggy-champion',
+    winMessage: 'Wow! With skill like that, maybe you should be battling, the real League Champion!',
     trainerClassId: 'bug-catcher',
     name: 'The Buggy Champion',
     description:

@@ -53,6 +53,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'pewter-gym-jerry',
+    winMessage: 'Brock told me that would be way harder to figure out!',
     trainerClassId: 'camper',
     name: 'Pewter Gym: Jerry',
     description: 'Can you work out how to defeat my Ground types with only 1 Pokemon?',
@@ -86,6 +87,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'pewter-gym-brock',
+    winMessage: 'Impressive work {trainer}! Maybe you are the Galar Champion after all!',
     trainerClassId: 'gym-leader',
     name: 'Gym Leader Brock',
     description: 'The Rock Solid Pokemon Trainer! Defeat him to earn the Boulder Badge.',
@@ -184,6 +186,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'singing-in-the-rain',
+    winMessage: 'Puuuuuuu',
     name: 'Singing in the Rain',
     description: 'Wow, that’s a mean-looking Jigglypuff. Wait, is that a marker pen in its hand?',
     category: 'Kanto',
@@ -211,6 +214,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-trainer-1',
+    winMessage: 'No matter how hard I train my Pidgey just wont evolve by itself.',
     trainerClassId: 'lass',
     name: 'Lass Janice',
     description: 'A trainer looking for a battle on Route 3.',
@@ -244,6 +248,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-trainer-2',
+    winMessage: 'Bug Pokemon Evolve quickly... But it seems they\'re still so weak.',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Colton',
     description: 'He loves bug pokemon!',
@@ -280,6 +285,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-trainer-3',
+    winMessage: 'That was really impressive! If you\'ve got a minute, I\'d love to show you what I trained my Rattata to do!',
     trainerClassId: 'youngster',
     name: 'Youngster Joey',
     description: 'Shorts are comfy and easy to wear!',
@@ -315,6 +321,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-trainer-4',
+    winMessage: 'I heard theirs a crazy guy in Virdian Forest that\'s raising an army of Bugs!',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Greg',
     description: 'More bugs!',
@@ -352,6 +359,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-trainer-5',
+    winMessage: 'Pidgeys are overrated all the cool kids have Spearow.',
     trainerClassId: 'youngster',
     name: 'Youngster Calvin',
     description: 'Look at my bird pokemon!',
@@ -386,6 +394,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-trainer-6',
+    winMessage: 'Oh, Sorry it was just a branch.',
     trainerClassId: 'lass',
     name: 'Lass Sally',
     description: 'Eek! Did you touch me?',
@@ -421,6 +430,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-trainer-7',
+    winMessage: 'I thought I found a super rare bug pokemon in Viridian Forest, but it was just a Pikachu.',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher James',
     description: 'Have you seen any rare bugs?',
@@ -456,6 +466,7 @@ export const pewterCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-3-trainer-8',
+    winMessage: 'There\'s rumours a crazy Jigglypuff comes out and draws on people, but only on rainy days.',
     trainerClassId: 'lass',
     name: 'Lass Robin',
     description: 'My Jigglypuff is so cute!',

@@ -69,6 +69,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-6-bug-catcher-keigo',
+    winMessage: 'I heard that, and It\'s Weedle & Caterpie!',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Keigo',
     description:
@@ -104,6 +105,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-6-camper-ricky',
+    winMessage: 'Have you heard of the Squirtle Squad?',
     trainerClassId: 'camper',
     name: 'Camper Ricky',
     description: 'A trainer with a very confident Squirtle.',
@@ -134,6 +136,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-6-picnicker-nancy',
+    winMessage: 'Sometimes I swear a weird Pikachu is following me.',
     trainerClassId: 'picnicker',
     name: 'Picnicker Nancy',
     description: 'A Picnicker blocking the road south.',
@@ -167,6 +170,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-6-bug-catcher-elijah',
+    winMessage: 'I wish I could go to Kalos, they have so many types of Butterfly Pokemon',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Elijah',
     description: 'A Bug Catcher showing off his fully evolved partner.',
@@ -197,6 +201,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-6-picnicker-isabelle',
+    winMessage: 'There\'s a special Pidgey trainer in Celadon, it\'s my dream to meet him!',
     trainerClassId: 'picnicker',
     name: 'Picnicker Isabelle',
     description: 'A Picnicker with a flock of Pidgey.',
@@ -231,6 +236,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-6-camper-jeff',
+    winMessage: 'My surprise attack failed!',
     trainerClassId: 'camper',
     name: 'Camper Jeff',
     description: 'A Camper preying on Trainers approaching Vermilion City.',
@@ -331,6 +337,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-youngster-eddie',
+    winMessage: 'Have you ever seen a Green Ekans? I swear I did!',
     trainerClassId: 'youngster',
     name: 'Youngster Eddie',
     description: 'A Youngster watches the grass near Route 11.',
@@ -365,6 +372,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-gamer-hugo',
+    winMessage: 'I lost all my money at the Game corner, I swear it\'s rigged!',
     trainerClassId: 'gamer',
     name: 'Gamer Hugo',
     description: 'A Gamer near Vermilion City opens with water Pokemon.',
@@ -402,6 +410,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-engineer-bernie',
+    winMessage: 'Maybe one day Surge will let me train with him',
     trainerClassId: 'engineer',
     name: 'Engineer Bernie',
     description: 'An Engineer checks his electric team beside the path.',
@@ -440,6 +449,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-youngster-dave',
+    winMessage: 'Boys are Pink and Girls are Blue. Pokemon are Crazy!',
     trainerClassId: 'youngster',
     name: 'Youngster Dave',
     description: 'A Youngster is eager to test his Nidoran.',
@@ -477,6 +487,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-youngster-dillon',
+    winMessage: 'My friend told me sometime Sandshrew are made of ice. He\'s always playing tricks on me.',
     trainerClassId: 'youngster',
     name: 'Youngster Dillon',
     description: 'A Youngster cuts across the Route 11 grass.',
@@ -514,6 +525,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-gamer-jasper',
+    winMessage: 'I\'ll get that Porygon one day!',
     trainerClassId: 'gamer',
     name: 'Gamer Jasper',
     description: 'A Gamer bets on Grass Pokemon.',
@@ -551,6 +563,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-engineer-braxton',
+    winMessage: 'I wonder how long Magnemite have been around, or where they came from.',
     trainerClassId: 'engineer',
     name: 'Engineer Braxton',
     description: 'An Engineer sparks up a single strong Magnemite.',
@@ -587,6 +600,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-gamer-darian',
+    winMessage: 'I can\'t believe you won, do you know how hard it is to find Fire type Pokemon around here?!',
     trainerClassId: 'gamer',
     name: 'Gamer Darian',
     description: 'A Gamer brings Fire Pokemon to the Route 11 path.',
@@ -624,6 +638,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-youngster-yasu',
+    winMessage: 'I saw a Black Rattata once, It even had a silly accent.',
     trainerClassId: 'youngster',
     name: 'Youngster Yasu',
     description: 'A Youngster has trained a pack of Rattata on Route 11.',
@@ -662,6 +677,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-11-gamer-dirk',
+    winMessage: 'It\'s not as hard as you think to be a high roller 1000 Tokens and you\'ll be in the big leagues.',
     trainerClassId: 'gamer',
     name: 'Gamer Dirk',
     description: 'A Gamer claims he has never lost.',
@@ -699,6 +715,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'vermilion-gym-sailor-dwayne',
+    winMessage: 'Why are Thunderstones so hard to get hold of now.',
     name: 'Sailor Dwayne',
     description: "Lt. Surge's first recruit is ready to test my footwork.",
     category: 'Secret',
@@ -725,6 +742,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'vermilion-gym-engineer-baily',
+    winMessage: 'I wish I could Self Destruct.',
     name: 'Engineer Baily',
     description: "Lt. Surge's second recruit has the gym wired for trouble.",
     category: 'Secret',
@@ -751,6 +769,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'vermilion-gym-gentleman-tucker',
+    winMessage: 'I\'ll never evolve my Pikachu. I just have a feeling that it\'ll be the most powerful Pokemon one day.',
     name: 'Gentleman Tucker',
     description: "Lt. Surge's final recruit waits behind another live Voltorb trap.",
     category: 'Secret',
@@ -774,6 +793,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'vermilion-gym-lt-surge',
+    winMessage: 'Hahaha Great work {trainer} that deserves a THUNDEROUS APPLAUSE!',
     name: 'Gym Leader Lt. Surge',
     description: 'The Thunder Badge is on the line.',
     category: 'Secret',
@@ -828,6 +848,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-fan-club-poke-dad',
+    winMessage: 'I can\'t believe what happened to the poor people at the Day Care Center.',
     name: 'Poke Dad',
     description: 'A proud Fan Club member shows off his electric favourites.',
     category: 'Secret',
@@ -854,6 +875,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-fan-club-poke-kid',
+    winMessage: 'My mum likes baby pokemon more than anything else!',
     name: 'Poke Kid',
     description: 'A cheerful Fan Club member battles with balloon Pokemon.',
     category: 'Secret',
@@ -880,6 +902,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-fan-club-poke-mom',
+    winMessage: 'My son was soooooo cute when he was a baby.',
     name: 'Poke Mom',
     description: 'A devoted Fan Club member brings out her moonlit favourites.',
     category: 'Secret',
@@ -906,6 +929,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'squirtle-squad-dock-prank',
+    winMessage: 'Darn Squirtles!',
     name: 'Sneaky Steal Gone Wrong',
     description: 'I can just picture the moment the angry trainers battled the Squirtle Squad .',
     category: 'Secret',
@@ -933,6 +957,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'squirtle-squad-boathouse-scrap',
+    winMessage: 'Chaaaaaar!',
     name: 'Charmander Crew',
     description: 'A battle with a rival gang breaks out, Wow this book has everything!',
     category: 'Secret',
@@ -961,6 +986,7 @@ export const vermilionCityBattles: BattleConfig[] = [
   },
   {
     id: 'squirtle-squad-rescue-battle',
+    winMessage: 'Tatatatata!',
     name: 'Pier Panic',
     description: 'The Diary continues.',
     category: 'Secret',

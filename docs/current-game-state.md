@@ -124,7 +124,7 @@ Release `0.51.46` fixes timed rhythm games, including Razz Berry Crushing (20 se
 - Unreleased: Consumed item and currency requirements now say “Hand Over” instead of “Spend” or “Pay”; non-consuming item, currency, and Pokémon ownership requirements say “Own.”
 - Unreleased: Bill's Evolution Stone Study now describes the machine as sensitive work Bill trusts the player with.
 - Unreleased: Purple Dye now unlocks at Artisan 5, and Red Berry Candy unlocks at Artisan 7.
-- Unreleased: Every authored trainer battle shows deterministic, trainer-class-voiced win and loss dialogue in a raised-paper results note with its battle icon; key story characters have bespoke lines. Optional `winMessage` and `loseMessage` fields override defaults. Wild Pokémon encounters and PvP matches have no trainer note.
+- Unreleased: Every authored trainer battle shows deterministic, trainer-class-voiced win and loss dialogue in a raised-paper results note with its battle icon; 235 of 261 authored PvE battles have a custom win line. Optional `winMessage` and `loseMessage` fields override defaults. Wild Pokémon encounters and PvP matches have no trainer note.
 - Unreleased: Generic trainer-class loss dialogue now consistently speaks from the trainer's winning perspective, including Gym Trainer Luis's Swimmer dialogue.
 - Unreleased: Gym Trainer and Gym Leader battles, plus Gym-named tasks, appear together under a dedicated Gym Challenges heading in Explore.
 - Unreleased: The win/loss follow-up chat tasks after the Pallet Town, Route 22, Cerulean, and S.S. Anne rival battles are removed. Their checkpoint and character dialogue now appears directly in the rival battle result note; the rival battles' one-time win/loss gates remain in place.

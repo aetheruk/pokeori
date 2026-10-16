@@ -150,6 +150,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'bug-catcher-kent',
+    winMessage: 'Bugs live in caves right?',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Kent',
     description: 'There doesnt seem to be any bug Pokemon here!',
@@ -191,6 +192,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'lass-iris',
+    winMessage: 'Teeheehee, There\'s a secret place below, but I\'ll never tell!',
     trainerClassId: 'lass',
     name: 'Lass Iris',
     description: 'You can find super rare Pokemon here! I know because I have one!',
@@ -239,6 +241,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'mt-moon-grunt-1',
+    winMessage: 'Do you know who you\'re up against here?!',
     trainerClassId: 'rocket-grunt',
     name: 'Team Rocket Grunt',
     description: 'Hey kid, this fossil survey route is Rocket property now!',
@@ -280,6 +283,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'super-nerd-jovan',
+    winMessage: 'I have a full set of Fossils anyway! Well Fossil Playing Cards',
     trainerClassId: 'super-nerd',
     name: 'Super Nerd Jovan',
     description: 'I cant wait to find some fossils of my own!',
@@ -321,6 +325,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'bug-catcher-robby',
+    winMessage: 'Maybe it\'s time to become a Geodude Trainer like my dad.',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Robby',
     description: 'Man, my bug types are getting squished by Geodudes!',
@@ -365,6 +370,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'lass-miriam',
+    winMessage: 'I\'m so lost! I just want out, I even came across a super scary Zubat, it was HUUUGE.',
     trainerClassId: 'lass',
     name: 'Lass Miriam',
     description: 'Hey do you know where the exit is?',
@@ -414,6 +420,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'mt-moon-grunt-2',
+    winMessage: 'Look kid, you scratch my back I scratch yours?',
     trainerClassId: 'rocket-grunt',
     name: 'Team Rocket Grunt',
     description: 'Aghhh! This place is so confusing, and the boss wants those fossil crates moved now!',
@@ -447,6 +454,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'youngster-josh',
+    winMessage: 'Was I the idiot?!',
     trainerClassId: 'youngster',
     name: 'Youngster Josh',
     description: 'Some people say Rattata are no good for battling.. but some people are idiots.',
@@ -481,6 +489,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'hiker-marcos',
+    winMessage: 'SOFT.',
     trainerClassId: 'hiker',
     name: 'Hiker Marcos',
     description: 'Brock wishes he was as rock hard as me!',
@@ -515,6 +524,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'mt-moon-grunt-3',
+    winMessage: 'Wait you weren\'t here for fossils?',
     trainerClassId: 'rocket-grunt',
     name: 'Team Rocket Grunt',
     description: "Stop! You can't go any further. These fossils belong to Team Rocket now!",
@@ -562,6 +572,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'mt-moon-grunt-4',
+    winMessage: '{trainer} was it? The boss will hear about this.',
     trainerClassId: 'rocket-grunt',
     name: 'Team Rocket Grunt',
     description: 'How did you make it this far? The researcher and the fossil records are not leaving with you!',
@@ -611,6 +622,7 @@ const mtMoonCoreBattles: BattleConfig[] = [
   },
   {
     id: 'researcher-miguel',
+    winMessage: 'You\'ll have a full set in no time! If you need more, I shared a whole bunch at the museum!',
     trainerClassId: 'super-nerd',
     name: 'Researcher Miguel',
     description:
@@ -688,6 +700,7 @@ const mtMoonExpeditionWildBattleIds = ['mt-moon-1f', 'mt-moon-b1f', 'mt-moon-b2f
 const mtMoonExpeditionSpecialBattles: BattleConfig[] = [
   {
     id: 'exp-mt-moon-clefairy-boss',
+    winMessage: 'Ughh, Well that backfired, These Pokemon were meant to be super strong!',
     name: 'Lass Agent Mira',
     description:
       'The mysterious lass drops the act and reveals herself as the Rocket agent who ran the fossil operation, commanding a Shadow Clefairy.',
@@ -712,6 +725,7 @@ const mtMoonExpeditionSpecialBattles: BattleConfig[] = [
   },
   {
     id: 'exp-mt-moon-clefable-boss',
+    winMessage: 'Ughh, Well that backfired, These Pokemon were meant to be super strong!',
     name: 'Lass Agent Mira',
     description:
       'The mysterious lass drops the act and reveals herself as the Rocket agent who ran the fossil operation, commanding a Shadow Clefable.',

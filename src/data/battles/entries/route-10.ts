@@ -35,6 +35,7 @@ export const route10Battles: BattleConfig[] = [
   },
   {
     id: 'route-10-picknicker-heidi',
+    winMessage: 'Great first you blow up the Mountain, now you injure my Pokemon, what\'s wrong with you!',
     trainerClassId: 'picnicker',
     trainerName: 'Heidi',
     name: 'Picknicker Heidi',

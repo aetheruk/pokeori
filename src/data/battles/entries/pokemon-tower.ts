@@ -68,6 +68,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-hope',
+    winMessage: 'The spirits warned me you\'d make it this far.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Hope' }),
     description: "Hope's whispered prayer sends a shiver through your team. Your Pokémon start paralysed unless protected by an immunity or ability.",
     playerTeamInitialStatus: 'paralysis',
@@ -88,6 +89,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-patricia',
+    winMessage: 'The roots welcome your Pokémon.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Patricia' }),
     description: "Roots curl between Patricia's memorial stones. Only Grass-type Pokémon may enter, including dual types.",
     allowedPlayerTypes: ['grass'],
@@ -105,6 +107,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-carly',
+    winMessage: 'You may pass.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Carly' }),
     description: "Carly calls for a single guardian at the stairway. Face her Gastly with just one Pokémon.",
     category: 'Kanto',
@@ -149,6 +152,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-laurel',
+    winMessage: 'The spirits held your partner in place, but they couldn\'t hold back that attack.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Laurel' }),
     description: "Laurel's spirits hold your partner in place. You cannot switch voluntarily; replacements after fainting and move-driven switches still work.",
     allowSwapping: false,
@@ -169,6 +173,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-jody',
+    winMessage: 'Cough Cough. I thought the poisonous mist was on my side.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Jody' }),
     description: "Jody's ancient chant stirs a poisonous mist. Your Pokémon start poisoned unless protected by an immunity or ability.",
     playerTeamInitialStatus: 'poison',
@@ -186,6 +191,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-paula',
+    winMessage: 'I was counting on you running out of supplies. I may have miscounted.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Paula' }),
     description: "Paula asks you to climb with a single offering. You may use a battle item only once during this encounter.",
     itemsPerBattle: 1,
@@ -239,6 +245,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-ruth',
+    winMessage: 'My spell backfired!',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Ruth' }),
     description: "The sanctuary has quieted Ruth's restless Gastly. It begins the battle asleep, giving you a moment to act.",
     category: 'Kanto',
@@ -255,6 +262,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-karina',
+    winMessage: 'The moonlight reflected your Water-types beautifully. I was too distracted to win.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Karina' }),
     description: "Karina watches a circle of still, reflected moonlight. Only Water-type Pokémon may enter, including dual types.",
     allowedPlayerTypes: ['water'],
@@ -272,6 +280,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-tammy',
+    winMessage: 'The candles burned brightly, but my chances went up in smoke.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Tammy' }),
     description: "Tammy's ghostly candles flare as you approach. Your Pokémon start burned unless protected by an immunity or ability.",
     playerTeamInitialStatus: 'burn',
@@ -289,6 +298,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-janae',
+    winMessage: 'I need to work on my channeling.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Janae' }),
     description: "Janae's overlapping chants leave her own Gastly bewildered. It starts confused; make use of the opening before it recovers.",
     category: 'Kanto',
@@ -333,6 +343,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-angelica',
+    winMessage: 'Three Gastly, two at a time, and still not a ghost of a chance.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Angelica' }),
     description: "Angelica's apparitions gather in pairs. Bring at least two Pokémon for a double battle against her three Gastly.",
     format: 'double',
@@ -354,6 +365,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-jennifer',
+    winMessage: 'You won without items?',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Jennifer' }),
     description: "Jennifer seals away your battle supplies. Win without using battle items; held items still work.",
     itemsPerBattle: 0,
@@ -371,6 +383,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-emilia',
+    winMessage: 'One move each, and you made every one count. I\'ll need to rethink that chant.',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Emilia' }),
     description: "Emilia's chant muffles elaborate commands. Each Pokémon may use a manual move only once; ordinary stance attacks remain available.",
     movesPerBattle: 1,
@@ -390,6 +403,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   // --- Upper Floors Shadow Gauntlet ---
   {
     id: 'pokemon-tower-shadow-surge-1',
+    winMessage: 'Gaaaaaaaaaaa!',
     name: 'Shadow Surge I',
     description: 'Restless shadow energy manifests as corrupted Pokémon in the upper stairwell.',
     category: 'Kanto',
@@ -410,6 +424,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-shadow-surge-2',
+    winMessage: 'Geoooootooo.',
     name: 'Shadow Surge II',
     description: 'Corrupted avian and spectral Pokémon swoop through the darkened upper corridor.',
     category: 'Kanto',
@@ -430,6 +445,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-shadow-surge-3',
+    winMessage: 'Screeeee!',
     name: 'Shadow Surge III',
     description: 'The final barrier of shadow Pokémon guarding the entrance to the summit.',
     category: 'Kanto',
@@ -453,6 +469,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   // --- Boss Battle: Calming Kita ---
   {
     id: 'pokemon-tower-kita-boss',
+    winMessage: 'Wak......',
     name: 'Kita',
     description: 'Calm Kita, who has been reborn through spectral fire into an Alolan Marowak.',
     category: 'Kanto',

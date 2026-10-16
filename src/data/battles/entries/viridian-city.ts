@@ -4,6 +4,7 @@ import { trainerPokeDollarReward } from '../trainer-payouts'
 export const viridianCityBattles: BattleConfig[] = [
   {
     id: 'battle-grumpy-man',
+    winMessage: 'Hmm. I guess you can pass.',
     trainerClassId: 'gentleman',
     name: 'The Grumpy Old Man',
     description:
