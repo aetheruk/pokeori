@@ -23,6 +23,7 @@ const route8TrainerRequirements = (battleId: string): BattleConfig['requirements
 
 const route8TrainerBattle = ({
   id,
+  winMessage,
   trainerClassId,
   trainerName,
   name,
@@ -34,6 +35,7 @@ const route8TrainerBattle = ({
   maxPokemon = 3,
 }: {
   id: string
+  winMessage?: BattleConfig['winMessage']
   trainerClassId: NonNullable<BattleConfig['trainerClassId']>
   trainerName: string
   name: string
@@ -45,6 +47,7 @@ const route8TrainerBattle = ({
   maxPokemon?: number
 }): BattleConfig => ({
   id,
+  winMessage,
   trainerClassId,
   trainerName,
   name,
@@ -94,6 +97,7 @@ const route8Battles: BattleConfig[] = [
   },
   route8TrainerBattle({
     id: 'route-8-lass-julia',
+    winMessage: 'All of the best Pokemon come from Space!',
     trainerClassId: 'lass',
     trainerName: 'Julia',
     name: 'Lass Julia',
@@ -106,6 +110,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-gamer-rich',
+    winMessage: 'Stay away from the Game Corner, you\'ll lose everything!',
     trainerClassId: 'gamer',
     trainerName: 'Rich',
     name: 'Gamer Rich',
@@ -118,6 +123,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-super-nerd-glenn',
+    winMessage: 'There\'s a super cool abandoned mansion on Cinnabar Island.',
     trainerClassId: 'super-nerd',
     trainerName: 'Glenn',
     name: 'Super Nerd Glenn',
@@ -131,6 +137,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-twins-eli-anne',
+    winMessage: 'We tried to battle at the same time, but the Pokemon Rangers told us off.',
     trainerClassId: 'twins',
     trainerName: 'Eli & Anne',
     name: 'Twins Eli & Anne',
@@ -143,6 +150,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-lass-paige',
+    winMessage: 'Have you see any rare Pokemon around here?',
     trainerClassId: 'lass',
     trainerName: 'Paige',
     name: 'Lass Paige',
@@ -155,6 +163,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-super-nerd-leslie',
+    winMessage: 'Koffing are quite rare, because Kanto cities are so clean!',
     trainerClassId: 'super-nerd',
     trainerName: 'Leslie',
     name: 'Super Nerd Leslie',
@@ -164,6 +173,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-lass-andrea',
+    winMessage: 'I taught my pokemon to talk, it can even say Nyaaah, now!',
     trainerClassId: 'lass',
     trainerName: 'Andrea',
     name: 'Lass Andrea',
@@ -177,6 +187,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-lass-megan',
+    winMessage: 'Morpeko\'s my favourite, but there\'s not too many around here.',
     trainerClassId: 'lass',
     trainerName: 'Megan',
     name: 'Lass Megan',
@@ -193,6 +204,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-biker-jaren',
+    winMessage: 'If you spend enough time on a route, you might just learn how to make items to power up your Pokemon.',
     trainerClassId: 'biker',
     trainerName: 'Jaren',
     name: 'Biker Jaren',
@@ -205,6 +217,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-biker-ricardo',
+    winMessage: 'Lavender Town makes me so sad...',
     trainerClassId: 'biker',
     trainerName: 'Ricardo',
     name: 'Biker Ricardo',
@@ -218,6 +231,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-gamer-stan',
+    winMessage: 'Pachinko or Slots that\'s the question.',
     trainerClassId: 'gamer',
     trainerName: 'Stan',
     name: 'Gamer Stan',
@@ -231,6 +245,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-super-nerd-aidan',
+    winMessage: 'Hey have you tried exploding stuff with Voltorb? So FUN.',
     trainerClassId: 'super-nerd',
     trainerName: 'Aidan',
     name: 'Super Nerd Aidan',
@@ -255,6 +270,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   ...route8Battles,
   {
     id: 'route-10-south-picnicker-carol',
+    winMessage: 'Flying pokemon are amazing, their feathers have special powers!',
     trainerClassId: 'picnicker',
     trainerName: 'Carol',
     name: 'Picnicker Carol',
@@ -277,6 +293,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-10-south-hiker-clark',
+    winMessage: 'Sometimes I feel like there\'s just to many Hikers about these days.',
     trainerClassId: 'hiker',
     trainerName: 'Clark',
     name: 'Hiker Clark',
@@ -299,6 +316,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-10-south-hiker-trent',
+    winMessage: 'When I visit Alola, I\'m going to get an electric Graveler!',
     trainerClassId: 'hiker',
     trainerName: 'Trent',
     name: 'Hiker Trent',
@@ -321,6 +339,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-10-south-pokemaniac-herman',
+    winMessage: 'That Mr Fuji, is a great guy, apparently he used to be a top scientist.',
     trainerClassId: 'pokemaniac',
     trainerName: 'Herman',
     name: 'Pokemaniac Herman',
@@ -343,6 +362,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-12-fisherman-ned',
+    winMessage: 'Some Pokemon will only appear based on what\'s in your keep net!',
     trainerClassId: 'fisherman',
     trainerName: 'Ned',
     name: 'Fisherman Ned',
@@ -372,6 +392,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-12-fisherman-chip',
+    winMessage: 'I saw a really ugly fish Pokemon once while trying to find a dratini.',
     trainerClassId: 'fisherman',
     trainerName: 'Chip',
     name: 'Fisherman Chip',
@@ -402,6 +423,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-12-fisherman-hank',
+    winMessage: 'If you hook plenty of the same Pokemon sometimes different coloured ones appear!',
     trainerClassId: 'fisherman',
     trainerName: 'Hank',
     name: 'Fisherman Hank',
@@ -429,6 +451,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-12-fisherman-elliot',
+    winMessage: 'It\'s been peaceful around here since that Snorlax blocked the way to Vermilion.',
     trainerClassId: 'fisherman',
     trainerName: 'Elliot',
     name: 'Fisherman Elliot',
@@ -461,6 +484,7 @@ export const lavenderTownBattles: BattleConfig[] = [
   },
   {
     id: 'route-12-nido-fan-battle',
+    winMessage: 'Amazing {trainer}! You know so much about Nido\'s!',
     trainerClassId: 'old-couple',
     trainerName: 'Nido Fans',
     name: 'Nido Fan Reunion',

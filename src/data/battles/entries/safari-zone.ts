@@ -6,6 +6,7 @@ const safariBackground = '/backgrounds/safari-reserve.avif'
 export const safariZoneBattles: BattleConfig[] = [
   {
     id: 'safari-central-rocket-poacher',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher',
@@ -26,6 +27,7 @@ export const safariZoneBattles: BattleConfig[] = [
   },
   {
     id: 'safari-east-rocket-poacher',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher',
@@ -46,6 +48,7 @@ export const safariZoneBattles: BattleConfig[] = [
   },
   {
     id: 'safari-west-rocket-poacher',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher',
@@ -66,6 +69,7 @@ export const safariZoneBattles: BattleConfig[] = [
   },
   {
     id: 'safari-north-rocket-poacher',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher',
@@ -86,6 +90,7 @@ export const safariZoneBattles: BattleConfig[] = [
   },
   {
     id: 'safari-poacher-watch-one',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher Scout',
@@ -106,6 +111,7 @@ export const safariZoneBattles: BattleConfig[] = [
   },
   {
     id: 'safari-poacher-watch-two',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher Trapper',
@@ -127,6 +133,7 @@ export const safariZoneBattles: BattleConfig[] = [
   },
   {
     id: 'safari-poacher-watch-three',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher Handler',
@@ -148,6 +155,7 @@ export const safariZoneBattles: BattleConfig[] = [
   },
   {
     id: 'safari-poacher-watch-four',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher Lookout',
@@ -169,6 +177,7 @@ export const safariZoneBattles: BattleConfig[] = [
   },
   {
     id: 'safari-poacher-watch-five',
+    winMessage: 'You\'ll never stop all of us!',
     trainerClassId: 'rocket-grunt',
     trainerName: 'Rocket Poacher',
     name: 'Rocket Poacher Leader',

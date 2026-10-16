@@ -126,6 +126,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-picnicker-alicia',
+    winMessage: 'I tried buying Pokeballs the other day, but they had ran out, can you believe it?!',
     trainerClassId: 'picnicker',
     name: 'Picnicker Alicia',
     description: 'A Picnicker near the pass is testing teams against the mountain wind.',
@@ -155,6 +156,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-hiker-jeremy',
+    winMessage: 'I wonder if there\'s different type of Machop in the world.',
     trainerClassId: 'hiker',
     name: 'Hiker Jeremy',
     description: 'A Hiker blocks the easier footing with a grin and a challenge.',
@@ -182,6 +184,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-camper-chris',
+    winMessage: 'I know where to find Charmander\'s do you?',
     trainerClassId: 'camper',
     name: 'Camper Chris',
     description: 'A Camper has fire in his team and too much confidence on the trail.',
@@ -209,6 +212,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-bug-catcher-brent',
+    winMessage: 'I knew I should have gone with Butterfree',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Brent',
     description: 'A Bug Catcher has trained his Beedrill for quick strikes between the rocks.',
@@ -236,6 +240,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-hiker-alan',
+    winMessage: 'It\'s so hard to evolve my Onix!',
     trainerClassId: 'hiker',
     name: 'Hiker Alan',
     description: 'A Hiker trusts rock-solid partners to hold the trail.',
@@ -263,6 +268,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-bug-catcher-conner',
+    winMessage: 'I caught my Pokemon, in the Safari Zone!',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Conner',
     description: 'A Bug Catcher shows how many small Pokemon can fill a narrow path.',
@@ -291,6 +297,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-camper-drew',
+    winMessage: 'My Parents said it\'s not safe to camp outside because of Alpha Pokemon.',
     trainerClassId: 'camper',
     name: 'Camper Drew',
     description: 'A Camper has a mixed team ready for anyone crossing the pass.',
@@ -320,6 +327,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-hiker-brice',
+    winMessage: 'Did you know there\'s a secret chamber in Rock Tunnel but it\'s fully closed off.',
     trainerClassId: 'hiker',
     name: 'Hiker Brice',
     description: 'A Hiker digs in with Geodude and Machop before the final climb.',
@@ -348,6 +356,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-9-pass-picnicker-caitlin',
+    winMessage: 'I saw a super weird Meowth the other day, I swear it was trying to tell me something.',
     trainerClassId: 'picnicker',
     name: 'Picnicker Caitlin',
     description: 'A Picnicker waits near the far side with one sharp Meowth.',
@@ -432,6 +441,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'nugget-bridge-1',
+    winMessage: 'Wow you\'re a great candidate! They promised me they\'d tell me how to make my Bug\'s the strongest in the world if I won!',
     trainerClassId: 'bug-catcher',
     name: 'Bug Catcher Cale',
     description: "Let's go Nugget Bridge Challenge! oh surprise, surprise another bug catcher...",
@@ -526,6 +536,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'nugget-bridge-2',
+    winMessage: 'Imagine If my Pokemon could be like that too, Nobody would bully me at school!',
     trainerClassId: 'lass',
     name: 'Lass Ali',
     description: 'I swear that bug catcher referred to me as a great candidate... ominous.',
@@ -571,6 +582,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'nugget-bridge-3',
+    winMessage: 'How did you beat me, They said nobody would be able to beat me!',
     trainerClassId: 'youngster',
     name: 'Youngster Timmy',
     description: 'One Golden Nugget coming my way!',
@@ -613,6 +625,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'nugget-bridge-4',
+    winMessage: 'Why would you even want a stupid nugget, it doesnt do anything?',
     trainerClassId: 'lass',
     name: 'Lass Reli',
     description: 'What was up with that kids Pokemon?!',
@@ -654,6 +667,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'nugget-bridge-5',
+    winMessage: 'I must have done something wrong? But I followed all the instructions!',
     trainerClassId: 'camper',
     name: 'Camper Ethan',
     description:
@@ -701,6 +715,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'nugget-bridge-6',
+    winMessage: 'You win this round kid, I was done here anyway.',
     trainerClassId: 'rocket-grunt',
     name: 'Rocket Recruiter',
     description: "I'm putting an end to this creep once and for all.",
@@ -923,6 +938,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'hiker-franklin',
+    winMessage: 'Clearly not strong enough.',
     trainerClassId: 'hiker',
     name: 'Hiker Franklin',
     description: 'I just got back from Mt. Moon, my Pokemon are stronger than ever!',
@@ -969,6 +985,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'hiker-wayne',
+    winMessage: 'You\'ve seen bigger?!',
     trainerClassId: 'hiker',
     name: 'Hiker Wayne',
     description: 'Have you seen how big my Onix is?',
@@ -1011,6 +1028,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'cer-youngster-joey',
+    winMessage: 'Whoa, you got even stronger since last time!',
     trainerClassId: 'youngster',
     name: 'Youngster Joey',
     description: "Hey {Trainer} fancy seeing you here! Let's Rematch! Rattatas Only!",
@@ -1057,6 +1075,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'youngster-dan',
+    winMessage: 'One day my Pokemon will be King!',
     trainerClassId: 'youngster',
     name: 'Youngster Dan',
     description: 'Slow and steady wins the race, right?',
@@ -1093,6 +1112,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'picknicker-kelsey',
+    winMessage: 'I met a guy who wouldn\'t stop talking to my Nidoran♂ He was kinda intense',
     trainerClassId: 'picnicker',
     name: 'Picknicker Kelsey',
     description: "My Nidoran are so cute, but they're tough too!",
@@ -1132,6 +1152,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'hiker-nob',
+    winMessage: 'My parents are the worst.',
     trainerClassId: 'hiker',
     name: 'Hiker Nob',
     description:
@@ -1187,6 +1208,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'camper-flint',
+    winMessage: 'I guess I\'ll keep training',
     trainerClassId: 'camper',
     name: 'Camper Flint',
     description: "I'm training hard to be a master!",
@@ -1226,6 +1248,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'youngster-chad',
+    winMessage: 'I let my Ekans out of his Pokeball on a flight to Alola once, that wasn\'t a good combination.',
     trainerClassId: 'youngster',
     name: 'Youngster Chad',
     description: 'Snakes and sand, my favorite combination!',
@@ -1265,6 +1288,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'lass-haley',
+    winMessage: 'I heard there\'s a Beautiful flower pokemon that can transform and grow wings!',
     trainerClassId: 'lass',
     name: 'Lass Haley',
     description: 'Flowers and birds make for a beautiful battle!',
@@ -1308,6 +1332,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'cerulean-gym-swimmer',
+    winMessage: 'Elegant, Beautiful I love it!.',
     trainerClassId: 'swimmer',
     name: 'Gym Trainer Luis',
     description: "Misty's gym trainer is ready to make sure I can handle a real water battle.",
@@ -1358,6 +1383,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'cerulean-gym-misty',
+    winMessage: 'CODE AQUAMARINE! CODE AQUAMARINE!',
     trainerClassId: 'gym-leader',
     name: 'Gym Leader Misty',
     description: 'The Cascade Badge is on the line.',
@@ -1435,6 +1461,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'cerulean-robbery-rocket',
+    winMessage: 'You need to know who you\'re dealing with kid. Sooner or later you\'ll be in over your head.',
     trainerClassId: 'rocket-grunt',
     name: 'Rocket Thief',
     description: 'The Rocket behind the robbed house is not leaving quietly.',

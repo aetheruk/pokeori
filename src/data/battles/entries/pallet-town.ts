@@ -454,6 +454,7 @@ export const palletTownBattles: BattleConfig[] = [
   },
   {
     id: 'pallet-town-savage-raticate',
+    winMessage: 'Screeeeeeee!',
     name: 'Savage Raticate',
     description:
       "Oh no, this Raticate doesn’t look happy, I think I may have ransacked one too many Rattata Burrows.",

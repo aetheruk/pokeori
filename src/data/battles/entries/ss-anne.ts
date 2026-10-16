@@ -6,6 +6,7 @@ const ssAnneBackground = '/backgrounds/ss-anne.avif'
 export const ssAnneBattles: BattleConfig[] = [
   {
     id: 'ss-anne-youngster-eddie',
+    winMessage: 'This trip was bogus!',
     trainerClassId: 'youngster',
     name: 'Youngster Eddie',
     description: 'A restless Youngster wants to battle before the ship powers back on.',
@@ -33,6 +34,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-gentleman-brooks',
+    winMessage: 'Will we be leaving soon?',
     trainerClassId: 'gentleman',
     name: 'Gentleman Brooks',
     description: 'A polished passenger insists a proper battle will pass the time.',
@@ -60,6 +62,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-lass-daphne',
+    winMessage: 'Wait till Fred here\'s about this!',
     trainerClassId: 'lass',
     name: 'Lass Daphne',
     description: 'A passenger is bored enough to challenge anyone walking past.',
@@ -87,6 +90,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-beauty-marina',
+    winMessage: 'It\'s just crazy how good looking I am right?',
     trainerClassId: 'beauty',
     name: 'Beauty Marina',
     description: 'A stylish Trainer near the cabins wants a graceful battle.',
@@ -114,6 +118,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-gentleman-parker',
+    winMessage: 'I heard some terrible rumours about Team Rocket, Scandalous stuff!',
     trainerClassId: 'gentleman',
     name: 'Gentleman Parker',
     description: 'A Gentleman has been waiting all day for a worthy opponent.',
@@ -141,6 +146,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-sailor-duncan',
+    winMessage: 'I can\'t wait to get back to the Orange Isles',
     trainerClassId: 'sailor',
     name: 'Sailor Duncan',
     description: 'A sailor in the galley is happy to blow off steam with a battle.',
@@ -168,6 +174,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-fisherman-morey',
+    winMessage: 'If you fish up too many of the same pokemon you may attract an Alpha!',
     trainerClassId: 'fisherman',
     name: 'Fisherman Morey',
     description: 'A Fisherman is comparing sea stories with anyone who will listen.',
@@ -196,6 +203,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-sailor-tucker',
+    winMessage: 'I miss the Pokemon back home.',
     trainerClassId: 'sailor',
     name: 'Sailor Tucker',
     description: 'A sailor guarding the storage hold mistakes you for more trouble.',
@@ -223,6 +231,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-engineer-hobbs',
+    winMessage: 'I really should be helping with the repairs...',
     trainerClassId: 'engineer',
     name: 'Engineer Hobbs',
     description: 'One of the ship engineers wants to test your battle circuits.',
@@ -250,6 +259,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-gentleman-winston',
+    winMessage: 'I\'m glad I invested in Evolution stones, when I did!',
     trainerClassId: 'gentleman',
     name: 'Gentleman Winston',
     description: 'A dining room guest is treating the delay like a formal tournament.',
@@ -277,6 +287,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-lass-vivian',
+    winMessage: 'You think you could get me Surge\'s Number?',
     trainerClassId: 'lass',
     name: 'Lass Vivian',
     description: 'A passenger near the dining room is eager for one more battle.',
@@ -304,6 +315,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-sailor-phillips',
+    winMessage: 'I keep fishing up garbage, but I can\'t bring myself to throw it away',
     trainerClassId: 'sailor',
     name: 'Sailor Phillips',
     description: 'A sailor on the upper deck is enjoying the sea breeze and the battles.',
@@ -331,6 +343,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-picnicker-rhea',
+    winMessage: 'Boats make for terrible picknicking',
     trainerClassId: 'picnicker',
     name: 'Picnicker Rhea',
     description: 'A Picnicker has turned the upper deck delay into a challenge.',
@@ -358,6 +371,7 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'ss-anne-camper-jules',
+    winMessage: 'Staying in a cabin is just like camping! ...Kinda',
     trainerClassId: 'camper',
     name: 'Camper Jules',
     description: 'A Camper by the rail is pretending the ship delay was his training plan.',

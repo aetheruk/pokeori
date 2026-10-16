@@ -73,6 +73,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-picnicker-alma',
+    winMessage: 'Fuchsia is so far away! at least there\'s plenty of spots to relax.',
     trainerClassId: 'picnicker',
     trainerName: 'Alma',
     name: 'Picnicker Alma',
@@ -96,6 +97,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-bird-keeper-sebastian',
+    winMessage: 'Have you seen those strange Pokemon that Team Rocket have?',
     trainerClassId: 'bird-keeper',
     trainerName: 'Sebastian',
     name: 'Bird Keeper Sebastian',
@@ -127,6 +129,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-picnicker-susie',
+    winMessage: 'I swear no matter how much I train my Pokemon just wont evolve!',
     trainerClassId: 'picnicker',
     trainerName: 'Susie',
     name: 'Picnicker Susie',
@@ -161,6 +164,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-beauty-lola',
+    winMessage: 'Dont you think Ratatta is just the cutest?!',
     trainerClassId: 'beauty',
     trainerName: 'Lola',
     name: 'Beauty Lola',
@@ -193,6 +197,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-beauty-sheila',
+    winMessage: 'I swear Clefairy used to be so rare, now everyone has them!',
     trainerClassId: 'beauty',
     trainerName: 'Sheila',
     name: 'Beauty Sheila',
@@ -224,6 +229,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-picnicker-valerie',
+    winMessage: 'My dad taught me how to fish, now I\'m hooked!',
     trainerClassId: 'picnicker',
     trainerName: 'Valerie',
     name: 'Picnicker Valerie',
@@ -255,6 +261,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-picnicker-gwen',
+    winMessage: 'Did you see the strange Meowth in Cerulean City?',
     trainerClassId: 'picnicker',
     trainerName: 'Gwen',
     name: 'Picnicker Gwen',
@@ -288,6 +295,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-bird-keeper-perry',
+    winMessage: 'Have you heard the legend of the branches?',
     trainerClassId: 'bird-keeper',
     trainerName: 'Perry',
     name: 'Bird Keeper Perry',
@@ -322,6 +330,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-biker-jared',
+    winMessage: 'Cycles are for chumps! That Cycle shop is is the Chumpiest of them all!',
     trainerClassId: 'biker',
     trainerName: 'Jared',
     name: 'Biker Jared',
@@ -354,6 +363,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-bird-keeper-robert',
+    winMessage: 'I\'ll be unstoppable once my Pidgeotto Evolves',
     trainerClassId: 'bird-keeper',
     trainerName: 'Robert',
     name: 'Bird Keeper Robert',
@@ -475,6 +485,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   // Feathered Gauntlet story battles (one-time)
   {
     id: 'route-14-bird-keeper-carter',
+    winMessage: 'Hopefully I\'ve created a tailwind for the others',
     trainerClassId: 'bird-keeper',
     trainerName: 'Carter',
     name: 'Bird Keeper Carter',
@@ -505,6 +516,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-14-bird-keeper-mitch',
+    winMessage: 'My dream is to fly on the back of a Legendary Pokemon!',
     trainerClassId: 'bird-keeper',
     trainerName: 'Mitch',
     name: 'Bird Keeper Mitch',
@@ -538,6 +550,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-14-bird-keeper-marlon',
+    winMessage: 'My Doduo can fly... I still havent worked out how that works. Can i fly?',
     trainerClassId: 'bird-keeper',
     trainerName: 'Marlon',
     name: 'Bird Keeper Marlon',
@@ -570,6 +583,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-14-bird-keeper-beck',
+    winMessage: 'Wow. Grounded.',
     trainerClassId: 'bird-keeper',
     trainerName: 'Beck',
     name: 'Bird Keeper Beck',
@@ -601,6 +615,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-14-bird-keeper-benny',
+    winMessage: 'If I try really hard, will my Fearow evolve again?',
     trainerClassId: 'bird-keeper',
     trainerName: 'Benny',
     name: 'Bird Keeper Benny',
@@ -632,6 +647,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-14-bird-champion-donald',
+    winMessage: 'What incredible skill!',
     trainerClassId: 'bird-keeper',
     trainerName: 'Donald',
     name: 'Bird Champion Donald',
@@ -931,6 +947,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-14-biker-lukas',
+    winMessage: 'Ok...',
     trainerClassId: 'biker',
     trainerName: 'Lukas',
     name: 'Biker Lukas',
@@ -991,6 +1008,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   // Route 15 chained trainer roster (FRLG order)
   {
     id: 'route-15-picnicker-becky',
+    winMessage: 'I tried teaching my Raichu how to surf, but I think it\'s better they stay on land...',
     trainerClassId: 'picnicker',
     trainerName: 'Becky',
     name: 'Picnicker Becky',
@@ -1013,6 +1031,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-crush-kin-ron-mya',
+    winMessage: 'Have you visited Saffron City There\'s a gym there that can teach you the best fighting techniques.',
     trainerClassId: 'old-couple',
     trainerName: 'Ron & Mya',
     name: 'Ron & Mya',
@@ -1044,6 +1063,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-picnicker-celia',
+    winMessage: 'Clefairy used Metronome. It fainted..',
     trainerClassId: 'picnicker',
     trainerName: 'Celia',
     name: 'Picnicker Celia',
@@ -1072,6 +1092,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-biker-ernest',
+    winMessage: 'There\'s just something so relaxing about breathing in toxic fumes.',
     trainerClassId: 'biker',
     trainerName: 'Ernest',
     name: 'Biker Ernest',
@@ -1106,6 +1127,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-biker-alex',
+    winMessage: 'I heard there\'s a Weezing that cleans air what\'s the point of that.',
     trainerClassId: 'biker',
     trainerName: 'Alex',
     name: 'Biker Alex',
@@ -1138,6 +1160,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-beauty-grace',
+    winMessage: 'My Wigglytuff always sings better in the rain.',
     trainerClassId: 'beauty',
     trainerName: 'Grace',
     name: 'Beauty Grace',
@@ -1169,6 +1192,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-beauty-olivia',
+    winMessage: 'I\'ll be unstoppable when Ivysaur evolves.',
     trainerClassId: 'beauty',
     trainerName: 'Olivia',
     name: 'Beauty Olivia',
@@ -1200,6 +1224,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-picnicker-kindra',
+    winMessage: 'I actually like the smell of Gloom.',
     trainerClassId: 'picnicker',
     trainerName: 'Kindra',
     name: 'Picnicker Kindra',
@@ -1232,6 +1257,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-bird-keeper-chester',
+    winMessage: 'I AM SPEEEEED.',
     trainerClassId: 'bird-keeper',
     trainerName: 'Chester',
     name: 'Bird Keeper Chester',
@@ -1264,6 +1290,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-bird-keeper-edwin',
+    winMessage: 'My Farfetch\'d came with an extra leek!.',
     trainerClassId: 'bird-keeper',
     trainerName: 'Edwin',
     name: 'Bird Keeper Edwin',
@@ -1297,6 +1324,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-picnicker-yazmin',
+    winMessage: 'I tried to see what was inside my Tangela. It did not go well.',
     trainerClassId: 'picnicker',
     trainerName: 'Yazmin',
     name: 'Picnicker Yazmin',
@@ -1329,6 +1357,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'fuchsia-gym-juggler-nate',
+    winMessage: 'Koga is a great master, you have no chance.',
     trainerClassId: 'juggler',
     trainerName: 'Nate',
     name: 'Juggler Nate',
@@ -1351,6 +1380,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'fuchsia-gym-juggler-kayden',
+    winMessage: 'I suddenly feel sleepy.',
     trainerClassId: 'juggler',
     trainerName: 'Kayden',
     name: 'Juggler Kayden',
@@ -1372,6 +1402,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'fuchsia-gym-juggler-kirk',
+    winMessage: 'Everyone loves jugglers right?',
     trainerClassId: 'juggler',
     trainerName: 'Kirk',
     name: 'Juggler Kirk',
@@ -1396,6 +1427,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'fuchsia-gym-tamer-edgar',
+    winMessage: 'I have been TAMED',
     trainerClassId: 'tamer',
     trainerName: 'Edgar',
     name: 'Tamer Edgar',
@@ -1419,6 +1451,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'fuchsia-gym-tamer-phil',
+    winMessage: 'Your Ninja skills are impressive.',
     trainerClassId: 'tamer',
     trainerName: 'Phil',
     name: 'Tamer Phil',
@@ -1441,6 +1474,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'fuchsia-gym-juggler-shawn',
+    winMessage: 'Sleep & Poison and yet you still came out the otherside.',
     trainerClassId: 'juggler',
     trainerName: 'Shawn',
     name: 'Juggler Shawn',
@@ -1463,6 +1497,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'fuchsia-gym-leader-koga',
+    winMessage: 'You have my attention.',
     trainerClassId: 'gym-kanto-koga',
     trainerName: 'Koga',
     name: 'Gym Leader Koga',

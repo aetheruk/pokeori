@@ -3,6 +3,7 @@ import { BattleConfig } from '../../types'
 export const secretBattles: BattleConfig[] = [
   {
     id: 'hoopa-unbound-battle',
+    winMessage: '...',
     name: 'The Boundless Void',
     description:
       'A terrifying rift in space-time has opened, revealing a malicious entity from another dimension.',

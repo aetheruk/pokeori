@@ -92,6 +92,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-hq-rocket-ambush',
+    winMessage: 'You better keep your mouth shut kid.',
     trainerClassId: 'rocket-grunt',
     name: 'Rocket Grunt',
     description: 'A Rocket Grunt ambushes you as you leave Police HQ.',
@@ -150,8 +151,7 @@ export const celadonCityBattles: BattleConfig[] = [
     trainerClassId: 'detective',
     trainerName: 'Ray Choo',
     loseMessage: 'Hmm, I’m not sure you’re ready for this {trainer}.',
-    winMessage:
-      'Magnificent Work {trainer}! I see a bit of my younger self in you.',
+    winMessage: 'Magnificent Work {trainer}! I see a bit of my younger self in you.',
     name: 'Det. Ray Choo',
     description:
       'Detective Ray Choo wants to test your skills before the two of you begin your investigation.',
@@ -189,6 +189,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-gym-lass-kay',
+    winMessage: 'Doesn\'t it just smell amazing in here!',
     trainerClassId: 'lass',
     trainerName: 'Kay',
     name: 'Lass Kay',
@@ -219,6 +220,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-gym-beauty-bridget',
+    winMessage: 'Erika is so generous!',
     trainerClassId: 'beauty',
     trainerName: 'Bridget',
     name: 'Beauty Bridget',
@@ -251,6 +253,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-gym-picnicker-tina',
+    winMessage: 'Did you know Erika designs all her own perfumes?',
     trainerClassId: 'picknicker',
     trainerName: 'Tina',
     name: 'Picnicker Tina',
@@ -286,6 +289,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-gym-lass-lisa',
+    winMessage: 'I tried buying a leaf stone but they\'re sold out everywhere!',
     trainerClassId: 'lass',
     trainerName: 'Lisa',
     name: 'Lass Lisa',
@@ -321,6 +325,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-gym-cooltrainer-mary',
+    winMessage: 'I heard Erika got this Gym because her parents are rich.',
     trainerClassId: 'expert-f',
     trainerName: 'Mary',
     name: 'Cooltrainer Mary',
@@ -354,6 +359,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-gym-beauty-lori',
+    winMessage: 'I\'m glad I stocked up on Pokeballs they\'re getting so hard to buy!',
     trainerClassId: 'beauty',
     trainerName: 'Lori',
     name: 'Beauty Lori',
@@ -386,6 +392,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-gym-beauty-tamia',
+    winMessage: 'Gross...',
     trainerClassId: 'beauty',
     trainerName: 'Tamia',
     name: 'Beauty Tamia',
@@ -416,6 +423,7 @@ export const celadonCityBattles: BattleConfig[] = [
   },
   {
     id: 'celadon-gym-erika',
+    winMessage: 'Oh my that was an impressive performance.',
     trainerClassId: 'gym-kanto-erika',
     trainerName: 'Erika',
     name: 'Gym Leader Erika',
