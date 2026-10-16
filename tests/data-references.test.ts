@@ -2557,7 +2557,7 @@ describe('static data references', () => {
     expect(bundle?.name).toBe('Ball Bag')
     expect(bundle?.icon).toEqual({ type: 'item', id: 'ball-bag' })
     expect(bundle?.cost).toEqual([
-      { type: 'currency', id: 'berry-powder', amount: 100 },
+      { type: 'currency', id: 'berry-powder', amount: 150 },
     ])
     expect(bundle?.stock).toBeUndefined()
     expect(bundle?.daily).toBeUndefined()
