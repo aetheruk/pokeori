@@ -136,6 +136,7 @@ export function rollGlobalFishingItem(
     }
   }
   const { quantityRange, ...entry } = selected as GlobalFishingItemEntry
+  entry.dropTable = table === tables.rare ? 'rare' : 'common'
   return quantityRange
     ? {
         ...entry,

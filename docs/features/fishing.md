@@ -59,3 +59,9 @@ After all numbered scales are owned, the ungated rare table has four entries: Ru
 ## Persistence
 
 The server resolves a global material bundle's quantity once at cast creation and persists the concrete quantity in the hooked result. Hook retries, netting, direct taking, and capture settlement reuse it. Existing paid reward transactions and idempotent action receipts remain responsible for collection; this change does not reroll contents on retries.
+
+## Universal bobber markers
+
+Every rod and location uses the rolled hook result for its bite marker. Normal Pokémon show `!`, common-table items show `!!`, rare-table items show `!!!`, and Pokémon unlocked by keep-net conditions show `?!`. Local override items show `!!` because they bypass the global table roll. Ungated secret Pokémon use `!`.
+
+Alpha Pokémon use the existing Alpha symbol. Rarity variants (including shiny, shadow, and gold) use the Lucide Sparkle icon. Alpha takes precedence over rarity, and rarity takes precedence over the net-condition marker. Alpha is rolled once at casting and retained through hooking, netting, and capture, so the bite can show its actual symbol. Legacy per-entry `symbol` settings are ignored.

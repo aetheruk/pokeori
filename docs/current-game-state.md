@@ -1239,3 +1239,7 @@ The current authored game progression includes the full Saffron blackout void re
 5. `celadon-timeline-divergence` ("A Divergence in Time") returns the player to Celadon right as Ray suggests Saffron; the player warns Ray of the arranged assassination delivery, breaking the time loop and restoring normal Kanto exploration.
 6. `celadon-poison-dead-drop` ("Intercepting the Toxin") allows the player to intercept the `rocket-poison-vial` from the Celadon back alley before the operative can collect it, setting up the investigation lead for Master Koga in Fuchsia City.
 7. Returning to Lavender Town, the player and Detective Choo ascend Pokémon Tower with Kita's guidance (`pokemon-tower-return-with-choo` and `pokemon-tower-clearing-the-floors`), reaching the summit in `pokemon-tower-summit-azure-flute` to discover the Note to the Trainer and the **Azure Flute** (`azure-flute`), which awakens the sleeping Snorlax on Route 12 and Route 16 to open southern Kanto toward Fuchsia City.
+
+## Fishing bobber update (0.51.49)
+
+Fishing bite markers are universal: `!` ordinary Pokémon, `!!` common/local items, `!!!` rare-table items, `?!` net-conditioned Pokémon, the Alpha symbol for Alphas, and Lucide Sparkle for rarity variants. Alpha takes priority over rarity, then net conditions. Alpha now rolls once at casting so the marker is accurate before hooking; the result persists through capture.

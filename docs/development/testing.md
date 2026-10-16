@@ -154,3 +154,6 @@ Set `POKEORI_PROFILE_GAME_SYNC=1` when running the security integration to add a
 temporary 1,000-Pokemon fixture, record scoped HTTP timing/bytes and Mongo explain
 statistics, and compare every Explore read-model row with Payload's normal DTO.
 The fixture and query helper reject production database settings.
+# Universal fishing markers
+
+`bun test tests/fishing-bite-marker.test.ts tests/fishing-secret-pokemon.test.ts tests/alpha-pokemon.test.ts` checks all shared bite markers, Alpha/rarity/net-condition priority, replacement provenance, and the cast-time Alpha result surviving hook and capture without rerolling.

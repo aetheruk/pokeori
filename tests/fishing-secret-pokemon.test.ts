@@ -35,6 +35,7 @@ describe('secret fishing Pokemon replacements', () => {
         ...baseEntry,
         speciesId: 369,
         formId: '369',
+        fromKeepNet: false,
       })
     }
   })
@@ -53,6 +54,7 @@ describe('secret fishing Pokemon replacements', () => {
         ...baseEntry,
         speciesId: 349,
         formId: '349',
+        fromKeepNet: true,
       })
     }
   })
@@ -69,6 +71,7 @@ describe('secret fishing Pokemon replacements', () => {
         ...baseEntry,
         speciesId: 369,
         formId: '369',
+        fromKeepNet: false,
       })
     }
   })

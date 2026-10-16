@@ -492,11 +492,17 @@ try {
     }
     // Avoid the separate secret replacement rolls while casting.
     let castRandomCalls = 0
-    Math.random = () => castRandomCalls++ === 0 ? 0.2 : 0.5
-    assert.equal((await castFishingLine(rodType)).success, true)
+    // Last cast roll determines Alpha; replacement and rarity rolls stay ordinary.
+    Math.random = () => {
+      const call = castRandomCalls++
+      return call === 0 ? 0.2 : call === 4 ? 0.005 : 0.5
+    }
+    const castResult = await castFishingLine(rodType)
+    assert.equal(castResult.success, true)
     const hooked = store.get('fishing:owner')
     assert.equal(hooked.hookedResult.isSecret, false)
-    assert.equal(hooked.hookedResult.isAlpha, undefined)
+    assert.equal(hooked.hookedResult.isAlpha, true)
+    assert.equal(castResult.symbol, 'alpha')
     hooked.phase = 'nibble'
     hooked.appearTime = Date.now() - 1
     hooked.castTime = ++castTime
