@@ -29,13 +29,14 @@ export const ceruleanCityrhythmEntries: RhythmConfig[] = [
     settings: {
       icons: [{ type: 'item', id: 'razz-berry', label: 'Razz' }],
       speed: 300, // pixels per second
-      spawnRate: { min: 1, max: 1.4 }, // seconds between spawns
-      timeLimit: 20, // Increased time for endless fun
+      // Fixed cadence gives every round 16 hittable berries (480 perfect points).
+      spawnRate: { min: 1.2, max: 1.2 },
+      timeLimit: 20,
       endless: {
         enabled: true,
         milestones: [
           {
-            score: 350,
+            score: 120,
             rewards: [
               {
                 type: 'currency',
@@ -46,7 +47,7 @@ export const ceruleanCityrhythmEntries: RhythmConfig[] = [
             ],
           },
           {
-            score: 470,
+            score: 320,
             rewards: [
               {
                 type: 'currency',
@@ -57,7 +58,7 @@ export const ceruleanCityrhythmEntries: RhythmConfig[] = [
             ],
           },
           {
-            score: 550,
+            score: 460,
             rewards: [
               {
                 type: 'currency',
@@ -104,13 +105,14 @@ export const ceruleanCityrhythmEntries: RhythmConfig[] = [
     settings: {
       icons: [{ type: 'item', id: 'razz-berry', label: 'Razz' }],
       speed: 300,
-      spawnRate: { min: 1, max: 1.4 },
+      // The longer round offers 49 hittable berries (1,470 perfect points).
+      spawnRate: { min: 1.2, max: 1.2 },
       timeLimit: 60,
       endless: {
         enabled: true,
         milestones: [
           {
-            score: 1050,
+            score: 360,
             rewards: [
               {
                 type: 'currency',
@@ -121,7 +123,7 @@ export const ceruleanCityrhythmEntries: RhythmConfig[] = [
             ],
           },
           {
-            score: 1410,
+            score: 980,
             rewards: [
               {
                 type: 'currency',
@@ -132,7 +134,7 @@ export const ceruleanCityrhythmEntries: RhythmConfig[] = [
             ],
           },
           {
-            score: 1650,
+            score: 1400,
             rewards: [
               {
                 type: 'currency',

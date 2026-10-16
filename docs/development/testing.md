@@ -1,5 +1,7 @@
 # Testing Strategy
 
+- `bun test tests/razz-rhythm-balance.test.ts tests/rhythm-timer.test.ts` verifies standard/EX crushing opportunity counts, seeded perfect maxima, Good/Great/near-perfect reward tiers, and server-verified timed completion. The balance calculations are recorded in `docs/game-data/razz-berry-crushing-balance.md`.
+
 - `bun test tests/ball-bag.test.ts` checks Ball Bag odds and sprite reuse, actual inventory opening and reward rolls, independent bonuses including the one-in-a-million Master Ball, missing stock/authentication, receipt replay, and transaction rollback on reward failure.
   `bun run test:e2e e2e/ball-bag.pw.ts` checks phone/desktop Inventory Open controls, the odds description, and drawer bounds.
 
