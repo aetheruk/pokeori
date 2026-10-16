@@ -144,6 +144,8 @@ export interface Item {
   moveId?: string // Link to a MoveConfig id for TMs
   scratchCardId?: string // Link to a ScratchCardConfig id
   effects?: {
+    /** Independently rolled rewards granted when this inventory container is opened. */
+    openRewards?: import('../types').Reward[]
     teachAbility?: string // ID of ability to teach
     usableByForms?: string[] // Only usable on these Form IDs
     usableByTypes?: PokemonTypeName[] // Only usable on Pokemon with one of these types
@@ -502,7 +504,8 @@ export function getInventoryDisplayPlacement(item: Item): {
   if (
     item.effects?.grantSkillXp ||
     item.effects?.grantPokemonResearchXp ||
-    item.effects?.grantRandomPokemonMaterials
+    item.effects?.grantRandomPokemonMaterials ||
+    item.effects?.openRewards
   ) {
     return { group: 'training', subCategory: 'trainer' }
   }

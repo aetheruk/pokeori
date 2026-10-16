@@ -237,11 +237,11 @@ export const ceruleanCityShops: ShopConfig[] = [
     items: [
       {
         id: 'poke-ball-bundle-bp',
-        name: 'Poké Ball Bundle',
-        description: 'A bundle of 5 Poké Balls.',
+        name: 'Ball Bag',
+        description: 'An openable bag of Poké Balls with a chance of bonus Great, Ultra, and Master Balls.',
         icon: {
           type: 'item',
-          id: 'poke-ball',
+          id: 'ball-bag',
         },
         cost: [
           {
@@ -253,11 +253,19 @@ export const ceruleanCityShops: ShopConfig[] = [
         rewards: [
           {
             type: 'item',
-            quantity: 5,
-            targetId: 'poke-ball',
+            quantity: 1,
+            targetId: 'ball-bag',
             dropChance: 100,
           },
         ],
+      },
+      {
+        id: 'pouch-of-materials-bp',
+        name: 'Pouch of Materials',
+        description: 'Open for random crafting materials and gems.',
+        icon: { type: 'item', id: 'pouch-of-materials' },
+        cost: [{ type: 'currency', id: 'berry-powder', amount: 150 }],
+        rewards: [{ type: 'item', targetId: 'pouch-of-materials', quantity: 1, dropChance: 100 }],
       },
       {
         id: 'researchers-journal-bp',

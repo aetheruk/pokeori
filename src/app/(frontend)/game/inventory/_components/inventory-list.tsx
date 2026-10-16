@@ -215,7 +215,7 @@ function getItemActionLabel(
   canChannel = false,
 ): string | null {
   if (canChannel) return 'Channel'
-  if (item.effects?.grantRandomPokemonMaterials) return 'Open'
+  if (item.effects?.grantRandomPokemonMaterials || item.effects?.openRewards) return 'Open'
   if (isArtisanIngredientItem(item)) return 'Craft'
   if (item.category === 'booster-pack') return 'Open'
   if (item.category === 'scratch-card') return 'Scratch'
@@ -765,6 +765,7 @@ export function InventoryList() {
 
         if (
           item.effects?.grantSkillXp ||
+          item.effects?.openRewards ||
           item.effects?.grantRandomPokemonMaterials ||
           item.effects?.grantPokemonResearchXp?.formId ||
           item.effects?.startBattle ||
@@ -1070,7 +1071,7 @@ export function InventoryList() {
             </Button>
           ) : selectedItem &&
             isArtisanIngredientItem(selectedItem) &&
-            !selectedItem.effects?.grantRandomPokemonMaterials ? (
+            !selectedItem.effects?.grantRandomPokemonMaterials && !selectedItem.effects?.openRewards ? (
             <Button
               className="w-full bg-game-charcoal font-bold text-game-cream hover:bg-game-charcoal-strong"
               onClick={() => openArtisanForItem(selectedItem)}
@@ -1119,6 +1120,7 @@ export function InventoryList() {
               {isUsing ? 'Scratching...' : 'Scratch!'}
             </Button>
           ) : selectedItem?.effects?.grantSkillXp ||
+            selectedItem?.effects?.openRewards ||
             selectedItem?.effects?.grantRandomPokemonMaterials ||
             selectedItem?.effects?.grantPokemonResearchXp?.formId ||
             selectedItem?.effects?.startBattle ||
@@ -1132,9 +1134,11 @@ export function InventoryList() {
             >
               {isUsing
                 ? 'Using...'
-                : selectedItem.effects?.grantRandomPokemonMaterials
-                  ? 'Open Pouch'
-                  : 'Use Item'}
+                : selectedItem.effects?.openRewards
+                  ? 'Open Bag'
+                  : selectedItem.effects?.grantRandomPokemonMaterials
+                    ? 'Open Pouch'
+                    : 'Use Item'}
             </Button>
           ) : selectedItem?.category === 'ability-patch' ||
             selectedItem?.category === 'vitamin' ||

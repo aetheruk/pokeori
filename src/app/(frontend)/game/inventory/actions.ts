@@ -368,7 +368,8 @@ export async function useConsumable(
   if (!itemDef) return { success: false, error: 'Item not found' }
   if (
     itemDef.effects?.grantRandomPokemonMaterials ||
-    itemDef.effects?.grantRandomGems
+    itemDef.effects?.grantRandomGems ||
+    itemDef.effects?.openRewards
   ) {
     const materialRange = itemDef.effects.grantRandomPokemonMaterials
     const gemRange = itemDef.effects.grantRandomGems
@@ -393,6 +394,7 @@ export async function useConsumable(
             ? rollRandomPokemonMaterialCount(gemRange.min, gemRange.max)
             : 0
           const rewards = [
+            ...(itemDef.effects?.openRewards || []),
             ...(materialRange
               ? buildRandomPokemonMaterialRewards(materialCount)
               : []),
@@ -409,7 +411,9 @@ export async function useConsumable(
           ].filter(Boolean)
           return {
             success: true,
-            message: `Found ${rewardDetails.join(' and ')}!`,
+            message: itemDef.effects?.openRewards
+              ? `Opened ${itemDef.name}!`
+              : `Found ${rewardDetails.join(' and ')}!`,
             summary: result.summary,
           }
         },
