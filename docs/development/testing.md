@@ -157,6 +157,8 @@ The fixture and query helper reject production database settings.
 
 ## Universal fishing markers
 
+Secret replacement tests cover Staryu's five-Pool-Scale gate and 1-in-8 boundary, plus Gold Magikarp's ten-Golden-Scale gate and unchanged 99% boundary.
+
 Relicanth coverage also verifies the five-unit Rock material requirement across bundles and the exclusive 1-in-64 roll boundary on every rod.
 
 `bun test tests/fishing-bite-marker.test.ts tests/fishing-secret-pokemon.test.ts tests/alpha-pokemon.test.ts` checks all shared bite markers, Alpha/rarity/net-condition priority, replacement provenance, and the cast-time Alpha result surviving hook and capture without rerolling.

@@ -149,13 +149,13 @@ describe('secret fishing Pokemon replacements', () => {
     }
   })
 
-  test('ten Cerulean Pool Scales give Staryu a 50% global replacement chance', () => {
+  test('five Cerulean Pool Scales give Staryu a 1-in-8 global replacement chance', () => {
     const ceruleanScaleKeepNet = [
       {
         id: 'cerulean-scales',
         type: 'item' as const,
         itemId: 'cerulean-pool-scale',
-        quantity: 10,
+        quantity: 5,
       },
     ]
 
@@ -166,7 +166,7 @@ describe('secret fishing Pokemon replacements', () => {
           rodType,
           entry: baseEntry,
           keepNet: ceruleanScaleKeepNet,
-          random: () => [0.49][rolls++],
+          random: () => [1 / 8 - Number.EPSILON][rolls++],
         }),
       ).toMatchObject({ speciesId: 120, formId: '120' })
 
@@ -176,7 +176,7 @@ describe('secret fishing Pokemon replacements', () => {
           rodType,
           entry: baseEntry,
           keepNet: ceruleanScaleKeepNet,
-          random: () => [0.5][rolls++],
+          random: () => [1 / 8][rolls++],
         }),
       ).toBe(baseEntry)
     }
@@ -185,8 +185,8 @@ describe('secret fishing Pokemon replacements', () => {
       applySecretFishingPokemonReplacement({
         rodType: 'old',
         entry: baseEntry,
-        keepNet: [{ ...ceruleanScaleKeepNet[0], quantity: 9 }],
-        random: () => 1,
+        keepNet: [{ ...ceruleanScaleKeepNet[0], quantity: 4 }],
+        random: () => 0,
       }),
     ).toBe(baseEntry)
   })
@@ -211,13 +211,13 @@ describe('secret fishing Pokemon replacements', () => {
     ).toBe(349)
   })
 
-  test('five repeatable Golden Scales make a Gold Magikarp almost certain', () => {
+  test('ten repeatable Golden Scales give Gold Magikarp a 99% replacement chance', () => {
     const goldenScales = [
       {
         id: 'golden-scales',
         type: 'item' as const,
         itemId: 'golden-scale',
-        quantity: 5,
+        quantity: 10,
       },
     ]
 
@@ -226,7 +226,7 @@ describe('secret fishing Pokemon replacements', () => {
         rodType: 'old',
         entry: baseEntry,
         keepNet: goldenScales,
-        random: () => 0,
+        random: () => 0.99 - Number.EPSILON,
       }),
     ).toMatchObject({ speciesId: 129, formId: '129', rarity: 'gold' })
 
@@ -235,7 +235,7 @@ describe('secret fishing Pokemon replacements', () => {
         rodType: 'old',
         entry: baseEntry,
         keepNet: goldenScales,
-        random: () => 1,
+        random: () => 0.99,
       }),
     ).toBe(baseEntry)
 
@@ -243,8 +243,8 @@ describe('secret fishing Pokemon replacements', () => {
       applySecretFishingPokemonReplacement({
         rodType: 'old',
         entry: baseEntry,
-        keepNet: [{ ...goldenScales[0], quantity: 4 }],
-        random: () => 1,
+        keepNet: [{ ...goldenScales[0], quantity: 9 }],
+        random: () => 0,
       }),
     ).toBe(baseEntry)
   })

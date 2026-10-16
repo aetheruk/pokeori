@@ -66,4 +66,6 @@ Every rod and location uses the rolled hook result for its bite marker. Normal P
 
 Relicanth requires five Tier 1 Rock material units (`small-stone-t1`) in the keep net and rolls at 1 in 64 after a Pokémon hook is selected. Quantities can be spread across bundles; five distinct slots are not required. It is checked before Feebas, Staryu, and Gold Magikarp and uses `?!` unless a rarity variant takes priority.
 
+Staryu requires five Cerulean Pool Scale units and rolls at 1 in 8 (12.5%) on Pokémon hooks. Gold Magikarp requires ten unnumbered Golden Scale units and retains its 99% replacement chance and fixed Gold rarity. These gates count total quantities across bundles. Earlier successful replacement rolls take precedence.
+
 Alpha Pokémon use the existing Alpha symbol. Rarity variants (including shiny, shadow, and gold) use the Lucide Sparkle icon. Alpha takes precedence over rarity, and rarity takes precedence over the net-condition marker. Alpha is rolled once at casting and retained through hooking, netting, and capture, so the bite can show its actual symbol. Legacy per-entry `symbol` settings are ignored.
