@@ -1,261 +1,246 @@
 import { describe, expect, test } from 'bun:test'
 import { items } from '@/data/items'
-import { globalFishingItemPools } from '@/data/games/fishing/item-pools'
-import type {
-  FishingItemEntry,
-  GlobalFishingItemEntry,
-} from '@/data/games/fishing/types'
 import {
-  addPostCollectionGoldenScaleDrop,
+  globalFishingCommonItemPools,
+  globalFishingRareItemPools,
+  FISHING_EVOLUTION_STONE_TYPES,
+  NUMBERED_GOLDEN_SCALE_IDS,
+} from '@/data/games/fishing/item-pools'
+import {
+  TIER_ONE_POKEMON_MATERIAL_IDS,
+  TYPE_MATERIAL_CONFIG,
+} from '@/utilities/artisan/material-drops'
+import {
   getAvailableFishingItemEntries,
+  getGlobalFishingItemTables,
+  getFishingRareItemChance,
+  rollGlobalFishingItem,
 } from '@/utilities/fishing/item-pool'
+import type { FishingKeepNetEntry } from '@/utilities/fishing/keep-net'
 
-describe('fishing item pools', () => {
-  test('adds Discarded Rubbish as a common item to every global rod pool', () => {
-    for (const entries of Object.values(globalFishingItemPools)) {
-      expect(entries).toContainEqual(
-        expect.objectContaining({ itemId: 'discarded-rubbish', weight: 10 }),
-      )
-    }
-    expect(items.find((item) => item.id === 'discarded-rubbish')).toMatchObject({
-      name: 'Discarded Rubbish',
-      category: 'misc',
-    })
-  })
+const netItem = (itemId: string, quantity = 1): FishingKeepNetEntry => ({
+  id: itemId,
+  type: 'item',
+  itemId,
+  quantity,
+})
+const ownedScales = Object.fromEntries(
+  NUMBERED_GOLDEN_SCALE_IDS.map((id) => [id, 1]),
+)
+const has = (entries: Array<{ itemId?: string }>, id: string) =>
+  entries.some((entry) => entry.itemId === id)
 
-  test('Pouch of Materials is a consumable that grants mixed Tier 1 materials', () => {
-    expect(items.find((item) => item.id === 'pouch-of-materials')).toMatchObject({
-      name: 'Pouch of Materials',
-      effects: {
-        grantRandomPokemonMaterials: { min: 1, max: 5 },
-        grantRandomGems: { min: 1, max: 3 },
-      },
-    })
-  })
-
-  test('does not offer owned unique Golden Scales again', () => {
-    const owned = Object.fromEntries(
-      Array.from({ length: 8 }, (_, index) => [
-        `golden-scale-${index + 1}`,
-        1,
-      ]),
-    )
-
-    const available = getAvailableFishingItemEntries(
-      globalFishingItemPools.old,
-      owned,
-    )
-
-      expect(available.filter((entry) => entry.itemId).map((entry) => entry.itemId)).toEqual([
-      'water-gem',
-      'aqua-solvent-t1',
-      'discarded-rubbish',
-      'broken-ball-t1',
-      'poke-ball',
-      'metal-scrap-t1',
-      'drake-scale-t1',
-    ])
-    expect(available.some((entry) => entry.currencyId === 'pokedollars')).toBe(true)
-    expect(available.some((entry) => entry.currencyId === 'crystals')).toBe(true)
-  })
-
-  test('unlocks repeatable Golden Scales only after all numbered scales and sets a 1-in-50 item roll', () => {
-    const eligible = getAvailableFishingItemEntries(
-      globalFishingItemPools.old,
-      {},
-    )
-    expect(
-      addPostCollectionGoldenScaleDrop(eligible, {}).some(
-        (entry) => entry.itemId === 'golden-scale',
-      ),
-    ).toBe(false)
-
-    const owned = Object.fromEntries(
-      Array.from({ length: 8 }, (_, index) => [
-        `golden-scale-${index + 1}`,
-        1,
-      ]),
-    )
-    const available = getAvailableFishingItemEntries(
-      globalFishingItemPools.old,
-      owned,
-    )
-    const withGoldenScale = addPostCollectionGoldenScaleDrop(available, owned)
-    const totalWeight = withGoldenScale.reduce(
-      (total, entry) => total + entry.weight,
-      0,
-    )
-    const goldenScaleWeight = withGoldenScale.find(
-      (entry) => entry.itemId === 'golden-scale',
-    )?.weight
-
-    expect(goldenScaleWeight).toBeDefined()
-    expect(goldenScaleWeight! / totalWeight).toBeCloseTo(1 / 50)
-    expect(items.find((item) => item.id === 'golden-scale')).toMatchObject({
-      name: 'Golden Scale',
-      category: 'misc',
-      spriteId: 'golden-scale',
-    })
-  })
-
-  test('keeps unowned unique items and repeatable items available', () => {
-    const entries: FishingItemEntry[] = [
-      {
-        itemId: 'golden-scale-1',
-        weight: 1,
-        symbol: '!!!',
-        reactionTime: 900,
-        appearTime: { min: 1, max: 1 },
-      },
-      {
-        itemId: 'water-gem',
-        weight: 1,
-        symbol: '!',
-        reactionTime: 900,
-        appearTime: { min: 1, max: 1 },
-      },
-    ]
-
-    expect(
-      getAvailableFishingItemEntries(entries, {
-        'golden-scale-1': 1,
-      }).map((entry) => entry.itemId),
-    ).toEqual(['water-gem'])
-
-    expect(
-      getAvailableFishingItemEntries(entries, {}).map((entry) => entry.itemId),
-    ).toEqual(['golden-scale-1', 'water-gem'])
-  })
-
-  test('does not roll unique items already reserved in the keep net', () => {
-    const entries: FishingItemEntry[] = [
-      {
-        itemId: 'golden-scale-1',
-        weight: 1,
-        symbol: '!!!',
-        reactionTime: 900,
-        appearTime: { min: 1, max: 1 },
-      },
-      {
-        itemId: 'water-gem',
-        weight: 1,
-        symbol: '!',
-        reactionTime: 900,
-        appearTime: { min: 1, max: 1 },
-      },
-    ]
-
-    expect(
-      getAvailableFishingItemEntries(entries, {}, new Set(), [
-        {
-          id: 'reserved-golden-scale',
-          type: 'item',
-          itemId: 'golden-scale-1',
-          quantity: 1,
-        },
-      ]).map(
-        (entry) => entry.itemId,
-      ),
-    ).toEqual(['water-gem'])
-  })
-
-  test('filters keep-net-gated catches until the required item is stored', () => {
-    const gatedEntries: GlobalFishingItemEntry[] = [
-      {
-        itemId: 'golden-scale-1',
-        weight: 1,
-        symbol: '!!!',
-        reactionTime: 900,
-        appearTime: { min: 1, max: 1 },
-        keepNetRequirements: [{ itemId: 'drake-scale-t1' }],
-      },
-    ]
-
-    expect(getAvailableFishingItemEntries(gatedEntries, {})).toEqual([])
-    expect(
-      getAvailableFishingItemEntries(gatedEntries, {}, new Set(), [
-        {
-          id: 'drake-scale',
-          type: 'item',
-          itemId: 'drake-scale-t1',
-          quantity: 1,
-        },
-      ]),
-    ).toEqual(gatedEntries)
-  })
-
-  test('Great Balls require three Poké Balls in the keep net on every rod', () => {
-    const pokeballs = (count: number) =>
-      Array.from({ length: count }, (_, index) => ({
-        id: `pokeball-${index}`,
-        type: 'item' as const,
-        itemId: 'poke-ball',
-        quantity: 1,
-      }))
-
-    for (const pool of Object.values(globalFishingItemPools)) {
+describe('fishing common and rare tables', () => {
+  test('every rod offers all eighteen base materials and broken balls in bundles of one or two', () => {
+    expect(TIER_ONE_POKEMON_MATERIAL_IDS).toHaveLength(18)
+    for (const pool of Object.values(globalFishingCommonItemPools)) {
+      expect(pool.every((entry) => entry.weight === 1)).toBe(true)
+      for (const id of [...TIER_ONE_POKEMON_MATERIAL_IDS, 'broken-ball-t1']) {
+        expect(
+          pool.find((entry) => entry.itemId === id)?.quantityRange,
+        ).toEqual({ min: 1, max: 2 })
+      }
       expect(
-        getAvailableFishingItemEntries(pool, {}, new Set(), pokeballs(2)).some(
-          (entry) => entry.itemId === 'great-ball',
+        pool.find((entry) => entry.currencyId === 'pokedollars')?.quantity,
+      ).toBe(100)
+      expect(
+        pool.find((entry) => entry.currencyId === 'crystals')?.quantity,
+      ).toBe(25)
+      expect(has(pool, 'water-gem')).toBe(false)
+      expect(has(pool, 'discarded-rubbish')).toBe(false)
+    }
+  })
+
+  test('ball gates use total broken-ball quantity and unlock cumulatively', () => {
+    for (const rod of ['old', 'good', 'super'] as const) {
+      for (const [count, unlocked] of [
+        [0, 0],
+        [1, 0],
+        [2, 1],
+        [4, 1],
+        [5, 2],
+        [7, 2],
+        [8, 3],
+      ]) {
+        const table = getGlobalFishingItemTables(rod, {}, [
+          netItem('broken-ball-t1', count),
+        ]).common
+        for (const [index, id] of [
+          'poke-ball',
+          'great-ball',
+          'ultra-ball',
+        ].entries()) {
+          expect(has(table, id)).toBe(index < unlocked)
+        }
+      }
+      const split = [
+        netItem('broken-ball-t1', 2),
+        netItem('broken-ball-t1', 2),
+        netItem('broken-ball-t1'),
+      ]
+      expect(
+        has(getGlobalFishingItemTables(rod, {}, split).common, 'great-ball'),
+      ).toBe(true)
+      expect(
+        has(
+          getGlobalFishingItemTables(rod, { 'broken-ball-t1': 100 }, []).common,
+          'poke-ball',
+        ),
+      ).toBe(false)
+    }
+  })
+
+  test('all eleven evolution stones need five occupied slots of the matching base material', () => {
+    const stoneIds = items
+      .filter(
+        (item) => item.category === 'evolution' && item.id.endsWith('-stone'),
+      )
+      .map((item) => item.id)
+    expect(Object.keys(FISHING_EVOLUTION_STONE_TYPES).sort()).toEqual(
+      stoneIds.sort(),
+    )
+    for (const [stone, type] of Object.entries(FISHING_EVOLUTION_STONE_TYPES)) {
+      const material = `${TYPE_MATERIAL_CONFIG[type].family}-t1`
+      expect(
+        has(
+          getGlobalFishingItemTables('old', {}, [netItem(material, 10)]).rare,
+          stone,
         ),
       ).toBe(false)
       expect(
-        getAvailableFishingItemEntries(
-          pool,
+        has(
+          getGlobalFishingItemTables(
+            'old',
+            {},
+            Array(4).fill(netItem(material, 2)),
+          ).rare,
+          stone,
+        ),
+      ).toBe(false)
+      const eligible = getGlobalFishingItemTables(
+        'old',
+        {},
+        Array(5).fill(netItem(material, 2)),
+      ).rare
+      expect(has(eligible, stone)).toBe(true)
+      expect(eligible.find((entry) => entry.itemId === stone)?.weight).toBe(1)
+      expect(
+        has(
+          getGlobalFishingItemTables(
+            'old',
+            {},
+            Array(5).fill(netItem(material.replace('-t1', '-t2'))),
+          ).rare,
+          stone,
+        ),
+      ).toBe(false)
+    }
+  })
+
+  test('unique scales are excluded when owned or netted and repeatable scale has equal rare weight', () => {
+    const initial = getGlobalFishingItemTables('old', {}).rare
+    expect(initial).toHaveLength(11)
+    expect(initial.every((entry) => entry.weight === 1)).toBe(true)
+    expect(has(initial, 'golden-scale')).toBe(false)
+    const partial = getGlobalFishingItemTables('old', { 'golden-scale-1': 1 }, [
+      netItem('golden-scale-2'),
+    ]).rare
+    expect(partial).toHaveLength(9)
+    expect(has(partial, 'golden-scale-1')).toBe(false)
+    expect(has(partial, 'golden-scale-2')).toBe(false)
+    expect(has(partial, 'golden-scale')).toBe(false)
+    const complete = getGlobalFishingItemTables('old', ownedScales).rare
+    expect(complete.map((entry) => entry.itemId || entry.currencyId)).toEqual([
+      'discarded-rubbish',
+      'pokedollars',
+      'crystals',
+      'golden-scale',
+    ])
+    expect(complete.every((entry) => entry.weight === 1)).toBe(true)
+    expect(
+      complete.find((entry) => entry.currencyId === 'pokedollars')?.quantity,
+    ).toBe(500)
+    expect(
+      complete.find((entry) => entry.currencyId === 'crystals')?.quantity,
+    ).toBe(200)
+    expect(
+      getAvailableFishingItemEntries(
+        globalFishingRareItemPools.old,
+        {},
+        new Set(['golden-scale-1']),
+      ).some((entry) => entry.itemId === 'golden-scale-1'),
+    ).toBe(false)
+  })
+
+  test('only unnumbered Golden Scales boost the rare roll by one percentage point each', () => {
+    expect(getFishingRareItemChance([])).toBe(1)
+    expect(getFishingRareItemChance([netItem('golden-scale')])).toBe(2)
+    expect(
+      getFishingRareItemChance(Array(5).fill(netItem('golden-scale'))),
+    ).toBe(6)
+    expect(
+      getFishingRareItemChance(Array(10).fill(netItem('golden-scale'))),
+    ).toBe(11)
+    expect(
+      getFishingRareItemChance([
+        netItem('golden-scale-1'),
+        netItem('drake-scale-t1'),
+      ]),
+    ).toBe(1)
+  })
+
+  test('table selection is separate from equal entry selection and quantity resolves once', () => {
+    const rng =
+      (...values: number[]) =>
+      () =>
+        values.shift() ?? 0
+    for (const rod of ['old', 'good', 'super'] as const) {
+      expect(rollGlobalFishingItem(rod, {}, [], rng(0.00999, 0)).itemId).toBe(
+        'golden-scale-1',
+      )
+      const one = rollGlobalFishingItem(rod, {}, [], rng(0.01, 0, 0))
+      const two = rollGlobalFishingItem(rod, {}, [], rng(0.99, 0, 0.99999))
+      expect(one.itemId).toBe(TIER_ONE_POKEMON_MATERIAL_IDS[0])
+      expect(one.quantity).toBe(1)
+      expect(two.quantity).toBe(2)
+      expect('quantityRange' in two).toBe(false)
+      expect(
+        rollGlobalFishingItem(
+          rod,
+          ownedScales,
+          [netItem('golden-scale')],
+          rng(0.01999, 0.9999),
+        ).itemId,
+      ).toBe('golden-scale')
+      expect(
+        rollGlobalFishingItem(
+          rod,
+          ownedScales,
+          [netItem('golden-scale')],
+          rng(0.02, 0),
+        ).itemId,
+      ).toBe(TIER_ONE_POKEMON_MATERIAL_IDS[0])
+      const available = getGlobalFishingItemTables(rod, {}).common
+      const selected = Array.from({ length: available.length }, (_, index) =>
+        rollGlobalFishingItem(
+          rod,
           {},
-          new Set(),
-          pokeballs(3),
-        ).some((entry) => entry.itemId === 'great-ball'),
-      ).toBe(true)
-    }
-  })
-
-  test('global pools include multi-quantity PokeDollars and Crystal catches', () => {
-    for (const pool of Object.values(globalFishingItemPools)) {
-      for (const currencyId of ['pokedollars', 'crystals']) {
-        const quantities = pool
-          .filter((entry) => entry.currencyId === currencyId)
-          .map((entry) => entry.quantity)
-        expect(new Set(quantities).size).toBeGreaterThan(1)
-        expect(quantities.every((quantity) => (quantity || 0) > 0)).toBe(true)
-      }
-    }
-  })
-
-  test('global pools include the requested common and uncommon crafting and ball items', () => {
-    for (const pool of Object.values(globalFishingItemPools)) {
-      const entries = new Map(
-        pool
-          .filter((entry) => entry.itemId)
-          .map((entry) => [entry.itemId, entry]),
+          [],
+          rng(0.5, (index + 0.5) / available.length, 0),
+        ),
       )
-
-      for (const itemId of [
-        'discarded-rubbish',
-        'broken-ball-t1',
-        'poke-ball',
-        'metal-scrap-t1',
-      ]) {
-        expect(entries.get(itemId)?.weight).toBe(10)
-        expect(entries.get(itemId)?.symbol).toBe('!')
-      }
-      for (const itemId of ['great-ball', 'drake-scale-t1']) {
-        expect(entries.get(itemId)?.weight).toBe(4)
-        expect(entries.get(itemId)?.symbol).toBe('!!')
-      }
-    }
-  })
-
-  test('Golden Scales keep their authored weight after general items are added', () => {
-    const expected = { old: 8 / 155, good: 8 / 156, super: 8 / 156 }
-    for (const [rod, pool] of Object.entries(globalFishingItemPools)) {
-      const totalWeight = pool.reduce((total, entry) => total + entry.weight, 0)
-      const goldenScaleWeight = pool
-        .filter((entry) => entry.itemId?.startsWith('golden-scale-'))
-        .reduce((total, entry) => total + entry.weight, 0)
-      expect(goldenScaleWeight / totalWeight).toBeCloseTo(
-        expected[rod as keyof typeof expected],
+      expect(selected.map((entry) => entry.itemId || entry.currencyId)).toEqual(
+        available.map((entry) => entry.itemId || entry.currencyId),
       )
     }
+  })
+
+  test('material pouches keep their existing material and gem contents', () => {
+    expect(
+      items.find((item) => item.id === 'pouch-of-materials')?.effects,
+    ).toMatchObject({
+      grantRandomPokemonMaterials: { min: 1, max: 5 },
+      grantRandomGems: { min: 1, max: 3 },
+    })
   })
 })

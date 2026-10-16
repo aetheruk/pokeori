@@ -69,9 +69,11 @@ export function applyFishingCatchCrystalMultiplier(
   }
 }
 
-export function getFishingItemChance(keepNetCount: number): number {
-  const count = Math.max(0, Math.min(FISHING_KEEP_NET_CAPACITY, keepNetCount))
-  return FISHING_ITEM_CHANCE + count
+export function getFishingItemChance(keepNet: readonly FishingKeepNetEntry[]): number {
+  return keepNet.slice(0, FISHING_KEEP_NET_CAPACITY).reduce(
+    (chance, entry) => chance + (entry.type === 'pokemon' ? 2 : -2),
+    FISHING_ITEM_CHANCE,
+  )
 }
 
 function getFormCount(count: number): number {

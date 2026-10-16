@@ -21,6 +21,8 @@ export interface FishingKeepNetRequirement {
   itemId: string
   /** Minimum total quantity across matching item bundles in the keep net. */
   quantity?: number
+  /** Minimum occupied matching-item slots, independently of bundle quantity. */
+  slots?: number
 }
 
 export interface FishingPokemonEntry {
@@ -53,16 +55,18 @@ export interface FishingItemEntry {
 
 /** Shared global item catches can be gated by items held in the keep net. */
 export interface GlobalFishingItemEntry extends FishingItemEntry {
+  /** Rolled once when casting, then persisted as a concrete quantity. */
+  quantityRange?: { min: number; max: number }
   keepNetRequirements?: FishingKeepNetRequirement[]
 }
 
 export interface FishingRodConfig {
   encounters: {
-    chance?: number // Deprecated; base fishing rolls are 70% Pokemon before keep-net modifiers.
+    chance?: number // Deprecated; the shared keep-net hook balance decides this.
     entries: FishingPokemonEntry[]
   }
   items?: {
-    chance?: number // Deprecated; base fishing rolls are 30% items before keep-net modifiers.
+    chance?: number // Deprecated; the shared keep-net hook balance decides this.
     entries: FishingItemEntry[]
   }
   // Per-rod catch settings

@@ -13,6 +13,19 @@ export function meetsFishingKeepNetRequirements(
   if (!requirements?.length) return true
 
   return requirements.every((requirement) => {
+    const matching = keepNet.filter(
+      (entry) =>
+        entry.type === 'item' &&
+        entry.itemId === requirement.itemId &&
+        (entry.quantity ?? 1) > 0,
+    )
+    if (
+      requirement.slots !== undefined &&
+      matching.length < Math.max(1, Math.floor(requirement.slots))
+    )
+      return false
+    if (requirement.quantity === undefined && requirement.slots !== undefined)
+      return true
     const requiredQuantity = Math.max(1, Math.floor(requirement.quantity ?? 1))
     const netQuantity = keepNet.reduce((total, entry) => {
       if (entry.type !== 'item' || entry.itemId !== requirement.itemId) {

@@ -1,5 +1,7 @@
 # Testing Strategy
 
+- Fishing tables: `bun test tests/fishing-item-pool.test.ts tests/fishing-keep-net.test.ts tests/fishing-keep-net-requirements.test.ts tests/alpha-pokemon.test.ts` verifies 50/50 hook balance, opposing two-point slot shifts, common/rare table boundaries, all eighteen base materials, 1–2 quantities, Broken Ball gates, all eleven five-slot stone gates, unique reservations, equal rare weights, and Golden Scale rare boosts. The existing isolated capture fixture now also exercises real casts, hooks, stable bundle quantities, net storage, and local-pool override/fallback.
+
 - `bun test tests/razz-rhythm-balance.test.ts tests/rhythm-timer.test.ts` verifies standard/EX crushing opportunity counts, seeded perfect maxima, Good/Great/near-perfect reward tiers, and server-verified timed completion. The balance calculations are recorded in `docs/game-data/razz-berry-crushing-balance.md`.
 
 - `bun test tests/ball-bag.test.ts` checks Ball Bag odds and sprite reuse, actual inventory opening and reward rolls, independent bonuses including the one-in-a-million Master Ball, missing stock/authentication, receipt replay, and transaction rollback on reward failure.

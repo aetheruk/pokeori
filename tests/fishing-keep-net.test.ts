@@ -12,12 +12,15 @@ import {
 } from '@/utilities/fishing/keep-net'
 
 describe('fishing keep net', () => {
-  test('scales item chance by total net occupancy', () => {
-    expect(getFishingItemChance(0)).toBe(30)
-    expect(getFishingItemChance(5)).toBe(35)
-    expect(getFishingItemChance(10)).toBe(40)
-    expect(getFishingItemChance(20)).toBe(40)
-
+  test('each stored result shifts hooks two points towards the opposite kind', () => {
+    const item: FishingKeepNetEntry = { id: 'item', type: 'item', itemId: 'broken-ball-t1', quantity: 2 }
+    const pokemon: FishingKeepNetEntry = { id: 'pokemon', type: 'pokemon', speciesId: 129, formId: '129', isShiny: false, isAlpha: false }
+    expect(getFishingItemChance([])).toBe(50)
+    expect(getFishingItemChance(Array(10).fill(item))).toBe(30)
+    expect(getFishingItemChance(Array(10).fill(pokemon))).toBe(70)
+    expect(getFishingItemChance([...Array(5).fill(item), ...Array(5).fill(pokemon)])).toBe(50)
+    expect(getFishingItemChance([item])).toBe(48)
+    expect(getFishingItemChance(Array(20).fill(item))).toBe(30)
   })
 
   test('adds Explorer XP using only Pokemon in the net', () => {
