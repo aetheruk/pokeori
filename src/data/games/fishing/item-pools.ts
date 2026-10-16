@@ -28,8 +28,8 @@ function buildPools(reactionTime: number) {
     })),
     { ...base, currencyId: 'pokedollars', quantity: 100, symbol: '$' },
     { ...base, currencyId: 'crystals', quantity: 25, symbol: '✧' },
-    { ...base, currencyId: 'pokedollars', quantity: 500, symbol: '!!' },
-    { ...base, currencyId: 'crystals', quantity: 200, symbol: '!!' },
+    { ...base, currencyId: 'pokedollars', quantity: 200, symbol: '!!' },
+    { ...base, currencyId: 'crystals', quantity: 50, symbol: '!!' },
     ...(['poke-ball', 'great-ball', 'ultra-ball'] as const).map((itemId, index) => ({
       ...base, itemId, quantity: 1, symbol: '!!',
       keepNetRequirements: [{ itemId: 'broken-ball-t1', quantity: [2, 5, 8][index] }],

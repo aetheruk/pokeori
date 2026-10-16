@@ -20,7 +20,7 @@ Common entries:
 
 - All eighteen base/Tier 1 Pokemon type materials, each in a uniform quantity of 1–2: Soft Fluff, Cinder Shard, Aqua Solvent, Electric Component, Wood Scraps, Frost Crystal, Grip Weave, Toxic Resin, Soft Clay, Wing Feather, Rune Stone, Chitin Fragment, Small Stone, Ectoplasm, Drake Scale, Shadow Cloth, Metal Scrap, and Fairy Charm.
 - Broken Ball T1, quantity 1–2.
-- 100 Pokedollars, 500 Pokedollars, 25 Crystals, or 200 Crystals, each a separate equally weighted bundle.
+- 100 Pokedollars, 200 Pokedollars, 25 Crystals, or 50 Crystals, each a separate equally weighted bundle.
 - One Poke Ball when the net holds at least 2 Broken Ball T1 units, one Great Ball at 5 units, and one Ultra Ball at 8 units. Unlocks are cumulative and count total quantity across bundles, rather than occupied slots. Inventory quantities do not qualify.
 
 Rare entries:

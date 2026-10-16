@@ -48,8 +48,8 @@ describe('fishing common and rare tables', () => {
       ).toBe(25)
       expect(has(pool, 'water-gem')).toBe(false)
       expect(has(pool, 'discarded-rubbish')).toBe(false)
-      expect(pool.filter((entry) => entry.currencyId === 'pokedollars').map((entry) => entry.quantity)).toEqual([100, 500])
-      expect(pool.filter((entry) => entry.currencyId === 'crystals').map((entry) => entry.quantity)).toEqual([25, 200])
+      expect(pool.filter((entry) => entry.currencyId === 'pokedollars').map((entry) => entry.quantity)).toEqual([100, 200])
+      expect(pool.filter((entry) => entry.currencyId === 'crystals').map((entry) => entry.quantity)).toEqual([25, 50])
     }
   })
 
