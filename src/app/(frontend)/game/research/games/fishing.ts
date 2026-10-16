@@ -109,6 +109,7 @@ export interface FishingState {
     isAlpha?: boolean
   }
   reactionDeadline?: number // When the hook window ends
+  missPenaltyApplied?: boolean
   phase: 'idle' | 'waiting' | 'nibble' | 'hooked' | 'missed'
   weather?: WeatherSnapshot
 }
@@ -150,6 +151,21 @@ async function forfeitFishingKeepNet(userId: string): Promise<boolean> {
   const state = (await redis.get(key)) as FishingKeepNetState | null
   await redis.del(key)
   return (state?.entries.length || 0) > 0
+}
+
+/** Penalize each failed cast once, including retry/recast cleanup paths. */
+async function applyFishingMissPenalty(userId: string, fishingState: FishingState): Promise<boolean> {
+  if (fishingState.missPenaltyApplied) return false
+  const key = getFishingKeepNetKey(userId)
+  const net = (await redis.get(key)) as FishingKeepNetState | null
+  const hasSlot = net?.encounterId === fishingState.encounterId && net.entries.length > 0
+  if (hasSlot && net) {
+    net.entries.splice(Math.floor(Math.random() * net.entries.length), 1)
+    await redis.set(key, net, { ex: FISHING_KEEP_NET_TTL })
+  }
+  fishingState.missPenaltyApplied = true
+  await redis.set(`fishing:${userId}`, fishingState, { ex: 60 })
+  return hasSlot === true
 }
 
 function getRodItemId(rodType: RodType): string {
@@ -283,8 +299,8 @@ async function clearExpiredFishingCast(
   fishingState: FishingState,
 ): Promise<boolean> {
   if (fishingState.phase === 'missed') {
+    await applyFishingMissPenalty(userId, fishingState)
     await redis.del(`fishing:${userId}`)
-    await forfeitFishingKeepNet(userId)
     return true
   }
 
@@ -292,8 +308,8 @@ async function clearExpiredFishingCast(
 
   const reactionDeadline = getReactionDeadline(fishingState)
   if (reactionDeadline !== null && Date.now() > reactionDeadline) {
+    await applyFishingMissPenalty(userId, fishingState)
     await redis.del(`fishing:${userId}`)
-    await forfeitFishingKeepNet(userId)
     return true
   }
 
@@ -599,6 +615,7 @@ export async function castFishingLine(rodType: RodType) {
         appearTime: fishingState.appearTime,
         reactionTime: selectedEntry.reactionTime,
         symbol: getFishingBiteMarker(fishingState.hookedResult!),
+        keepNet: fishingKeepNet.entries,
       }
     } finally {
       await releaseActionLock(actionLock)
@@ -684,7 +701,7 @@ export async function attemptHook() {
       if (now < fishingState.appearTime) {
         // Pressed too early
         fishingState.phase = 'missed'
-        const keepNetLost = await forfeitFishingKeepNet(user.id)
+        const keepNetLost = await applyFishingMissPenalty(user.id, fishingState)
         await redis.set(`fishing:${user.id}`, fishingState, { ex: 60 })
         const response = {
           success: true,
@@ -700,7 +717,7 @@ export async function attemptHook() {
       if (now > reactionDeadline) {
         // Too late
         fishingState.phase = 'missed'
-        const keepNetLost = await forfeitFishingKeepNet(user.id)
+        const keepNetLost = await applyFishingMissPenalty(user.id, fishingState)
         await redis.set(`fishing:${user.id}`, fishingState, { ex: 60 })
         const response = {
           success: true,
@@ -1079,8 +1096,8 @@ export async function releaseFish() {
         (['waiting', 'nibble'].includes(fishingState?.phase || '') &&
           reactionDeadline !== null &&
           Date.now() > reactionDeadline)
-      const keepNetLost = failedHook
-        ? await forfeitFishingKeepNet(user.id)
+      const keepNetLost = failedHook && fishingState
+        ? await applyFishingMissPenalty(user.id, fishingState)
         : false
 
       // Clear fishing state, keep research session for continued fishing

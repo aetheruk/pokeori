@@ -1,6 +1,6 @@
 # Fishing hook and item tables
 
-Release 0.51.49 replaces the global item pool and hook balance. Rod-specific Pokemon pools, secret Pokemon replacements, capture rewards, net forfeiture/retry rules, and rod reaction windows are unchanged. Eligible special location item pools still override global item drops and fall back to global tables only when exhausted.
+Release 0.51.49 introduced the global item tables and hook balance. Release 0.51.50 reduces Golden Scale boosts and replaces full-net loss on missed hooks with a single random slot loss. Eligible special location item pools still override global item drops and fall back to global tables only when exhausted.
 
 ## Hook balance
 
@@ -12,7 +12,7 @@ Ten items therefore give 30% items / 70% Pokemon; ten Pokemon give 70% items / 3
 
 ## Common and rare global item hooks
 
-After rolling an item hook, independently choose the common table at 99% or rare table at 1%. Each unnumbered Golden Scale stored in the keep net adds one percentage point to rare chance and removes one from common chance. Numbered collectibles do not boost this roll. A Golden Scale is normally a one-item bundle; the helper counts stored units, capped at 100% rare. The table selection is separate from entry weights.
+After rolling an item hook, independently choose the common table at 99% or rare table at 1%. Each unnumbered Golden Scale stored in the keep net adds 0.3 percentage points to rare chance and removes the same from common chance. Numbered collectibles do not boost this roll. A Golden Scale is normally a one-item bundle; the helper counts stored units, capped at 100% rare. Ten Golden Scales give a 4% rare-table chance. The table selection is separate from entry weights.
 
 All eligible entries have equal weight 1. Old, Good, and Super Rods share contents and odds, retaining reaction windows of 900/850/800 milliseconds and global bite delays of 2–5 seconds.
 
@@ -54,9 +54,11 @@ A stone requires five distinct occupied keep-net slots of its mapped Tier 1 mate
 
 At an empty net before numbered-scale collection, there are 23 eligible common entries and 9 eligible rare entries. Each common entry is `50% × 99% ÷ 23 = 2.15217%` per cast, while each rare entry is `50% × 1% ÷ 9 = 0.05556%` per cast.
 
-After all numbered scales are owned, the ungated rare table has two entries: Rubbish and Golden Scale. With one unnumbered scale in the net, item chance is 48%, rare-table chance is 2%, and each of those two rewards is `48% × 2% ÷ 2 = 0.48%` per cast. Eligible stones expand that equal-weight table without changing the rare-table selection chance.
+After all numbered scales are owned, the ungated rare table has two entries: Rubbish and Golden Scale. With one unnumbered scale in the net, item chance is 48%, rare-table chance is 1.3%, and each of those two rewards is `48% × 1.3% ÷ 2 = 0.312%` per cast. Eligible stones expand that equal-weight table without changing the rare-table selection chance.
 
 ## Persistence
+
+Early or late hooks, missed-bite recasts, and timeout cleanup remove one uniformly random occupied keep-net slot. An item bundle is one slot, so its entire quantity is lost if selected; Pokémon can also be selected. Empty nets lose nothing. A persisted per-cast penalty flag prevents repeated attempts or Try Again from charging a second slot. The client refreshes surviving slots after a failure or recast. Leaving fishing, expired research sessions, taking an item, and final capture escape retain their separate settlement/forfeiture rules.
 
 The server resolves a global material bundle's quantity once at cast creation and persists the concrete quantity in the hooked result. Hook retries, netting, direct taking, and capture settlement reuse it. Existing paid reward transactions and idempotent action receipts remain responsible for collection; this change does not reroll contents on retries.
 
