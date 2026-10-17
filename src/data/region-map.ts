@@ -35,7 +35,7 @@ export const regionCategories: Record<string, RegionData> = {
     },
                     'Underground': {
         "category": "Underground",
-        "image": "/backgrounds/kanto-underground.avif",
+        "image": "/backgrounds/underground.avif",
         "timeZone": "Asia/Tokyo",
         "icon": { type: 'pokemon', id: '95' }
     },
