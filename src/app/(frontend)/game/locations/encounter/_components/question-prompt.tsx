@@ -107,6 +107,18 @@ export function QuestionPrompt({
                 (option.highlightedUntil !== undefined &&
                   option.highlightedUntil > Date.now()))
             const selected = selectedOptionIndex === idx
+            const catchShapeColors = [
+              'text-[#c83f36]',
+              'text-[#36834b]',
+              'text-[#3976b8]',
+              'text-[#a77912]',
+            ]
+            const catchShapeSurfaces = [
+              'border-[#c83f36]/45 bg-[#c83f36]/10',
+              'border-[#36834b]/45 bg-[#36834b]/10',
+              'border-[#3976b8]/45 bg-[#3976b8]/10',
+              'border-[#a77912]/50 bg-[#a77912]/10',
+            ]
             const disabled =
               submittingAnswer ||
               !!answerStatus ||
@@ -170,7 +182,7 @@ export function QuestionPrompt({
                   selected && answerStatus
                     ? 'disabled:opacity-100'
                     : isCatchAppearance
-                      ? 'disabled:opacity-75'
+                      ? 'disabled:opacity-100'
                       : 'disabled:opacity-50',
                   highlighted && 'border-game-ochre/60 bg-game-ochre/10',
                   selected &&
@@ -192,7 +204,7 @@ export function QuestionPrompt({
                     className={cn(
                       'relative z-10 flex h-10 w-10 items-center justify-center rounded-md border',
                       isCatchAppearance
-                        ? 'border-game-charcoal/35 bg-game-canvas/80 text-game-charcoal-strong shadow-inner'
+                        ? `${catchShapeSurfaces[idx % catchShapeSurfaces.length]} ${catchShapeColors[idx % catchShapeColors.length]}`
                         : 'border-game-moss/25 bg-game-canvas text-game-moss-strong',
                     )}
                   >

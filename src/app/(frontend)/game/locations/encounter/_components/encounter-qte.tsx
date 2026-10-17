@@ -6,7 +6,6 @@ import Image from 'next/image'
 import type React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
-import { SectionDivider } from '@/components/ui/section-divider'
 import { items } from '@/data/items'
 import { cn } from '@/lib/utils'
 import type { CaptureThrowPoint } from '@/utilities/pokemon/catch-balance'
@@ -192,10 +191,10 @@ export function EncounterQte({
 
   if (qte.type === 'calm') {
     return (
-      <div className="flex w-full flex-col items-center gap-2">
-        <p className="text-center text-sm font-bold text-game-ink">
+      <div className="relative flex h-full w-full flex-col items-center gap-2 pt-10">
+        <h2 className="absolute right-0 top-0 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
           Calm with {getItemName(qte.correctBerryId || 'the right berry')}
-        </p>
+        </h2>
         <ItemFlickQte
           compact
           showInfinity={false}
@@ -216,18 +215,15 @@ export function EncounterQte({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.2 }}
-      className="relative z-10 flex h-full w-full max-w-3xl mx-auto flex-col justify-center"
+      className="relative z-10 flex h-full w-full max-w-3xl mx-auto flex-col justify-center pt-10"
     >
-      <SectionDivider
-        className="mb-4 min-h-8 [&>div:first-child]:text-base [&>div:first-child]:font-bold [&>div:first-child]:leading-tight [&>div:first-child]:tracking-[0.04em]"
-        textColor="text-game-ink"
-      >
+      <h2 className="absolute right-0 top-0 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
         {qte.type === 'focus'
           ? `Circle the ${pokemonName}`
           : qte.type === 'chase'
             ? `Chase after ${pokemonName}`
             : 'Scare the nearby Pokemon'}
-      </SectionDivider>
+      </h2>
 
       {qte.type === 'focus' && (
         <div
