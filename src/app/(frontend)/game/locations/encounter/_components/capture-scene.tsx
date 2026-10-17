@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import type React from 'react'
 import {
   MdChevronLeft as ChevronLeft,
@@ -7,7 +7,6 @@ import {
 } from 'react-icons/md'
 import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
-import { SectionDivider } from '@/components/ui/section-divider'
 import type { Item } from '@/data/items'
 import { cn } from '@/lib/utils'
 import type { CaptureThrowPayload } from './draggable-pokeball'
@@ -42,6 +41,8 @@ export function CaptureScene({
   prevBall,
   handleRunAway,
 }: CaptureSceneProps) {
+  const prefersReducedMotion = useReducedMotion()
+
   if (showCaptureAnimation || isCapturing) return null
 
   return (
@@ -51,16 +52,11 @@ export function CaptureScene({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -24 }}
       transition={{ duration: 0.28 }}
-      className="h-full flex flex-col items-center justify-end gap-4 max-w-md mx-auto w-full pb-2"
+      className="relative h-full flex flex-col items-center justify-end gap-4 max-w-md mx-auto w-full pb-2"
     >
-      <div className="text-center space-y-2 w-full px-8">
-        <SectionDivider
-          className="mb-4 min-h-8 [&>div:first-child]:text-base [&>div:first-child]:font-bold [&>div:first-child]:leading-tight [&>div:first-child]:tracking-[0.04em]"
-          textColor="text-game-ink"
-        >
-          Choose a Poké Ball
-        </SectionDivider>
-      </div>
+      <h2 className="absolute right-0 top-0 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
+        Choose a Poké Ball
+      </h2>
 
       {balls.length > 0 ? (
         <div className="relative flex flex-col items-center justify-end gap-6 w-full max-w-sm h-full max-h-[60vh] pb-6">
@@ -78,6 +74,30 @@ export function CaptureScene({
             </Button>
 
             <div className="flex flex-col items-center gap-3">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none -mb-3 flex h-8 select-none flex-col items-center justify-center text-game-charcoal-strong"
+              >
+                {[0, 1, 2].map((index) => (
+                  <motion.span
+                    key={index}
+                    animate={
+                      prefersReducedMotion
+                        ? { opacity: 1, y: 0 }
+                        : { opacity: [0.25, 1, 0.25], y: [2, 0, 2] }
+                    }
+                    transition={{
+                      duration: prefersReducedMotion ? 0 : 1.2,
+                      delay: prefersReducedMotion ? 0 : index * 0.16,
+                      repeat: prefersReducedMotion ? 0 : Infinity,
+                      ease: 'easeInOut',
+                    }}
+                    className="-my-2 block h-5"
+                  >
+                    <ChevronUp className="h-6 w-6" />
+                  </motion.span>
+                ))}
+              </div>
               <div className="relative h-24 w-24">
                 <DraggablePokeball
                   onThrow={handleCapture}
@@ -105,8 +125,8 @@ export function CaptureScene({
                 <div className="text-lg font-bold text-game-ink">
                   {balls[selectedBallIndex].name}
                 </div>
-                <div className="mt-2 inline-flex min-w-[3.25rem] items-center justify-center rounded-md border border-game-border bg-game-surface-raised px-3 py-1 shadow-sm">
-                  <span className="tabular-nums text-xs font-bold uppercase tracking-wider text-game-muted">
+                <div className="mt-2 inline-flex min-w-[3.25rem] items-center justify-center rounded-full border border-game-charcoal px-3 py-1">
+                  <span className="tabular-nums text-xs font-bold uppercase tracking-wider text-game-charcoal-strong">
                     x
                     {inventory.find(
                       (i) => i.itemId === balls[selectedBallIndex].id,
@@ -115,12 +135,6 @@ export function CaptureScene({
                 </div>
               </div>
 
-              <div className="pointer-events-none mt-3 flex select-none flex-col items-center gap-1 text-game-charcoal-strong">
-                <ChevronUp className="h-6 w-6" aria-hidden="true" />
-                <span className="text-xs font-bold uppercase tracking-[0.08em]">
-                  Swipe up
-                </span>
-              </div>
             </div>
 
             <Button
