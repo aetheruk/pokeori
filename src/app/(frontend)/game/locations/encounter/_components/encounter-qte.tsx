@@ -191,8 +191,8 @@ export function EncounterQte({
 
   if (qte.type === 'calm') {
     return (
-      <div className="relative flex h-full w-full flex-col items-center gap-2 pt-10">
-        <h2 className="absolute right-0 top-0 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
+      <div className="relative flex h-full w-full flex-col items-center justify-center gap-2">
+        <h2 className="absolute -right-4 -top-4 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white xl:-right-5 xl:-top-5">
           Calm with {getItemName(qte.correctBerryId || 'the right berry')}
         </h2>
         <ItemFlickQte
@@ -217,7 +217,7 @@ export function EncounterQte({
       transition={{ duration: 0.2 }}
       className="relative z-10 flex h-full w-full max-w-3xl mx-auto flex-col justify-center pt-10"
     >
-      <h2 className="absolute right-0 top-0 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
+      <h2 className="absolute -right-4 -top-4 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white xl:-right-5 xl:-top-5">
         {qte.type === 'focus'
           ? `Circle the ${pokemonName}`
           : qte.type === 'chase'

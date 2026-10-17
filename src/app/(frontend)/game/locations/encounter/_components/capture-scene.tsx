@@ -52,9 +52,9 @@ export function CaptureScene({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -24 }}
       transition={{ duration: 0.28 }}
-      className="relative h-full flex flex-col items-center justify-end gap-4 max-w-md mx-auto w-full pb-2"
+      className="relative flex h-full w-full flex-col items-center justify-end gap-4 pb-2"
     >
-      <h2 className="absolute right-0 top-0 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
+      <h2 className="absolute -right-4 -top-4 z-10 max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white xl:-right-5 xl:-top-5">
         Choose a Poké Ball
       </h2>
 
@@ -126,7 +126,7 @@ export function CaptureScene({
                   {balls[selectedBallIndex].name}
                 </div>
                 <div className="mt-2 inline-flex min-w-[3.25rem] items-center justify-center rounded-full border border-game-charcoal px-3 py-1">
-                  <span className="tabular-nums text-xs font-bold uppercase tracking-wider text-game-charcoal-strong">
+                  <span className="tabular-nums text-xs font-bold uppercase tracking-wider text-[#1d2522]">
                     x
                     {inventory.find(
                       (i) => i.itemId === balls[selectedBallIndex].id,
