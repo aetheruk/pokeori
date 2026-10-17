@@ -43,7 +43,6 @@ describe('research input validation', () => {
     expect(validateResearchAnswer('snake', false).success).toBe(true)
     expect(validateResearchAnswer('brick-breaker', 'true').success).toBe(false)
     expect(validateResearchAnswer('snake', 1).success).toBe(false)
-    expect(validateResearchAnswer('mining', 'true').success).toBe(false)
   })
 
   test('validates structured spelling and sliding puzzle payloads', () => {

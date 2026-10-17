@@ -125,7 +125,7 @@ function formatGameAction(gameType?: string): string {
     spelling: 'Spell through',
     'sliding-puzzle': 'Solve',
     rhythm: 'Complete',
-    mining: 'Mine in',
+    'underground-mining': 'Mine in',
     'tcg-inspection': 'Inspect',
     'tcg-battle': 'Win',
     'field-observation': 'Study',

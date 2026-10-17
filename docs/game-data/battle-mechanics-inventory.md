@@ -1,5 +1,7 @@
 # Battle Mechanics Inventory
 
+- Unreleased: Rock Tunnel's Hidden Chamber now uses Underground Mining, with an independent 0.1% chance to bury a Metal Coat evolution item in each wall. The existing 12% Rusty Coat held-item recipe unlock remains a reward for clearing the wall. Fully uncovered Metal Coats are retained on collapse under this encounter's `complete: false` policy.
+
 Release `0.51.20` removes manual battle effects and enemy-use rules from berries. Eligible healing/status berries act only through their existing held-item triggers and ability interactions; battle inventories and singles/doubles item actions reject loose berries. The Squirtle Squad Chronicle keeps its held berries and no longer supplies loose battle berries.
 
 Release `0.51.12` sets shared base Alpha odds to 1-in-55 for wild battles, location captures, fishing, and arcade-authority encounters, retaining eligibility rules and keep-net modifiers. The Beast Below is a regular Steelix; its stats, moves, level cap, and Metal Coat reward are unchanged.

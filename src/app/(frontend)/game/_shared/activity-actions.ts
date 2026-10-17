@@ -34,7 +34,7 @@ import {
   type ExpeditionProgressSnapshot,
 } from '@/utilities/expeditions/server'
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
-import { createEconomyRequestId, getEconomyActionResult, runEconomyAction } from '@/utilities/economy/transactions'
+import { createEconomyRequestId, EconomyTransactionsUnavailableError, getEconomyActionErrorMessage, getEconomyActionResult, runEconomyAction } from '@/utilities/economy/transactions'
 import { isDailyExcludedGameType } from '@/utilities/tasks/daily-activity'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
@@ -147,6 +147,14 @@ import type { DiglettTunnelTapSettings } from '@/data/games/diglett-tunnel-tap/t
 import { getGameCompletionInvalidations } from '@/utilities/games/completion-invalidation'
 import { randomInt } from 'node:crypto'
 import { createArcadeRound, getArcadeSessionSettings, normalizeArcadeRound, isArcadeGameType, verifyArcadeCheckpoint } from '@/utilities/research/arcade-authority'
+import {
+  createUndergroundMiningRound,
+  getEligibleUndergroundMiningSettings,
+  getUndergroundMiningPublicRound,
+  getUndergroundMiningRewards,
+  type UndergroundMiningPrivateRound,
+} from '@/utilities/research/underground-mining'
+import type { UndergroundMiningSettings } from '@/data/games/underground-mining/types'
 
 const FIELD_OBSERVATION_FAILURE_REWARD_LOSS_CHANCE = 0.7
 
@@ -184,6 +192,7 @@ export interface GameActivityState {
   fieldObservationPrivate?: FieldObservationPrivateRoundData
   // Art Academy specific
   artAcademyPrivate?: ArtAcademyPrivateRoundData
+  undergroundMiningPrivate?: UndergroundMiningPrivateRound
   // Endless mode specific
   claimedMilestones?: number[] // Array of milestone scores that have been claimed
   weather?: WeatherSnapshot
@@ -360,6 +369,7 @@ function getSnapTargetId(
 }
 
 function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
+  if (encounter.gameType === 'underground-mining') return 7200
   if (encounter.gameType === 'field-observation') {
     return getFieldObservationSessionSeconds(encounter.settings as any)
   }
@@ -374,11 +384,12 @@ function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
 
 function sanitizeResearchState(
   state: GameActivityState,
-): Omit<GameActivityState, 'fieldObservationPrivate' | 'artAcademyPrivate'> {
-  const { fieldObservationPrivate, artAcademyPrivate, eventConfigSnapshot, ...safeState } = state
+): Omit<GameActivityState, 'fieldObservationPrivate' | 'artAcademyPrivate' | 'undergroundMiningPrivate'> {
+  const { fieldObservationPrivate, artAcademyPrivate, undergroundMiningPrivate, eventConfigSnapshot, ...safeState } = state
   void eventConfigSnapshot
   void fieldObservationPrivate
   void artAcademyPrivate
+  void undergroundMiningPrivate
   return safeState
 }
 
@@ -627,6 +638,14 @@ export async function startGameActivity(
 
       // Check for existing session first
       const existingState = await getGameActivityStateForUser(user.id, domain)
+      // Rebuild an active wall after a ruleset change without charging its entry twice.
+      const isMigratingUndergroundMiningSession =
+        encounter.gameType === 'underground-mining' &&
+        existingState?.encounterId === validatedEncounterId &&
+        existingState.expiry > Date.now() &&
+        !validatedForceReset &&
+        (existingState.roundData?.kind !== 'underground-mining' ||
+          existingState.undergroundMiningPrivate?.kind !== 'underground-mining-private')
 
       // If a session exists and we aren't forcing a reset, return it
       if (
@@ -648,10 +667,14 @@ export async function startGameActivity(
         const isIncompatibleInspection = encounter.gameType === 'tcg-inspection' && existingState.roundData?.kind !== 'tcg-inspection'
         const isIncompatibleDiglett = encounter.gameType === 'diglett-tunnel-tap' && existingState.roundData?.kind !== 'diglett-tunnel-tap'
         const isIncompatibleArcade = isArcadeGameType(encounter.gameType) && (existingState.roundData?.kind !== 'arcade' || existingState.roundData?.version !== 1)
+        const isIncompatibleUndergroundMining = encounter.gameType === 'underground-mining' && (
+          existingState.roundData?.kind !== 'underground-mining' ||
+          existingState.undergroundMiningPrivate?.kind !== 'underground-mining-private'
+        )
 
         if (
           existingState.expiry > Date.now() &&
-          !isIncompatibleFieldObservation && !isIncompatibleMatch3 && !isIncompatibleRockPush && !isIncompatibleInspection && !isIncompatibleArcade && !isIncompatibleDiglett
+          !isIncompatibleFieldObservation && !isIncompatibleMatch3 && !isIncompatibleRockPush && !isIncompatibleInspection && !isIncompatibleArcade && !isIncompatibleDiglett && !isIncompatibleUndergroundMining
         ) {
           return {
             success: true,
@@ -664,7 +687,9 @@ export async function startGameActivity(
             wins: existingState.wins,
             roundData: isArcadeGameType(encounter.gameType)
               ? normalizeArcadeRound(encounter.gameType, encounter.settings, existingState.roundData)
-              : existingState.roundData,
+              : encounter.gameType === 'underground-mining' && existingState.undergroundMiningPrivate
+                ? getUndergroundMiningPublicRound(encounter.settings as UndergroundMiningSettings, existingState.undergroundMiningPrivate)
+                : existingState.roundData,
           }
         }
       }
@@ -699,6 +724,12 @@ export async function startGameActivity(
               (slot) => slot.requirements || [],
             )
           : []
+      const undergroundMiningLootRequirements = encounter.gameType === 'underground-mining'
+        ? [
+            ...(encounter.settings.lootPool || []),
+            ...(encounter.settings.bonusLoot || []),
+          ].flatMap((entry) => entry.requirements || [])
+        : []
       const requiredKeys = analyzeRequirements([
         ...(encounter.requirements || []),
         ...(encounter.criteria || []),
@@ -706,6 +737,7 @@ export async function startGameActivity(
         ...fieldObservationGlobalRequirements,
         ...fieldObservationSpecialDropRequirements,
         ...prizeWheelSlotRequirements,
+        ...undergroundMiningLootRequirements,
       ])
       const userData = await getGameUserData(user as User, requiredKeys)
       const weatherSnapshot = {
@@ -729,6 +761,19 @@ export async function startGameActivity(
         return { success: false, error: 'Requirements not met' }
       }
 
+      const undergroundMiningSettings = encounter.gameType === 'underground-mining'
+        ? getEligibleUndergroundMiningSettings(
+            encounter.settings as UndergroundMiningSettings,
+            (requirement) => checkRequirement(userData, requirement, {
+              category: encounter.category,
+              subCategory: encounter.subCategory,
+              weather: weatherSnapshot.weather,
+            }),
+          )
+        : undefined
+      if (undergroundMiningSettings?.lootPool.length === 0)
+        return { success: false, error: 'No eligible mining loot' }
+
       const prizeWheelSlots =
         encounter.gameType === 'prize-wheel'
           ? getEligiblePrizeWheelSlots(
@@ -750,7 +795,7 @@ export async function startGameActivity(
       }
 
       // Check and Consume Criteria
-      if (encounter.criteria && encounter.criteria.length > 0) {
+      if (encounter.criteria && encounter.criteria.length > 0 && !isMigratingUndergroundMiningSession) {
         const criteriaMet = encounter.criteria.every((req) =>
           checkRequirement(userData, req, {
             category: encounter.category,
@@ -930,6 +975,7 @@ export async function startGameActivity(
       let currentItemId: string | undefined
       let fieldObservationPrivate: FieldObservationPrivateRoundData | undefined
       let artAcademyPrivate: ArtAcademyPrivateRoundData | undefined
+      let undergroundMiningPrivate: UndergroundMiningPrivateRound | undefined
 
       // Pick first target
       if (encounter.gameType === 'field-observation') {
@@ -966,6 +1012,14 @@ export async function startGameActivity(
         roundData = createArcadeRound(encounter.gameType, getArcadeSessionSettings(encounter.gameType, encounter.settings, sessionTimeLimit), startTime, randomInt(0, 2 ** 32))
         // Simulation time bounds gameplay; the durable lifetime also permits
         // paused tabs and network-recovery retries without consuming play time.
+        expiry = startTime + 7_200_000
+      } else if (encounter.gameType === 'underground-mining') {
+        const generated = createUndergroundMiningRound(
+          undergroundMiningSettings!,
+          randomInt(0, 2 ** 32),
+        )
+        roundData = generated.publicRound
+        undergroundMiningPrivate = generated.privateRound
         expiry = startTime + 7_200_000
       } else if (encounter.gameType === 'match3') {
         roundData = createMatch3Round(encounter.settings as unknown as Match3GameSettings, expiry)
@@ -1383,6 +1437,7 @@ export async function startGameActivity(
         roundData,
         fieldObservationPrivate,
         artAcademyPrivate,
+        undergroundMiningPrivate,
         weather: weatherSnapshot,
         activeAbilityId,
         activeAbilitySourceFormId,
@@ -1393,7 +1448,7 @@ export async function startGameActivity(
       const isEndlessMode =
         (encounter as any).settings?.endless?.enabled || false
       const sessionTTL =
-        isArcadeGameType(encounter.gameType)
+        isArcadeGameType(encounter.gameType) || encounter.gameType === 'underground-mining'
           ? Math.ceil((expiry - startTime) / 1000) + 120
           : isEndlessMode || encounter.gameType === 'tcg-battle'
           ? 3600
@@ -2322,6 +2377,30 @@ export async function completeGameActivity(
         return { success: false, error: 'Invalid encounter session' }
       }
 
+      const isUndergroundMining = encounter.gameType === 'underground-mining'
+      const undergroundMiningCleared = isUndergroundMining &&
+        state.undergroundMiningPrivate?.kind === 'underground-mining-private' &&
+        state.undergroundMiningPrivate.status === 'cleared'
+      if (isUndergroundMining) {
+        if (validatedFinalScore !== undefined || validatedCollectedEndlessRewards !== undefined || validatedCollectedRockPushRewardIds !== undefined || validatedArtAcademyDrawing !== undefined || gameplayProof !== undefined || submittedFieldObservationDropClaims !== undefined) {
+          return { success: false, error: 'Mining rewards are determined by the saved wall' }
+        }
+        const miningStatus = state.undergroundMiningPrivate?.status
+        if (
+          state.undergroundMiningPrivate?.kind !== 'underground-mining-private' ||
+          !state.roundData ||
+          state.roundData.kind !== 'underground-mining' ||
+          state.roundData.status !== miningStatus ||
+          state.roundData.revision !== state.undergroundMiningPrivate.revision ||
+          (miningStatus !== 'cleared' && miningStatus !== 'collapsed')
+        ) {
+          return { success: false, error: 'Finish the mining wall before saving the result' }
+        }
+        if (validatedSuccess !== undergroundMiningCleared) {
+          return { success: false, error: 'Invalid mining result' }
+        }
+      }
+
       if (encounter.gameType === 'field-observation') {
         const verifiedDropClaims = verifyFieldObservationDropClaims(
           state,
@@ -2547,7 +2626,8 @@ export async function completeGameActivity(
         'sliding-puzzle', 'procedure-order', 'field-observation',
       ].includes(encounter.gameType)
       const currentWins =
-        encounter.gameType === 'tcg-battle' ? (verifiedTcgBattleSuccess ? requiredWins : 0)
+        isUndergroundMining ? (undergroundMiningCleared ? requiredWins : 0)
+        : encounter.gameType === 'tcg-battle' ? (verifiedTcgBattleSuccess ? requiredWins : 0)
         : arcadeResult ? (arcadeResult.won ? requiredWins : 0)
         : isTranscriptPuzzle ? (transcriptVerified && validatedSuccess ? requiredWins : 0)
         : isScoreCompletionGame ? (scoreCompletionSuccess ? requiredWins : 0)
@@ -2623,6 +2703,12 @@ export async function completeGameActivity(
         encounter.gameType === 'field-observation'
           ? getCollectedFieldObservationRewards(state)
           : []
+      const collectedUndergroundMiningRewards = isUndergroundMining
+        ? getUndergroundMiningRewards(
+            state.undergroundMiningPrivate,
+            encounter.settings as UndergroundMiningSettings,
+          )
+        : []
       const collectedRockPushRewards =
         encounter.gameType === 'grid-puzzle'
           ? getCollectedRockPushRewards(
@@ -2809,13 +2895,15 @@ export async function completeGameActivity(
         } else if (
           (encounter.rewards && encounter.rewards.length > 0) ||
           encounter.skillXp ||
-          collectedRockPushRewards.length > 0
+          collectedRockPushRewards.length > 0 ||
+          collectedUndergroundMiningRewards.length > 0
         ) {
           const rewardsToGrant: Reward[] = [
             ...(encounter.rewards || []),
             ...abilityCompletionRewards,
           ]
           rewardsToGrant.push(...collectedRockPushRewards)
+          rewardsToGrant.push(...collectedUndergroundMiningRewards)
           const skillXpReward = buildGeneratedResearchSkillXpReward(
             encounter,
             encounter.skillXp?.level || 1,
@@ -2829,6 +2917,19 @@ export async function completeGameActivity(
               payload,
               req,
           })
+          rewardSummary = summary
+        }
+      } else if (isUndergroundMining) {
+        if (collectedUndergroundMiningRewards.length > 0) {
+          const { summary } = await grantRewards(
+            user.id,
+            collectedUndergroundMiningRewards,
+            {
+              requirementContext: rewardRequirementContext,
+              payload,
+              req,
+            },
+          )
           rewardSummary = summary
         }
       } else if (state.history.length > 0) {
@@ -2948,7 +3049,7 @@ export async function completeGameActivity(
     }
   } catch (error) {
     console.error(`Error completing ${domain} activity:`, error)
-    return { success: false, error: 'Internal server error' }
+    return { success: false, error: error instanceof EconomyTransactionsUnavailableError ? getEconomyActionErrorMessage(error) : 'Internal server error' }
   }
 }
 

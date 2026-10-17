@@ -156,6 +156,13 @@ function getCollectibleRewards(item: ExploreItem): RewardLike[] {
   const data = item.originalData as any
   const rewards: RewardLike[] = [...(data.rewards || [])]
 
+  if (item.type === 'game' && data.gameType === 'underground-mining' && data.settings?.awardLoot !== false) {
+    for (const entry of [...(data.settings?.lootPool || []), ...(data.settings?.bonusLoot || [])]) {
+      if (entry.dropChance === 0) continue
+      rewards.push({ type: 'item', targetId: entry.itemId, requirements: entry.requirements })
+    }
+  }
+
   if (item.type === 'field-research') {
     for (const drop of data.settings?.itemDrops || []) {
       rewards.push({

@@ -5775,11 +5775,11 @@ describe('static data references', () => {
       type: 'task_completed',
       targetId: 'rock-tunnel-hidden-chamber',
     })
-    expect(chamberMining?.rewards).toContainEqual({
-      type: 'item',
-      targetId: 'metal-scrap-t1',
+    expect(chamberMining?.settings.lootPool).toContainEqual({
+      itemId: 'metal-scrap-t1',
+      weight: 1,
+      size: { width: 2, height: 2 },
       quantity: { min: 1, max: 2 },
-      dropChance: 100,
     })
     expect(chamberMining?.skillXp).toEqual({ skill: 'catching', level: 15 })
     expect(rockTunnelMap.completeRequirements).toContainEqual({
@@ -6040,14 +6040,17 @@ describe('static data references', () => {
       "Hey {Trainer}, that's some really nice work on the fossil sets, really appreciate the crystals. They will be pleased indeed. Lemme give you a few tips and tricks when you're fossil hunting.",
     )
 
-    for (const [entry, baseDropChance, improvedDropChance] of [
-      [mining, 1, 2],
-      [voyage, 2, 4],
+    const miningFossils = (mining?.settings.bonusLoot || []).map((entry) => ({
+      ...entry, targetId: entry.itemId,
+    }))
+    for (const [rewards, baseDropChance, improvedDropChance] of [
+      [miningFossils, 1, 2],
+      [voyage?.rewards || [], 2, 4],
     ] as const) {
-      const domeRewards = (entry?.rewards || []).filter(
+      const domeRewards = rewards.filter(
         (reward) => reward.targetId === 'dome-fossil',
       )
-      const helixRewards = (entry?.rewards || []).filter(
+      const helixRewards = rewards.filter(
         (reward) => reward.targetId === 'helix-fossil',
       )
       for (const fossilRewards of [domeRewards, helixRewards]) {

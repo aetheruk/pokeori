@@ -36,7 +36,6 @@ export type ArcadeGameType =
   | 'flap'
   | 'surf'
   | 'rhythm'
-  | 'mining'
   | 'snake'
   | 'brick-breaker'
 export const ARCADE_TICK_RATE = 60
@@ -52,7 +51,6 @@ export interface ArcadeInput {
     | 'flap'
     | 'steer'
     | 'rhythm'
-    | 'mine'
     | 'heading'
     | 'paddle'
     | 'launch'
@@ -226,7 +224,6 @@ export function isArcadeGameType(value: unknown): value is ArcadeGameType {
     value === 'flap' ||
     value === 'surf' ||
     value === 'rhythm' ||
-    value === 'mining' ||
     value === 'snake' ||
     value === 'brick-breaker'
   )
@@ -295,13 +292,6 @@ export function createArcadeRound(
   const sim: ArcadeSimulation = {
     rhythmIcons: [],
     nextRhythm: 0,
-    miningPosition: 0,
-    miningDirection: 1,
-    miningSpeed: 0,
-    targetStart: 0,
-    targetSize: 0,
-    hp: settings.itemHp || 0,
-    swings: 0,
     lastHit: null,
     tick: 0,
     rng: seed >>> 0,
@@ -359,7 +349,7 @@ export function createArcadeRound(
       )
     }
   }
-  initializeTiming(sim, gameType, settings)
+  if (gameType === 'rhythm') initializeTiming(sim, settings)
   if (gameType === 'snake' || gameType === 'brick-breaker')
     sim.trajectory = createTrajectoryState(gameType, settings, seed)
   for (const config of collectibleConfigs(settings))
@@ -434,8 +424,7 @@ export function stepArcadeSimulation(
   for (const enemy of sim.enemies) {
     if (enemy.id === undefined) enemy.id = sim.nextId++
   }
-  if (gameType === 'rhythm' || gameType === 'mining')
-    return stepTiming(sim, gameType, settings, inputs)
+  if (gameType === 'rhythm') return stepTiming(sim, settings, inputs)
   if (gameType === 'snake' || gameType === 'brick-breaker') {
     const trajectory = stepTrajectoryState(
       gameType,
@@ -879,13 +868,11 @@ export function verifyArcadeCheckpoint(
             ? ['flap']
             : gameType === 'rhythm'
               ? ['rhythm']
-              : gameType === 'mining'
-                ? ['mine']
-                : gameType === 'snake'
-                  ? ['heading']
-                  : gameType === 'brick-breaker'
-                    ? ['paddle', 'launch']
-                    : ['steer']
+              : gameType === 'snake'
+                ? ['heading']
+                : gameType === 'brick-breaker'
+                  ? ['paddle', 'launch']
+                  : ['steer']
       ).includes(input.kind)
     )
       return fail()

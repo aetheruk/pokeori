@@ -98,7 +98,6 @@ const submitAnswerSchemas: Partial<Record<GameType, z.ZodType>> = {
   snake: booleanAnswerSchema,
   'grid-puzzle': booleanAnswerSchema,
   rhythm: booleanAnswerSchema,
-  mining: booleanAnswerSchema,
   'field-observation': fieldObservationAnswerSchema,
   spelling: spellingAnswerSchema,
   'sliding-puzzle': slidingPuzzleAnswerSchema,
