@@ -163,7 +163,6 @@ export function getEligibleUndergroundMiningSettings(
   return {
     ...settings,
     lootPool: settings.lootPool.filter(eligible),
-    bonusLoot: settings.bonusLoot?.filter(eligible),
   }
 }
 
@@ -237,10 +236,6 @@ export function createUndergroundMiningRound(
     entry: chooseLoot(settings, rng),
     quantity: 1,
   }))
-  for (const entry of settings.bonusLoot || []) {
-    if (random(rng) * 100 < entry.dropChance)
-      selectedLoot.push({ id: selectedLoot.length, entry, quantity: 1 })
-  }
   for (const treasure of selectedLoot) {
     const quantity = treasure.entry.quantity ?? 1
     treasure.quantity =

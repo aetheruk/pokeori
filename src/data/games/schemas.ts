@@ -1249,9 +1249,6 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
       lootPool: z
         .array(undergroundMiningLootItemSchema.extend({ weight: z.number().positive() }))
         .min(1),
-      bonusLoot: z.array(undergroundMiningLootItemSchema.extend({
-        dropChance: z.number().min(0).max(100),
-      })).max(19).optional(),
       wallStressLimit: z.number().positive(),
       toolStress: z.object({
         pickaxe: z.number().positive(),
@@ -1261,17 +1258,14 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
     })
     .strict()
     .superRefine((settings, ctx) => {
-      for (const [poolName, entries] of [
-        ['lootPool', settings.lootPool],
-        ['bonusLoot', settings.bonusLoot || []],
-      ] as const) entries.forEach((entry, index) => {
+      settings.lootPool.forEach((entry, index) => {
         if (
           entry.size.width > settings.gridSize.cols ||
           entry.size.height > settings.gridSize.rows
         ) {
           ctx.addIssue({
             code: 'custom',
-            path: [poolName, index, 'size'],
+            path: ['lootPool', index, 'size'],
             message: 'Treasure footprint must fit inside the mining grid',
           })
         }
@@ -1289,9 +1283,8 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
         0,
       )
       if (
-        settings.treasureCount.max + (settings.bonusLoot?.length || 0) > 20 ||
-        settings.treasureCount.max * largestFootprint +
-          (settings.bonusLoot || []).reduce((area, entry) => area + entry.size.width * entry.size.height, 0) >
+        settings.treasureCount.max > 20 ||
+        settings.treasureCount.max * largestFootprint >
           settings.gridSize.cols * settings.gridSize.rows
       ) {
         ctx.addIssue({

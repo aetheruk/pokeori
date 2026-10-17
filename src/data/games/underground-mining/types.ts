@@ -15,12 +15,6 @@ export interface UndergroundMiningLootEntry extends UndergroundMiningLootItem {
   weight: number
 }
 
-export interface UndergroundMiningBonusLootEntry
-  extends UndergroundMiningLootItem {
-  /** Independent percentage rolled once per wall, in addition to its regular slots. */
-  dropChance: number
-}
-
 export interface UndergroundMiningSettings {
   /** Require every treasure for any rewards; false/omitted keeps complete finds on collapse. */
   complete?: boolean
@@ -33,7 +27,6 @@ export interface UndergroundMiningSettings {
   wallTexturePortrait?: string
   treasureCount: { min: number; max: number }
   lootPool: UndergroundMiningLootEntry[]
-  bonusLoot?: UndergroundMiningBonusLootEntry[]
   wallStressLimit: number
   toolStress: Record<UndergroundMiningTool, number>
   bedrockChance: number

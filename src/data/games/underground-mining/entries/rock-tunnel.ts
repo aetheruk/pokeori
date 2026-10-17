@@ -22,27 +22,25 @@ export const rockTunnelUndergroundMiningEntries: UndergroundMiningConfig[] = [
       gridSize: { cols: 13, rows: 10 },
       wallTexture: '/backgrounds/underground-mining-wall.avif',
       wallTexturePortrait: '/games/underground-mining/scene-portrait.avif',
-      treasureCount: { min: 1, max: 1 },
+      treasureCount: { min: 2, max: 4 },
       lootPool: [
         {
           itemId: 'metal-scrap-t1',
-          weight: 1,
+          weight: 49.6,
           size: { width: 2, height: 2 },
           quantity: 1,
         },
-      ],
-      bonusLoot: [
         {
           itemId: 'small-stone-t1',
+          weight: 49.6,
           size: { width: 2, height: 2 },
           quantity: 1,
-          dropChance: 100,
         },
         {
           itemId: 'metal-coat',
+          weight: 0.8,
           size: { width: 2, height: 2 },
           quantity: 1,
-          dropChance: 0.8,
         },
       ],
       wallStressLimit: 49,

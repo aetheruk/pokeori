@@ -31,27 +31,41 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
       gridSize: { cols: 13, rows: 10 },
       wallTexture: '/backgrounds/underground-mining-wall.avif',
       wallTexturePortrait: '/games/underground-mining/scene-portrait.avif',
-      treasureCount: { min: 1, max: 1 },
+      treasureCount: { min: 2, max: 4 },
       lootPool: [
         {
           itemId: 'small-stone-t1',
-          weight: 1,
+          weight: 96,
           size: { width: 2, height: 2 },
           quantity: 1,
+          requirements: [
+            {
+              type: 'task_completed',
+              targetId: 'mt-moon-expert-advice',
+              inverse: true,
+            },
+          ],
         },
-      ],
-      bonusLoot: [
+        {
+          itemId: 'small-stone-t1',
+          weight: 94,
+          size: { width: 2, height: 2 },
+          quantity: 1,
+          requirements: [
+            { type: 'task_completed', targetId: 'mt-moon-expert-advice' },
+          ],
+        },
         {
           itemId: 'moon-stone',
+          weight: 2,
           size: { width: 2, height: 2 },
           quantity: 1,
-          dropChance: 2,
         },
         {
           itemId: 'dome-fossil',
+          weight: 1,
           size: { width: 2, height: 2 },
           quantity: 1,
-          dropChance: 1,
           requirements: [
             {
               type: 'task_completed',
@@ -62,18 +76,18 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'dome-fossil',
+          weight: 2,
           size: { width: 2, height: 2 },
           quantity: 1,
-          dropChance: 2,
           requirements: [
             { type: 'task_completed', targetId: 'mt-moon-expert-advice' },
           ],
         },
         {
           itemId: 'helix-fossil',
+          weight: 1,
           size: { width: 2, height: 2 },
           quantity: 1,
-          dropChance: 1,
           requirements: [
             {
               type: 'task_completed',
@@ -84,9 +98,9 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'helix-fossil',
+          weight: 2,
           size: { width: 2, height: 2 },
           quantity: 1,
-          dropChance: 2,
           requirements: [
             { type: 'task_completed', targetId: 'mt-moon-expert-advice' },
           ],

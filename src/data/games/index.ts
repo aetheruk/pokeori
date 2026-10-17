@@ -97,7 +97,6 @@ export { rhythmEntries as rhythmGames } from './rhythm'
 export type {
   UndergroundMiningConfig,
   UndergroundMiningLootEntry,
-  UndergroundMiningBonusLootEntry,
   UndergroundMiningLootItem,
   UndergroundMiningSettings,
   UndergroundMiningTool,
@@ -380,7 +379,6 @@ export interface GameSettings {
   awardLoot?: boolean
   treasureCount?: { min: number; max: number }
   lootPool?: import('./underground-mining/types').UndergroundMiningLootEntry[]
-  bonusLoot?: import('./underground-mining/types').UndergroundMiningBonusLootEntry[]
   wallStressLimit?: number
   toolStress?: import('./underground-mining/types').UndergroundMiningSettings['toolStress']
   bedrockChance?: number
