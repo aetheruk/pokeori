@@ -5779,7 +5779,7 @@ describe('static data references', () => {
       itemId: 'metal-scrap-t1',
       weight: 1,
       size: { width: 2, height: 2 },
-      quantity: { min: 1, max: 2 },
+      quantity: 1,
     })
     expect(chamberMining?.skillXp).toEqual({ skill: 'catching', level: 15 })
     expect(rockTunnelMap.completeRequirements).toContainEqual({

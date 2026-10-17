@@ -1639,7 +1639,7 @@ describe('artisan recipes', () => {
     expect(rockTunnelMetalMining?.rewards).toContainEqual({
       type: 'task_complete',
       targetId: 'rusty-coat-recipe',
-      dropChance: 12,
+      dropChance: 100,
     })
   })
 
