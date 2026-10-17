@@ -31,7 +31,7 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   spelling: dynamic(() => import('@/app/(frontend)/game/research/encounter/spelling').then((module) => module.SpellingGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   'sliding-puzzle': dynamic(() => import('@/app/(frontend)/game/research/encounter/sliding-puzzle').then((module) => module.SlidingPuzzleGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   rhythm: dynamic(() => import('@/app/(frontend)/game/research/encounter/rhythm').then((module) => module.RhythmGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
-  mining: dynamic(() => import('@/app/(frontend)/game/research/encounter/mining').then((module) => module.MiningGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
+  'underground-mining': dynamic(() => import('@/app/(frontend)/game/research/encounter/underground-mining').then((module) => module.UndergroundMiningGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   'tcg-inspection': dynamic(() => import('@/app/(frontend)/game/research/encounter/tcg-inspection').then((module) => module.TcgInspectionGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   'tcg-battle': dynamic(() => import('@/app/(frontend)/game/research/encounter/tcg-battle').then((module) => module.TcgBattleGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   'diglett-tunnel-tap':

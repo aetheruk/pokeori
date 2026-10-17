@@ -55,61 +55,6 @@ function proof(
 }
 
 describe('deterministic arcade authority', () => {
-  test('mining derives target hits, damage and swing failure from inputs', () => {
-    const settings = {
-      targetSize: { min: 100, max: 100 },
-      speed: { min: 1, max: 1 },
-      itemHp: 20,
-      perfectDamage: 10,
-      okDamage: 5,
-      maxSwings: 3,
-      timeLimit: 30,
-    }
-    const round = createArcadeRound('mining', settings, now, 5)
-    const inputs: ArcadeInput[] = [
-      { tick: 1, kind: 'mine' },
-      { tick: 2, kind: 'mine' },
-    ]
-    const result = verifyArcadeCheckpoint(
-      'mining',
-      settings,
-      round,
-      proof(round, 2, inputs),
-      now + 100,
-    )
-    expect(result.success).toBe(true)
-    if (result.success) {
-      expect(result.won).toBe(true)
-      expect(result.score).toBe(20)
-      expect(result.roundData.simulation.swings).toBe(2)
-    }
-    const missSettings = {
-      ...settings,
-      targetSize: { min: 0, max: 0 },
-      maxSwings: 1,
-    }
-    const missRound = createArcadeRound('mining', missSettings, now, 5)
-    const miss = verifyArcadeCheckpoint(
-      'mining',
-      missSettings,
-      missRound,
-      proof(missRound, 1, inputs.slice(0, 1)),
-      now + 100,
-    )
-    expect(miss.success && miss.won).toBe(false)
-    expect(miss.success && miss.roundData.simulation.status).toBe('lost')
-    expect(
-      verifyArcadeCheckpoint(
-        'mining',
-        settings,
-        round,
-        proof(round, 3, inputs),
-        now + 100,
-      ).success,
-    ).toBe(false)
-    expect(round.simulation.hp).toBe(20)
-  })
-
   test('rhythm scores seeded icons at their real position and rejects invented controls', () => {
     const settings = {
       speed: 300,

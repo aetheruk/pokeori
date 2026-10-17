@@ -40,7 +40,7 @@ const expectedBannerNames = {
 } as const
 
 const expectedGameTypes = {
-  brock: ['grid-puzzle', 'mining', 'procedure-order'],
+  brock: ['grid-puzzle', 'underground-mining', 'procedure-order'],
   misty: ['cry', 'rhythm', 'sliding-puzzle'],
   surge: ['cry', 'grid-puzzle', 'magnemite-circuit'],
   erika: ['identify', 'procedure-order'],

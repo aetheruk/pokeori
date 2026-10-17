@@ -63,5 +63,4 @@ test('survival endless games retain their untimed sessions', () => {
   for (const game of ['run', 'flap', 'surf', 'snake', 'brick-breaker'] as const) {
     expect(getArcadeSessionSettings(game, { timeLimit: 20, endless: { enabled: true } }, 25).timeLimit).toBeUndefined()
   }
-  expect(getArcadeSessionSettings('mining', { timeLimit: 20 }, 25).timeLimit).toBe(25)
 })

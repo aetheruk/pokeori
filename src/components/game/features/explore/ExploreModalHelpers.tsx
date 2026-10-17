@@ -33,6 +33,7 @@ import type {
   FishingGameConfig,
   FishingItemEntry,
 } from '@/data/games/fishing/types'
+import type { UndergroundMiningSettings } from '@/data/games/underground-mining/types'
 import { items } from '@/data/items'
 import { isEncounterSpawnItem } from '@/data/items/types'
 import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
@@ -62,6 +63,7 @@ import {
 } from './utils'
 import { getVsSeekerDifficultyMultiplier } from '@/utilities/vs-seeker'
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
+import { getEligibleUndergroundMiningSettings } from '@/utilities/research/underground-mining'
 
 // Types for props
 interface ModalHelperProps {
@@ -967,6 +969,37 @@ export function getFormattedRewards(
         }),
       )
       .filter((r: any) => r !== null) || []
+
+  if (selectedItem.type === 'game' && selectedItem.originalData.gameType === 'underground-mining') {
+    const settings = selectedItem.originalData.settings as UndergroundMiningSettings
+    for (const reward of rewardItems)
+      reward.subLabel = [reward.subLabel, 'On clearing the wall'].filter(Boolean).join(' · ')
+    if (settings.awardLoot !== false) {
+      const eligible = getEligibleUndergroundMiningSettings(settings, (requirement) =>
+        checkRequirement(userData, requirement, {
+          category: selectedItem.category,
+          subCategory: selectedItem.subCategory,
+        }),
+      )
+      const totalWeight = eligible.lootPool.reduce((total, entry) => total + entry.weight, 0)
+      const buriedLoot = [
+        ...eligible.lootPool.map((entry) => ({
+          entry,
+          subLabel: `${formatPercent(entry.weight / totalWeight * 100)} per treasure slot`,
+        })),
+        ...(eligible.bonusLoot || []).filter((entry) => entry.dropChance > 0).map((entry) => ({
+          entry,
+          subLabel: `${formatPercent(entry.dropChance)} of walls`,
+        })),
+      ]
+      for (const { entry, subLabel } of buriedLoot) {
+        const mapped = mapRewardToDisplayItem({
+          type: 'item', targetId: entry.itemId, quantity: entry.quantity ?? 1,
+        }, { userInventory, user: userData.user })
+        if (mapped) rewardItems.push({ ...mapped, subLabel: `Buried · ${subLabel}` })
+      }
+    }
+  }
 
   if (isEndlessMode && repeatingRewards.length > 0) {
     repeatingRewards.forEach((entry: any) => {

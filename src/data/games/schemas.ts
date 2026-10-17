@@ -366,6 +366,16 @@ const costSchema = z.object({
   amount: z.number().positive(),
 })
 
+const undergroundMiningLootItemSchema = z.object({
+  itemId: z.string().min(1),
+  size: z.object({
+    width: z.number().int().positive().max(8),
+    height: z.number().int().positive().max(8),
+  }),
+  quantity: fieldObservationItemDropSchema.shape.quantity,
+  requirements: z.array(taskConditionSchema).optional(),
+}).strict()
+
 const pachinkoPegSchema = z
   .object({
     x: z.number().nonnegative(),
@@ -1222,18 +1232,75 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
       timeLimit: z.number().positive(),
     })
     .passthrough(),
-  mining: z
+  'underground-mining': z
     .object({
-      targetSize: z.object({ min: z.number().positive(), max: z.number().positive() }),
-      speed: z.object({ min: z.number().positive(), max: z.number().positive() }),
-      itemHp: z.number().positive(),
-      perfectDamage: z.number().positive(),
-      okDamage: z.number().positive(),
-      timeLimit: z.number().positive(),
-      buttonIcon: taskIconSchema,
-      miningTarget: z.string().min(1),
+      complete: z.boolean().optional(),
+      awardLoot: z.boolean().optional(),
+      gridSize: z.object({
+        cols: z.number().int().min(4).max(30),
+        rows: z.number().int().min(4).max(20),
+      }),
+      wallTexture: z.string().min(1).optional(),
+      wallTexturePortrait: z.string().min(1).optional(),
+      treasureCount: z.object({
+        min: z.number().int().min(1).max(20),
+        max: z.number().int().min(1).max(20),
+      }),
+      lootPool: z
+        .array(undergroundMiningLootItemSchema.extend({ weight: z.number().positive() }))
+        .min(1),
+      bonusLoot: z.array(undergroundMiningLootItemSchema.extend({
+        dropChance: z.number().min(0).max(100),
+      })).max(19).optional(),
+      wallStressLimit: z.number().positive(),
+      toolStress: z.object({
+        pickaxe: z.number().positive(),
+        hammer: z.number().positive(),
+      }),
+      bedrockChance: z.number().min(0).max(100),
     })
-    .passthrough(),
+    .strict()
+    .superRefine((settings, ctx) => {
+      for (const [poolName, entries] of [
+        ['lootPool', settings.lootPool],
+        ['bonusLoot', settings.bonusLoot || []],
+      ] as const) entries.forEach((entry, index) => {
+        if (
+          entry.size.width > settings.gridSize.cols ||
+          entry.size.height > settings.gridSize.rows
+        ) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [poolName, index, 'size'],
+            message: 'Treasure footprint must fit inside the mining grid',
+          })
+        }
+      })
+      if (settings.treasureCount.max < settings.treasureCount.min) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['treasureCount', 'max'],
+          message: 'Maximum treasure count must be at least the minimum',
+        })
+      }
+      const largestFootprint = settings.lootPool.reduce(
+        (largest, entry) =>
+          Math.max(largest, entry.size.width * entry.size.height),
+        0,
+      )
+      if (
+        settings.treasureCount.max + (settings.bonusLoot?.length || 0) > 20 ||
+        settings.treasureCount.max * largestFootprint +
+          (settings.bonusLoot || []).reduce((area, entry) => area + entry.size.width * entry.size.height, 0) >
+          settings.gridSize.cols * settings.gridSize.rows
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['treasureCount', 'max'],
+          message: 'Configured treasures cannot fit in the mining grid',
+        })
+      }
+    }),
   'tcg-inspection': z
     .object({
       packSize: z.number().int().min(3).max(10),

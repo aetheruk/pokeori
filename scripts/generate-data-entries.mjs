@@ -52,7 +52,7 @@ const GAMES = [
   { dir: 'spelling', type: 'SpellingConfig', export: 'spellingEntries' },
   { dir: 'sliding-puzzle', type: 'SlidingPuzzleConfig', export: 'slidingPuzzleGames' },
   { dir: 'rhythm', type: 'RhythmConfig', export: 'rhythmEntries' },
-  { dir: 'mining', type: 'MiningConfig', export: 'miningEntries' },
+  { dir: 'underground-mining', type: 'UndergroundMiningConfig', export: 'undergroundMiningEntries' },
 ]
 
 // 2. Process each category

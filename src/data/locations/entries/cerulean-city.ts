@@ -185,14 +185,7 @@ export const ceruleanCityLocations: Location[] = [
       min: 8,
       max: 12,
     },
-    rewards: [
-      {
-        type: 'task_complete',
-        targetId: 'razz-berry-discovery',
-        dropChance: 5,
-        label: 'Discovered Secret!',
-      },
-    ],
+    rewards: [],
   },
   {
     id: 'route-24',

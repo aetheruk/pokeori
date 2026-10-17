@@ -117,7 +117,7 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <Grid3x3 className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'rhythm')
         return <Music className="w-4 h-4 text-game-moss-strong" />
-      if (gameType === 'mining')
+      if (gameType === 'underground-mining')
         return <Pickaxe className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'tcg-inspection')
         return <CreditCard className="w-4 h-4 text-game-moss-strong" />
@@ -228,8 +228,8 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'PUZZLE'
     case 'rhythm':
       return 'RHYTHM'
-    case 'mining':
-      return 'MINING'
+    case 'underground-mining':
+      return 'UNDERGROUND MINING'
     case 'tcg-inspection':
       return 'TCG'
     case 'tcg-battle':

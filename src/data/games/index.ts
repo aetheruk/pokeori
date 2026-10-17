@@ -93,9 +93,16 @@ export { slidingPuzzleGames } from './sliding-puzzle'
 export type { RhythmConfig, RhythmGameSettings, RhythmIcon } from './rhythm/types'
 export { rhythmEntries as rhythmGames } from './rhythm'
 
-// Mining game
-export type { MiningConfig, MiningGameSettings } from './mining/types'
-export { miningEntries as miningGames } from './mining'
+// Sinnoh Underground-style excavation game
+export type {
+  UndergroundMiningConfig,
+  UndergroundMiningLootEntry,
+  UndergroundMiningBonusLootEntry,
+  UndergroundMiningLootItem,
+  UndergroundMiningSettings,
+  UndergroundMiningTool,
+} from './underground-mining/types'
+export { undergroundMiningGames } from './underground-mining'
 
 // TCG Inspection game
 export type {
@@ -192,7 +199,7 @@ import { match3Games } from './match3'
 import { spellingEntries as spellingGames } from './spelling'
 import { slidingPuzzleGames } from './sliding-puzzle'
 import { rhythmEntries as rhythmGames } from './rhythm'
-import { miningEntries as miningGames } from './mining'
+import { undergroundMiningGames } from './underground-mining'
 import { tcgInspectionGames } from './tcg-inspection'
 import { tcgBattleGames } from './tcg-battle'
 import { fieldObservationGames } from './field-observation'
@@ -224,7 +231,7 @@ export type GameType =
   | 'spelling'
   | 'sliding-puzzle'
   | 'rhythm'
-  | 'mining'
+  | 'underground-mining'
   | 'tcg-inspection'
   | 'tcg-battle'
   | 'field-observation'
@@ -288,7 +295,7 @@ export interface GameSettings {
   playerSprite?: string
   // Run game specific
   winScore?: number
-  speed?: number | { min: number; max: number }
+  speed?: number
   sprite?: string | SpriteConfig
   player?: SpriteConfig
   jumpSprite?: string | SpriteConfig
@@ -369,14 +376,14 @@ export interface GameSettings {
   shuffleMoves?: number
   // Rhythm game specific
   icons?: import('./rhythm/types').RhythmIcon[]
-  // Mining game specific
-  targetSize?: { min: number; max: number }
-  itemHp?: number
-  perfectDamage?: number
-  okDamage?: number
-  maxSwings?: number
-  buttonIcon?: import('./shared').TaskIcon
-  miningTarget?: string
+  // Underground mining specific
+  awardLoot?: boolean
+  treasureCount?: { min: number; max: number }
+  lootPool?: import('./underground-mining/types').UndergroundMiningLootEntry[]
+  bonusLoot?: import('./underground-mining/types').UndergroundMiningBonusLootEntry[]
+  wallStressLimit?: number
+  toolStress?: import('./underground-mining/types').UndergroundMiningSettings['toolStress']
+  bedrockChance?: number
   // TCG Inspection specific
   allowedSetIds?: string[]
   allowedRarities?: string[]
@@ -493,7 +500,7 @@ export const allGames: GameItem[] = [
   ...spellingGames.map((g) => ({ ...g, gameType: 'spelling' as const })),
   ...slidingPuzzleGames.map((g) => ({ ...g, gameType: 'sliding-puzzle' as const })),
   ...rhythmGames.map((g) => ({ ...g, gameType: 'rhythm' as const })),
-  ...miningGames.map((g) => ({ ...g, gameType: 'mining' as const })),
+  ...undergroundMiningGames.map((g) => ({ ...g, gameType: 'underground-mining' as const })),
   ...tcgInspectionGames.map((g) => ({ ...g, gameType: 'tcg-inspection' as const })),
   ...tcgBattleGames.map((g) => ({ ...g, gameType: 'tcg-battle' as const })),
   ...fieldObservationGames.map((g) => ({ ...g, gameType: 'field-observation' as const } as unknown as GameItem)),
