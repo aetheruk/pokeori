@@ -37,7 +37,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
           itemId: 'small-stone-t1',
           weight: 1,
           size: { width: 2, height: 2 },
-          quantity: { min: 2, max: 6 },
+          quantity: 1,
         },
       ],
       bonusLoot: [
@@ -92,7 +92,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
           ],
         },
       ],
-      wallStressLimit: 32,
+      wallStressLimit: 49,
       toolStress: { pickaxe: 1, hammer: 2 },
       bedrockChance: 4,
     },
