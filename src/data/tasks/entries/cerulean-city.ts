@@ -3281,7 +3281,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 1,
         title: 'Day Care Couple',
         message:
-          "The front gate worries us most. We need a helper who can watch the entrance and make strangers think twice, but who won't frighten the young Pokemon or their trainers. Who do you think could strike that balance?",
+          "The front gate worries us most. We need a Pokemon that's both warm and friendly, yet mighty and intimidating, and would alert us to intruders.",
         background: '/backgrounds/inside-house.avif',
         icon: {
           type: 'trainer',
@@ -3343,7 +3343,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 'old-couple',
       },
       message:
-        "Arcanine could make the entrance feel safe without making it unfriendly. If you know one with the right temperament, bring it by and we'll introduce it to the youngsters.",
+        "Arcanine would be perfect! It would make the gate feel safe without making it unfriendly. If you know one with the right temperament, bring it by and we'll introduce it to the youngsters.",
       closeButtonText: 'Find Helper',
     },
   },
@@ -3436,7 +3436,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 1,
         title: 'Day Care Couple',
         message:
-          "Some of the young Pokemon have questions faster than we can answer them. We'd love a helper who can keep every little mind busy without letting the louder ones leave the shy ones behind. Who do you think might suit them?",
+          "Some of the young Pokemon have questions faster than we can answer them. We'd love an incredibly intelligent Pokemon helper who can keep every little mind busy without letting the louder ones leave the shy ones behind. Who do you think might suit them?",
         background: '/backgrounds/inside-house.avif',
         icon: {
           type: 'trainer',
@@ -3746,7 +3746,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 1,
         title: 'Day Care Couple',
         message:
-          "The playroom is our biggest puzzle. The youngsters need games, room to explore, and someone who can keep the excitement from spilling through the whole building. Who could manage all that without spoiling the fun?",
+          "The playroom is our biggest puzzle. We need an entertaining Pokemon that can play and spark their curiosity without making too much noise. In fact, the quieter the better!",
         background: '/backgrounds/inside-house.avif',
         icon: {
           type: 'trainer',
@@ -3901,7 +3901,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 1,
         title: 'Day Care Couple',
         message:
-          "After lunch, every cot becomes a trampoline. We need a calm helper who can settle a whole room at once, even when half the youngsters insist they aren't tired. Who would you trust with nap time?",
+          "After lunch, every cot becomes a trampoline. We need a helper who can settle a whole room at once, even when half the youngsters insist they aren't tired. Who would you trust with nap time?",
         background: '/backgrounds/inside-house.avif',
         icon: {
           type: 'trainer',
