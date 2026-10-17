@@ -24,7 +24,7 @@ function buildPools(reactionTime: number) {
   const base = { weight: 1, reactionTime, appearTime: { min: 2000, max: 5000 } }
   const common: GlobalFishingItemEntry[] = [
     ...[...TIER_ONE_POKEMON_MATERIAL_IDS, 'broken-ball-t1'].map((itemId) => ({
-      ...base, itemId, symbol: '!', quantityRange: { min: 1, max: 2 },
+      ...base, itemId, symbol: '!', quantity: 1,
     })),
     { ...base, currencyId: 'pokedollars', quantity: 100, symbol: '$' },
     { ...base, currencyId: 'crystals', quantity: 25, symbol: '✧' },
