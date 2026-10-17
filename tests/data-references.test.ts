@@ -5777,10 +5777,11 @@ describe('static data references', () => {
     })
     expect(chamberMining?.settings.lootPool).toContainEqual({
       itemId: 'metal-scrap-t1',
-      weight: 1,
+      weight: 49.6,
       size: { width: 2, height: 2 },
       quantity: 1,
     })
+    expect(chamberMining?.settings.treasureCount).toEqual({ min: 2, max: 4 })
     expect(chamberMining?.skillXp).toEqual({ skill: 'catching', level: 15 })
     expect(rockTunnelMap.completeRequirements).toContainEqual({
       type: 'task_completed',
@@ -6040,8 +6041,10 @@ describe('static data references', () => {
       "Hey {Trainer}, that's some really nice work on the fossil sets, really appreciate the crystals. They will be pleased indeed. Lemme give you a few tips and tricks when you're fossil hunting.",
     )
 
-    const miningFossils = (mining?.settings.bonusLoot || []).map((entry) => ({
-      ...entry, targetId: entry.itemId,
+    const miningFossils = (mining?.settings.lootPool || []).map((entry) => ({
+      ...entry,
+      targetId: entry.itemId,
+      dropChance: entry.weight,
     }))
     for (const [rewards, baseDropChance, improvedDropChance] of [
       [miningFossils, 1, 2],

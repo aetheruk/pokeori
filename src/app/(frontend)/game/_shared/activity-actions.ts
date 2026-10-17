@@ -725,10 +725,7 @@ export async function startGameActivity(
             )
           : []
       const undergroundMiningLootRequirements = encounter.gameType === 'underground-mining'
-        ? [
-            ...(encounter.settings.lootPool || []),
-            ...(encounter.settings.bonusLoot || []),
-          ].flatMap((entry) => entry.requirements || [])
+        ? (encounter.settings.lootPool || []).flatMap((entry) => entry.requirements || [])
         : []
       const requiredKeys = analyzeRequirements([
         ...(encounter.requirements || []),
