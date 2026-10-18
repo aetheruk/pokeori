@@ -271,6 +271,30 @@ describe('Explore location completion star', () => {
     expect(labels).not.toContain('Water Gem')
   })
 
+  test('Underground Mining previews show each buried item chance before its label', () => {
+    const mining = allGames.find(
+      (game) => game.id === 'rock-tunnel-hidden-chamber-mining',
+    )!
+    const rewards = getFormattedRewards(
+      {
+        id: mining.id,
+        type: 'game',
+        category: mining.category,
+        subCategory: mining.subCategory,
+        originalData: mining,
+      } as unknown as ExploreItem,
+      makeUserData(),
+      [],
+    )
+
+    expect(rewards).toContainEqual(
+      expect.objectContaining({
+        label: 'Metal Coat x1',
+        subLabel: '0.15% chance - Buried',
+      }),
+    )
+  })
+
   test('global fallback fishing item pools do not block location mastery', () => {
     expect(
       isLocationEntryMastered(

@@ -5777,11 +5777,17 @@ describe('static data references', () => {
     })
     expect(chamberMining?.settings.lootPool).toContainEqual({
       itemId: 'metal-scrap-t1',
-      weight: 49.6,
+      weight: 49.925,
       size: { width: 2, height: 2 },
       quantity: 1,
     })
     expect(chamberMining?.settings.treasureCount).toEqual({ min: 2, max: 4 })
+    expect(chamberMining?.settings.lootPool).toContainEqual({
+      itemId: 'metal-coat',
+      weight: 0.15,
+      size: { width: 2, height: 2 },
+      quantity: 1,
+    })
     expect(chamberMining?.skillXp).toEqual({ skill: 'catching', level: 15 })
     expect(rockTunnelMap.completeRequirements).toContainEqual({
       type: 'task_completed',

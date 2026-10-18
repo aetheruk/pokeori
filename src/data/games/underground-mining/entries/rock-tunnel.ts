@@ -26,19 +26,19 @@ export const rockTunnelUndergroundMiningEntries: UndergroundMiningConfig[] = [
       lootPool: [
         {
           itemId: 'metal-scrap-t1',
-          weight: 49.6,
+          weight: 49.925,
           size: { width: 2, height: 2 },
           quantity: 1,
         },
         {
           itemId: 'small-stone-t1',
-          weight: 49.6,
+          weight: 49.925,
           size: { width: 2, height: 2 },
           quantity: 1,
         },
         {
           itemId: 'metal-coat',
-          weight: 0.8,
+          weight: 0.15,
           size: { width: 2, height: 2 },
           quantity: 1,
         },
