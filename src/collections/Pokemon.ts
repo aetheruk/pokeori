@@ -251,6 +251,18 @@ export const Pokemon: CollectionConfig = {
       },
     },
     {
+      name: 'battleLevelUpLevel',
+      type: 'number',
+      label: 'Last Battle Level-Up Level',
+      min: 0,
+      max: 100,
+      defaultValue: 0,
+      admin: {
+        description:
+          'Level last reached by gaining experience from a battle. Used for battle-level evolution requirements.',
+      },
+    },
+    {
       name: 'superEffectiveHitsLanded',
       type: 'number',
       label: 'Super Effective Hits Landed',
@@ -288,7 +300,8 @@ export const Pokemon: CollectionConfig = {
       defaultValue: 0,
       min: 0,
       admin: {
-        description: 'Number of times this Pokemon has been knocked out in battle.',
+        description:
+          'Number of times this Pokemon has been knocked out in battle.',
       },
     },
     {
@@ -500,6 +513,7 @@ export const Pokemon: CollectionConfig = {
         { label: 'Starter', value: 'starter' },
         { label: 'Purchased', value: 'purchased' },
         { label: 'Reward', value: 'reward' },
+        { label: 'Evolution', value: 'evolution' },
         { label: 'Hatched', value: 'hatched' },
       ],
       admin: {

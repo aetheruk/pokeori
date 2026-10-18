@@ -310,6 +310,16 @@ export const gen8Evolutions: Record<number, Evolution[]> = {
       }
     }
   ],
+  "868": [
+    {
+      "speciesId": 869,
+      "name": "alcremie",
+      "trigger": "level-up",
+      "conditions": {
+        "minHappiness": 255
+      }
+    }
+  ],
   "872": [
     {
       "speciesId": 873,

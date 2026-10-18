@@ -281,7 +281,10 @@ export const gen3Evolutions: Record<number, Evolution[]> = {
       "name": "ninjask",
       "trigger": "level-up",
       "conditions": {
-        "minLevel": 20
+        "minLevel": 20,
+        "requiresBattleTeamSlot": true,
+        "requiredInventoryItemId": "poke-ball",
+        "additionalSpeciesId": 292
       }
     }
   ],

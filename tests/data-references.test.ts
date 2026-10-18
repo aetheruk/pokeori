@@ -5922,6 +5922,11 @@ describe('static data references', () => {
       type: 'task_completed',
       targetId: 'mt-moon-fossil-hunter',
     })
+    expect(mining?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'mt-moon-easier-mining-unlocked',
+      inverse: true,
+    })
     expect(mining?.rewards).toContainEqual({
       type: 'pokemon_research_xp',
       targetId: '74',
@@ -5938,6 +5943,7 @@ describe('static data references', () => {
       type: 'task_complete',
       targetId: 'mt-moon-easier-mining-unlocked',
       dropChance: 100,
+      secret: true,
     })
     expect(easierMining?.requirements).toContainEqual({
       type: 'task_completed',

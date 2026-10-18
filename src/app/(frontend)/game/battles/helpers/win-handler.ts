@@ -1,6 +1,9 @@
 import 'server-only'
 import type { Payload, PayloadRequest } from 'payload'
-import { createEconomyRequestId, runEconomyAction } from '@/utilities/economy/transactions'
+import {
+  createEconomyRequestId,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 import type { BattleState } from '@/utilities/battle/types'
 import type { User } from '@/payload-types'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
@@ -11,7 +14,10 @@ import {
   registerUserSketchedMove,
 } from '@/utilities/user-state'
 import { buildBattleWinRewards } from './win-rewards'
-import { persistConsumedHeldItems, persistHeldItemBattleWinEffects } from './held-items'
+import {
+  persistConsumedHeldItems,
+  persistHeldItemBattleWinEffects,
+} from './held-items'
 import { persistPokemonBattleKOs } from './pokemon-ko-credit'
 import { persistPokemonBattleEvs } from './pokemon-ev-rewards'
 
@@ -56,13 +62,19 @@ export async function handleWin(
     {
       userId: user.id,
       action: 'settle-battle-outcome',
-      requestId: createEconomyRequestId(`battle-outcome:${state.economyActionId || state.battleId}:${user.id}`),
+      requestId: createEconomyRequestId(
+        `battle-outcome:${state.economyActionId || state.battleId}:${user.id}`,
+      ),
     },
     async ({ payload, req }) => {
       // Retry from the original state: failed transaction attempts must not
       // retain in-memory flags that skip rolled-back Pokemon effects.
       const nextState = structuredClone(state)
-      const freshUser = await payload.findByID({ collection: 'users', id: user.id, req })
+      const freshUser = await payload.findByID({
+        collection: 'users',
+        id: user.id,
+        req,
+      })
       await settleBattleWin(nextState, freshUser, battleConfig, payload, req)
       await persistConsumedHeldItems(nextState, payload)
       return nextState
@@ -78,7 +90,6 @@ async function settleBattleWin(
   payload: Payload,
   req: PayloadRequest,
 ) {
-
   const newlySketchedMoves = await settlePendingSketchedMoves(
     state,
     user.id,
@@ -98,9 +109,15 @@ async function settleBattleWin(
   }
 
   if (!state.chronicle) {
-    await incrementUserActivityResult(payload as any, user.id, 'battleResults', state.battleId, {
-      wins: 1,
-    })
+    await incrementUserActivityResult(
+      payload as any,
+      user.id,
+      'battleResults',
+      state.battleId,
+      {
+        wins: 1,
+      },
+    )
   }
 
   const expeditionResult = await recordExpeditionActivityResult(
@@ -116,15 +133,25 @@ async function settleBattleWin(
 
   if (!state.chronicle) {
     await persistPokemonBattleKOs(state, payload)
-    await persistHeldItemBattleWinEffects(state.playerTeam, Math.random, payload)
+    await persistHeldItemBattleWinEffects(
+      state.playerTeam,
+      Math.random,
+      payload,
+    )
   }
 
   if (state.chronicle || battleConfig.disableRewards) {
     if (state.chronicle) return
-    await incrementDailyTaskProgress(user.id, 'daily_battle', 1, {
-      sourceId: state.battleId,
-      isTrainer: !battleConfig.isWildBattle,
-    }, { payload, req })
+    await incrementDailyTaskProgress(
+      user.id,
+      'daily_battle',
+      1,
+      {
+        sourceId: state.battleId,
+        isTrainer: !battleConfig.isWildBattle,
+      },
+      { payload, req },
+    )
     return
   }
 
@@ -134,6 +161,7 @@ async function settleBattleWin(
   const { summary } = await grantRewards(user.id, rewardsToGrant, {
     payload,
     req,
+    source: 'battle-win',
     requirementContext: {
       category: battleConfig.category,
       subCategory: battleConfig.subCategory,
@@ -146,8 +174,14 @@ async function settleBattleWin(
   state.rewards = summary
 
   // Explicit Daily Battle Tracking
-  await incrementDailyTaskProgress(user.id, 'daily_battle', 1, {
-    sourceId: state.battleId,
-    isTrainer: !battleConfig.isWildBattle,
-  }, { payload, req })
+  await incrementDailyTaskProgress(
+    user.id,
+    'daily_battle',
+    1,
+    {
+      sourceId: state.battleId,
+      isTrainer: !battleConfig.isWildBattle,
+    },
+    { payload, req },
+  )
 }

@@ -18,6 +18,23 @@ Regional source-form evolution overrides live in `scripts/generate-evolutions.mj
 base, Alolan, Galarian, Hisuian, and Paldean source forms gated to the matching target form where
 the species-level source data would otherwise collapse the rows together.
 
+The same generator stores durable game-specific overrides for evolution conditions that the
+source game data does not capture. Current overrides include Mantyke requiring Remoraid in the
+party; Nincada's level-20 Ninjask evolution also granting Shedinja when Nincada is on the battle
+team, a slot is free, and a Poké Ball is owned; and Meltan using Dense Liquid Metal. Galarian
+Farfetch'd needs 100 battle KOs, Galarian Yamask needs exactly level 49 and the Evolution Compass,
+Milcery needs maximum friendship, and Stantler needs level 50 with Psyshield Bash equipped.
+White-Striped Basculin tracks 50 faints separately from KOs. Pawmo, Bramblin, and Rellor need
+level 30 while set as the active companion. Tandemaus keeps its battle-earned level-up requirement
+at level 25 or higher and has a 1% Family of Three form roll. Bisharp needs 50 battle KOs, while
+Gimmighoul requires ownership of 999 Gimmighoul Coins. Primeape needs level 50 and Rage Fist for
+Annihilape. The generator is the source of truth for all these overrides so data regeneration
+retains them.
+
+Server evolution actions validate persisted move loadouts, party composition, companion state,
+per-Pokémon KOs/faints, inventory quantity, level bounds, and battle-earned levels. The Pokémon
+details panel uses the same state to show an evolution option only when the conditions are met.
+
 ## Evolution Module Example
 ```typescript
 export const evolutionChains = {

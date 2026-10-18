@@ -375,5 +375,15 @@ export const gen7Evolutions: Record<number, Evolution[]> = {
         "knownMoveId": "dragon-pulse"
       }
     }
+  ],
+  "808": [
+    {
+      "speciesId": 809,
+      "name": "melmetal",
+      "trigger": "use-item",
+      "conditions": {
+        "itemId": "dense-liquid-metal"
+      }
+    }
   ]
 }

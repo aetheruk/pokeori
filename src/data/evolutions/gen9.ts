@@ -109,7 +109,21 @@ export const gen9Evolutions: Record<number, Evolution[]> = {
       "speciesId": 923,
       "name": "pawmot",
       "trigger": "level-up",
-      "conditions": {}
+      "conditions": {
+        "minLevel": 30,
+        "requiresActiveCompanion": true
+      }
+    }
+  ],
+  "924": [
+    {
+      "speciesId": 925,
+      "name": "maushold",
+      "trigger": "level-up",
+      "conditions": {
+        "minLevel": 25,
+        "requiresBattleLevelUp": true
+      }
     }
   ],
   "926": [
@@ -225,7 +239,10 @@ export const gen9Evolutions: Record<number, Evolution[]> = {
       "speciesId": 947,
       "name": "brambleghast",
       "trigger": "level-up",
-      "conditions": {}
+      "conditions": {
+        "minLevel": 30,
+        "requiresActiveCompanion": true
+      }
     }
   ],
   "948": [
@@ -253,7 +270,10 @@ export const gen9Evolutions: Record<number, Evolution[]> = {
       "speciesId": 954,
       "name": "rabsca",
       "trigger": "level-up",
-      "conditions": {}
+      "conditions": {
+        "minLevel": 30,
+        "requiresActiveCompanion": true
+      }
     }
   ],
   "955": [
@@ -364,6 +384,17 @@ export const gen9Evolutions: Record<number, Evolution[]> = {
       "trigger": "level-up",
       "conditions": {
         "minLevel": 54
+      }
+    }
+  ],
+  "999": [
+    {
+      "speciesId": 1000,
+      "name": "gholdengo",
+      "trigger": "level-up",
+      "conditions": {
+        "requiredInventoryItemId": "gimmighoul-coin",
+        "requiredInventoryItemQuantity": 999
       }
     }
   ],

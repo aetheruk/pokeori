@@ -61,6 +61,7 @@ const writeEvolutionModules = (evolutionMap) => {
 
   const typesContent = `export interface EvolutionCondition {
   minLevel?: number
+  maxLevel?: number
   itemId?: string
   minHappiness?: number
   timeOfDay?: string
@@ -68,6 +69,15 @@ const writeEvolutionModules = (evolutionMap) => {
   locationId?: string
   /** Battle move slug that must be equipped in the saved loadout. */
   knownMoveId?: string
+  requiredPartySpeciesId?: number
+  requiredInventoryItemId?: string
+  requiredInventoryItemQuantity?: number
+  requiresBattleTeamSlot?: boolean
+  requiresActiveCompanion?: boolean
+  requiresBattleLevelUp?: boolean
+  minBattleKOs?: number
+  minTimesKOd?: number
+  additionalSpeciesId?: number
   heldItem?: string
   trade?: boolean
   requiredSourceForm?: string
@@ -273,6 +283,159 @@ async function generate() {
         trigger: 'level-up',
         conditions: { minLevel: 36, requiredRegion: 'Hisui' },
         targetForm: 'Hisuian Form',
+      },
+    ],
+    // Nincada adds Shedinja alongside Ninjask when there is room in the party.
+    290: [
+      {
+        speciesId: 291,
+        name: 'ninjask',
+        trigger: 'level-up',
+        conditions: {
+          minLevel: 20,
+          requiresBattleTeamSlot: true,
+          requiredInventoryItemId: 'poke-ball',
+          additionalSpeciesId: 292,
+        },
+      },
+    ],
+    // Mantyke requires Remoraid in the party when it levels up.
+    458: [
+      {
+        speciesId: 226,
+        name: 'mantine',
+        trigger: 'level-up',
+        conditions: { requiredPartySpeciesId: 223 },
+      },
+    ],
+    // Primeape evolves after learning Rage Fist and reaching the KO milestone.
+    57: [
+      {
+        speciesId: 979,
+        name: 'annihilape',
+        trigger: 'level-up',
+        conditions: { minLevel: 50, knownMoveId: 'rage-fist' },
+      },
+    ],
+    // Meltan's cross-game evolution uses the authored Dense Liquid Metal item.
+    808: [
+      {
+        speciesId: 809,
+        name: 'melmetal',
+        trigger: 'use-item',
+        conditions: { itemId: 'dense-liquid-metal' },
+      },
+    ],
+    // Galarian Farfetch'd uses lifetime battle KOs in place of critical hits.
+    83: [
+      {
+        speciesId: 865,
+        name: 'sirfetchd',
+        trigger: 'level-up',
+        conditions: { requiredSourceForm: 'Galarian Form', minBattleKOs: 100 },
+      },
+    ],
+    // The Galarian branch evolves at exactly level 49 with an Evolution Compass.
+    562: [
+      {
+        speciesId: 563,
+        name: 'cofagrigus',
+        trigger: 'level-up',
+        conditions: { minLevel: 34, requiredSourceForm: 'base' },
+        targetForm: 'base',
+      },
+      {
+        speciesId: 867,
+        name: 'runerigus',
+        trigger: 'use-item',
+        conditions: {
+          minLevel: 49,
+          maxLevel: 49,
+          itemId: 'evolution-compass',
+          requiredSourceForm: 'Galarian Form',
+        },
+      },
+    ],
+    // Milcery reaches Alcremie through maximum friendship.
+    868: [
+      {
+        speciesId: 869,
+        name: 'alcremie',
+        trigger: 'level-up',
+        conditions: { minHappiness: 255 },
+      },
+    ],
+    // Wyrdeer now uses an equipped Psyshield Bash and a level milestone.
+    234: [
+      {
+        speciesId: 899,
+        name: 'wyrdeer',
+        trigger: 'level-up',
+        conditions: { minLevel: 50, knownMoveId: 'psyshield-bash' },
+      },
+    ],
+    // White-Striped Basculin evolves after it has fainted fifty times.
+    550: [
+      {
+        speciesId: 902,
+        name: 'basculegion',
+        trigger: 'level-up',
+        conditions: { minTimesKOd: 50 },
+      },
+    ],
+    // Poké Ball walking evolutions use companion status and a level threshold.
+    922: [
+      {
+        speciesId: 923,
+        name: 'pawmot',
+        trigger: 'level-up',
+        conditions: { minLevel: 30, requiresActiveCompanion: true },
+      },
+    ],
+    946: [
+      {
+        speciesId: 947,
+        name: 'brambleghast',
+        trigger: 'level-up',
+        conditions: { minLevel: 30, requiresActiveCompanion: true },
+      },
+    ],
+    953: [
+      {
+        speciesId: 954,
+        name: 'rabsca',
+        trigger: 'level-up',
+        conditions: { minLevel: 30, requiresActiveCompanion: true },
+      },
+    ],
+    // Tandemaus keeps its battle level-up rule and rare Family of Three roll.
+    924: [
+      {
+        speciesId: 925,
+        name: 'maushold',
+        trigger: 'level-up',
+        conditions: { minLevel: 25, requiresBattleLevelUp: true },
+      },
+    ],
+    // Bisharp's evolution condition is represented by per-Pokémon battle KOs.
+    625: [
+      {
+        speciesId: 983,
+        name: 'kingambit',
+        trigger: 'level-up',
+        conditions: { minBattleKOs: 50 },
+      },
+    ],
+    // Gimmighoul coin evolution was already modeled as an item route in-game.
+    999: [
+      {
+        speciesId: 1000,
+        name: 'gholdengo',
+        trigger: 'level-up',
+        conditions: {
+          requiredInventoryItemId: 'gimmighoul-coin',
+          requiredInventoryItemQuantity: 999,
+        },
       },
     ],
     // Rattata (19)
@@ -600,16 +763,6 @@ async function generate() {
         trigger: 'use-item',
         conditions: { itemId: 'ice-stone', requiredSourceForm: 'Galarian Form' },
         targetForm: 'Galarian Form',
-      },
-    ],
-    // Yamask (562)
-    562: [
-      {
-        speciesId: 563,
-        name: 'cofagrigus',
-        trigger: 'level-up',
-        conditions: { minLevel: 34, requiredSourceForm: 'base' },
-        targetForm: 'base',
       },
     ],
     // Zorua (570)

@@ -139,6 +139,7 @@ export interface Item {
   berryPower?: number
   spriteId?: string
   hueRotate?: number
+  spriteFilter?: string
   unique?: boolean
   skillRequirements?: ItemSkillRequirements
   moveId?: string // Link to a MoveConfig id for TMs

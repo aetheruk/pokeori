@@ -62,14 +62,6 @@ export const gen5Evolutions: Record<number, Evolution[]> = {
       "conditions": {
         "minLevel": 36
       }
-    },
-    {
-      "speciesId": 503,
-      "name": "samurott",
-      "trigger": "level-up",
-      "conditions": {
-        "minLevel": 36
-      }
     }
   ],
   "504": [
@@ -322,13 +314,15 @@ export const gen5Evolutions: Record<number, Evolution[]> = {
       "conditions": {
         "itemId": "sun-stone"
       }
-    },
+    }
+  ],
+  "550": [
     {
-      "speciesId": 549,
-      "name": "lilligant",
-      "trigger": "use-item",
+      "speciesId": 902,
+      "name": "basculegion",
+      "trigger": "level-up",
       "conditions": {
-        "itemId": "sun-stone"
+        "minTimesKOd": 50
       }
     }
   ],
@@ -404,6 +398,17 @@ export const gen5Evolutions: Record<number, Evolution[]> = {
         "requiredSourceForm": "base"
       },
       "targetForm": "base"
+    },
+    {
+      "speciesId": 867,
+      "name": "runerigus",
+      "trigger": "use-item",
+      "conditions": {
+        "minLevel": 49,
+        "maxLevel": 49,
+        "itemId": "evolution-compass",
+        "requiredSourceForm": "Galarian Form"
+      }
     }
   ],
   "564": [
@@ -772,15 +777,17 @@ export const gen5Evolutions: Record<number, Evolution[]> = {
       }
     }
   ],
-  "627": [
+  "625": [
     {
-      "speciesId": 628,
-      "name": "braviary",
+      "speciesId": 983,
+      "name": "kingambit",
       "trigger": "level-up",
       "conditions": {
-        "minLevel": 54
+        "minBattleKOs": 50
       }
-    },
+    }
+  ],
+  "627": [
     {
       "speciesId": 628,
       "name": "braviary",

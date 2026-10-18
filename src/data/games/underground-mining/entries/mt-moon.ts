@@ -17,6 +17,11 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         type: 'task_completed',
         targetId: 'mt-moon-fossil-hunter',
       },
+      {
+        type: 'task_completed',
+        targetId: 'mt-moon-easier-mining-unlocked',
+        inverse: true,
+      },
     ],
     criteria: [
       {
@@ -121,6 +126,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         type: 'task_complete',
         targetId: 'mt-moon-easier-mining-unlocked',
         dropChance: 100,
+        secret: true,
       },
       {
         type: 'pokemon_research_xp',
@@ -138,9 +144,9 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
   },
   {
     id: 'mt-moon-easier-mining',
-    name: 'Easier Mining',
+    name: 'Mining Mt. Moon',
     description:
-      'Your Geodude have shifted so much rock it should be much easier to mine by yourself here now.',
+      'It should be much easier to mine here now Geodude has broke through the tough rock',
     category: 'Kanto',
     subCategory: 'Mt. Moon',
     icon: {

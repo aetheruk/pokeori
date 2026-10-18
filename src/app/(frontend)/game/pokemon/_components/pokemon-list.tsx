@@ -177,13 +177,19 @@ export function PokemonList({
     [gameData?.inventory],
   )
 
-  const [pokemonList, setPokemonList] = useState<Pokemon[]>(initialBoxState.docs)
+  const [pokemonList, setPokemonList] = useState<Pokemon[]>(
+    initialBoxState.docs,
+  )
   const [eggs, setEggs] = useState<BoxEgg[]>(initialBoxState.eggs)
   const [hatchingEggId, setHatchingEggId] = useState<string | null>(null)
   const [eggHatchResult, setEggHatchResult] = useState<any | null>(null)
   const [eggHatchAnimation, setEggHatchAnimation] = useState<any | null>(null)
-  const [battleTeam, setBattleTeam] = useState<Pokemon[]>(initialBoxState.battleTeam)
-  const [companion, setCompanion] = useState<Pokemon | null>(initialBoxState.companion)
+  const [battleTeam, setBattleTeam] = useState<Pokemon[]>(
+    initialBoxState.battleTeam,
+  )
+  const [companion, setCompanion] = useState<Pokemon | null>(
+    initialBoxState.companion,
+  )
 
   const [hasNextPage, setHasNextPage] = useState(initialBoxState.hasNextPage)
   const [nextPage, setNextPage] = useState(initialBoxState.nextPage ?? null)
@@ -203,7 +209,9 @@ export function PokemonList({
   const [isReorderingBattleTeam, setIsReorderingBattleTeam] = useState(false)
   const battleTeamSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   )
   const [releaseResult, setReleaseResult] = useState<any | null>(null)
   const [releasedPokemonResult, setReleasedPokemonResult] =
@@ -226,38 +234,48 @@ export function PokemonList({
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const longPressTriggeredRef = useRef(false)
   const longPressStartRef = useRef<{ x: number; y: number } | null>(null)
-  const [totalPokemonCount, setTotalPokemonCount] = useState(initialBoxState.totalPokemonCount)
+  const [totalPokemonCount, setTotalPokemonCount] = useState(
+    initialBoxState.totalPokemonCount,
+  )
 
   // The box is separate from the scoped user snapshot. Reconcile a prefetched
   // box on entry without clearing the grid or overwriting edits/pagination that
   // the player has made while the request was in flight.
-  const reconcileInitialBox = useEffectEvent((fresh: InitialPokemonBoxState) => {
-    if (
-      selectedBoxId !== null || loading ||
-      pokemonList !== initialBoxState.docs ||
-      eggs !== initialBoxState.eggs ||
-      battleTeam !== initialBoxState.battleTeam ||
-      companion !== initialBoxState.companion ||
-      totalPokemonCount !== initialBoxState.totalPokemonCount
-    ) return
+  const reconcileInitialBox = useEffectEvent(
+    (fresh: InitialPokemonBoxState) => {
+      if (
+        selectedBoxId !== null ||
+        loading ||
+        pokemonList !== initialBoxState.docs ||
+        eggs !== initialBoxState.eggs ||
+        battleTeam !== initialBoxState.battleTeam ||
+        companion !== initialBoxState.companion ||
+        totalPokemonCount !== initialBoxState.totalPokemonCount
+      )
+        return
 
-    setPokemonList(fresh.docs)
-    setEggs(fresh.eggs)
-    setBattleTeam(fresh.battleTeam)
-    setCompanion(fresh.companion)
-    setHasNextPage(fresh.hasNextPage)
-    setNextPage(fresh.nextPage ?? null)
-    setTotalPokemonCount(fresh.totalPokemonCount)
-  })
+      setPokemonList(fresh.docs)
+      setEggs(fresh.eggs)
+      setBattleTeam(fresh.battleTeam)
+      setCompanion(fresh.companion)
+      setHasNextPage(fresh.hasNextPage)
+      setNextPage(fresh.nextPage ?? null)
+      setTotalPokemonCount(fresh.totalPokemonCount)
+    },
+  )
 
   useEffect(() => {
     let cancelled = false
-    void getPokemonBoxInitialState().then((fresh) => {
-      if (!cancelled) reconcileInitialBox(fresh)
-    }).catch((error) => {
-      console.error('Unable to refresh the Pokemon box on entry', error)
-    })
-    return () => { cancelled = true }
+    void getPokemonBoxInitialState()
+      .then((fresh) => {
+        if (!cancelled) reconcileInitialBox(fresh)
+      })
+      .catch((error) => {
+        console.error('Unable to refresh the Pokemon box on entry', error)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const canBulkReleasePokemon = useCallback(
@@ -342,12 +360,12 @@ export function PokemonList({
         onBattleTeam: role === 'battle-team',
         battleTeamPosition:
           role === 'battle-team'
-            ? result.battleTeamPosition ?? position ?? 1
+            ? (result.battleTeamPosition ?? position ?? 1)
             : null,
         isCompanion: role === 'companion',
         boxId:
           role === 'box'
-            ? result.boxId ?? (selectedBoxId ?? null)
+            ? (result.boxId ?? selectedBoxId ?? null)
             : pokemon.boxId,
       })
 
@@ -367,8 +385,7 @@ export function PokemonList({
             .map((member) => ({
               ...member,
               battleTeamPosition:
-                positionByPokemonId.get(member.id) ??
-                member.battleTeamPosition,
+                positionByPokemonId.get(member.id) ?? member.battleTeamPosition,
             }))
             .sort(
               (a, b) =>
@@ -477,8 +494,7 @@ export function PokemonList({
             positionByPokemonId.get(pokemon.id) ?? pokemon.battleTeamPosition,
         }))
         .sort(
-          (a, b) =>
-            (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
+          (a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
         )
 
     // Reflect the swap before waiting on the network. The server remains the
@@ -498,7 +514,11 @@ export function PokemonList({
     } catch (error) {
       setBattleTeam(previousBattleTeam)
       refreshUser()
-      toast.error(error instanceof Error ? error.message : 'Could not reorder the battle team.')
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Could not reorder the battle team.',
+      )
       return false
     } finally {
       setIsReorderingBattleTeam(false)
@@ -545,8 +565,8 @@ export function PokemonList({
     if (oldIndex < 0 || newIndex < 0) return
 
     const reorderedIds = arrayMove(
-      currentPlacements.map(({ pokemonId: currentPokemonId }) =>
-        currentPokemonId,
+      currentPlacements.map(
+        ({ pokemonId: currentPokemonId }) => currentPokemonId,
       ),
       oldIndex,
       newIndex,
@@ -682,7 +702,6 @@ export function PokemonList({
     [exitBulkReleaseMode],
   )
 
-
   const hatchBoxEgg = async (egg: BoxEgg) => {
     setHatchingEggId(egg.id)
     try {
@@ -705,11 +724,7 @@ export function PokemonList({
 
   const renderEggCard = (egg: BoxEgg) => {
     return (
-      <EggCard
-        egg={egg}
-        hatchingEggId={hatchingEggId}
-        onHatch={hatchBoxEgg}
-      />
+      <EggCard egg={egg} hatchingEggId={hatchingEggId} onHatch={hatchBoxEgg} />
     )
   }
 
@@ -1136,6 +1151,7 @@ export function PokemonList({
       return (
         <PokemonDetailsDialog
           pokemon={pokemon}
+          battleTeam={battleTeam}
           boxes={user?.boxes || []}
           inventory={Object.entries(inventoryMap).map(([itemId, quantity]) => ({
             itemId,
@@ -1143,6 +1159,22 @@ export function PokemonList({
           }))}
           onRename={(u) => {
             syncPokemonAssignment(u)
+          }}
+          onPokemonAdded={(addedPokemon) => {
+            setBattleTeam((prev) =>
+              [
+                ...prev.filter((p) => p.id !== addedPokemon.id),
+                addedPokemon,
+              ].sort(
+                (a, b) =>
+                  (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
+              ),
+            )
+            setPokemonList((prev) =>
+              prev.filter((p) => p.id !== addedPokemon.id),
+            )
+            setTotalPokemonCount((prev) => prev + 1)
+            refreshUser()
           }}
           onRelease={(id) => {
             setPokemonList((prev) => prev.filter((p) => p.id !== id))
@@ -1289,357 +1321,370 @@ export function PokemonList({
         collisionDetection={closestCenter}
         onDragEnd={handleRosterDragEnd}
       >
-      <div className="contents xl:grid xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <PokemonBoxDropZone className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-6 w-full max-w-7xl mx-auto custom-scrollbar xl:min-w-0 xl:max-w-none">
-          <div className="w-full flex-1">
-            <div className="min-h-[40vh] p-4">
-              <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 xl:grid-cols-[repeat(auto-fill,minmax(104px,1fr))]">
-                {visibleEggs.map((egg) => (
-                  <div key={`egg-${egg.id}`} className="relative aspect-square w-full select-none touch-manipulation">{renderEggCard(egg)}</div>
-                ))}
-                {pokemonList.map((p) => (
-                  <div
-                    key={p.id}
-                    className="relative aspect-square w-full select-none touch-manipulation"
-                  >
-                    {renderPokemonCard(p)}
-                  </div>
-                ))}
-              </div>
-            </div>
-            {pokemonList.length === 0 && visibleEggs.length === 0 && (
-              <div
-                className="mx-auto flex max-w-md flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-game-border-strong bg-game-canvas/70 px-6 py-10 text-center text-game-muted"
-                role="status"
-                aria-live="polite"
-              >
-                <Image
-                  src="/ui/pokeori/desktop/empty-box.png"
-                  alt=""
-                  aria-hidden="true"
-                  width={220}
-                  height={180}
-                  className="h-28 w-36 object-contain opacity-90 sm:h-36 sm:w-44"
-                />
-                <div>
-                  <p className="text-sm font-black uppercase tracking-[0.08em] text-game-ink">
-                    Box is empty
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-game-muted">
-                    Catch or receive a Pokémon to start filling your field box.
-                  </p>
+        <div className="contents xl:grid xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <PokemonBoxDropZone className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-6 w-full max-w-7xl mx-auto custom-scrollbar xl:min-w-0 xl:max-w-none">
+            <div className="w-full flex-1">
+              <div className="min-h-[40vh] p-4">
+                <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 xl:grid-cols-[repeat(auto-fill,minmax(104px,1fr))]">
+                  {visibleEggs.map((egg) => (
+                    <div
+                      key={`egg-${egg.id}`}
+                      className="relative aspect-square w-full select-none touch-manipulation"
+                    >
+                      {renderEggCard(egg)}
+                    </div>
+                  ))}
+                  {pokemonList.map((p) => (
+                    <div
+                      key={p.id}
+                      className="relative aspect-square w-full select-none touch-manipulation"
+                    >
+                      {renderPokemonCard(p)}
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-            {hasNextPage && (
-              <div ref={ref} className="flex justify-center py-8">
-                {loading && (
-                  <Loader2 className="h-6 w-6 animate-spin text-game-muted" />
-                )}
-              </div>
-            )}
-          </div>
-        </PokemonBoxDropZone>
-
-        <div className="z-30 flex w-full shrink-0 flex-col border-t border-game-border bg-game-surface/96 shadow-[0_-10px_30px_rgba(75,62,39,0.14)] backdrop-blur-xl xl:h-full xl:min-w-0 xl:border-l xl:border-t-0 xl:shadow-none">
-          <button
-            type="button"
-            onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-            className="game-focus-ring group flex h-10 w-full items-center justify-center border-b border-game-border hover:bg-game-moss/5 xl:hidden"
-            aria-expanded={isPanelExpanded}
-            aria-controls="pokemon-team-panel"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-game-muted group-hover:text-game-moss-strong">
-                {isPanelExpanded ? 'Collapse Team' : 'Expand Team'}
-              </span>
-              {isPanelExpanded ? (
-                <ChevronDown className="h-3 w-3 text-game-muted group-hover:text-game-moss" />
-              ) : (
-                <ChevronUp className="h-3 w-3 text-game-muted group-hover:text-game-moss" />
+              {pokemonList.length === 0 && visibleEggs.length === 0 && (
+                <div
+                  className="mx-auto flex max-w-md flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-game-border-strong bg-game-canvas/70 px-6 py-10 text-center text-game-muted"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <Image
+                    src="/ui/pokeori/desktop/empty-box.png"
+                    alt=""
+                    aria-hidden="true"
+                    width={220}
+                    height={180}
+                    className="h-28 w-36 object-contain opacity-90 sm:h-36 sm:w-44"
+                  />
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-[0.08em] text-game-ink">
+                      Box is empty
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-game-muted">
+                      Catch or receive a Pokémon to start filling your field
+                      box.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {hasNextPage && (
+                <div ref={ref} className="flex justify-center py-8">
+                  {loading && (
+                    <Loader2 className="h-6 w-6 animate-spin text-game-muted" />
+                  )}
+                </div>
               )}
             </div>
-          </button>
+          </PokemonBoxDropZone>
 
-          <div
-            id="pokemon-team-panel"
-            className={cn(
-              'invisible grid overflow-hidden border-b border-game-border transition-[grid-template-rows,opacity,visibility] duration-200',
-              isPanelExpanded
-                ? 'grid-rows-[1fr] opacity-100 visible'
-                : 'grid-rows-[0fr] opacity-0 xl:grid-rows-[1fr] xl:opacity-100 xl:visible',
-            )}
-          >
-            <div className="min-h-0 overflow-hidden">
-              <div className="w-full max-w-7xl mx-auto px-4 md:px-6 py-3">
-                <div className="flex flex-col gap-4 items-stretch">
-                  <div className="flex-1 min-w-0 w-full">
-                    <div className="h-full rounded-md border border-game-border bg-game-surface p-2">
-                      <div className="flex items-center justify-center mb-2 px-1 relative">
-                        <div className="flex items-center gap-2">
-                          <Swords className="h-3 w-3 text-game-moss-strong" />
+          <div className="z-30 flex w-full shrink-0 flex-col border-t border-game-border bg-game-surface/96 shadow-[0_-10px_30px_rgba(75,62,39,0.14)] backdrop-blur-xl xl:h-full xl:min-w-0 xl:border-l xl:border-t-0 xl:shadow-none">
+            <button
+              type="button"
+              onClick={() => setIsPanelExpanded(!isPanelExpanded)}
+              className="game-focus-ring group flex h-10 w-full items-center justify-center border-b border-game-border hover:bg-game-moss/5 xl:hidden"
+              aria-expanded={isPanelExpanded}
+              aria-controls="pokemon-team-panel"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-game-muted group-hover:text-game-moss-strong">
+                  {isPanelExpanded ? 'Collapse Team' : 'Expand Team'}
+                </span>
+                {isPanelExpanded ? (
+                  <ChevronDown className="h-3 w-3 text-game-muted group-hover:text-game-moss" />
+                ) : (
+                  <ChevronUp className="h-3 w-3 text-game-muted group-hover:text-game-moss" />
+                )}
+              </div>
+            </button>
+
+            <div
+              id="pokemon-team-panel"
+              className={cn(
+                'invisible grid overflow-hidden border-b border-game-border transition-[grid-template-rows,opacity,visibility] duration-200',
+                isPanelExpanded
+                  ? 'grid-rows-[1fr] opacity-100 visible'
+                  : 'grid-rows-[0fr] opacity-0 xl:grid-rows-[1fr] xl:opacity-100 xl:visible',
+              )}
+            >
+              <div className="min-h-0 overflow-hidden">
+                <div className="w-full max-w-7xl mx-auto px-4 md:px-6 py-3">
+                  <div className="flex flex-col gap-4 items-stretch">
+                    <div className="flex-1 min-w-0 w-full">
+                      <div className="h-full rounded-md border border-game-border bg-game-surface p-2">
+                        <div className="flex items-center justify-center mb-2 px-1 relative">
+                          <div className="flex items-center gap-2">
+                            <Swords className="h-3 w-3 text-game-moss-strong" />
+                            <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-game-ink">
+                              Battle Team
+                            </h3>
+                          </div>
+                          <div className="absolute right-1 font-mono text-[10px] text-game-muted">
+                            {battleTeam.length}/{MAX_BATTLE_TEAM_SIZE}
+                          </div>
+                        </div>
+                        <SortableContext
+                          items={[...battleTeam]
+                            .sort(
+                              (a, b) =>
+                                (a.battleTeamPosition || 0) -
+                                (b.battleTeamPosition || 0),
+                            )
+                            .map((pokemon) => pokemon.id)}
+                          strategy={rectSortingStrategy}
+                        >
+                          <div className="grid w-full grid-cols-3 gap-2">
+                            {[...Array(MAX_BATTLE_TEAM_SIZE)].map((_, i) => {
+                              const p = battleTeam.find(
+                                (pokemon) =>
+                                  pokemon.battleTeamPosition === i + 1,
+                              )
+                              return p ? (
+                                <SortableBattleTeamMember
+                                  key={p.id}
+                                  pokemonId={p.id}
+                                  disabled={isReorderingBattleTeam}
+                                >
+                                  {renderPokemonCard(p, {
+                                    showRosterBadge: false,
+                                    disableHoldMenu: true,
+                                  })}
+                                </SortableBattleTeamMember>
+                              ) : (
+                                <button
+                                  key={`empty-${i}`}
+                                  type="button"
+                                  onClick={() =>
+                                    beginRosterSelection({
+                                      role: 'battle-team',
+                                      position: i + 1,
+                                    })
+                                  }
+                                  className="game-focus-ring group/slot flex aspect-square w-full max-w-[104px] items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
+                                  aria-label={`Choose a Pokemon for battle team slot ${i + 1}`}
+                                >
+                                  <span className="text-[10px] font-bold text-game-muted group-hover/slot:text-game-moss-strong">
+                                    {i + 1}
+                                  </span>
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </SortableContext>
+                      </div>
+                    </div>
+                    <div className="w-full shrink-0">
+                      <div className="flex h-full flex-col rounded-md border border-game-border bg-game-surface p-2">
+                        <div className="flex items-center justify-center gap-2 mb-2 px-1">
+                          <Heart className="h-3 w-3 text-game-moss-strong" />
                           <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-game-ink">
-                            Battle Team
+                            Partner
                           </h3>
                         </div>
-                        <div className="absolute right-1 font-mono text-[10px] text-game-muted">
-                          {battleTeam.length}/{MAX_BATTLE_TEAM_SIZE}
-                        </div>
-                      </div>
-                      <SortableContext
-                        items={[...battleTeam]
-                          .sort((a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0))
-                          .map((pokemon) => pokemon.id)}
-                        strategy={rectSortingStrategy}
-                      >
-                      <div className="grid w-full grid-cols-3 gap-2">
-                        {[...Array(MAX_BATTLE_TEAM_SIZE)].map((_, i) => {
-                          const p = battleTeam.find(
-                            (pokemon) => pokemon.battleTeamPosition === i + 1,
-                          )
-                          return p ? (
-                            <SortableBattleTeamMember
-                              key={p.id}
-                              pokemonId={p.id}
-                              disabled={isReorderingBattleTeam}
+                        <div className="mx-auto h-24 w-24">
+                          {companion ? (
+                            <DraggablePartner
+                              pokemonId={companion.id}
+                              disabled={
+                                isAssigningRoster || isReorderingBattleTeam
+                              }
                             >
-                              {renderPokemonCard(p, {
+                              {renderPokemonCard(companion, {
                                 showRosterBadge: false,
                                 disableHoldMenu: true,
                               })}
-                            </SortableBattleTeamMember>
+                            </DraggablePartner>
                           ) : (
                             <button
-                              key={`empty-${i}`}
                               type="button"
                               onClick={() =>
-                                beginRosterSelection({
-                                  role: 'battle-team',
-                                  position: i + 1,
-                                })
+                                beginRosterSelection({ role: 'companion' })
                               }
-                              className="game-focus-ring group/slot flex aspect-square w-full max-w-[104px] items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
-                              aria-label={`Choose a Pokemon for battle team slot ${i + 1}`}
+                              className="game-focus-ring group/slot flex h-full w-full items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
+                              aria-label="Choose a partner Pokemon"
                             >
-                              <span className="text-[10px] font-bold text-game-muted group-hover/slot:text-game-moss-strong">
-                                {i + 1}
-                              </span>
+                              <Plus className="h-4 w-4 text-game-muted group-hover/slot:text-game-moss-strong" />
                             </button>
-                          )
-                        })}
-                      </div>
-                      </SortableContext>
-                    </div>
-                  </div>
-                  <div className="w-full shrink-0">
-                    <div className="flex h-full flex-col rounded-md border border-game-border bg-game-surface p-2">
-                      <div className="flex items-center justify-center gap-2 mb-2 px-1">
-                        <Heart className="h-3 w-3 text-game-moss-strong" />
-                        <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-game-ink">
-                          Partner
-                        </h3>
-                      </div>
-                      <div className="mx-auto h-24 w-24">
-                        {companion ? (
-                          <DraggablePartner
-                            pokemonId={companion.id}
-                            disabled={isAssigningRoster || isReorderingBattleTeam}
-                          >
-                            {renderPokemonCard(companion, {
-                              showRosterBadge: false,
-                              disableHoldMenu: true,
-                            })}
-                          </DraggablePartner>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              beginRosterSelection({ role: 'companion' })
-                            }
-                            className="game-focus-ring group/slot flex h-full w-full items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
-                            aria-label="Choose a partner Pokemon"
-                          >
-                            <Plus className="h-4 w-4 text-game-muted group-hover/slot:text-game-moss-strong" />
-                          </button>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="w-full shrink-0 bg-game-surface-raised px-4 py-3">
-            <div className="max-w-7xl mx-auto relative">
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <PremiumSelect
-                    value={selectedBoxId ?? 'unorganized'}
-                    onValueChange={(val) =>
-                      handleBoxChange(val === 'unorganized' ? null : val)
-                    }
-                    options={[
-                      { id: 'unorganized', label: 'Unorganized' },
-                      ...(user?.boxes || [])
-                        .filter((box) => !!box.id)
-                        .map((box) => ({
-                          id: box.id as string,
-                          label: box.name as string,
-                        })),
-                    ]}
-                  />
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {(user?.boxes?.length || 0) < (user?.maxBoxes || 5) && (
-                    <Dialog
-                      open={isCreatingBox}
-                      onOpenChange={setIsCreatingBox}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          className="h-10 w-10 border-game-border bg-game-surface text-game-moss-strong"
-                          aria-label="Create storage box"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="border-game-border bg-game-surface text-game-ink sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Create a box</DialogTitle>
-                          <DialogDescription>
-                            Give this storage box a short, memorable name.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label className="text-right text-xs text-game-muted">
-                              Name
-                            </Label>
-                            <Input
-                              value={newBoxName}
-                              onChange={(e) => setNewBoxName(e.target.value)}
-                              className="col-span-3 h-10 border-game-border bg-game-surface-raised text-game-ink"
-                              maxLength={12}
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter>
+            <div className="w-full shrink-0 bg-game-surface-raised px-4 py-3">
+              <div className="max-w-7xl mx-auto relative">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <PremiumSelect
+                      value={selectedBoxId ?? 'unorganized'}
+                      onValueChange={(val) =>
+                        handleBoxChange(val === 'unorganized' ? null : val)
+                      }
+                      options={[
+                        { id: 'unorganized', label: 'Unorganized' },
+                        ...(user?.boxes || [])
+                          .filter((box) => !!box.id)
+                          .map((box) => ({
+                            id: box.id as string,
+                            label: box.name as string,
+                          })),
+                      ]}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {(user?.boxes?.length || 0) < (user?.maxBoxes || 5) && (
+                      <Dialog
+                        open={isCreatingBox}
+                        onOpenChange={setIsCreatingBox}
+                      >
+                        <DialogTrigger asChild>
                           <Button
-                            onClick={handleCreateBox}
-                            className="h-10 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
+                            size="icon"
+                            variant="outline"
+                            className="h-10 w-10 border-game-border bg-game-surface text-game-moss-strong"
+                            aria-label="Create storage box"
                           >
-                            Create Box
+                            <Plus className="w-4 h-4" />
                           </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                  {typeof selectedBoxId === 'string' &&
-                    selectedBoxId !== 'battle-team' && (
-                      <>
-                        <Dialog
-                          open={isRenamingBox}
-                          onOpenChange={setIsRenamingBox}
-                        >
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() =>
-                                setRenameBoxName(
-                                  user?.boxes?.find(
-                                    (b) => b.id === selectedBoxId,
-                                  )?.name || '',
-                                )
-                              }
-                              className="h-10 w-10 text-game-muted hover:text-game-ink"
-                              aria-label="Rename selected box"
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="border-game-border bg-game-surface text-game-ink">
-                            <DialogHeader>
-                              <DialogTitle>Rename box</DialogTitle>
-                              <DialogDescription>
-                                Choose a new name for this collection.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right text-xs text-game-muted">
-                                  Name
-                                </Label>
-                                <Input
-                                  value={renameBoxName}
-                                  onChange={(e) =>
-                                    setRenameBoxName(e.target.value)
-                                  }
-                                  className="col-span-3 h-10 border-game-border bg-game-surface-raised text-game-ink"
-                                  maxLength={12}
-                                />
-                              </div>
+                        </DialogTrigger>
+                        <DialogContent className="border-game-border bg-game-surface text-game-ink sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle>Create a box</DialogTitle>
+                            <DialogDescription>
+                              Give this storage box a short, memorable name.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label className="text-right text-xs text-game-muted">
+                                Name
+                              </Label>
+                              <Input
+                                value={newBoxName}
+                                onChange={(e) => setNewBoxName(e.target.value)}
+                                className="col-span-3 h-10 border-game-border bg-game-surface-raised text-game-ink"
+                                maxLength={12}
+                              />
                             </div>
-                            <DialogFooter>
-                              <Button
-                                onClick={handleRenameBox}
-                                className="h-10 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
-                              >
-                                Save
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                        <Dialog
-                          open={isDeletingBox}
-                          onOpenChange={setIsDeletingBox}
-                        >
-                          <DialogTrigger asChild>
+                          </div>
+                          <DialogFooter>
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-10 w-10 text-game-clay-strong"
-                              aria-label="Delete selected box"
+                              onClick={handleCreateBox}
+                              className="h-10 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              Create Box
                             </Button>
-                          </DialogTrigger>
-                          <DialogContent className="border-game-border bg-game-surface text-game-ink">
-                            <DialogHeader>
-                              <DialogTitle>Delete box?</DialogTitle>
-                              <DialogDescription>
-                                The box must be empty. This cannot be undone.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter className="mt-4 flex flex-row gap-2">
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                    {typeof selectedBoxId === 'string' &&
+                      selectedBoxId !== 'battle-team' && (
+                        <>
+                          <Dialog
+                            open={isRenamingBox}
+                            onOpenChange={setIsRenamingBox}
+                          >
+                            <DialogTrigger asChild>
                               <Button
                                 variant="ghost"
-                                onClick={() => setIsDeletingBox(false)}
-                                className="h-10 flex-1"
+                                size="icon"
+                                onClick={() =>
+                                  setRenameBoxName(
+                                    user?.boxes?.find(
+                                      (b) => b.id === selectedBoxId,
+                                    )?.name || '',
+                                  )
+                                }
+                                className="h-10 w-10 text-game-muted hover:text-game-ink"
+                                aria-label="Rename selected box"
                               >
-                                Cancel
+                                <Pencil className="w-3.5 h-3.5" />
                               </Button>
+                            </DialogTrigger>
+                            <DialogContent className="border-game-border bg-game-surface text-game-ink">
+                              <DialogHeader>
+                                <DialogTitle>Rename box</DialogTitle>
+                                <DialogDescription>
+                                  Choose a new name for this collection.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right text-xs text-game-muted">
+                                    Name
+                                  </Label>
+                                  <Input
+                                    value={renameBoxName}
+                                    onChange={(e) =>
+                                      setRenameBoxName(e.target.value)
+                                    }
+                                    className="col-span-3 h-10 border-game-border bg-game-surface-raised text-game-ink"
+                                    maxLength={12}
+                                  />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  onClick={handleRenameBox}
+                                  className="h-10 w-full bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
+                                >
+                                  Save
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                          <Dialog
+                            open={isDeletingBox}
+                            onOpenChange={setIsDeletingBox}
+                          >
+                            <DialogTrigger asChild>
                               <Button
-                                onClick={handleDeleteBox}
-                                variant="destructive"
-                                className="h-10 flex-1"
+                                variant="ghost"
+                                size="icon"
+                                className="h-10 w-10 text-game-clay-strong"
+                                aria-label="Delete selected box"
                               >
-                                Delete
+                                <Trash2 className="w-3.5 h-3.5" />
                               </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </>
-                    )}
+                            </DialogTrigger>
+                            <DialogContent className="border-game-border bg-game-surface text-game-ink">
+                              <DialogHeader>
+                                <DialogTitle>Delete box?</DialogTitle>
+                                <DialogDescription>
+                                  The box must be empty. This cannot be undone.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter className="mt-4 flex flex-row gap-2">
+                                <Button
+                                  variant="ghost"
+                                  onClick={() => setIsDeletingBox(false)}
+                                  className="h-10 flex-1"
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  onClick={handleDeleteBox}
+                                  variant="destructive"
+                                  className="h-10 flex-1"
+                                >
+                                  Delete
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </>
+                      )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </DndContext>
 
       <ResponsivePanel
@@ -1679,8 +1724,7 @@ export function PokemonList({
                 type="button"
                 variant="outline"
                 disabled={
-                  battleTeam.length >= MAX_BATTLE_TEAM_SIZE ||
-                  isAssigningRoster
+                  battleTeam.length >= MAX_BATTLE_TEAM_SIZE || isAssigningRoster
                 }
                 aria-busy={isAssigningRoster}
                 className="h-12 justify-start border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss/45 hover:bg-game-moss/5"
@@ -1695,7 +1739,9 @@ export function PokemonList({
                 ) : (
                   <Swords className="h-4 w-4 text-game-moss-strong" />
                 )}
-                {isAssigningRoster ? 'Adding to battle team…' : 'Add to battle team'}
+                {isAssigningRoster
+                  ? 'Adding to battle team…'
+                  : 'Add to battle team'}
               </Button>
             )}
             {!quickMenuPokemon.isCompanion && (
@@ -1738,7 +1784,9 @@ export function PokemonList({
                 ) : (
                   <Box className="h-4 w-4 text-game-muted" />
                 )}
-                {isAssigningRoster ? 'Moving to current box…' : 'Move to current box'}
+                {isAssigningRoster
+                  ? 'Moving to current box…'
+                  : 'Move to current box'}
               </Button>
             )}
             <Button
@@ -1821,7 +1869,14 @@ export function PokemonList({
       <RewardResultOverlay
         result={eggHatchResult}
         onClose={() => setEggHatchResult(null)}
-        icon={eggHatchResult?.summary?.pokemon?.[0] ? { type: 'pokemon', id: eggHatchResult.summary.pokemon[0].speciesId } : undefined}
+        icon={
+          eggHatchResult?.summary?.pokemon?.[0]
+            ? {
+                type: 'pokemon',
+                id: eggHatchResult.summary.pokemon[0].speciesId,
+              }
+            : undefined
+        }
         iconAlt="Hatched Pokemon"
         title="Egg Hatched"
         message={eggHatchResult?.message}
@@ -1858,7 +1913,9 @@ function EggCard({
   hatchingEggId: string | null
   onHatch: (egg: BoxEgg) => void | Promise<void>
 }) {
-  const { formatted: timeLeft, timeLeft: timeLeftMs } = useCountdown(egg.hatchAt)
+  const { formatted: timeLeft, timeLeft: timeLeftMs } = useCountdown(
+    egg.hatchAt,
+  )
   const rarity = resolvePokemonRarity({ rarity: egg.rarity })
   const rarityEffect = getPokemonRarityEffect(rarity)
   const isVariantEgg = rarity !== 'normal'
@@ -1886,7 +1943,9 @@ function EggCard({
         <Card className="game-focus-ring group relative aspect-square h-full w-full cursor-pointer border border-game-card-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
           <PokemonRarityEggSprite
             rarity={rarity}
-            alt={isVariantEgg ? `${rarityEffect.label} Pokemon Egg` : 'Pokemon Egg'}
+            alt={
+              isVariantEgg ? `${rarityEffect.label} Pokemon Egg` : 'Pokemon Egg'
+            }
             className="h-full w-full"
             imageClassName="h-full w-full"
           />
@@ -1899,7 +1958,8 @@ function EggCard({
             {isVariantEgg ? `${rarityEffect.label} Egg` : 'A mystery egg'}
           </DialogTitle>
           <DialogDescription>
-            An unhatched{isVariantEgg ? ` ${rarityEffect.label}` : ''} Pokémon egg
+            An unhatched{isVariantEgg ? ` ${rarityEffect.label}` : ''} Pokémon
+            egg
             {egg.sourceLocation ? ` found at ${egg.sourceLocation}` : ''}.
           </DialogDescription>
         </DialogHeader>
@@ -1912,7 +1972,13 @@ function EggCard({
                 viewBox="0 0 100 100"
                 fill="none"
               >
-                <circle cx="50" cy="50" r="43" stroke="currentColor" strokeWidth="2" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="43"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
                 <circle
                   className="text-game-ochre transition-[stroke-dashoffset] duration-700 ease-out"
                   cx="50"
@@ -1932,7 +1998,11 @@ function EggCard({
                 >
                   <PokemonRarityEggSprite
                     rarity={rarity}
-                    alt={isVariantEgg ? `${rarityEffect.label} Pokemon Egg` : 'Mystery Pokemon Egg'}
+                    alt={
+                      isVariantEgg
+                        ? `${rarityEffect.label} Pokemon Egg`
+                        : 'Mystery Pokemon Egg'
+                    }
                     className="h-36 w-36"
                     imageClassName="h-full w-full"
                     sizes="144px"
@@ -1982,7 +2052,9 @@ function EggCard({
               disabled={hatchingEggId === egg.id}
               onClick={() => onHatch(egg)}
             >
-              {hatchingEggId === egg.id ? 'Preparing hatch…' : 'Hatch · 50 Crystals'}
+              {hatchingEggId === egg.id
+                ? 'Preparing hatch…'
+                : 'Hatch · 50 Crystals'}
             </Button>
           ) : (
             <p className="w-full text-center text-sm text-game-muted">
@@ -2002,7 +2074,9 @@ function EggHatchOverlay({
   rarity?: string | null
   onComplete: () => void
 }) {
-  const [phase, setPhase] = useState<'warm' | 'cracking' | 'flash' | 'reveal'>('warm')
+  const [phase, setPhase] = useState<'warm' | 'cracking' | 'flash' | 'reveal'>(
+    'warm',
+  )
   useEffect(() => {
     const cracking = setTimeout(() => setPhase('cracking'), 900)
     const flash = setTimeout(() => setPhase('flash'), 2050)
@@ -2078,8 +2152,14 @@ function SortableBattleTeamMember({
   disabled,
   children,
 }: PropsWithChildren<{ pokemonId: string; disabled: boolean }>) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: pokemonId, disabled })
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: pokemonId, disabled })
 
   return (
     <div

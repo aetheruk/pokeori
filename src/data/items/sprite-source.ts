@@ -70,3 +70,7 @@ export function getItemSpriteUrl(itemId: string): string {
 export function getItemHueRotate(itemId: string): number | undefined {
   return itemsById.get(itemId)?.hueRotate
 }
+
+export function getItemSpriteFilter(itemId: string): string | undefined {
+  return itemsById.get(itemId)?.spriteFilter
+}

@@ -559,11 +559,13 @@ function PokemonExperienceBar({
 
 interface PokemonDetailsDialogProps {
   pokemon: Pokemon
+  battleTeam?: Pokemon[]
   boxes: NonNullable<User['boxes']>
   inventory?: { itemId: string; quantity: number }[]
   trigger?: React.ReactNode
   onRename?: (updatedPokemon: Pokemon) => void
   onRelease?: (pokemonId: string) => void
+  onPokemonAdded?: (pokemon: Pokemon) => void
   defaultOpenUseItem?: boolean
   highlightItemId?: string
 }
@@ -583,18 +585,28 @@ export function PokemonDetailsDialog(props: PokemonDetailsDialogProps) {
       },
     })
   }
-  return <Button variant="ghost" size="icon" className="h-10 w-10 text-game-muted hover:bg-game-moss/10 hover:text-game-moss" onClick={() => setActivated(true)}>
-    <Info className="h-5 w-5" /><span className="sr-only">View Details</span>
-  </Button>
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-10 w-10 text-game-muted hover:bg-game-moss/10 hover:text-game-moss"
+      onClick={() => setActivated(true)}
+    >
+      <Info className="h-5 w-5" />
+      <span className="sr-only">View Details</span>
+    </Button>
+  )
 }
 
 function MountedPokemonDetailsDialog({
   pokemon,
+  battleTeam = [],
   boxes,
   inventory = [],
   trigger,
   onRename,
   onRelease,
+  onPokemonAdded,
   defaultOpenUseItem,
   highlightItemId,
   initialOpen,
@@ -834,7 +846,8 @@ function MountedPokemonDetailsDialog({
           !matchesEvolutionRegion(conditions, pokemon) ||
           (conditions.requiredSourceForm &&
             conditions.requiredSourceForm !== (formInfo?.form || 'base'))
-        ) return []
+        )
+          return []
         const move = getMove(conditions.knownMoveId)
         return move ? [move.name] : []
       }),
@@ -1045,10 +1058,12 @@ function MountedPokemonDetailsDialog({
           if (!open) setMoveWorkspaceOpen(false)
         }}
         trigger={panelTrigger}
-        title={<span className="inline-flex items-center gap-2">
-          {pokemon.isAlpha && <AlphaIcon />}
-          {pokemon.name || formInfo?.name || 'Pokemon'}
-        </span>}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {pokemon.isAlpha && <AlphaIcon />}
+            {pokemon.name || formInfo?.name || 'Pokemon'}
+          </span>
+        }
         description={formLabel}
         icon={
           <PokemonRaritySprite
@@ -1126,7 +1141,46 @@ function MountedPokemonDetailsDialog({
                 const canEvolveLevel = conditions.minLevel
                   ? (pokemon.level || 1) >= conditions.minLevel
                   : true
-                if (!canEvolveLevel) return false
+                const canEvolveMaxLevel = conditions.maxLevel
+                  ? (pokemon.level || 1) <= conditions.maxLevel
+                  : true
+                if (!canEvolveLevel || !canEvolveMaxLevel) return false
+                if (
+                  conditions.minBattleKOs &&
+                  (pokemon.battleKOs || 0) < conditions.minBattleKOs
+                )
+                  return false
+                if (
+                  conditions.minTimesKOd &&
+                  (pokemon.timesKOd || 0) < conditions.minTimesKOd
+                )
+                  return false
+                if (conditions.requiresActiveCompanion && !pokemon.isCompanion)
+                  return false
+                if (
+                  conditions.requiresBattleLevelUp &&
+                  pokemon.battleLevelUpLevel !== pokemon.level
+                )
+                  return false
+                if (
+                  conditions.requiredPartySpeciesId &&
+                  !battleTeam.some(
+                    (member) =>
+                      member.speciesId === conditions.requiredPartySpeciesId,
+                  )
+                )
+                  return false
+                if (
+                  conditions.requiresBattleTeamSlot &&
+                  (!pokemon.onBattleTeam || battleTeam.length >= 6)
+                )
+                  return false
+                if (
+                  conditions.requiredInventoryItemId &&
+                  (effectiveInventoryMap[conditions.requiredInventoryItemId] ||
+                    0) < (conditions.requiredInventoryItemQuantity || 1)
+                )
+                  return false
                 const canEvolveFriendship = conditions.minHappiness
                   ? ((pokemon as any).friendship || 0) >=
                     conditions.minHappiness
@@ -1166,7 +1220,8 @@ function MountedPokemonDetailsDialog({
                         conditions.requiredSourceForm !== currentFormName
                       )
                         return null
-                      if (!matchesEvolutionRegion(conditions, pokemon)) return null
+                      if (!matchesEvolutionRegion(conditions, pokemon))
+                        return null
                       if (!matchesEvolutionGender(conditions, pokemonGender))
                         return null
                       const timeConditionMet =
@@ -1174,7 +1229,8 @@ function MountedPokemonDetailsDialog({
                           conditions,
                           evolutionTimeRegion,
                         )
-                      const requiredItemId = getRequiredEvolutionItem(conditions)
+                      const requiredItemId =
+                        getRequiredEvolutionItem(conditions)
                       const hasRequiredItem = requiredItemId
                         ? hasItem(requiredItemId)
                         : true
@@ -1186,6 +1242,9 @@ function MountedPokemonDetailsDialog({
                       const canEvolveLevel = conditions.minLevel
                         ? (pokemon.level || 1) >= conditions.minLevel
                         : true
+                      const canEvolveMaxLevel = conditions.maxLevel
+                        ? (pokemon.level || 1) <= conditions.maxLevel
+                        : true
                       const canEvolveFriendship = conditions.minHappiness
                         ? ((pokemon as any).friendship || 0) >=
                           conditions.minHappiness
@@ -1196,9 +1255,35 @@ function MountedPokemonDetailsDialog({
                           )} (${getEvolutionTimeRegionLabel(evolutionTimeRegion)})`
                         : ''
                       const canEvolve =
-                        matchesEvolutionMove(conditions, pokemon.assignedMoves) &&
+                        matchesEvolutionMove(
+                          conditions,
+                          pokemon.assignedMoves,
+                        ) &&
                         canEvolveLevel &&
+                        canEvolveMaxLevel &&
                         canEvolveFriendship &&
+                        (!conditions.minBattleKOs ||
+                          (pokemon.battleKOs || 0) >=
+                            conditions.minBattleKOs) &&
+                        (!conditions.minTimesKOd ||
+                          (pokemon.timesKOd || 0) >= conditions.minTimesKOd) &&
+                        (!conditions.requiresActiveCompanion ||
+                          !!pokemon.isCompanion) &&
+                        (!conditions.requiresBattleLevelUp ||
+                          pokemon.battleLevelUpLevel === pokemon.level) &&
+                        (!conditions.requiredPartySpeciesId ||
+                          battleTeam.some(
+                            (member) =>
+                              member.speciesId ===
+                              conditions.requiredPartySpeciesId,
+                          )) &&
+                        (!conditions.requiresBattleTeamSlot ||
+                          (!!pokemon.onBattleTeam && battleTeam.length < 6)) &&
+                        (!conditions.requiredInventoryItemId ||
+                          (effectiveInventoryMap[
+                            conditions.requiredInventoryItemId
+                          ] || 0) >=
+                            (conditions.requiredInventoryItemQuantity || 1)) &&
                         hasRequiredItem &&
                         hasEvolutionCatalyst &&
                         timeConditionMet
@@ -1228,12 +1313,58 @@ function MountedPokemonDetailsDialog({
 
                       if (conditions.knownMoveId) {
                         const moveName =
-                          getMove(conditions.knownMoveId)?.name || conditions.knownMoveId
+                          getMove(conditions.knownMoveId)?.name ||
+                          conditions.knownMoveId
                         const moveRequirement = `${moveName} equipped`
                         requirementText =
                           requirementText === 'Unknown Condition'
                             ? moveRequirement
                             : `${requirementText} + ${moveRequirement}`
+                      }
+
+                      const additionalRequirements = [
+                        conditions.maxLevel &&
+                        conditions.maxLevel !== conditions.minLevel
+                          ? `level ${conditions.maxLevel} or lower`
+                          : '',
+                        conditions.maxLevel &&
+                        conditions.maxLevel === conditions.minLevel
+                          ? `exactly level ${conditions.maxLevel}`
+                          : '',
+                        requiredItemId && conditions.minLevel
+                          ? `Use ${items.find((item) => item.id === requiredItemId)?.name || requiredItemId}`
+                          : '',
+                        conditions.minBattleKOs
+                          ? `${conditions.minBattleKOs} battle KOs`
+                          : '',
+                        conditions.minTimesKOd
+                          ? `${conditions.minTimesKOd} faints`
+                          : '',
+                        conditions.requiredPartySpeciesId === 223
+                          ? 'Remoraid in party'
+                          : '',
+                        conditions.requiresBattleTeamSlot
+                          ? 'party slot + Poké Ball'
+                          : '',
+                        conditions.requiresActiveCompanion
+                          ? 'active companion'
+                          : '',
+                        conditions.requiresBattleLevelUp
+                          ? 'level up in battle'
+                          : '',
+                        conditions.requiredInventoryItemId && !requiredItemId
+                          ? `${conditions.requiredInventoryItemQuantity || 1} ${items.find((item) => item.id === conditions.requiredInventoryItemId)?.name || conditions.requiredInventoryItemId}`
+                          : '',
+                      ].filter(Boolean)
+                      if (additionalRequirements.length) {
+                        requirementText = [
+                          requirementText === 'Unknown Condition'
+                            ? ''
+                            : requirementText,
+                          ...additionalRequirements,
+                        ]
+                          .filter(Boolean)
+                          .join(' + ')
                       }
 
                       const handleEvolution = async () => {
@@ -1264,6 +1395,8 @@ function MountedPokemonDetailsDialog({
                             })
                             if (result.pokemon)
                               setEvolvedPokemon(result.pokemon)
+                            if (result.additionalPokemon)
+                              onPokemonAdded?.(result.additionalPokemon)
                             if (result.rewards)
                               setEvolutionRewards(
                                 result.rewards as RewardSummary,
@@ -1603,7 +1736,10 @@ function MountedPokemonDetailsDialog({
                                   : `Remove ${currentHeldItem.name}`}
                               </span>
                             </span>
-                            <X className="size-4 shrink-0 text-game-muted" aria-hidden="true" />
+                            <X
+                              className="size-4 shrink-0 text-game-muted"
+                              aria-hidden="true"
+                            />
                           </Button>
                         )}
 
@@ -1620,7 +1756,8 @@ function MountedPokemonDetailsDialog({
                             {heldItemOptions.map((item) => {
                               const selected = heldItemId === item.id
                               const saving = isSavingHeldItem === item.id
-                              const quantity = effectiveInventoryMap[item.id] || 0
+                              const quantity =
+                                effectiveInventoryMap[item.id] || 0
                               const skillLockReason = getItemSkillLockReason(
                                 item,
                                 user?.skills,
@@ -1676,7 +1813,8 @@ function MountedPokemonDetailsDialog({
                                       )}
                                     </div>
                                     <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">
-                                      {skillLockReason || formatHeldItemTrigger(item)}
+                                      {skillLockReason ||
+                                        formatHeldItemTrigger(item)}
                                     </div>
                                   </div>
                                 </button>
@@ -1776,8 +1914,8 @@ function MountedPokemonDetailsDialog({
               <div className="space-y-3 border-y border-game-border/75 py-4">
                 {evolutionMoveNames.length > 0 && (
                   <p className="text-xs text-game-muted">
-                    Evolution move: {evolutionMoveNames.join(' or ')}. Equip and save
-                    the move to meet this evolution requirement.
+                    Evolution move: {evolutionMoveNames.join(' or ')}. Equip and
+                    save the move to meet this evolution requirement.
                   </p>
                 )}
 
@@ -1809,9 +1947,7 @@ function MountedPokemonDetailsDialog({
                               key={`summary-move-slot-${index + 1}`}
                               className={cn(
                                 'flex min-h-14 items-center gap-2 border-b border-game-border/75 px-2 py-2 last:border-b-0',
-                                move
-                                  ? 'bg-game-moss/10'
-                                  : 'border-dashed',
+                                move ? 'bg-game-moss/10' : 'border-dashed',
                               )}
                             >
                               <span className="font-mono text-[9px] font-bold text-game-muted">
@@ -1881,7 +2017,6 @@ function MountedPokemonDetailsDialog({
                         Manage moves
                       </Button>
                     </div>
-
                   </>
                 )}
               </div>
@@ -1934,10 +2069,7 @@ function MountedPokemonDetailsDialog({
               <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                 Pokemon Stats
               </SectionDivider>
-              <div
-                className="relative overflow-hidden py-2"
-                data-vaul-no-drag
-              >
+              <div className="relative overflow-hidden py-2" data-vaul-no-drag>
                 <Carousel className="mx-auto w-full max-w-lg">
                   <CarouselContent className="-ml-0">
                     {/* Base Stats */}

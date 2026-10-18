@@ -15,6 +15,14 @@ const levelEvolutionCatalystItems: Item[] = LEVEL_EVOLUTION_CATALYSTS.map(
 
 export const evolutionItems: Item[] = [
   ...levelEvolutionCatalystItems,
+  {
+    id: 'dense-liquid-metal',
+    name: 'Dense Liquid Metal',
+    description: 'A heavy, silver liquid metal that can trigger Meltan’s evolution.',
+    category: 'evolution',
+    spriteId: 'nugget',
+    spriteFilter: 'grayscale(1) brightness(1.2) contrast(0.95)',
+  },
   // Evolution Items
   {
     id: 'thunder-stone',
