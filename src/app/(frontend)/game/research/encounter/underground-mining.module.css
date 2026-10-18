@@ -117,9 +117,6 @@
   box-shadow: inset 1px 1px 0 rgb(255 221 150 / .15), inset -1px -1px 0 rgb(50 29 15 / .3);
 }
 
-.cell[data-depth='6'] .stone { filter: brightness(1.05); }
-.cell[data-depth='4'] .stone { filter: brightness(.94); }
-.cell[data-depth='3'] .stone { filter: brightness(.88); }
 .clearedCell::after { box-shadow: inset 1px 1px 3px rgb(32 20 13 / .6); }
 .bedrockCell::after { box-shadow: inset 1px 1px 0 rgb(227 239 239 / .4), inset -2px -2px 2px rgb(20 24 27 / .5); }
 .cell:focus-visible { z-index: 3; outline: 3px solid #fff1b7; outline-offset: -3px; }
