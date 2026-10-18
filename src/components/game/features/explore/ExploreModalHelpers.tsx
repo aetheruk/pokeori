@@ -984,13 +984,13 @@ export function getFormattedRewards(
       const totalWeight = eligible.lootPool.reduce((total, entry) => total + entry.weight, 0)
       const buriedLoot = eligible.lootPool.map((entry) => ({
         entry,
-        subLabel: `${formatPercent(entry.weight / totalWeight * 100)} per treasure slot`,
+        subLabel: `${formatPercent(entry.weight / totalWeight * 100)} chance - Buried`,
       }))
       for (const { entry, subLabel } of buriedLoot) {
         const mapped = mapRewardToDisplayItem({
           type: 'item', targetId: entry.itemId, quantity: entry.quantity ?? 1,
         }, { userInventory, user: userData.user })
-        if (mapped) rewardItems.push({ ...mapped, subLabel: `Buried · ${subLabel}` })
+        if (mapped) rewardItems.push({ ...mapped, subLabel })
       }
     }
   }
