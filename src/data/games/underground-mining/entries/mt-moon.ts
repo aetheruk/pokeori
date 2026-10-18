@@ -35,7 +35,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
       lootPool: [
         {
           itemId: 'small-stone-t1',
-          weight: 96,
+          weight: 99.3,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -48,7 +48,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'small-stone-t1',
-          weight: 94,
+          weight: 98.9,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -57,13 +57,13 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'moon-stone',
-          weight: 2,
+          weight: 0.1,
           size: { width: 2, height: 2 },
           quantity: 1,
         },
         {
           itemId: 'dome-fossil',
-          weight: 1,
+          weight: 0.2,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -76,7 +76,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'dome-fossil',
-          weight: 2,
+          weight: 0.4,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -85,7 +85,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'helix-fossil',
-          weight: 1,
+          weight: 0.2,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -98,12 +98,18 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'helix-fossil',
-          weight: 2,
+          weight: 0.4,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
             { type: 'task_completed', targetId: 'mt-moon-expert-advice' },
           ],
+        },
+        {
+          itemId: 'old-amber',
+          weight: 0.2,
+          size: { width: 2, height: 2 },
+          quantity: 1,
         },
       ],
       wallStressLimit: 49,
