@@ -127,8 +127,7 @@ export function UndergroundMiningGame({
 
   useEffect(() => {
     if (!round || round.status === 'playing') return
-    const revealTimer = window.setTimeout(() => void finish(round), 850)
-    return () => window.clearTimeout(revealTimer)
+    void finish(round)
   }, [finish, round])
 
   const strike = async (x: number, y: number) => {
@@ -245,7 +244,7 @@ export function UndergroundMiningGame({
         onToolChange={setSelectedTool}
         onStrike={strike}
       />
-      {(isFinishing || finishError) && !result ? (
+      {finishError && !result ? (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-game-charcoal/55 p-5">
           <div className="flex max-w-sm flex-col items-center gap-3 rounded-xl border border-game-border bg-game-surface-raised px-6 py-5 text-center text-game-ink shadow-sm">
             <p className="font-semibold">
@@ -253,24 +252,13 @@ export function UndergroundMiningGame({
                 ? 'Treasures recovered!'
                 : 'The wall collapsed'}
             </p>
-            {finishError ? (
-              <>
-                <p role="alert" className="text-sm text-game-danger">
-                  {finishError}
-                </p>
-                <Button onClick={() => void finish(round)}>Retry saving</Button>
-                <Button variant="outline" onClick={close}>
-                  Return to Explore
-                </Button>
-              </>
-            ) : (
-              <>
-                <LoadingSpinner />
-                <p role="status" className="text-sm text-game-muted">
-                  Saving finds…
-                </p>
-              </>
-            )}
+            <p role="alert" className="text-sm text-game-danger">
+              {finishError}
+            </p>
+            <Button onClick={() => void finish(round)}>Retry saving</Button>
+            <Button variant="outline" onClick={close}>
+              Return to Explore
+            </Button>
           </div>
         </div>
       ) : null}

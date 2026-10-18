@@ -141,7 +141,7 @@
 .dock { position: absolute; inset: auto 0 max(18px, env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: center; gap: 16px; }
 .tools { display: flex; align-items: center; gap: 30px; margin: 0; padding: 0; border: 0; }
 .tool { position: relative; display: grid; place-items: center; width: 106px; height: 110px; padding: 5px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; }
-.toolSprite { display: block; width: 92px; height: 92px; object-fit: contain; opacity: .65; filter: drop-shadow(0 3px 2px rgb(28 18 12 / .7)); transition: opacity .15s; }
+.toolSprite { display: block; width: 76px; height: 76px; object-fit: contain; opacity: .65; filter: drop-shadow(0 3px 2px rgb(28 18 12 / .7)); transition: opacity .15s; }
 .selectedTool .toolSprite { opacity: 1; }
 .selectedTool::after { content: ''; position: absolute; bottom: -2px; left: 50%; width: 24px; height: 3px; transform: translateX(-50%); border-radius: 2px; background: #ffe4a9; }
 .tool:focus-visible { outline: 2px solid #ffe4a9; outline-offset: 3px; }
@@ -168,7 +168,7 @@
   .dock { inset: 64px 12px 14px auto; width: 96px; }
   .tools { flex-direction: column; gap: 12px; }
   .tool { width: 80px; height: 92px; }
-  .toolSprite { width: 70px; height: 70px; }
+  .toolSprite { width: 60px; height: 60px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
