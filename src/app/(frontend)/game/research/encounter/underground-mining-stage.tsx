@@ -34,11 +34,8 @@ interface UndergroundMiningStageProps {
 
 function rockTexture(layers: number, bedrock: boolean) {
   if (bedrock) return 'bedrock'
-  if (layers >= 5) return 'rock-thick'
-  if (layers >= 3) return 'rock-chipped'
-  if (layers === 2) return 'rock-rust'
-  if (layers === 1) return 'rock-thin'
-  return 'earth'
+  if (layers <= 0) return 'earth'
+  return `layer-${Math.min(6, layers)}`
 }
 
 function describeCell(cell: UndergroundMiningPublicRound['cells'][number]) {
