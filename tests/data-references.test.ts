@@ -6052,8 +6052,14 @@ describe('static data references', () => {
       targetId: entry.itemId,
       dropChance: entry.weight,
     }))
+    expect(miningFossils).toContainEqual(expect.objectContaining({
+      itemId: 'old-amber',
+      weight: 0.2,
+      size: { width: 2, height: 2 },
+      quantity: 1,
+    }))
     for (const [rewards, baseDropChance, improvedDropChance] of [
-      [miningFossils, 1, 2],
+      [miningFossils, 0.2, 0.4],
       [voyage?.rewards || [], 2, 4],
     ] as const) {
       const domeRewards = rewards.filter(
