@@ -823,4 +823,27 @@ export const mtMoonTasks: Task[] = [
       closeButtonText: 'Enter Route 4',
     },
   },
+  {
+    id: 'mt-moon-easier-mining-unlocked',
+    name: 'Easier Mining',
+    description:
+      'Your Geodude have shifted so much rock it should be much easier to mine by yourself here now.',
+    category: 'Kanto',
+    subCategory: 'Mt. Moon',
+    icon: { type: 'item', id: 'hard-stone' },
+    background: '/backgrounds/cave.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'auto',
+    requirements: [
+      {
+        type: 'game_result',
+        targetId: 'mt-moon-mining',
+        battleStatus: 'win',
+        count: 5,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+  },
 ]

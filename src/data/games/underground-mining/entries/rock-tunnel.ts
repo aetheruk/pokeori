@@ -56,7 +56,7 @@ export const rockTunnelUndergroundMiningEntries: UndergroundMiningConfig[] = [
       {
         type: 'xp',
         skill: 'catching',
-        quantity: 250,
+        quantity: 50,
         dropChance: 100,
       },
     ],

@@ -2706,6 +2706,15 @@ export async function completeGameActivity(
             encounter.settings as UndergroundMiningSettings,
           )
         : []
+      const undergroundMiningPerItemRewards =
+        isUndergroundMining &&
+        (encounter.settings as UndergroundMiningSettings).complete !== true &&
+        state.undergroundMiningPrivate?.kind === 'underground-mining-private'
+          ? Array.from(
+              { length: state.undergroundMiningPrivate.treasures.filter((treasure) => treasure.found).length },
+              () => encounter.rewards || [],
+            ).flat()
+          : []
       const collectedRockPushRewards =
         encounter.gameType === 'grid-puzzle'
           ? getCollectedRockPushRewards(
@@ -2896,7 +2905,10 @@ export async function completeGameActivity(
           collectedUndergroundMiningRewards.length > 0
         ) {
           const rewardsToGrant: Reward[] = [
-            ...(encounter.rewards || []),
+            ...(isUndergroundMining &&
+            (encounter.settings as UndergroundMiningSettings).complete !== true
+              ? undergroundMiningPerItemRewards
+              : encounter.rewards || []),
             ...abilityCompletionRewards,
           ]
           rewardsToGrant.push(...collectedRockPushRewards)
@@ -2917,10 +2929,14 @@ export async function completeGameActivity(
           rewardSummary = summary
         }
       } else if (isUndergroundMining) {
-        if (collectedUndergroundMiningRewards.length > 0) {
+        const rewardsToGrant = [
+          ...collectedUndergroundMiningRewards,
+          ...undergroundMiningPerItemRewards,
+        ]
+        if (rewardsToGrant.length > 0) {
           const { summary } = await grantRewards(
             user.id,
-            collectedUndergroundMiningRewards,
+            rewardsToGrant,
             {
               requirementContext: rewardRequirementContext,
               payload,
