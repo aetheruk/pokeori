@@ -5788,7 +5788,12 @@ describe('static data references', () => {
       size: { width: 2, height: 2 },
       quantity: 1,
     })
-    expect(chamberMining?.skillXp).toEqual({ skill: 'catching', level: 15 })
+    expect(chamberMining?.rewards).toContainEqual({
+      type: 'xp',
+      skill: 'catching',
+      quantity: 250,
+      dropChance: 100,
+    })
     expect(rockTunnelMap.completeRequirements).toContainEqual({
       type: 'task_completed',
       targetId: 'rock-tunnel-exit',
@@ -5910,6 +5915,18 @@ describe('static data references', () => {
     expect(mining?.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'mt-moon-fossil-hunter',
+    })
+    expect(mining?.rewards).toContainEqual({
+      type: 'pokemon_research_xp',
+      targetId: '74',
+      quantity: 25,
+      dropChance: 100,
+    })
+    expect(mining?.rewards).toContainEqual({
+      type: 'xp',
+      skill: 'catching',
+      quantity: 250,
+      dropChance: 100,
     })
     expect(voyage?.requirements).toContainEqual({
       type: 'task_completed',

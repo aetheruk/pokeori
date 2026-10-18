@@ -53,7 +53,12 @@ export const rockTunnelUndergroundMiningEntries: UndergroundMiningConfig[] = [
         targetId: 'rusty-coat-recipe',
         dropChance: 100,
       },
+      {
+        type: 'xp',
+        skill: 'catching',
+        quantity: 250,
+        dropChance: 100,
+      },
     ],
-    skillXp: { skill: 'catching', level: 15 },
   },
 ]

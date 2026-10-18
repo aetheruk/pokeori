@@ -120,10 +120,15 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
       {
         type: 'pokemon_research_xp',
         targetId: '74',
-        quantity: 5,
+        quantity: 25,
+        dropChance: 100,
+      },
+      {
+        type: 'xp',
+        skill: 'catching',
+        quantity: 250,
         dropChance: 100,
       },
     ],
-    skillXp: { skill: 'catching', level: 15 },
   },
 ]
