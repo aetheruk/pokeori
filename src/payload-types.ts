@@ -563,6 +563,7 @@ export interface Pokemon {
    * Number of opposing Pokemon this Pokemon has knocked out in battles.
    */
   battleKOs?: number | null;
+  battleLevelUpLevel?: number | null;
   /**
    * Number of damaging super effective hits this Pokemon has landed in battles.
    */
@@ -664,7 +665,7 @@ export interface Pokemon {
   /**
    * How this Pokemon was originally obtained.
    */
-  obtainedMethod?: ('caught' | 'trade' | 'gift' | 'starter' | 'purchased' | 'reward' | 'hatched') | null;
+  obtainedMethod?: ('caught' | 'trade' | 'gift' | 'starter' | 'purchased' | 'reward' | 'evolution' | 'hatched') | null;
   obtainedRegion?: string | null;
   obtainedLocation?: string | null;
   /**
@@ -1420,6 +1421,7 @@ export interface PokemonSelect<T extends boolean = true> {
   level?: T;
   experience?: T;
   battleKOs?: T;
+  battleLevelUpLevel?: T;
   superEffectiveHitsLanded?: T;
   stanceVictories?: T;
   stanceLosses?: T;

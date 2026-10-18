@@ -833,7 +833,7 @@ export const mtMoonTasks: Task[] = [
     icon: { type: 'item', id: 'hard-stone' },
     background: '/backgrounds/cave.avif',
     repeatable: false,
-    secret: false,
+    secret: true,
     completionTrigger: 'auto',
     requirements: [
       {
@@ -845,5 +845,13 @@ export const mtMoonTasks: Task[] = [
     ],
     criteria: [],
     rewards: [],
+    exitModal: {
+      icon: { type: 'item', id: 'hard-stone' },
+      title: 'Mining Mt. Moon',
+      message:
+        'Your Geodude have shifted so much rock it should be much easier to mine by yourself here now.',
+      background: '/backgrounds/cave.avif',
+      closeButtonText: 'Keep Mining',
+    },
   },
 ]

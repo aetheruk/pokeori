@@ -14,6 +14,8 @@ const TOXTRICITY_SPECIES_ID = 849
 const LOW_KEY_TOXTRICITY_FORM = 'Low Key Form'
 const DARUMAKA_SPECIES_ID = 554
 const DARMANITAN_SPECIES_ID = 555
+const TANDEMAUS_SPECIES_ID = 924
+const MAUSHOLD_SPECIES_ID = 925
 const DARMANITAN_FORM_IDS = {
   standard: '555',
   zen: '10017',
@@ -144,6 +146,13 @@ export function resolveEvolutionTargetForm(
     }
 
     return evolvesToZen ? DARMANITAN_FORM_IDS.zen : DARMANITAN_FORM_IDS.standard
+  }
+
+  if (
+    pokemon.speciesId === TANDEMAUS_SPECIES_ID &&
+    evolution.speciesId === MAUSHOLD_SPECIES_ID
+  ) {
+    return random() < 0.01 ? 'Family of Three' : 'base'
   }
 
   return evolution.targetForm || 'base'

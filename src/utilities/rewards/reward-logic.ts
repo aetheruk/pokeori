@@ -44,14 +44,13 @@ import {
 } from '@/utilities/tasks/task-logic'
 import type { RequirementEvaluationContext } from '@/utilities/requirements'
 import { calculateStats } from '@/utilities/pokemon/pokemon-mechanics'
-import { getOwnedPokemonGender, rollPokemonGender } from '@/utilities/pokemon/gender'
+import {
+  getOwnedPokemonGender,
+  rollPokemonGender,
+} from '@/utilities/pokemon/gender'
 import type { ExtendedUser, SkillsData, CurrencyData } from '@/types/user-data'
 import type { GuildsData } from '@/types/user-data'
-import {
-  getGuild,
-  getGuildMaxXp,
-  getGuildRankForXp,
-} from '@/data/guilds'
+import { getGuild, getGuildMaxXp, getGuildRankForXp } from '@/data/guilds'
 import { UserDataConverters } from '@/types/user-data'
 import {
   addPokedexCaughtRarity,
@@ -309,11 +308,13 @@ export async function grantRewards(
           : createEconomyActionId(),
         payload: options.payload,
       },
-      ({ payload, req }) => grantRewards(userId, rewards, { ...options, payload, req }),
+      ({ payload, req }) =>
+        grantRewards(userId, rewards, { ...options, payload, req }),
     )
   }
 
-  const payload = options.payload || (await getPayload({ config: configPromise }))
+  const payload =
+    options.payload || (await getPayload({ config: configPromise }))
   const requestOptions = options.req ? { req: options.req } : {}
 
   // Fetch user with embedded fields
@@ -339,8 +340,16 @@ export async function grantRewards(
     pagination: false,
     ...requestOptions,
   })
-  const inventory = await getUserInventoryMap(payload as any, userId, requestOptions)
-  const pokedex = await getUserPokedexMap(payload as any, userId, requestOptions)
+  const inventory = await getUserInventoryMap(
+    payload as any,
+    userId,
+    requestOptions,
+  )
+  const pokedex = await getUserPokedexMap(
+    payload as any,
+    userId,
+    requestOptions,
+  )
   const completedTasks = await getUserCompletedTasksMap(
     payload as any,
     userId,
@@ -747,6 +756,12 @@ export async function grantRewards(
         data: {
           experience: nextExperience,
           level: newLevel,
+          battleLevelUpLevel:
+            options.source === 'battle-win' &&
+            newLevel > currentLevel &&
+            newLevel >= 25
+              ? newLevel
+              : 0,
           stats: updatedPokemon.stats,
         },
         ...requestOptions,
@@ -1012,10 +1027,7 @@ export async function grantRewards(
           : 0
         const storedLevel = Number(existing.researchLevel || 0)
         const oldLevel = Number.isFinite(storedLevel)
-          ? Math.max(
-              0,
-              Math.min(MAX_RESEARCH_LEVEL, Math.floor(storedLevel)),
-            )
+          ? Math.max(0, Math.min(MAX_RESEARCH_LEVEL, Math.floor(storedLevel)))
           : 0
         const effectiveQuantity =
           oldLevel >= MAX_RESEARCH_LEVEL

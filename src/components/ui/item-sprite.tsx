@@ -1,8 +1,17 @@
 'use client'
 
-import { type CSSProperties, type SyntheticEvent, useEffect, useState } from 'react'
+import {
+  type CSSProperties,
+  type SyntheticEvent,
+  useEffect,
+  useState,
+} from 'react'
 import Image from 'next/image'
-import { getItemHueRotate, getItemSpriteUrl } from '@/data/items'
+import {
+  getItemHueRotate,
+  getItemSpriteFilter,
+  getItemSpriteUrl,
+} from '@/data/items'
 import { getVisibleBoundsImageStyle } from '@/utilities/visible-image-bounds'
 
 interface ItemSpriteProps {
@@ -29,15 +38,18 @@ export function ItemSprite({
   onLoad,
 }: ItemSpriteProps) {
   const hueRotate = getItemHueRotate(itemId)
+  const spriteFilter = getItemSpriteFilter(itemId)
   const hueRotateFilter = hueRotate ? `hue-rotate(${hueRotate}deg)` : ''
   const mergedStyle: React.CSSProperties = {
     ...style,
-    filter: [hueRotateFilter, style?.filter].filter(Boolean).join(' ') || undefined,
+    filter:
+      [spriteFilter, hueRotateFilter, style?.filter]
+        .filter(Boolean)
+        .join(' ') || undefined,
   }
 
   const [hasError, setHasError] = useState(false)
-  const [visibleBoundsStyle, setVisibleBoundsStyle] =
-    useState<CSSProperties>()
+  const [visibleBoundsStyle, setVisibleBoundsStyle] = useState<CSSProperties>()
 
   useEffect(() => {
     setVisibleBoundsStyle(undefined)

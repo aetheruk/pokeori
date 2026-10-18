@@ -9,6 +9,7 @@ import { matchesEvolutionMove } from '@/utilities/pokemon/evolution-moves'
 import { validateAssignedMoveIds } from '@/utilities/pokemon/pokemon-moves'
 
 const expectedMoves: Record<string, string> = {
+  '57': 'rage-fist',
   '108': 'rollout',
   '114': 'ancient-power',
   '190': 'double-hit',
@@ -17,6 +18,7 @@ const expectedMoves: Record<string, string> = {
   '206': 'hyper-drill',
   '211': 'barb-barrage',
   '221': 'ancient-power',
+  '234': 'psyshield-bash',
   '438': 'mimic',
   '439': 'mimic',
   '762': 'stomp',

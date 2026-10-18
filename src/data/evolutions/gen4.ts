@@ -331,14 +331,6 @@ export const gen4Evolutions: Record<number, Evolution[]> = {
       "conditions": {
         "knownMoveId": "mimic"
       }
-    },
-    {
-      "speciesId": 122,
-      "name": "mr-mime",
-      "trigger": "level-up",
-      "conditions": {
-        "knownMoveId": "mimic"
-      }
     }
   ],
   "440": [
@@ -438,7 +430,9 @@ export const gen4Evolutions: Record<number, Evolution[]> = {
       "speciesId": 226,
       "name": "mantine",
       "trigger": "level-up",
-      "conditions": {}
+      "conditions": {
+        "requiredPartySpeciesId": 223
+      }
     }
   ],
   "459": [

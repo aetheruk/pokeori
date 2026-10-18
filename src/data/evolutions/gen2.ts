@@ -31,7 +31,9 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "trigger": "level-up",
       "conditions": {
         "minLevel": 14,
-        "excludedRegions": ["Hisui"]
+        "excludedRegions": [
+          "Hisui"
+        ]
       }
     },
     {
@@ -51,7 +53,9 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "trigger": "level-up",
       "conditions": {
         "minLevel": 36,
-        "excludedRegions": ["Hisui"]
+        "excludedRegions": [
+          "Hisui"
+        ]
       }
     },
     {
@@ -500,6 +504,17 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "conditions": {
         "itemId": "dubious-disc",
         "trade": true
+      }
+    }
+  ],
+  "234": [
+    {
+      "speciesId": 899,
+      "name": "wyrdeer",
+      "trigger": "level-up",
+      "conditions": {
+        "minLevel": 50,
+        "knownMoveId": "psyshield-bash"
       }
     }
   ],

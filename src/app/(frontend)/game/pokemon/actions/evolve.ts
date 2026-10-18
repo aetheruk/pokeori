@@ -30,7 +30,10 @@ import { getMove } from '@/data/moves'
 import { rollResearchXp } from '@/utilities/research/research-levels'
 import { EVOLUTIONS, type EvolutionCondition } from '@/data/evolutions'
 import { getLevelEvolutionCatalystForEvolution } from '@/data/evolution-catalysts'
-import { resolveEvolvedAbility } from '@/data/abilities'
+import {
+  getPrimaryFormAbilityId,
+  resolveEvolvedAbility,
+} from '@/data/abilities'
 import { getResearcherHiddenAbilitiesUnlocked } from '@/utilities/skills/unlocks'
 import { resolveEvolutionTargetForm } from '@/utilities/pokemon/evolution-targets'
 import {
@@ -54,7 +57,10 @@ import {
   setUserInventoryMap,
   setUserPokedexMap,
 } from '@/utilities/user-state'
-import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
+import {
+  getEconomyActionErrorMessage,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 
 function matchesSourceForm(
   conditions: EvolutionCondition,
@@ -83,307 +89,523 @@ export async function evolvePokemon(
 ) {
   const user = await getUser()
   if (!user) throw new Error('Unauthorized')
-  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
+  if (!clientActionId)
+    return { success: false, message: 'Missing action identifier' }
   try {
     const result = await runEconomyAction(
       { userId: user.id, action: 'evolve-pokemon', requestId: clientActionId },
       async ({ payload, req }) => {
+        // 1. Fetch Pokemon
+        const pokemon = await payload.findByID({
+          collection: 'pokemon',
+          id: pokemonId,
+          req,
+        })
 
-  // 1. Fetch Pokemon
-  const pokemon = await payload.findByID({
-    collection: 'pokemon',
-    id: pokemonId,
-    req,
-  })
+        if (
+          (typeof pokemon.user === 'object'
+            ? pokemon.user.id
+            : pokemon.user) !== user.id
+        ) {
+          throw new Error('Pokemon not owned by user')
+        }
 
-  if (
-    (typeof pokemon.user === 'object' ? pokemon.user.id : pokemon.user) !==
-    user.id
-  ) {
-    throw new Error('Pokemon not owned by user')
-  }
+        // 2. Validate Evolution
+        const possibleEvolutions = EVOLUTIONS[pokemon.speciesId] || []
+        const currentFormInfo = getPokemonForm(pokemon.formId)
+        const currentFormName = currentFormInfo?.form || 'base'
+        const pokemonGender = getOwnedPokemonGender(pokemon)
+        const evolutionTimeRegion = resolveEvolutionTimeRegion(pokemon)
+        const matchingEvolutionCandidates = possibleEvolutions.filter(
+          (e) =>
+            e.speciesId === targetSpeciesId &&
+            matchesSourceForm(e.conditions, currentFormName) &&
+            matchesEvolutionRegion(e.conditions, pokemon) &&
+            matchesEvolutionGender(e.conditions, pokemonGender) &&
+            matchesTriggerItem(e.conditions, triggerItemId),
+        )
+        const targetEvolution = matchingEvolutionCandidates.find((e) =>
+          matchesEvolutionTimeOfDayForRegion(e.conditions, evolutionTimeRegion),
+        )
 
-  // 2. Validate Evolution
-  const possibleEvolutions = EVOLUTIONS[pokemon.speciesId] || []
-  const currentFormInfo = getPokemonForm(pokemon.formId)
-  const currentFormName = currentFormInfo?.form || 'base'
-  const pokemonGender = getOwnedPokemonGender(pokemon)
-  const evolutionTimeRegion = resolveEvolutionTimeRegion(pokemon)
-  const matchingEvolutionCandidates = possibleEvolutions.filter(
-    (e) =>
-      e.speciesId === targetSpeciesId &&
-      matchesSourceForm(e.conditions, currentFormName) &&
-      matchesEvolutionRegion(e.conditions, pokemon) &&
-      matchesEvolutionGender(e.conditions, pokemonGender) &&
-      matchesTriggerItem(e.conditions, triggerItemId),
-  )
-  const targetEvolution = matchingEvolutionCandidates.find((e) =>
-    matchesEvolutionTimeOfDayForRegion(e.conditions, evolutionTimeRegion),
-  )
+        if (!targetEvolution) {
+          const timeGatedEvolution = matchingEvolutionCandidates.find(
+            (e) => e.conditions.timeOfDay,
+          )
 
-  if (!targetEvolution) {
-    const timeGatedEvolution = matchingEvolutionCandidates.find(
-      (e) => e.conditions.timeOfDay,
-    )
+          if (timeGatedEvolution?.conditions.timeOfDay) {
+            return {
+              success: false,
+              message: `This evolution can only happen during ${getEvolutionTimeOfDayLabel(
+                timeGatedEvolution.conditions.timeOfDay,
+              )} (${getEvolutionTimeRegionLabel(evolutionTimeRegion)})`,
+            }
+          }
 
-    if (timeGatedEvolution?.conditions.timeOfDay) {
-      return {
-        success: false,
-        message: `This evolution can only happen during ${getEvolutionTimeOfDayLabel(
-          timeGatedEvolution.conditions.timeOfDay,
-        )} (${getEvolutionTimeRegionLabel(evolutionTimeRegion)})`,
-      }
-    }
+          return {
+            success: false,
+            message: 'Invalid evolution target',
+          }
+        }
 
-    return {
-      success: false,
-      message: 'Invalid evolution target',
-    }
-  }
+        // Check Conditions
+        const { conditions } = targetEvolution
 
-  // Check Conditions
-  const { conditions } = targetEvolution
+        if (!matchesEvolutionMove(conditions, pokemon.assignedMoves)) {
+          const moveName =
+            getMove(conditions.knownMoveId || '')?.name || 'the required move'
+          return {
+            success: false,
+            message: `Equip and save ${moveName} before evolving`,
+          }
+        }
 
-  if (!matchesEvolutionMove(conditions, pokemon.assignedMoves)) {
-    const moveName = getMove(conditions.knownMoveId || '')?.name || 'the required move'
-    return { success: false, message: `Equip and save ${moveName} before evolving` }
-  }
+        // Check Source Form Requirement (Regional variants)
+        // Resolve current form name from ID
+        if (
+          conditions.requiredSourceForm &&
+          conditions.requiredSourceForm !== currentFormName
+        ) {
+          throw new Error(
+            `This evolution is only for ${conditions.requiredSourceForm} form`,
+          )
+        }
 
-  // Check Source Form Requirement (Regional variants)
-  // Resolve current form name from ID
-  if (
-    conditions.requiredSourceForm &&
-    conditions.requiredSourceForm !== currentFormName
-  ) {
-    throw new Error(
-      `This evolution is only for ${conditions.requiredSourceForm} form`,
-    )
-  }
+        // Level Check
+        if (conditions.minLevel && (pokemon.level || 1) < conditions.minLevel) {
+          throw new Error(
+            `Pokemon must be level ${conditions.minLevel} to evolve`,
+          )
+        }
 
-  // Level Check
-  if (conditions.minLevel && (pokemon.level || 1) < conditions.minLevel) {
-    throw new Error(`Pokemon must be level ${conditions.minLevel} to evolve`)
-  }
+        if (conditions.maxLevel && (pokemon.level || 1) > conditions.maxLevel) {
+          throw new Error(
+            `Pokemon must be level ${conditions.maxLevel} or lower to evolve`,
+          )
+        }
 
-  if (conditions.timeOfDay) {
-    if (
-      !matchesEvolutionTimeOfDayForRegion(conditions, evolutionTimeRegion)
-    ) {
-      return {
-        success: false,
-        message: `This evolution can only happen during ${getEvolutionTimeOfDayLabel(
-          conditions.timeOfDay,
-        )} (${getEvolutionTimeRegionLabel(evolutionTimeRegion)})`,
-      }
-    }
-  }
+        if (
+          conditions.minBattleKOs &&
+          (pokemon.battleKOs || 0) < conditions.minBattleKOs
+        ) {
+          throw new Error(
+            `Pokemon needs ${conditions.minBattleKOs} battle KOs to evolve`,
+          )
+        }
 
-  // Item Check Logic (including simplified mechanics)
-  const requiredItem = getRequiredEvolutionItem(conditions)
-  const evolutionCatalyst = getLevelEvolutionCatalystForEvolution(targetEvolution)
-  const userInventory =
-    requiredItem || evolutionCatalyst
-      ? await getUserInventoryMap(payload as any, user.id, { req })
-      : null
+        if (
+          conditions.minTimesKOd &&
+          (pokemon.timesKOd || 0) < conditions.minTimesKOd
+        ) {
+          throw new Error(
+            `Pokemon must have fainted ${conditions.minTimesKOd} times to evolve`,
+          )
+        }
 
-  if (requiredItem) {
-    // If specific item triggers it (for multi-path evolutions like Eevee items), verify match
-    // Only check trigger match if it was explicitly passed (details dialog usually passes it)
-    if (triggerItemId && triggerItemId !== requiredItem) {
-      // Allow if trigger is generic "link-cable" check but we swapped to something else?
-      // Actually, simplified logic implies we just enforce the requirement.
-      // But if the user clicked "Fire Stone" but it requires "Water Stone", we should fail.
-      // For Compass/TM, the UI triggers generic "use-item", so we shouldn't block id mismatch if we're autopopulating.
-      // Let's rely on inventory check below mostly.
-      if (conditions.itemId && triggerItemId !== requiredItem) {
-        throw new Error(`Requires ${requiredItem} to evolve`)
-      }
-    }
+        if (conditions.requiresActiveCompanion && !pokemon.isCompanion) {
+          throw new Error('Set this Pokemon as your active companion to evolve')
+        }
 
-    // Check Inventory
-    if (!userInventory || (userInventory[requiredItem] || 0) < 1) {
-      // Create readable names for custom items
-      let itemName = requiredItem
-      const itemDef = items.find((i) => i.id === requiredItem)
-      if (itemDef) itemName = itemDef.name
+        if (
+          conditions.requiresBattleLevelUp &&
+          pokemon.battleLevelUpLevel !== pokemon.level
+        ) {
+          throw new Error(
+            'This Pokemon must reach its current level by leveling up in battle',
+          )
+        }
 
-      throw new Error(`You need a ${itemName} to evolve`)
-    }
+        const needsTeam =
+          conditions.requiredPartySpeciesId || conditions.requiresBattleTeamSlot
+        const battleTeam = needsTeam
+          ? await payload.find({
+              collection: 'pokemon',
+              where: {
+                and: [
+                  { user: { equals: user.id } },
+                  { onBattleTeam: { equals: true } },
+                ],
+              },
+              limit: 6,
+              depth: 0,
+              req,
+            })
+          : null
 
-  }
+        if (
+          conditions.requiredPartySpeciesId &&
+          !battleTeam?.docs.some(
+            (member) => member.speciesId === conditions.requiredPartySpeciesId,
+          )
+        ) {
+          throw new Error(
+            'A Remoraid must be in your party to evolve this Pokemon',
+          )
+        }
 
-  if (evolutionCatalyst) {
-    if (!userInventory || (userInventory[evolutionCatalyst.id] || 0) < 1) {
-      const itemDef = items.find((item) => item.id === evolutionCatalyst.id)
-      throw new Error(`You need a ${itemDef?.name || evolutionCatalyst.name} to evolve`)
-    }
-  }
+        if (
+          conditions.requiresBattleTeamSlot &&
+          (!pokemon.onBattleTeam || (battleTeam?.docs.length || 0) >= 6)
+        ) {
+          throw new Error(
+            'Keep this Pokemon in your party with one open slot to evolve',
+          )
+        }
 
-  if (userInventory) {
-    if (requiredItem) userInventory[requiredItem] -= 1
-    if (evolutionCatalyst) userInventory[evolutionCatalyst.id] -= 1
-    await setUserInventoryMap(payload as any, user.id, userInventory, { req })
-  }
+        if (conditions.timeOfDay) {
+          if (
+            !matchesEvolutionTimeOfDayForRegion(conditions, evolutionTimeRegion)
+          ) {
+            return {
+              success: false,
+              message: `This evolution can only happen during ${getEvolutionTimeOfDayLabel(
+                conditions.timeOfDay,
+              )} (${getEvolutionTimeRegionLabel(evolutionTimeRegion)})`,
+            }
+          }
+        }
 
-  // Friendship Check
-  if (
-    conditions.minHappiness &&
-    (pokemon.friendship || 0) < conditions.minHappiness
-  ) {
-    throw new Error(`Pokemon is not friendly enough to evolve`)
-  }
+        // Item Check Logic (including simplified mechanics)
+        const requiredItem = getRequiredEvolutionItem(conditions)
+        const evolutionCatalyst =
+          getLevelEvolutionCatalystForEvolution(targetEvolution)
+        const userInventory =
+          requiredItem ||
+          evolutionCatalyst ||
+          conditions.requiredInventoryItemId
+            ? await getUserInventoryMap(payload as any, user.id, { req })
+            : null
 
-  if (!matchesEvolutionGender(conditions, pokemonGender)) {
-    throw new Error('This evolution is not available for this Pokemon gender')
-  }
+        if (requiredItem) {
+          // If specific item triggers it (for multi-path evolutions like Eevee items), verify match
+          // Only check trigger match if it was explicitly passed (details dialog usually passes it)
+          if (triggerItemId && triggerItemId !== requiredItem) {
+            // Allow if trigger is generic "link-cable" check but we swapped to something else?
+            // Actually, simplified logic implies we just enforce the requirement.
+            // But if the user clicked "Fire Stone" but it requires "Water Stone", we should fail.
+            // For Compass/TM, the UI triggers generic "use-item", so we shouldn't block id mismatch if we're autopopulating.
+            // Let's rely on inventory check below mostly.
+            if (conditions.itemId && triggerItemId !== requiredItem) {
+              throw new Error(`Requires ${requiredItem} to evolve`)
+            }
+          }
 
-  // 3. Evolve (Update Pokemon)
-  // Determine new Form ID based on target specs
-  // If targetForm is specified (overrides), use it. Otherwise assume "base" (standard evolution).
-  // Note: Some evolutions might preserve form (Shellos East -> Gastrodon East), but our script defaults to standard unless overridden.
-  // For now, if no override, we assume "base".
-  const targetFormName = resolveEvolutionTargetForm(pokemon, targetEvolution)
-  const directTargetForm = getPokemonForm(targetFormName)
-  const newSpeciesInfo =
-    directTargetForm &&
-    getSpeciesIdForForm(targetFormName) === targetEvolution.speciesId
-      ? directTargetForm
-      : getPokemonSpecies(targetEvolution.speciesId, targetFormName)
+          // Check Inventory
+          if (!userInventory || (userInventory[requiredItem] || 0) < 1) {
+            // Create readable names for custom items
+            let itemName = requiredItem
+            const itemDef = items.find((i) => i.id === requiredItem)
+            if (itemDef) itemName = itemDef.name
 
-  if (!newSpeciesInfo?.id) {
-    throw new Error(
-      `Failed to resolve target form ID for ${targetEvolution.name} (${targetFormName})`,
-    )
-  }
+            throw new Error(`You need a ${itemName} to evolve`)
+          }
+        }
 
-  const newFormId = newSpeciesInfo.id
-  const researcherLevel = user.skills?.researching?.level || 1
-  const newAbilityId = resolveEvolvedAbility(
-    pokemon.formId,
-    pokemon.ability,
-    newFormId,
-    Math.random,
-    getResearcherHiddenAbilitiesUnlocked(researcherLevel),
-  )
+        if (evolutionCatalyst) {
+          if (
+            !userInventory ||
+            (userInventory[evolutionCatalyst.id] || 0) < 1
+          ) {
+            const itemDef = items.find(
+              (item) => item.id === evolutionCatalyst.id,
+            )
+            throw new Error(
+              `You need a ${itemDef?.name || evolutionCatalyst.name} to evolve`,
+            )
+          }
+        }
 
-  await payload.update({
-    collection: 'pokemon',
-    id: pokemonId,
-    data: {
-      speciesId: targetEvolution.speciesId,
-      formId: newFormId,
-      name:
-        targetEvolution.name.charAt(0).toUpperCase() +
-        targetEvolution.name.slice(1), // Auto-rename to species name
-      ability: newAbilityId || '',
-      evolved: true,
-    },
-    req,
-  })
+        if (conditions.requiredInventoryItemId) {
+          const needed = conditions.requiredInventoryItemQuantity || 1
+          if (
+            (userInventory?.[conditions.requiredInventoryItemId] || 0) < needed
+          ) {
+            const itemDef = items.find(
+              (item) => item.id === conditions.requiredInventoryItemId,
+            )
+            throw new Error(
+              `You need ${needed} ${itemDef?.name || conditions.requiredInventoryItemId} to evolve`,
+            )
+          }
+        }
 
-  // 3b. Recalculate stats for the new species/form
-  // First fetch the updated pokemon to get the new formId/speciesId
-  const evolvedPokemon = await payload.findByID({
-    collection: 'pokemon',
-    id: pokemonId,
-    req,
-  })
+        if (userInventory) {
+          if (requiredItem) userInventory[requiredItem] -= 1
+          if (evolutionCatalyst) userInventory[evolutionCatalyst.id] -= 1
+          await setUserInventoryMap(payload as any, user.id, userInventory, {
+            req,
+          })
+        }
 
-  // Calculate new stats based on new species base stats
-  const pokemonWithNewStats = calculateStats(evolvedPokemon)
+        // Friendship Check
+        if (
+          conditions.minHappiness &&
+          (pokemon.friendship || 0) < conditions.minHappiness
+        ) {
+          throw new Error(`Pokemon is not friendly enough to evolve`)
+        }
 
-  // Save the recalculated stats
-  await payload.update({
-    collection: 'pokemon',
-    id: pokemonId,
-    data: {
-      stats: pokemonWithNewStats.stats,
-    },
-    req,
-  })
+        if (!matchesEvolutionGender(conditions, pokemonGender)) {
+          throw new Error(
+            'This evolution is not available for this Pokemon gender',
+          )
+        }
 
-  // 4. Update User Stats (Pokedex & Count)
-  // Fetch fresh user to avoid race conditions/stale data
-  const freshUser = await payload.findByID({
-    collection: 'users',
-    id: user.id,
-    req,
-  })
+        // 3. Evolve (Update Pokemon)
+        // Determine new Form ID based on target specs
+        // If targetForm is specified (overrides), use it. Otherwise assume "base" (standard evolution).
+        // Note: Some evolutions might preserve form (Shellos East -> Gastrodon East), but our script defaults to standard unless overridden.
+        // For now, if no override, we assume "base".
+        const targetFormName = resolveEvolutionTargetForm(
+          pokemon,
+          targetEvolution,
+        )
+        const directTargetForm = getPokemonForm(targetFormName)
+        const newSpeciesInfo =
+          directTargetForm &&
+          getSpeciesIdForForm(targetFormName) === targetEvolution.speciesId
+            ? directTargetForm
+            : getPokemonSpecies(targetEvolution.speciesId, targetFormName)
 
-  // Update Pokedex for new species
-  const pokedex = await getUserPokedexMap(payload as any, user.id, { req })
-  const speciesKey = targetEvolution.speciesId.toString()
-  const formKey = newFormId
+        if (!newSpeciesInfo?.id) {
+          throw new Error(
+            `Failed to resolve target form ID for ${targetEvolution.name} (${targetFormName})`,
+          )
+        }
 
-  const speciesMap = pokedex[speciesKey] || {}
-  const existing = speciesMap[formKey] || {
-    caught: false,
-    seen: false,
-    totalCaught: 0,
-    totalSeen: 0,
-    shinyCaught: false,
-    shinySeen: false,
-  }
+        const newFormId = newSpeciesInfo.id
+        const researcherLevel = user.skills?.researching?.level || 1
+        const newAbilityId = resolveEvolvedAbility(
+          pokemon.formId,
+          pokemon.ability,
+          newFormId,
+          Math.random,
+          getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+        )
 
-  const evolvedRarity = resolvePokemonRarity(pokemon)
-  pokedex[speciesKey] = {
-    ...speciesMap,
-    [formKey]: addPokedexCaughtRarity({
-      ...existing,
-      caught: true,
-      seen: true,
-      totalCaught: (existing.totalCaught || 0) + 1,
-      totalSeen: (existing.totalSeen || 0) + 1,
-    }, evolvedRarity),
-  }
+        await payload.update({
+          collection: 'pokemon',
+          id: pokemonId,
+          data: {
+            speciesId: targetEvolution.speciesId,
+            formId: newFormId,
+            name:
+              targetEvolution.name.charAt(0).toUpperCase() +
+              targetEvolution.name.slice(1), // Auto-rename to species name
+            ability: newAbilityId || '',
+            evolved: true,
+          },
+          req,
+        })
 
-  // Update Total Evolutions Count
-  const userStats = getUserProfileStats(freshUser)
-  const oldTotal = userStats.totalEvolutions || 0
-  userStats.totalEvolutions = oldTotal + 1
+        let additionalPokemon: Pokemon | null = null
+        if (conditions.additionalSpeciesId && battleTeam) {
+          const additionalSpecies = getPokemonSpecies(
+            conditions.additionalSpeciesId,
+          )
+          if (!additionalSpecies?.id)
+            throw new Error('Could not resolve the additional evolution form')
+          const usedPositions = new Set(
+            battleTeam.docs.map((member) => member.battleTeamPosition || 0),
+          )
+          const battleTeamPosition = [1, 2, 3, 4, 5, 6].find(
+            (position) => !usedPositions.has(position),
+          )
+          if (!battleTeamPosition)
+            throw new Error('Your party has no room for the additional Pokemon')
+          const additionalAbility =
+            getPrimaryFormAbilityId(additionalSpecies.id) || ''
+          const additionalPokemonData = {
+            speciesId: conditions.additionalSpeciesId,
+            formId: additionalSpecies.id,
+            level: pokemon.level || 1,
+            nature: pokemon.nature,
+            ivs: pokemon.ivs,
+            evs: pokemon.evs,
+            rarity: pokemon.rarity,
+            shiny: pokemon.shiny,
+            alpha: pokemon.isAlpha,
+          }
+          const additionalStats = calculateStats(additionalPokemonData as any)
+          additionalPokemon = await payload.create({
+            collection: 'pokemon',
+            data: {
+              user: user.id,
+              speciesId: conditions.additionalSpeciesId,
+              formId: additionalSpecies.id,
+              name: additionalSpecies.name,
+              level: pokemon.level || 1,
+              experience: pokemon.experience || 0,
+              nature: pokemon.nature,
+              ivs: pokemon.ivs,
+              evs: pokemon.evs,
+              rarity: pokemon.rarity,
+              shiny: pokemon.shiny,
+              isAlpha: pokemon.isAlpha,
+              ability: additionalAbility,
+              gender: pokemon.gender,
+              identified: true,
+              originalTrainer: user.id,
+              ballType: pokemon.ballType,
+              background: pokemon.background,
+              obtainedRegion: pokemon.obtainedRegion,
+              obtainedLocation: pokemon.obtainedLocation,
+              onBattleTeam: true,
+              battleTeamPosition,
+              obtainedMethod: 'evolution',
+              obtainedSourceId: 'nincada-evolution',
+              stats: additionalStats.stats,
+            },
+            req,
+          })
+        }
 
-  logger.debug('Logging Evolution:', {
-    id: freshUser.id,
-    oldTotal,
-    newTotal: userStats.totalEvolutions,
-  })
+        // 3b. Recalculate stats for the new species/form
+        // First fetch the updated pokemon to get the new formId/speciesId
+        const evolvedPokemon = await payload.findByID({
+          collection: 'pokemon',
+          id: pokemonId,
+          req,
+        })
 
-  await setUserPokedexMap(payload as any, user.id, pokedex, { req })
-  await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: {
-        stats: userStats,
-      },
-      req,
-    })
+        // Calculate new stats based on new species base stats
+        const pokemonWithNewStats = calculateStats(evolvedPokemon)
 
-  // Grant Research XP via reward logic to trigger auto-leveling
-  const { grantRewards } = await import('@/utilities/rewards/reward-logic')
-  const { summary } = await grantRewards(user.id, [
-    {
-      type: 'pokemon_research_xp',
-      targetId: newFormId,
-      quantity: rollResearchXp(),
-      dropChance: 100,
-    },
-  ], { payload, req, source: 'pokemon-evolution' })
+        // Save the recalculated stats
+        await payload.update({
+          collection: 'pokemon',
+          id: pokemonId,
+          data: {
+            stats: pokemonWithNewStats.stats,
+          },
+          req,
+        })
 
-  // 5. Fetch Updated Pokemon & Return
-  const updatedPokemon = await payload.findByID({
-    collection: 'pokemon',
-    id: pokemonId,
-    req,
-  })
+        // 4. Update User Stats (Pokedex & Count)
+        // Fetch fresh user to avoid race conditions/stale data
+        const freshUser = await payload.findByID({
+          collection: 'users',
+          id: user.id,
+          req,
+        })
 
-  return {
-    success: true,
-    message: `Evolved into ${targetEvolution.name}!`,
-    newSpeciesId: targetEvolution.speciesId,
-    newFormId: newFormId,
-    pokemon: serializePokemon(updatedPokemon),
-    rewards: summary,
-  }
+        // Update Pokedex for new species
+        const pokedex = await getUserPokedexMap(payload as any, user.id, {
+          req,
+        })
+        const speciesKey = targetEvolution.speciesId.toString()
+        const formKey = newFormId
+
+        const speciesMap = pokedex[speciesKey] || {}
+        const existing = speciesMap[formKey] || {
+          caught: false,
+          seen: false,
+          totalCaught: 0,
+          totalSeen: 0,
+          shinyCaught: false,
+          shinySeen: false,
+        }
+
+        const evolvedRarity = resolvePokemonRarity(pokemon)
+        pokedex[speciesKey] = {
+          ...speciesMap,
+          [formKey]: addPokedexCaughtRarity(
+            {
+              ...existing,
+              caught: true,
+              seen: true,
+              totalCaught: (existing.totalCaught || 0) + 1,
+              totalSeen: (existing.totalSeen || 0) + 1,
+            },
+            evolvedRarity,
+          ),
+        }
+
+        if (additionalPokemon) {
+          const additionalSpeciesKey = additionalPokemon.speciesId.toString()
+          const additionalFormKey = additionalPokemon.formId
+          const additionalSpeciesMap = pokedex[additionalSpeciesKey] || {}
+          const additionalExisting = additionalSpeciesMap[
+            additionalFormKey
+          ] || {
+            caught: false,
+            seen: false,
+            totalCaught: 0,
+            totalSeen: 0,
+            shinyCaught: false,
+            shinySeen: false,
+          }
+          pokedex[additionalSpeciesKey] = {
+            ...additionalSpeciesMap,
+            [additionalFormKey]: addPokedexCaughtRarity(
+              {
+                ...additionalExisting,
+                caught: true,
+                seen: true,
+                totalCaught: (additionalExisting.totalCaught || 0) + 1,
+                totalSeen: (additionalExisting.totalSeen || 0) + 1,
+              },
+              evolvedRarity,
+            ),
+          }
+        }
+
+        // Update Total Evolutions Count
+        const userStats = getUserProfileStats(freshUser)
+        const oldTotal = userStats.totalEvolutions || 0
+        userStats.totalEvolutions = oldTotal + 1
+
+        logger.debug('Logging Evolution:', {
+          id: freshUser.id,
+          oldTotal,
+          newTotal: userStats.totalEvolutions,
+        })
+
+        await setUserPokedexMap(payload as any, user.id, pokedex, { req })
+        await payload.update({
+          collection: 'users',
+          id: user.id,
+          data: {
+            stats: userStats,
+          },
+          req,
+        })
+
+        // Grant Research XP via reward logic to trigger auto-leveling
+        const { grantRewards } = await import(
+          '@/utilities/rewards/reward-logic'
+        )
+        const { summary } = await grantRewards(
+          user.id,
+          [
+            {
+              type: 'pokemon_research_xp',
+              targetId: newFormId,
+              quantity: rollResearchXp(),
+              dropChance: 100,
+            },
+          ],
+          { payload, req, source: 'pokemon-evolution' },
+        )
+
+        // 5. Fetch Updated Pokemon & Return
+        const updatedPokemon = await payload.findByID({
+          collection: 'pokemon',
+          id: pokemonId,
+          req,
+        })
+
+        return {
+          success: true,
+          message: `Evolved into ${targetEvolution.name}!`,
+          newSpeciesId: targetEvolution.speciesId,
+          newFormId: newFormId,
+          pokemon: serializePokemon(updatedPokemon),
+          additionalPokemon: additionalPokemon
+            ? serializePokemon(additionalPokemon)
+            : null,
+          rewards: summary,
+        }
       },
     )
     revalidatePath('/game/pokemon')

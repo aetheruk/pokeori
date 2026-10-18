@@ -380,14 +380,6 @@ export const gen6Evolutions: Record<number, Evolution[]> = {
       "conditions": {
         "minLevel": 40
       }
-    },
-    {
-      "speciesId": 705,
-      "name": "sliggoo",
-      "trigger": "level-up",
-      "conditions": {
-        "minLevel": 40
-      }
     }
   ],
   "705": [
@@ -435,14 +427,6 @@ export const gen6Evolutions: Record<number, Evolution[]> = {
     }
   ],
   "712": [
-    {
-      "speciesId": 713,
-      "name": "avalugg",
-      "trigger": "level-up",
-      "conditions": {
-        "minLevel": 37
-      }
-    },
     {
       "speciesId": 713,
       "name": "avalugg",

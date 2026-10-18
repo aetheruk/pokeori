@@ -175,14 +175,6 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
       "conditions": {
         "itemId": "thunder-stone"
       }
-    },
-    {
-      "speciesId": 26,
-      "name": "raichu",
-      "trigger": "use-item",
-      "conditions": {
-        "itemId": "thunder-stone"
-      }
     }
   ],
   "27": [
@@ -428,6 +420,17 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
       "trigger": "level-up",
       "conditions": {
         "minLevel": 28
+      }
+    }
+  ],
+  "57": [
+    {
+      "speciesId": 979,
+      "name": "annihilape",
+      "trigger": "level-up",
+      "conditions": {
+        "minLevel": 50,
+        "knownMoveId": "rage-fist"
       }
     }
   ],
@@ -733,6 +736,17 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
       }
     }
   ],
+  "83": [
+    {
+      "speciesId": 865,
+      "name": "sirfetchd",
+      "trigger": "level-up",
+      "conditions": {
+        "requiredSourceForm": "Galarian Form",
+        "minBattleKOs": 100
+      }
+    }
+  ],
   "84": [
     {
       "speciesId": 85,
@@ -867,14 +881,6 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
       "conditions": {
         "itemId": "leaf-stone"
       }
-    },
-    {
-      "speciesId": 103,
-      "name": "exeggutor",
-      "trigger": "use-item",
-      "conditions": {
-        "itemId": "leaf-stone"
-      }
     }
   ],
   "104": [
@@ -907,14 +913,6 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
     }
   ],
   "109": [
-    {
-      "speciesId": 110,
-      "name": "weezing",
-      "trigger": "level-up",
-      "conditions": {
-        "minLevel": 35
-      }
-    },
     {
       "speciesId": 110,
       "name": "weezing",

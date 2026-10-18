@@ -6,6 +6,7 @@ for (const [path, ids] of Object.entries(spriteIndex.paths)) {
   for (const id of ids) paths.set(id, `/sprites/items/${path}`)
 }
 const hues = spriteIndex.hues as Record<string, number>
+const filters = (spriteIndex as typeof spriteIndex & { filters?: Record<string, string> }).filters || {}
 
 export function getItemSpriteUrl(itemId: string): string {
   const known = paths.get(itemId)
@@ -25,4 +26,8 @@ export function getItemSpriteUrl(itemId: string): string {
 
 export function getItemHueRotate(itemId: string): number | undefined {
   return Object.hasOwn(hues, itemId) ? hues[itemId] : undefined
+}
+
+export function getItemSpriteFilter(itemId: string): string | undefined {
+  return filters[itemId]
 }
