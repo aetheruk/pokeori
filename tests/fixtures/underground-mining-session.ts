@@ -370,7 +370,7 @@ const collapsed = await completeGameActivity('game', base.id, false)
 assert.equal(collapsed.success, true, JSON.stringify(collapsed))
 assert.equal(store.has('game:miner'), false)
 assert.deepEqual(ledger.inventory, { 'helix-fossil': 2 })
-assert.equal(ledger.currency, 0)
+assert.equal(ledger.currency, 25)
 assert.equal(ledger.losses, 1)
 assert.equal(ledger.grants, 1)
 assert.equal((await completeGameActivity('game', base.id, false)).success, true)
@@ -398,7 +398,7 @@ assert.equal(
 assert.equal((await completeGameActivity('game', base.id, true)).success, true)
 assert.equal(store.has('game:miner'), false)
 assert.equal(ledger.wins, 1)
-assert.equal(ledger.currency, 25)
+assert.equal(ledger.currency, 75)
 assert.equal(ledger.inventory['helix-fossil'], 6)
 
 // Strict walls cannot pay partial loot, authored completion rewards, or failure XP.

@@ -6,6 +6,7 @@ let inventoryState: Record<string, number>
 let pokedexState: Record<string, Record<string, any>>
 let completedTasksState: Record<string, any>
 let activityStatsState: Record<string, any>
+let gameActivityStatsState: Record<string, any>
 let tcgState: Record<string, number>
 
 const payloadMock = {
@@ -78,6 +79,7 @@ mock.module('@/utilities/user-state', () => ({
   getUserCompletedTasksMap: mock(async () => completedTasksState),
   getUserTcgMap: mock(async () => tcgState),
   getUserActivityStatsMap: mock(async () => ({
+    games: gameActivityStatsState,
     fieldResearch: activityStatsState,
   })),
   setUserInventoryMap: setInventoryMapMock,
@@ -92,6 +94,7 @@ describe('task_complete reward cascading', () => {
     pokedexState = {}
     completedTasksState = {}
     activityStatsState = {}
+    gameActivityStatsState = {}
     tcgState = {}
     payloadMock.find.mockClear()
     payloadMock.count.mockClear()
@@ -127,6 +130,32 @@ describe('task_complete reward cascading', () => {
     expect(summary.tasksCompleted).toEqual([])
     expect(completedTasksState['rock-tunnel-dead-end-supplies']?.count).toBe(1)
     expect(inventoryState['battle-potion']).toBe(5)
+  })
+
+  test('awards the Mt. Moon Easier Mining unlock once across per-item rewards', async () => {
+    gameActivityStatsState = { 'mt-moon-mining': { wins: 5 } }
+    const { grantRewards } = await import('@/utilities/rewards/reward-logic')
+
+    const { summary } = await grantRewards('user-1', [
+      {
+        type: 'task_complete',
+        targetId: 'mt-moon-easier-mining-unlocked',
+        dropChance: 100,
+      },
+      {
+        type: 'task_complete',
+        targetId: 'mt-moon-easier-mining-unlocked',
+        dropChance: 100,
+      },
+    ], transactionOptions)
+
+    expect(completedTasksState['mt-moon-easier-mining-unlocked']?.count).toBe(1)
+    expect(summary.tasksCompleted).toEqual([
+      {
+        id: 'mt-moon-easier-mining-unlocked',
+        name: 'Easier Mining',
+      },
+    ])
   })
 
   test('queues exit modals and research XP from cascaded task rewards', async () => {

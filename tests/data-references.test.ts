@@ -5791,7 +5791,7 @@ describe('static data references', () => {
     expect(chamberMining?.rewards).toContainEqual({
       type: 'xp',
       skill: 'catching',
-      quantity: 250,
+      quantity: 50,
       dropChance: 100,
     })
     expect(rockTunnelMap.completeRequirements).toContainEqual({
@@ -5888,6 +5888,12 @@ describe('static data references', () => {
       (entry) => entry.id === 'mt-moon-fossil-hunter',
     )
     const mining = allGames.find((entry) => entry.id === 'mt-moon-mining')
+    const easierMining = allGames.find(
+      (entry) => entry.id === 'mt-moon-easier-mining',
+    )
+    const easierMiningTask = tasks.find(
+      (entry) => entry.id === 'mt-moon-easier-mining-unlocked',
+    )
     const voyage = voyages.find((entry) => entry.id === 'mt-moon-fossil-hunt')
     const researcherMiguel = battles.find(
       (entry) => entry.id === 'researcher-miguel',
@@ -5919,14 +5925,30 @@ describe('static data references', () => {
     expect(mining?.rewards).toContainEqual({
       type: 'pokemon_research_xp',
       targetId: '74',
-      quantity: 25,
+      quantity: 4,
       dropChance: 100,
     })
     expect(mining?.rewards).toContainEqual({
       type: 'xp',
       skill: 'catching',
-      quantity: 250,
+      quantity: 50,
       dropChance: 100,
+    })
+    expect(mining?.rewards).toContainEqual({
+      type: 'task_complete',
+      targetId: 'mt-moon-easier-mining-unlocked',
+      dropChance: 100,
+    })
+    expect(easierMining?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'mt-moon-easier-mining-unlocked',
+    })
+    expect(easierMining?.criteria).toEqual([])
+    expect(easierMiningTask?.requirements).toContainEqual({
+      type: 'game_result',
+      targetId: 'mt-moon-mining',
+      battleStatus: 'win',
+      count: 5,
     })
     expect(voyage?.requirements).toContainEqual({
       type: 'task_completed',
