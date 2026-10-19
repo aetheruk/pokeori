@@ -2524,7 +2524,7 @@ describe('static data references', () => {
     expect(bundle?.name).toBe('Ball Bag')
     expect(bundle?.icon).toEqual({ type: 'item', id: 'ball-bag' })
     expect(bundle?.cost).toEqual([
-      { type: 'currency', id: 'berry-powder', amount: 150 },
+      { type: 'currency', id: 'berry-powder', amount: 75 },
     ])
     expect(bundle?.stock).toBeUndefined()
     expect(bundle?.daily).toBeUndefined()
@@ -2532,8 +2532,25 @@ describe('static data references', () => {
       { type: 'item', quantity: 1, targetId: 'ball-bag', dropChance: 100 },
     ])
     const pouch = shop?.items.find((entry) => entry.id === 'pouch-of-materials-bp')
-    expect(pouch?.cost).toEqual([{ type: 'currency', id: 'berry-powder', amount: 150 }])
+    expect(pouch?.cost).toEqual([{ type: 'currency', id: 'berry-powder', amount: 75 }])
     expect(pouch?.rewards).toEqual([{ type: 'item', targetId: 'pouch-of-materials', quantity: 1, dropChance: 100 }])
+
+    const journalIds = [
+      'researchers-journal',
+      'explorers-journal',
+      'champions-journal',
+      'artisans-journal',
+    ]
+    for (const journalId of journalIds) {
+      const offer = shop?.items.find((entry) => entry.id === `${journalId}-bp`)
+      const journal = items.find((entry) => entry.id === journalId)
+
+      expect(offer?.cost).toEqual([{ type: 'currency', id: 'berry-powder', amount: 150 }])
+      expect(offer?.rewards).toEqual([
+        { type: 'item', targetId: journalId, quantity: 1, dropChance: 100 },
+      ])
+      expect(journal?.effects?.grantSkillXp?.amount).toBe(350)
+    }
   })
 
   test('Misty Trainer level gate is on the Gym Leader battle instead of the first gym visit', () => {
@@ -4530,6 +4547,10 @@ describe('static data references', () => {
         count: 50,
       })
       expect(battle?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: 'pallet-kanto-myths-mystery-of-the-branches',
+      })
+      expect(battle?.requirements).toContainEqual({
         type: 'battle_result',
         targetId: expected.id,
         battleStatus: 'win',
@@ -4564,6 +4585,10 @@ describe('static data references', () => {
         count: 50,
       })
       expect(snap?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: 'pallet-kanto-myths-mystery-of-the-branches',
+      })
+      expect(snap?.requirements).toContainEqual({
         type: 'game_result',
         targetId: expected.id,
         battleStatus: 'win',
@@ -4577,6 +4602,17 @@ describe('static data references', () => {
         dropChance: 100,
       })
     }
+
+    const mythsTask = tasks.find(
+      (entry) => entry.id === 'pallet-kanto-myths-mystery-of-the-branches',
+    )
+    expect(mythsTask?.subCategory).toBe('Pallet Town')
+    expect(mythsTask?.requirements).toEqual([])
+    expect(mythsTask?.criteria).toEqual([
+      { type: 'skill_level', targetId: 'catching', count: 50 },
+      { type: 'skill_level', targetId: 'researching', count: 50 },
+      { type: 'skill_level', targetId: 'battling', count: 50 },
+    ])
 
     const silverFeather = items.find((entry) => entry.id === 'silver-feather')
     const lugiaSnap = allGames.find(
@@ -4775,6 +4811,10 @@ describe('static data references', () => {
         type: 'skill_level',
         targetId: 'researching',
         count: 50,
+      })
+      expect(event?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: 'pallet-kanto-myths-mystery-of-the-branches',
       })
       expect(event?.requirements).toContainEqual({
         type: 'item_owned',

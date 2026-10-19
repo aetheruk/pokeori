@@ -126,7 +126,7 @@ const artisanConsumables: Item[] = [
     name: 'Neutral Stone',
     description: 'A quiet crafting stone with no element of its own.',
     category: 'misc',
-    spriteId: 'everstone',
+    spriteId: 'artisan/neutral-stone',
     sellValue: 10,
   },
   {

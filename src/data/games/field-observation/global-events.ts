@@ -15,6 +15,10 @@ const legendaryBirdResearcherRequirement = {
   targetId: 'researching',
   count: 50,
 }
+const legendaryBirdMythRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'pallet-kanto-myths-mystery-of-the-branches',
+}
 
 export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonEvent[] = [
   {
@@ -60,6 +64,7 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
     odds: 256,
     requirements: [
       legendaryBirdResearcherRequirement,
+      legendaryBirdMythRequirement,
       notOwned('flaming-twig'),
       notOwned('lifeless-flaming-branch'),
       notOwned('concentrated-flaming-branch'),
@@ -72,6 +77,7 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
     odds: 256,
     requirements: [
       legendaryBirdResearcherRequirement,
+      legendaryBirdMythRequirement,
       notOwned('charged-twig'),
       notOwned('lifeless-charged-branch'),
       notOwned('concentrated-charged-branch'),
@@ -84,6 +90,7 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
     odds: 256,
     requirements: [
       legendaryBirdResearcherRequirement,
+      legendaryBirdMythRequirement,
       notOwned('frozen-twig'),
       notOwned('lifeless-frozen-branch'),
       notOwned('concentrated-frozen-branch'),

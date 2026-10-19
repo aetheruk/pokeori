@@ -8,6 +8,10 @@ const legendaryBirdExplorerRequirement = {
   targetId: 'catching',
   count: 50,
 }
+const legendaryBirdMythRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'pallet-kanto-myths-mystery-of-the-branches',
+}
 
 type LegendaryBirdSnap = {
   id: string
@@ -67,6 +71,7 @@ const legendaryBirdSnapEntries: SnapConfig[] = legendaryBirdSnaps.map((entry) =>
   isRandomEvent: true,
   requirements: [
     legendaryBirdExplorerRequirement,
+    legendaryBirdMythRequirement,
     {
       type: 'game_result',
       targetId: entry.id,

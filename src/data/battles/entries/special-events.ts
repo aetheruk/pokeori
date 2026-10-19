@@ -13,6 +13,10 @@ const legendaryBirdTrainerRequirement = {
   targetId: 'battling',
   count: 50,
 }
+const legendaryBirdMythRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'pallet-kanto-myths-mystery-of-the-branches',
+}
 
 type LegendaryBirdBattle = {
   id: string
@@ -207,6 +211,7 @@ export const specialEventBattles: BattleConfig[] = [
     enemyAttackTelegraphChance: 2,
     requirements: [
       legendaryBirdTrainerRequirement,
+      legendaryBirdMythRequirement,
       legendaryBeastRollRequirement,
       {
         type: 'battle_result' as const,
