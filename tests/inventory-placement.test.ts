@@ -204,6 +204,7 @@ describe('inventory placement', () => {
     )
 
     expect(xpGrantingItems.map(({ id }) => id).sort()).toEqual([
+      'artisans-journal',
       'champions-journal',
       'explorers-journal',
       'research-kit',

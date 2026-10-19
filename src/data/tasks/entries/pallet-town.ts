@@ -3391,4 +3391,52 @@ export const palletTownTasks: Task[] = [
       closeButtonText: 'Leave Them to Oak',
     },
   },
+  {
+    id: 'pallet-kanto-myths-mystery-of-the-branches',
+    name: 'Kanto Myths: Mystery of the Branches',
+    description: 'A researcher has become absorbed in a dusty old tome about Kanto mythology.',
+    category: 'Kanto',
+    subCategory: 'Pallet Town',
+    background: '/backgrounds/lab.avif',
+    icon: { type: 'trainer', id: 'researcher' },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hear the Myth',
+    requirements: [],
+    criteria: [
+      { type: 'skill_level', targetId: 'catching', count: 50 },
+      { type: 'skill_level', targetId: 'researching', count: 50 },
+      { type: 'skill_level', targetId: 'battling', count: 50 },
+    ],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/lab.avif',
+        title: 'Researcher',
+        icon: { type: 'trainer', id: 'researcher' },
+        message:
+          "Oh Hey {trainer}, I know it's not strictly Research per se but I can't stop reading about Kanto mythology. Apparently in ancient times, 3 Legendary Pokemon Battled and their elemental powers caused chaos all over Kanto, until a 4th Pokemon appeared and quelled their rage.",
+        buttons: [{ text: 'No way.', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/lab.avif',
+        title: 'Researcher',
+        icon: { type: 'trainer', id: 'researcher' },
+        message:
+          'Yeah! After being overpowered by the mysterious 4th Pokemon each infused part of their power into 3 branches as a promise to keep balance in the region.',
+        buttons: [{ text: 'That is amazing!', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/lab.avif',
+      title: 'Researcher',
+      icon: { type: 'trainer', id: 'researcher' },
+      message:
+        'That all sounds really cool, but I think he should probably get back to work and do some actual research.',
+      closeButtonText: 'Back to Research',
+    },
+  },
 ]

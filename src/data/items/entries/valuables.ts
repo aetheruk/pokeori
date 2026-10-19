@@ -539,7 +539,7 @@ export const valuableItems: Item[] = [
     effects: {
       grantSkillXp: {
         skill: 'researching',
-        amount: 150,
+        amount: 350,
       },
     },
   },
@@ -609,7 +609,7 @@ export const valuableItems: Item[] = [
     effects: {
       grantSkillXp: {
         skill: 'catching',
-        amount: 150,
+        amount: 350,
       },
     },
   },
@@ -623,7 +623,21 @@ export const valuableItems: Item[] = [
     effects: {
       grantSkillXp: {
         skill: 'battling',
-        amount: 150,
+        amount: 350,
+      },
+    },
+  },
+  {
+    id: 'artisans-journal',
+    name: "Artisan's Journal",
+    description: 'A journal of clever recipes and careful handiwork. Reading it grants 350 Artisan XP.',
+    category: 'valuable',
+    spriteId: 'guide-book',
+    hueRotate: 280,
+    effects: {
+      grantSkillXp: {
+        skill: 'artisan',
+        amount: 350,
       },
     },
   },

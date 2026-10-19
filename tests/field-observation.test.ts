@@ -233,12 +233,37 @@ describe('field observation research mode', () => {
         'Kanto',
         () => 0,
       ),
+    ).toBeNull()
+    expect(
+      rollFieldObservationGlobalPokemonEvent(
+        [moltresEvent],
+        {
+          ...baseData,
+          completedTasks: [
+            {
+              taskId: 'pallet-kanto-myths-mystery-of-the-branches',
+              completedAt: '2026-10-19T00:00:00.000Z',
+              count: 1,
+            },
+          ],
+          user: { skills: { researching: { level: 50 } } },
+        },
+        'Kanto',
+        () => 0,
+      ),
     ).toEqual(moltresEvent)
     expect(
       rollFieldObservationGlobalPokemonEvent(
         [moltresEvent],
         {
           ...baseData,
+          completedTasks: [
+            {
+              taskId: 'pallet-kanto-myths-mystery-of-the-branches',
+              completedAt: '2026-10-19T00:00:00.000Z',
+              count: 1,
+            },
+          ],
           user: { skills: { researching: { level: 50 } } },
           inventory: [{ itemId: 'flaming-twig', quantity: 1 }],
         },

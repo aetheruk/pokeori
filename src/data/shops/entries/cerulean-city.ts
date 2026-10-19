@@ -247,7 +247,7 @@ export const ceruleanCityShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'berry-powder',
-            amount: 150,
+            amount: 75,
           },
         ],
         rewards: [
@@ -264,7 +264,7 @@ export const ceruleanCityShops: ShopConfig[] = [
         name: 'Pouch of Materials',
         description: 'Open for random crafting materials and gems.',
         icon: { type: 'item', id: 'pouch-of-materials' },
-        cost: [{ type: 'currency', id: 'berry-powder', amount: 150 }],
+        cost: [{ type: 'currency', id: 'berry-powder', amount: 75 }],
         rewards: [{ type: 'item', targetId: 'pouch-of-materials', quantity: 1, dropChance: 100 }],
       },
       {
@@ -335,6 +335,24 @@ export const ceruleanCityShops: ShopConfig[] = [
             type: 'item',
             quantity: 1,
             targetId: 'champions-journal',
+            dropChance: 100,
+          },
+        ],
+      },
+      {
+        id: 'artisans-journal-bp',
+        name: "Artisan's Journal",
+        description: 'A journal of clever recipes and careful handiwork.',
+        icon: {
+          type: 'item',
+          id: 'artisans-journal',
+        },
+        cost: [{ type: 'currency', id: 'berry-powder', amount: 150 }],
+        rewards: [
+          {
+            type: 'item',
+            quantity: 1,
+            targetId: 'artisans-journal',
             dropChance: 100,
           },
         ],
