@@ -170,7 +170,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
       lootPool: [
         {
           itemId: 'small-stone-t1',
-          weight: 99.3,
+          weight: 96,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -183,7 +183,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'small-stone-t1',
-          weight: 98.9,
+          weight: 96,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -192,13 +192,13 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'moon-stone',
-          weight: 0.1,
+          weight: 1,
           size: { width: 2, height: 2 },
           quantity: 1,
         },
         {
           itemId: 'dome-fossil',
-          weight: 0.2,
+          weight: 1,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -211,7 +211,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'dome-fossil',
-          weight: 0.4,
+          weight: 1,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -220,7 +220,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'helix-fossil',
-          weight: 0.2,
+          weight: 1,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -233,7 +233,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'helix-fossil',
-          weight: 0.4,
+          weight: 1,
           size: { width: 2, height: 2 },
           quantity: 1,
           requirements: [
@@ -242,7 +242,7 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
         },
         {
           itemId: 'old-amber',
-          weight: 0.2,
+          weight: 1,
           size: { width: 2, height: 2 },
           quantity: 1,
         },
@@ -252,12 +252,6 @@ export const mtMoonUndergroundMiningEntries: UndergroundMiningConfig[] = [
       bedrockChance: 4,
     },
     rewards: [
-      {
-        type: 'pokemon_research_xp',
-        targetId: '74',
-        quantity: 4,
-        dropChance: 100,
-      },
       {
         type: 'xp',
         skill: 'catching',
