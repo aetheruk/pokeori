@@ -290,7 +290,7 @@ describe('Explore location completion star', () => {
     expect(rewards).toContainEqual(
       expect.objectContaining({
         label: 'Metal Coat x1',
-        subLabel: '0.15% chance - Buried',
+        subLabel: '1.2% chance - Buried',
       }),
     )
   })

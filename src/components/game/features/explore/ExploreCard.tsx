@@ -67,26 +67,34 @@ const getActivityTone = (modeItem: ExploreItem) => {
   }
 }
 
+const getSkillActionIcon = (
+  skillId: 'catching' | 'battling' | 'researching',
+): TaskIcon => ({
+  type: 'local',
+  id: `/fallback/skills/${getSkill(skillId)?.iconId || 'explorer-v2.png'}`,
+})
+
 const getActionIcon = (modeItem: ExploreItem): TaskIcon => {
-  if (modeItem.type === 'voyage' || modeItem.type === 'expedition') {
-    return { type: 'item', id: 'escape-rope' }
+  if (modeItem.type === 'voyage') {
+    return getSkillActionIcon('catching')
+  }
+  if (modeItem.type === 'expedition') {
+    return getSkillActionIcon('catching')
   }
   if (modeItem.type === 'task') {
     return { type: 'item', id: 'explorers-journal' }
   }
   if (modeItem.type === 'location') {
-    return { type: 'item', id: 'poke-ball' }
+    return getSkillActionIcon('catching')
   }
   if (modeItem.type === 'field-research') {
-    return { type: 'item', id: 'eject-pack' }
+    return getSkillActionIcon('researching')
   }
   if (modeItem.type === 'vs-seeker') {
-    return { type: 'item', id: 'vs-seeker' }
+    return getSkillActionIcon('battling')
   }
   if (modeItem.type === 'battle') {
-    return modeItem.originalData.isWildBattle
-      ? { type: 'item', id: 'battle-potion' }
-      : { type: 'item', id: 'vs-seeker' }
+    return getSkillActionIcon('battling')
   }
   if (modeItem.type === 'shop') {
     return {
@@ -104,16 +112,11 @@ const getActionIcon = (modeItem: ExploreItem): TaskIcon => {
             ? 'deck-box'
             : modeItem.originalData.gameType === 'fishing'
               ? 'super-rod'
-              : /\s+EX$/i.test(modeItem.name)
-                ? 'master-ball'
-                : 'rotom-light-bulb-manual',
+              : 'rotom-light-bulb-manual',
     }
   }
 
-  return {
-    type: 'local',
-    id: `/fallback/skills/${getSkill('catching')?.iconId || 'explorer-v2.png'}`,
-  }
+  return getSkillActionIcon('catching')
 }
 
 const EXPLORE_CONTENT_ICON_OVERRIDES: Record<string, TaskIcon> = {
@@ -364,7 +367,10 @@ function ExploreCardComponent({
                       className="pointer-events-none whitespace-nowrap text-[10px]"
                     />
                   ) : (
-                    <span aria-hidden="true" className="pointer-events-none">
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none relative block h-7 w-7"
+                    >
                       {isConversation ? (
                         <GridPlayerSprite
                           gender={userData.user.trainerGender}
@@ -384,6 +390,12 @@ function ExploreCardComponent({
                           className="h-7 w-7"
                         />
                       )}
+                      {groupedItem.type === 'game' &&
+                        /\s+EX$/i.test(groupedItem.name) && (
+                          <span className="absolute inset-x-0 bottom-0 z-10 text-center text-[9px] font-black italic leading-[9px] text-game-charcoal [text-shadow:0_0_2px_#fff8e8]">
+                            EX
+                          </span>
+                        )}
                     </span>
                   )}
                 </Button>
