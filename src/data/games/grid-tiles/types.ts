@@ -83,7 +83,7 @@ export type GridObjectPurpose =
   | 'dialogue'
   | (string & {})
 
-/** Interaction started when a player steps onto a placed object. */
+/** Activity launched by facing a placed object and using the interact action. */
 export type GridObjectInteractionType = 'battle' | 'encounter' | 'minigame'
 export type GridObjectVictoryMode = 'win' | 'clear'
 

@@ -65,11 +65,15 @@ objects: [{
 }]
 ```
 
-`win` completes the active Grid Puzzle after the external activity succeeds;
-`clear` removes only that placement, allowing additional battles or catches
-to be authored on the same board. Rock Push persists its board snapshot while
-the battle or encounter screen is open and restores it when the result returns
-to `/game/games/grid-puzzle`.
+Interactive objects block movement until cleared. Face an adjacent object and
+use the A action (or press E) to launch its external activity. A failed result
+leaves the player beside the object, where it can be retried. Successful
+interactions are included in the server-verified movement proof. `win`
+completes the active Grid Puzzle after the external activity succeeds; `clear`
+removes only that placement, allowing additional battles or catches to be
+authored on the same board. Rock Push persists its board snapshot while the
+battle, encounter, or minigame screen is open and restores it when the result
+returns to `/game/games/grid-puzzle`.
 Use the `wild-battle-trigger` object for wild battle targets so the board shows
 a Poké Ball marker instead of the trainer sprite used by `battle-trigger`.
 

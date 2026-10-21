@@ -55,12 +55,37 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
   const clearedObjects = new Set<string>()
   const usedObjectWins = new Map<string, number>()
   const hasAuthoredScreens = Boolean(settings.screens?.length)
+  const hasExplicitInteractions = moves.some((move) =>
+    move.startsWith('interact:'),
+  )
   const winTile = (screen: Screen, position: Position) => (screen.config.winTiles || []).some((tile) => equal(tile, position))
   const wallGoal = (screen: Screen, position: Position) => position.y === 0 && winTile(screen, position)
+  const gridObjectBlocks = (screen: Screen, position: Position) => {
+    for (const [index, object] of (screen.config.objects || []).entries()) {
+      const definition = getGridObjectDefinition(gridObjects, object.objectId)
+      if (
+        !definition ||
+        position.x < object.x ||
+        position.y < object.y ||
+        position.x >= object.x + definition.size.cols ||
+        position.y >= object.y + definition.size.rows
+      ) {
+        continue
+      }
+      const id = `${screen.config.id}:${object.id || `${object.objectId}-${index}`}`
+      const interactive =
+        object.interaction &&
+        definition.interaction === object.interaction.type
+      if (interactive) return hasExplicitInteractions && !clearedObjects.has(id)
+      if (definition.collision === 'solid' || definition.collision === 'pushable') return true
+    }
+    return false
+  }
   const blocked = (screen: Screen, position: Position, rock: boolean, ignoredRock?: number) => {
     const cell = screen.grid[position.y]?.[position.x]
     return !cell || (cell === 'wall' && (rock || !wallGoal(screen, position))) ||
       (rock ? wallGoal(screen, position) : cell === 'hole') ||
+      gridObjectBlocks(screen, position) ||
       screen.rocks.some((entry) => entry.id !== ignoredRock && equal(entry, position))
   }
   const collect = (screen: Screen, path: Position[]) => {
@@ -92,11 +117,30 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
   }
   for (const move of moves) {
     if (solved) return fail
+    if (move.startsWith('interact:')) {
+      const direction = move.slice('interact:'.length)
+      const delta = deltas[direction]
+      if (!delta) return fail
+      const object = interaction(active, {
+        x: player.x + delta.x,
+        y: player.y + delta.y,
+      })
+      if (object === 'none' || object === 'unverified') return fail
+      if (object === 'win') solved = true
+      continue
+    }
     const delta = deltas[move]
     if (!delta) return fail
     const next = { x: player.x + delta.x, y: player.y + delta.y }
     const nextCell = active.grid[next.y]?.[next.x]
-    if (!nextCell || (nextCell === 'wall' && !wallGoal(active, next)) || nextCell === 'hole') return fail
+    if (
+      !nextCell ||
+      (nextCell === 'wall' && !wallGoal(active, next)) ||
+      nextCell === 'hole' ||
+      gridObjectBlocks(active, next)
+    ) {
+      return fail
+    }
     const rock = active.rocks.find((entry) => equal(entry, next))
     let filledHole = false
     if (rock) {
@@ -119,10 +163,12 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
       player = target
     }
     collect(active, path)
-    const object = interaction(active, player)
-    if (object === 'unverified') return fail
-    if (object === 'win') { solved = true; continue }
-    if (object === 'clear') continue
+    if (!hasExplicitInteractions) {
+      const object = interaction(active, player)
+      if (object === 'unverified') return fail
+      if (object === 'win') { solved = true; continue }
+      if (object === 'clear') continue
+    }
     if (path.some((position) => winTile(active!, position))) { solved = true; continue }
     if (rock && filledHole) {
       active.grid[rock.y][rock.x] = 'empty'
@@ -137,14 +183,24 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
     if (!destination) continue
     const target = { x: teleporter.target.x, y: teleporter.target.y }
     const cell = destination.grid[target.y]?.[target.x]
-    if (!cell || cell === 'wall' || cell === 'hole' || destination.rocks.some((entry) => equal(entry, target))) continue
+    if (
+      !cell ||
+      cell === 'wall' ||
+      cell === 'hole' ||
+      gridObjectBlocks(destination, target) ||
+      destination.rocks.some((entry) => equal(entry, target))
+    ) {
+      continue
+    }
     active = destination
     player = target
     collect(active, [player])
     if (winTile(active, player)) { solved = true; continue }
-    const targetObject = interaction(active, player)
-    if (targetObject === 'unverified') return fail
-    if (targetObject === 'win') solved = true
+    if (!hasExplicitInteractions) {
+      const targetObject = interaction(active, player)
+      if (targetObject === 'unverified') return fail
+      if (targetObject === 'win') solved = true
+    }
   }
   return { solved, prizeIds: [...collected] }
 }

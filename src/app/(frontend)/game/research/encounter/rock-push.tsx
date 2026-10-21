@@ -80,11 +80,22 @@ interface Position {
   y: number
 }
 
+type FacingDirection = 'up' | 'down' | 'left' | 'right'
+const directionDeltas: Record<FacingDirection, Position> = {
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+}
+const isFacingDirection = (value: unknown): value is FacingDirection =>
+  value === 'up' || value === 'down' || value === 'left' || value === 'right'
+
 interface RockState extends Position {
   id: string
 }
 
 interface MoveSnapshot {
+  proofLength: number
   activeScreenId: string
   screenStates: Record<string, ScreenRuntimeState>
   grid: CellType[][]
@@ -124,6 +135,7 @@ interface GridObjectResumeState {
   clearedObjectKeys: string[]
   pendingObjectKey: string
   pendingVictory: GridObjectVictoryMode
+  pendingFacing?: FacingDirection
   pendingOutcome?: 'won' | 'lost'
   screenStates?: Record<string, ScreenRuntimeState>
 }
@@ -290,7 +302,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const [rocks, setRocks] = useState<RockState[]>([])
   const [playerPos, setPlayerPos] = useState<Position>({ x: 0, y: 0 })
   const [gridSize, setGridSize] = useState({ w: 8, h: 8 }) // Fixed size for now
-  const [facing, setFacing] = useState<'up' | 'down' | 'left' | 'right'>('down')
+  const [facing, setFacing] = useState<FacingDirection>('down')
   const [history, setHistory] = useState<MoveSnapshot[]>([])
   const [blockedOffset, setBlockedOffset] = useState<Position | null>(null)
   const [fallingRock, setFallingRock] = useState<RockState | null>(null)
@@ -408,6 +420,47 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     return null
   }
 
+  const isBlockingGridObject = (
+    position: Position,
+    screenId = activeScreenId,
+  ) => {
+    const screen = screenConfigs.find((entry) => entry.id === screenId)
+    for (const [index, placement] of (screen?.objects || []).entries()) {
+      const definition = getGridObjectDefinition(
+        gridObjects as GridObjectLibrary,
+        placement.objectId,
+      )
+      if (!definition) continue
+      const inFootprint =
+        position.x >= placement.x &&
+        position.x < placement.x + definition.size.cols &&
+        position.y >= placement.y &&
+        position.y < placement.y + definition.size.rows
+      if (!inFootprint) continue
+
+      const key = getGridObjectKey(placement, index, screenId)
+      const interactive =
+        placement.interaction &&
+        definition.interaction === placement.interaction.type
+      if (interactive) return !clearedObjectKeys.has(key)
+      if (
+        definition.collision === 'solid' ||
+        definition.collision === 'pushable'
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
+  const getGridObjectInteractionAhead = () => {
+    const delta = directionDeltas[facing]
+    return getGridObjectInteraction({
+      x: playerPos.x + delta.x,
+      y: playerPos.y + delta.y,
+    })
+  }
+
   const initializingRef = useRef(false)
 
   // A second start must not consume an already-restored room checkpoint.
@@ -483,9 +536,44 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                 (parsed.pendingVictory === 'win' ||
                   parsed.pendingVictory === 'clear')
               ) {
+                if (!isFacingDirection(parsed.pendingFacing)) {
+                  parsed.pendingFacing = undefined
+                }
+                if (!parsed.pendingFacing && parsed.moveProof?.length) {
+                  const lastMove = parsed.moveProof[parsed.moveProof.length - 1]
+                  const legacyFacing = isFacingDirection(lastMove)
+                    ? lastMove
+                    : undefined
+                  const legacyDelta = legacyFacing
+                    ? directionDeltas[legacyFacing]
+                    : undefined
+                  const legacyInteraction = getGridObjectInteraction(
+                    parsed.playerPos,
+                    parsed.activeScreenId,
+                  )
+                  if (
+                    legacyDelta &&
+                    legacyFacing &&
+                    legacyInteraction?.key === parsed.pendingObjectKey
+                  ) {
+                    parsed.playerPos = {
+                      x: parsed.playerPos.x - legacyDelta.x,
+                      y: parsed.playerPos.y - legacyDelta.y,
+                    }
+                    parsed.moves = Math.max(0, parsed.moves - 1)
+                    parsed.moveProof = parsed.moveProof.slice(0, -1)
+                    parsed.pendingFacing = legacyFacing
+                  }
+                }
                 const outcome = url.searchParams.get('outcome')
                 if (outcome === 'won' || outcome === 'lost') {
                   parsed.pendingOutcome = outcome
+                  if (outcome === 'won' && parsed.pendingFacing) {
+                    parsed.moveProof = [
+                      ...(parsed.moveProof || []),
+                      `interact:${parsed.pendingFacing}`,
+                    ]
+                  }
                 }
                 resumeState = parsed
                 window.sessionStorage.removeItem(
@@ -501,6 +589,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
       if (resumeState) {
         moveProofRef.current = resumeState.moveProof || []
+        if (resumeState.pendingFacing) setFacing(resumeState.pendingFacing)
         const restoredScreenStates = resumeState.screenStates || nextScreenStates
         const restoredActiveState =
           restoredScreenStates[resumeState.activeScreenId]
@@ -662,6 +751,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         overrides.clearedObjectKeys || Array.from(clearedObjectKeys),
       pendingObjectKey: interaction.key,
       pendingVictory: interaction.victory,
+      pendingFacing: facing,
       screenStates: {
         ...cloneScreenStates(overrides.screenStates || screenStates),
         [resumeActiveScreenId]: activeState,
@@ -734,18 +824,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     }
   }
 
-  const scheduleGridObjectInteraction = (
-    position: Position,
-    delayMs: number,
-    overrides: Parameters<typeof saveGridObjectResume>[1] = {},
-  ) => {
-    const interaction = getGridObjectInteraction(position)
-    if (!interaction) return false
-    window.setTimeout(
-      () => void launchGridObjectInteraction(interaction, overrides),
-      delayMs,
-    )
-    return true
+  const interactWithGridObject = () => {
+    if (gameEnded || slidingRef.current) return
+    const interaction = getGridObjectInteractionAhead()
+    if (!interaction) return
+    playSfx('select')
+    void launchGridObjectInteraction(interaction)
   }
 
   useEffect(() => {
@@ -832,10 +916,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   }
 
   const saveSnapshot = (dx: number, dy: number) => {
+    const proofLength = moveProofRef.current.length
     moveProofRef.current.push(dx < 0 ? 'left' : dx > 0 ? 'right' : dy < 0 ? 'up' : 'down')
     setHistory((prev) => [
       ...prev.slice(-59),
       {
+        proofLength,
         activeScreenId,
         screenStates: {
           ...cloneScreenStates(screenStates),
@@ -897,6 +983,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     (grid[position.y][position.x] === 'wall' &&
       !wallGoalKeys.has(getRockPushPositionKey(position))) ||
     grid[position.y][position.x] === 'hole' ||
+    isBlockingGridObject(position) ||
     rockList.some((rock) => isSamePosition(rock, position))
 
   const isBlockedCellForPlayer = (position: Position) =>
@@ -906,7 +993,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     position.y >= gridSize.h ||
     (grid[position.y][position.x] === 'wall' &&
       !wallGoalKeys.has(getRockPushPositionKey(position))) ||
-    grid[position.y][position.x] === 'hole'
+    grid[position.y][position.x] === 'hole' ||
+    isBlockingGridObject(position)
 
   const isBlockedForRock = (
     position: Position,
@@ -919,6 +1007,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     position.y >= gridSize.h ||
     grid[position.y][position.x] === 'wall' ||
     wallGoalKeys.has(getRockPushPositionKey(position)) ||
+    isBlockingGridObject(position) ||
     rockList.some(
       (rock) => rock.id !== ignoredRockId && isSamePosition(rock, position),
     )
@@ -1041,6 +1130,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       !targetCell ||
       targetCell === 'wall' ||
       targetCell === 'hole' ||
+      isBlockingGridObject(targetPosition, targetScreenId) ||
       targetState.rocks.some((rock) => isSamePosition(rock, targetPosition))
 
     if (targetBlocked) return null
@@ -1093,31 +1183,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       return
     }
 
-    const targetInteraction = getGridObjectInteraction(
-      target.position,
-      target.screenId,
-    )
-    if (targetInteraction) {
-      setTimeout(
-        () =>
-          void launchGridObjectInteraction(targetInteraction, {
-            activeScreenId: target.screenId,
-            grid: targetState.grid,
-            rocks: targetState.rocks,
-            playerPos: target.position,
-            rocksSolved: targetState.rocksSolved,
-            screenStates: nextScreenStates,
-            collectedPrizeIds: Array.from(targetCollected),
-          }),
-        defaultMoveDurationMs,
-      )
-    }
   }
 
   const undoMove = () => {
     if (gameEnded || isSliding || history.length === 0) return
-    moveProofRef.current.pop()
     const snapshot = history[history.length - 1]
+    moveProofRef.current = moveProofRef.current.slice(0, snapshot.proofLength)
     playSfx('select')
     setHistory((prev) => prev.slice(0, -1))
     setActiveScreenId(snapshot.activeScreenId)
@@ -1209,17 +1280,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         const nextMoves = moves + 1
         setMoves(nextMoves)
 
-        if (
-          scheduleGridObjectInteraction(movedPlayerPos, moveDuration, {
-            rocks: movingRocks,
-            playerPos: movedPlayerPos,
-            moves: nextMoves,
-            collectedPrizeIds: Array.from(nextCollectedPrizeIds),
-          })
-        ) {
-          return
-        }
-
         if (winsByTile) {
           setTimeout(() => handleWin(nextCollectedPrizeIds), moveDuration)
           return
@@ -1292,17 +1352,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         const nextMoves = moves + 1
         setMoves(nextMoves)
 
-        if (
-          scheduleGridObjectInteraction(movedPlayerPos, moveDuration, {
-            rocks: newRocks,
-            playerPos: movedPlayerPos,
-            moves: nextMoves,
-            collectedPrizeIds: Array.from(nextCollectedPrizeIds),
-          })
-        ) {
-          return
-        }
-
         if (winsByTile) {
           setTimeout(() => handleWin(nextCollectedPrizeIds), moveDuration)
           return
@@ -1349,16 +1398,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       applyCollectedPrizeIds(nextCollectedPrizeIds)
       const nextMoves = moves + 1
       setMoves(nextMoves)
-
-      if (
-        scheduleGridObjectInteraction(movedPlayerPos, moveDuration, {
-          playerPos: movedPlayerPos,
-          moves: nextMoves,
-          collectedPrizeIds: Array.from(nextCollectedPrizeIds),
-        })
-      ) {
-        return
-      }
 
       if (winsByTile) {
         setTimeout(() => handleWin(nextCollectedPrizeIds), moveDuration)
@@ -1413,14 +1452,27 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         e.preventDefault()
         undoMove()
       }
+      if (e.key.toLowerCase() === 'e') {
+        e.preventDefault()
+        interactWithGridObject()
+      }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerPos, rocks, gameEnded, history])
+  }, [
+    playerPos,
+    rocks,
+    gameEnded,
+    history,
+    facing,
+    clearedObjectKeys,
+    isSliding,
+  ])
 
   const activeTilePaletteId =
     activeScreenConfig?.tilePaletteId || encounter.settings.tilePaletteId
+  const interactionAhead = getGridObjectInteractionAhead()
   const tileSources = resolveGridTileSources(activeTilePaletteId, {
     floor: encounter.settings.floorSprite,
     ice: encounter.settings.iceSprite,
@@ -1847,6 +1899,25 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             title="Undo move"
           >
             <Undo2 className="w-5 h-5" />
+          </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-12 w-12 rounded-full border-2 border-game-clay bg-game-clay text-2xl font-black text-game-cream shadow-sm hover:bg-game-clay/90 disabled:opacity-35"
+            onClick={interactWithGridObject}
+            disabled={!interactionAhead || gameEnded || isSliding}
+            aria-label={
+              interactionAhead
+                ? `Interact with ${interactionAhead.definition.name}`
+                : 'No object in front to interact with'
+            }
+            title={
+              interactionAhead
+                ? `Interact with ${interactionAhead.definition.name} (E)`
+                : 'Face an object to interact (E)'
+            }
+          >
+            A
           </Button>
           <Button
             size="icon"
