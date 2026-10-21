@@ -237,7 +237,7 @@ export function TcgPvpModal({
               Share this code. Your deck remains private while you wait.
             </p>
             <div className="flex items-center justify-center gap-2">
-              <span className="font-mono text-4xl font-bold tracking-[0.16em] text-game-clay-strong">
+              <span className="font-mono text-4xl font-bold tracking-[0.16em] text-game-ink">
                 {lobbyCode}
               </span>
               <Button
