@@ -32,7 +32,10 @@ export const celadonCityShops: ShopConfig[] = [
     items: [
       item('rocket-ball', 'rocket-ball', 350),
       item('rocket-ball-bundle', 'rocket-ball', 3500, 10),
-      item('battle-potion', 'battle-potion', 500),
+      {
+        ...item('battle-potion', 'battle-potion', 500),
+        name: 'Potion',
+      },
       item('antidote', 'antidote', 550),
       item('ice-heal', 'ice-heal', 550),
       item('burn-heal', 'burn-heal', 550),

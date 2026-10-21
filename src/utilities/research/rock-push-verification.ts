@@ -14,6 +14,12 @@ export function getRockPushProofScreens(settings: Settings): RockPushScreenConfi
   return settings.screens?.length ? settings.screens : [{ ...settings, id: 'main' }]
 }
 
+export function hasRockPushMinigameTarget(settings: Settings, targetId: string) {
+  return getRockPushObjectProofTargets(settings).some(
+    (target) => target.type === 'minigame' && target.targetId === targetId,
+  )
+}
+
 export function getRockPushObjectProofTargets(settings: Settings) {
   return getRockPushProofScreens(settings).flatMap((screen) => (screen.objects || []).flatMap((object, index) => {
     const definition = getGridObjectDefinition(gridObjects, object.objectId)

@@ -6,7 +6,12 @@ import type { ComponentType } from 'react'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import type { GameItem, GameType } from '@/data/games'
 
-type GameProps = { encounter: GameItem; initialState?: any; state?: any }
+type GameProps = {
+  encounter: GameItem
+  initialState?: any
+  state?: any
+  returnTo?: string
+}
 
 function GameLoading() {
   return <div role="status" className="flex min-h-dvh items-center justify-center gap-3 bg-game-canvas text-game-ink"><LoadingSpinner size="lg" /><span>Preparing game…</span></div>

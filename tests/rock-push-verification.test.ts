@@ -4,14 +4,18 @@ import type { RockPushGameConfig } from '@/data/games/rock-push/types'
 import { testbasicEntries } from '@/data/games/rock-push/entries/test'
 
 describe('rock-push transcript verification', () => {
-  test('combined course is solvable only after both checkpoints and both rock puzzles', () => {
+  test('combined course is solvable only after all integrated activities and both rock puzzles', () => {
     const course = testbasicEntries[0].settings
     const moves = [
       'down', 'right', 'right', 'right', 'right',
       'down', 'right', 'down', 'down', 'right', 'right', 'right',
       'down', 'right', 'right', 'right', 'down',
     ]
-    const wins = { 'frost:wild-checkpoint': 1, 'vault:trainer-checkpoint': 1 }
+    const wins = {
+      'frost:wild-checkpoint': 1,
+      'frost:mining-checkpoint': 1,
+      'vault:route-1-wild-checkpoint': 1,
+    }
     const proof = { kind: 'rock-push', moves }
     expect(verifyRockPushProof(course, proof, wins)).toEqual({
       solved: true,
@@ -19,7 +23,7 @@ describe('rock-push transcript verification', () => {
     })
     expect(verifyRockPushProof(course, proof).solved).toBe(false)
     expect(verifyRockPushProof(course, proof, { 'frost:wild-checkpoint': 1 }).solved).toBe(false)
-    expect(verifyRockPushProof(course, proof, { 'vault:trainer-checkpoint': 1 }).solved).toBe(false)
+    expect(verifyRockPushProof(course, proof, { 'vault:route-1-wild-checkpoint': 1 }).solved).toBe(false)
     expect(verifyRockPushProof(course, { ...proof, moves: moves.slice(0, -1) }, wins).solved).toBe(false)
     // Return through the paired portal, then revisit the already-solved first room.
     const returnTrip = [...moves.slice(0, 5), 'down', 'up', 'left', 'right', ...moves.slice(5)]

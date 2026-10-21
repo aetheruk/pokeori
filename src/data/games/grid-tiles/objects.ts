@@ -38,6 +38,15 @@ export const gridObjects = {
     collision: 'none',
     interaction: 'battle',
   },
+  wildBattleTrigger: {
+    id: 'wild-battle-trigger',
+    name: 'Wild Battle Trigger',
+    purpose: 'battle-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/sprites/pokemon/gen-v/front/normal/666-poke-ball.avif' },
+    collision: 'none',
+    interaction: 'battle',
+  },
   encounterTrigger: {
     id: 'encounter-trigger',
     name: 'Encounter Trigger',
@@ -46,6 +55,15 @@ export const gridObjects = {
     asset: { src: '/sprites/pokemon/gen-v/front/normal/666-poke-ball.avif' },
     collision: 'none',
     interaction: 'encounter',
+  },
+  minigameTrigger: {
+    id: 'minigame-trigger',
+    name: 'Mining Trigger',
+    purpose: 'minigame-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/games/underground-mining/pickaxe.avif' },
+    collision: 'none',
+    interaction: 'minigame',
   },
 } satisfies GridObjectLibrary
 

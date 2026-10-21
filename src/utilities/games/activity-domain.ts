@@ -1,8 +1,28 @@
 import { allGames, type GameType } from '@/data/games'
 
-export type GameActivityDomain = 'game' | 'field-research'
+export type GameActivityDomain = 'game' | 'field-research' | 'grid-minigame'
+type PrimaryGameActivityDomain = Exclude<GameActivityDomain, 'grid-minigame'>
 
-export function getGameActivityDomain(gameType: GameType): GameActivityDomain {
+/** A mining wall embedded in Grid Adventure owns a separate resumable session. */
+export function isGameActivityDomainAllowed(
+  gameType: GameType,
+  domain: GameActivityDomain,
+): boolean {
+  return (
+    getGameActivityDomain(gameType) === domain ||
+    (domain === 'grid-minigame' && gameType === 'underground-mining')
+  )
+}
+
+export function getExpeditionActivityDomain(
+  domain: GameActivityDomain,
+): PrimaryGameActivityDomain {
+  return domain === 'grid-minigame' ? 'game' : domain
+}
+
+export function getGameActivityDomain(
+  gameType: GameType,
+): PrimaryGameActivityDomain {
   return gameType === 'field-observation' ? 'field-research' : 'game'
 }
 
@@ -19,7 +39,7 @@ export function getGameActivityRouteForId(gameId: string): string | null {
 
 export function classifyLegacyActivityId(
   activityId: string,
-): GameActivityDomain {
+): PrimaryGameActivityDomain {
   const game = allGames.find((entry) => entry.id === activityId)
   return game?.gameType === 'field-observation' ? 'field-research' : 'game'
 }

@@ -8,6 +8,7 @@ import {
   CircleDot,
   EyeOff,
   Footprints,
+  Heart,
   RefreshCw,
   Undo2,
 } from 'lucide-react'
@@ -47,6 +48,7 @@ import type {
   GridObjectDefinition,
   GridObjectLibrary,
   GridObjectPlacement,
+  GridObjectInteractionType,
   GridObjectVictoryMode,
 } from '@/data/games/grid-tiles'
 import { useGameMusic } from '@/hooks/useGameMusic'
@@ -63,6 +65,7 @@ import {
 } from '@/utilities/games/client-action-recovery'
 import { startBattle } from '@/app/(frontend)/game/battles/actions'
 import { startEncounter } from '@/app/(frontend)/game/locations/encounter/actions'
+import { startGridMinigame } from '@/app/(frontend)/game/games/grid-minigame-actions'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 
 interface RockPushGameProps {
@@ -93,6 +96,12 @@ interface MoveSnapshot {
   clearedObjectKeys: string[]
 }
 
+interface PendingGridObjectResult {
+  key: string
+  victory: GridObjectVictoryMode
+  outcome: 'won' | 'lost'
+}
+
 interface ScreenRuntimeState {
   id: string
   grid: CellType[][]
@@ -110,6 +119,7 @@ interface GridObjectResumeState {
   playerPos: Position
   rocksSolved: number
   moves: number
+  lives?: number
   collectedPrizeIds: string[]
   clearedObjectKeys: string[]
   pendingObjectKey: string
@@ -261,6 +271,13 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     [encounter.settings],
   )
   const hasAuthoredScreens = !!encounter.settings.screens?.length
+  const configuredLives = encounter.settings.lives
+  const initialLives =
+    typeof configuredLives === 'number' &&
+    Number.isInteger(configuredLives) &&
+    configuredLives > 0
+      ? configuredLives
+      : null
 
   // Game State
   const [activeScreenId, setActiveScreenId] = useState(
@@ -294,11 +311,10 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const [clearedObjectKeys, setClearedObjectKeys] = useState<Set<string>>(
     new Set(),
   )
-  const [pendingObjectResult, setPendingObjectResult] = useState<{
-    key: string
-    victory: GridObjectVictoryMode
-    outcome: 'won' | 'lost'
-  } | null>(null)
+  const [pendingObjectResult, setPendingObjectResult] =
+    useState<PendingGridObjectResult | null>(null)
+  const handledGridObjectResultRef =
+    useRef<PendingGridObjectResult | null>(null)
   const [revealedBarrierKeys, setRevealedBarrierKeys] = useState<Set<string>>(
     new Set(),
   )
@@ -314,6 +330,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
   const [rocksSolved, setRocksSolved] = useState(0)
   const [timeLeft, setTimeLeft] = useState(encounter.settings.timeLimit || 120)
+  const [lives, setLives] = useState<number | null>(initialLives)
   const [moves, setMoves] = useState(0)
   const [maxMoves, setMaxMoves] = useState<number | null>(null)
   const totalRocks = screenConfigs.reduce(
@@ -353,7 +370,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     key: string
     placement: GridObjectPlacement
     definition: GridObjectDefinition
-    type: 'battle' | 'encounter'
+    type: GridObjectInteractionType
     targetId: string
     victory: GridObjectVictoryMode
   } | null => {
@@ -425,6 +442,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       setCollectedPrizeIds(new Set())
       setClearedObjectKeys(new Set())
       setRevealedBarrierKeys(new Set())
+      setLives(initialLives)
 
       if (res.restored && res.expiry) {
         const remaining = Math.max(
@@ -499,6 +517,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         )
         setRocksSolved(resumeState.rocksSolved || 0)
         setMoves(resumeState.moves || 0)
+        setLives(resumeState.lives ?? initialLives)
         setCollectedPrizeIds(new Set(resumeState.collectedPrizeIds || []))
         setClearedObjectKeys(new Set(resumeState.clearedObjectKeys || []))
         if (resumeState.pendingOutcome) {
@@ -540,7 +559,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     } finally {
       initializingRef.current = false
     }
-  }, [encounter, screenConfigs])
+  }, [encounter, initialLives, screenConfigs])
 
   useEffect(() => {
     if (!gameStarted) initGame()
@@ -636,6 +655,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       playerPos: { ...(overrides.playerPos || playerPos) },
       rocksSolved: overrides.rocksSolved ?? rocksSolved,
       moves: overrides.moves ?? moves,
+      lives: lives ?? undefined,
       collectedPrizeIds:
         overrides.collectedPrizeIds || Array.from(collectedPrizeIds),
       clearedObjectKeys:
@@ -655,7 +675,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
   const launchGridObjectInteraction = async (
     interaction: {
-      type: 'battle' | 'encounter'
+      type: GridObjectInteractionType
       targetId: string
       victory: GridObjectVictoryMode
       key: string
@@ -678,6 +698,20 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         router.push(
           `/game/battles/encounter?returnTo=${encodeURIComponent(returnTo)}`,
         )
+        return
+      }
+
+      if (interaction.type === 'minigame') {
+        const result = await startGridMinigame(interaction.targetId)
+        if (!result.success) {
+          window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
+          setResult({
+            success: false,
+            message: result.error || 'The mining game could not start.',
+          })
+          return
+        }
+        router.push('/game/games/underground-mining?gridMinigame=1')
         return
       }
 
@@ -717,8 +751,18 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   useEffect(() => {
     if (!gameStarted || !pendingObjectResult || gameEnded) return
     const pending = pendingObjectResult
+    if (handledGridObjectResultRef.current === pending) return
+    handledGridObjectResultRef.current = pending
     setPendingObjectResult(null)
-    if (pending.outcome !== 'won') return
+    if (pending.outcome !== 'won') {
+      if (lives !== null) {
+        const remainingLives = Math.max(0, lives - 1)
+        setLives(remainingLives)
+        playSfx('bad')
+        if (remainingLives === 0) void handleLoss('Out of lives!')
+      }
+      return
+    }
     if (pending.victory === 'win') {
       void handleWin()
       return
@@ -729,7 +773,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       next.add(pending.key)
       return next
     })
-  }, [gameEnded, gameStarted, handleWin, pendingObjectResult, playSfx])
+  }, [gameEnded, gameStarted, handleLoss, handleWin, lives, pendingObjectResult, playSfx])
 
   const signalBlocked = (dx: number, dy: number) => {
     if (blockedTimerRef.current) clearTimeout(blockedTimerRef.current)
@@ -1472,53 +1516,66 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       `}</style>
       <div className="relative z-10 flex flex-col items-center justify-center min-h-dvh w-full p-4">
         {/* Header Stats / Chips */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-row gap-3 z-50 pointer-events-none">
-          {/* Objective Chip */}
-          <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm">
-            {encounter.settings.invisibleMaze ? (
-              <>
-                <EyeOff className="h-3 w-3 text-game-ochre" />
-                <span>Find the exit</span>
-              </>
-            ) : (
-              <>
-                <CircleDot className="h-3 w-3 text-game-moss" />
-                <span>
-                  {displayRocksSolved} / {totalRocks}
-                </span>
-              </>
-            )}
-          </div>
+        <div className="absolute inset-x-4 top-4 z-50 flex items-center gap-2 pointer-events-none">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {/* Objective Chip */}
+            <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm">
+              {encounter.settings.invisibleMaze ? (
+                <>
+                  <EyeOff className="h-3 w-3 text-game-ochre" />
+                  <span>Find the exit</span>
+                </>
+              ) : (
+                <>
+                  <CircleDot className="h-3 w-3 text-game-moss" />
+                  <span>
+                    {displayRocksSolved} / {totalRocks}
+                  </span>
+                </>
+              )}
+            </div>
 
-          {/* Moves Chip */}
-          <div
-            className={cn(
-              'flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm transition-colors',
-              maxMoves && moves >= maxMoves * 0.9
-                ? 'border-game-danger/50 bg-game-danger/15'
-                : '',
-            )}
-          >
-            <Footprints
+            {/* Moves Chip */}
+            <div
               className={cn(
-                'w-3 h-3',
-                maxMoves && moves > maxMoves * 0.9
-                  ? 'text-game-danger'
-                  : 'text-game-moss',
+                'flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm transition-colors',
+                maxMoves && moves >= maxMoves * 0.9
+                  ? 'border-game-danger/50 bg-game-danger/15'
+                  : '',
               )}
-            />
-            <span>
-              {moves}{' '}
-              {maxMoves && (
-                <span className="text-game-muted">/ {maxMoves}</span>
-              )}
-            </span>
+            >
+              <Footprints
+                className={cn(
+                  'w-3 h-3',
+                  maxMoves && moves > maxMoves * 0.9
+                    ? 'text-game-danger'
+                    : 'text-game-moss',
+                )}
+              />
+              <span>
+                {moves}{' '}
+                {maxMoves && (
+                  <span className="text-game-muted">/ {maxMoves}</span>
+                )}
+              </span>
+            </div>
+            {lives !== null && (
+              <div
+                role="status"
+                aria-live="polite"
+                aria-label={`${lives} of ${initialLives} lives remaining`}
+                className="flex shrink-0 items-center gap-1 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm"
+              >
+                <Heart
+                  aria-hidden="true"
+                  className="h-3 w-3 fill-current text-game-clay"
+                />
+                <span>{lives}/{initialLives}</span>
+              </div>
+            )}
           </div>
-        </div>
-
-        {/* Absolute Timer */}
-        <div className="absolute top-4 right-4 z-50">
           <GameTimer
+            className="ml-auto shrink-0"
             timeLeft={timeLeft}
             totalTime={encounter.settings.timeLimit || 120}
           />

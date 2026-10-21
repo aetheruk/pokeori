@@ -4,6 +4,8 @@ import {
   getGameActivityStateForUser,
   getUser,
 } from '@/app/(frontend)/game/_shared/activity-actions'
+import { getGameActivitySessionKey } from '@/utilities/games/activity-domain'
+import type { GameActivityDomain } from '@/utilities/games/activity-domain'
 import { allGames } from '@/data/games'
 import type {
   UndergroundMiningSettings,
@@ -20,6 +22,7 @@ import {
   releaseActionLock,
 } from '@/utilities/game-integrity'
 import { validateResearchEncounterId } from '@/utilities/research/input-validation'
+import { hasRockPushMinigameTarget } from '@/utilities/research/rock-push-verification'
 import { redis } from '@/utilities/redis'
 
 export type UndergroundMiningStrikeResponse =
@@ -37,6 +40,19 @@ interface MiningStrikeInput {
 
 export async function submitUndergroundMiningStrike(
   input: MiningStrikeInput,
+): Promise<UndergroundMiningStrikeResponse> {
+  return submitUndergroundMiningStrikeForDomain(input, 'game')
+}
+
+export async function submitGridMinigameUndergroundMiningStrike(
+  input: MiningStrikeInput,
+): Promise<UndergroundMiningStrikeResponse> {
+  return submitUndergroundMiningStrikeForDomain(input, 'grid-minigame')
+}
+
+async function submitUndergroundMiningStrikeForDomain(
+  input: MiningStrikeInput,
+  domain: GameActivityDomain,
 ): Promise<UndergroundMiningStrikeResponse> {
   const user = await getUser()
   if (!user) return { success: false, error: 'Not authenticated' }
@@ -57,7 +73,7 @@ export async function submitUndergroundMiningStrike(
     return { success: false, error: 'Invalid mining strike' }
   }
 
-  const receiptKey = `underground-mining:strike:${user.id}:${input.encounterId}:${input.startTime}:${input.revision}`
+  const receiptKey = `underground-mining:strike:${domain}:${user.id}:${input.encounterId}:${input.startTime}:${input.revision}`
   const existing =
     await getIdempotentResult<UndergroundMiningStrikeResponse>(receiptKey)
   if (existing) return existing
@@ -67,7 +83,8 @@ export async function submitUndergroundMiningStrike(
   ) {
     return { success: false, error: 'Too many mining actions. Please wait.' }
   }
-  const lock = await acquireActionLock(`lock:game:settle:${user.id}`, 60)
+  const sessionKey = getGameActivitySessionKey(user.id, domain)
+  const lock = await acquireActionLock(`lock:${domain}:settle:${user.id}`, 60)
   if (!lock.acquired)
     return { success: false, error: 'Game action already in progress' }
 
@@ -75,7 +92,7 @@ export async function submitUndergroundMiningStrike(
     const repeated =
       await getIdempotentResult<UndergroundMiningStrikeResponse>(receiptKey)
     if (repeated) return repeated
-    const state = await getGameActivityStateForUser(user.id, 'game')
+    const state = await getGameActivityStateForUser(user.id, domain)
     if (
       !state ||
       state.encounterId !== input.encounterId ||
@@ -96,6 +113,22 @@ export async function submitUndergroundMiningStrike(
       state.undergroundMiningPrivate?.kind !== 'underground-mining-private'
     ) {
       return { success: false, error: 'Invalid mining session' }
+    }
+    if (domain === 'grid-minigame') {
+      const parentState = await getGameActivityStateForUser(user.id, 'game')
+      const parentEncounter = parentState?.eventConfigSnapshot || allGames.find(
+        (game) => game.id === parentState?.encounterId,
+      )
+      if (
+        parentEncounter?.gameType !== 'grid-puzzle' ||
+        parentEncounter.settings.variant !== 'rock-push' ||
+        !hasRockPushMinigameTarget(
+          parentEncounter.settings as any,
+          input.encounterId,
+        )
+      ) {
+        return { success: false, error: 'This mining wall is no longer part of the active Grid Adventure.' }
+      }
     }
     if (
       input.revision !== state.roundData.revision ||
@@ -122,9 +155,9 @@ export async function submitUndergroundMiningStrike(
       success: true,
       round: result.publicRound,
     }
-    const saved = await redis.setManyIfValue(`game:${user.id}`, previous, [
+    const saved = await redis.setManyIfValue(sessionKey, previous, [
       {
-        key: `game:${user.id}`,
+        key: sessionKey,
         value: state,
         ttlSeconds: Math.max(
           120,

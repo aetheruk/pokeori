@@ -70,6 +70,21 @@ objects: [{
 to be authored on the same board. Rock Push persists its board snapshot while
 the battle or encounter screen is open and restores it when the result returns
 to `/game/games/grid-puzzle`.
+Use the `wild-battle-trigger` object for wild battle targets so the board shows
+a Poké Ball marker instead of the trainer sprite used by `battle-trigger`.
+
+Rock Push settings may include an optional `lives` count. When configured,
+returning from a failed integrated battle, catch, or minigame removes one life;
+reaching zero ends the puzzle. Courses without `lives` keep the existing
+unlimited integrated-attempt behavior. The Kanto test course uses three lives
+to exercise wild-battle, catch, and mining failures.
+
+Use the `minigame-trigger` object for an authored activity under
+`interaction.type: 'minigame'`. The activity runs in a separate session slot,
+so the parent Grid Adventure remains resumable. The server accepts a minigame
+only when its id is referenced by the active Rock Push board, and the board's
+completion proof checks the saved game result before clearing the marker. The
+test board integrates `underground-mining-test` in its frost room.
 
 Wall filenames are four-bit cardinal masks: north `1`, east `2`, south `4`, west `8`. For example, north + east is `3`, east + west is `10`, and all four directions is `15`. Each mask should be deliberately authored with the correct corners and side faces.
 

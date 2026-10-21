@@ -13,7 +13,7 @@ export const testbasicEntries: RockPushGameConfig[] = [
   {
     id: 'grid-adventure-test',
     name: 'Grid Adventure Test',
-    description: 'Explore three connected rooms. Slide rocks across ice, collect supplies, use teleporters, clear a wild encounter, and defeat the trainer before filling the final hole.',
+    description: 'Explore three connected rooms. Slide rocks across ice, collect supplies, mine a wall, and clear a wild catch and Route 1 wild battle before filling the final hole. You have three lives.',
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'item', id: 'hard-stone' },
@@ -26,6 +26,7 @@ export const testbasicEntries: RockPushGameConfig[] = [
       timeLimit: 1800,
       grid_size: 9,
       maxMoves: 200,
+      lives: 3,
       playerStart: { x: 1, y: 1 },
       startScreen: 'entry',
       screens: [
@@ -61,6 +62,9 @@ export const testbasicEntries: RockPushGameConfig[] = [
           objects: [{
             id: 'wild-checkpoint', objectId: 'encounter-trigger', x: 4, y: 3,
             interaction: { type: 'encounter', targetId: 'test-safari-catching', victory: 'clear' },
+          }, {
+            id: 'mining-checkpoint', objectId: 'minigame-trigger', x: 4, y: 2,
+            interaction: { type: 'minigame', targetId: 'underground-mining-test', victory: 'clear' },
           }],
         },
         {
@@ -75,8 +79,8 @@ export const testbasicEntries: RockPushGameConfig[] = [
           holes: [{ x: 4, y: 4 }],
           prizes: [{ id: 'vault-supplies', x: 3, y: 2, itemId: 'escape-rope', quantity: 1 }],
           objects: [{
-            id: 'trainer-checkpoint', objectId: 'battle-trigger', x: 2, y: 2,
-            interaction: { type: 'battle', targetId: 'safari-central-rocket-poacher', victory: 'clear' },
+            id: 'route-1-wild-checkpoint', objectId: 'wild-battle-trigger', x: 2, y: 2,
+            interaction: { type: 'battle', targetId: 'route-1-battle', victory: 'clear' },
           }],
         },
       ],
