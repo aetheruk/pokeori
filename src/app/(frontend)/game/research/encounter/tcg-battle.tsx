@@ -134,10 +134,10 @@ const TYPE_BADGE_CLASSES: Record<string, string> = {
   Darkness: 'border-game-charcoal/30 bg-game-charcoal/10 text-game-charcoal',
   Dragon: 'border-violet-300 bg-violet-50 text-violet-800',
   Fairy: 'border-pink-300 bg-pink-50 text-pink-800',
-  Fighting: 'border-orange-300 bg-orange-50 text-orange-800',
+  Fighting: 'border-orange-300 bg-orange-50 text-game-ink',
   Fire: 'border-red-300 bg-red-50 text-red-800',
   Grass: 'border-emerald-300 bg-emerald-50 text-emerald-800',
-  Lightning: 'border-yellow-300 bg-yellow-50 text-yellow-800',
+  Lightning: 'border-yellow-300 bg-yellow-50 text-game-ink',
   Metal: 'border-slate-300 bg-slate-50 text-slate-800',
   Psychic: 'border-fuchsia-300 bg-fuchsia-50 text-fuchsia-800',
   Water: 'border-sky-300 bg-sky-50 text-sky-800',
@@ -552,14 +552,16 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const [resolution, setResolution] = useState<BattleResolution | null>(null)
   const [isActionBusy, setIsActionBusy] = useState(false)
   const [attackCapPulse, setAttackCapPulse] = useState(false)
-  const [showEvolutionEnergyBurst, setShowEvolutionEnergyBurst] =
-    useState(false)
-  const [showEnergyCardBurst, setShowEnergyCardBurst] = useState(false)
+  const [energyNotice, setEnergyNotice] = useState<{
+    id: number
+    kind: 'evolution' | 'energy-card'
+  } | null>(null)
   const [showSurrenderConfirm, setShowSurrenderConfirm] = useState(false)
   const [clockNow, setClockNow] = useState(() => Date.now())
   const [isPending, startTransition] = useTransition()
   const timersRef = useRef<number[]>([])
   const lastAnimatedActionRef = useRef<string | null>(null)
+  const energyNoticeIdRef = useRef(0)
 
   const clearResolutionTimers = useCallback(() => {
     timersRef.current.forEach((timer) => window.clearTimeout(timer))
@@ -647,36 +649,43 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     const previousCap = prevAttackCapRef.current
     if (didAttackCapIncrease(previousCap, attackCap)) {
       setAttackCapPulse(true)
-      const timer = window.setTimeout(() => setAttackCapPulse(false), 1100)
-      prevAttackCapRef.current = attackCap
-      return () => window.clearTimeout(timer)
     }
     prevAttackCapRef.current = attackCap
   }, [attackCap, state])
 
   useEffect(() => {
+    if (!attackCapPulse) return
+    const timer = window.setTimeout(() => setAttackCapPulse(false), 1100)
+    return () => window.clearTimeout(timer)
+  }, [attackCapPulse])
+
+  useEffect(() => {
     if (!state) return
     const previousTurn = prevTurnRef.current
     if (previousTurn < 15 && state.turnNumber >= 15) {
-      setShowEnergyCardBurst(true)
-      const timer = window.setTimeout(() => setShowEnergyCardBurst(false), 2100)
       prevTurnRef.current = state.turnNumber
-      return () => window.clearTimeout(timer)
+      energyNoticeIdRef.current += 1
+      setEnergyNotice({ id: energyNoticeIdRef.current, kind: 'energy-card' })
+      return
     }
     if (
       state.turnNumber !== previousTurn &&
       isStageUnlockTurn(state.turnNumber)
     ) {
-      setShowEvolutionEnergyBurst(true)
-      const timer = window.setTimeout(
-        () => setShowEvolutionEnergyBurst(false),
-        1850,
-      )
       prevTurnRef.current = state.turnNumber
-      return () => window.clearTimeout(timer)
+      energyNoticeIdRef.current += 1
+      setEnergyNotice({ id: energyNoticeIdRef.current, kind: 'evolution' })
+      return
     }
     prevTurnRef.current = state.turnNumber
   }, [state])
+
+  useEffect(() => {
+    if (!energyNotice) return
+    const duration = energyNotice.kind === 'energy-card' ? 2100 : 1850
+    const timer = window.setTimeout(() => setEnergyNotice(null), duration)
+    return () => window.clearTimeout(timer)
+  }, [energyNotice])
 
   const commitActionResult = useCallback(
     (nextState: TcgBattleState, completion?: GameCompletionResult) => {
@@ -1831,7 +1840,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             Their cards stay hidden until both collectors are ready.
           </p>
           {deadlineSeconds !== null && (
-          <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-game-border bg-game-surface-raised/90 px-4 font-mono text-lg font-bold text-game-ochre">
+            <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-game-border bg-game-surface-raised/90 px-4 font-mono text-lg font-bold text-game-ink">
               {formatMatchClock(deadlineSeconds)}
             </div>
           )}
@@ -1864,7 +1873,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         <main className="relative z-10 flex h-full flex-col">
           <header className="shrink-0 px-4 pt-[calc(env(safe-area-inset-top)+1.8rem)] text-center sm:pt-[calc(env(safe-area-inset-top)+2.6rem)]">
             {state.battleMode === 'pvp' && deadlineSeconds !== null && (
-              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-md border border-game-border bg-game-surface-raised/95 px-4 font-mono text-sm font-bold text-game-ochre">
+              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-md border border-game-border bg-game-surface-raised/95 px-4 font-mono text-sm font-bold text-game-ink">
                 {formatMatchClock(deadlineSeconds)}
                 <Button
                   type="button"
@@ -1881,7 +1890,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             <SectionDivider className="mx-auto mb-2 max-w-xs sm:max-w-sm">
               Choose
             </SectionDivider>
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-game-ochre sm:text-5xl">
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-game-ink sm:text-5xl">
               Active Pokemon
             </h1>
           </header>
@@ -1969,7 +1978,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           state.phase !== 'finished' &&
           (state.activeSide === 'opponent' ||
             state.pendingPromotion === 'opponent') && (
-            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-md border border-game-ochre/35 bg-game-surface-raised px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-game-ochre shadow-md">
+            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-md border border-game-ochre/35 bg-game-surface-raised px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-game-ink shadow-md">
               {state.pendingPromotion === 'opponent'
                 ? 'Opponent is choosing a promotion'
                 : 'Opponent’s turn'}
@@ -2110,10 +2119,14 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         {resolution?.coinCue && <CoinFlipOverlay cue={resolution.coinCue} />}
       </AnimatePresence>
       <AnimatePresence>
-        {showEvolutionEnergyBurst && <EvolutionEnergyBurst />}
+        {energyNotice?.kind === 'evolution' && (
+          <EvolutionEnergyBurst key={energyNotice.id} />
+        )}
       </AnimatePresence>
       <AnimatePresence>
-        {showEnergyCardBurst && <EnergyCardActivationBurst state={state} />}
+        {energyNotice?.kind === 'energy-card' && (
+          <EnergyCardActivationBurst key={energyNotice.id} state={state} />
+        )}
       </AnimatePresence>
 
       {resultOverlay && (
@@ -2384,7 +2397,7 @@ function BattleTopBar({
               ? ` · ${formatMatchClock(deadlineSeconds)}`
               : ''}
           </div>
-          <div className="text-[12px] font-black tracking-[0.14em] text-game-battle-orange">
+          <div className="text-[12px] font-black tracking-[0.14em] text-game-ink">
             {sideLabel}
           </div>
         </div>
@@ -2427,7 +2440,7 @@ function EvolutionEnergyBurst() {
     >
       <div className="relative overflow-hidden rounded-md border border-game-ochre/40 bg-game-surface-raised/95 px-4 py-3 text-center backdrop-blur-md">
         <div className="pointer-events-none absolute inset-0 animate-[tcg-energy-sweep_900ms_ease-out] bg-[linear-gradient(to_right,transparent,rgba(211,173,99,0.18),transparent)]" />
-        <p className="relative text-xs font-black uppercase tracking-[0.18em] text-game-ochre sm:text-sm">
+        <p className="relative text-xs font-black uppercase tracking-[0.18em] text-game-ink sm:text-sm">
           A burst of Evolution Energy sweeps across the battlefield
         </p>
       </div>
@@ -3088,6 +3101,7 @@ function BattleCommandControls({
       <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1.25rem)] z-30 flex justify-center">
         <Button
           type="button"
+          variant="outline"
           disabled={isPending}
           onClick={onPromote}
           className="game-focus-ring min-h-12 rounded-md border border-game-ochre/50 bg-game-surface-raised px-5 text-xs font-black uppercase tracking-wide text-game-ink hover:bg-game-ochre/10"
@@ -3114,7 +3128,7 @@ function BattleCommandControls({
           <span className="relative inline-flex items-center justify-center">
             <EnergyIcon type="Colorless" className="h-[18px] w-[18px]" />
             {!atCap && (
-              <span className="absolute -right-5 -top-3 rounded border border-game-moss/55 bg-game-moss/10 px-1 py-[1px] text-[10px] font-black leading-none text-game-ink">
+              <span className="absolute -right-5 -top-3 rounded border border-game-ochre/70 bg-game-ochre px-1 py-[1px] text-[10px] font-black leading-none text-game-ink">
                 +{formatConfig.chargeGain}
               </span>
             )}
@@ -3139,6 +3153,7 @@ function LabeledCommandButton({
   return (
     <Button
       type="button"
+      variant="outline"
       aria-label={label}
       title={label}
       disabled={disabled}
@@ -3338,7 +3353,7 @@ function SideScorePill({
         <div className="text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
           {label}
         </div>
-        <div className="flex items-center gap-1 text-xs font-black text-game-ochre">
+        <div className="flex items-center gap-1 text-xs font-black text-game-ink">
           <span className="text-[9px] uppercase tracking-wide">Energy</span>
           {energy}
         </div>
@@ -4047,7 +4062,7 @@ function CardImageButton({
       {isLocked && !knockedOut && (
         <div
           className={cn(
-            'pointer-events-none absolute z-30 flex items-center gap-1 rounded-full border border-game-ochre/60 bg-game-surface-raised/95 px-2 py-1 text-[10px] font-black uppercase text-game-ochre shadow-md backdrop-blur-sm',
+            'pointer-events-none absolute z-30 flex items-center gap-1 rounded-full border border-game-ochre/60 bg-game-surface-raised/95 px-2 py-1 text-[10px] font-black uppercase text-game-ink shadow-md backdrop-blur-sm',
             side === 'opponent' ? '-left-2 -top-2' : '-right-2 -top-2',
           )}
         >
@@ -4121,7 +4136,7 @@ function CardImageButton({
       {card.markers?.includes('lightningRod') && (
         <div
           className={cn(
-            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-md border border-game-ochre/50 bg-game-surface-raised px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-game-ochre shadow-sm',
+            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-md border border-game-ochre/50 bg-game-surface-raised px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-game-ink shadow-sm',
             side === 'opponent' && 'rotate-180',
           )}
           title="Lightning Rod marker"
