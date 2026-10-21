@@ -1989,7 +1989,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           <TeamEnergyReadout
             energy={state.opponent.energy}
             cap={formatConfig?.energyCap || 0}
-            benchCount={state.opponent.back.length}
+            pokemonCount={getLivingCards(state.opponent).length}
             position="opponent"
           />
           <BattleCardRow
@@ -2022,7 +2022,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           <TeamEnergyReadout
             energy={state.player.energy}
             cap={formatConfig?.energyCap || 0}
-            benchCount={state.player.back.length}
+            pokemonCount={getLivingCards(state.player).length}
             position="player"
           />
 
@@ -2479,13 +2479,13 @@ function EnergyCardActivationBurst({ state }: { state: TcgBattleState }) {
 function TeamEnergyReadout({
   energy,
   cap,
-  benchCount,
+  pokemonCount,
   inverted = false,
   position,
 }: {
   energy: number
   cap: number
-  benchCount: number
+  pokemonCount: number
   inverted?: boolean
   position: SideTone
 }) {
@@ -2504,8 +2504,14 @@ function TeamEnergyReadout({
         </span>
       </span>
       <span className="inline-flex items-center gap-1.5 text-game-muted">
-        <span>Bench</span>
-        <span className="font-mono text-game-ink">{benchCount}</span>
+        <Image
+          src="/sprites/items/balls/poke-ball.avif"
+          alt="Pokémon remaining"
+          width={20}
+          height={20}
+          className="h-5 w-5 object-contain"
+        />
+        <span className="font-mono text-game-ink">{pokemonCount}</span>
       </span>
     </div>
   )
@@ -3128,7 +3134,7 @@ function BattleCommandControls({
           <span className="relative inline-flex items-center justify-center">
             <EnergyIcon type="Colorless" className="h-[18px] w-[18px]" />
             {!atCap && (
-              <span className="absolute -right-5 -top-3 rounded border border-game-ochre/70 bg-game-ochre px-1 py-[1px] text-[10px] font-black leading-none text-game-ink">
+              <span className="absolute -right-5 -top-3 rounded border border-game-charcoal bg-game-charcoal px-1 py-[1px] text-[10px] font-black leading-none text-white">
                 +{formatConfig.chargeGain}
               </span>
             )}
