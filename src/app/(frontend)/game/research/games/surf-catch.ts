@@ -3,6 +3,7 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { startBattleFromConfig } from '@/app/(frontend)/game/battles/pve/start-battle'
+import { allGames } from '@/data/games'
 import type { BattleConfig } from '@/data/types'
 import {
   getGameActivityStateForUser,
@@ -100,9 +101,13 @@ export async function chooseSurfPokemon(
     const isShiny = pending.rarity === 'shiny'
     const isShadow = pending.rarity === 'shadow'
     const isRadiant = pending.rarity === 'radiant'
-    const background =
+    const encounterBackground =
+      state.eventConfigSnapshot?.background ||
+      allGames.find((game) => game.id === encounterId)?.background ||
       round.settings?.scene?.backdrop ||
       '/games/surf/backgrounds/kanto-coast.avif'
+    const sceneBackground =
+      round.settings?.scene?.backdrop || encounterBackground
     let response: SurfChoiceResult
 
     if (choice === 'battle') {
@@ -113,7 +118,7 @@ export async function chooseSurfPokemon(
         category: 'Kanto',
         subCategory: 'Test',
         icon: { type: 'pokemon', id: pending.formId },
-        background,
+        background: sceneBackground,
         requirements: [],
         enemyTeam: [
           {
@@ -164,7 +169,7 @@ export async function chooseSurfPokemon(
         gender,
         isShiny,
         rarity,
-        background,
+        background: encounterBackground,
         startTime: now,
         expiry: now + duration * 1000,
         baseCatchRate: isAlpha ? 0 : captureRate,
@@ -190,7 +195,7 @@ export async function chooseSurfPokemon(
             },
           ],
           rewards: [],
-          background,
+          background: encounterBackground,
           timer: duration,
           levelRange: { min: pending.level, max: pending.level },
           keyEncounter: true,

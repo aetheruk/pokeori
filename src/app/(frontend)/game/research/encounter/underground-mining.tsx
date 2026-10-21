@@ -2,7 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { submitUndergroundMiningStrike } from '@/app/(frontend)/game/research/games/underground-mining'
+import {
+  submitGridMinigameUndergroundMiningStrike,
+  submitUndergroundMiningStrike,
+} from '@/app/(frontend)/game/research/games/underground-mining'
+import {
+  completeGridMinigame,
+  startGridMinigame,
+} from '@/app/(frontend)/game/games/grid-minigame-actions'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
@@ -27,6 +34,11 @@ const defaultActions = {
   strike: submitUndergroundMiningStrike,
   complete: completeGameActivity,
 }
+const gridMinigameActions: UndergroundMiningActions = {
+  start: startGridMinigame,
+  strike: submitGridMinigameUndergroundMiningStrike,
+  complete: completeGridMinigame,
+}
 export type UndergroundMiningActions = typeof defaultActions
 
 interface UndergroundMiningGameProps {
@@ -34,13 +46,16 @@ interface UndergroundMiningGameProps {
   initialState?: any
   actions?: UndergroundMiningActions
   onExit?: () => void
+  returnTo?: string
 }
 
 export function UndergroundMiningGame({
   encounter,
-  actions = defaultActions,
+  actions: suppliedActions,
   onExit,
+  returnTo,
 }: UndergroundMiningGameProps) {
+  const actions = suppliedActions || (returnTo ? gridMinigameActions : defaultActions)
   useGameMusic(encounter)
   const router = useRouter()
   const { playSfx } = useAudio()
@@ -175,6 +190,16 @@ export function UndergroundMiningGame({
       return
     }
     void refreshUser(true, completionInvalidatesRef.current)
+    if (returnTo) {
+      if (result && typeof window !== 'undefined') {
+        const returnUrl = new URL(returnTo, window.location.origin)
+        returnUrl.searchParams.set('outcome', result.success ? 'won' : 'lost')
+        router.push(`${returnUrl.pathname}${returnUrl.search}`)
+      } else {
+        router.push(returnTo)
+      }
+      return
+    }
     router.push('/game/explore')
   }
 
@@ -216,7 +241,7 @@ export function UndergroundMiningGame({
               </p>
               <Button onClick={() => router.refresh()}>Try again</Button>
               <Button variant="outline" onClick={close}>
-                Return to Explore
+                {returnTo ? 'Return to Grid Adventure' : 'Return to Explore'}
               </Button>
             </>
           ) : (
@@ -257,7 +282,7 @@ export function UndergroundMiningGame({
             </p>
             <Button onClick={() => void finish(round)}>Retry saving</Button>
             <Button variant="outline" onClick={close}>
-              Return to Explore
+              {returnTo ? 'Return to Grid Adventure' : 'Return to Explore'}
             </Button>
           </div>
         </div>
@@ -271,7 +296,7 @@ export function UndergroundMiningGame({
           background={encounter.settings.wallTexture || encounter.background}
           title={result.success ? 'Treasures recovered!' : 'The wall collapsed'}
           secondaryAction={
-            encounter.isEligibleForReplay ? (
+            encounter.isEligibleForReplay && !returnTo ? (
               <Button
                 size="lg"
                 onClick={replay}

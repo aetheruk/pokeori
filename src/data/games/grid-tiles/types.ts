@@ -84,7 +84,7 @@ export type GridObjectPurpose =
   | (string & {})
 
 /** Interaction started when a player steps onto a placed object. */
-export type GridObjectInteractionType = 'battle' | 'encounter'
+export type GridObjectInteractionType = 'battle' | 'encounter' | 'minigame'
 export type GridObjectVictoryMode = 'win' | 'clear'
 
 export interface GridObjectInteractionPlacement {

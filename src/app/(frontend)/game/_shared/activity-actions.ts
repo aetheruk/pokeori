@@ -122,8 +122,10 @@ import {
   shouldProtectFieldObservationRewards,
 } from '@/utilities/pokemon/encounter-ability-runtime'
 import {
+  getExpeditionActivityDomain,
   getGameActivityDomain,
   getGameActivitySessionKey,
+  isGameActivityDomainAllowed,
   type GameActivityDomain,
 } from '@/utilities/games/activity-domain'
 import {
@@ -139,7 +141,7 @@ import type { MagnemiteCircuitSettings } from '@/data/games/magnemite-circuit/ty
 import type { RockTunnelEchoMapSettings } from '@/data/games/rock-tunnel-echo-map/types'
 import type { VoltorbGridSettings } from '@/data/games/voltorb-grid/types'
 import type { RockPushGameConfig } from '@/data/games/rock-push/types'
-import { getRockPushObjectProofTargets, verifyRockPushProof } from '@/utilities/research/rock-push-verification'
+import { getRockPushObjectProofTargets, hasRockPushMinigameTarget, verifyRockPushProof } from '@/utilities/research/rock-push-verification'
 import { generateInspectionRound } from '@/utilities/research/tcg-inspection-server'
 import type { TcgInspectionGameSettings } from '@/data/games/tcg-inspection/types'
 import { createDiglettRound } from '@/utilities/research/diglett-authority'
@@ -224,6 +226,37 @@ export interface GameActivityCompletionResult {
   error?: string
   message?: string
   finalScore?: number
+}
+
+function isAuthoredGridMinigameTarget(
+  parentState: GameActivityState | null,
+  targetId: string,
+) {
+  if (!parentState) return false
+  const parentEncounter = parentState.eventConfigSnapshot || allGames.find(
+    (entry) => entry.id === parentState.encounterId,
+  )
+  return (
+    parentEncounter?.gameType === 'grid-puzzle' &&
+    parentEncounter.settings.variant === 'rock-push' &&
+    hasRockPushMinigameTarget(
+      parentEncounter.settings as unknown as RockPushGameConfig['settings'],
+      targetId,
+    )
+  )
+}
+
+function getRockPushObjectWinCount(
+  stats: Awaited<ReturnType<typeof getUserActivityStatsMap>>,
+  target: { type: string; targetId: string },
+) {
+  const domainStats =
+    target.type === 'battle'
+      ? stats.battles
+      : target.type === 'encounter'
+        ? stats.locations
+        : stats.games
+  return domainStats?.[target.targetId]?.wins || 0
 }
 
 export async function getGameActivityStateForUser(
@@ -607,22 +640,38 @@ export async function startGameActivity(
       if (!encounter) {
         return { success: false, error: 'Game encounter not found' }
       }
-      if (getGameActivityDomain(encounter.gameType) !== domain) {
+      if (!isGameActivityDomainAllowed(encounter.gameType, domain)) {
         return {
           success: false,
           error: 'Activity belongs to a different game mode',
         }
       }
 
+      if (domain === 'grid-minigame') {
+        const parentGridState = await getGameActivityStateForUser(
+          user.id,
+          'game',
+        )
+        if (!isAuthoredGridMinigameTarget(parentGridState, encounter.id)) {
+          return {
+            success: false,
+            error: 'This mining activity is not part of the active Grid Adventure.',
+          }
+        }
+      }
+
       const isExpeditionActivityContent =
         (encounter as any).expeditionOnly === true ||
-        isExpeditionActivity(domain, validatedEncounterId)
+        isExpeditionActivity(
+          getExpeditionActivityDomain(domain),
+          validatedEncounterId,
+        )
       if (isExpeditionActivityContent) {
         const expeditionStepStatus =
           await getExpeditionActivityStepStatusForUser(
             payload,
             user.id,
-            domain,
+            getExpeditionActivityDomain(domain),
             validatedEncounterId,
           )
         if (expeditionStepStatus !== 'current') {
@@ -1028,9 +1077,9 @@ export async function startGameActivity(
         expiry = roundData.deadline + 1000
       } else if (encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'rock-push') {
         const targets = getRockPushObjectProofTargets(encounter.settings as unknown as RockPushGameConfig['settings'])
-        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults']) : {}
+        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults', 'gameResults']) : {}
         roundData = { kind: 'rock-push', objectWins: Object.fromEntries(targets.map((target) => [
-          target.key, stats[target.type === 'battle' ? 'battles' : 'locations']?.[target.targetId]?.wins || 0,
+          target.key, getRockPushObjectWinCount(stats, target),
         ])) }
       } else if (snapTargetId !== undefined) {
         roundData = generateSnapTargetRoundData(
@@ -1497,7 +1546,7 @@ export async function submitGameActivityAnswer(
     if (!encounter) {
       return { success: false, error: 'Invalid encounter' }
     }
-    if (getGameActivityDomain(encounter.gameType) !== domain) {
+    if (!isGameActivityDomainAllowed(encounter.gameType, domain)) {
       return {
         success: false,
         error: 'Activity belongs to a different game mode',
@@ -2278,10 +2327,20 @@ export async function completeGameActivity(
     if (!configuredEncounter) {
       return { success: false, error: 'Game encounter not found' }
     }
-    if (getGameActivityDomain(configuredEncounter.gameType) !== domain) {
+    if (!isGameActivityDomainAllowed(configuredEncounter.gameType, domain)) {
       return {
         success: false,
         error: 'Activity belongs to a different game mode',
+      }
+    }
+
+    if (domain === 'grid-minigame') {
+      const parentGridState = await getGameActivityStateForUser(user.id, 'game')
+      if (!isAuthoredGridMinigameTarget(parentGridState, validatedEncounterId)) {
+        return {
+          success: false,
+          error: 'This mining activity is no longer part of the active Grid Adventure.',
+        }
       }
     }
 
@@ -2421,13 +2480,16 @@ export async function completeGameActivity(
 
       const isExpeditionActivityContent =
         (encounter as any).expeditionOnly === true ||
-        isExpeditionActivity(domain, validatedEncounterId)
+        isExpeditionActivity(
+          getExpeditionActivityDomain(domain),
+          validatedEncounterId,
+        )
       if (isExpeditionActivityContent) {
         const expeditionStepStatus =
           await getExpeditionActivityStepStatusForUser(
             payload,
             user.id,
-            domain,
+            getExpeditionActivityDomain(domain),
             validatedEncounterId,
           )
         if (expeditionStepStatus !== 'current') {
@@ -2461,11 +2523,11 @@ export async function completeGameActivity(
       if (encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'rock-push') {
         const settings = encounter.settings as unknown as RockPushGameConfig['settings']
         const targets = getRockPushObjectProofTargets(settings)
-        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults']) : {}
+        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults', 'gameResults']) : {}
         const verifiedObjects = Object.fromEntries(targets.map((target) => {
           const baseline = state.roundData?.objectWins?.[target.key]
           return [target.key, typeof baseline === 'number'
-            ? Math.max(0, (stats[target.type === 'battle' ? 'battles' : 'locations']?.[target.targetId]?.wins || 0) - baseline)
+            ? Math.max(0, getRockPushObjectWinCount(stats, target) - baseline)
             : 0]
         }))
         rockPushVerification = verifyRockPushProof(settings, gameplayProof, verifiedObjects)
@@ -2672,7 +2734,7 @@ export async function completeGameActivity(
         await incrementUserActivityResult(
           payload as any,
           user.id,
-          domain === 'game' ? 'gameResults' : 'fieldResearchResults',
+          domain === 'field-research' ? 'fieldResearchResults' : 'gameResults',
           validatedEncounterId,
           {
             [actualSuccess || isEndlessWin ? 'wins' : 'losses']: 1,
@@ -2689,7 +2751,7 @@ export async function completeGameActivity(
         !isDailyExcludedGameType(encounter.gameType)
       ) {
         await recordDailyActivityProgress(user.id, {
-          kind: domain === 'game' ? 'game_win' : 'field_research_win',
+          kind: domain === 'field-research' ? 'field_research_win' : 'game_win',
           sourceId: validatedEncounterId,
         }, { payload, req })
       }
@@ -3015,7 +3077,7 @@ export async function completeGameActivity(
 
       const expeditionResult = await recordExpeditionActivityResult(
         user.id,
-        domain,
+        getExpeditionActivityDomain(domain),
         validatedEncounterId,
         actualSuccess || isEndlessWin,
         { payload, req, revalidatePaths: false },
@@ -3037,7 +3099,7 @@ export async function completeGameActivity(
         summary: summaryWithExpedition,
         expeditionProgress: expeditionResult.expedition,
         message: completionMessage,
-        invalidates: getGameCompletionInvalidations(summaryWithExpedition, domain === 'game' ? 'game' : 'research', Boolean(expeditionResult.expedition)),
+        invalidates: getGameCompletionInvalidations(summaryWithExpedition, domain === 'field-research' ? 'research' : 'game', Boolean(expeditionResult.expedition)),
         finalScore:
           encounter.gameType === 'art-academy'
             ? normalizedFinalScore || undefined
@@ -3077,7 +3139,7 @@ export async function getGameActivityState(domain: GameActivityDomain) {
 
     const encounter = state.eventConfigSnapshot || allGames.find((e) => e.id === state.encounterId)
     if (!encounter) return null
-    if (getGameActivityDomain(encounter.gameType) !== domain) return null
+    if (!isGameActivityDomainAllowed(encounter.gameType, domain)) return null
 
     const timeLimit = getResearchSessionTimeLimit(encounter)
     const gameEndTime = state.startTime + timeLimit * 1000
@@ -3087,7 +3149,7 @@ export async function getGameActivityState(domain: GameActivityDomain) {
     const isEligibleForReplay = replayEncounter ? await isActivityEligibleForReplay(
       user as User,
       replayEncounter,
-      domain,
+      getExpeditionActivityDomain(domain),
     ) : false
 
     return {

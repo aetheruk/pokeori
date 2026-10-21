@@ -562,14 +562,18 @@ describe('shared grid sprite sets', () => {
     expect(spatialGames.filter((game) => game.subCategory === 'Test').map((game) => game.id)).toEqual(['grid-adventure-test'])
   })
 
-  test('combined grid course references valid encounter and battle checkpoints', () => {
+  test('combined grid course references valid encounter, battle, and minigame checkpoints', () => {
     const course = allGames.find((game) => game.id === 'grid-adventure-test')
     const objects = course?.settings.screens?.flatMap((screen) => screen.objects || []) || []
-    expect(objects).toHaveLength(2)
-    expect(objects.map((object) => object.interaction?.type).sort()).toEqual(['battle', 'encounter'])
+    expect(objects).toHaveLength(3)
+    expect(objects.map((object) => object.interaction?.type).sort()).toEqual(['battle', 'encounter', 'minigame'])
     for (const object of objects) {
       expect(object.interaction?.victory).toBe('clear')
-      const targets = object.interaction?.type === 'battle' ? battles : locations
+      const targets = object.interaction?.type === 'battle'
+        ? battles
+        : object.interaction?.type === 'encounter'
+          ? locations
+          : allGames.filter((game) => game.gameType === 'underground-mining')
       expect(targets.some((target) => target.id === object.interaction?.targetId)).toBe(true)
     }
   })
@@ -615,6 +619,7 @@ describe('shared grid sprite sets', () => {
       'breakableRock',
       'pushableBoulder',
       'battleTrigger',
+      'wildBattleTrigger',
       'encounterTrigger',
     ])
     for (const object of Object.values(gridObjects)) {

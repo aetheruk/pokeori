@@ -66,6 +66,8 @@ export interface RockPushGameConfig extends BaseGameConfig {
     winRate?: number
     timeLimit?: number
     maxMoves?: number
+    /** Optional attempt pool. Failed integrated encounters remove one life. */
+    lives?: number
     /** Hide authored internal barriers until the player walks into them. */
     invisibleMaze?: boolean
     boulderSprite?: string
