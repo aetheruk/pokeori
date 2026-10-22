@@ -174,6 +174,7 @@ export function useExploreData(
     const isItemUnlocked = (
       item: ExploreItem,
       visited = new Set<string>(),
+      allowGridAdventureOnly = false,
     ): boolean => {
       if (visited.has(item.id)) return false
       visited.add(item.id)
@@ -181,7 +182,17 @@ export function useExploreData(
       // Filter out Secret category items (never show on explore list)
       if (item.category === 'Secret') return false
 
-      if ((item.originalData as { expeditionOnly?: boolean }).expeditionOnly) {
+      const originalData = item.originalData as {
+        expeditionOnly?: boolean
+        gridAdventureOnly?: boolean
+        gameType?: string
+        settings?: { variant?: string }
+      }
+      if (originalData.expeditionOnly) {
+        return false
+      }
+
+      if (originalData.gridAdventureOnly && !allowGridAdventureOnly) {
         return false
       }
 
@@ -235,7 +246,11 @@ export function useExploreData(
       if (item.overrides) {
         const overriddenItem = itemById.get(item.overrides)
         if (overriddenItem) {
-          return isItemUnlocked(overriddenItem, visited)
+          const isGridAdventure =
+            item.type === 'game' &&
+            originalData.gameType === 'grid-puzzle' &&
+            originalData.settings?.variant === 'rock-push'
+          return isItemUnlocked(overriddenItem, visited, isGridAdventure)
         }
       }
       return true

@@ -29,6 +29,8 @@ export interface BaseGameConfig {
   skillXpOnFailure?: boolean
   /** Keep this activity available to expedition paths without listing it separately in Explore. */
   expeditionOnly?: boolean
+  /** Only allow this activity to start from a matching object on the active Grid Adventure. */
+  gridAdventureOnly?: boolean
 }
 
 export type EndlessScoreInterval =

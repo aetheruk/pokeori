@@ -8,6 +8,7 @@ import { grantRewards } from '@/utilities/rewards/reward-logic'
 import { mergeSummaries } from '../utils'
 import {
   getUser,
+  isGridAdventureActivityContextActive,
   type GameActivityState,
 } from '@/app/(frontend)/game/_shared/activity-actions'
 import {
@@ -66,6 +67,19 @@ export async function spinSlotMachine(clientActionId: string, betAmount?: number
       const encounter = allGames.find((e) => e.id === state.encounterId)
       if (encounter?.gameType !== 'slots') {
         return { success: false, error: 'Invalid game type' }
+      }
+      if (
+        encounter.gridAdventureOnly &&
+        !(await isGridAdventureActivityContextActive(
+          user.id,
+          state.encounterId,
+          state.gridAdventureContext,
+        ))
+      ) {
+        return {
+          success: false,
+          error: 'This slot machine is only available from its active Grid Adventure.',
+        }
       }
 
       const cost = encounter.settings.cost

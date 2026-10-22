@@ -141,6 +141,7 @@ import type { MagnemiteCircuitSettings } from '@/data/games/magnemite-circuit/ty
 import type { RockTunnelEchoMapSettings } from '@/data/games/rock-tunnel-echo-map/types'
 import type { VoltorbGridSettings } from '@/data/games/voltorb-grid/types'
 import type { RockPushGameConfig } from '@/data/games/rock-push/types'
+import type { GridObjectPlacement } from '@/data/games/grid-tiles/types'
 import {
   getRockPushObjectProofTargets,
   hasRockPushMinigameTarget,
@@ -177,6 +178,7 @@ export async function getUser(): Promise<User | null> {
 }
 export interface GameActivityState {
   eventConfigSnapshot?: (typeof allGames)[number]
+  gridAdventureContext?: GridAdventureActivityContext
   userId: string
   encounterId: string
   startTime: number
@@ -234,6 +236,11 @@ export interface GameActivityCompletionResult {
   finalScore?: number
 }
 
+export interface GridAdventureActivityContext {
+  encounterId: string
+  objectKey: string
+}
+
 function isAuthoredGridMinigameTarget(
   parentState: GameActivityState | null,
   targetId: string,
@@ -252,6 +259,86 @@ function isAuthoredGridMinigameTarget(
   )
 }
 
+function getAuthoredGridAdventureObject(
+  parentState: GameActivityState | null,
+  targetId: string,
+  objectKey: string,
+  interactionType: 'minigame' | 'field-research',
+): GridObjectPlacement | null {
+  if (!parentState || parentState.expiry <= Date.now()) return null
+  const parentEncounter = parentState.eventConfigSnapshot || allGames.find(
+    (entry) => entry.id === parentState.encounterId,
+  )
+  if (
+    parentEncounter?.gameType !== 'grid-puzzle' ||
+    parentEncounter.settings.variant !== 'rock-push'
+  ) {
+    return null
+  }
+
+  const settings = parentEncounter.settings as unknown as RockPushGameConfig['settings']
+  const proofTarget = getRockPushObjectProofTargets(settings).find(
+    (target) =>
+      target.key === objectKey &&
+      target.type === interactionType &&
+      target.targetId === targetId,
+  )
+  if (!proofTarget) return null
+
+  const screens = settings.screens?.length
+    ? settings.screens
+    : [{ id: 'main', objects: settings.objects || [] }]
+  for (const screen of screens) {
+    for (const [index, placement] of (screen.objects || []).entries()) {
+      const key = `${screen.id}:${placement.id || `${placement.objectId}-${index}`}`
+      if (key === objectKey) return placement
+    }
+  }
+  return null
+}
+
+export async function getGridAdventureActivityTargetForUser(
+  userId: string,
+  targetId: string,
+  objectKey: string,
+  interactionType: 'minigame' | 'field-research',
+) {
+  const parentState = await ensureGridAdventureSessionForUser(userId)
+  const placement = getAuthoredGridAdventureObject(
+    parentState,
+    targetId,
+    objectKey,
+    interactionType,
+  )
+  if (!parentState || !placement) return null
+  return {
+    context: {
+      encounterId: parentState.encounterId,
+      objectKey,
+    } satisfies GridAdventureActivityContext,
+    placement,
+  }
+}
+
+export async function isGridAdventureActivityContextActive(
+  userId: string,
+  targetId: string,
+  context: GridAdventureActivityContext | undefined,
+  interactionType: 'minigame' | 'field-research' = 'minigame',
+) {
+  if (!context) return false
+  const parentState = await ensureGridAdventureSessionForUser(userId)
+  if (parentState?.encounterId !== context.encounterId) return false
+  return Boolean(
+    getAuthoredGridAdventureObject(
+      parentState,
+      targetId,
+      context.objectKey,
+      interactionType,
+    ),
+  )
+}
+
 function getRockPushObjectWinCount(
   stats: Awaited<ReturnType<typeof getUserActivityStatsMap>>,
   target: { type: string; targetId: string },
@@ -267,7 +354,25 @@ function getRockPushObjectWinCount(
   return domainStats?.[target.targetId]?.wins || 0
 }
 
-function maybeAddLuckyGridAdventureMachine(
+function generateGridAdventureSlotWinRate() {
+  const rates = Array.from({ length: 36 }, (_, index) => {
+    const winRate = 20 + index
+    const distance = (winRate - 35) / 7
+    return {
+      winRate,
+      weight: Math.max(1, Math.round(Math.exp(-0.5 * distance * distance) * 1_000_000)),
+    }
+  })
+  const totalWeight = rates.reduce((total, rate) => total + rate.weight, 0)
+  let roll = randomInt(0, totalWeight)
+  for (const rate of rates) {
+    if (roll < rate.weight) return rate.winRate
+    roll -= rate.weight
+  }
+  return 35
+}
+
+function maybeRandomizeGridAdventureSlotWinRates(
   encounter: (typeof allGames)[number],
 ): (typeof allGames)[number] {
   if (
@@ -278,65 +383,45 @@ function maybeAddLuckyGridAdventureMachine(
   }
 
   const settings = encounter.settings as unknown as RockPushGameConfig['settings']
-  const screens = settings.screens
-  if (!screens?.length) return encounter
-
   const slotTargetIds = new Set(
     allGames
-      .filter((entry) => entry.gameType === 'slots')
+      .filter((entry) => entry.gameType === 'slots' && entry.gridAdventureOnly)
       .map((entry) => entry.id),
   )
-  const candidates = screens.flatMap((screen, screenIndex) =>
-    (screen.objects || []).flatMap((object, objectIndex) => {
-      const luckyTargetId = object.properties?.luckyTargetId
+
+  const randomizeObjects = (objects: GridObjectPlacement[] = []) =>
+    objects.map((object) => {
       if (
         object.interaction?.type !== 'minigame' ||
-        typeof luckyTargetId !== 'string' ||
-        !slotTargetIds.has(luckyTargetId)
+        !slotTargetIds.has(object.interaction.targetId)
       ) {
-        return []
+        return object
       }
-      return [{
-        screenIndex,
-        objectIndex,
-        luckyTargetId,
-        luckyObjectId: typeof object.properties?.luckyObjectId === 'string'
-          ? object.properties.luckyObjectId
-          : object.objectId,
-      }]
-    }),
-  )
-
-  // Half of runs feature one randomly selected lucky machine.
-  if (candidates.length === 0 || randomInt(0, 2) === 0) return encounter
-
-  const luckyMachine = candidates[randomInt(0, candidates.length)]
-  const randomizedScreens = screens.map((screen, screenIndex) =>
-    screenIndex !== luckyMachine.screenIndex
-      ? screen
-      : {
-          ...screen,
-          objects: (screen.objects || []).map((object, objectIndex) =>
-            objectIndex !== luckyMachine.objectIndex
-              ? object
-              : {
-                  ...object,
-                  objectId: luckyMachine.luckyObjectId,
-                  interaction: {
-                    ...object.interaction!,
-                    targetId: luckyMachine.luckyTargetId,
-                  },
-                },
-          ),
+      return {
+        ...object,
+        properties: {
+          ...object.properties,
+          gridAdventureWinRate: generateGridAdventureSlotWinRate(),
         },
-  )
+      }
+    })
+
+  const randomizedSettings = settings.screens?.length
+    ? {
+        ...encounter.settings,
+        screens: settings.screens.map((screen) => ({
+          ...screen,
+          objects: randomizeObjects(screen.objects),
+        })),
+      }
+    : {
+        ...encounter.settings,
+        objects: randomizeObjects(settings.objects),
+      }
 
   return {
     ...encounter,
-    settings: {
-      ...encounter.settings,
-      screens: randomizedScreens,
-    },
+    settings: randomizedSettings,
   } as (typeof allGames)[number]
 }
 
@@ -572,12 +657,50 @@ function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
 function sanitizeResearchState(
   state: GameActivityState,
 ): Omit<GameActivityState, 'fieldObservationPrivate' | 'artAcademyPrivate' | 'undergroundMiningPrivate'> {
-  const { fieldObservationPrivate, artAcademyPrivate, undergroundMiningPrivate, eventConfigSnapshot, ...safeState } = state
+  const { fieldObservationPrivate, artAcademyPrivate, undergroundMiningPrivate, eventConfigSnapshot, gridAdventureContext, ...safeState } = state
   void eventConfigSnapshot
+  void gridAdventureContext
   void fieldObservationPrivate
   void artAcademyPrivate
   void undergroundMiningPrivate
   return safeState
+}
+
+function hideGridAdventureSlotWinRates(
+  encounter: (typeof allGames)[number],
+): (typeof allGames)[number] {
+  if (
+    encounter.gameType !== 'grid-puzzle' ||
+    encounter.settings.variant !== 'rock-push'
+  ) {
+    return encounter
+  }
+  const stripRates = (objects: GridObjectPlacement[] = []) =>
+    objects.map((object) => {
+      if (typeof object.properties?.gridAdventureWinRate !== 'number') {
+        return object
+      }
+      const properties = { ...object.properties }
+      delete properties.gridAdventureWinRate
+      return {
+        ...object,
+        properties: Object.keys(properties).length ? properties : undefined,
+      }
+    })
+  const settings = encounter.settings as unknown as RockPushGameConfig['settings']
+  const safeSettings = settings.screens?.length
+    ? {
+        ...encounter.settings,
+        screens: settings.screens.map((screen) => ({
+          ...screen,
+          objects: stripRates(screen.objects),
+        })),
+      }
+    : {
+        ...encounter.settings,
+        objects: stripRates(settings.objects),
+      }
+  return { ...encounter, settings: safeSettings } as (typeof allGames)[number]
 }
 
 function generateSnapTargetRoundData(
@@ -745,6 +868,7 @@ export async function startGameActivity(
   encounterId: string,
   forceReset = false,
   consumedPokemonIds?: string[],
+  gridAdventureObjectKey?: string,
 ) {
   try {
     const startInput = validateResearchStartInput(
@@ -829,6 +953,50 @@ export async function startGameActivity(
         }
       }
 
+      let gridAdventureContext: GridAdventureActivityContext | undefined
+      if (encounter.gridAdventureOnly) {
+        const interactionType = domain === 'field-research'
+          ? 'field-research'
+          : domain === 'game'
+            ? 'minigame'
+            : null
+        if (!interactionType || !gridAdventureObjectKey) {
+          return {
+            success: false,
+            error: 'This activity can only be started from its Grid Adventure object.',
+          }
+        }
+        const authoredTarget = await getGridAdventureActivityTargetForUser(
+          user.id,
+          validatedEncounterId,
+          gridAdventureObjectKey,
+          interactionType,
+        )
+        if (!authoredTarget) {
+          return {
+            success: false,
+            error: 'This activity is not part of the active Grid Adventure.',
+          }
+        }
+        gridAdventureContext = authoredTarget.context
+        const authoredWinRate = authoredTarget.placement.properties?.gridAdventureWinRate
+        if (
+          encounter.gameType === 'slots' &&
+          typeof authoredWinRate === 'number' &&
+          Number.isFinite(authoredWinRate) &&
+          authoredWinRate >= 20 &&
+          authoredWinRate <= 55
+        ) {
+          encounter = {
+            ...encounter,
+            settings: {
+              ...encounter.settings,
+              winRate: authoredWinRate,
+            },
+          } as (typeof allGames)[number]
+        }
+      }
+
       const isExpeditionActivityContent =
         (encounter as any).expeditionOnly === true ||
         isExpeditionActivity(
@@ -865,15 +1033,29 @@ export async function startGameActivity(
         (existingState.roundData?.kind !== 'underground-mining' ||
           existingState.undergroundMiningPrivate?.kind !== 'underground-mining-private')
 
-      // If a session exists and we aren't forcing a reset, return it
-      if (
+      const shouldRestoreExistingState =
         existingState &&
         shouldRestoreExistingGameActivity({
           existingEncounterId: existingState.encounterId,
           requestedEncounterId: validatedEncounterId,
           forceReset: validatedForceReset ?? false,
         })
+      if (
+        existingState &&
+        shouldRestoreExistingState &&
+        encounter.gridAdventureOnly &&
+        existingState.gridAdventureContext &&
+        (existingState.gridAdventureContext.encounterId !== gridAdventureContext?.encounterId ||
+          existingState.gridAdventureContext.objectKey !== gridAdventureContext?.objectKey)
       ) {
+        return {
+          success: false,
+          error: 'Finish the active slot session before using another machine.',
+        }
+      }
+
+      // If a session exists and we aren't forcing a reset, return it
+      if (existingState && shouldRestoreExistingState) {
         const isFieldObservation = encounter.gameType === 'field-observation'
         const restoredRoundUsesKidModeQuestion =
           existingState.roundData?.question?.type === 'kid-most-appeared'
@@ -913,7 +1095,7 @@ export async function startGameActivity(
       }
 
       if (domain === 'grid-adventure') {
-        encounter = maybeAddLuckyGridAdventureMachine(encounter)
+        encounter = maybeRandomizeGridAdventureSlotWinRates(encounter)
       }
 
       // Analyze requirements
@@ -1643,6 +1825,7 @@ export async function startGameActivity(
       const state: GameActivityState = {
         userId: user.id,
         encounterId: validatedEncounterId,
+        gridAdventureContext,
         eventConfigSnapshot:
           domain === 'field-research' || domain === 'grid-adventure'
             ? encounter
@@ -1726,6 +1909,20 @@ export async function submitGameActivityAnswer(
       return {
         success: false,
         error: 'Activity belongs to a different game mode',
+      }
+    }
+    if (
+      encounter.gridAdventureOnly &&
+      !(await isGridAdventureActivityContextActive(
+        user.id,
+        state.encounterId,
+        state.gridAdventureContext,
+        domain === 'field-research' ? 'field-research' : 'minigame',
+      ))
+    ) {
+      return {
+        success: false,
+        error: 'This activity is no longer part of the active Grid Adventure.',
       }
     }
 
@@ -2624,6 +2821,21 @@ export async function completeGameActivity(
         return { success: false, error: 'Invalid encounter session' }
       }
 
+      if (
+        encounter.gridAdventureOnly &&
+        !(await isGridAdventureActivityContextActive(
+          user.id,
+          validatedEncounterId,
+          state.gridAdventureContext,
+          domain === 'field-research' ? 'field-research' : 'minigame',
+        ))
+      ) {
+        return {
+          success: false,
+          error: 'This activity is no longer part of the active Grid Adventure.',
+        }
+      }
+
       const isUndergroundMining = encounter.gameType === 'underground-mining'
       const undergroundMiningCleared = isUndergroundMining &&
         state.undergroundMiningPrivate?.kind === 'underground-mining-private' &&
@@ -3348,12 +3560,15 @@ export async function getGameActivityState(domain: GameActivityDomain) {
       replayEncounter,
       getExpeditionActivityDomain(domain),
     ) : false
+    const publicEncounter = domain === 'grid-adventure'
+      ? hideGridAdventureSlotWinRates(encounter)
+      : encounter
 
     return {
       ...sanitizeResearchState(state),
       timeLeft,
       encounter: {
-        ...encounter,
+        ...publicEncounter,
         isEligibleForReplay,
       },
     }
