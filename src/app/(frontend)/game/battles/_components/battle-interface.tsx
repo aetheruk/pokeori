@@ -60,6 +60,7 @@ import { getIcon } from '@/data/user/icons'
 import { getTrainerBattleResultDialogue } from '@/data/battles/trainer-result-dialogue'
 import { useBattleManager } from '@/utilities/battle/engine/useBattleManager'
 import { needsPlayerLeadSelection } from '@/utilities/battle/switching'
+import { isGridExploreReturnPath } from '@/utilities/games/grid-explore-return'
 import type { BattlePowersData } from '../powers/powers-data'
 import { BattleActionMenu } from './battle-action-menu'
 import { type BattleContextType, BattleProvider } from './battle-context'
@@ -144,6 +145,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   const returnTo = searchParams.get('returnTo')
   const gridPuzzleReturnTo =
     returnTo?.startsWith('/') && !returnTo.startsWith('//') ? returnTo : null
+  const isGridExploreActivity = isGridExploreReturnPath(gridPuzzleReturnTo)
   const { refreshUser } = useUser()
   const {
     battleState,
@@ -1194,7 +1196,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
               }
             }}
             secondaryAction={
-              (battleState as any).isEligibleForReplay ? (
+              (battleState as any).isEligibleForReplay && !isGridExploreActivity ? (
                 <Button
                   size="lg"
                   type="button"

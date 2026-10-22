@@ -12,6 +12,7 @@ import { SectionDivider } from '@/components/ui/section-divider'
 import type { TaskExitModal, TaskIcon } from '@/data/tasks'
 import type { TcgCard } from '@/data/tcg/types'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
+import { isGridExploreReturnPath } from '@/utilities/games/grid-explore-return'
 import { startEncounter } from '../actions'
 
 const LevelUpModal = nextDynamic(
@@ -121,6 +122,7 @@ export function EncounterResults({
 
   if (!captureResult) return null
 
+  const isGridExploreActivity = isGridExploreReturnPath(returnPath)
   const expeditionProgress = captureResult.expeditionProgress
   const capturePokemonFormId =
     captureResult.formId ||
@@ -320,7 +322,7 @@ export function EncounterResults({
           }
         }}
         secondaryAction={
-          encounter.isEligibleForReplay ? (
+          encounter.isEligibleForReplay && !isGridExploreActivity ? (
             <Button
               size="lg"
               type="button"
