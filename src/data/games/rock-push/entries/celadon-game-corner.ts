@@ -4,9 +4,10 @@ import type { RockPushGameConfig } from '../types'
 function createSlotMachinePlacements(
   targetId: string,
   luckyTargetId: string,
+  layout = { columns: [1, 3, 5, 7], rows: [2, 4, 6] },
 ): GridObjectPlacement[] {
-  return [2, 4, 6].flatMap((y, row) =>
-    [1, 3, 5, 7].map((x, column) => ({
+  return layout.rows.flatMap((y, row) =>
+    layout.columns.map((x, column) => ({
       id: `slot-${row + 1}-${column + 1}`,
       objectId: 'celadon-slot-machine',
       x,
@@ -33,11 +34,13 @@ const testSlotMachinePlacements = createSlotMachinePlacements(
 const lowStakesSlotMachinePlacements = createSlotMachinePlacements(
   'celadon-rocket-slots',
   'celadon-rocket-slots-lucky',
+  { columns: [1, 2, 4, 5], rows: [1, 3, 5] },
 )
 
 const highStakesSlotMachinePlacements = createSlotMachinePlacements(
   'celadon-high-stakes-slots',
   'celadon-high-stakes-slots-lucky',
+  { columns: [1, 2, 4, 5], rows: [1, 3, 5] },
 )
 
 function createGameCornerAdventure({
@@ -70,13 +73,13 @@ function createGameCornerAdventure({
       variant: 'rock-push',
       tilePaletteId: 'celadon-game-corner',
       timeLimit: 1800,
-      grid_size: 9,
-      playerStart: { x: 4, y: 7 },
+      grid_size: 7,
+      playerStart: { x: 3, y: 5 },
       startScreen: 'arcade-floor',
       screens: [{
         id: 'arcade-floor',
         objects,
-        winTiles: [{ x: 4, y: 0 }],
+        winTiles: [{ x: 3, y: 0 }],
       }],
     },
   }

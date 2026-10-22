@@ -196,7 +196,7 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       const variant = (item.originalData as any).settings?.variant
       if (variant === 'voltorb') return 'VOLTORB'
       if (variant === 'echo-map') return 'ECHO MAP'
-      return 'ROCK PUSH'
+      return 'ADVENTURE'
     }
     case 'run':
       return 'RUN'

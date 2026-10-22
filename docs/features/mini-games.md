@@ -26,7 +26,7 @@ Shared startup/completion recovery retains pending results and retries the same 
 - Spatial puzzle games use sprite-set manifests registered in `src/data/games/grid-tiles`. The complete asset and scene contract is documented in [grid-sprite-sets.md](./grid-sprite-sets.md).
 - The renderer uses a 16×16 logical tile and selects the largest whole-number pixel scale that fits the board up to 500px. This keeps pixel art crisp on mobile and desktop while all movement and collision logic remains cell-based.
 - Architectural walls, floor blockers, and reusable objects are separate layers. Walls use connected sides and corners selected from a four-bit north/east/south/west mask. Generic blockers are explicitly authored as 1×1 or 2×2 floor-layer props; entities reference the shared object library by id and carry their own footprint and purpose.
-- Grid Puzzle is the shared spatial game mode. Its `settings.variant` selects Rock Push, Rock Tunnel Echo Map, or Voltorb rules while all variants use the same palette resolver and pixel-grid board. Rock Push screens may override the parent palette with `settings.screens[*].tilePaletteId`.
+- Grid Puzzle is the shared spatial game mode. Its `settings.variant` selects Rock Push, Rock Tunnel Echo Map, or Voltorb rules while all variants use the same palette resolver and pixel-grid board. Explore presents the Rock Push ruleset as Adventure because its boards now host multiple kinds of interactive activities. Rock Push screens may override the parent palette with `settings.screens[*].tilePaletteId`.
 - Optional per-role sprite settings remain available as explicit overrides for bespoke boards, with precedence over the selected palette.
 - Floor rendering uses one required common tile and optional weighted rare tiles. Rare placement is deterministic from the set id, scene seed and coordinates, defaults to 8%, and never affects collision.
 - Every registered set includes source and licensing metadata. Credits are rendered in the in-app Credits & Legal dialog, and third-party packs must also be recorded in `ATTRIBUTIONS.md`.
@@ -47,7 +47,7 @@ session, and `game` activity-stat rows. Field Observation alone uses the
 `field-research` activity-stat rows. A player can therefore keep one active
 Mini Game and one active Field Research study at the same time.
 
-Rock Push Grid Adventure can launch any authored Mini Game or Field Observation
+Grid Adventure can launch any authored Mini Game or Field Observation
 as an interactive object. The parent board uses a dedicated `grid-adventure`
 session while the child runs in its normal `game` or `field-research` domain.
 The return result is matched to the authored object and activity wins are
@@ -169,6 +169,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 ## Grid Puzzle: Rock Push variant
 - Rock Push renders tile backgrounds separately from moving entities so the player and boulders slide between cells.
 - Rock Push object placements resolve shared definitions by stable `objectId`, allowing reusable battle and encounter markers to render and trigger regardless of the registry's internal property names.
+- Placed interactive object and prize sprites render at steady opacity without a pulsing animation.
 - Players can undo successful movement with the undo control or `Z`; invalid moves play a short bump animation and do not increment move count.
 - Boulders that fall into holes are removed after the drop animation and return that cell to the active set's normal floor tile; simple corner deadlocks are highlighted on the boulder as a warning.
 - Rock Push boards are fully authored in `settings` with `grid_size`, `playerStart`, `boulders`, `holes`, and `barriers`; there is no automatic puzzle generator.
@@ -177,7 +178,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Boards can author `teleporters`, including cross-screen teleports through `settings.screens`. A two-way pair is represented by two source teleporter entries targeting each other; a one-way teleporter renders only its source entry and uses the target coordinate as a hidden landing reference.
 - Optional `settings.prizes` entries place item rewards on the board. A prize is added to the final reward pool only if the player walks over its cell and then completes the puzzle.
 - Optional `settings.screens[*].prizes` entries work like board-level prizes and are validated with screen-scoped ids.
-- Board item prizes render as enlarged, borderless sprites with a subtle pulse so they remain readable without looking like placed objects.
+- Board item prizes render as enlarged, borderless sprites so they remain readable without looking like placed objects.
 - `settings.invisibleMaze: true` turns authored internal obstacles into contact-revealed props. The architectural outer boundary remains visible, bumping an internal obstacle permanently reveals its 1×1 prop for that attempt, and a `winTiles` exit can complete a maze with no boulders.
 - The working `basic-cave`, `grass`, `wooden-interior`, `industrial-power`, `laboratory`, and Sabrina `psychic-quiet-room` sets use 64×64 native artwork on the shared 16×16 logical grid under `public/games/grid-tiles` (2×2 blockers are 128×128). Each provides a common floor, a common-base rare texture/decal, repeated back wall, 1×1 and 2×2 blockers, distinct floor and wall goal/teleporter markers, and full-square tileable ice/hole gameplay tiles. Existing Pokeori boulder and player artwork remains available through the manifests/runtime. Individual roles can still be overridden through explicit sprite settings for bespoke boards; wall goals use `wallGoalSprite` when a scene needs an explicit override, otherwise the palette wall marker.
 
@@ -259,7 +260,8 @@ WebKit, which may still permit history swipes despite that CSS property.
 ## Celadon Game Corner balance
 
 - Standard Rocket Slots cost 5 Fun Tokens and retain a 40% total win rate. Their common 5/15/50-token lines return 95.8%; the 100-token Porygon line and 1-in-1,000 1,100-token jackpot bring full RTP to 119.8%. High Stakes costs and every payout are exactly five times larger, including its 5,500-token jackpot, so it has the same odds and RTP. Every payline supplies a human-readable token reward label for both the prize table and win toast.
-- Explore lists low- and high-stakes Slot Grid Adventures in place of standalone Rocket Slots. Each board has twelve interactive machines and keeps its linked slot session hidden from the Explore list. Half of fresh boards randomly mark one machine as lucky; its sprite stays the same as the other machines, while its win chance is 52% instead of 40%. The High Stakes board retains its 25-token wager and five-times payouts. Other Celadon chance games continue to use their game-specific Pokemon icons in Explore, with evolved variants distinguishing their High Stakes versions. Match 3 reward rules are unchanged by the chance-game balance pass.
+- Slot win feedback uses the message `Congrats you won, {prize}` in a charcoal label with white text and no icon. It stays in a reserved area below the reels so the machine does not shift.
+- Explore lists low- and high-stakes Slot Grid Adventures in place of standalone Rocket Slots. Each board is seven columns wide, with each of its three machine rows arranged gap, machine, machine, gap, machine, machine, gap; the exit is centered in the back wall. Boards have twelve interactive machines and keep their linked slot session hidden from the Explore list. Half of fresh boards randomly mark one machine as lucky; its sprite stays the same as the other machines, while its win chance is 52% instead of 40%. The High Stakes board retains its 25-token wager and five-times payouts. Other Celadon chance games continue to use their game-specific Pokemon icons in Explore, with evolved variants distinguishing their High Stakes versions. Match 3 reward rules are unchanged by the chance-game balance pass.
 - A 100-token Rocket Scratch Card always pays something: 25% awards three Rocket Balls, 60% awards 50 Fun Tokens, 5% awards 250, 3% awards 500, 1% awards 1,000, 3% awards a Nugget, and three separate 1% outcomes unlock the Gambler icon, Gambler title, or Game Corner background. The scratch-card modal removes the separate Reveal card control; after scratching, Claim Prize appears as an overlay on the card artwork.
 
 ## Battle Bets
