@@ -1,5 +1,6 @@
 import {
   celadonGameCornerSlotEntries,
+  celadonGameCornerLuckySlotEntries,
   celadonGameCornerTestSlotEntries,
 } from './entries/celadon-game-corner'
 
@@ -8,5 +9,6 @@ import { SlotGameConfig } from './types'
 
 export const slotGames: SlotGameConfig[] = [
   ...celadonGameCornerSlotEntries,
+  ...celadonGameCornerLuckySlotEntries,
   ...celadonGameCornerTestSlotEntries,
 ]
