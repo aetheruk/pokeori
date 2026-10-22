@@ -1,6 +1,6 @@
 # Grid sprite-set contract
 
-The combined `grid-adventure-test` has three connected outdoor scenes and five Route 1 Pokémon sprite battle markers. Any three successful battles clear it; the three lives are an independent optional failure limit, and the course has no move limit or step counter. `grid-adventure-celadon-game-corner-test` uses opaque, edge-to-edge checkerboard floor tiles, a centered doorway built into the top wall, and twelve interactive slot machines arranged in four columns across three rows. Each machine uses the low-stakes 5-token test slot game; half of new runs replace one randomly selected machine with a 70%-odds version. The lucky selection is saved in the activity configuration so it remains stable after reloads and is used for completion verification. Room schemas validate object placements with the shared object schema. Grid initialization ignores overlapping starts so an encounter/battle return cannot consume its saved room checkpoint twice. Integrated battles, catches, and minigames return to the grid without offering replay, keeping each placement to one attempt before the player resolves its outcome.
+The combined `grid-adventure-test` has three connected outdoor scenes and five Route 1 Pokémon sprite battle markers. Any three successful battles clear it; the three lives are an independent optional failure limit, and the course has no move limit or step counter. `grid-adventure-celadon-game-corner-test` uses opaque, edge-to-edge checkerboard floor tiles, a centered doorway built into the top wall, and twelve interactive slot machines arranged in four columns across three rows. Each machine uses the low-stakes 5-token test slot game; half of new runs replace one randomly selected machine with a 52%-odds version. The lucky selection is saved in the activity configuration so it remains stable after reloads and is used for completion verification. Room schemas validate object placements with the shared object schema. Grid initialization ignores overlapping starts so an encounter/battle return cannot consume its saved room checkpoint twice. Integrated battles, catches, and minigames return to the grid without offering replay, keeping each placement to one attempt before the player resolves its outcome.
 
 Player appearance comes from the saved trainer gender in all three grid variants, independently of terrain sets: Lucas for male, Dawn for female, and Ditto for neither or an unset legacy profile. `GridPlayerSprite` renders all three 256×256 sheets as sixteen 64×64 frames, with down, left, right, and up rows and four movement frames per row. Ditto uses the Following Pokémon EX overworld sheet and shares the 360ms walking cycle. Voltorb and protected Kanto Rattata/Ditto use downward-facing overworld frames; full source sheets and extracted idle frames live in `public/games/overworld/`. Credits are recorded in `ATTRIBUTIONS.md` and the in-app Credits & Legal registry. Player appearance does not affect collisions or game rules. Legacy per-game player sprite overrides are no longer used by these renderers; the generic trainer asset remains available for NPC battle markers.
 
@@ -70,8 +70,10 @@ use the A action (or press E) to launch its external activity. A failed result
 leaves the player beside the object, where it can be retried. Successful
 interactions are included in the server-verified movement proof. `win`
 completes the active Grid Puzzle after the external activity succeeds; `clear`
-removes only that placement, allowing additional battles or catches to be
-authored on the same board. Rock Push persists its board snapshot while the
+records that placement as a success while allowing the board to continue.
+Placements are removed on success by default; set `removeOnSuccess: false` to
+keep an activity object visible and available to interact with again. Persistent
+objects count only once toward a board's distinct-placement win condition. Rock Push persists its board snapshot while the
 battle, encounter, or minigame screen is open and restores it when the result
 returns to `/game/games/grid-puzzle`.
 Use the `wild-battle-trigger` object for wild battle targets so the board shows
@@ -92,8 +94,10 @@ Field Observation under `interaction.type: 'field-research'`. The parent Rock
 Push session stays in its own slot while each child uses its normal game or
 Field Research runtime. The server only opens the activity when its id is
 referenced by the active board, returns to the saved grid with the result, and
-checks that activity's saved win before clearing the marker. Grid-launched
-activities omit their replay action so a cleared placement cannot be repeated.
+checks that activity's saved win before clearing the marker. Completion
+acknowledgments are distinct from game wins, so a losing Slots session is not
+recorded as a successful object interaction. Grid-launched activities omit
+their replay action so a cleared placement cannot be repeated.
 
 Wall filenames are four-bit cardinal masks: north `1`, east `2`, south `4`, west `8`. For example, north + east is `3`, east + west is `10`, and all four directions is `15`. Each mask should be deliberately authored with the correct corners and side faces.
 

@@ -225,6 +225,8 @@ export interface GameActivityState {
 export interface GameActivityCompletionResult {
   invalidates?: GameDataKeys[]
   success: boolean
+  /** Whether the activity itself met its win condition, distinct from settlement success. */
+  activitySuccess?: boolean
   summary?: any
   expeditionProgress?: ExpeditionProgressSnapshot
   error?: string
@@ -3290,6 +3292,7 @@ export async function completeGameActivity(
 
       return {
         success: true,
+        activitySuccess: actualSuccess || isEndlessWin,
         summary: summaryWithExpedition,
         expeditionProgress: expeditionResult.expedition,
         message: completionMessage,

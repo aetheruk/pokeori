@@ -12,6 +12,7 @@ function createSlotMachinePlacements(
       objectId: 'celadon-slot-machine',
       x,
       y,
+      removeOnSuccess: false,
       interaction: {
         type: 'minigame',
         targetId,

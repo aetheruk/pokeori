@@ -51,9 +51,14 @@ Grid Adventure can launch any authored Mini Game or Field Observation
 as an interactive object. The parent board uses a dedicated `grid-adventure`
 session while the child runs in its normal `game` or `field-research` domain.
 The return result is matched to the authored object and activity wins are
-verified from the board's start-time baseline before the object clears. Grid
-launched result screens hide replay controls. Slots use the shared result flow to
-return to the saved grid when the player leaves the machine.
+verified from the board's start-time baseline before success is recorded. A
+completed session is distinct from an activity win, so a Slots session with no
+winning spin returns as a loss for the board proof. Object placements disappear
+on success by default; `removeOnSuccess: false` keeps an object visible and
+available to interact with again. A persistent placement only counts once toward
+the board's distinct-activity win condition. Grid-launched result screens hide
+replay controls. Slots use the shared result flow to return to the saved grid
+when the player leaves the machine.
 
 Chronicle battles do not write ordinary battle activity-stat rows. When a
 Chronicle battle is launched from a matching Grid Adventure, its server-side

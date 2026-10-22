@@ -31,6 +31,8 @@ import type {
 // For now, let's accept a shape that matches CompleteTaskResult mostly, or extend it.
 export interface GenericResult {
   success: boolean
+  /** Server-verified game outcome when completion succeeded but the activity was lost. */
+  activitySuccess?: boolean
   message?: string
   /** Optional scenic artwork supplied by the activity that produced the result. */
   background?: string
@@ -314,7 +316,9 @@ export function RewardResultOverlay({
     setExitModalData(null)
     setExitModalQueue([])
     if (gridActivityReturn) {
-      gridActivityReturn.returnFromActivity(result?.success === true)
+      gridActivityReturn.returnFromActivity(
+        result?.activitySuccess ?? result?.success === true,
+      )
     } else {
       onClose()
     }

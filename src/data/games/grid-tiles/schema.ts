@@ -82,6 +82,7 @@ export const gridObjectPlacementSchema = gridPositionSchema
   .extend({
     id: z.string().min(1).max(80).optional(),
     objectId: z.string().min(1).max(80),
+    removeOnSuccess: z.boolean().optional(),
     interaction: gridObjectInteractionSchema.optional(),
     properties: z.record(z.string(), z.unknown()).optional(),
   })

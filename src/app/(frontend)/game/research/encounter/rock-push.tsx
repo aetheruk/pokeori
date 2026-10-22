@@ -108,11 +108,13 @@ interface MoveSnapshot {
   moves: number
   collectedPrizeIds: string[]
   clearedObjectKeys: string[]
+  successfulObjectKeys: string[]
 }
 
 interface PendingGridObjectResult {
   key: string
   victory: GridObjectVictoryMode
+  removeOnSuccess: boolean
   outcome: 'won' | 'lost'
 }
 
@@ -136,8 +138,10 @@ interface GridObjectResumeState {
   lives?: number
   collectedPrizeIds: string[]
   clearedObjectKeys: string[]
+  successfulObjectKeys?: string[]
   pendingObjectKey: string
   pendingVictory: GridObjectVictoryMode
+  pendingRemoveOnSuccess?: boolean
   pendingFacing?: FacingDirection
   pendingOutcome?: 'won' | 'lost'
   screenStates?: Record<string, ScreenRuntimeState>
@@ -326,6 +330,9 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const [clearedObjectKeys, setClearedObjectKeys] = useState<Set<string>>(
     new Set(),
   )
+  const [successfulObjectKeys, setSuccessfulObjectKeys] = useState<Set<string>>(
+    new Set(),
+  )
   const [pendingObjectResult, setPendingObjectResult] =
     useState<PendingGridObjectResult | null>(null)
   const handledGridObjectResultRef =
@@ -399,6 +406,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     type: GridObjectInteractionType
     targetId: string
     victory: GridObjectVictoryMode
+    removeOnSuccess: boolean
   } | null => {
     const screen = screenConfigs.find((entry) => entry.id === screenId)
     for (const [index, placement] of (screen?.objects || []).entries()) {
@@ -429,6 +437,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         type: interaction.type,
         targetId: interaction.targetId,
         victory: interaction.victory,
+        removeOnSuccess: placement.removeOnSuccess !== false,
       }
     }
     return null
@@ -509,6 +518,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       })
       setCollectedPrizeIds(new Set())
       setClearedObjectKeys(new Set())
+      setSuccessfulObjectKeys(new Set())
       setRevealedBarrierKeys(new Set())
       setLives(initialLives)
 
@@ -624,10 +634,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         setLives(resumeState.lives ?? initialLives)
         setCollectedPrizeIds(new Set(resumeState.collectedPrizeIds || []))
         setClearedObjectKeys(new Set(resumeState.clearedObjectKeys || []))
+        setSuccessfulObjectKeys(new Set(resumeState.successfulObjectKeys || []))
         if (resumeState.pendingOutcome) {
           setPendingObjectResult({
             key: resumeState.pendingObjectKey,
             victory: resumeState.pendingVictory,
+            removeOnSuccess: resumeState.pendingRemoveOnSuccess !== false,
             outcome: resumeState.pendingOutcome,
           })
         }
@@ -729,6 +741,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     interaction: {
       key: string
       victory: GridObjectVictoryMode
+      removeOnSuccess: boolean
     },
     overrides: Partial<
       Pick<
@@ -741,6 +754,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         | 'moves'
         | 'collectedPrizeIds'
         | 'clearedObjectKeys'
+        | 'successfulObjectKeys'
         | 'screenStates'
       >
     > = {},
@@ -768,8 +782,11 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         overrides.collectedPrizeIds || Array.from(collectedPrizeIds),
       clearedObjectKeys:
         overrides.clearedObjectKeys || Array.from(clearedObjectKeys),
+      successfulObjectKeys:
+        overrides.successfulObjectKeys || Array.from(successfulObjectKeys),
       pendingObjectKey: interaction.key,
       pendingVictory: interaction.victory,
+      pendingRemoveOnSuccess: interaction.removeOnSuccess,
       pendingFacing: facing,
       screenStates: {
         ...cloneScreenStates(overrides.screenStates || screenStates),
@@ -787,6 +804,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       type: GridObjectInteractionType
       targetId: string
       victory: GridObjectVictoryMode
+      removeOnSuccess: boolean
       key: string
     },
     overrides: Parameters<typeof saveGridObjectResume>[1] = {},
@@ -907,22 +925,21 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       return
     }
     playSfx('good')
-    const nextClearedCount = clearedObjectKeys.has(pending.key)
-      ? clearedObjectKeys.size
-      : clearedObjectKeys.size + 1
-    setClearedObjectKeys((current) => {
+    const nextSuccessfulObjects = new Set(successfulObjectKeys)
+    nextSuccessfulObjects.add(pending.key)
+    setSuccessfulObjectKeys(nextSuccessfulObjects)
+    if (pending.removeOnSuccess) setClearedObjectKeys((current) => {
       const next = new Set(current)
       next.add(pending.key)
       return next
     })
     if (
       requiredActivitySuccesses !== null &&
-      nextClearedCount >= requiredActivitySuccesses
+      nextSuccessfulObjects.size >= requiredActivitySuccesses
     ) {
       void handleWin()
     }
   }, [
-    clearedObjectKeys,
     gameEnded,
     gameStarted,
     handleLoss,
@@ -931,6 +948,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     pendingObjectResult,
     playSfx,
     requiredActivitySuccesses,
+    successfulObjectKeys,
   ])
 
   const signalBlocked = (dx: number, dy: number) => {
@@ -1014,6 +1032,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         moves,
         collectedPrizeIds: Array.from(collectedPrizeIds),
         clearedObjectKeys: Array.from(clearedObjectKeys),
+        successfulObjectKeys: Array.from(successfulObjectKeys),
       },
     ])
   }
@@ -1284,6 +1303,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     })
     setCollectedPrizeIds(new Set(snapshot.collectedPrizeIds))
     setClearedObjectKeys(new Set(snapshot.clearedObjectKeys))
+    setSuccessfulObjectKeys(new Set(snapshot.successfulObjectKeys))
     setDeadlockedRockIds(detectDeadlockedRocks(snapshot.grid, snapshot.rocks))
   }
 
@@ -1657,9 +1677,9 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                   <Star className="h-3 w-3 fill-game-ochre text-game-ochre" />
                   <span
                     role="img"
-                    aria-label={`Activities ${clearedObjectKeys.size} of ${requiredActivitySuccesses}`}
+                    aria-label={`Activities ${successfulObjectKeys.size} of ${requiredActivitySuccesses}`}
                   >
-                    {clearedObjectKeys.size} / {requiredActivitySuccesses}
+                    {successfulObjectKeys.size} / {requiredActivitySuccesses}
                   </span>
                 </>
               ) : encounter.settings.invisibleMaze ? (

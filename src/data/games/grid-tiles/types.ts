@@ -159,6 +159,8 @@ export interface GridBlockerPlacement extends GridPosition {
 export interface GridObjectPlacement extends GridPosition {
   id?: string
   objectId: string
+  /** Whether to remove this placement after its activity succeeds. Defaults to true. */
+  removeOnSuccess?: boolean
   /** Optional map-specific activity target and post-victory behaviour. */
   interaction?: GridObjectInteractionPlacement
   /** Per-placement state or renderer hints interpreted by the active variant. */
