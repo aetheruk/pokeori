@@ -340,6 +340,10 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const moveProofRef = useRef<string[]>([])
 
   const [gameStarted, setGameStarted] = useState(false)
+  const [gameInitialized, setGameInitialized] = useState(false)
+  const [initializationError, setInitializationError] = useState<string | null>(
+    null,
+  )
   const [gameEnded, setGameEnded] = useState(false)
   const [result, setResult] = useState<any | null>(null)
 
@@ -477,14 +481,15 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const initGame = useCallback(async () => {
     if (initializingRef.current) return
     initializingRef.current = true
+    setInitializationError(null)
     try {
       const res = await startGame(encounter.id)
       if (!res.success) {
         console.error('Failed to start:', res.error)
+        setInitializationError(res.error || 'Unable to start this adventure.')
         return
       }
 
-      setGameStarted(true)
       setGameEnded(false)
       setResult(null)
       setPendingObjectResult(null)
@@ -630,6 +635,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           detectDeadlockedRocks(resumeState.grid, resumeState.rocks || []),
         )
         setMaxMoves(encounter.settings.maxMoves || null)
+        setGameStarted(true)
+        setGameInitialized(true)
         return
       }
 
@@ -655,6 +662,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       } else {
         setMaxMoves(null)
       }
+      setGameStarted(true)
+      setGameInitialized(true)
     } finally {
       initializingRef.current = false
     }
@@ -1592,6 +1601,23 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     )
   const isRenderedWall = (x: number, y: number) =>
     grid[y]?.[x] === 'wall' && !authoredBarrierKeys.has(`${x},${y}`)
+
+  if (!gameInitialized) {
+    return (
+      <div className="grid min-h-dvh place-items-center bg-game-night-canvas p-6 text-game-cream">
+        {initializationError ? (
+          <div className="flex max-w-sm flex-col items-center gap-4 text-center">
+            <p role="alert">{initializationError}</p>
+            <Button onClick={() => void initGame()}>Try again</Button>
+          </div>
+        ) : (
+          <p role="status" aria-live="polite">
+            Loading Grid Adventure…
+          </p>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="relative min-h-dvh flex flex-col font-sans overflow-hidden game-night bg-game-night-canvas">

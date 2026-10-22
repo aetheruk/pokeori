@@ -59,12 +59,16 @@ export function PixelGridBoard({
 }: PixelGridBoardProps) {
   const measureRef = useRef<HTMLDivElement>(null)
   const [availableWidth, setAvailableWidth] = useState(maxWidth)
+  const [hasMeasured, setHasMeasured] = useState(false)
 
   useEffect(() => {
     const element = measureRef.current
     if (!element) return
 
-    const updateWidth = () => setAvailableWidth(element.clientWidth)
+    const updateWidth = () => {
+      setAvailableWidth(element.clientWidth)
+      setHasMeasured(true)
+    }
     updateWidth()
     const observer = new ResizeObserver(updateWidth)
     observer.observe(element)
@@ -110,7 +114,7 @@ export function PixelGridBoard({
         aria-label={ariaLabel}
         data-logical-tile-size={GRID_LOGICAL_TILE_SIZE}
         data-pixel-scale={metrics.scale}
-        className={cn('shrink-0', className)}
+        className={cn('shrink-0', !hasMeasured && 'invisible', className)}
         style={style}
       >
         {children}
