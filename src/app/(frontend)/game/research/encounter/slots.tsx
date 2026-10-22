@@ -350,6 +350,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
 
     setResult({
       success: res.success,
+      activitySuccess: res.activitySuccess,
       message: res.success ? 'Session Ended' : res.error || 'The slot session could not be ended.',
       rewards: res.summary,
     })

@@ -58,7 +58,8 @@ on success by default; `removeOnSuccess: false` keeps an object visible and
 available to interact with again. A persistent placement only counts once toward
 the board's distinct-activity win condition. Grid-launched result screens hide
 replay controls. Slots use the shared result flow to return to the saved grid
-when the player leaves the machine.
+when the player leaves the machine, and forward the server-verified activity
+outcome separately from successful session settlement.
 
 Chronicle battles do not write ordinary battle activity-stat rows. When a
 Chronicle battle is launched from a matching Grid Adventure, its server-side
