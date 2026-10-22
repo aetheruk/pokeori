@@ -3,25 +3,17 @@
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 
 import {
-  Banknote,
-  Check,
   Coins,
   DoorOpen,
   Gift,
-  Info,
-  LogOut,
-  Play,
   Sparkles,
-  X,
 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { GameTimer } from '@/components/game/shared/game-timer'
+import { useEffect, useRef, useState } from 'react'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -30,14 +22,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import { getCurrency } from '@/data/currencies'
 import {
   SlotGameConfig,
-  SlotPayline,
   SlotSymbol,
 } from '@/data/games/slots/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
@@ -238,11 +228,35 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
   // Game State
   const [spinning, setSpinning] = useState(false)
   const [reels, setReels] = useState<string[]>(['?', '?', '?'])
-  const [spinMessage, setSpinMessage] = useState('Line up the symbols and spin.')
+  const [spinFeedback, setSpinFeedback] = useState<{
+    message: string
+    tone: 'win' | 'error'
+  } | null>(null)
   const [result, setResult] = useState<any | null>(null)
+  const spinFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [timeLeft, setTimeLeft] = useState(encounter.settings.timeLimit || 0)
   const [gameEnded, setGameEnded] = useState(false)
+
+  const showSpinFeedback = (message: string, tone: 'win' | 'error') => {
+    if (spinFeedbackTimeoutRef.current) {
+      clearTimeout(spinFeedbackTimeoutRef.current)
+    }
+    setSpinFeedback({ message, tone })
+    spinFeedbackTimeoutRef.current = setTimeout(() => {
+      setSpinFeedback(null)
+      spinFeedbackTimeoutRef.current = null
+    }, 2800)
+  }
+
+  useEffect(
+    () => () => {
+      if (spinFeedbackTimeoutRef.current) {
+        clearTimeout(spinFeedbackTimeoutRef.current)
+      }
+    },
+    [],
+  )
 
   // Initialize reels with random valid symbols
   useEffect(() => {
@@ -277,12 +291,16 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
     const cost = encounter.settings.cost
     const balance = user?.currency?.[cost.currencyType] || 0
     if (balance < cost.amount) {
-      setSpinMessage('Not enough currency to spin.')
+      showSpinFeedback('Not enough currency to spin.', 'error')
       return
     }
 
+    if (spinFeedbackTimeoutRef.current) {
+      clearTimeout(spinFeedbackTimeoutRef.current)
+      spinFeedbackTimeoutRef.current = null
+    }
+    setSpinFeedback(null)
     setSpinning(true)
-    setSpinMessage('Spinning…')
 
     // Call API
     const res = await spinSlotMachine(crypto.randomUUID())
@@ -290,7 +308,10 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
     if (!res.success) {
       console.error(res.error)
       setSpinning(false)
-      setSpinMessage(res.error || 'The spin could not be completed. Try again.')
+      showSpinFeedback(
+        res.error || 'The spin could not be completed. Try again.',
+        'error',
+      )
       return
     }
 
@@ -316,9 +337,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
           label = payline.rewards[0].label
         }
 
-        setSpinMessage(`${label} Added to your session winnings.`)
-      } else {
-        setSpinMessage('No prize this spin.')
+        showSpinFeedback(`${label} Added to your session winnings.`, 'win')
       }
     }, 1500)
   }
@@ -331,8 +350,8 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
     completionInvalidatesRef.current = res.invalidates
 
     setResult({
-      success: true,
-      message: 'Session Ended',
+      success: res.success,
+      message: res.success ? 'Session Ended' : res.error || 'The slot session could not be ended.',
       rewards: res.summary,
     })
   }
@@ -448,13 +467,26 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
             }}
           />
         </div>
-        <div
-          className="mt-6 flex min-h-11 w-full max-w-md items-center justify-center rounded-md border border-game-border bg-game-surface-raised px-3 py-2 text-center text-sm font-semibold text-game-ink shadow-sm"
-          role="status"
-          aria-live="polite"
-        >
-          {spinMessage}
-        </div>
+        {spinFeedback && (
+          <div
+            className={cn(
+              'mt-6 flex max-w-md items-center justify-center gap-2 rounded-md border bg-game-surface-raised px-3 py-2 text-center text-sm font-semibold shadow-sm',
+              spinFeedback.tone === 'win'
+                ? 'border-game-ochre/50 text-game-ink'
+                : 'border-game-danger/50 text-game-danger',
+            )}
+            role="status"
+            aria-live="polite"
+          >
+            {spinFeedback.tone === 'win' && (
+              <Sparkles
+                className="h-4 w-4 shrink-0 text-game-ochre"
+                aria-hidden="true"
+              />
+            )}
+            {spinFeedback.message}
+          </div>
+        )}
       </div>
       {/* Controls Section (Fixed Bottom) */}
       <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-4 px-4 z-50 pb-safe">

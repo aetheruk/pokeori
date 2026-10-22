@@ -86,12 +86,37 @@ export const celadonGameCornerTestSlotEntries: SlotGameConfig[] = [
     ...lowStakesTestTemplate,
     id: 'celadon-game-corner-test-lucky-slots',
     name: 'Lucky Game Corner Test Slots',
-    description: 'A rare test machine with the low-stakes Rocket Slots prize table and much better odds.',
+    description: 'A rare test machine with the low-stakes Rocket Slots prize table and a 52% win chance.',
     subCategory: 'Test',
     requirements: [],
     settings: {
       ...lowStakesTestTemplate.settings,
-      winRate: 70,
+      winRate: 52,
+    },
+  },
+]
+
+export const celadonGameCornerLuckySlotEntries: SlotGameConfig[] = [
+  {
+    ...celadonGameCornerSlotEntries[0]!,
+    id: 'celadon-rocket-slots-lucky',
+    name: 'Lucky Rocket Slots',
+    description: 'A rare low-stakes machine with a 52% win chance.',
+    hide: 'when-the-fun-stops',
+    settings: {
+      ...celadonGameCornerSlotEntries[0]!.settings,
+      winRate: 52,
+    },
+  },
+  {
+    ...celadonGameCornerSlotEntries[1]!,
+    id: 'celadon-high-stakes-slots-lucky',
+    name: 'Lucky High Stakes Rocket Slots',
+    description: 'A rare high-stakes machine with a 52% win chance.',
+    hide: 'high-roller',
+    settings: {
+      ...celadonGameCornerSlotEntries[1]!.settings,
+      winRate: 52,
     },
   },
 ]

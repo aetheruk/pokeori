@@ -1,25 +1,86 @@
 import type { GridObjectPlacement } from '../../grid-tiles'
 import type { RockPushGameConfig } from '../types'
 
-const slotMachineInteraction: GridObjectPlacement['interaction'] = {
-  type: 'minigame',
-  targetId: 'celadon-game-corner-test-slots',
-  victory: 'clear',
+function createSlotMachinePlacements(
+  targetId: string,
+  luckyTargetId: string,
+): GridObjectPlacement[] {
+  return [2, 4, 6].flatMap((y, row) =>
+    [1, 3, 5, 7].map((x, column) => ({
+      id: `slot-${row + 1}-${column + 1}`,
+      objectId: 'celadon-slot-machine',
+      x,
+      y,
+      interaction: {
+        type: 'minigame',
+        targetId,
+        victory: 'clear',
+      },
+      properties: {
+        // Keep the lucky machine visually identical; its odds are the discovery.
+        luckyObjectId: 'celadon-slot-machine',
+        luckyTargetId,
+      },
+    })),
+  )
 }
 
-const slotMachinePlacements: GridObjectPlacement[] = [2, 4, 6].flatMap(
-  (y, row) => [1, 3, 5, 7].map((x, column) => ({
-    id: `slot-${row + 1}-${column + 1}`,
-    objectId: 'celadon-slot-machine',
-    x,
-    y,
-    interaction: slotMachineInteraction,
-    properties: {
-      luckyObjectId: 'celadon-lucky-slot-machine',
-      luckyTargetId: 'celadon-game-corner-test-lucky-slots',
-    },
-  })),
+const testSlotMachinePlacements = createSlotMachinePlacements(
+  'celadon-game-corner-test-slots',
+  'celadon-game-corner-test-lucky-slots',
 )
+
+const lowStakesSlotMachinePlacements = createSlotMachinePlacements(
+  'celadon-rocket-slots',
+  'celadon-rocket-slots-lucky',
+)
+
+const highStakesSlotMachinePlacements = createSlotMachinePlacements(
+  'celadon-high-stakes-slots',
+  'celadon-high-stakes-slots-lucky',
+)
+
+function createGameCornerAdventure({
+  id,
+  name,
+  description,
+  requirements,
+  overrides,
+  objects,
+}: {
+  id: string
+  name: string
+  description: string
+  requirements: RockPushGameConfig['requirements']
+  overrides: string
+  objects: GridObjectPlacement[]
+}): RockPushGameConfig {
+  return {
+    id,
+    name,
+    description,
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    icon: { type: 'local', id: '/games/grid-objects/celadon-slot-machine.png' },
+    background: '/backgrounds/celadon-game-corner-arcade.avif',
+    requirements,
+    overrides,
+    rewards: [],
+    settings: {
+      variant: 'rock-push',
+      tilePaletteId: 'celadon-game-corner',
+      timeLimit: 1800,
+      grid_size: 9,
+      playerStart: { x: 4, y: 7 },
+      startScreen: 'arcade-floor',
+      screens: [{
+        id: 'arcade-floor',
+        objects,
+        winTiles: [{ x: 4, y: 0 }],
+      }],
+    },
+  }
+}
 
 export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
   {
@@ -42,9 +103,27 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
       startScreen: 'arcade-floor',
       screens: [{
         id: 'arcade-floor',
-        objects: slotMachinePlacements,
+        objects: testSlotMachinePlacements,
         winTiles: [{ x: 4, y: 0 }],
       }],
     },
   },
+  createGameCornerAdventure({
+    id: 'grid-adventure-celadon-game-corner',
+    name: 'Rocket Slots',
+    description:
+      'Explore the Celadon Game Corner floor, try the low-stakes slot machines, and find the exit in the back wall. One machine may secretly have better odds.',
+    requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
+    overrides: 'celadon-rocket-slots',
+    objects: lowStakesSlotMachinePlacements,
+  }),
+  createGameCornerAdventure({
+    id: 'grid-adventure-celadon-high-stakes-game-corner',
+    name: 'High Stakes Rocket Slots',
+    description:
+      'Enter the High Stakes Room, try its slot machines, and find the exit in the back wall. One machine may secretly have better odds.',
+    requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
+    overrides: 'celadon-high-stakes-slots',
+    objects: highStakesSlotMachinePlacements,
+  }),
 ]
