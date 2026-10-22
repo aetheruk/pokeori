@@ -1,86 +1,63 @@
-import type { RockPushGameConfig, RockPushPosition } from '../types'
+import type { RockPushGameConfig } from '../types'
 
-// Keep a single connected route through each room so every mechanic is exercised.
-function corridor(cells: RockPushPosition[]): RockPushPosition[] {
-  const open = new Set(cells.map(({ x, y }) => `${x},${y}`))
-  return Array.from({ length: 72 }, (_, index) => ({
-    x: index % 9,
-    y: Math.floor(index / 9) + 1,
-  })).filter(({ x, y }) => !open.has(`${x},${y}`))
+const route1Battle = {
+  type: 'battle' as const,
+  targetId: 'route-1-battle',
+  victory: 'clear' as const,
 }
 
 export const testbasicEntries: RockPushGameConfig[] = [
   {
     id: 'grid-adventure-test',
     name: 'Grid Adventure Test',
-    description: 'Explore three connected rooms. Slide rocks across ice, collect supplies, mine a wall, and clear a wild catch and Route 1 wild battle before filling the final hole. You have three lives.',
+    description: 'Choose from five Route 1 wild Pokémon across three connected scenes. Win any three battles to clear the grid. You have three lives.',
     category: 'Kanto',
     subCategory: 'Test',
-    icon: { type: 'item', id: 'hard-stone' },
-    background: '/backgrounds/cave.avif',
+    icon: { type: 'local', id: '/sprites/tall_grass-v2.avif' },
+    background: '/backgrounds/grassy-route.avif',
     requirements: [],
     rewards: [],
     settings: {
       variant: 'rock-push',
-      tilePaletteId: 'basic-cave',
+      tilePaletteId: 'grass',
       timeLimit: 1800,
       grid_size: 9,
-      maxMoves: 200,
       lives: 3,
+      winCondition: { type: 'activity-successes', count: 3 },
       playerStart: { x: 1, y: 1 },
       startScreen: 'entry',
       screens: [
         {
           id: 'entry',
-          barriers: corridor([
-            { x: 1, y: 1 },
-            ...Array.from({ length: 7 }, (_, i) => ({ x: i + 1, y: 2 })),
-          ]),
-          boulders: [{ x: 2, y: 2 }],
-          holes: [{ x: 5, y: 2 }],
-          ice: [{ x: 3, y: 2 }, { x: 4, y: 2 }],
-          prizes: [{ id: 'entry-supplies', x: 1, y: 2, itemId: 'poke-ball', quantity: 3 }],
-          teleporters: [{
-            id: 'entry-to-frost', x: 7, y: 2,
-            target: { screen: 'frost', x: 1, y: 1 },
-          }],
-        },
-        {
-          id: 'frost',
-          barriers: corridor([
-            { x: 1, y: 1 },
-            ...Array.from({ length: 4 }, (_, i) => ({ x: i + 1, y: 2 })),
-            { x: 4, y: 3 },
-            ...Array.from({ length: 4 }, (_, i) => ({ x: i + 4, y: 4 })),
-          ]),
-          ice: [{ x: 2, y: 2 }, { x: 3, y: 2 }],
-          prizes: [{ id: 'ice-supplies', x: 3, y: 2, itemId: 'battle-potion', quantity: 1 }],
-          teleporters: [
-            { id: 'frost-to-entry', x: 1, y: 1, target: { screen: 'entry', x: 7, y: 2 } },
-            { id: 'frost-to-vault', x: 7, y: 4, target: { screen: 'vault', x: 1, y: 1 }, oneWay: true },
+          objects: [
+            { id: 'entry-rattata', objectId: 'route-1-rattata-trigger', x: 2, y: 1, interaction: route1Battle },
+            { id: 'entry-pidgey', objectId: 'route-1-pidgey-trigger', x: 4, y: 1, interaction: route1Battle },
           ],
-          objects: [{
-            id: 'wild-checkpoint', objectId: 'encounter-trigger', x: 4, y: 3,
-            interaction: { type: 'encounter', targetId: 'test-safari-catching', victory: 'clear' },
-          }, {
-            id: 'mining-checkpoint', objectId: 'minigame-trigger', x: 4, y: 2,
-            interaction: { type: 'minigame', targetId: 'underground-mining-test', victory: 'clear' },
+          teleporters: [{
+            id: 'entry-to-meadow', x: 7, y: 1,
+            target: { screen: 'meadow', x: 1, y: 1 },
+            oneWay: true,
           }],
         },
         {
-          id: 'vault',
-          tilePaletteId: 'wooden-interior',
-          barriers: corridor([
-            { x: 1, y: 1 },
-            ...Array.from({ length: 4 }, (_, i) => ({ x: i + 1, y: 2 })),
-            { x: 4, y: 3 }, { x: 4, y: 4 },
-          ]),
-          boulders: [{ x: 4, y: 3 }],
-          holes: [{ x: 4, y: 4 }],
-          prizes: [{ id: 'vault-supplies', x: 3, y: 2, itemId: 'escape-rope', quantity: 1 }],
-          objects: [{
-            id: 'route-1-wild-checkpoint', objectId: 'wild-battle-trigger', x: 2, y: 2,
-            interaction: { type: 'battle', targetId: 'route-1-battle', victory: 'clear' },
+          id: 'meadow',
+          objects: [
+            { id: 'meadow-pidgey', objectId: 'route-1-pidgey-trigger', x: 2, y: 1, interaction: route1Battle },
+            { id: 'meadow-rattata', objectId: 'route-1-rattata-trigger', x: 4, y: 1, interaction: route1Battle },
+          ],
+          teleporters: [
+            { id: 'meadow-to-entry', x: 1, y: 1, target: { screen: 'entry', x: 7, y: 1 } },
+            { id: 'meadow-to-woodland', x: 7, y: 1, target: { screen: 'woodland', x: 1, y: 1 }, oneWay: true },
+          ],
+        },
+        {
+          id: 'woodland',
+          objects: [
+            { id: 'woodland-pidgey', objectId: 'route-1-pidgey-trigger', x: 4, y: 4, interaction: route1Battle },
+          ],
+          teleporters: [{
+            id: 'woodland-to-meadow', x: 1, y: 1,
+            target: { screen: 'meadow', x: 7, y: 1 },
           }],
         },
       ],

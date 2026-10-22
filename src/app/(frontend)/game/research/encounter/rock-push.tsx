@@ -349,6 +349,13 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     (sum, screen) => sum + (screen.holes || []).length,
     0,
   )
+  const hasPushableRocks = screenConfigs.some(
+    (screen) => (screen.boulders || []).length > 0,
+  )
+  const requiredActivitySuccesses =
+    encounter.settings.winCondition?.type === 'activity-successes'
+      ? encounter.settings.winCondition.count
+      : null
   const activeScreenConfig =
     screenConfigs.find((screen) => screen.id === activeScreenId) ||
     screenConfigs[0]
@@ -852,12 +859,31 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       return
     }
     playSfx('good')
+    const nextClearedCount = clearedObjectKeys.has(pending.key)
+      ? clearedObjectKeys.size
+      : clearedObjectKeys.size + 1
     setClearedObjectKeys((current) => {
       const next = new Set(current)
       next.add(pending.key)
       return next
     })
-  }, [gameEnded, gameStarted, handleLoss, handleWin, lives, pendingObjectResult, playSfx])
+    if (
+      requiredActivitySuccesses !== null &&
+      nextClearedCount >= requiredActivitySuccesses
+    ) {
+      void handleWin()
+    }
+  }, [
+    clearedObjectKeys,
+    gameEnded,
+    gameStarted,
+    handleLoss,
+    handleWin,
+    lives,
+    pendingObjectResult,
+    playSfx,
+    requiredActivitySuccesses,
+  ])
 
   const signalBlocked = (dx: number, dy: number) => {
     if (blockedTimerRef.current) clearTimeout(blockedTimerRef.current)
@@ -1572,45 +1598,56 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             {/* Objective Chip */}
             <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm">
-              {encounter.settings.invisibleMaze ? (
+              {requiredActivitySuccesses !== null ? (
+                <>
+                  <CircleDot className="h-3 w-3 text-game-ochre" />
+                  <span>
+                    Activities {clearedObjectKeys.size} / {requiredActivitySuccesses}
+                  </span>
+                </>
+              ) : encounter.settings.invisibleMaze ? (
                 <>
                   <EyeOff className="h-3 w-3 text-game-ochre" />
                   <span>Find the exit</span>
                 </>
-              ) : (
+              ) : totalRocks > 0 ? (
                 <>
                   <CircleDot className="h-3 w-3 text-game-moss" />
                   <span>
                     {displayRocksSolved} / {totalRocks}
                   </span>
                 </>
+              ) : (
+                <>
+                  <CircleDot className="h-3 w-3 text-game-moss" />
+                  <span>Complete the goal</span>
+                </>
               )}
             </div>
 
             {/* Moves Chip */}
-            <div
-              className={cn(
-                'flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm transition-colors',
-                maxMoves && moves >= maxMoves * 0.9
-                  ? 'border-game-danger/50 bg-game-danger/15'
-                  : '',
-              )}
-            >
-              <Footprints
+            {maxMoves !== null && (
+              <div
                 className={cn(
-                  'w-3 h-3',
-                  maxMoves && moves > maxMoves * 0.9
-                    ? 'text-game-danger'
-                    : 'text-game-moss',
+                  'flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm transition-colors',
+                  moves >= maxMoves * 0.9
+                    ? 'border-game-danger/50 bg-game-danger/15'
+                    : '',
                 )}
-              />
-              <span>
-                {moves}{' '}
-                {maxMoves && (
-                  <span className="text-game-muted">/ {maxMoves}</span>
-                )}
-              </span>
-            </div>
+              >
+                <Footprints
+                  className={cn(
+                    'w-3 h-3',
+                    moves > maxMoves * 0.9
+                      ? 'text-game-danger'
+                      : 'text-game-moss',
+                  )}
+                />
+                <span>
+                  {moves} <span className="text-game-muted">/ {maxMoves}</span>
+                </span>
+              </div>
+            )}
             {lives !== null && (
               <div
                 role="status"
@@ -1889,21 +1926,23 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
         {/* Board Actions */}
         <div className="flex-none mt-2 mb-12 z-50 flex items-center gap-3">
+          {hasPushableRocks && (
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-10 w-10 rounded-full border-game-border bg-game-surface-raised text-game-muted shadow-sm hover:border-game-moss hover:text-game-moss disabled:opacity-35"
+              onClick={undoMove}
+              disabled={history.length === 0 || gameEnded || isSliding}
+              aria-label="Undo move"
+              title="Undo move"
+            >
+              <Undo2 className="w-5 h-5" />
+            </Button>
+          )}
           <Button
             size="icon"
             variant="outline"
-            className="h-10 w-10 rounded-full border-game-border bg-game-surface-raised text-game-muted shadow-sm hover:border-game-moss hover:text-game-moss disabled:opacity-35"
-            onClick={undoMove}
-            disabled={history.length === 0 || gameEnded || isSliding}
-            aria-label="Undo move"
-            title="Undo move"
-          >
-            <Undo2 className="w-5 h-5" />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            className="h-12 w-12 rounded-full border-2 border-game-clay bg-game-clay text-2xl font-black text-game-cream shadow-sm hover:bg-game-clay/90 disabled:opacity-35"
+            className="h-12 w-12 rounded-full border-2 border-game-charcoal bg-game-charcoal text-2xl font-black text-game-cream shadow-sm hover:bg-game-charcoal-strong disabled:opacity-35"
             onClick={interactWithGridObject}
             disabled={!interactionAhead || gameEnded || isSliding}
             aria-label={
@@ -1919,16 +1958,18 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           >
             A
           </Button>
-          <Button
-            size="icon"
-            className="h-10 w-10 rounded-full border-2 border-game-charcoal bg-game-charcoal text-game-cream shadow-sm hover:bg-game-charcoal-strong"
-            onClick={() => initGame()}
-            disabled={isSliding}
-            aria-label="Restart puzzle"
-            title="Restart puzzle"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </Button>
+          {hasPushableRocks && (
+            <Button
+              size="icon"
+              className="h-10 w-10 rounded-full border-2 border-game-charcoal bg-game-charcoal text-game-cream shadow-sm hover:bg-game-charcoal-strong"
+              onClick={() => initGame()}
+              disabled={isSliding}
+              aria-label="Restart puzzle"
+              title="Restart puzzle"
+            >
+              <RefreshCw className="w-5 h-5" />
+            </Button>
+          )}
         </div>
 
         {/* Mobile Controls */}

@@ -44,6 +44,12 @@ export interface RockPushScreenConfig {
   objects?: GridObjectPlacement[]
 }
 
+export interface RockPushWinCondition {
+  /** Finish after this many distinct external activity placements succeed. */
+  type: 'activity-successes'
+  count: number
+}
+
 export interface RockPushGameConfig extends BaseGameConfig {
   settings: {
     /** Ruleset executed by the shared Grid Puzzle game mode. */
@@ -68,6 +74,8 @@ export interface RockPushGameConfig extends BaseGameConfig {
     maxMoves?: number
     /** Optional attempt pool. Failed integrated encounters remove one life. */
     lives?: number
+    /** Optional completion rule for open-choice boards with external activities. */
+    winCondition?: RockPushWinCondition
     /** Hide authored internal barriers until the player walks into them. */
     invisibleMaze?: boolean
     boulderSprite?: string

@@ -33,6 +33,10 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
   const fail = { solved: false, prizeIds: [] }
   const moves = readPuzzleTranscript(proof, 'rock-push')
   if (!moves || (settings.maxMoves && moves.length > settings.maxMoves)) return fail
+  const requiredActivitySuccesses = settings.winCondition?.type === 'activity-successes'
+    ? settings.winCondition.count
+    : undefined
+  if (requiredActivitySuccesses && requiredActivitySuccesses > getRockPushObjectProofTargets(settings).length) return fail
   const configurations = getRockPushProofScreens(settings)
   const screens = new Map<string, Screen>()
   let totalHoles = 0
@@ -51,6 +55,7 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
   if (!active) return fail
   let player = { ...settings.playerStart }
   let solved = false
+  let successfulActivityCount = 0
   const collected = new Set<string>()
   const clearedObjects = new Set<string>()
   const usedObjectWins = new Map<string, number>()
@@ -115,6 +120,13 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
     }
     return 'none'
   }
+  const recordSuccessfulActivity = (victory: 'clear' | 'win') => {
+    successfulActivityCount += 1
+    return victory === 'win' || (
+      requiredActivitySuccesses !== undefined &&
+      successfulActivityCount >= requiredActivitySuccesses
+    )
+  }
   for (const move of moves) {
     if (solved) return fail
     if (move.startsWith('interact:')) {
@@ -126,7 +138,7 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
         y: player.y + delta.y,
       })
       if (object === 'none' || object === 'unverified') return fail
-      if (object === 'win') solved = true
+      if (recordSuccessfulActivity(object)) solved = true
       continue
     }
     const delta = deltas[move]
@@ -166,8 +178,10 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
     if (!hasExplicitInteractions) {
       const object = interaction(active, player)
       if (object === 'unverified') return fail
-      if (object === 'win') { solved = true; continue }
-      if (object === 'clear') continue
+      if (object === 'win' || object === 'clear') {
+        if (recordSuccessfulActivity(object)) solved = true
+        continue
+      }
     }
     if (path.some((position) => winTile(active!, position))) { solved = true; continue }
     if (rock && filledHole) {

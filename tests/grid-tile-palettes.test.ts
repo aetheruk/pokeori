@@ -5,7 +5,6 @@ import sharp from 'sharp'
 import { getPixelGridMetrics } from '@/components/game/shared/pixel-grid-board'
 import { battles } from '@/data/battles'
 import { allGames } from '@/data/games'
-import { locations } from '@/data/locations'
 import {
   GRID_LOGICAL_TILE_SIZE,
   GRID_TILE_PALETTE_IDS,
@@ -562,19 +561,23 @@ describe('shared grid sprite sets', () => {
     expect(spatialGames.filter((game) => game.subCategory === 'Test').map((game) => game.id)).toEqual(['grid-adventure-test'])
   })
 
-  test('combined grid course references valid encounter, battle, and minigame checkpoints', () => {
+  test('combined grid course references five Route 1 battles and its success threshold', () => {
     const course = allGames.find((game) => game.id === 'grid-adventure-test')
     const objects = course?.settings.screens?.flatMap((screen) => screen.objects || []) || []
-    expect(objects).toHaveLength(3)
-    expect(objects.map((object) => object.interaction?.type).sort()).toEqual(['battle', 'encounter', 'minigame'])
+    expect(objects).toHaveLength(5)
+    expect(objects.map((object) => object.interaction?.type)).toEqual(
+      Array(5).fill('battle'),
+    )
+    expect(new Set(objects.map((object) => object.interaction?.targetId))).toEqual(
+      new Set(['route-1-battle']),
+    )
+    expect(course?.settings.winCondition).toEqual({
+      type: 'activity-successes',
+      count: 3,
+    })
     for (const object of objects) {
       expect(object.interaction?.victory).toBe('clear')
-      const targets = object.interaction?.type === 'battle'
-        ? battles
-        : object.interaction?.type === 'encounter'
-          ? locations
-          : allGames.filter((game) => game.gameType === 'underground-mining')
-      expect(targets.some((target) => target.id === object.interaction?.targetId)).toBe(true)
+      expect(battles.some((battle) => battle.id === object.interaction?.targetId)).toBe(true)
     }
   })
 
@@ -620,7 +623,10 @@ describe('shared grid sprite sets', () => {
       'pushableBoulder',
       'battleTrigger',
       'wildBattleTrigger',
+      'route1RattataTrigger',
+      'route1PidgeyTrigger',
       'encounterTrigger',
+      'minigameTrigger',
     ])
     for (const object of Object.values(gridObjects)) {
       expect(object.size).toEqual({ cols: 1, rows: 1 })

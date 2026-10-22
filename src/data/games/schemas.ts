@@ -651,9 +651,28 @@ const gridPuzzleSettingsSchema = z.union([
       objects: z.array(gridObjectPlacementSchema).optional(),
       timeLimit: z.number().positive().optional(),
       maxMoves: z.number().int().positive().optional(),
+      lives: z.number().int().min(1).max(20).optional(),
+      winCondition: z.object({
+        type: z.literal('activity-successes'),
+        count: z.number().int().min(1).max(20),
+      }).strict().optional(),
       invisibleMaze: z.boolean().optional(),
     })
-    .passthrough(),
+    .passthrough()
+    .superRefine((settings, ctx) => {
+      if (!settings.winCondition) return
+      const availableActivities = [
+        ...(settings.objects || []),
+        ...(settings.screens || []).flatMap((screen) => screen.objects || []),
+      ].filter((object) => object.interaction).length
+      if (settings.winCondition.count > availableActivities) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['winCondition', 'count'],
+          message: 'The activity win condition cannot exceed the number of interactive objects',
+        })
+      }
+    }),
   z
     .object({
       variant: z.literal('voltorb'),

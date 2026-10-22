@@ -4159,7 +4159,7 @@ describe('static data references', () => {
     expect(route10Study?.settings.levelRange).toEqual({ min: 14, max: 18 })
   })
 
-  test('Grid Adventure Test combines multi-room mechanics', () => {
+  test('Grid Adventure Test offers five Route 1 battles with a three-win clear', () => {
     const game = allGames.find(
       (entry) => entry.id === 'grid-adventure-test',
     )
@@ -4169,12 +4169,25 @@ describe('static data references', () => {
     expect(game?.settings.startScreen).toBe('entry')
     expect(screens.map((screen) => screen.id).sort()).toEqual([
       'entry',
-      'frost',
-      'vault',
+      'meadow',
+      'woodland',
     ])
-    expect(screens.flatMap((screen) => screen.holes || [])).toHaveLength(2)
-    expect(screens.flatMap((screen) => screen.ice || []).length).toBeGreaterThan(0)
-    expect(screens.flatMap((screen) => screen.prizes || [])).toHaveLength(3)
+    expect(screens.flatMap((screen) => screen.holes || [])).toHaveLength(0)
+    expect(screens.flatMap((screen) => screen.boulders || [])).toHaveLength(0)
+    expect(screens.flatMap((screen) => screen.objects || [])).toHaveLength(5)
+    expect(
+      screens.flatMap((screen) => screen.objects || []).every(
+        (object) =>
+          object.interaction?.type === 'battle' &&
+          object.interaction.targetId === 'route-1-battle',
+      ),
+    ).toBe(true)
+    expect(game?.settings.winCondition).toEqual({
+      type: 'activity-successes',
+      count: 3,
+    })
+    expect(game?.settings.lives).toBe(3)
+    expect(game?.settings.maxMoves).toBeUndefined()
     expect(
       screens
         .flatMap((screen) => screen.teleporters || [])
