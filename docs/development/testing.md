@@ -28,7 +28,7 @@
 
 - `bun test tests/notifications.test.ts tests/image-cache.test.ts` checks opt-in defaults, outbound endpoint restrictions, private subscription access, owner isolation, successful/partial/expired delivery, retry persistence, voyage timing/deduplication, UTC resets, and service-worker display/click behavior alongside image-cache compatibility. `e2e/notification-settings.pw.ts` checks off states, unsupported-browser instructions, and mobile/desktop bounds without requesting permission on load. Real iOS/APNs delivery still needs the Home Screen checks in [Device notifications](../features/notifications.md).
 
-The combined grid course is covered by `bunx playwright test e2e/grid-adventure.pw.ts`. It walks all three rooms and mocks the encounter/battle boundaries to verify checkpoint restoration, collected items, move-proof continuity and final completion. `tests/rock-push-verification.test.ts` separately replays the authored course with server-verified wins and rejects missing checkpoints or an unfinished final hole.
+`bunx playwright test e2e/grid-adventure.pw.ts` exercises the multi-room checkpoint fixture across external activity returns. `tests/rock-push-verification.test.ts` replays the authored open-choice course and checks its three-of-five Route 1 battle win condition against server-recorded activity wins.
 
 Grid movement: `bun run test:e2e e2e/trainer-appearance.pw.ts -g 'grid walking'` checks all three grid variants at phone and desktop widths. Browser animations are paused at known times to verify the 360ms movement/cycle duration, half-cell translation, all four 90ms walking frames, the standing frame on arrival, and immediate movement with reduced motion enabled. Rock Push also checks undo, restart, and facing a blocked cell.
 

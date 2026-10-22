@@ -4,30 +4,29 @@ import type { RockPushGameConfig } from '@/data/games/rock-push/types'
 import { testbasicEntries } from '@/data/games/rock-push/entries/test'
 
 describe('rock-push transcript verification', () => {
-  test('combined course is solvable only after all integrated activities and both rock puzzles', () => {
+  test('open-choice course clears after three distinct verified Route 1 battles', () => {
     const course = testbasicEntries[0].settings
     const moves = [
-      'down', 'right', 'right', 'right', 'right',
-      'down', 'right', 'down', 'down', 'right', 'right', 'right',
-      'down', 'right', 'right', 'right', 'down',
+      'interact:right', 'right', 'right', 'interact:right',
+      'right', 'right', 'right', 'right', 'interact:right',
     ]
     const wins = {
-      'frost:wild-checkpoint': 1,
-      'frost:mining-checkpoint': 1,
-      'vault:route-1-wild-checkpoint': 1,
+      'entry:entry-rattata': 3,
+      'entry:entry-pidgey': 3,
+      'meadow:meadow-pidgey': 3,
+      'meadow:meadow-rattata': 3,
+      'woodland:woodland-pidgey': 3,
     }
     const proof = { kind: 'rock-push', moves }
-    expect(verifyRockPushProof(course, proof, wins)).toEqual({
-      solved: true,
-      prizeIds: ['entry:entry-supplies', 'frost:ice-supplies', 'vault:vault-supplies'],
-    })
+    expect(verifyRockPushProof(course, proof, wins)).toEqual({ solved: true, prizeIds: [] })
     expect(verifyRockPushProof(course, proof).solved).toBe(false)
-    expect(verifyRockPushProof(course, proof, { 'frost:wild-checkpoint': 1 }).solved).toBe(false)
-    expect(verifyRockPushProof(course, proof, { 'vault:route-1-wild-checkpoint': 1 }).solved).toBe(false)
+    expect(verifyRockPushProof(course, proof, {
+      ...wins,
+      'meadow:meadow-pidgey': 0,
+      'meadow:meadow-rattata': 0,
+      'woodland:woodland-pidgey': 0,
+    }).solved).toBe(false)
     expect(verifyRockPushProof(course, { ...proof, moves: moves.slice(0, -1) }, wins).solved).toBe(false)
-    // Return through the paired portal, then revisit the already-solved first room.
-    const returnTrip = [...moves.slice(0, 5), 'down', 'up', 'left', 'right', ...moves.slice(5)]
-    expect(verifyRockPushProof(course, { ...proof, moves: returnTrip }, wins)).toEqual(verifyRockPushProof(course, proof, wins))
   })
 
   const settings: RockPushGameConfig['settings'] = {
