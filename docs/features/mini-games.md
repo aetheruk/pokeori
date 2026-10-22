@@ -55,6 +55,11 @@ verified from the board's start-time baseline before the object clears. Grid
 launched result screens hide replay controls. Slots use the shared result flow to
 return to the saved grid when the player leaves the machine.
 
+Chronicle battles do not write ordinary battle activity-stat rows. When a
+Chronicle battle is launched from a matching Grid Adventure, its server-side
+settlement receipt is kept with the parent session and included in the board's
+activity proof so returning from the battle can still be verified.
+
 Legacy `/game/research` and `/game/research/encounter` links resolve the
 player's old active session and redirect to its canonical route. Legacy
 `research:{userId}` sessions migrate lazily on first read.

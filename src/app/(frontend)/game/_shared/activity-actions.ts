@@ -2713,11 +2713,16 @@ export async function completeGameActivity(
         const settings = encounter.settings as unknown as RockPushGameConfig['settings']
         const targets = getRockPushObjectProofTargets(settings)
         const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults', 'gameResults', 'fieldResearchResults']) : {}
+        const chronicleBattleWins = state.roundData?.chronicleBattleWins || {}
         const verifiedObjects = Object.fromEntries(targets.map((target) => {
           const baseline = state.roundData?.objectWins?.[target.key]
-          return [target.key, typeof baseline === 'number'
+          const activityWins = typeof baseline === 'number'
             ? Math.max(0, getRockPushObjectWinCount(stats, target) - baseline)
-            : 0]
+            : 0
+          const chronicleWins = target.type === 'battle'
+            ? chronicleBattleWins[`battle:${target.targetId}`]?.length || 0
+            : 0
+          return [target.key, activityWins + chronicleWins]
         }))
         rockPushVerification = verifyRockPushProof(settings, gameplayProof, verifiedObjects)
       }
