@@ -18,7 +18,7 @@ const gridTileAssetSchema = z
 
 const gridObjectInteractionSchema = z
   .object({
-    type: z.enum(['battle', 'encounter', 'minigame']),
+    type: z.enum(['battle', 'encounter', 'minigame', 'field-research']),
     targetId: z.string().min(1).max(120),
     victory: z.enum(['win', 'clear']),
   })
@@ -62,7 +62,9 @@ export const gridObjectDefinitionSchema = z
       .strict(),
     asset: gridTileAssetSchema,
     collision: z.enum(['none', 'solid', 'pushable']).optional(),
-    interaction: z.enum(['battle', 'encounter', 'minigame']).optional(),
+    interaction: z
+      .enum(['battle', 'encounter', 'minigame', 'field-research'])
+      .optional(),
     properties: z.record(z.string(), z.unknown()).optional(),
   })
   .strict()

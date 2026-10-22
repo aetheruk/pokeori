@@ -15,8 +15,16 @@ export function getRockPushProofScreens(settings: Settings): RockPushScreenConfi
 }
 
 export function hasRockPushMinigameTarget(settings: Settings, targetId: string) {
+  return hasRockPushActivityTarget(settings, 'minigame', targetId)
+}
+
+export function hasRockPushActivityTarget(
+  settings: Settings,
+  type: string,
+  targetId: string,
+) {
   return getRockPushObjectProofTargets(settings).some(
-    (target) => target.type === 'minigame' && target.targetId === targetId,
+    (target) => target.type === type && target.targetId === targetId,
   )
 }
 

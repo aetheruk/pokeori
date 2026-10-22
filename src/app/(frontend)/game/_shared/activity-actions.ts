@@ -141,7 +141,11 @@ import type { MagnemiteCircuitSettings } from '@/data/games/magnemite-circuit/ty
 import type { RockTunnelEchoMapSettings } from '@/data/games/rock-tunnel-echo-map/types'
 import type { VoltorbGridSettings } from '@/data/games/voltorb-grid/types'
 import type { RockPushGameConfig } from '@/data/games/rock-push/types'
-import { getRockPushObjectProofTargets, hasRockPushMinigameTarget, verifyRockPushProof } from '@/utilities/research/rock-push-verification'
+import {
+  getRockPushObjectProofTargets,
+  hasRockPushMinigameTarget,
+  verifyRockPushProof,
+} from '@/utilities/research/rock-push-verification'
 import { generateInspectionRound } from '@/utilities/research/tcg-inspection-server'
 import type { TcgInspectionGameSettings } from '@/data/games/tcg-inspection/types'
 import { createDiglettRound } from '@/utilities/research/diglett-authority'
@@ -255,8 +259,83 @@ function getRockPushObjectWinCount(
       ? stats.battles
       : target.type === 'encounter'
         ? stats.locations
-        : stats.games
+        : target.type === 'field-research'
+          ? stats.fieldResearch
+          : stats.games
   return domainStats?.[target.targetId]?.wins || 0
+}
+
+function maybeAddLuckyGridAdventureMachine(
+  encounter: (typeof allGames)[number],
+): (typeof allGames)[number] {
+  if (
+    encounter.gameType !== 'grid-puzzle' ||
+    encounter.settings.variant !== 'rock-push'
+  ) {
+    return encounter
+  }
+
+  const settings = encounter.settings as unknown as RockPushGameConfig['settings']
+  const screens = settings.screens
+  if (!screens?.length) return encounter
+
+  const slotTargetIds = new Set(
+    allGames
+      .filter((entry) => entry.gameType === 'slots')
+      .map((entry) => entry.id),
+  )
+  const candidates = screens.flatMap((screen, screenIndex) =>
+    (screen.objects || []).flatMap((object, objectIndex) => {
+      const luckyTargetId = object.properties?.luckyTargetId
+      if (
+        object.interaction?.type !== 'minigame' ||
+        typeof luckyTargetId !== 'string' ||
+        !slotTargetIds.has(luckyTargetId)
+      ) {
+        return []
+      }
+      return [{
+        screenIndex,
+        objectIndex,
+        luckyTargetId,
+        luckyObjectId: typeof object.properties?.luckyObjectId === 'string'
+          ? object.properties.luckyObjectId
+          : object.objectId,
+      }]
+    }),
+  )
+
+  // Half of runs feature one randomly selected lucky machine.
+  if (candidates.length === 0 || randomInt(0, 2) === 0) return encounter
+
+  const luckyMachine = candidates[randomInt(0, candidates.length)]
+  const randomizedScreens = screens.map((screen, screenIndex) =>
+    screenIndex !== luckyMachine.screenIndex
+      ? screen
+      : {
+          ...screen,
+          objects: (screen.objects || []).map((object, objectIndex) =>
+            objectIndex !== luckyMachine.objectIndex
+              ? object
+              : {
+                  ...object,
+                  objectId: luckyMachine.luckyObjectId,
+                  interaction: {
+                    ...object.interaction!,
+                    targetId: luckyMachine.luckyTargetId,
+                  },
+                },
+          ),
+        },
+  )
+
+  return {
+    ...encounter,
+    settings: {
+      ...encounter.settings,
+      screens: randomizedScreens,
+    },
+  } as (typeof allGames)[number]
 }
 
 export async function getGameActivityStateForUser(
@@ -332,6 +411,79 @@ export async function clearGameActivityStateForUser(
   domain: GameActivityDomain,
 ) {
   return redis.del(getGameActivitySessionKey(userId, domain))
+}
+
+/** Move a legacy Rock Push session out of the standard Mini Game slot. */
+export async function ensureGridAdventureSessionForUser(userId: string) {
+  const current = await getGameActivityStateForUser(userId, 'grid-adventure')
+  if (current) return current
+
+  const migrationLock = await acquireActionLock(
+    `lock:grid-adventure-session-migration:${userId}`,
+    10,
+  )
+  if (!migrationLock.acquired) {
+    return getGameActivityStateForUser(userId, 'grid-adventure')
+  }
+
+  try {
+    const stateAfterLock = await getGameActivityStateForUser(
+      userId,
+      'grid-adventure',
+    )
+    if (stateAfterLock) return stateAfterLock
+
+    const legacyState = await getGameActivityStateForUser(userId, 'game')
+    const legacyEncounter = legacyState?.eventConfigSnapshot || allGames.find(
+      (entry) => entry.id === legacyState?.encounterId,
+    )
+    if (
+      !legacyState ||
+      legacyEncounter?.gameType !== 'grid-puzzle' ||
+      legacyEncounter.settings.variant !== 'rock-push'
+    ) {
+      return null
+    }
+
+    const ttlSeconds = Math.max(
+      60,
+      Math.ceil((legacyState.expiry - Date.now()) / 1000) + 120,
+    )
+    await setGameActivityStateForUser(
+      userId,
+      'grid-adventure',
+      legacyState,
+      ttlSeconds,
+    )
+    await clearGameActivityStateForUser(userId, 'game')
+    return legacyState
+  } finally {
+    await releaseActionLock(migrationLock)
+  }
+}
+
+export async function getGridAdventureActivityState() {
+  const user = await getUser()
+  if (!user) return null
+  await ensureGridAdventureSessionForUser(user.id)
+  return getGameActivityState('grid-adventure')
+}
+
+export async function prepareGridAdventureInteraction(encounterId: string) {
+  const user = await getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+  const state = await ensureGridAdventureSessionForUser(user.id)
+  const encounter = state?.eventConfigSnapshot || allGames.find(
+    (entry) => entry.id === state?.encounterId,
+  )
+  if (
+    state?.encounterId !== encounterId ||
+    encounter?.gameType !== 'grid-puzzle' ||
+    encounter.settings.variant !== 'rock-push'
+  ) {
+    return { success: false, error: 'The active Grid Adventure could not be restored.' }
+  }
+  return { success: true }
 }
 
 function getResearchStateAbility(
@@ -632,9 +784,16 @@ export async function startGameActivity(
     }
 
     try {
+      if (
+        domain === 'game' ||
+        domain === 'field-research' ||
+        domain === 'grid-minigame'
+      ) {
+        await ensureGridAdventureSessionForUser(user.id)
+      }
       const payload = await getPayload({ config: configPromise })
 
-      const encounter = domain === 'field-research'
+      let encounter = domain === 'field-research'
         ? await getEffectiveContent('field-research', validatedEncounterId, user) as unknown as (typeof allGames)[number] | undefined
         : allGames.find((e) => e.id === validatedEncounterId)
       if (!encounter) {
@@ -647,11 +806,19 @@ export async function startGameActivity(
         }
       }
 
+      if (
+        domain === 'grid-adventure' &&
+        (encounter.gameType !== 'grid-puzzle' ||
+          encounter.settings.variant !== 'rock-push')
+      ) {
+        return {
+          success: false,
+          error: 'Grid Adventure sessions require the Rock Push ruleset.',
+        }
+      }
+
       if (domain === 'grid-minigame') {
-        const parentGridState = await getGameActivityStateForUser(
-          user.id,
-          'game',
-        )
+        const parentGridState = await ensureGridAdventureSessionForUser(user.id)
         if (!isAuthoredGridMinigameTarget(parentGridState, encounter.id)) {
           return {
             success: false,
@@ -741,6 +908,10 @@ export async function startGameActivity(
                 : existingState.roundData,
           }
         }
+      }
+
+      if (domain === 'grid-adventure') {
+        encounter = maybeAddLuckyGridAdventureMachine(encounter)
       }
 
       // Analyze requirements
@@ -1077,7 +1248,7 @@ export async function startGameActivity(
         expiry = roundData.deadline + 1000
       } else if (encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'rock-push') {
         const targets = getRockPushObjectProofTargets(encounter.settings as unknown as RockPushGameConfig['settings'])
-        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults', 'gameResults']) : {}
+        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults', 'gameResults', 'fieldResearchResults']) : {}
         roundData = { kind: 'rock-push', objectWins: Object.fromEntries(targets.map((target) => [
           target.key, getRockPushObjectWinCount(stats, target),
         ])) }
@@ -1470,7 +1641,10 @@ export async function startGameActivity(
       const state: GameActivityState = {
         userId: user.id,
         encounterId: validatedEncounterId,
-        eventConfigSnapshot: domain === 'field-research' ? encounter : undefined,
+        eventConfigSnapshot:
+          domain === 'field-research' || domain === 'grid-adventure'
+            ? encounter
+            : undefined,
         startTime,
         expiry: expiry,
         wins: 0,
@@ -2315,6 +2489,10 @@ export async function completeGameActivity(
       return { success: false, error: 'Not authenticated' }
     }
 
+    if (domain === 'grid-minigame') {
+      await ensureGridAdventureSessionForUser(user.id)
+    }
+
     const encounterInput = validateResearchEncounterId(encounterId)
     if (!encounterInput.success) {
       return { success: false, error: encounterInput.error }
@@ -2334,8 +2512,19 @@ export async function completeGameActivity(
       }
     }
 
+    if (
+      domain === 'grid-adventure' &&
+      (configuredEncounter.gameType !== 'grid-puzzle' ||
+        configuredEncounter.settings.variant !== 'rock-push')
+    ) {
+      return {
+        success: false,
+        error: 'Grid Adventure sessions require the Rock Push ruleset.',
+      }
+    }
+
     if (domain === 'grid-minigame') {
-      const parentGridState = await getGameActivityStateForUser(user.id, 'game')
+      const parentGridState = await ensureGridAdventureSessionForUser(user.id)
       if (!isAuthoredGridMinigameTarget(parentGridState, validatedEncounterId)) {
         return {
           success: false,
@@ -2523,7 +2712,7 @@ export async function completeGameActivity(
       if (encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'rock-push') {
         const settings = encounter.settings as unknown as RockPushGameConfig['settings']
         const targets = getRockPushObjectProofTargets(settings)
-        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults', 'gameResults']) : {}
+        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults', 'gameResults', 'fieldResearchResults']) : {}
         const verifiedObjects = Object.fromEntries(targets.map((target) => {
           const baseline = state.roundData?.objectWins?.[target.key]
           return [target.key, typeof baseline === 'number'

@@ -3,6 +3,7 @@
 import {
   claimGameActivityEndlessMilestone,
   completeGameActivity,
+  getGridAdventureActivityState,
   getGameActivityState,
   getGameActivityStateForUser,
   getUser,
@@ -47,7 +48,17 @@ export async function startGame(
   if (gameId === 'celadon-high-stakes-battle-bets') {
     return startBattleBets(forceReset) as any
   }
-  return startGameActivity('game', gameId, forceReset, consumedPokemonIds)
+  const encounter = allGames.find((entry) => entry.id === gameId)
+  const isRockPushAdventure =
+    encounter?.gameType === 'grid-puzzle' &&
+    'variant' in encounter.settings &&
+    encounter.settings.variant === 'rock-push'
+  return startGameActivity(
+    isRockPushAdventure ? 'grid-adventure' : 'game',
+    gameId,
+    forceReset,
+    consumedPokemonIds,
+  )
 }
 
 export async function submitGameAnswer(answer: unknown) {
@@ -64,8 +75,13 @@ export async function completeGame(
   artAcademyDrawing?: string,
   gameplayProof?: unknown,
 ) {
+  const encounter = allGames.find((entry) => entry.id === gameId)
+  const isRockPushAdventure =
+    encounter?.gameType === 'grid-puzzle' &&
+    'variant' in encounter.settings &&
+    encounter.settings.variant === 'rock-push'
   return completeGameActivity(
-    'game',
+    isRockPushAdventure ? 'grid-adventure' : 'game',
     gameId,
     success,
     finalScore,
@@ -79,6 +95,10 @@ export async function completeGame(
 
 export async function getGameState() {
   return getGameActivityState('game')
+}
+
+export async function getGridAdventureState() {
+  return getGridAdventureActivityState()
 }
 
 export async function claimEndlessMilestone(gameId: string, score: number) {

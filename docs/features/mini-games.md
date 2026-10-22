@@ -47,6 +47,13 @@ session, and `game` activity-stat rows. Field Observation alone uses the
 `field-research` activity-stat rows. A player can therefore keep one active
 Mini Game and one active Field Research study at the same time.
 
+Rock Push Grid Adventure can launch any authored Mini Game or Field Observation
+as an interactive object. The parent board uses a dedicated `grid-adventure`
+session while the child runs in its normal `game` or `field-research` domain.
+The return result is matched to the authored object and activity wins are
+verified from the board's start-time baseline before the object clears. Grid
+launched result screens hide replay controls.
+
 Legacy `/game/research` and `/game/research/encounter` links resolve the
 player's old active session and redirect to its canonical route. Legacy
 `research:{userId}` sessions migrate lazily on first read.

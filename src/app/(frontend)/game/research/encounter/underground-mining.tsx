@@ -11,6 +11,7 @@ import {
   startGridMinigame,
 } from '@/app/(frontend)/game/games/grid-minigame-actions'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { useGridActivityReturn } from '@/components/game/shared/GridActivityReturnContext'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { useAudio } from '@/context/AudioContext'
@@ -47,6 +48,7 @@ interface UndergroundMiningGameProps {
   actions?: UndergroundMiningActions
   onExit?: () => void
   returnTo?: string
+  gridMinigame?: boolean
 }
 
 export function UndergroundMiningGame({
@@ -54,10 +56,13 @@ export function UndergroundMiningGame({
   actions: suppliedActions,
   onExit,
   returnTo,
+  gridMinigame = false,
 }: UndergroundMiningGameProps) {
-  const actions = suppliedActions || (returnTo ? gridMinigameActions : defaultActions)
+  const actions =
+    suppliedActions || (gridMinigame ? gridMinigameActions : defaultActions)
   useGameMusic(encounter)
   const router = useRouter()
+  const gridActivityReturn = useGridActivityReturn()
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
   const [round, setRound] = useState<UndergroundMiningPublicRound | null>(null)
@@ -190,6 +195,10 @@ export function UndergroundMiningGame({
       return
     }
     void refreshUser(true, completionInvalidatesRef.current)
+    if (gridActivityReturn) {
+      gridActivityReturn.returnFromActivity(result?.success === true)
+      return
+    }
     if (returnTo) {
       if (result && typeof window !== 'undefined') {
         const returnUrl = new URL(returnTo, window.location.origin)

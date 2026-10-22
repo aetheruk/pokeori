@@ -558,7 +558,14 @@ describe('shared grid sprite sets', () => {
     const course = spatialGames.find((game) => game.id === 'grid-adventure-test')
     expect(course?.subCategory).toBe('Test')
     expect(course?.requirements).toEqual([])
-    expect(spatialGames.filter((game) => game.subCategory === 'Test').map((game) => game.id)).toEqual(['grid-adventure-test'])
+    expect(
+      spatialGames
+        .filter((game) => game.subCategory === 'Test')
+        .map((game) => game.id),
+    ).toEqual([
+      'grid-adventure-test',
+      'grid-adventure-celadon-game-corner-test',
+    ])
   })
 
   test('combined grid course references five Route 1 battles and its success threshold', () => {
@@ -627,6 +634,9 @@ describe('shared grid sprite sets', () => {
       'route1PidgeyTrigger',
       'encounterTrigger',
       'minigameTrigger',
+      'celadonSlotMachine',
+      'celadonLuckySlotMachine',
+      'fieldResearchTrigger',
     ])
     for (const object of Object.values(gridObjects)) {
       expect(object.size).toEqual({ cols: 1, rows: 1 })

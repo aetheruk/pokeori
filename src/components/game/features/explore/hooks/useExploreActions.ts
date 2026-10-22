@@ -779,7 +779,10 @@ export function useExploreActions(
           }
           const result = await startGame(item.id)
           if (result.success) {
-            router.push(getGameActivityRoute(item.originalData.gameType))
+            router.push(
+              getGameActivityRouteForId(item.id) ||
+                getGameActivityRoute(item.originalData.gameType),
+            )
           } else {
             toast.error(result.error || 'Failed to start encounter')
             setLoadingId(null)
@@ -904,7 +907,10 @@ export function useExploreActions(
         selectedPokemonIds,
       )
       if (result.success) {
-        router.push(getGameActivityRoute(selectedResearchEncounter.gameType))
+        router.push(
+          getGameActivityRouteForId(selectedResearchEncounter.id) ||
+            getGameActivityRoute(selectedResearchEncounter.gameType),
+        )
       } else {
         toast.error(result.error || 'Failed to start encounter')
         setLoadingId(null)
@@ -1000,7 +1006,9 @@ export function useExploreActions(
         redirectPath = '/game/field-research'
       } else {
         result = await startGame(encounter.id, false, selectedPokemonIds)
-        redirectPath = getGameActivityRoute(encounter.gameType)
+        redirectPath =
+          getGameActivityRouteForId(encounter.id) ||
+          getGameActivityRoute(encounter.gameType)
       }
 
       if (result.success) {

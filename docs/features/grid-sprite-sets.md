@@ -1,6 +1,6 @@
 # Grid sprite-set contract
 
-The combined `grid-adventure-test` has three connected outdoor scenes and five Route 1 Pokémon sprite battle markers. Any three successful battles clear it; the three lives are an independent optional failure limit, and the course has no move limit or step counter. Room schemas validate object placements with the shared object schema. Grid initialization ignores overlapping starts so an encounter/battle return cannot consume its saved room checkpoint twice. Integrated battles, catches, and minigames return to the grid without offering replay, keeping each placement to one attempt before the player resolves its outcome.
+The combined `grid-adventure-test` has three connected outdoor scenes and five Route 1 Pokémon sprite battle markers. Any three successful battles clear it; the three lives are an independent optional failure limit, and the course has no move limit or step counter. `grid-adventure-celadon-game-corner-test` uses a generated Celadon arcade palette, a bottom exit, and twelve interactive slot machines arranged in four columns across three rows. Each machine uses the low-stakes 5-token test slot game; half of new runs replace one randomly selected machine with a 70%-odds version. The lucky selection is saved in the activity configuration so it remains stable after reloads and is used for completion verification. Room schemas validate object placements with the shared object schema. Grid initialization ignores overlapping starts so an encounter/battle return cannot consume its saved room checkpoint twice. Integrated battles, catches, and minigames return to the grid without offering replay, keeping each placement to one attempt before the player resolves its outcome.
 
 Player appearance comes from the saved trainer gender in all three grid variants, independently of terrain sets: Lucas for male, Dawn for female, and Ditto for neither or an unset legacy profile. `GridPlayerSprite` renders all three 256×256 sheets as sixteen 64×64 frames, with down, left, right, and up rows and four movement frames per row. Ditto uses the Following Pokémon EX overworld sheet and shares the 360ms walking cycle. Voltorb and protected Kanto Rattata/Ditto use downward-facing overworld frames; full source sheets and extracted idle frames live in `public/games/overworld/`. Credits are recorded in `ATTRIBUTIONS.md` and the in-app Credits & Legal registry. Player appearance does not affect collisions or game rules. Legacy per-game player sprite overrides are no longer used by these renderers; the generic trainer asset remains available for NPC battle markers.
 
@@ -86,11 +86,14 @@ placements succeed, without requiring every placed activity to be completed.
 The Kanto test course uses three lives and requires three wins from its five
 Route 1 battle markers.
 
-Use the `minigame-trigger` object for an authored activity under
-`interaction.type: 'minigame'`. The activity runs in a separate session slot,
-so the parent Grid Adventure remains resumable. The server accepts a minigame
-only when its id is referenced by the active Rock Push board, and the board's
-completion proof checks the saved game result before clearing the marker.
+Use the `minigame-trigger` object for any authored Mini Game under
+`interaction.type: 'minigame'`; use `field-research-trigger` for an authored
+Field Observation under `interaction.type: 'field-research'`. The parent Rock
+Push session stays in its own slot while each child uses its normal game or
+Field Research runtime. The server only opens the activity when its id is
+referenced by the active board, returns to the saved grid with the result, and
+checks that activity's saved win before clearing the marker. Grid-launched
+activities omit their replay action so a cleared placement cannot be repeated.
 
 Wall filenames are four-bit cardinal masks: north `1`, east `2`, south `4`, west `8`. For example, north + east is `3`, east + west is `10`, and all four directions is `15`. Each mask should be deliberately authored with the correct corners and side faces.
 

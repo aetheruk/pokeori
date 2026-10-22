@@ -70,3 +70,28 @@ export const celadonGameCornerSlotEntries: SlotGameConfig[] = [
     },
   },
 ]
+
+const lowStakesTestTemplate = celadonGameCornerSlotEntries[0]
+
+export const celadonGameCornerTestSlotEntries: SlotGameConfig[] = [
+  {
+    ...lowStakesTestTemplate,
+    id: 'celadon-game-corner-test-slots',
+    name: 'Game Corner Test Slots',
+    description: 'A test version of the low-stakes Rocket Slots: 5 Fun Tokens per spin and the standard prize table.',
+    subCategory: 'Test',
+    requirements: [],
+  },
+  {
+    ...lowStakesTestTemplate,
+    id: 'celadon-game-corner-test-lucky-slots',
+    name: 'Lucky Game Corner Test Slots',
+    description: 'A rare test machine with the low-stakes Rocket Slots prize table and much better odds.',
+    subCategory: 'Test',
+    requirements: [],
+    settings: {
+      ...lowStakesTestTemplate.settings,
+      winRate: 70,
+    },
+  },
+]

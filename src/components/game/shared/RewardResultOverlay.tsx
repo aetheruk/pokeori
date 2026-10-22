@@ -16,6 +16,7 @@ import { LevelUpModal } from '@/components/game/level-up-modal'
 import { GameResult } from '@/components/game/ResearchResult'
 import { markExpeditionReturn } from '@/components/game/features/explore/expedition-return'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { useGridActivityReturn } from '@/components/game/shared/GridActivityReturnContext'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import type { TaskExitModal, TaskIcon } from '@/data/tasks'
 import type { CompleteTaskResult } from '@/utilities/tasks/actions'
@@ -157,6 +158,7 @@ export function RewardResultOverlay({
   secondaryAction,
 }: RewardResultOverlayProps) {
   const { playSfx } = useAudio()
+  const gridActivityReturn = useGridActivityReturn()
   const lastPlayedResultRef = useRef<GenericResult | null>(null)
 
   // State for sequential flow
@@ -311,13 +313,18 @@ export function RewardResultOverlay({
     setCurrentStep('idle')
     setExitModalData(null)
     setExitModalQueue([])
-    onClose()
+    if (gridActivityReturn) {
+      gridActivityReturn.returnFromActivity(result?.success === true)
+    } else {
+      onClose()
+    }
   }
 
   if (!result) return null
 
   const rewardSummary = result.rewards || result.summary
-  const showSecondaryAction = shouldShowRewardResultSecondaryAction(result)
+  const showSecondaryAction =
+    !gridActivityReturn && shouldShowRewardResultSecondaryAction(result)
   const expeditionProgress =
     result.expeditionProgress || (rewardSummary as any)?.expeditionProgress
   const expeditionLabel = expeditionProgress?.isChronicle

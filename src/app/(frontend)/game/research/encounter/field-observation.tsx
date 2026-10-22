@@ -26,6 +26,7 @@ import {
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { useGridActivityReturn } from '@/components/game/shared/GridActivityReturnContext'
 import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { useAudio } from '@/context/AudioContext'
@@ -55,6 +56,7 @@ export function FieldObservationGame({
 }: FieldObservationGameProps) {
   useGameMusic(encounter)
   const router = useRouter()
+  const gridActivityReturn = useGridActivityReturn()
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
   const roundData = initialState?.roundData as
@@ -242,8 +244,16 @@ export function FieldObservationGame({
         <div className="game-folio-section space-y-4 p-6 text-center">
           <Eye className="mx-auto h-10 w-10 text-game-moss-strong" />
           <p className="text-game-muted">No field survey is active.</p>
-          <Button onClick={() => router.push('/game/explore')}>
-            Return to Explore
+          <Button
+            onClick={() => {
+              if (gridActivityReturn) {
+                gridActivityReturn.returnFromActivity(false)
+              } else {
+                router.push('/game/explore')
+              }
+            }}
+          >
+            {gridActivityReturn ? 'Return to Grid Adventure' : 'Return to Explore'}
           </Button>
         </div>
       </div>

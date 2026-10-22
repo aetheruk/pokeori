@@ -17,6 +17,7 @@ import { allGames } from '@/data/games'
 import {
   getGameActivityDomain,
   getGameActivityRoute,
+  getGameActivityRouteForId,
 } from '@/utilities/games/activity-domain'
 import { drawTcgBoosterPacks } from '@/utilities/tcg/tcg-card-draw'
 import type { TcgCard } from '@/data/tcg/types'
@@ -572,7 +573,9 @@ export async function useConsumable(
             error: activityResult.error || 'Failed to start activity',
           }
         }
-        redirect = getGameActivityRoute(activity.gameType)
+        redirect =
+          getGameActivityRouteForId(researchStart.id) ||
+          getGameActivityRoute(activity.gameType)
       }
 
       revalidatePath('/game/inventory')
