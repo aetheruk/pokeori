@@ -3,6 +3,7 @@ import { SlotGameConfig } from '../types'
 export const celadonGameCornerSlotEntries: SlotGameConfig[] = [
   {
     id: 'celadon-rocket-slots',
+    gridAdventureOnly: true,
     name: 'Rocket Slots',
     description: 'Line up three symbols to turn a small stack of Fun Tokens into a bigger one.',
     category: 'Kanto',
@@ -37,6 +38,7 @@ export const celadonGameCornerSlotEntries: SlotGameConfig[] = [
   },
   {
     id: 'celadon-high-stakes-slots',
+    gridAdventureOnly: true,
     name: 'High Stakes Rocket Slots',
     description: 'The same reels, with a far more serious pile of Fun Tokens on the line.',
     category: 'Kanto',
@@ -77,6 +79,7 @@ export const celadonGameCornerTestSlotEntries: SlotGameConfig[] = [
   {
     ...lowStakesTestTemplate,
     id: 'celadon-game-corner-test-slots',
+    gridAdventureOnly: true,
     name: 'Game Corner Test Slots',
     description: 'A test version of the low-stakes Rocket Slots: 5 Fun Tokens per spin and the standard prize table.',
     subCategory: 'Test',
@@ -85,6 +88,7 @@ export const celadonGameCornerTestSlotEntries: SlotGameConfig[] = [
   {
     ...lowStakesTestTemplate,
     id: 'celadon-game-corner-test-lucky-slots',
+    gridAdventureOnly: true,
     name: 'Lucky Game Corner Test Slots',
     description: 'A rare test machine with the low-stakes Rocket Slots prize table and a 52% win chance.',
     subCategory: 'Test',
@@ -100,6 +104,7 @@ export const celadonGameCornerLuckySlotEntries: SlotGameConfig[] = [
   {
     ...celadonGameCornerSlotEntries[0]!,
     id: 'celadon-rocket-slots-lucky',
+    gridAdventureOnly: true,
     name: 'Lucky Rocket Slots',
     description: 'A rare low-stakes machine with a 52% win chance.',
     hide: 'when-the-fun-stops',
@@ -111,6 +116,7 @@ export const celadonGameCornerLuckySlotEntries: SlotGameConfig[] = [
   {
     ...celadonGameCornerSlotEntries[1]!,
     id: 'celadon-high-stakes-slots-lucky',
+    gridAdventureOnly: true,
     name: 'Lucky High Stakes Rocket Slots',
     description: 'A rare high-stakes machine with a 52% win chance.',
     hide: 'high-roller',

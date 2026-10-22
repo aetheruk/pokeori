@@ -25,6 +25,7 @@ const forbiddenFields = new Set([
   'dynamicOpponent',
   'pvp',
   'expeditionOnly',
+  'gridAdventureOnly',
   'dailyMetadata',
   'rivalSelection',
 ])

@@ -3,6 +3,7 @@
 import {
   claimGameActivityEndlessMilestone,
   completeGameActivity,
+  getGridAdventureActivityTargetForUser,
   getGridAdventureActivityState,
   getGameActivityState,
   getGameActivityStateForUser,
@@ -23,8 +24,30 @@ export async function startGame(
   gameId: string,
   forceReset = false,
   consumedPokemonIds?: string[],
+  gridAdventureObjectKey?: string,
 ) {
   const user = await getUser()
+  const requestedEncounter = allGames.find((entry) => entry.id === gameId)
+  if (requestedEncounter?.gridAdventureOnly) {
+    if (!user || !gridAdventureObjectKey) {
+      return {
+        success: false,
+        error: 'This activity can only be started from its Grid Adventure object.',
+      }
+    }
+    const authoredTarget = await getGridAdventureActivityTargetForUser(
+      user.id,
+      gameId,
+      gridAdventureObjectKey,
+      'minigame',
+    )
+    if (!authoredTarget) {
+      return {
+        success: false,
+        error: 'This activity is not part of the active Grid Adventure.',
+      }
+    }
+  }
   if (user) {
     const existingState = await getGameActivityStateForUser(user.id, 'game')
     if (existingState && existingState.encounterId !== gameId) {
@@ -58,6 +81,7 @@ export async function startGame(
     gameId,
     forceReset,
     consumedPokemonIds,
+    gridAdventureObjectKey,
   )
 }
 
