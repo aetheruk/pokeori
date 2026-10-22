@@ -5,6 +5,7 @@ export { submitGameAnswer, getGameState, claimEndlessMilestone } from '@/app/(fr
 export type { GameCompletionResult, GameState } from '@/app/(frontend)/game/games/actions'
 
 import { recoverGameAction } from './action-recovery'
+import { getStartGameRequestArguments } from './start-game-request'
 import { ACTIVITY_STARTED_EVENT, ACTIVITY_SETTLED_EVENT } from './update-safety'
 export { getGameRecovery, getServerGameRecovery, subscribeToGameRecovery } from './action-recovery'
 
@@ -13,7 +14,9 @@ export function startGame(...args: Parameters<typeof startGameAction>) {
   let firstAttempt = true
   return recoverGameAction(
     () => {
-      const request = startGameAction(args[0], firstAttempt ? args[1] : false, args[2])
+      const request = startGameAction(
+        ...getStartGameRequestArguments(args, firstAttempt),
+      )
       firstAttempt = false
       return request
     },
