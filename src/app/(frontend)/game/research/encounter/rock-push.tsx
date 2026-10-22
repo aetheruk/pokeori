@@ -10,6 +10,7 @@ import {
   Footprints,
   Heart,
   RefreshCw,
+  Star,
   Undo2,
 } from 'lucide-react'
 import Image from 'next/image'
@@ -1600,9 +1601,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm">
               {requiredActivitySuccesses !== null ? (
                 <>
-                  <CircleDot className="h-3 w-3 text-game-ochre" />
-                  <span>
-                    Activities {clearedObjectKeys.size} / {requiredActivitySuccesses}
+                  <Star className="h-3 w-3 fill-game-ochre text-game-ochre" />
+                  <span
+                    role="img"
+                    aria-label={`Activities ${clearedObjectKeys.size} of ${requiredActivitySuccesses}`}
+                  >
+                    {clearedObjectKeys.size} / {requiredActivitySuccesses}
                   </span>
                 </>
               ) : encounter.settings.invisibleMaze ? (
