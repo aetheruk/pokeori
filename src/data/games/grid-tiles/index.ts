@@ -94,7 +94,7 @@ export const gridTilePalettes = {
     walls: {
       back: { src: '/games/grid-tiles/celadon-game-corner/walls/back.png' },
       markers: {
-        goal: { src: '/games/grid-tiles/celadon-game-corner/floor/markers/goal.png' },
+        goal: { src: '/games/grid-tiles/celadon-game-corner/walls/markers/goal.png' },
         teleporter: { src: '/games/grid-tiles/grass/walls/markers/teleporter.png' },
       },
     },
@@ -105,7 +105,7 @@ export const gridTilePalettes = {
     },
     credits: [{
       label: 'Pokeori Celadon Game Corner pixel-art tiles',
-      notice: 'AI-generated 64×64 floor, lucky floor variation, back wall, and exit marker for the shared 16×16 logical grid.',
+      notice: 'AI-generated opaque 64×64 checkerboard floor tiles, a full-bleed back wall, and an integrated wall doorway for the shared 16×16 logical grid.',
       external: false,
     }],
   },
