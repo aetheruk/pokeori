@@ -839,7 +839,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       }
 
       if (interaction.type === 'minigame') {
-        const result = await startGame(interaction.targetId)
+        const result = await startGame(
+          interaction.targetId,
+          false,
+          undefined,
+          interaction.key,
+        )
         if (!result.success) {
           window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
           setResult({
@@ -859,7 +864,11 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       }
 
       if (interaction.type === 'field-research') {
-        const result = await startFieldResearch(interaction.targetId)
+        const result = await startFieldResearch(
+          interaction.targetId,
+          false,
+          interaction.key,
+        )
         if (!result.success) {
           window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
           setResult({

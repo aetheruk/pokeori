@@ -11,6 +11,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { useGridActivityReturn } from '@/components/game/shared/GridActivityReturnContext'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { Button } from '@/components/ui/button'
@@ -218,6 +219,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { user, refreshUser } = useUser()
+  const gridActivityReturn = useGridActivityReturn()
   const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
 
@@ -513,15 +515,22 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
           background={encounter.background}
           onClose={() => {
             refreshUser(true, completionInvalidatesRef.current)
-            router.push('/game/explore')
+            if (gridActivityReturn) {
+              gridActivityReturn.returnFromActivity(
+                result.activitySuccess === true,
+              )
+            } else {
+              router.push('/game/explore')
+            }
           }}
           icon={encounter.icon}
           iconAlt={encounter.name}
           title="END"
           message={`Maybe one more go...`}
           secondaryAction={
-            initialState?.encounter?.isEligibleForReplay ||
-            encounter?.isEligibleForReplay ? (
+            !gridActivityReturn &&
+            (initialState?.encounter?.isEligibleForReplay ||
+              encounter?.isEligibleForReplay) ? (
               <Button
                 size="lg"
                 onClick={async () => {
@@ -535,7 +544,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
                     } else {
                       window.location.href = '/game/explore'
                     }
-                  } catch (e) {
+                  } catch {
                     window.location.href = '/game/explore'
                   }
                 }}

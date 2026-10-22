@@ -15,8 +15,15 @@ export type FieldResearchCompletionResult = GameActivityCompletionResult
 export async function startFieldResearch(
   fieldResearchId: string,
   forceReset = false,
+  gridAdventureObjectKey?: string,
 ) {
-  return startGameActivity('field-research', fieldResearchId, forceReset)
+  return startGameActivity(
+    'field-research',
+    fieldResearchId,
+    forceReset,
+    undefined,
+    gridAdventureObjectKey,
+  )
 }
 
 export async function submitFieldResearchAnswer(answer: unknown) {

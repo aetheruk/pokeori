@@ -3,7 +3,6 @@ import type { RockPushGameConfig } from '../types'
 
 function createSlotMachinePlacements(
   targetId: string,
-  luckyTargetId: string,
   layout = { columns: [1, 3, 5, 7], rows: [2, 4, 6] },
 ): GridObjectPlacement[] {
   return layout.rows.flatMap((y, row) =>
@@ -18,29 +17,21 @@ function createSlotMachinePlacements(
         targetId,
         victory: 'clear',
       },
-      properties: {
-        // Keep the lucky machine visually identical; its odds are the discovery.
-        luckyObjectId: 'celadon-slot-machine',
-        luckyTargetId,
-      },
     })),
   )
 }
 
 const testSlotMachinePlacements = createSlotMachinePlacements(
   'celadon-game-corner-test-slots',
-  'celadon-game-corner-test-lucky-slots',
 )
 
 const lowStakesSlotMachinePlacements = createSlotMachinePlacements(
   'celadon-rocket-slots',
-  'celadon-rocket-slots-lucky',
   { columns: [1, 2, 4, 5], rows: [1, 3, 5] },
 )
 
 const highStakesSlotMachinePlacements = createSlotMachinePlacements(
   'celadon-high-stakes-slots',
-  'celadon-high-stakes-slots-lucky',
   { columns: [1, 2, 4, 5], rows: [1, 3, 5] },
 )
 
@@ -91,7 +82,7 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
     id: 'grid-adventure-celadon-game-corner-test',
     name: 'Celadon Game Corner Grid Test',
     description:
-      'Explore a Celadon Game Corner floor lined with twelve slot machines and reach the large doorway in the back wall. One machine may be a lucky find with better odds.',
+      'Explore a Celadon Game Corner floor lined with twelve slot machines, each with its own win odds, and reach the large doorway in the back wall.',
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'local', id: '/games/grid-objects/celadon-slot-machine.png' },
@@ -116,7 +107,7 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
     id: 'grid-adventure-celadon-game-corner',
     name: 'Rocket Slots',
     description:
-      'Explore the Celadon Game Corner floor, try the low-stakes slot machines, and find the exit in the back wall. One machine may secretly have better odds.',
+      'Explore the Celadon Game Corner floor, try twelve low-stakes slot machines with different odds, and find the exit in the back wall.',
     requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
     overrides: 'celadon-rocket-slots',
     objects: lowStakesSlotMachinePlacements,
@@ -125,7 +116,7 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
     id: 'grid-adventure-celadon-high-stakes-game-corner',
     name: 'High Stakes Rocket Slots',
     description:
-      'Enter the High Stakes Room, try its slot machines, and find the exit in the back wall. One machine may secretly have better odds.',
+      'Enter the High Stakes Room, try twelve slot machines with different odds, and find the exit in the back wall.',
     requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
     overrides: 'celadon-high-stakes-slots',
     objects: highStakesSlotMachinePlacements,
