@@ -1619,17 +1619,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           }
         }
 
-        @keyframes rock-push-prize-pulse {
-          0%,
-          100% {
-            opacity: 0.92;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.08);
-          }
-        }
       `}</style>
       <div className="relative z-10 flex flex-col items-center justify-center min-h-dvh w-full p-4">
         {/* Header Stats / Chips */}
@@ -1858,7 +1847,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                     style={entityStyle(prize)}
                     aria-hidden="true"
                   >
-                    <div className="relative h-full w-full motion-safe:[animation:rock-push-prize-pulse_1.8s_ease-in-out_infinite]">
+                    <div className="relative h-full w-full">
                       <EndlessCollectibleSprite
                         reward={getRockPushPrizeReward(prize)}
                         size={52}
@@ -1887,7 +1876,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                       height: `${(definition.size.rows * 100) / Math.max(gridSize.h, 1)}%`,
                     }}
                   >
-                    <div className="relative h-full w-full motion-safe:animate-pulse">
+                    <div className="relative h-full w-full">
                       <Image
                         src={definition.asset.src}
                         alt={definition.name}

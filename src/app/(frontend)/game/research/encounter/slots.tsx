@@ -6,7 +6,6 @@ import {
   Coins,
   DoorOpen,
   Gift,
-  Sparkles,
 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -326,7 +325,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
       // Handle Win Display
       if (res.rewards) {
         playSfx('good')
-        let label = 'WIN!'
+        let prize = 'a prize'
         const payline = encounter.settings.paytable?.find(
           (p) =>
             p.icons[0] === res.icons[0] &&
@@ -334,10 +333,10 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
             p.icons[2] === res.icons[2],
         )
         if (payline?.rewards[0].label) {
-          label = payline.rewards[0].label
+          prize = payline.rewards[0].label
         }
 
-        showSpinFeedback(`${label} Added to your session winnings.`, 'win')
+        showSpinFeedback(`Congrats you won, ${prize}`, 'win')
       }
     }, 1500)
   }
@@ -467,26 +466,25 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
             }}
           />
         </div>
-        {spinFeedback && (
-          <div
-            className={cn(
-              'mt-6 flex max-w-md items-center justify-center gap-2 rounded-md border bg-game-surface-raised px-3 py-2 text-center text-sm font-semibold shadow-sm',
-              spinFeedback.tone === 'win'
-                ? 'border-game-ochre/50 text-game-ink'
-                : 'border-game-danger/50 text-game-danger',
-            )}
-            role="status"
-            aria-live="polite"
-          >
-            {spinFeedback.tone === 'win' && (
-              <Sparkles
-                className="h-4 w-4 shrink-0 text-game-ochre"
-                aria-hidden="true"
-              />
-            )}
-            {spinFeedback.message}
-          </div>
-        )}
+        <div
+          className="mt-6 flex h-12 w-full max-w-md items-center justify-center"
+          role="status"
+          aria-live="polite"
+        >
+          {spinFeedback && (
+            <span
+              className={cn(
+                'max-w-full rounded-md border px-3 py-2 text-center text-xs font-semibold leading-4 shadow-sm',
+                spinFeedback.tone === 'win' &&
+                  'border-game-charcoal bg-game-charcoal text-game-cream',
+                spinFeedback.tone === 'error' &&
+                  'border-game-danger/50 bg-game-surface-raised text-game-danger',
+              )}
+            >
+              <span className="line-clamp-2">{spinFeedback.message}</span>
+            </span>
+          )}
+        </div>
       </div>
       {/* Controls Section (Fixed Bottom) */}
       <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-4 px-4 z-50 pb-safe">
