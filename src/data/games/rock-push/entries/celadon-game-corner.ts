@@ -26,7 +26,7 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
     id: 'grid-adventure-celadon-game-corner-test',
     name: 'Celadon Game Corner Grid Test',
     description:
-      'Explore a Celadon Game Corner floor lined with twelve slot machines and reach the exit at the bottom. One machine may be a lucky find with better odds.',
+      'Explore a Celadon Game Corner floor lined with twelve slot machines and reach the large doorway in the back wall. One machine may be a lucky find with better odds.',
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'local', id: '/games/grid-objects/celadon-slot-machine.png' },
@@ -38,12 +38,12 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
       tilePaletteId: 'celadon-game-corner',
       timeLimit: 1800,
       grid_size: 9,
-      playerStart: { x: 4, y: 1 },
+      playerStart: { x: 4, y: 7 },
       startScreen: 'arcade-floor',
       screens: [{
         id: 'arcade-floor',
         objects: slotMachinePlacements,
-        winTiles: [{ x: 4, y: 8 }],
+        winTiles: [{ x: 4, y: 0 }],
       }],
     },
   },
