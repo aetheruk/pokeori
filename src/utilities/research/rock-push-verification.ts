@@ -66,6 +66,7 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
   let successfulActivityCount = 0
   const collected = new Set<string>()
   const clearedObjects = new Set<string>()
+  const successfulObjects = new Set<string>()
   const usedObjectWins = new Map<string, number>()
   const hasAuthoredScreens = Boolean(settings.screens?.length)
   const hasExplicitInteractions = moves.some((move) =>
@@ -112,7 +113,10 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
       collected.add(hasAuthoredScreens ? getRockPushScopedPrizeId(prize, index, screen.config.id) : getRockPushPrizeId(prize, index))
     }
   }
-  const interaction = (screen: Screen, position: Position): 'none' | 'clear' | 'win' | 'unverified' => {
+  const interaction = (screen: Screen, position: Position):
+    | { id: string; victory: 'clear' | 'win' }
+    | 'none'
+    | 'unverified' => {
     for (const [index, object] of (screen.config.objects || []).entries()) {
       const definition = getGridObjectDefinition(gridObjects, object.objectId)
       if (!definition || !object.interaction || definition.interaction !== object.interaction.type) continue
@@ -123,14 +127,17 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
       const usedWins = usedObjectWins.get(targetKey) || 0
       if ((verifiedObjects[id] || 0) <= usedWins) return 'unverified'
       usedObjectWins.set(targetKey, usedWins + 1)
-      clearedObjects.add(id)
-      return object.interaction.victory
+      if (object.removeOnSuccess !== false) clearedObjects.add(id)
+      return { id, victory: object.interaction.victory }
     }
     return 'none'
   }
-  const recordSuccessfulActivity = (victory: 'clear' | 'win') => {
-    successfulActivityCount += 1
-    return victory === 'win' || (
+  const recordSuccessfulActivity = (activity: { id: string; victory: 'clear' | 'win' }) => {
+    const isNewPlacementSuccess = !successfulObjects.has(activity.id)
+    successfulObjects.add(activity.id)
+    if (isNewPlacementSuccess) successfulActivityCount += 1
+    return activity.victory === 'win' || (
+      isNewPlacementSuccess &&
       requiredActivitySuccesses !== undefined &&
       successfulActivityCount >= requiredActivitySuccesses
     )
@@ -186,7 +193,7 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
     if (!hasExplicitInteractions) {
       const object = interaction(active, player)
       if (object === 'unverified') return fail
-      if (object === 'win' || object === 'clear') {
+      if (object !== 'none') {
         if (recordSuccessfulActivity(object)) solved = true
         continue
       }
@@ -221,7 +228,7 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
     if (!hasExplicitInteractions) {
       const targetObject = interaction(active, player)
       if (targetObject === 'unverified') return fail
-      if (targetObject === 'win') solved = true
+      if (targetObject !== 'none' && recordSuccessfulActivity(targetObject)) solved = true
     }
   }
   return { solved, prizeIds: [...collected] }
