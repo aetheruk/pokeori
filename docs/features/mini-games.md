@@ -50,6 +50,8 @@ Mini Game and one active Field Research study at the same time.
 Grid Adventure can launch any authored Mini Game or Field Observation
 as an interactive object. The parent board uses a dedicated `grid-adventure`
 session while the child runs in its normal `game` or `field-research` domain.
+The client start-action recovery wrapper preserves the exact object key on the
+initial request and retries, allowing the server to enforce the placement guard.
 The return result is matched to the authored object and activity wins are
 verified from the board's start-time baseline before success is recorded. A
 completed session is distinct from an activity win, so a Slots session with no

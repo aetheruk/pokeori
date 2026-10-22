@@ -1,8 +1,28 @@
 import { describe, expect, test } from 'bun:test'
 import { clearGameRecovery, getGameRecovery, recoverGameAction } from '@/utilities/games/action-recovery'
+import {
+  getStartGameRequestArguments,
+  type StartGameRequestArguments,
+} from '@/utilities/games/start-game-request'
 import { isActivityUpdateDeferred } from '@/utilities/games/update-safety'
 
 describe('game action recovery', () => {
+  test('preserves a Grid Adventure object key through start retries', () => {
+    const args: StartGameRequestArguments = [
+      'celadon-lucky-slots',
+      true,
+      undefined,
+      'arcade:machine-7',
+    ]
+    expect(getStartGameRequestArguments([...args], true)).toEqual(args)
+    expect(getStartGameRequestArguments([...args], false)).toEqual([
+      'celadon-lucky-slots',
+      false,
+      undefined,
+      'arcade:machine-7',
+    ])
+  })
+
   test('discards recovery prompts from a departed route, including delayed failures', async () => {
     let fail: (() => void) | undefined
     void recoverGameAction(() => new Promise((_resolve, reject) => { fail = () => reject(new Error('late failure')) }), 'Old game')
