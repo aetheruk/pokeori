@@ -20,6 +20,7 @@ import {
 } from './held-items'
 import { persistPokemonBattleKOs } from './pokemon-ko-credit'
 import { persistPokemonBattleEvs } from './pokemon-ev-rewards'
+import { recordGridAdventureChronicleBattleWin } from '@/utilities/research/grid-adventure-battle-proof'
 
 async function settlePendingSketchedMoves(
   state: BattleState,
@@ -81,6 +82,13 @@ export async function handleWin(
     },
   )
   Object.assign(state, settled)
+  if (state.chronicle && state.economyActionId) {
+    await recordGridAdventureChronicleBattleWin(
+      user.id,
+      state.battleId,
+      state.economyActionId,
+    )
+  }
 }
 
 async function settleBattleWin(
