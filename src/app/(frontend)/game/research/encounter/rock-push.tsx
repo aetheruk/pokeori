@@ -66,7 +66,9 @@ import {
 } from '@/utilities/games/client-action-recovery'
 import { startBattle } from '@/app/(frontend)/game/battles/actions'
 import { startEncounter } from '@/app/(frontend)/game/locations/encounter/actions'
-import { startGridMinigame } from '@/app/(frontend)/game/games/grid-minigame-actions'
+import { startFieldResearch } from '@/app/(frontend)/game/field-research/actions'
+import { prepareGridAdventureInteraction } from '@/app/(frontend)/game/games/grid-adventure-actions'
+import { getGridActivityRouteForId } from '@/utilities/games/activity-domain'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 
 interface RockPushGameProps {
@@ -783,6 +785,16 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     saveGridObjectResume(interaction, overrides)
     const returnTo = `/game/games/grid-puzzle?gridReturn=1&gameId=${encodeURIComponent(encounter.id)}`
     try {
+      const prepared = await prepareGridAdventureInteraction(encounter.id)
+      if (!prepared.success) {
+        window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
+        setResult({
+          success: false,
+          message: prepared.error || 'The Grid Adventure could not be restored.',
+        })
+        return
+      }
+
       if (interaction.type === 'battle') {
         const result = await startBattle(interaction.targetId)
         if (!result.success) {
@@ -800,7 +812,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       }
 
       if (interaction.type === 'minigame') {
-        const result = await startGridMinigame(interaction.targetId)
+        const result = await startGame(interaction.targetId)
         if (!result.success) {
           window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
           setResult({
@@ -809,7 +821,33 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           })
           return
         }
-        router.push('/game/games/underground-mining?gridMinigame=1')
+        const activityRoute = getGridActivityRouteForId(interaction.targetId)
+        if (!activityRoute) {
+          window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
+          setResult({ success: false, message: 'This mini-game is unavailable.' })
+          return
+        }
+        router.push(activityRoute)
+        return
+      }
+
+      if (interaction.type === 'field-research') {
+        const result = await startFieldResearch(interaction.targetId)
+        if (!result.success) {
+          window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
+          setResult({
+            success: false,
+            message: result.error || 'Field Research could not start.',
+          })
+          return
+        }
+        const activityRoute = getGridActivityRouteForId(interaction.targetId)
+        if (!activityRoute) {
+          window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
+          setResult({ success: false, message: 'This field survey is unavailable.' })
+          return
+        }
+        router.push(activityRoute)
         return
       }
 

@@ -32,6 +32,7 @@ import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import type { GameItem } from '@/data/games'
 import { useBattleManager } from '@/utilities/battle/engine/useBattleManager'
+import { useGridActivityReturn } from '@/components/game/shared/GridActivityReturnContext'
 import type { BattleState } from '@/utilities/battle/types'
 import type {
   BattleBetsPublicState,
@@ -70,11 +71,14 @@ function formatOdds(odds: number): string {
 export function BattleBetsGame({
   encounter,
   initialState,
+  returnTo,
 }: {
   encounter: GameItem
   initialState: BattleBetsPublicState
+  returnTo?: string
 }) {
   const router = useRouter()
+  const gridActivityReturn = useGridActivityReturn()
   const { refreshUser } = useUser()
   const [state, setState] = useState(initialState)
   const [busy, setBusy] = useState(false)
@@ -140,7 +144,11 @@ export function BattleBetsGame({
       return
     }
     refreshUser()
-    router.push('/game/explore')
+    if (gridActivityReturn) {
+      gridActivityReturn.returnFromActivity(state.won === true)
+    } else {
+      router.push('/game/explore')
+    }
   }
 
   if (state.phase !== 'inspect' && state.battle) {
@@ -152,6 +160,7 @@ export function BattleBetsGame({
         onStateChange={setState}
         onPlayAgain={playAgain}
         onReturn={returnToExplore}
+        returnTo={returnTo}
       />
     )
   }
@@ -175,7 +184,7 @@ export function BattleBetsGame({
           className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 border border-game-night-border/60 bg-game-night-surface/90 text-game-night-ink hover:bg-game-night-surface-raised hover:text-game-night-ink sm:right-5 sm:top-5"
           disabled={busy}
           onClick={() => void returnToExplore()}
-          aria-label="Return to Explore"
+          aria-label={returnTo ? 'Return to Grid Adventure' : 'Return to Explore'}
         >
           <DoorOpen className="h-4 w-4" />
         </Button>
@@ -381,12 +390,14 @@ function BattleBetsBattle({
   onStateChange,
   onPlayAgain,
   onReturn,
+  returnTo,
 }: {
   state: BattleBetsPublicState
   busy: boolean
   onStateChange: (state: BattleBetsPublicState) => void
   onPlayAgain: () => Promise<void>
   onReturn: () => Promise<void>
+  returnTo?: string
 }) {
   const initialBattle = useRef(state.battle as BattleState)
   const { battleState, anim, isProcessing, pushTurnResult } = useBattleManager(
@@ -551,13 +562,13 @@ function BattleBetsBattle({
             icon={{ type: 'trainer', id: selectedTrainer.trainerSpriteId }}
             iconAlt={selectedTrainer.trainerName}
             titleColor={state.won ? 'text-game-ochre' : 'text-game-danger'}
-            returnText="Return to Explore"
+            returnText={returnTo ? 'Return to Grid Adventure' : 'Return to Explore'}
             onReturn={() => void onReturn()}
-            secondaryAction={
+            secondaryAction={!returnTo ? (
               <Button disabled={busy} onClick={() => void onPlayAgain()}>
                 {busy ? 'Preparing matchup…' : 'Play Again'}
               </Button>
-            }
+            ) : undefined}
           />
         </div>
       )}

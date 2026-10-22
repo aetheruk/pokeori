@@ -69,6 +69,46 @@ export const gridTilePalettes = {
       external: false,
     }],
   },
+  'celadon-game-corner': {
+    id: 'celadon-game-corner',
+    name: 'Celadon Game Corner',
+    logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
+    floor: {
+      common: { src: '/games/grid-tiles/celadon-game-corner/floor/common.png' },
+      rare: [{
+        id: 'lucky-star',
+        asset: { src: '/games/grid-tiles/celadon-game-corner/floor/rare-lucky-star.png' },
+        weight: 1,
+      }],
+      rareChance: 0.08,
+      blockers: {
+        small: { src: '/games/grid-tiles/grass/floor/blockers/small.png' },
+        large: { src: '/games/grid-tiles/grass/floor/blockers/large.png' },
+      },
+      markers: {
+        teleporter: { src: '/games/grid-tiles/grass/floor/markers/teleporter.png' },
+        goal: { src: '/games/grid-tiles/celadon-game-corner/floor/markers/goal.png' },
+      },
+    },
+    walls: {
+      back: { src: '/games/grid-tiles/celadon-game-corner/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/celadon-game-corner/floor/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/grass/walls/markers/teleporter.png' },
+      },
+    },
+    gameplay: {
+      boulder: { src: '/games/rockpush/boulder.avif' },
+      ice: { src: '/games/grid-tiles/grass/gameplay/ice.png' },
+      hole: { src: '/games/grid-tiles/grass/gameplay/hole.png' },
+    },
+    credits: [{
+      label: 'Pokeori Celadon Game Corner pixel-art tiles',
+      notice: 'AI-generated 64×64 floor, lucky floor variation, back wall, and exit marker for the shared 16×16 logical grid.',
+      external: false,
+    }],
+  },
   'psychic-quiet-room': {
     id: 'psychic-quiet-room',
     name: 'Psychic Quiet Room tile set',

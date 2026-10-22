@@ -84,7 +84,11 @@ export type GridObjectPurpose =
   | (string & {})
 
 /** Activity launched by facing a placed object and using the interact action. */
-export type GridObjectInteractionType = 'battle' | 'encounter' | 'minigame'
+export type GridObjectInteractionType =
+  | 'battle'
+  | 'encounter'
+  | 'minigame'
+  | 'field-research'
 export type GridObjectVictoryMode = 'win' | 'clear'
 
 export interface GridObjectInteractionPlacement {

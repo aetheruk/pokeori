@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type { ComponentType } from 'react'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { GridActivityReturnProvider } from '@/components/game/shared/GridActivityReturnContext'
 import type { GameItem, GameType } from '@/data/games'
 
 type GameProps = {
@@ -11,6 +12,7 @@ type GameProps = {
   initialState?: any
   state?: any
   returnTo?: string
+  gridMinigame?: boolean
 }
 
 function GameLoading() {
@@ -52,5 +54,16 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
 
 export function GameClient(props: GameProps) {
   const Component = GAME_COMPONENTS[props.encounter.gameType]
-  return Component ? <Component {...props} /> : <Link href="/game/explore">Return to Explore</Link>
+  const content = Component ? (
+    <Component {...props} />
+  ) : (
+    <Link href="/game/explore">Return to Explore</Link>
+  )
+  return props.returnTo ? (
+    <GridActivityReturnProvider returnTo={props.returnTo}>
+      {content}
+    </GridActivityReturnProvider>
+  ) : (
+    content
+  )
 }
