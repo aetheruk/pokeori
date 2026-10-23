@@ -313,7 +313,6 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
       'Visit the Match 3 arcade cabinet, Prize Wheel, and UFO Catcher, then leave through the floor mat at the bottom of the room.',
     icon: { type: 'local', id: '/games/grid-objects/game-plaza-match3-cabinet.png' },
     requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
-    overrides: 'celadon-rocket-match-3',
     gridSize: 9,
     playerStart: { x: 4, y: 7 },
     startScreen: 'game-plaza',
