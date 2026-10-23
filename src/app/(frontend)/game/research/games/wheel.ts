@@ -347,7 +347,7 @@ export async function exitPrizeWheel(encounterId: string) {
 
       if (!spinDataRaw) {
         if (state) await clearGameActivityStateForUser(user.id, 'game')
-        return { success: true }
+        return { success: true, activitySuccess: false }
       }
       if (!state) {
         return { success: false, error: 'Research session mismatch' }
@@ -380,7 +380,11 @@ export async function exitPrizeWheel(encounterId: string) {
 
       await redis.del(spinKey)
       await clearGameActivityStateForUser(user.id, 'game')
-      return { success: true, settledSpin: true }
+      return {
+        success: true,
+        settledSpin: true,
+        activitySuccess: claimResult.hasRewards === true,
+      }
     } finally {
       await releaseActionLock(exitLock)
     }

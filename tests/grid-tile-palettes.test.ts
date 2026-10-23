@@ -742,6 +742,8 @@ describe('shared grid sprite sets', () => {
       'breakableRock',
       'pushableBoulder',
       'battleTrigger',
+      'bugCatcherTrainer',
+      'birdKeeperTrainer',
       'wildBattleTrigger',
       'route1RattataTrigger',
       'route1PidgeyTrigger',
@@ -751,6 +753,12 @@ describe('shared grid sprite sets', () => {
       'celadonHighStakesSlotMachine',
       'celadonPachinkoMachine',
       'celadonHighStakesPachinkoMachine',
+      'gamePlazaMatch3Cabinet',
+      'gamePlazaPrizeWheel',
+      'gamePlazaUfoCatcher',
+      'gamePlazaHighStakesMatch3Cabinet',
+      'gamePlazaHighStakesPrizeWheel',
+      'gamePlazaHighStakesUfoCatcher',
       'fieldResearchTrigger',
     ])
     for (const object of Object.values(gridObjects)) {

@@ -8,6 +8,14 @@ The shared grid renderer uses a 16×16 logical cell. Current production-ready ar
 
 The live `Rocket Pachinko` Adventure follows the same one-entry/two-room pattern as Rocket Slots. Both rooms contain twelve reusable interactive cabinets; high-stakes cabinets use the green Pachinko sprite. The server saves each cabinet's stable bucket offsets (at most three board units), width changes (at most two units), and per-slot token payouts (within 8% of standard), then scales its wager and all payouts fivefold in the high-stakes room. Pachinko rounds verify that their exact cabinet placement is still part of the active Adventure before they can settle.
 
+The Celadon `Game Plaza` Adventure uses transparent 64×64 cabinet sprites for
+Match 3, Prize Wheel, and UFO Catcher. The standard room has one of each. After
+`high-roller`, the same Explore entry shows all three green-and-gold high-stakes
+cabinet sprites beside their standard counterparts in the same room, matching
+the premium Slots and Pachinko machines. Every cabinet launches its grid-only
+activity through its saved object placement; only the High Stakes UFO Catcher's
+stake changes to 300 Fun Tokens.
+
 ## Asset layout
 
 ```text
@@ -48,6 +56,12 @@ behaviour, and sprite. This lets the same Voltorb, breakable rock, pushable
   1×1 object uses a 64×64 native canvas; a 2×2 object uses 128×128; larger
 dimensions remain possible for future content. The logical footprint remains
 one or two 16px cells.
+
+Buggy and Feathered Gauntlet trainer markers use the matching FRLG Bug Catcher
+and Bird Keeper sprites. Their original sheets stay unchanged under
+`public/games/trainers/source/`; the small SVG object assets show the first
+32×32 frame at the grid's 64×64 native size. Source details and credits are in
+`ATTRIBUTIONS.md`.
 
 Interactive object types can opt into `interaction: 'battle'` or
 `interaction: 'encounter'` on their shared definition. A map placement then
@@ -94,10 +108,10 @@ Use the `minigame-trigger` object for any authored Mini Game under
 `interaction.type: 'minigame'`; use `field-research-trigger` for an authored
 Field Observation under `interaction.type: 'field-research'`. The parent Rock
 Push session stays in its own slot while each child uses its normal game or
-Field Research runtime. Activities marked `gridAdventureOnly` are authorized
-on the server only when the exact object key and target id are present on the
-active board. Slot spins and completion recheck that relationship against the
-saved child context. Grid-launched Slots return to the saved grid with their
+Field Research runtime. Activities and battles marked `gridAdventureOnly` are
+authorized on the server only when the exact object key and target id are
+present on the active board. Slot spins and completion recheck that relationship
+against the saved child context. Grid-launched Slots return to the saved grid with their
 verified result, and the server checks that activity's saved win before
 recording the interaction. Completion
 acknowledgments are distinct from game wins, so a losing Slots session is not

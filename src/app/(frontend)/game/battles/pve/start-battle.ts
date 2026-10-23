@@ -84,6 +84,7 @@ import {
   getActiveExpeditionForUser,
   getExpeditionActivityStepStatusForUser,
 } from '@/utilities/expeditions/server'
+import { getGridAdventureActivityTargetForUser } from '@/app/(frontend)/game/_shared/activity-actions'
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import {
   ensureUserWeatherSlot,
@@ -114,13 +115,34 @@ import type { PokemonIVs } from '@/utilities/pokemon/pokemon-mechanics'
 export async function startBattle(
   battleId: string,
   consumedPokemonIds?: string[],
-  options?: { encounterItemId?: string },
+  options?: { encounterItemId?: string; gridAdventureObjectKey?: string },
 ): Promise<{ success: boolean; error?: string; state?: BattleState }> {
   const user = await getUser({ fresh: true })
   if (!user) return { success: false, error: 'Not authenticated' }
 
   const battleConfig = await getEffectiveContent('battle', battleId, user)
   if (!battleConfig) return { success: false, error: 'Battle not found' }
+
+  if (battleConfig.gridAdventureOnly) {
+    if (!options?.gridAdventureObjectKey) {
+      return {
+        success: false,
+        error: 'This battle can only be started from its Grid Adventure object.',
+      }
+    }
+    const authoredTarget = await getGridAdventureActivityTargetForUser(
+      user.id,
+      battleId,
+      options.gridAdventureObjectKey,
+      'battle',
+    )
+    if (!authoredTarget) {
+      return {
+        success: false,
+        error: 'This battle is not part of the active Grid Adventure.',
+      }
+    }
+  }
 
   const encounterItemId = options?.encounterItemId
   if (encounterItemId) {

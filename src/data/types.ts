@@ -273,6 +273,8 @@ export interface BattleConfig {
   disableRewards?: boolean
   /** Prevent currency deductions when the player loses this battle. */
   disableLossPayout?: boolean
+  /** Only allow this battle to start from a matching active Grid Adventure object. */
+  gridAdventureOnly?: boolean
   disableCandyRewards?: boolean
   generatedXpMultiplier?: number
   music?: string // Optional custom background music URL

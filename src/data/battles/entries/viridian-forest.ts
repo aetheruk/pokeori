@@ -254,12 +254,13 @@ export const viridianForestBattles: BattleConfig[] = [
       },
     ],
   },
-  // Expedition-only Bug Gauntlet rematches (XP and research still apply; no trainer payout)
+  // Secret Bug Gauntlet rematches used by the repeatable Grid Adventure.
   {
     id: 'bug-gauntlet-barry',
     name: 'Bug Gauntlet: Barry',
     description: 'Gauntlet rematch against Bug Catcher Barry.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Viridian Forest',
     icon: {
       type: 'trainer',
@@ -288,6 +289,7 @@ export const viridianForestBattles: BattleConfig[] = [
     name: 'Bug Gauntlet: Billy',
     description: 'Gauntlet rematch against Bug Catcher Billy.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Viridian Forest',
     icon: {
       type: 'trainer',
@@ -316,6 +318,7 @@ export const viridianForestBattles: BattleConfig[] = [
     name: 'Bug Gauntlet: Berry',
     description: 'Gauntlet rematch against Bug Catcher Berry.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Viridian Forest',
     icon: {
       type: 'trainer',
@@ -341,6 +344,7 @@ export const viridianForestBattles: BattleConfig[] = [
     name: 'Bug Gauntlet: Benny',
     description: 'Gauntlet rematch against Bug Catcher Benny.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Viridian Forest',
     icon: {
       type: 'trainer',
@@ -366,6 +370,7 @@ export const viridianForestBattles: BattleConfig[] = [
     name: 'Bug Gauntlet: Champion',
     description: 'Final gauntlet rematch against The Buggy Champion.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Viridian Forest',
     icon: {
       type: 'trainer',

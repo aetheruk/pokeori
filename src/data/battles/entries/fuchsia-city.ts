@@ -677,7 +677,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     maxPokemon: 2,
     enemyAttackTelegraphChance: 2,
   },
-  // Repeatable Feathered Gauntlet rematches (expedition-only)
+  // Secret Feathered Gauntlet rematches used by the repeatable Grid Adventure.
   {
     id: 'route-14-gauntlet-carter',
     trainerClassId: 'bird-keeper',
@@ -685,6 +685,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Gauntlet: Carter',
     description: 'Feathered Gauntlet rematch against Bird Keeper Carter.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
@@ -714,6 +715,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Gauntlet: Mitch',
     description: 'Feathered Gauntlet rematch against Bird Keeper Mitch.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
@@ -744,6 +746,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Gauntlet: Marlon',
     description: 'Feathered Gauntlet rematch against Bird Keeper Marlon.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
@@ -773,6 +776,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Gauntlet: Beck',
     description: 'Feathered Gauntlet rematch against Bird Keeper Beck.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
@@ -801,6 +805,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Gauntlet: Benny',
     description: 'Feathered Gauntlet rematch against Bird Keeper Benny.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
@@ -829,6 +834,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Gauntlet: Donald',
     description: 'Feathered Gauntlet rematch against Bird Champion Donald.',
     category: 'Secret',
+    gridAdventureOnly: true,
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
