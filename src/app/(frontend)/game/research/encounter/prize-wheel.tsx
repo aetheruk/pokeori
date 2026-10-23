@@ -29,6 +29,7 @@ import {
 } from '@/data/games/prize-wheel/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
+import { useGridActivityReturn } from '@/components/game/shared/GridActivityReturnContext'
 import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 import {
   claimPrizeWheelReward,
@@ -118,6 +119,7 @@ export function PrizeWheelGame({
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const router = useRouter()
+  const gridActivityReturn = useGridActivityReturn()
   const { user, refreshUser } = useUser()
   const [isSpinning, setIsSpinning] = useState(false)
   const [spinResult, setSpinResult] = useState<{
@@ -289,7 +291,14 @@ export function PrizeWheelGame({
     setIsExiting(true)
     const exitResult = await exitPrizeWheel(encounter.id)
     if (exitResult.success) {
-      router.push('/game/explore')
+      if (gridActivityReturn) {
+        const activitySuccess = result
+          ? result.success === true
+          : 'activitySuccess' in exitResult && exitResult.activitySuccess === true
+        gridActivityReturn.returnFromActivity(activitySuccess)
+      } else {
+        router.push('/game/explore')
+      }
       return
     }
 

@@ -238,8 +238,15 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
 
   // Restoring a session restores its exact authoritative board and score.
   const initGame = useCallback(async () => {
-    const response = await recoverGameAction(() => startGame(encounter.id), 'Unable to restore this board.', (result) => result.roundData?.kind === 'match3' ? undefined : 'The saved board is unavailable. Retry or return to Explore.')
-    const restored = response.roundData as Match3RoundState | undefined
+    const initialRound =
+      initialState?.encounterId === encounter.id &&
+      initialState.roundData?.kind === 'match3'
+        ? (initialState.roundData as Match3RoundState)
+        : undefined
+    const response = initialRound
+      ? initialState
+      : await recoverGameAction(() => startGame(encounter.id), 'Unable to restore this board.', (result) => result.roundData?.kind === 'match3' ? undefined : 'The saved board is unavailable. Retry or return to Explore.')
+    const restored = initialRound || (response.roundData as Match3RoundState | undefined)
     if (!mountedRef.current || restored?.kind !== 'match3') return
     roundRef.current = restored
     sessionStartRef.current = response.startTime
@@ -254,7 +261,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
     setIsProcessing(false)
     setCascadeLevel(0)
     setTimeLeft(restored.deadline === null ? encounter.settings.timeLimit || 0 : Math.max(0, Math.ceil((restored.deadline - Date.now()) / 1000)))
-  }, [encounter.id, encounter.settings.timeLimit])
+  }, [encounter.id, encounter.settings.timeLimit, initialState])
 
   useEffect(() => { if (!gameStarted) void initGame() }, [gameStarted, initGame])
 
