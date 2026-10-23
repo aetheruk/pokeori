@@ -54,7 +54,7 @@ function createGameCornerAdventure({
   description: string
   icon?: RockPushGameConfig['icon']
   requirements: RockPushGameConfig['requirements']
-  overrides: string
+  overrides?: string
   screens: NonNullable<RockPushGameConfig['settings']['screens']>
   gridSize?: number
   playerStart?: RockPushGameConfig['settings']['playerStart']
@@ -69,8 +69,7 @@ function createGameCornerAdventure({
     icon: icon || { type: 'local', id: '/games/grid-objects/celadon-slot-machine.png' },
     background: '/backgrounds/celadon-game-corner-arcade.avif',
     requirements,
-    overrides,
-    rewards: [],
+    ...(overrides ? { overrides } : {}),    rewards: [],
     settings: {
       variant: 'rock-push',
       tilePaletteId: 'celadon-game-corner',
