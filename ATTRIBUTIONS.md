@@ -28,7 +28,7 @@ The unchanged FRLG Bug Catcher and Bird Keeper sheets in
 compiled by SoulfulLex and released on 3 October 2021. Its included readme
 credits the Bird Keeper sprite to Spherical Ice but does not identify the
 original Bug Catcher artist or state an open artwork license. The Grid
-Adventure trainer markers use 64×64 PNG crops of the first 32×32 frame from
+Adventure trainer markers use 64×96 PNG crops of the first 32×48 frame from
 each unchanged 128×192 sheet. Pokémon artwork and characters remain the
 property of their respective rights holders.
 
