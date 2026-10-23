@@ -69,7 +69,8 @@ function createGameCornerAdventure({
     icon: icon || { type: 'local', id: '/games/grid-objects/celadon-slot-machine.png' },
     background: '/backgrounds/celadon-game-corner-arcade.avif',
     requirements,
-    ...(overrides ? { overrides } : {}),    rewards: [],
+    ...(overrides ? { overrides } : {}),
+    rewards: [],
     settings: {
       variant: 'rock-push',
       tilePaletteId: 'celadon-game-corner',
