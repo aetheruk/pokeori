@@ -66,6 +66,7 @@ import {
   getRockPushPrizeReward,
   getRockPushScopedPrizeId,
 } from '@/utilities/research/rock-push'
+import { selectGridAdventureObjectKeys } from '@/utilities/research/grid-adventure-random-selection'
 import {
   calculateFieldObservationSkillXp,
   generateFieldObservationRound,
@@ -449,12 +450,14 @@ async function filterGridAdventureObjectsByRequirements(
   rollSnapshot: number
 }> {
   const entries = getGridAdventureObjectEntries(encounter)
+  const selectedObjectKeys = selectGridAdventureObjectKeys(entries, rollSnapshot)
   const settings = encounter.settings as unknown as RockPushGameConfig['settings']
   const prizeEntries = settings.screens?.length
     ? settings.screens.flatMap((screen) => screen.prizes || [])
     : settings.prizes || []
   const hasConditionalObjects = entries.some(
-    ({ placement }) => placement.requirements?.length || placement.interaction,
+    ({ placement }) =>
+      placement.requirements?.length || placement.interaction || placement.randomGroup,
   )
   const hasConditionalPrizes = prizeEntries.some(
     (prize) => prize.requirements?.length,
@@ -465,10 +468,12 @@ async function filterGridAdventureObjectsByRequirements(
 
   const targetCache: GridAdventureTargetCache = new Map()
   const conditionEntries = await Promise.all(
-    entries.map(async (entry) => ({
+    entries
+      .filter(({ key }) => selectedObjectKeys.has(key))
+      .map(async (entry) => ({
       ...entry,
       conditions: await getGridAdventureObjectConditions(entry.placement, user, targetCache),
-    })),
+      })),
   )
   const requirements = [
     ...conditionEntries.flatMap(({ conditions }) => conditions.requirements),
@@ -508,7 +513,7 @@ async function filterGridAdventureObjectsByRequirements(
   const filterObjects = (objects: GridObjectPlacement[] = [], screenId = 'main') =>
     objects.filter((placement, index) =>
       eligibleKeys.has(`${screenId}:${placement.id || `${placement.objectId}-${index}`}`),
-    )
+    ).map(({ randomGroup: _randomGroup, ...placement }) => placement)
   const filteredSettings = settings.screens?.length
     ? {
         ...encounter.settings,

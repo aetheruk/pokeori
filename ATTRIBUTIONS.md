@@ -22,15 +22,17 @@ Pokémon-related names, characters, artwork, sprites, sounds, card designs, and 
 
 The Lucas and Dawn overworld sheets in `public/games/trainers/` were supplied by the project owner as `NPC_198_Lucas.png` and `NPC_201_Dawn.png`. Pokémon character and sprite rights remain with their respective owners; no separate upstream source or license was supplied with these files.
 
-The unchanged FRLG Bug Catcher and Bird Keeper sheets in
+The unchanged FRLG Bug Catcher, Bird Keeper, and female Psychic sheets in
 `public/games/trainers/source/` come from the [FRLG Accurate NPC Megapack
 (Relic Castle Edition)](https://www.mediafire.com/file/nbr92qe5uhorhlv/FRLG_Accurate_NPC_Megapack_%2528Relic_Castle_Edition%2529.zip/file),
 compiled by SoulfulLex and released on 3 October 2021. Its included readme
-credits the Bird Keeper sprite to Spherical Ice but does not identify the
-original Bug Catcher artist or state an open artwork license. The Grid
-Adventure trainer markers use 64×96 PNG crops of the first 32×48 frame from
-each unchanged 128×192 sheet. Pokémon artwork and characters remain the
-property of their respective rights holders.
+credits the Bird Keeper sprite to Spherical Ice and the female Psychic sprite
+to Kalarie, but does not identify the original Bug Catcher artist or state an
+open artwork license. Grid Adventure trainer markers use 64×96 PNG crops of the
+first 32×48 frame from each unchanged 128×192 sheet; the female Psychic sprite
+is used for Channeler markers because the pack has no dedicated Channeler
+sheet. Pokémon artwork and characters remain the property of their respective
+rights holders.
 
 ## Pokémon overworld sprites
 
@@ -61,6 +63,7 @@ Each dependency remains under its own license. Their license texts are available
 
 - **Pokeori Basic Cave tile set** — supplied 16×16 test tiles arranged under `public/games/grid-tiles/basic-cave`, with existing Pokeori boulder, filled-hole, goal, and player artwork retained for gameplay compatibility.
 - **Pokeori Grass Field tile set** — supplied 16×16 and 32×32 grass test tiles arranged under `public/games/grid-tiles/grass`, with existing Pokeori gameplay artwork retained where the grass pack has no equivalent.
+- **Pokeori Pokémon Tower tile set** — AI-generated plum stone floor and stained-glass shrine wall tiles under `public/games/grid-tiles/pokemon-tower`; shared blockers and gameplay markers reuse the Psychic Quiet Room palette.
 
 Every sprite set records its source, creator, link, license, and required notice in `src/data/games/grid-tiles`. External packs must be added both to that registry, which feeds the in-app Credits & Legal dialog, and to this file before their assets are used.
 

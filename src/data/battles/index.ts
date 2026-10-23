@@ -16,7 +16,10 @@ import { rockTunnelBattles } from './entries/rock-tunnel'
 import { lavenderTownBattles } from './entries/lavender-town'
 import { celadonCityBattles } from './entries/celadon-city'
 import { celadonGameCornerBattles } from './entries/celadon-game-corner'
-import { pokemonTowerBattles } from './entries/pokemon-tower'
+import {
+  pokemonTowerBattles,
+  pokemonTowerGauntletBattles,
+} from './entries/pokemon-tower'
 import { saffronCityBattles } from './entries/saffron-city'
 import { silphCoBattles } from './entries/silph-co'
 import { cyclingRoadBattles } from './entries/cycling-road'
@@ -57,6 +60,7 @@ const authoredBattles: BattleConfig[] = [
   ...celadonCityBattles,
   ...celadonGameCornerBattles,
   ...pokemonTowerBattles,
+  ...pokemonTowerGauntletBattles,
   ...saffronCityBattles,
   ...silphCoBattles,
   ...cyclingRoadBattles,

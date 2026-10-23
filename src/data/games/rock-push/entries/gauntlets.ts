@@ -1,4 +1,5 @@
 import type { RockPushGameConfig } from '../types'
+import { pokemonTowerGauntletBattles } from '@/data/battles/entries/pokemon-tower'
 
 const bugGauntletBattleIds = [
   'bug-gauntlet-barry',
@@ -32,6 +33,37 @@ function createTrainerPlacements(
     interaction: {
       type: 'battle' as const,
       targetId,
+      victory: 'clear' as const,
+    },
+  }))
+}
+
+function createTowerTrainerPlacements() {
+  const positions = [
+    { x: 2, y: 1 },
+    { x: 4, y: 1 },
+    { x: 6, y: 1 },
+    { x: 1, y: 3 },
+    { x: 3, y: 3 },
+    { x: 5, y: 3 },
+    { x: 7, y: 3 },
+    { x: 2, y: 5 },
+    { x: 4, y: 5 },
+    { x: 6, y: 5 },
+    { x: 1, y: 6 },
+    { x: 3, y: 6 },
+    { x: 7, y: 6 },
+  ]
+
+  return pokemonTowerGauntletBattles.map((battle, index) => ({
+    id: `trainer-${battle.id}`,
+    objectId: 'channeler-trainer',
+    ...positions[index],
+    removeOnSuccess: true,
+    randomGroup: { id: 'tower-channeler-pool', selectCount: 5 },
+    interaction: {
+      type: 'battle' as const,
+      targetId: battle.id,
       victory: 'clear' as const,
     },
   }))
@@ -136,6 +168,48 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
           ],
           'bird-keeper-trainer',
         ),
+      }],
+    },
+  },
+  {
+    id: 'pokemon-tower-ghost-trial-grid-adventure',
+    name: 'The Ghost Trial Gauntlet',
+    description:
+      'Face five of the Tower Channelers, chosen at random for each run. You have one life; defeat every trainer to clear the tower.',
+    category: 'Kanto',
+    subCategory: 'Pokemon Tower',
+    icon: { type: 'trainer', id: 'channeler' },
+    background: '/backgrounds/pkmn-tower.avif',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'pokemon-tower-summit-azure-flute',
+      },
+      {
+        type: 'battle_result',
+        targetId: 'pokemon-tower-kita-boss',
+        battleStatus: 'win',
+        count: 1,
+      },
+    ],
+    rewards: [
+      { type: 'currency', targetId: 'pokedollars', quantity: 1200, dropChance: 100 },
+      { type: 'item', targetId: 'spirit-wisp-t1', quantity: 3, dropChance: 100 },
+      { type: 'item', targetId: 'rare-candy-m', quantity: 1, dropChance: 100 },
+    ],
+    isEligibleForReplay: true,
+    settings: {
+      variant: 'rock-push',
+      tilePaletteId: 'pokemon-tower',
+      timeLimit: 1800,
+      grid_size: 9,
+      lives: 1,
+      winCondition: { type: 'activity-successes', count: 5 },
+      playerStart: { x: 4, y: 7 },
+      startScreen: 'tower',
+      screens: [{
+        id: 'tower',
+        objects: createTowerTrainerPlacements(),
       }],
     },
   },

@@ -163,6 +163,8 @@ export interface GridObjectPlacement extends GridPosition {
   objectId: string
   /** Whether to remove this placement after its activity succeeds. Defaults to true. */
   removeOnSuccess?: boolean
+  /** On run creation, select this many placements from the shared random pool. */
+  randomGroup?: { id: string; selectCount: number }
   /** Hide this object when any Explore-style visibility requirement is unmet. */
   requirements?: TaskCondition[]
   /** Keep the object visible but require these Explore-style criteria to interact. */

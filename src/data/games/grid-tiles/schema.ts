@@ -25,6 +25,13 @@ const gridObjectInteractionSchema = z
   })
   .strict()
 
+const gridObjectRandomGroupSchema = z
+  .object({
+    id: z.string().min(1).max(80),
+    selectCount: z.number().int().positive().max(100),
+  })
+  .strict()
+
 export const gridFloorRenderConfigSchema = z
   .object({
     seed: z.string().min(1).max(120).optional(),
@@ -84,6 +91,7 @@ export const gridObjectPlacementSchema = gridPositionSchema
     id: z.string().min(1).max(80).optional(),
     objectId: z.string().min(1).max(80),
     removeOnSuccess: z.boolean().optional(),
+    randomGroup: gridObjectRandomGroupSchema.optional(),
     requirements: z.array(taskConditionSchema).optional(),
     criteria: z.array(taskConditionSchema).optional(),
     interaction: gridObjectInteractionSchema.optional(),
