@@ -92,9 +92,9 @@ export const gridObjects = {
     collision: 'none',
     interaction: 'minigame',
   },
-  celadonLuckySlotMachine: {
-    id: 'celadon-lucky-slot-machine',
-    name: 'Lucky Celadon Slot Machine',
+  celadonHighStakesSlotMachine: {
+    id: 'celadon-high-stakes-slot-machine',
+    name: 'High Stakes Celadon Slot Machine',
     purpose: 'minigame-trigger',
     size: { cols: 1, rows: 1 },
     asset: { src: '/games/grid-objects/celadon-lucky-slot-machine.png' },

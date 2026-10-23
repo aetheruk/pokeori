@@ -73,7 +73,11 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
     move.startsWith('interact:'),
   )
   const winTile = (screen: Screen, position: Position) => (screen.config.winTiles || []).some((tile) => equal(tile, position))
-  const wallGoal = (screen: Screen, position: Position) => position.y === 0 && winTile(screen, position)
+  const wallPassage = (screen: Screen, position: Position) =>
+    position.y === 0 && (
+      winTile(screen, position) ||
+      (screen.config.teleporters || []).some((entry) => equal(entry, position))
+    )
   const gridObjectBlocks = (screen: Screen, position: Position) => {
     for (const [index, object] of (screen.config.objects || []).entries()) {
       const definition = getGridObjectDefinition(gridObjects, object.objectId)
@@ -97,8 +101,8 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
   }
   const blocked = (screen: Screen, position: Position, rock: boolean, ignoredRock?: number) => {
     const cell = screen.grid[position.y]?.[position.x]
-    return !cell || (cell === 'wall' && (rock || !wallGoal(screen, position))) ||
-      (rock ? wallGoal(screen, position) : cell === 'hole') ||
+    return !cell || (cell === 'wall' && (rock || !wallPassage(screen, position))) ||
+      (rock ? wallPassage(screen, position) : cell === 'hole') ||
       gridObjectBlocks(screen, position) ||
       screen.rocks.some((entry) => entry.id !== ignoredRock && equal(entry, position))
   }
@@ -162,7 +166,7 @@ export function verifyRockPushProof(settings: Settings, proof: unknown, verified
     const nextCell = active.grid[next.y]?.[next.x]
     if (
       !nextCell ||
-      (nextCell === 'wall' && !wallGoal(active, next)) ||
+      (nextCell === 'wall' && !wallPassage(active, next)) ||
       nextCell === 'hole' ||
       gridObjectBlocks(active, next)
     ) {
