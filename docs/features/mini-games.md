@@ -63,6 +63,14 @@ replay controls. Slots and Pachinko use the shared result flow to return to the
 saved grid when the player leaves the machine, and forward the server-verified
 activity outcome separately from successful session settlement.
 
+Grid Adventure object placements can carry the same `requirements` and
+`criteria` rules used by Explore entries. Placement and linked-activity
+requirements determine which objects are present when the board snapshot is
+created. Placement and activity criteria leave the object visible while
+disabling its A/E interaction until they are met. The server checks the rules
+again on interaction and child-session start, and routes item, currency, and
+Pokémon consumption through the existing criteria handling.
+
 Chronicle battles do not write ordinary battle activity-stat rows. When a
 Chronicle battle is launched from a matching Grid Adventure, its server-side
 settlement receipt is kept with the parent session and included in the board's

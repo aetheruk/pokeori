@@ -17,6 +17,8 @@ const birdGauntletBattleIds = [
   'route-14-gauntlet-donald',
 ]
 
+const rareMaterialRollRequirement = [{ type: 'roll' as const, count: 200_000 }]
+
 function createTrainerPlacements(
   battleIds: string[],
   positions: Array<{ x: number; y: number }>,
@@ -68,6 +70,11 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       startScreen: 'forest',
       screens: [{
         id: 'forest',
+        prizes: [
+          { id: 'forest-chitin-1', x: 3, y: 2, itemId: 'chitin-fragment-t1', quantity: 1, requirements: rareMaterialRollRequirement },
+          { id: 'forest-chitin-2', x: 5, y: 4, itemId: 'chitin-fragment-t1', quantity: 1, requirements: rareMaterialRollRequirement },
+          { id: 'forest-chitin-3', x: 3, y: 6, itemId: 'chitin-fragment-t1', quantity: 1, requirements: rareMaterialRollRequirement },
+        ],
         objects: createTrainerPlacements(
           bugGauntletBattleIds,
           [
@@ -112,6 +119,11 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       startScreen: 'route-14',
       screens: [{
         id: 'route-14',
+        prizes: [
+          { id: 'route-14-feather-1', x: 4, y: 2, itemId: 'wing-feather-t1', quantity: 1, requirements: rareMaterialRollRequirement },
+          { id: 'route-14-feather-2', x: 4, y: 4, itemId: 'wing-feather-t1', quantity: 1, requirements: rareMaterialRollRequirement },
+          { id: 'route-14-feather-3', x: 4, y: 6, itemId: 'wing-feather-t1', quantity: 1, requirements: rareMaterialRollRequirement },
+        ],
         objects: createTrainerPlacements(
           birdGauntletBattleIds,
           [

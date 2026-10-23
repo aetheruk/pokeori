@@ -75,6 +75,7 @@ import {
 } from '@/utilities/pokemon/safari-catch'
 import { BASE_SHINY_CHANCE, getShinyChance } from '@/utilities/pokemon/shiny-odds'
 import { getEffectiveContent } from '@/utilities/events/server'
+import type { GridObjectPlacement } from '@/data/games/grid-tiles/types'
 import { combinedShinyChance, resolveRarityChances, resolveGeneratedPokemonRarity } from '@/utilities/pokemon/rarity-chances'
 import {
   getEncounterActivityReference,
@@ -113,6 +114,7 @@ import {
 
 type StartEncounterOptions = {
   encounterItemId?: string
+  gridAdventureObjectKey?: string
   /** Backward-compatible alias for older Explore clients. */
   repelItemId?: string
 }
@@ -174,7 +176,8 @@ export async function startEncounter(
         : 'none'
     const encounterItemId = options.encounterItemId || options.repelItemId
     const encounterItemKey = encounterItemId || 'none'
-    const startResultKey = `encounter:start:result:${user.id}:${locationId}:${consumedKey}:${encounterItemKey}`
+    const gridAdventureObjectKey = options.gridAdventureObjectKey || 'none'
+    const startResultKey = `encounter:start:result:${user.id}:${locationId}:${consumedKey}:${encounterItemKey}:${gridAdventureObjectKey}`
 
     const encounterId = `encounter:${user.id}`
     const activeEncounterState = (await redis.get(
@@ -195,6 +198,31 @@ export async function startEncounter(
 
     const location = await getEffectiveContent('location', locationId, user)
     if (!location) throw new Error('Location not found')
+    let gridAdventurePlacement: GridObjectPlacement | undefined
+    let gridAdventureContext: {
+      encounterId: string
+      objectKey: string
+      rollSnapshot?: number
+    } | undefined
+    if ((location as any).gridAdventureOnly && !options.gridAdventureObjectKey) {
+      throw new Error('This encounter can only be started from its Grid Adventure object')
+    }
+    if (options.gridAdventureObjectKey) {
+      const { getGridAdventureActivityTargetForUser } = await import(
+        '@/app/(frontend)/game/_shared/activity-actions'
+      )
+      const authoredTarget = await getGridAdventureActivityTargetForUser(
+        user.id,
+        locationId,
+        options.gridAdventureObjectKey,
+        'encounter',
+      )
+      if (!authoredTarget) {
+        throw new Error('This encounter is not part of the active Grid Adventure')
+      }
+      gridAdventurePlacement = authoredTarget.placement
+      gridAdventureContext = authoredTarget.context
+    }
     if (encounterItemId && !items.some((item) => item.id === encounterItemId && isEncounterSpawnItem(item))) {
       throw new Error('Invalid encounter item')
     }
@@ -312,6 +340,17 @@ export async function startEncounter(
 
     if (
       existingState &&
+      (existingState.encounterMode === 'safari' || Date.now() < existingState.expiry) &&
+      ((gridAdventureContext &&
+        (existingState.gridAdventureContext?.encounterId !== gridAdventureContext.encounterId ||
+          existingState.gridAdventureContext?.objectKey !== gridAdventureContext.objectKey)) ||
+        (!gridAdventureContext && existingState.gridAdventureContext))
+    ) {
+      throw new Error('Finish the active Grid Adventure encounter before starting another activity')
+    }
+
+    if (
+      existingState &&
       (existingState.encounterMode === 'safari' ||
         Date.now() < existingState.expiry)
     ) {
@@ -333,7 +372,19 @@ export async function startEncounter(
     }
 
     // Analyze requirements
-    const requiredKeys = analyzeRequirements(location.requirements)
+    const requiredKeys = analyzeRequirements([
+      ...location.requirements,
+      ...(gridAdventurePlacement?.requirements || []),
+      ...(gridAdventurePlacement?.criteria || []),
+    ])
+    const gridPlacementData = gridAdventurePlacement
+      ? {
+          ...await getGameUserData(user as User, requiredKeys),
+          ...(typeof gridAdventureContext?.rollSnapshot === 'number'
+            ? { lastRoll: gridAdventureContext.rollSnapshot }
+            : {}),
+        }
+      : undefined
 
     const [inventoryMap, pokedexMap, completedTasksMap, activityStats] =
       await Promise.all([
@@ -414,6 +465,8 @@ export async function startEncounter(
             }),
           )
         : [],
+      lastRoll:
+        gridAdventureContext?.rollSnapshot ?? (user as any).lastRoll,
       weatherSlot: weatherState.slot,
       weatherUpdatedAt: weatherState.updatedAt,
     }
@@ -421,6 +474,31 @@ export async function startEncounter(
       ...resolveSubRegionWeather(location.subCategory, weatherState.slot),
       updatedAt: weatherState.updatedAt,
       expiresAt: weatherState.expiresAt,
+    }
+
+    if (
+      gridAdventurePlacement?.requirements?.some(
+        (condition) =>
+          !checkRequirement(gridPlacementData!, condition, {
+            category: location.category,
+            subCategory: location.subCategory,
+            weather: weatherSnapshot.weather,
+          }),
+      )
+    ) {
+      throw new Error('Requirements not met')
+    }
+    if (
+      gridAdventurePlacement?.criteria?.some(
+        (condition) =>
+          !checkRequirement(gridPlacementData!, condition, {
+            category: location.category,
+            subCategory: location.subCategory,
+            weather: weatherSnapshot.weather,
+          }),
+      )
+    ) {
+      throw new Error('Entry criteria not met')
     }
 
     // Check requirements
@@ -450,6 +528,8 @@ export async function startEncounter(
     const allReqsAndCriteria = [
       ...(location.requirements || []),
       ...(location.criteria || []),
+      ...(gridAdventurePlacement?.requirements || []),
+      ...(gridAdventurePlacement?.criteria || []),
     ]
 
     // Handle Pokemon Consumption
@@ -722,6 +802,7 @@ export async function startEncounter(
         1000
 
     const state: EncounterState = {
+      gridAdventureContext,
       userId: user.id,
       locationId: location.id,
       pokemonId,

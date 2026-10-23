@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { getGridObjectDefinition } from './objects'
 import type { GridObjectLibrary } from './types'
+import { taskConditionSchema } from '@/data/tasks/condition-schema'
 
 const gridPositionSchema = z
   .object({ x: z.number().int().nonnegative(), y: z.number().int().nonnegative() })
@@ -83,6 +84,8 @@ export const gridObjectPlacementSchema = gridPositionSchema
     id: z.string().min(1).max(80).optional(),
     objectId: z.string().min(1).max(80),
     removeOnSuccess: z.boolean().optional(),
+    requirements: z.array(taskConditionSchema).optional(),
+    criteria: z.array(taskConditionSchema).optional(),
     interaction: gridObjectInteractionSchema.optional(),
     properties: z.record(z.string(), z.unknown()).optional(),
   })

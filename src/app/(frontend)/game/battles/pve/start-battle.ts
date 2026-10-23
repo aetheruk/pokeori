@@ -84,7 +84,10 @@ import {
   getActiveExpeditionForUser,
   getExpeditionActivityStepStatusForUser,
 } from '@/utilities/expeditions/server'
-import { getGridAdventureActivityTargetForUser } from '@/app/(frontend)/game/_shared/activity-actions'
+import {
+  applyGridAdventureRollSnapshot,
+  getGridAdventureActivityTargetForUser,
+} from '@/app/(frontend)/game/_shared/activity-actions'
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import {
   ensureUserWeatherSlot,
@@ -123,13 +126,15 @@ export async function startBattle(
   const battleConfig = await getEffectiveContent('battle', battleId, user)
   if (!battleConfig) return { success: false, error: 'Battle not found' }
 
-  if (battleConfig.gridAdventureOnly) {
-    if (!options?.gridAdventureObjectKey) {
-      return {
-        success: false,
-        error: 'This battle can only be started from its Grid Adventure object.',
-      }
+  let gridAdventurePlacement: import('@/data/games/grid-tiles/types').GridObjectPlacement | undefined
+  let gridAdventureRollSnapshot: number | undefined
+  if (battleConfig.gridAdventureOnly && !options?.gridAdventureObjectKey) {
+    return {
+      success: false,
+      error: 'This battle can only be started from its Grid Adventure object.',
     }
+  }
+  if (options?.gridAdventureObjectKey) {
     const authoredTarget = await getGridAdventureActivityTargetForUser(
       user.id,
       battleId,
@@ -142,6 +147,8 @@ export async function startBattle(
         error: 'This battle is not part of the active Grid Adventure.',
       }
     }
+    gridAdventurePlacement = authoredTarget.placement
+    gridAdventureRollSnapshot = authoredTarget.context.rollSnapshot
   }
 
   const encounterItemId = options?.encounterItemId
@@ -198,10 +205,22 @@ export async function startBattle(
   }
 
   // Check requirements
-  if (battleConfig.requirements && battleConfig.requirements.length > 0) {
-    const requiredKeys = analyzeRequirements(battleConfig.requirements)
-    const userData = await getGameUserData(user as User, requiredKeys)
-    const meetsRequirements = battleConfig.requirements.every((req) =>
+  const battleRequirements = [
+    ...(battleConfig.requirements || []),
+    ...(gridAdventurePlacement?.requirements || []),
+  ]
+  const battleCriteria = [
+    ...(battleConfig.criteria || []),
+    ...(gridAdventurePlacement?.criteria || []),
+  ]
+
+  if (battleRequirements.length > 0) {
+    const requiredKeys = analyzeRequirements(battleRequirements)
+    const userData = applyGridAdventureRollSnapshot(
+      await getGameUserData(user as User, requiredKeys),
+      gridAdventureRollSnapshot,
+    )
+    const meetsRequirements = battleRequirements.every((req) =>
       checkRequirement(userData, req, {
         category: battleConfig.category,
         subCategory: battleConfig.subCategory,
@@ -212,10 +231,13 @@ export async function startBattle(
   }
 
   // Check criteria - these can also be consumed!
-  if (battleConfig.criteria && battleConfig.criteria.length > 0) {
-    const requiredKeys = analyzeRequirements(battleConfig.criteria)
-    const userData = await getGameUserData(user as User, requiredKeys)
-    const criteriaMet = battleConfig.criteria.every((req) =>
+  if (battleCriteria.length > 0) {
+    const requiredKeys = analyzeRequirements(battleCriteria)
+    const userData = applyGridAdventureRollSnapshot(
+      await getGameUserData(user as User, requiredKeys),
+      gridAdventureRollSnapshot,
+    )
+    const criteriaMet = battleCriteria.every((req) =>
       checkRequirement(userData, req, {
         category: battleConfig.category,
         subCategory: battleConfig.subCategory,
@@ -225,8 +247,8 @@ export async function startBattle(
   }
 
   const allReqsAndCriteria = [
-    ...(battleConfig.requirements || []),
-    ...(battleConfig.criteria || []),
+    ...battleRequirements,
+    ...battleCriteria,
   ]
 
   // Handle Pokemon Consumption

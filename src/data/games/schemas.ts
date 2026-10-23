@@ -304,6 +304,7 @@ const rockPushPrizeSchema = rockPushPositionSchema
     itemId: z.string().min(1),
     quantity: z.number().int().positive().optional(),
     reward: rewardSchema.optional(),
+    requirements: z.array(taskConditionSchema).optional(),
   })
   .strict()
 
