@@ -3,7 +3,9 @@ import { Match3GameConfig } from '../types'
 export const celadonGameCornermatch3gamesEntries: Match3GameConfig[] = [
   {
     id: 'celadon-rocket-match-3',
-    name: 'Rocket Match 3',
+    gridAdventureOnly: true,
+    hide: 'when-the-fun-stops',
+    name: 'Game Plaza Match 3',
     description:
       'Clear Team Rocket’s poison Pokemon from the board before the timer runs out.',
     category: 'Kanto',
@@ -46,7 +48,9 @@ export const celadonGameCornermatch3gamesEntries: Match3GameConfig[] = [
   },
   {
     id: 'celadon-high-stakes-match-3',
-    name: 'High Stakes Rocket Match 3',
+    gridAdventureOnly: true,
+    hide: 'high-roller',
+    name: 'High Stakes Game Plaza Match 3',
     description:
       'The private board runs faster, scores higher, and gives Team Rocket no room for mistakes.',
     category: 'Kanto',

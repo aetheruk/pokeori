@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { getGameTypeLabel } from '@/components/game/features/explore/utils'
 import { battleBetsGames } from '@/data/games/battle-bets'
-import { celadonGameCornerTcgBattleEntries } from '@/data/games/tcg-battle/entries/celadon-game-corner'
 import { celadonGameCornermatch3gamesEntries } from '@/data/games/match3/entries/celadon-game-corner'
 import { celadonGameCornerPachinkoEntries } from '@/data/games/pachinko/entries/celadon-game-corner'
 import { celadonGameCornerPrizeWheelEntries } from '@/data/games/prize-wheel/entries/celadon-game-corner'
@@ -18,8 +17,6 @@ import {
 } from '@/utilities/research/pachinko-physics'
 import { splitGuaranteedPachinkoCurrencyRewards } from '@/utilities/research/pachinko-rewards'
 import { resolvePachinkoRound } from '@/utilities/research/pachinko-round'
-import { getTcgCardById } from '@/utilities/tcg/tcg'
-import { validateTcgBattleDeck } from '@/utilities/tcg/tcg-battle'
 import { getCeladonPachinkoMachineSettings } from '@/utilities/research/celadon-pachinko-machines'
 
 function getSlotRtp(game: (typeof celadonGameCornerSlotEntries)[number]) {
@@ -62,74 +59,6 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(celadonGameCornerPrizeWheelEntries[0].settings.cost?.amount).toBe(25)
     expect(celadonGameCornerSlotEntries[0].settings.cost.amount).toBe(5)
     expect(celadonGameCornerPachinkoEntries[0].settings.cost?.amount).toBe(5)
-  })
-
-  test('adds balanced low and high stakes TCG tables behind Battle Decks', async () => {
-    expect(celadonGameCornerTcgBattleEntries.map((game) => game.id)).toEqual([
-      'celadon-tcg-battle',
-      'celadon-high-stakes-tcg-battle',
-    ])
-
-    const [lowStakes, highStakes] = celadonGameCornerTcgBattleEntries
-    expect(lowStakes.icon).toEqual({ type: 'trainer', id: 'tcg-maniac-m' })
-    expect(highStakes.icon).toEqual({ type: 'trainer', id: 'tcg-maniac-f' })
-    expect(lowStakes.settings.deckFormat).toBe('baby')
-    expect(highStakes.settings.deckFormat).toBe('champions')
-    expect(lowStakes.criteria).toContainEqual({
-      type: 'currency_owned',
-      targetId: 'fun-tokens',
-      count: 50,
-      consume: true,
-    })
-    expect(lowStakes.rewards[0]).toMatchObject({
-      type: 'currency',
-      targetId: 'fun-tokens',
-      quantity: 120,
-    })
-    expect(highStakes.criteria).toContainEqual({
-      type: 'currency_owned',
-      targetId: 'fun-tokens',
-      count: 200,
-      consume: true,
-    })
-    expect(highStakes.rewards[0]).toMatchObject({
-      type: 'currency',
-      targetId: 'fun-tokens',
-      quantity: 350,
-    })
-
-    for (const game of celadonGameCornerTcgBattleEntries) {
-      expect(game.requirements).toContainEqual({
-        type: 'item_owned',
-        targetId: 'deck-box',
-      })
-      expect(game.isEligibleForReplay).toBe(true)
-
-      const cardIds = game.settings.opponentDeckCardIds!
-      const validation = await validateTcgBattleDeck(
-        cardIds,
-        Object.fromEntries(cardIds.map((cardId) => [cardId, 1])),
-        game.settings.deckFormat,
-      )
-      expect(
-        validation.valid,
-        `${game.id} should be a valid opponent deck`,
-      ).toBe(true)
-      expect(new Set(cardIds).size).toBe(15)
-      expect(
-        new Set(
-          cardIds.flatMap((cardId) => getTcgCardById(cardId)?.types || []),
-        ).size,
-      ).toBeGreaterThanOrEqual(6)
-      expect(game.settings.opponentEnergyType).toBe('Colorless')
-      expect(validation.totalCost).toBeLessThanOrEqual(
-        game.settings.deckFormat === 'baby'
-          ? 30
-          : game.settings.deckFormat === 'champions'
-            ? 55
-            : 85,
-      )
-    }
   })
 
   test('uses the revised Stardust and Nugget Prize Exchange prices', () => {

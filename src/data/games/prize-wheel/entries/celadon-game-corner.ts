@@ -3,8 +3,10 @@ import { PrizeWheelGameConfig } from '../types'
 export const celadonGameCornerPrizeWheelEntries: PrizeWheelGameConfig[] = [
   {
     id: 'celadon-rocket-prize-wheel',
+    gridAdventureOnly: true,
+    hide: 'when-the-fun-stops',
     gameType: 'prize-wheel',
-    name: 'Rocket Prize Wheel',
+    name: 'Game Plaza Prize Wheel',
     description: 'A colourful spin with a chance to win a Rocket Scratch Card.',
     icon: { type: 'pokemon', id: '52' },
     background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
@@ -30,8 +32,10 @@ export const celadonGameCornerPrizeWheelEntries: PrizeWheelGameConfig[] = [
   },
   {
     id: 'celadon-high-stakes-prize-wheel',
+    gridAdventureOnly: true,
+    hide: 'high-roller',
     gameType: 'prize-wheel',
-    name: 'High Stakes Rocket Prize Wheel',
+    name: 'High Stakes Game Plaza Prize Wheel',
     description: 'A private wheel where every spin costs more than most people carry.',
     icon: { type: 'pokemon', id: '53' },
     background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
