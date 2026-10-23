@@ -20,6 +20,7 @@ import { splitGuaranteedPachinkoCurrencyRewards } from '@/utilities/research/pac
 import { resolvePachinkoRound } from '@/utilities/research/pachinko-round'
 import { getTcgCardById } from '@/utilities/tcg/tcg'
 import { validateTcgBattleDeck } from '@/utilities/tcg/tcg-battle'
+import { getCeladonPachinkoMachineSettings } from '@/utilities/research/celadon-pachinko-machines'
 
 function getSlotRtp(game: (typeof celadonGameCornerSlotEntries)[number]) {
   const totalWeight = game.settings.paytable.reduce(
@@ -208,19 +209,34 @@ describe('Celadon Game Corner balance and presentation', () => {
       125,
     )
 
-    expect(celadonGameCornerPachinkoEntries[1].settings.cost?.amount).toBe(25)
+    const pachinko = celadonGameCornerPachinkoEntries[0]!
+    const standardMachine = getCeladonPachinkoMachineSettings(
+      pachinko.settings,
+      1,
+      'standard',
+    )
+    const highStakesMachine = getCeladonPachinkoMachineSettings(
+      pachinko.settings,
+      1,
+      'high',
+    )
+    expect(highStakesMachine.cost?.amount).toBe(25)
     expect(
-      celadonGameCornerPachinkoEntries[1].settings.board.buckets
+      highStakesMachine.board.buckets
         .filter((bucket) => bucket.kind !== 'bonus')
         .map((bucket) => bucket.rewards[0]?.quantity),
-    ).toEqual([75, 250, 75])
+    ).toEqual(
+      standardMachine.board.buckets
+        .filter((bucket) => bucket.kind !== 'bonus')
+        .map((bucket) => Number(bucket.rewards[0]?.quantity) * 5),
+    )
     expect(
       celadonGameCornerPachinkoEntries[0].settings.board.buckets
         .filter((bucket) => bucket.kind !== 'bonus')
         .map((bucket) => bucket.label),
     ).toEqual(['Prize', 'Jackpot', 'Prize'])
     expect(
-      celadonGameCornerPachinkoEntries[1].settings.board.buckets
+      highStakesMachine.board.buckets
         .filter((bucket) => bucket.kind !== 'bonus')
         .map((bucket) => bucket.label),
     ).toEqual(['Prize', 'Jackpot', 'Prize'])
@@ -278,34 +294,79 @@ describe('Celadon Game Corner balance and presentation', () => {
   })
 
   test('settles Pachinko token prizes at their authored gross value', () => {
-    const [standard, highStakes] = celadonGameCornerPachinkoEntries
-    const standardLeft = standard.settings.board.buckets[0]
-    const highStakesLeft = highStakes.settings.board.buckets[0]
+    const standard = celadonGameCornerPachinkoEntries[0]!
+    const standardSettings = getCeladonPachinkoMachineSettings(
+      standard.settings,
+      1,
+      'standard',
+    )
+    const highStakesSettings = getCeladonPachinkoMachineSettings(
+      standard.settings,
+      1,
+      'high',
+    )
+    const standardLeft = standardSettings.board.buckets[0]
+    const highStakesLeft = highStakesSettings.board.buckets[0]
 
     const standardSettlement = splitGuaranteedPachinkoCurrencyRewards(
       standardLeft.rewards,
-      standard.settings.cost!.currencyType,
+      standardSettings.cost!.currencyType,
     )
     const highStakesSettlement = splitGuaranteedPachinkoCurrencyRewards(
       highStakesLeft.rewards,
-      highStakes.settings.cost!.currencyType,
+      highStakesSettings.cost!.currencyType,
     )
 
-    expect(standardSettlement.guaranteedCurrencyPayout).toBe(15)
-    expect(highStakesSettlement.guaranteedCurrencyPayout).toBe(75)
+    expect(standardSettlement.guaranteedCurrencyPayout).toBeGreaterThanOrEqual(14)
+    expect(standardSettlement.guaranteedCurrencyPayout).toBeLessThanOrEqual(16)
+    expect(highStakesSettlement.guaranteedCurrencyPayout).toBe(
+      standardSettlement.guaranteedCurrencyPayout * 5,
+    )
     expect(standardSettlement.deferredRewards).toEqual([])
     expect(highStakesSettlement.deferredRewards).toEqual([])
 
     expect(
       100 -
-        standard.settings.cost!.amount +
+        standardSettings.cost!.amount +
         standardSettlement.guaranteedCurrencyPayout,
-    ).toBe(110)
+    ).toBe(111)
     expect(
       100 -
-        highStakes.settings.cost!.amount +
+        highStakesSettings.cost!.amount +
         highStakesSettlement.guaranteedCurrencyPayout,
-    ).toBe(150)
+    ).toBe(155)
+  })
+
+  test('gives each Pachinko cabinet a small stable bucket and payout variation', () => {
+    const standard = celadonGameCornerPachinkoEntries[0]!
+    const machines = Array.from({ length: 12 }, (_, index) =>
+      getCeladonPachinkoMachineSettings(
+        standard.settings,
+        index + 1,
+        'standard',
+      ),
+    )
+    const signatures = new Set(
+      machines.map((settings) => JSON.stringify(settings.board.buckets)),
+    )
+
+    expect(signatures.size).toBe(12)
+    for (const settings of machines) {
+      for (const bucket of settings.board.buckets) {
+        const base = standard.settings.board.buckets.find(
+          (entry) => entry.id === bucket.id,
+        )!
+        expect(Math.abs(bucket.x - base.x)).toBeLessThanOrEqual(3)
+        expect(Math.abs(bucket.width - base.width)).toBeLessThanOrEqual(2)
+        if (bucket.kind === 'bonus') expect(bucket.rewards).toEqual([])
+        else {
+          const basePayout = Number(base.rewards[0]?.quantity)
+          const machinePayout = Number(bucket.rewards[0]?.quantity)
+          expect(machinePayout * 100).toBeGreaterThanOrEqual(basePayout * 92)
+          expect(machinePayout * 100).toBeLessThanOrEqual(basePayout * 108)
+        }
+      }
+    }
   })
 
   test('uses the rare-jackpot High Stakes Prize Wheel payout table', () => {
@@ -554,7 +615,12 @@ describe('Celadon Game Corner balance and presentation', () => {
   })
 
   test('uses Voltorb and Electrode for the Pachinko jackpots', () => {
-    const [standard, highStakes] = celadonGameCornerPachinkoEntries
+    const standard = celadonGameCornerPachinkoEntries[0]!
+    const highStakes = getCeladonPachinkoMachineSettings(
+      standard.settings,
+      1,
+      'high',
+    )
 
     expect(
       standard.settings.board.buckets.find(
@@ -562,7 +628,7 @@ describe('Celadon Game Corner balance and presentation', () => {
       )?.icon,
     ).toEqual({ type: 'pokemon', id: '100' })
     expect(
-      highStakes.settings.board.buckets.find(
+      highStakes.board.buckets.find(
         (bucket) => bucket.kind === 'jackpot',
       )?.icon,
     ).toEqual({ type: 'pokemon', id: '101' })

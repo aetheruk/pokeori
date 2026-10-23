@@ -14,6 +14,7 @@ import {
   type VoltorbGridPosition,
   type VoltorbGridVoltorb,
 } from '@/data/games'
+import { getCeladonPachinkoMachineSettings } from '@/utilities/research/celadon-pachinko-machines'
 import type { GridPuzzleVoltorbGameConfig } from '@/data/games/grid-puzzle'
 import { validateGameItem } from '@/data/games/schemas'
 import {
@@ -729,15 +730,14 @@ describe('generated game data schemas', () => {
     )
   })
 
-  test('Celadon Pachinko authors two non-paying five-ball bonus slots', () => {
+  test('Celadon Pachinko has one grid-only game entry with two non-paying bonus slots', () => {
     const games = allGames.filter(
-      (game) =>
-        game.id === 'celadon-rocket-pachinko' ||
-        game.id === 'celadon-high-stakes-pachinko',
+      (game) => game.id.startsWith('celadon-') && game.gameType === 'pachinko',
     ) as PachinkoGameConfig[]
-    expect(games).toHaveLength(2)
+    expect(games.map((game) => game.id)).toEqual(['celadon-rocket-pachinko'])
 
     for (const game of games) {
+      expect(game.gridAdventureOnly).toBe(true)
       expect(game.settings.board.buckets).toHaveLength(5)
       expect(
         game.settings.board.buckets
@@ -764,6 +764,22 @@ describe('generated game data schemas', () => {
           ...game.settings.board.pegs.map((peg: { y: number }) => peg.y),
         ),
       ).toBe(600)
+    }
+
+    const game = games[0]!
+    for (let machineNumber = 1; machineNumber <= 12; machineNumber += 1) {
+      for (const stakes of ['standard', 'high'] as const) {
+        expect(
+          validateGameItem({
+            ...game,
+            settings: getCeladonPachinkoMachineSettings(
+              game.settings,
+              machineNumber,
+              stakes,
+            ),
+          }).success,
+        ).toBe(true)
+      }
     }
   })
 
