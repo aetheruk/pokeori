@@ -87,15 +87,15 @@ export const gridTilePalettes = {
         large: { src: '/games/grid-tiles/grass/floor/blockers/large.png' },
       },
       markers: {
-        teleporter: { src: '/games/grid-tiles/grass/floor/markers/teleporter.png' },
-        goal: { src: '/games/grid-tiles/celadon-game-corner/floor/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/celadon-game-corner/floor/markers/exit-mat.png' },
+        goal: { src: '/games/grid-tiles/celadon-game-corner/floor/markers/exit-mat.png' },
       },
     },
     walls: {
       back: { src: '/games/grid-tiles/celadon-game-corner/walls/back.png' },
       markers: {
         goal: { src: '/games/grid-tiles/celadon-game-corner/walls/markers/goal.png' },
-        teleporter: { src: '/games/grid-tiles/grass/walls/markers/teleporter.png' },
+        teleporter: { src: '/games/grid-tiles/celadon-game-corner/walls/markers/goal.png' },
       },
     },
     gameplay: {

@@ -43,6 +43,7 @@ import {
   resolveGridGoalSource,
   resolveGridObstacleSources,
   resolveGridTileSources,
+  resolveGridWallMarkerSource,
   resolveGridWallSource,
 } from '@/data/games/grid-tiles'
 import type {
@@ -379,10 +380,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const winTiles = activeScreenConfig?.winTiles || []
   // A win tile in the reserved back-wall row is still a playable doorway.
   // Keep the architectural wall art, but let the player enter that cell.
-  const wallGoalKeys = useMemo(
-    () =>
-      new Set(winTiles.filter(({ y }) => y === 0).map(getRockPushPositionKey)),
-    [winTiles],
+  const wallPassageKeys = useMemo(
+    () => new Set([
+      ...winTiles.filter(({ y }) => y === 0).map(getRockPushPositionKey),
+      ...teleporters.filter(({ y }) => y === 0).map(getRockPushPositionKey),
+    ]),
+    [teleporters, winTiles],
   )
   const displayRocksSolved = Object.entries(screenStates).reduce(
     (sum, [screenId, state]) =>
@@ -1083,7 +1086,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     position.y < 0 ||
     position.y >= gridSize.h ||
     (grid[position.y][position.x] === 'wall' &&
-      !wallGoalKeys.has(getRockPushPositionKey(position))) ||
+      !wallPassageKeys.has(getRockPushPositionKey(position))) ||
     grid[position.y][position.x] === 'hole' ||
     isBlockingGridObject(position) ||
     rockList.some((rock) => isSamePosition(rock, position))
@@ -1094,7 +1097,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     position.y < 0 ||
     position.y >= gridSize.h ||
     (grid[position.y][position.x] === 'wall' &&
-      !wallGoalKeys.has(getRockPushPositionKey(position))) ||
+      !wallPassageKeys.has(getRockPushPositionKey(position))) ||
     grid[position.y][position.x] === 'hole' ||
     isBlockingGridObject(position)
 
@@ -1108,7 +1111,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     position.y < 0 ||
     position.y >= gridSize.h ||
     grid[position.y][position.x] === 'wall' ||
-    wallGoalKeys.has(getRockPushPositionKey(position)) ||
+    wallPassageKeys.has(getRockPushPositionKey(position)) ||
     isBlockingGridObject(position) ||
     rockList.some(
       (rock) => rock.id !== ignoredRockId && isSamePosition(rock, position),
@@ -1609,6 +1612,9 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     'wall',
     activeScreenConfig?.wallGoalSprite || encounter.settings.wallGoalSprite,
   )
+  const wallTeleporterSprite =
+    resolveGridWallMarkerSource(activeTilePaletteId, 'teleporter') ||
+    teleporterSprite
   const backWallOnly = isGridBackWallOnly(activeTilePaletteId)
   const cellWidth = `${100 / Math.max(gridSize.w, 1)}%`
   const cellHeight = `${100 / Math.max(gridSize.h, 1)}%`
@@ -1881,7 +1887,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                 >
                   <div className="relative h-full w-full">
                     <Image
-                      src={teleporterSprite}
+                      src={teleporter.y === 0 ? wallTeleporterSprite : teleporterSprite}
                       alt=""
                       fill
                       sizes="64px"

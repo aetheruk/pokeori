@@ -57,6 +57,27 @@ describe('rock-push transcript verification', () => {
     }
     expect(verifyRockPushProof(multi, { kind: 'rock-push', moves: ['right', 'right'] })).toEqual({ solved: true, prizeIds: ['b:arrival'] })
   })
+  test('replays the Rocket Slots center door and bottom-center exit mats', () => {
+    const multi: RockPushGameConfig['settings'] = {
+      variant: 'rock-push', grid_size: 7, playerStart: { x: 3, y: 5 }, startScreen: 'arcade-floor',
+      screens: [
+        {
+          id: 'arcade-floor',
+          teleporters: [{ id: 'high-stakes-room-door', x: 3, y: 0, target: { screen: 'high-stakes-room', x: 3, y: 5 } }],
+          winTiles: [{ x: 3, y: 6 }],
+        },
+        {
+          id: 'high-stakes-room',
+          teleporters: [{ id: 'arcade-return-mat', x: 3, y: 6, target: { screen: 'arcade-floor', x: 3, y: 5 } }],
+        },
+      ],
+    }
+    const enterHighStakes = Array(5).fill('up')
+    expect(verifyRockPushProof(multi, { kind: 'rock-push', moves: ['down'] }).solved).toBe(true)
+    expect(verifyRockPushProof(multi, { kind: 'rock-push', moves: [...enterHighStakes, 'down'] }).solved).toBe(false)
+    const moves = [...enterHighStakes, 'down', 'down']
+    expect(verifyRockPushProof(multi, { kind: 'rock-push', moves }).solved).toBe(true)
+  })
   test('object victory requires new server-recorded wins, one per interaction', () => {
     const objectBoard: RockPushGameConfig['settings'] = {
       variant: 'rock-push', grid_size: 6, playerStart: { x: 1, y: 1 },

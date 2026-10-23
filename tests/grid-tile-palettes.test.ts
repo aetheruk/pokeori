@@ -27,8 +27,10 @@ import {
   resolveGridFloorSourceFromPalette,
   resolveGridGoalSource,
   resolveGridTileSources,
+  resolveGridWallMarkerSource,
 } from '@/data/games/grid-tiles'
 import type { GridTileAsset, GridTilePalette } from '@/data/games/grid-tiles'
+import type { GridPuzzleRockPushGameConfig } from '@/data/games/grid-puzzle/types'
 
 function expectAssetExists(asset: GridTileAsset) {
   expect(asset.src.startsWith('/')).toBe(true)
@@ -223,6 +225,12 @@ describe('shared grid sprite sets', () => {
       expect(wallGoal).toBeDefined()
       expect(wallGoal).not.toBe(floorGoal)
     }
+    expect(resolveGridWallMarkerSource('celadon-game-corner', 'teleporter')).toBe(
+      gridTilePalettes['celadon-game-corner'].walls?.markers?.goal?.src,
+    )
+    expect(
+      gridTilePalettes['celadon-game-corner'].floor.markers?.teleporter?.src,
+    ).toBe(gridTilePalettes['celadon-game-corner'].floor.markers?.goal?.src)
   })
 
   test('rare floors retain the common tile with a sparse texture overlay', async () => {
@@ -588,6 +596,57 @@ describe('shared grid sprite sets', () => {
     }
   })
 
+  test('Rocket Slots becomes a two-room adventure after High Stakes unlocks', () => {
+    const lowStakes = allGames.find(
+      (game) => game.id === 'grid-adventure-celadon-game-corner',
+    ) as GridPuzzleRockPushGameConfig | undefined
+    const highStakes = allGames.find(
+      (game) => game.id === 'grid-adventure-celadon-high-stakes-game-corner',
+    ) as GridPuzzleRockPushGameConfig | undefined
+
+    expect(lowStakes?.name).toBe('Rocket Slots')
+    expect(highStakes?.name).toBe('Rocket Slots')
+    expect(highStakes?.overrides).toBe(lowStakes?.id)
+    expect(highStakes?.requirements).toEqual([
+      { type: 'task_completed', targetId: 'high-roller' },
+    ])
+
+    const lowRoom = lowStakes?.settings.screens?.[0]
+    expect(lowStakes?.settings.screens).toHaveLength(1)
+    expect(lowRoom?.objects).toHaveLength(12)
+    expect(new Set(lowRoom?.objects?.map((object) => object.objectId))).toEqual(
+      new Set(['celadon-slot-machine']),
+    )
+    expect(lowRoom?.winTiles).toEqual([{ x: 3, y: 0 }])
+
+    const [arcade, highStakesRoom] = highStakes?.settings.screens || []
+    expect(highStakes?.settings.screens).toHaveLength(2)
+    expect(arcade?.objects).toHaveLength(12)
+    expect(arcade?.teleporters).toEqual([{
+      id: 'high-stakes-room-door',
+      x: 3,
+      y: 0,
+      target: { screen: 'high-stakes-room', x: 3, y: 5 },
+    }])
+    expect(arcade?.winTiles).toEqual([{ x: 3, y: 6 }])
+    expect(highStakesRoom?.objects).toHaveLength(12)
+    expect(new Set(highStakesRoom?.objects?.map((object) => object.objectId))).toEqual(
+      new Set(['celadon-high-stakes-slot-machine']),
+    )
+    expect(highStakesRoom?.teleporters).toEqual([{
+      id: 'arcade-return-mat',
+      x: 3,
+      y: 6,
+      target: { screen: 'arcade-floor', x: 3, y: 5 },
+    }])
+    expect(gridTilePalettes['celadon-game-corner'].floor.markers?.goal?.src).toBe(
+      '/games/grid-tiles/celadon-game-corner/floor/markers/exit-mat.png',
+    )
+    expect(gridObjects.celadonHighStakesSlotMachine.asset.src).toBe(
+      '/games/grid-objects/celadon-lucky-slot-machine.png',
+    )
+  })
+
   test('back-wall row is reserved for the wall surface and exit markers', () => {
     const spatialGames = allGames.filter(
       (game) => game.gameType === 'grid-puzzle',
@@ -635,7 +694,7 @@ describe('shared grid sprite sets', () => {
       'encounterTrigger',
       'minigameTrigger',
       'celadonSlotMachine',
-      'celadonLuckySlotMachine',
+      'celadonHighStakesSlotMachine',
       'fieldResearchTrigger',
     ])
     for (const object of Object.values(gridObjects)) {

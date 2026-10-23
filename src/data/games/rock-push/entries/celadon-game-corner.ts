@@ -4,11 +4,12 @@ import type { RockPushGameConfig } from '../types'
 function createSlotMachinePlacements(
   targetId: string,
   layout = { columns: [1, 3, 5, 7], rows: [2, 4, 6] },
+  objectId = 'celadon-slot-machine',
 ): GridObjectPlacement[] {
   return layout.rows.flatMap((y, row) =>
     layout.columns.map((x, column) => ({
       id: `slot-${row + 1}-${column + 1}`,
-      objectId: 'celadon-slot-machine',
+      objectId,
       x,
       y,
       removeOnSuccess: false,
@@ -33,6 +34,7 @@ const lowStakesSlotMachinePlacements = createSlotMachinePlacements(
 const highStakesSlotMachinePlacements = createSlotMachinePlacements(
   'celadon-high-stakes-slots',
   { columns: [1, 2, 4, 5], rows: [1, 3, 5] },
+  'celadon-high-stakes-slot-machine',
 )
 
 function createGameCornerAdventure({
@@ -41,14 +43,14 @@ function createGameCornerAdventure({
   description,
   requirements,
   overrides,
-  objects,
+  screens,
 }: {
   id: string
   name: string
   description: string
   requirements: RockPushGameConfig['requirements']
   overrides: string
-  objects: GridObjectPlacement[]
+  screens: NonNullable<RockPushGameConfig['settings']['screens']>
 }): RockPushGameConfig {
   return {
     id,
@@ -68,11 +70,7 @@ function createGameCornerAdventure({
       grid_size: 7,
       playerStart: { x: 3, y: 5 },
       startScreen: 'arcade-floor',
-      screens: [{
-        id: 'arcade-floor',
-        objects,
-        winTiles: [{ x: 3, y: 0 }],
-      }],
+      screens,
     },
   }
 }
@@ -107,18 +105,44 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
     id: 'grid-adventure-celadon-game-corner',
     name: 'Rocket Slots',
     description:
-      'Explore the Celadon Game Corner floor, try twelve low-stakes slot machines with different odds, and find the exit in the back wall.',
+      'Try twelve low-stakes Rocket Slots, each with its own odds, and leave through the center doorway in the back wall.',
     requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
     overrides: 'celadon-rocket-slots',
-    objects: lowStakesSlotMachinePlacements,
+    screens: [{
+      id: 'arcade-floor',
+      objects: lowStakesSlotMachinePlacements,
+      winTiles: [{ x: 3, y: 0 }],
+    }],
   }),
   createGameCornerAdventure({
     id: 'grid-adventure-celadon-high-stakes-game-corner',
-    name: 'High Stakes Rocket Slots',
+    name: 'Rocket Slots',
     description:
-      'Enter the High Stakes Room, try twelve slot machines with different odds, and find the exit in the back wall.',
+      'Explore the arcade, pass through the middle door to the High Stakes Room, and use the bottom-center mat to leave or return.',
     requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
-    overrides: 'celadon-high-stakes-slots',
-    objects: highStakesSlotMachinePlacements,
+    overrides: 'grid-adventure-celadon-game-corner',
+    screens: [
+      {
+        id: 'arcade-floor',
+        objects: lowStakesSlotMachinePlacements,
+        teleporters: [{
+          id: 'high-stakes-room-door',
+          x: 3,
+          y: 0,
+          target: { screen: 'high-stakes-room', x: 3, y: 5 },
+        }],
+        winTiles: [{ x: 3, y: 6 }],
+      },
+      {
+        id: 'high-stakes-room',
+        objects: highStakesSlotMachinePlacements,
+        teleporters: [{
+          id: 'arcade-return-mat',
+          x: 3,
+          y: 6,
+          target: { screen: 'arcade-floor', x: 3, y: 5 },
+        }],
+      },
+    ],
   }),
 ]
