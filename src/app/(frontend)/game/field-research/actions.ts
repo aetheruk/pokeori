@@ -16,12 +16,13 @@ export async function startFieldResearch(
   fieldResearchId: string,
   forceReset = false,
   gridAdventureObjectKey?: string,
+  consumedPokemonIds?: string[],
 ) {
   return startGameActivity(
     'field-research',
     fieldResearchId,
     forceReset,
-    undefined,
+    consumedPokemonIds,
     gridAdventureObjectKey,
   )
 }

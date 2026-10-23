@@ -2,8 +2,31 @@ import { describe, expect, test } from 'bun:test'
 import { verifyRockPushProof } from '@/utilities/research/rock-push-verification'
 import type { RockPushGameConfig } from '@/data/games/rock-push/types'
 import { testbasicEntries } from '@/data/games/rock-push/entries/test'
+import { gauntletGridAdventureEntries } from '@/data/games/rock-push/entries/gauntlets'
 
 describe('rock-push transcript verification', () => {
+  test('gauntlet bonus material appears as three one-item floor pickups on a 1-in-5 roll', () => {
+    const expectedPickups = [
+      ['buggy-gauntlet-grid-adventure', 'chitin-fragment-t1'],
+      ['feathered-gauntlet-grid-adventure', 'wing-feather-t1'],
+    ] as const
+
+    for (const [encounterId, itemId] of expectedPickups) {
+      const encounter = gauntletGridAdventureEntries.find(
+        (entry) => entry.id === encounterId,
+      )
+      const prizes = encounter?.settings.screens?.[0]?.prizes || []
+
+      expect(prizes).toHaveLength(3)
+      expect(prizes.every((prize) => prize.itemId === itemId && prize.quantity === 1)).toBe(true)
+      expect(prizes.every((prize) =>
+        prize.requirements?.length === 1 &&
+        prize.requirements[0]?.type === 'roll' &&
+        prize.requirements[0]?.count === 200_000,
+      )).toBe(true)
+    }
+  })
+
   test('open-choice course clears after three distinct verified Route 1 battles', () => {
     const course = testbasicEntries[0].settings
     const moves = [

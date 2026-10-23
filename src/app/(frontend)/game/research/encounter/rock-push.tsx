@@ -46,6 +46,10 @@ import {
   resolveGridWallMarkerSource,
   resolveGridWallSource,
 } from '@/data/games/grid-tiles'
+import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
+import type { TaskCondition } from '@/data/tasks/types'
+import { PokemonSelectionList } from '@/components/game/shared/PokemonSelectionList'
+import type { Pokemon } from '@/payload-types'
 import type {
   GridObjectDefinition,
   GridObjectLibrary,
@@ -82,6 +86,20 @@ type CellType = 'empty' | 'wall' | 'hole' | 'ice'
 interface Position {
   x: number
   y: number
+}
+
+interface GridObjectInteraction {
+  key: string
+  placement: GridObjectPlacement
+  definition: GridObjectDefinition
+  type: GridObjectInteractionType
+  targetId: string
+  victory: GridObjectVictoryMode
+  removeOnSuccess: boolean
+  canInteract: boolean
+  unmetCriteria: TaskCondition[]
+  consumedPokemonCount: number
+  eligiblePokemon: Pokemon[]
 }
 
 type FacingDirection = 'up' | 'down' | 'left' | 'right'
@@ -354,6 +372,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   )
   const [gameEnded, setGameEnded] = useState(false)
   const [result, setResult] = useState<any | null>(null)
+  const [gridObjectEligibilityMessage, setGridObjectEligibilityMessage] =
+    useState<string | null>(null)
+  const [pendingPokemonSelection, setPendingPokemonSelection] = useState<{
+    interaction: GridObjectInteraction
+    selectedPokemonIds: string[]
+  } | null>(null)
 
   const [rocksSolved, setRocksSolved] = useState(0)
   const [timeLeft, setTimeLeft] = useState(encounter.settings.timeLimit || 120)
@@ -402,15 +426,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const getGridObjectInteraction = (
     position: Position,
     screenId = activeScreenId,
-  ): {
-    key: string
-    placement: GridObjectPlacement
-    definition: GridObjectDefinition
-    type: GridObjectInteractionType
-    targetId: string
-    victory: GridObjectVictoryMode
-    removeOnSuccess: boolean
-  } | null => {
+  ): GridObjectInteraction | null => {
     const screen = screenConfigs.find((entry) => entry.id === screenId)
     for (const [index, placement] of (screen?.objects || []).entries()) {
       const definition = getGridObjectDefinition(
@@ -441,6 +457,18 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         targetId: interaction.targetId,
         victory: interaction.victory,
         removeOnSuccess: placement.removeOnSuccess !== false,
+        canInteract:
+          (encounter.settings as any).gridAdventureObjectEligibility?.[key]
+            ?.canInteract !== false,
+        unmetCriteria:
+          ((encounter.settings as any).gridAdventureObjectEligibility?.[key]
+            ?.unmetCriteria || []) as TaskCondition[],
+        consumedPokemonCount:
+          (encounter.settings as any).gridAdventureObjectEligibility?.[key]
+            ?.consumedPokemonCount || 0,
+        eligiblePokemon:
+          ((encounter.settings as any).gridAdventureObjectEligibility?.[key]
+            ?.eligiblePokemon || []) as Pokemon[],
       }
     }
     return null
@@ -803,19 +831,19 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   }
 
   const launchGridObjectInteraction = async (
-    interaction: {
-      type: GridObjectInteractionType
-      targetId: string
-      victory: GridObjectVictoryMode
-      removeOnSuccess: boolean
-      key: string
-    },
+    interaction: GridObjectInteraction,
     overrides: Parameters<typeof saveGridObjectResume>[1] = {},
+    consumedPokemonIds: string[] = [],
   ) => {
     saveGridObjectResume(interaction, overrides)
     const returnTo = `/game/games/grid-puzzle?gridReturn=1&gameId=${encodeURIComponent(encounter.id)}`
     try {
-      const prepared = await prepareGridAdventureInteraction(encounter.id)
+      const prepared = await prepareGridAdventureInteraction(
+        encounter.id,
+        interaction.targetId,
+        interaction.key,
+        interaction.type,
+      )
       if (!prepared.success) {
         window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
         setResult({
@@ -826,7 +854,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       }
 
       if (interaction.type === 'battle') {
-        const result = await startBattle(interaction.targetId, undefined, {
+        const result = await startBattle(interaction.targetId, consumedPokemonIds, {
           gridAdventureObjectKey: interaction.key,
         })
         if (!result.success) {
@@ -847,7 +875,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         const result = await startGame(
           interaction.targetId,
           false,
-          undefined,
+          consumedPokemonIds,
           interaction.key,
         )
         if (!result.success) {
@@ -873,6 +901,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           interaction.targetId,
           false,
           interaction.key,
+          consumedPokemonIds,
         )
         if (!result.success) {
           window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
@@ -892,7 +921,9 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         return
       }
 
-      const result = await startEncounter(interaction.targetId)
+      const result = await startEncounter(interaction.targetId, consumedPokemonIds, {
+        gridAdventureObjectKey: interaction.key,
+      })
       if (!result?.success) {
         window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
         setResult({ success: false, message: 'Encounter could not start.' })
@@ -915,8 +946,50 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     if (gameEnded || slidingRef.current) return
     const interaction = getGridObjectInteractionAhead()
     if (!interaction) return
+    if (!interaction.canInteract) {
+      setGridObjectEligibilityMessage('Meet the entry criteria shown below to use this object.')
+      return
+    }
+    setGridObjectEligibilityMessage(null)
+    if (interaction.consumedPokemonCount > 0) {
+      setPendingPokemonSelection({ interaction, selectedPokemonIds: [] })
+      return
+    }
     playSfx('select')
     void launchGridObjectInteraction(interaction)
+  }
+
+  const toggleGridPokemonSelection = (pokemonId: string) => {
+    setPendingPokemonSelection((current) => {
+      if (!current) return current
+      const selected = current.selectedPokemonIds
+      if (selected.includes(pokemonId)) {
+        return {
+          ...current,
+          selectedPokemonIds: selected.filter((id) => id !== pokemonId),
+        }
+      }
+      if (selected.length >= current.interaction.consumedPokemonCount) {
+        return current
+      }
+      return {
+        ...current,
+        selectedPokemonIds: [...selected, pokemonId],
+      }
+    })
+  }
+
+  const confirmGridPokemonSelection = () => {
+    if (
+      !pendingPokemonSelection ||
+      pendingPokemonSelection.selectedPokemonIds.length !==
+        pendingPokemonSelection.interaction.consumedPokemonCount
+    ) {
+      return
+    }
+    const { interaction, selectedPokemonIds } = pendingPokemonSelection
+    setPendingPokemonSelection(null)
+    void launchGridObjectInteraction(interaction, {}, selectedPokemonIds)
   }
 
   useEffect(() => {
@@ -1540,6 +1613,13 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   // Key Listeners
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      if (pendingPokemonSelection) {
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          setPendingPokemonSelection(null)
+        }
+        return
+      }
       if (['ArrowUp', 'w'].includes(e.key)) {
         e.preventDefault()
         move(0, -1)
@@ -1576,6 +1656,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     facing,
     clearedObjectKeys,
     isSliding,
+    pendingPokemonSelection,
   ])
 
   const activeTilePaletteId =
@@ -2038,15 +2119,24 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             variant="outline"
             className="h-12 w-12 rounded-full border-2 border-game-charcoal bg-game-charcoal text-2xl font-black text-game-cream shadow-sm hover:bg-game-charcoal-strong disabled:opacity-35"
             onClick={interactWithGridObject}
-            disabled={!interactionAhead || gameEnded || isSliding}
+            disabled={
+              !interactionAhead ||
+              (interactionAhead && !interactionAhead.canInteract) ||
+              gameEnded ||
+              isSliding
+            }
             aria-label={
               interactionAhead
-                ? `Interact with ${interactionAhead.definition.name}`
+                ? interactionAhead.canInteract
+                  ? `Interact with ${interactionAhead.definition.name}`
+                  : `Entry criteria not met for ${interactionAhead.definition.name}`
                 : 'No object in front to interact with'
             }
             title={
               interactionAhead
-                ? `Interact with ${interactionAhead.definition.name} (E)`
+                ? interactionAhead.canInteract
+                  ? `Interact with ${interactionAhead.definition.name} (E)`
+                  : `Entry criteria not met for ${interactionAhead.definition.name}`
                 : 'Face an object to interact (E)'
             }
           >
@@ -2065,6 +2155,27 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             </Button>
           )}
         </div>
+        {interactionAhead && !interactionAhead.canInteract && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="mb-3 max-w-sm rounded-md border border-game-border bg-game-surface px-3 py-2 text-center text-xs text-game-ink"
+          >
+            <p className="font-bold text-game-muted">
+              {gridObjectEligibilityMessage || 'Entry criteria required'}
+            </p>
+            <ul className="mt-1 space-y-1">
+              {interactionAhead.unmetCriteria.map((condition, index) => {
+                const display = mapCriteriaToDisplayItem(condition)
+                return (
+                  <li key={`${condition.type}-${index}`}>
+                    {display.label}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
 
         {/* Mobile Controls */}
         <div className="flex-none max-w-[200px] w-full z-40 mb-8">
@@ -2118,6 +2229,57 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           </div>
         </div>
       </div>
+
+      {pendingPokemonSelection && (
+        <div className="fixed inset-0 z-[120] flex items-end justify-center bg-game-charcoal/65 p-3 sm:items-center">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="grid-pokemon-selection-title"
+            className="flex max-h-[88dvh] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-game-border bg-game-canvas shadow-2xl"
+          >
+            <header className="border-b border-game-border bg-game-surface px-4 py-3">
+              <h2
+                id="grid-pokemon-selection-title"
+                className="text-sm font-black text-game-ink"
+              >
+                Select Pokémon to consume
+              </h2>
+              <p className="mt-1 text-xs text-game-muted">
+                These Pokémon will be permanently consumed to start this activity.
+              </p>
+            </header>
+            <div className="overflow-y-auto p-4">
+              <PokemonSelectionList
+                eligiblePokemon={pendingPokemonSelection.interaction.eligiblePokemon}
+                selectedPokemonIds={pendingPokemonSelection.selectedPokemonIds}
+                onToggle={toggleGridPokemonSelection}
+                totalRequired={pendingPokemonSelection.interaction.consumedPokemonCount}
+              />
+            </div>
+            <footer className="flex items-center justify-end gap-2 border-t border-game-border bg-game-surface px-4 py-3">
+              <Button
+                variant="outline"
+                onClick={() => setPendingPokemonSelection(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="border border-game-charcoal bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong"
+                onClick={confirmGridPokemonSelection}
+                disabled={
+                  pendingPokemonSelection.selectedPokemonIds.length !==
+                  pendingPokemonSelection.interaction.consumedPokemonCount
+                }
+              >
+                Confirm selection (
+                {pendingPokemonSelection.selectedPokemonIds.length}/
+                {pendingPokemonSelection.interaction.consumedPokemonCount})
+              </Button>
+            </footer>
+          </section>
+        </div>
+      )}
 
       {result && (
         <RewardResultOverlay

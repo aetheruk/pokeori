@@ -106,6 +106,27 @@ placements succeed, without requiring every placed activity to be completed.
 The Kanto test course uses three lives and requires three wins from its five
 Route 1 battle markers.
 
+Each placement may also define Explore-style `requirements` and `criteria`.
+Requirements from the placement and its linked activity determine visibility
+when a Grid Adventure run is created; hidden objects are removed from the saved
+board, so they do not block movement or count toward board completion. Criteria
+from both sources keep the object visible but disable interaction until met.
+The board refreshes criteria for display, then rechecks them on the server when
+the player interacts and again when the child activity starts. Consumable item,
+currency, and Pokémon criteria use the existing activity consumption rules,
+including a Pokémon selection step when required. This applies to battle,
+encounter, Mini Game, and Field Research objects.
+
+Floor prize squares may also define `requirements`. The server filters these
+before saving the board, so unavailable pickups are not rendered, collected, or
+included in completion rewards. A Grid Adventure generates a fresh roll on the
+server and saves it in private session state; its object and prize requirements,
+plus child activity checks, use that same roll for the whole run. The client
+never supplies the roll, and other game systems continue using the player's
+global roll. The repeatable Buggy and Feathered Gauntlets each use a 1-in-5 roll
+to place three separate one-item material pickups on the floor: Chitin
+Fragments in the forest and Wing Feathers on Route 14.
+
 Use the `minigame-trigger` object for any authored Mini Game under
 `interaction.type: 'minigame'`; use `field-research-trigger` for an authored
 Field Observation under `interaction.type: 'field-research'`. The parent Rock

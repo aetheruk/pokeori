@@ -3,6 +3,8 @@ import 'server-only'
 // Shared server runtime for Mini Games and Field Research.
 
 import { allGames, GameType } from '@/data/games'
+import { battles } from '@/data/battles'
+import { locations } from '@/data/locations'
 import { getEffectiveContent } from '@/utilities/events/server'
 import { ABILITIES, type AbilityConfig } from '@/data/abilities'
 import {
@@ -16,7 +18,7 @@ import { headers } from 'next/headers'
 import { checkRequirement, isPokemonEligible } from '@/utilities/requirements'
 import { grantRewards, Reward } from '@/utilities/rewards/reward-logic'
 import { redis } from '@/utilities/redis'
-import type { User } from '@/payload-types'
+import type { Pokemon, User } from '@/payload-types'
 import { getGameUserData } from '@/utilities/game-data'
 import { analyzeRequirements, type GameDataKeys } from '@/utilities/requirements/analysis'
 import pokemonData from '@/data/pokemon-data'
@@ -143,6 +145,7 @@ import type { VoltorbGridSettings } from '@/data/games/voltorb-grid/types'
 import type { RockPushGameConfig } from '@/data/games/rock-push/types'
 import type { PachinkoGameConfig, PachinkoGameSettings } from '@/data/games/pachinko/types'
 import type { GridObjectPlacement } from '@/data/games/grid-tiles/types'
+import type { TaskCondition } from '@/data/tasks/types'
 import {
   getRockPushObjectProofTargets,
   hasRockPushMinigameTarget,
@@ -181,6 +184,8 @@ export async function getUser(): Promise<User | null> {
 export interface GameActivityState {
   eventConfigSnapshot?: (typeof allGames)[number]
   gridAdventureContext?: GridAdventureActivityContext
+  /** Server-owned roll used by every roll requirement in this board session. */
+  gridAdventureRollSnapshot?: number
   userId: string
   encounterId: string
   startTime: number
@@ -241,6 +246,16 @@ export interface GameActivityCompletionResult {
 export interface GridAdventureActivityContext {
   encounterId: string
   objectKey: string
+  rollSnapshot?: number
+}
+
+export function applyGridAdventureRollSnapshot<T extends { lastRoll?: number }>(
+  data: T,
+  rollSnapshot?: number,
+): T {
+  return typeof rollSnapshot === 'number' && Number.isFinite(rollSnapshot)
+    ? { ...data, lastRoll: rollSnapshot }
+    : data
 }
 
 function isAuthoredGridMinigameTarget(
@@ -265,7 +280,7 @@ function getAuthoredGridAdventureObject(
   parentState: GameActivityState | null,
   targetId: string,
   objectKey: string,
-  interactionType: 'battle' | 'minigame' | 'field-research',
+  interactionType: 'battle' | 'encounter' | 'minigame' | 'field-research',
 ): GridObjectPlacement | null {
   if (!parentState || parentState.expiry <= Date.now()) return null
   const parentEncounter = parentState.eventConfigSnapshot || allGames.find(
@@ -303,9 +318,12 @@ export async function getGridAdventureActivityTargetForUser(
   userId: string,
   targetId: string,
   objectKey: string,
-  interactionType: 'battle' | 'minigame' | 'field-research',
+  interactionType: 'battle' | 'encounter' | 'minigame' | 'field-research',
 ) {
-  const parentState = await ensureGridAdventureSessionForUser(userId)
+  const ensuredParentState = await ensureGridAdventureSessionForUser(userId)
+  const parentState = ensuredParentState
+    ? await ensureGridAdventureRollSnapshot(userId, ensuredParentState)
+    : null
   const placement = getAuthoredGridAdventureObject(
     parentState,
     targetId,
@@ -317,6 +335,7 @@ export async function getGridAdventureActivityTargetForUser(
     context: {
       encounterId: parentState.encounterId,
       objectKey,
+      rollSnapshot: parentState.gridAdventureRollSnapshot,
     } satisfies GridAdventureActivityContext,
     placement,
   }
@@ -326,7 +345,7 @@ export async function isGridAdventureActivityContextActive(
   userId: string,
   targetId: string,
   context: GridAdventureActivityContext | undefined,
-  interactionType: 'battle' | 'minigame' | 'field-research' = 'minigame',
+  interactionType: 'battle' | 'encounter' | 'minigame' | 'field-research' = 'minigame',
 ) {
   if (!context) return false
   const parentState = await ensureGridAdventureSessionForUser(userId)
@@ -339,6 +358,262 @@ export async function isGridAdventureActivityContextActive(
       interactionType,
     ),
   )
+}
+
+type GridAdventureObjectConditions = {
+  requirements: TaskCondition[]
+  criteria: TaskCondition[]
+  category?: string
+  subCategory?: string
+}
+
+type GridAdventureTargetCache = Map<string, Promise<any>>
+
+async function resolveGridAdventureObjectTarget(
+  placement: GridObjectPlacement,
+  user: User,
+) {
+  const interaction = placement.interaction
+  if (!interaction) return undefined
+  if (interaction.type === 'battle') {
+    return (await getEffectiveContent('battle', interaction.targetId, user)) ||
+      battles.find((entry) => entry.id === interaction.targetId)
+  }
+  if (interaction.type === 'encounter') {
+    return (await getEffectiveContent('location', interaction.targetId, user)) ||
+      locations.find((entry) => entry.id === interaction.targetId)
+  }
+  if (interaction.type === 'field-research') {
+    return (await getEffectiveContent('field-research', interaction.targetId, user)) ||
+      allGames.find((entry) => entry.id === interaction.targetId)
+  }
+  return allGames.find((entry) => entry.id === interaction.targetId)
+}
+
+async function getGridAdventureObjectConditions(
+  placement: GridObjectPlacement,
+  user: User,
+  targetCache?: GridAdventureTargetCache,
+): Promise<GridAdventureObjectConditions> {
+  const interaction = placement.interaction
+  const targetKey = interaction
+    ? `${interaction.type}:${interaction.targetId}`
+    : undefined
+  let target: any
+  if (targetKey && targetCache?.has(targetKey)) {
+    target = await targetCache.get(targetKey)
+  } else {
+    const targetPromise = resolveGridAdventureObjectTarget(placement, user)
+    if (targetKey && targetCache) targetCache.set(targetKey, targetPromise)
+    target = await targetPromise
+  }
+
+  return {
+    requirements: [
+      ...(placement.requirements || []),
+      ...(((target as any)?.requirements || []) as TaskCondition[]),
+    ],
+    criteria: [
+      ...(placement.criteria || []),
+      ...(((target as any)?.criteria || []) as TaskCondition[]),
+    ],
+    category: (target as any)?.category,
+    subCategory: (target as any)?.subCategory,
+  }
+}
+
+function getGridAdventureObjectEntries(
+  encounter: (typeof allGames)[number],
+): Array<{ key: string; placement: GridObjectPlacement }> {
+  if (encounter.gameType !== 'grid-puzzle' || encounter.settings.variant !== 'rock-push') {
+    return []
+  }
+  const settings = encounter.settings as unknown as RockPushGameConfig['settings']
+  const screens = settings.screens?.length
+    ? settings.screens
+    : [{ id: 'main', objects: settings.objects || [] }]
+  return screens.flatMap((screen) =>
+    (screen.objects || []).map((placement, index) => ({
+      key: `${screen.id}:${placement.id || `${placement.objectId}-${index}`}`,
+      placement,
+    })),
+  )
+}
+
+async function filterGridAdventureObjectsByRequirements(
+  encounter: (typeof allGames)[number],
+  user: User,
+  rollSnapshot: number,
+): Promise<{
+  encounter: (typeof allGames)[number]
+  rollSnapshot: number
+}> {
+  const entries = getGridAdventureObjectEntries(encounter)
+  const settings = encounter.settings as unknown as RockPushGameConfig['settings']
+  const prizeEntries = settings.screens?.length
+    ? settings.screens.flatMap((screen) => screen.prizes || [])
+    : settings.prizes || []
+  const hasConditionalObjects = entries.some(
+    ({ placement }) => placement.requirements?.length || placement.interaction,
+  )
+  const hasConditionalPrizes = prizeEntries.some(
+    (prize) => prize.requirements?.length,
+  )
+  if (!hasConditionalObjects && !hasConditionalPrizes) {
+    return { encounter, rollSnapshot }
+  }
+
+  const targetCache: GridAdventureTargetCache = new Map()
+  const conditionEntries = await Promise.all(
+    entries.map(async (entry) => ({
+      ...entry,
+      conditions: await getGridAdventureObjectConditions(entry.placement, user, targetCache),
+    })),
+  )
+  const requirements = [
+    ...conditionEntries.flatMap(({ conditions }) => conditions.requirements),
+    ...prizeEntries.flatMap((prize) => prize.requirements || []),
+  ]
+  const userData = await getGameUserData(user, analyzeRequirements(requirements))
+  const evaluationData = applyGridAdventureRollSnapshot(userData, rollSnapshot)
+  const eligibleKeys = new Set(
+    conditionEntries
+      .filter(({ conditions }) =>
+        conditions.requirements.every((requirement) =>
+          checkRequirement(evaluationData, requirement, {
+            category: conditions.category,
+            subCategory: conditions.subCategory,
+            weather: resolveSubRegionWeather(conditions.subCategory, userData.weatherSlot).weather,
+          }),
+        ),
+      )
+      .map(({ key }) => key),
+  )
+
+  const filterPrizes = (prizes: RockPushGameConfig['settings']['prizes'] = []) =>
+    prizes
+      .filter((prize) =>
+        (prize.requirements || []).every((requirement) =>
+          checkRequirement(evaluationData, requirement, {
+            category: encounter.category,
+            subCategory: encounter.subCategory,
+            weather: resolveSubRegionWeather(encounter.subCategory, evaluationData.weatherSlot).weather,
+          }),
+        ),
+      )
+      .map((prize) => {
+        const { requirements: _requirements, ...visiblePrize } = prize
+        return visiblePrize
+      })
+  const filterObjects = (objects: GridObjectPlacement[] = [], screenId = 'main') =>
+    objects.filter((placement, index) =>
+      eligibleKeys.has(`${screenId}:${placement.id || `${placement.objectId}-${index}`}`),
+    )
+  const filteredSettings = settings.screens?.length
+    ? {
+        ...encounter.settings,
+        screens: settings.screens.map((screen) => ({
+          ...screen,
+          objects: filterObjects(screen.objects, screen.id),
+          prizes: filterPrizes(screen.prizes),
+        })),
+      }
+    : {
+        ...encounter.settings,
+        objects: filterObjects(settings.objects),
+        prizes: filterPrizes(settings.prizes),
+      }
+
+  return {
+    encounter: { ...encounter, settings: filteredSettings } as (typeof allGames)[number],
+    rollSnapshot,
+  }
+}
+
+async function getGridAdventureObjectEligibility(
+  encounter: (typeof allGames)[number],
+  user: User,
+  rollSnapshot?: number,
+) {
+  const entries = getGridAdventureObjectEntries(encounter)
+  const targetCache: GridAdventureTargetCache = new Map()
+  const conditionEntries = await Promise.all(
+    entries.map(async (entry) => ({
+      ...entry,
+      conditions: await getGridAdventureObjectConditions(entry.placement, user, targetCache),
+    })),
+  )
+  const criteria = conditionEntries.flatMap(({ conditions }) => conditions.criteria)
+  const userData = applyGridAdventureRollSnapshot(
+    await getGameUserData(user, analyzeRequirements(criteria)),
+    rollSnapshot,
+  )
+  const eligibility: Record<string, {
+    canInteract: boolean
+    unmetCriteria: TaskCondition[]
+    consumedPokemonCount?: number
+    eligiblePokemon?: Pokemon[]
+  }> = {}
+
+  for (const { key, conditions } of conditionEntries) {
+    const unmetCriteria = conditions.criteria.filter(
+      (condition) =>
+        !checkRequirement(userData, condition, {
+          category: conditions.category,
+          subCategory: conditions.subCategory,
+          weather: resolveSubRegionWeather(conditions.subCategory, userData.weatherSlot).weather,
+        }),
+    )
+    const consumedPokemonCriteria = conditions.criteria.filter(
+      (condition) => condition.type === 'pokemon_owned' && condition.consume,
+    )
+    const eligiblePokemon = consumedPokemonCriteria.length
+      ? userData.pokemon.filter((pokemon) =>
+          !(pokemon as any).locked &&
+          consumedPokemonCriteria.some((condition) => {
+            if (condition.pokemonCriteria) {
+              return isPokemonEligible(pokemon, condition.pokemonCriteria)
+            }
+            if (condition.targetId) {
+              const targetIds = Array.isArray(condition.targetId)
+                ? condition.targetId.map(String)
+                : [String(condition.targetId)]
+              return targetIds.includes(String(pokemon.speciesId))
+            }
+            return true
+          }),
+        )
+      : undefined
+    eligibility[key] = {
+      canInteract: unmetCriteria.length === 0,
+      unmetCriteria,
+      ...(consumedPokemonCriteria.length
+        ? {
+            consumedPokemonCount: consumedPokemonCriteria.reduce(
+              (total, condition) => total + (condition.count || 1),
+              0,
+            ),
+            eligiblePokemon: eligiblePokemon?.map((pokemon) => ({
+              id: pokemon.id,
+              name: pokemon.name,
+              level: pokemon.level,
+              formId: pokemon.formId,
+              rarity: pokemon.rarity,
+              shiny: pokemon.shiny,
+              isShadow: pokemon.isShadow,
+              isRadiant: pokemon.isRadiant,
+              gender: pokemon.gender,
+              markingSquare: (pokemon as any).markingSquare,
+              markingCircle: (pokemon as any).markingCircle,
+              markingTriangle: (pokemon as any).markingTriangle,
+              markingDiamond: (pokemon as any).markingDiamond,
+            } as Pokemon)),
+          }
+        : {}),
+    }
+  }
+
+  return eligibility
 }
 
 function getRockPushObjectWinCount(
@@ -495,6 +770,30 @@ export async function setGameActivityStateForUser(
   })
 }
 
+async function ensureGridAdventureRollSnapshot(
+  userId: string,
+  state: GameActivityState,
+): Promise<GameActivityState> {
+  if (typeof state.gridAdventureRollSnapshot === 'number') return state
+  const latestState = await getGameActivityStateForUser(userId, 'grid-adventure')
+  if (!latestState) return state
+  if (typeof latestState.gridAdventureRollSnapshot === 'number') return latestState
+
+  const payload = await getPayload({ config: configPromise })
+  const user = await payload.findByID({ collection: 'users', id: userId })
+  const rollSnapshot = Number.isFinite((user as any).lastRoll)
+    ? (user as any).lastRoll as number
+    : 0
+  const updatedState = { ...latestState, gridAdventureRollSnapshot: rollSnapshot }
+  await setGameActivityStateForUser(
+    userId,
+    'grid-adventure',
+    updatedState,
+    Math.max(60, Math.ceil((latestState.expiry - Date.now()) / 1000) + 120),
+  )
+  return updatedState
+}
+
 export async function clearGameActivityStateForUser(
   userId: string,
   domain: GameActivityDomain,
@@ -558,10 +857,50 @@ export async function getGridAdventureActivityState() {
   return getGameActivityState('grid-adventure')
 }
 
-export async function prepareGridAdventureInteraction(encounterId: string) {
+async function hasActiveGridAdventureChildSession(
+  userId: string,
+  targetId: string,
+  objectKey: string,
+  interactionType: 'battle' | 'encounter' | 'minigame' | 'field-research',
+) {
+  const matchesContext = (context?: GridAdventureActivityContext) =>
+    context?.objectKey === objectKey
+  if (interactionType === 'minigame' || interactionType === 'field-research') {
+    const state = await getGameActivityStateForUser(
+      userId,
+      interactionType === 'field-research' ? 'field-research' : 'game',
+    )
+    return Boolean(
+      state &&
+        state.encounterId === targetId &&
+        state.expiry > Date.now() &&
+        matchesContext(state.gridAdventureContext),
+    )
+  }
+  if (interactionType === 'encounter') {
+    const state = await redis.get<any>(`encounter:${userId}`)
+    return Boolean(
+      state &&
+        state.locationId === targetId &&
+        (state.encounterMode === 'safari' || state.expiry > Date.now()) &&
+        matchesContext(state.gridAdventureContext),
+    )
+  }
+  return false
+}
+
+export async function prepareGridAdventureInteraction(
+  encounterId: string,
+  targetId: string,
+  objectKey: string,
+  interactionType: 'battle' | 'encounter' | 'minigame' | 'field-research',
+) {
   const user = await getUser()
   if (!user) return { success: false, error: 'Not authenticated' }
-  const state = await ensureGridAdventureSessionForUser(user.id)
+  const ensuredState = await ensureGridAdventureSessionForUser(user.id)
+  const state = ensuredState
+    ? await ensureGridAdventureRollSnapshot(user.id, ensuredState)
+    : null
   const encounter = state?.eventConfigSnapshot || allGames.find(
     (entry) => entry.id === state?.encounterId,
   )
@@ -572,6 +911,38 @@ export async function prepareGridAdventureInteraction(encounterId: string) {
   ) {
     return { success: false, error: 'The active Grid Adventure could not be restored.' }
   }
+  const placement = getAuthoredGridAdventureObject(
+    state,
+    targetId,
+    objectKey,
+    interactionType,
+  )
+  if (!placement) {
+    return { success: false, error: 'This activity is not part of the active Grid Adventure.' }
+  }
+  if (
+    await hasActiveGridAdventureChildSession(
+      user.id,
+      targetId,
+      objectKey,
+      interactionType,
+    )
+  ) {
+    return { success: true }
+  }
+  const conditions = await getGridAdventureObjectConditions(placement, user)
+  const userData = applyGridAdventureRollSnapshot(
+    await getGameUserData(user, analyzeRequirements(conditions.criteria)),
+    state.gridAdventureRollSnapshot,
+  )
+  const criteriaMet = conditions.criteria.every((condition) =>
+    checkRequirement(userData, condition, {
+      category: conditions.category,
+      subCategory: conditions.subCategory,
+      weather: resolveSubRegionWeather(conditions.subCategory, userData.weatherSlot).weather,
+    }),
+  )
+  if (!criteriaMet) return { success: false, error: 'Entry criteria not met.' }
   return { success: true }
 }
 
@@ -659,9 +1030,18 @@ function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
 function sanitizeResearchState(
   state: GameActivityState,
 ): Omit<GameActivityState, 'fieldObservationPrivate' | 'artAcademyPrivate' | 'undergroundMiningPrivate'> {
-  const { fieldObservationPrivate, artAcademyPrivate, undergroundMiningPrivate, eventConfigSnapshot, gridAdventureContext, ...safeState } = state
+  const {
+    fieldObservationPrivate,
+    artAcademyPrivate,
+    undergroundMiningPrivate,
+    eventConfigSnapshot,
+    gridAdventureContext,
+    gridAdventureRollSnapshot,
+    ...safeState
+  } = state
   void eventConfigSnapshot
   void gridAdventureContext
+  void gridAdventureRollSnapshot
   void fieldObservationPrivate
   void artAcademyPrivate
   void undergroundMiningPrivate
@@ -955,11 +1335,13 @@ export async function startGameActivity(
         }
       }
 
-      let gridAdventureContext: GridAdventureActivityContext | undefined
-      if (encounter.gridAdventureOnly) {
+    let gridAdventureContext: GridAdventureActivityContext | undefined
+    let gridAdventurePlacement: GridObjectPlacement | undefined
+    let gridAdventureRollSnapshot: number | undefined
+      if (encounter.gridAdventureOnly || gridAdventureObjectKey) {
         const interactionType = domain === 'field-research'
           ? 'field-research'
-          : domain === 'game'
+          : domain === 'game' || domain === 'grid-minigame'
             ? 'minigame'
             : null
         if (!interactionType || !gridAdventureObjectKey) {
@@ -981,6 +1363,7 @@ export async function startGameActivity(
           }
         }
         gridAdventureContext = authoredTarget.context
+        gridAdventurePlacement = authoredTarget.placement
         const authoredWinRate = authoredTarget.placement.properties?.gridAdventureWinRate
         if (
           encounter.gameType === 'slots' &&
@@ -1074,10 +1457,10 @@ export async function startGameActivity(
       if (
         existingState &&
         shouldRestoreExistingState &&
-        encounter.gridAdventureOnly &&
-        existingState.gridAdventureContext &&
-        (existingState.gridAdventureContext.encounterId !== gridAdventureContext?.encounterId ||
-          existingState.gridAdventureContext.objectKey !== gridAdventureContext?.objectKey)
+        (encounter.gridAdventureOnly || gridAdventureObjectKey || existingState.gridAdventureContext) &&
+        (!gridAdventureContext ||
+          existingState.gridAdventureContext?.encounterId !== gridAdventureContext.encounterId ||
+          existingState.gridAdventureContext?.objectKey !== gridAdventureContext.objectKey)
       ) {
         return {
           success: false,
@@ -1087,6 +1470,24 @@ export async function startGameActivity(
 
       // If a session exists and we aren't forcing a reset, return it
       if (existingState && shouldRestoreExistingState) {
+        if (
+          domain === 'grid-adventure' &&
+          typeof existingState.gridAdventureRollSnapshot !== 'number'
+        ) {
+          const legacyRollSnapshot = Number.isFinite((user as any).lastRoll)
+            ? (user as any).lastRoll as number
+            : undefined
+          const migratedState = {
+            ...existingState,
+            gridAdventureRollSnapshot: legacyRollSnapshot,
+          }
+          await setGameActivityStateForUser(
+            user.id,
+            domain,
+            migratedState,
+            Math.max(60, Math.ceil((existingState.expiry - Date.now()) / 1000) + 120),
+          )
+        }
         const isFieldObservation = encounter.gameType === 'field-observation'
         const restoredRoundUsesKidModeQuestion =
           existingState.roundData?.question?.type === 'kid-most-appeared'
@@ -1126,6 +1527,14 @@ export async function startGameActivity(
       }
 
       if (domain === 'grid-adventure') {
+        gridAdventureRollSnapshot = randomInt(1, 1_000_001)
+        const filteredAdventure = await filterGridAdventureObjectsByRequirements(
+          encounter,
+          user as User,
+          gridAdventureRollSnapshot,
+        )
+        encounter = filteredAdventure.encounter
+        gridAdventureRollSnapshot = filteredAdventure.rollSnapshot
         encounter = maybeRandomizeGridAdventureSlotWinRates(encounter)
       }
 
@@ -1162,16 +1571,30 @@ export async function startGameActivity(
       const undergroundMiningLootRequirements = encounter.gameType === 'underground-mining'
         ? (encounter.settings.lootPool || []).flatMap((entry) => entry.requirements || [])
         : []
-      const requiredKeys = analyzeRequirements([
+      const activityRequirements = [
         ...(encounter.requirements || []),
+        ...(gridAdventurePlacement?.requirements || []),
+      ]
+      const activityCriteria = [
         ...(encounter.criteria || []),
+        ...(gridAdventurePlacement?.criteria || []),
+      ]
+      const requiredKeys = analyzeRequirements([
+        ...activityRequirements,
+        ...activityCriteria,
         ...fieldObservationPoolRequirements,
         ...fieldObservationGlobalRequirements,
         ...fieldObservationSpecialDropRequirements,
         ...prizeWheelSlotRequirements,
         ...undergroundMiningLootRequirements,
       ])
-      const userData = await getGameUserData(user as User, requiredKeys)
+      const requirementRollSnapshot = domain === 'grid-adventure'
+        ? gridAdventureRollSnapshot
+        : gridAdventureContext?.rollSnapshot
+      const userData = applyGridAdventureRollSnapshot(
+        await getGameUserData(user as User, requiredKeys),
+        requirementRollSnapshot,
+      )
       const weatherSnapshot = {
         ...resolveSubRegionWeather(encounter.subCategory, userData.weatherSlot),
         updatedAt: userData.weatherUpdatedAt,
@@ -1179,9 +1602,8 @@ export async function startGameActivity(
 
       // Check requirements
       const requirementsMet =
-        !encounter.requirements ||
-        encounter.requirements.length === 0 ||
-        encounter.requirements.every((req) =>
+        activityRequirements.length === 0 ||
+        activityRequirements.every((req) =>
           checkRequirement(userData, req, {
             category: encounter.category,
             subCategory: encounter.subCategory,
@@ -1227,8 +1649,8 @@ export async function startGameActivity(
       }
 
       // Check and Consume Criteria
-      if (encounter.criteria && encounter.criteria.length > 0 && !isMigratingUndergroundMiningSession) {
-        const criteriaMet = encounter.criteria.every((req) =>
+      if (activityCriteria.length > 0 && !isMigratingUndergroundMiningSession) {
+        const criteriaMet = activityCriteria.every((req) =>
           checkRequirement(userData, req, {
             category: encounter.category,
             subCategory: encounter.subCategory,
@@ -1244,7 +1666,7 @@ export async function startGameActivity(
         let hasConsumption = false
 
         // Check Pokemon Consumption Criteria
-        const pokemonCriteria = encounter.criteria.filter(
+        const pokemonCriteria = activityCriteria.filter(
           (req) => req.type === 'pokemon_owned' && req.consume,
         )
 
@@ -1307,7 +1729,7 @@ export async function startGameActivity(
         }
 
         // Check Item Consumption
-        for (const req of encounter.criteria) {
+        for (const req of activityCriteria) {
           if (
             req.consume &&
             req.type === 'item_owned' &&
@@ -1861,6 +2283,8 @@ export async function startGameActivity(
         userId: user.id,
         encounterId: validatedEncounterId,
         gridAdventureContext,
+        gridAdventureRollSnapshot:
+          domain === 'grid-adventure' ? gridAdventureRollSnapshot : undefined,
         eventConfigSnapshot:
           domain === 'field-research' || domain === 'grid-adventure'
             ? encounter
@@ -3578,8 +4002,11 @@ export async function getGameActivityState(domain: GameActivityDomain) {
 
     if (!user) return null
 
-    const state = await getGameActivityStateForUser(user.id, domain)
+    let state = await getGameActivityStateForUser(user.id, domain)
     if (!state) return null
+    if (domain === 'grid-adventure') {
+      state = await ensureGridAdventureRollSnapshot(user.id, state)
+    }
 
     const encounter = state.eventConfigSnapshot || allGames.find((e) => e.id === state.encounterId)
     if (!encounter) return null
@@ -3598,12 +4025,28 @@ export async function getGameActivityState(domain: GameActivityDomain) {
     const publicEncounter = domain === 'grid-adventure'
       ? hideGridAdventureSlotWinRates(encounter)
       : encounter
+    const gridAdventureObjectEligibility = domain === 'grid-adventure'
+      ? await getGridAdventureObjectEligibility(
+          encounter,
+          user as User,
+          state.gridAdventureRollSnapshot,
+        )
+      : undefined
+    const encounterForClient = gridAdventureObjectEligibility
+      ? {
+          ...publicEncounter,
+          settings: {
+            ...publicEncounter.settings,
+            gridAdventureObjectEligibility,
+          },
+        }
+      : publicEncounter
 
     return {
       ...sanitizeResearchState(state),
       timeLeft,
       encounter: {
-        ...publicEncounter,
+        ...encounterForClient,
         isEligibleForReplay,
       },
     }

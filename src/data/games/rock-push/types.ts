@@ -5,6 +5,7 @@ import type {
   GridTilePaletteId,
 } from '../grid-tiles'
 import type { LocationReward } from '@/data/types'
+import type { TaskCondition } from '@/data/tasks/types'
 
 export interface RockPushPosition {
   x: number
@@ -26,6 +27,8 @@ export interface RockPushPrizeSquare extends RockPushPosition {
   itemId: string
   quantity?: number
   reward?: LocationReward
+  /** Hide this floor pickup when an Explore-style visibility requirement is unmet. */
+  requirements?: TaskCondition[]
 }
 
 export interface RockPushScreenConfig {

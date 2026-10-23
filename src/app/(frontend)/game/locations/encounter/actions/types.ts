@@ -17,6 +17,11 @@ export interface EncounterShieldState {
 }
 
 export interface EncounterState {
+  gridAdventureContext?: {
+    encounterId: string
+    objectKey: string
+    rollSnapshot?: number
+  }
   battleCapturePokemon?: import('@/utilities/pokemon/alpha').BattleCapturePokemon
   battleCaptureId?: string
   alphaPokemon?: import('@/utilities/pokemon/alpha').AlphaCapturePokemon
