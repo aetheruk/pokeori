@@ -742,6 +742,8 @@ describe('shared grid sprite sets', () => {
       'breakableRock',
       'pushableBoulder',
       'battleTrigger',
+      'bugCatcherTrainer',
+      'birdKeeperTrainer',
       'wildBattleTrigger',
       'route1RattataTrigger',
       'route1PidgeyTrigger',

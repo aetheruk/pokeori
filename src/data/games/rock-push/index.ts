@@ -5,6 +5,7 @@ import { testbasicEntries } from './entries/test'
 import { gymLeaderChronicleRockPushEntries } from './entries/gym-leader-chronicles'
 import { fuchsiaCitybasicEntries } from './entries/fuchsia-city'
 import { celadonGameCornerbasicEntries } from './entries/celadon-game-corner'
+import { gauntletGridAdventureEntries } from './entries/gauntlets'
 
 /** Rock Push ruleset entries; exposed to the app through grid-puzzle. */
 export const basicEntries: RockPushGameConfig[] = [
@@ -12,4 +13,5 @@ export const basicEntries: RockPushGameConfig[] = [
   ...gymLeaderChronicleRockPushEntries,
   ...fuchsiaCitybasicEntries,
   ...celadonGameCornerbasicEntries,
+  ...gauntletGridAdventureEntries,
 ]

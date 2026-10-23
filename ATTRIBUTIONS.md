@@ -22,6 +22,16 @@ Pokémon-related names, characters, artwork, sprites, sounds, card designs, and 
 
 The Lucas and Dawn overworld sheets in `public/games/trainers/` were supplied by the project owner as `NPC_198_Lucas.png` and `NPC_201_Dawn.png`. Pokémon character and sprite rights remain with their respective owners; no separate upstream source or license was supplied with these files.
 
+The unchanged FRLG Bug Catcher and Bird Keeper sheets in
+`public/games/trainers/source/` come from the [FRLG Accurate NPC Megapack
+(Relic Castle Edition)](https://www.mediafire.com/file/nbr92qe5uhorhlv/FRLG_Accurate_NPC_Megapack_%2528Relic_Castle_Edition%2529.zip/file),
+compiled by SoulfulLex and released on 3 October 2021. Its included readme
+credits the Bird Keeper sprite to Spherical Ice but does not identify the
+original Bug Catcher artist or state an open artwork license. The Grid
+Adventure trainer markers show the first 32×32 frame from each unchanged
+128×192 sheet. Pokémon artwork and characters remain the property of their
+respective rights holders.
+
 ## Pokémon overworld sprites
 
 The Ditto, Rattata and Voltorb overworld sheets in `public/games/overworld/` come from [Following Pokémon EX 2.5.1 on Eevee Expo](https://eeveeexpo.com/resources/516/), downloaded 8 September 2026. The full 256×256 sheets are unchanged; `*-idle.png` files extract the first 64×64 downward-facing frame. The resource requests credit when used: NoNonever, Golisopod User, Help-14, zingzags, Rayd12smitty, mej71, PurpleZaffre, Akizakura16, Thundaga, Armin (Fairies Resource Pack), and Maruno. No separate open-source artwork license is stated; Pokémon rights remain with their respective owners.

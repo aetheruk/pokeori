@@ -4321,9 +4321,25 @@ describe('static data references', () => {
       targetId: 'binder-base2',
     })
 
-    const bugGauntlet = expeditions.find(
-      (entry) => entry.id === 'bug-gauntlet-expedition',
+    const bugGauntlet = allGames.find(
+      (entry) => entry.id === 'buggy-gauntlet-grid-adventure',
     )
+    expect(bugGauntlet?.gameType).toBe('grid-puzzle')
+    expect((bugGauntlet?.settings as any)?.lives).toBe(1)
+    expect((bugGauntlet?.settings as any)?.winCondition).toEqual({
+      type: 'activity-successes',
+      count: 5,
+    })
+    for (const battleId of [
+      'bug-gauntlet-barry',
+      'bug-gauntlet-billy',
+      'bug-gauntlet-berry',
+      'bug-gauntlet-benny',
+      'bug-gauntlet-champion',
+    ]) {
+      expect(battles.find((entry) => entry.id === battleId)?.gridAdventureOnly)
+        .toBe(true)
+    }
     expect(bugGauntlet?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'pokedollars',
@@ -4337,15 +4353,36 @@ describe('static data references', () => {
       dropChance: 100,
     })
 
-    const featheredGauntlet = expeditions.find(
-      (entry) => entry.id === 'route-14-bird-gauntlet-expedition',
+    const featheredGauntlet = allGames.find(
+      (entry) => entry.id === 'feathered-gauntlet-grid-adventure',
     )
+    expect(featheredGauntlet?.gameType).toBe('grid-puzzle')
+    expect((featheredGauntlet?.settings as any)?.lives).toBe(1)
+    expect((featheredGauntlet?.settings as any)?.winCondition).toEqual({
+      type: 'activity-successes',
+      count: 6,
+    })
+    for (const battleId of [
+      'route-14-gauntlet-carter',
+      'route-14-gauntlet-mitch',
+      'route-14-gauntlet-marlon',
+      'route-14-gauntlet-beck',
+      'route-14-gauntlet-benny',
+      'route-14-gauntlet-donald',
+    ]) {
+      expect(battles.find((entry) => entry.id === battleId)?.gridAdventureOnly)
+        .toBe(true)
+    }
     expect(featheredGauntlet?.rewards).toContainEqual({
       type: 'item',
       targetId: 'rare-candy-m',
       quantity: 1,
       dropChance: 100,
     })
+    expect(expeditions.some((entry) =>
+      entry.id === 'bug-gauntlet-expedition' ||
+      entry.id === 'route-14-bird-gauntlet-expedition',
+    )).toBe(false)
 
     const photoExchange = tasks.find(
       (entry) => entry.id === 'task-photo-exchange',

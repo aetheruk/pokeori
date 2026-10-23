@@ -826,7 +826,9 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       }
 
       if (interaction.type === 'battle') {
-        const result = await startBattle(interaction.targetId)
+        const result = await startBattle(interaction.targetId, undefined, {
+          gridAdventureObjectKey: interaction.key,
+        })
         if (!result.success) {
           window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
           setResult({

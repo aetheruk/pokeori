@@ -57,6 +57,12 @@ behaviour, and sprite. This lets the same Voltorb, breakable rock, pushable
 dimensions remain possible for future content. The logical footprint remains
 one or two 16px cells.
 
+Buggy and Feathered Gauntlet trainer markers use the matching FRLG Bug Catcher
+and Bird Keeper sprites. Their original sheets stay unchanged under
+`public/games/trainers/source/`; the small SVG object assets show the first
+32×32 frame at the grid's 64×64 native size. Source details and credits are in
+`ATTRIBUTIONS.md`.
+
 Interactive object types can opt into `interaction: 'battle'` or
 `interaction: 'encounter'` on their shared definition. A map placement then
 provides the target id and `victory: 'win' | 'clear'`:
@@ -102,10 +108,10 @@ Use the `minigame-trigger` object for any authored Mini Game under
 `interaction.type: 'minigame'`; use `field-research-trigger` for an authored
 Field Observation under `interaction.type: 'field-research'`. The parent Rock
 Push session stays in its own slot while each child uses its normal game or
-Field Research runtime. Activities marked `gridAdventureOnly` are authorized
-on the server only when the exact object key and target id are present on the
-active board. Slot spins and completion recheck that relationship against the
-saved child context. Grid-launched Slots return to the saved grid with their
+Field Research runtime. Activities and battles marked `gridAdventureOnly` are
+authorized on the server only when the exact object key and target id are
+present on the active board. Slot spins and completion recheck that relationship
+against the saved child context. Grid-launched Slots return to the saved grid with their
 verified result, and the server checks that activity's saved win before
 recording the interaction. Completion
 acknowledgments are distinct from game wins, so a losing Slots session is not

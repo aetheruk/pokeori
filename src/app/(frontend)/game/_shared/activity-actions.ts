@@ -265,7 +265,7 @@ function getAuthoredGridAdventureObject(
   parentState: GameActivityState | null,
   targetId: string,
   objectKey: string,
-  interactionType: 'minigame' | 'field-research',
+  interactionType: 'battle' | 'minigame' | 'field-research',
 ): GridObjectPlacement | null {
   if (!parentState || parentState.expiry <= Date.now()) return null
   const parentEncounter = parentState.eventConfigSnapshot || allGames.find(
@@ -303,7 +303,7 @@ export async function getGridAdventureActivityTargetForUser(
   userId: string,
   targetId: string,
   objectKey: string,
-  interactionType: 'minigame' | 'field-research',
+  interactionType: 'battle' | 'minigame' | 'field-research',
 ) {
   const parentState = await ensureGridAdventureSessionForUser(userId)
   const placement = getAuthoredGridAdventureObject(
@@ -326,7 +326,7 @@ export async function isGridAdventureActivityContextActive(
   userId: string,
   targetId: string,
   context: GridAdventureActivityContext | undefined,
-  interactionType: 'minigame' | 'field-research' = 'minigame',
+  interactionType: 'battle' | 'minigame' | 'field-research' = 'minigame',
 ) {
   if (!context) return false
   const parentState = await ensureGridAdventureSessionForUser(userId)
