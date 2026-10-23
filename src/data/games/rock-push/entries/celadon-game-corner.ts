@@ -41,6 +41,7 @@ function createGameCornerAdventure({
   id,
   name,
   description,
+  icon,
   requirements,
   overrides,
   screens,
@@ -48,6 +49,7 @@ function createGameCornerAdventure({
   id: string
   name: string
   description: string
+  icon?: RockPushGameConfig['icon']
   requirements: RockPushGameConfig['requirements']
   overrides: string
   screens: NonNullable<RockPushGameConfig['settings']['screens']>
@@ -58,7 +60,7 @@ function createGameCornerAdventure({
     description,
     category: 'Kanto',
     subCategory: 'Celadon Game Corner',
-    icon: { type: 'local', id: '/games/grid-objects/celadon-slot-machine.png' },
+    icon: icon || { type: 'local', id: '/games/grid-objects/celadon-slot-machine.png' },
     background: '/backgrounds/celadon-game-corner-arcade.avif',
     requirements,
     overrides,
@@ -73,6 +75,35 @@ function createGameCornerAdventure({
       screens,
     },
   }
+}
+
+function createPachinkoMachinePlacements(
+  stakes: 'standard' | 'high',
+): GridObjectPlacement[] {
+  const objectId = stakes === 'high'
+    ? 'celadon-high-stakes-pachinko-machine'
+    : 'celadon-pachinko-machine'
+  const rows = [1, 3, 5]
+  const columns = [1, 2, 4, 5]
+
+  return rows.flatMap((y, row) =>
+    columns.map((x, column) => ({
+      id: `pachinko-${stakes}-${row + 1}-${column + 1}`,
+      objectId,
+      x,
+      y,
+      removeOnSuccess: false,
+      interaction: {
+        type: 'minigame' as const,
+        targetId: 'celadon-rocket-pachinko',
+        victory: 'clear' as const,
+      },
+      properties: {
+        gridAdventurePachinkoMachine: row * columns.length + column + 1,
+        gridAdventurePachinkoStakes: stakes,
+      },
+    })),
+  )
 }
 
 export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
@@ -138,6 +169,52 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
         objects: highStakesSlotMachinePlacements,
         teleporters: [{
           id: 'arcade-return-mat',
+          x: 3,
+          y: 6,
+          target: { screen: 'arcade-floor', x: 3, y: 5 },
+        }],
+      },
+    ],
+  }),
+  createGameCornerAdventure({
+    id: 'grid-adventure-celadon-pachinko',
+    name: 'Rocket Pachinko',
+    description:
+      'Try twelve low-stakes Rocket Pachinko machines, each with a slightly different bucket layout and payout table, then leave through the arcade exit mat.',
+    icon: { type: 'local', id: '/games/grid-objects/celadon-pachinko-machine.png' },
+    requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
+    overrides: 'celadon-rocket-pachinko',
+    screens: [{
+      id: 'arcade-floor',
+      objects: createPachinkoMachinePlacements('standard'),
+      winTiles: [{ x: 3, y: 0 }],
+    }],
+  }),
+  createGameCornerAdventure({
+    id: 'grid-adventure-celadon-high-stakes-pachinko',
+    name: 'Rocket Pachinko',
+    description:
+      'Explore both arcade rooms. The middle door leads to twelve High Stakes Pachinko machines; the bottom-center mat exits or returns between rooms.',
+    icon: { type: 'local', id: '/games/grid-objects/celadon-pachinko-machine.png' },
+    requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
+    overrides: 'grid-adventure-celadon-pachinko',
+    screens: [
+      {
+        id: 'arcade-floor',
+        objects: createPachinkoMachinePlacements('standard'),
+        teleporters: [{
+          id: 'high-stakes-pachinko-room-door',
+          x: 3,
+          y: 0,
+          target: { screen: 'high-stakes-pachinko-room', x: 3, y: 5 },
+        }],
+        winTiles: [{ x: 3, y: 6 }],
+      },
+      {
+        id: 'high-stakes-pachinko-room',
+        objects: createPachinkoMachinePlacements('high'),
+        teleporters: [{
+          id: 'pachinko-arcade-return-mat',
           x: 3,
           y: 6,
           target: { screen: 'arcade-floor', x: 3, y: 5 },

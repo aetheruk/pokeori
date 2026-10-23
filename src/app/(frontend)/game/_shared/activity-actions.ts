@@ -141,6 +141,7 @@ import type { MagnemiteCircuitSettings } from '@/data/games/magnemite-circuit/ty
 import type { RockTunnelEchoMapSettings } from '@/data/games/rock-tunnel-echo-map/types'
 import type { VoltorbGridSettings } from '@/data/games/voltorb-grid/types'
 import type { RockPushGameConfig } from '@/data/games/rock-push/types'
+import type { PachinkoGameConfig, PachinkoGameSettings } from '@/data/games/pachinko/types'
 import type { GridObjectPlacement } from '@/data/games/grid-tiles/types'
 import {
   getRockPushObjectProofTargets,
@@ -150,6 +151,7 @@ import {
 import { generateInspectionRound } from '@/utilities/research/tcg-inspection-server'
 import type { TcgInspectionGameSettings } from '@/data/games/tcg-inspection/types'
 import { createDiglettRound } from '@/utilities/research/diglett-authority'
+import { getCeladonPachinkoMachineSettings } from '@/utilities/research/celadon-pachinko-machines'
 import type { DiglettTunnelTapSettings } from '@/data/games/diglett-tunnel-tap/types'
 import { getGameCompletionInvalidations } from '@/utilities/games/completion-invalidation'
 import { randomInt } from 'node:crypto'
@@ -995,6 +997,35 @@ export async function startGameActivity(
             },
           } as (typeof allGames)[number]
         }
+        const pachinkoMachineNumber =
+          authoredTarget.placement.properties?.gridAdventurePachinkoMachine
+        const pachinkoStakes =
+          authoredTarget.placement.properties?.gridAdventurePachinkoStakes
+        if (
+          encounter.id === 'celadon-rocket-pachinko' &&
+          encounter.gameType === 'pachinko' &&
+          typeof pachinkoMachineNumber === 'number' &&
+          Number.isInteger(pachinkoMachineNumber) &&
+          pachinkoMachineNumber >= 1 &&
+          pachinkoMachineNumber <= 12 &&
+          (pachinkoStakes === 'standard' || pachinkoStakes === 'high')
+        ) {
+          const pachinkoEncounter = encounter as PachinkoGameConfig
+          encounter = {
+            ...pachinkoEncounter,
+            name: pachinkoStakes === 'high'
+              ? 'High Stakes Rocket Pachinko'
+              : pachinkoEncounter.name,
+            description: pachinkoStakes === 'high'
+              ? 'Drop through the pegs for high-stakes token prizes, a narrow Electrode jackpot, or a five-ball Bonus Drop.'
+              : pachinkoEncounter.description,
+            settings: getCeladonPachinkoMachineSettings(
+              pachinkoEncounter.settings as PachinkoGameSettings,
+              pachinkoMachineNumber,
+              pachinkoStakes,
+            ),
+          } as (typeof allGames)[number]
+        }
       }
 
       const isExpeditionActivityContent =
@@ -1793,6 +1824,10 @@ export async function startGameActivity(
         const state: GameActivityState = {
           userId: user.id,
           encounterId: validatedEncounterId,
+          gridAdventureContext,
+          eventConfigSnapshot: encounter.gridAdventureOnly
+            ? encounter
+            : undefined,
           startTime,
           expiry: expiry,
           wins: 0,

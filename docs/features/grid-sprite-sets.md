@@ -6,6 +6,8 @@ Player appearance comes from the saved trainer gender in all three grid variants
 
 The shared grid renderer uses a 16×16 logical cell. Current production-ready art is authored at 64×64 native pixels per logical cell (and 128×128 for a 2×2 footprint), then scaled responsively by the renderer. This keeps movement, collision, and authored coordinates stable while giving mobile screens enough source detail. The renderer waits until it has measured its container before revealing the board, avoiding a visible scale and position correction on mount. Grid Adventure restores its saved scene before rendering the board after an integrated activity returns. A sprite set owns terrain and floor-layer art. Reusable entities are registered separately, and scene geometry is authored by each game.
 
+The live `Rocket Pachinko` Adventure follows the same one-entry/two-room pattern as Rocket Slots. Both rooms contain twelve reusable interactive cabinets; high-stakes cabinets use the green Pachinko sprite. The server saves each cabinet's stable bucket offsets (at most three board units), width changes (at most two units), and per-slot token payouts (within 8% of standard), then scales its wager and all payouts fivefold in the high-stakes room. Pachinko rounds verify that their exact cabinet placement is still part of the active Adventure before they can settle.
+
 ## Asset layout
 
 ```text

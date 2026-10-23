@@ -647,6 +647,60 @@ describe('shared grid sprite sets', () => {
     )
   })
 
+  test('Rocket Pachinko becomes a two-room Adventure with cabinet-specific stakes', () => {
+    const standard = allGames.find(
+      (game) => game.id === 'grid-adventure-celadon-pachinko',
+    ) as GridPuzzleRockPushGameConfig | undefined
+    const highStakes = allGames.find(
+      (game) => game.id === 'grid-adventure-celadon-high-stakes-pachinko',
+    ) as GridPuzzleRockPushGameConfig | undefined
+
+    expect(standard?.name).toBe('Rocket Pachinko')
+    expect(highStakes?.name).toBe('Rocket Pachinko')
+    expect(highStakes?.overrides).toBe(standard?.id)
+    expect(highStakes?.requirements).toEqual([
+      { type: 'task_completed', targetId: 'high-roller' },
+    ])
+
+    const standardRoom = standard?.settings.screens?.[0]
+    expect(standardRoom?.objects).toHaveLength(12)
+    expect(new Set(standardRoom?.objects?.map((object) => object.objectId))).toEqual(
+      new Set(['celadon-pachinko-machine']),
+    )
+    expect(standardRoom?.objects?.map((object) => object.properties?.gridAdventurePachinkoMachine)).toEqual(
+      Array.from({ length: 12 }, (_, index) => index + 1),
+    )
+
+    const [arcade, highStakesRoom] = highStakes?.settings.screens || []
+    expect(highStakes?.settings.screens).toHaveLength(2)
+    expect(arcade?.teleporters?.[0]).toMatchObject({
+      id: 'high-stakes-pachinko-room-door',
+      x: 3,
+      y: 0,
+      target: { screen: 'high-stakes-pachinko-room', x: 3, y: 5 },
+    })
+    expect(arcade?.winTiles).toEqual([{ x: 3, y: 6 }])
+    expect(highStakesRoom?.objects).toHaveLength(12)
+    expect(new Set(highStakesRoom?.objects?.map((object) => object.objectId))).toEqual(
+      new Set(['celadon-high-stakes-pachinko-machine']),
+    )
+    expect(new Set(highStakesRoom?.objects?.map((object) => object.properties?.gridAdventurePachinkoStakes))).toEqual(
+      new Set(['high']),
+    )
+    expect(highStakesRoom?.teleporters?.[0]).toMatchObject({
+      id: 'pachinko-arcade-return-mat',
+      x: 3,
+      y: 6,
+      target: { screen: 'arcade-floor', x: 3, y: 5 },
+    })
+    expect(gridObjects.celadonPachinkoMachine.asset.src).toBe(
+      '/games/grid-objects/celadon-pachinko-machine.png',
+    )
+    expect(gridObjects.celadonHighStakesPachinkoMachine.asset.src).toBe(
+      '/games/grid-objects/celadon-high-stakes-pachinko-machine.png',
+    )
+  })
+
   test('back-wall row is reserved for the wall surface and exit markers', () => {
     const spatialGames = allGames.filter(
       (game) => game.gameType === 'grid-puzzle',
@@ -695,6 +749,8 @@ describe('shared grid sprite sets', () => {
       'minigameTrigger',
       'celadonSlotMachine',
       'celadonHighStakesSlotMachine',
+      'celadonPachinkoMachine',
+      'celadonHighStakesPachinkoMachine',
       'fieldResearchTrigger',
     ])
     for (const object of Object.values(gridObjects)) {

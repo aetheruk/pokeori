@@ -36,8 +36,9 @@ export const celadonGameCornerPachinkoEntries: PachinkoGameConfig[] = [
   {
     id: 'celadon-rocket-pachinko',
     gameType: 'pachinko',
+    gridAdventureOnly: true,
     name: 'Rocket Pachinko',
-    description: 'Drop through the pegs for token prizes, the narrow 50-token Voltorb jackpot, or a five-ball Bonus Drop.',
+    description: 'Drop through the pegs for varied token prizes, a narrow Voltorb jackpot, or a five-ball Bonus Drop.',
     icon: { type: 'pokemon', id: '100' },
     background: '/backgrounds/celadon-game-corner-arcade.avif',
     category: 'Kanto',
@@ -50,41 +51,6 @@ export const celadonGameCornerPachinkoEntries: PachinkoGameConfig[] = [
       background: '/backgrounds/celadon-game-corner-arcade.avif',
       themeColour: '#9f1239',
       cost: { currencyType: 'fun-tokens', amount: 5 },
-    },
-  },
-  {
-    id: 'celadon-high-stakes-pachinko',
-    gameType: 'pachinko',
-    name: 'High Stakes Rocket Pachinko',
-    description: 'Twenty-five tokens buys a drop toward the 250-token Electrode jackpot or a five-ball Bonus Drop.',
-    icon: { type: 'pokemon', id: '101' },
-    background: '/backgrounds/celadon-game-corner-arcade.avif',
-    category: 'Kanto',
-    subCategory: 'Celadon Game Corner',
-    requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
-    criteria: [],
-    rewards: [],
-    settings: {
-      ...rocketPachinkoSettings,
-      board: {
-        ...rocketPachinkoSettings.board,
-        buckets: rocketPachinkoSettings.board.buckets.map((bucket) => ({
-          ...bucket,
-          icon:
-            bucket.kind === 'jackpot'
-              ? { type: 'pokemon' as const, id: '101' }
-              : bucket.icon,
-          rewards:
-            bucket.id === 'fifty'
-              ? [{ type: 'currency', targetId: 'fun-tokens', quantity: 250, dropChance: 100 }]
-              : bucket.id.includes('fifteen')
-                ? [{ type: 'currency', targetId: 'fun-tokens', quantity: 75, dropChance: 100 }]
-                : [],
-        })),
-      },
-      background: '/backgrounds/celadon-game-corner-arcade.avif',
-      themeColour: '#f59e0b',
-      cost: { currencyType: 'fun-tokens', amount: 25 },
     },
   },
 ]

@@ -6,6 +6,7 @@ import { randomInt } from 'node:crypto'
 import {
   type GameActivityState,
   getUser,
+  isGridAdventureActivityContextActive,
 } from '@/app/(frontend)/game/_shared/activity-actions'
 import { allGames } from '@/data/games'
 import type { PachinkoGameSettings } from '@/data/games/pachinko/types'
@@ -115,9 +116,22 @@ export async function completePachinkoRound({
         return { success: false, error: 'Pachinko session changed' }
       }
 
-      const encounter = allGames.find((e) => e.id === encounterId)
+      const encounter = state.eventConfigSnapshot || allGames.find((e) => e.id === encounterId)
       if (encounter?.gameType !== 'pachinko' || !encounter.settings.board) {
         return { success: false, error: 'Invalid game type' }
+      }
+      if (
+        encounter.gridAdventureOnly &&
+        !(await isGridAdventureActivityContextActive(
+          user.id,
+          state.encounterId,
+          state.gridAdventureContext,
+        ))
+      ) {
+        return {
+          success: false,
+          error: 'This Pachinko machine is no longer part of the active Grid Adventure.',
+        }
       }
 
       const cost = encounter.settings.cost
