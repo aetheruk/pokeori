@@ -312,7 +312,6 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
   ...[
     ['link-cable', 'Link Cable'],
     ['up-grade', 'Up-Grade'],
-    ['dubious-disc', 'Dubious Disc'],
     ['nugget', 'Nugget'],
   ].map(([itemId, name]) =>
     itemPrize({
@@ -333,6 +332,83 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
     rarity: 'rare',
   }),
   ...[
+    ['health-feather', 'Health Feather'],
+    ['muscle-feather', 'Muscle Feather'],
+    ['resist-feather', 'Resist Feather'],
+    ['genius-feather', 'Genius Feather'],
+    ['clever-feather', 'Clever Feather'],
+    ['swift-feather', 'Swift Feather'],
+  ].map(([itemId, name]) =>
+    itemPrize({
+      id: itemId,
+      label: name,
+      itemId,
+      quantity: 1,
+      weight: 0.5,
+      rarity: 'ultra-rare',
+    }),
+  ),
+]
+
+const evFeatherPrizeIds = new Set([
+  'health-feather',
+  'muscle-feather',
+  'resist-feather',
+  'genius-feather',
+  'clever-feather',
+  'swift-feather',
+])
+const materialPrizeIds = new Set<string>(
+  materialFamilies.map(([itemId]) => itemId),
+)
+
+function multiplyItemRewards(
+  rewards: UfoCatcherPrizeTier['rewards'],
+  itemIds: Set<string>,
+  multiplier: number,
+) {
+  return rewards.map((reward) => {
+    if (
+      reward.type !== 'item' ||
+      !itemIds.has(String(reward.targetId)) ||
+      typeof reward.quantity !== 'number'
+    ) {
+      return reward
+    }
+
+    const quantity = reward.quantity * multiplier
+    const label = itemIds.has('pack-base5') && reward.targetId === 'pack-base5'
+      ? '5 Team Rocket Booster Packs'
+      : reward.label?.startsWith('3 ')
+        ? reward.label.replace(/^3 /, `${quantity} `)
+        : reward.label
+
+    return { ...reward, quantity, label }
+  })
+}
+
+const highStakesPrizePool: UfoCatcherPrizeTier[] = [
+  ...itemPrizePool
+    .filter((tier) => !evFeatherPrizeIds.has(tier.id) && tier.id !== 'up-grade')
+    .map((tier) => ({
+      ...tier,
+      label: materialPrizeIds.has(tier.id)
+        ? tier.label.replace(/^3 /, '15 ')
+        : tier.label,
+      rewards: multiplyItemRewards(tier.rewards, materialPrizeIds, 5),
+      replacementWhenOwned: tier.replacementWhenOwned
+        ? {
+            ...tier.replacementWhenOwned,
+            label: '5 Team Rocket Booster Packs',
+            rewards: multiplyItemRewards(
+              tier.replacementWhenOwned.rewards,
+              new Set(['pack-base5']),
+              5,
+            ),
+          }
+        : undefined,
+    })),
+  ...[
     ['hp-up', 'HP Up'],
     ['protein', 'Protein'],
     ['iron', 'Iron'],
@@ -349,6 +425,45 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
       rarity: 'ultra-rare',
     }),
   ),
+  ...[
+    ['thunder-stone', 'Thunder Stone'],
+    ['ice-stone', 'Ice Stone'],
+    ['moon-stone', 'Moon Stone'],
+    ['fire-stone', 'Fire Stone'],
+    ['leaf-stone', 'Leaf Stone'],
+    ['water-stone', 'Water Stone'],
+    ['oval-stone', 'Oval Stone'],
+    ['sun-stone', 'Sun Stone'],
+    ['shiny-stone', 'Shiny Stone'],
+    ['dusk-stone', 'Dusk Stone'],
+    ['dawn-stone', 'Dawn Stone'],
+  ].map(([itemId, name]) =>
+    itemPrize({
+      id: itemId,
+      label: name,
+      itemId,
+      quantity: 1,
+      weight: 0.5,
+      rarity: 'rare',
+    }),
+  ),
+  itemPrize({
+    id: 'super-potion',
+    label: 'Super Potion',
+    itemId: 'battle-super-potion',
+    iconId: 'super-potion',
+    quantity: 1,
+    weight: 8,
+    rarity: 'common',
+  }),
+  itemPrize({
+    id: 'dubious-disc',
+    label: 'Dubious Disc',
+    itemId: 'dubious-disc',
+    quantity: 1,
+    weight: 0.5,
+    rarity: 'rare',
+  }),
 ]
 
 const ufoCatcherSettings: UfoCatcherSettings = {
@@ -367,8 +482,10 @@ const ufoCatcherSettings: UfoCatcherSettings = {
 export const celadonGameCornerUfoCatcherEntries: UfoCatcherGameConfig[] = [
   {
     id: 'celadon-rocket-ufo-catcher',
+    gridAdventureOnly: true,
+    hide: 'when-the-fun-stops',
     gameType: 'ufo-catcher',
-    name: 'Rocket UFO Catcher',
+    name: 'Game Plaza UFO Catcher',
     description:
       'Guide the claw across the cabinet and back over a prize before making your drop.',
     category: 'Kanto',
@@ -379,5 +496,27 @@ export const celadonGameCornerUfoCatcherEntries: UfoCatcherGameConfig[] = [
     criteria: [],
     rewards: [],
     settings: ufoCatcherSettings,
+  },
+  {
+    id: 'celadon-high-stakes-ufo-catcher',
+    gridAdventureOnly: true,
+    hide: 'high-roller',
+    gameType: 'ufo-catcher',
+    name: 'High Stakes Game Plaza UFO Catcher',
+    description:
+      'Spend 300 Fun Tokens for a round with fivefold material and booster pack prizes, rare evolution stones, and Super Potions.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    icon: { type: 'pokemon', id: '479' },
+    background: '/backgrounds/celadon-game-corner-arcade.avif',
+    requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
+    criteria: [],
+    rewards: [],
+    settings: {
+      ...ufoCatcherSettings,
+      cost: { currencyType: 'fun-tokens', amount: 300 },
+      themeColour: '#1f8a5b',
+      tiers: highStakesPrizePool,
+    },
   },
 ]

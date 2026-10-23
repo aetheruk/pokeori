@@ -21,7 +21,7 @@ import {
 } from '@/utilities/research/ufo-catcher'
 import { getRequiredResearchWins } from '@/utilities/research/required-wins'
 
-const [standard] = celadonGameCornerUfoCatcherEntries
+const [standard, highStakes] = celadonGameCornerUfoCatcherEntries
 
 const layoutRolls = {
   tierRolls: [0, 0, 0, 0, 0],
@@ -46,15 +46,16 @@ describe('UFO Catcher authored balance', () => {
     expect(isDailyExcludedGameType('prize-wheel')).toBe(true)
   })
 
-  test('authors one 30-token non-currency machine with five prizes per play', () => {
+  test('authors low and high stakes non-currency machines with five prizes per play', () => {
     expect(celadonGameCornerUfoCatcherEntries.map((entry) => entry.id)).toEqual(
-      ['celadon-rocket-ufo-catcher'],
+      ['celadon-rocket-ufo-catcher', 'celadon-high-stakes-ufo-catcher'],
     )
     expect(standard.settings.cost).toEqual({
       currencyType: 'fun-tokens',
       amount: 30,
     })
     expect(standard.settings.prizeCount).toBe(5)
+    expect(standard.gridAdventureOnly).toBe(true)
     expect(standard.icon).toEqual({ type: 'pokemon', id: '479' })
     expect(
       standard.settings.tiers.every(
@@ -68,9 +69,17 @@ describe('UFO Catcher authored balance', () => {
         tier.rewards.some((reward) => reward.type === 'currency'),
       ),
     ).toBe(false)
+
+    expect(highStakes.settings.cost).toEqual({
+      currencyType: 'fun-tokens',
+      amount: 300,
+    })
+    expect(highStakes.settings.prizeCount).toBe(5)
+    expect(highStakes.gridAdventureOnly).toBe(true)
+    expect(highStakes.settings.themeColour).toBe('#1f8a5b')
   })
 
-  test('includes the requested consumables, gems, materials, balls, evolution items, and vitamins', () => {
+  test('low stakes includes consumables, gems, materials, balls, Up-Grade, and EV feathers', () => {
     expect(getItemReward('potions')).toMatchObject({
       targetId: 'battle-potion',
       quantity: 1,
@@ -167,20 +176,62 @@ describe('UFO Catcher authored balance', () => {
       'rocket-ball',
       'link-cable',
       'up-grade',
-      'dubious-disc',
       'nugget',
-      'hp-up',
-      'protein',
-      'iron',
-      'calcium',
-      'zinc',
-      'carbos',
     ]) {
       expect(getItemReward(itemId)).toMatchObject({
         targetId: itemId,
         quantity: 1,
       })
     }
+
+    for (const featherId of [
+      'health-feather',
+      'muscle-feather',
+      'resist-feather',
+      'genius-feather',
+      'clever-feather',
+      'swift-feather',
+    ]) {
+      expect(getItemReward(featherId)).toMatchObject({
+        targetId: featherId,
+        quantity: 1,
+      })
+    }
+    expect(standard.settings.tiers.some((tier) => tier.id === 'dubious-disc')).toBe(false)
+    expect(standard.settings.tiers.some((tier) => tier.id === 'protein')).toBe(false)
+  })
+
+  test('high stakes adds vitamins, Dubious Disc, evolution stones, and Super Potion', () => {
+    for (const itemId of [
+      'hp-up',
+      'protein',
+      'iron',
+      'calcium',
+      'zinc',
+      'carbos',
+      'dubious-disc',
+      'thunder-stone',
+      'ice-stone',
+      'moon-stone',
+      'fire-stone',
+      'leaf-stone',
+      'water-stone',
+      'oval-stone',
+      'sun-stone',
+      'shiny-stone',
+      'dusk-stone',
+      'dawn-stone',
+      'super-potion',
+    ]) {
+      const tier = highStakes.settings.tiers.find((entry) => entry.id === itemId)
+      expect(tier?.rewards[0]).toMatchObject({
+        type: 'item',
+        targetId: itemId === 'super-potion' ? 'battle-super-potion' : itemId,
+        quantity: 1,
+      })
+    }
+    expect(highStakes.settings.tiers.some((tier) => tier.id === 'health-feather')).toBe(false)
+    expect(highStakes.settings.tiers.some((tier) => tier.id === 'up-grade')).toBe(false)
   })
 
   test('makes the Team Rocket binder a dominant common prize with an owned-item upgrade', () => {
@@ -485,9 +536,9 @@ describe('UFO Catcher geometry and resolution', () => {
 })
 
 describe('UFO Catcher registration and validation', () => {
-  test('registers one zero-required-win game route with its own Explore icon', () => {
+  test('registers both zero-required-win variants on one game route', () => {
     const authored = allGames.filter((game) => game.gameType === 'ufo-catcher')
-    expect(authored).toHaveLength(1)
+    expect(authored).toHaveLength(2)
     expect(authored.every((game) => getRequiredResearchWins(game) === 0)).toBe(
       true,
     )

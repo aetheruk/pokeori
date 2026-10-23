@@ -1,7 +1,8 @@
 # UFO Catcher
 
 UFO Catcher is a reusable paid mini-game type first used by the Celadon Game
-Corner claw machine.
+Corner claw machine. Celadon's standard and High Stakes cabinets are launched
+from the corresponding objects in the `Game Plaza` Grid Adventure.
 
 ## Player flow
 
@@ -41,8 +42,8 @@ joystick game-type icon.
 
 UFO Catcher never returns Fun Tokens. The server makes five weighted draws
 without replacement when the attempt starts, so the revealed prizes are always
-distinct. Common medicine, gems, materials, and candies fill most cabinets,
-with rarer X items, special Poké Balls, evolution items, valuables, EV vitamins,
+distinct. Common medicine, gems, and materials fill most cabinets, with rarer
+X items, special Poké Balls, evolution items, valuables, EV training prizes,
 and profile unlocks appearing through the same visible pool. A profile icon or
 title is removed from a trainer's eligible pool after they unlock it.
 
@@ -72,15 +73,23 @@ records a loss.
 
 ## Celadon balance
 
-Celadon has one UFO Catcher machine. It costs 30 Fun Tokens per attempt.
+The standard Game Plaza UFO Catcher costs 30 Fun Tokens. Its High Stakes
+counterpart costs 300; Match 3 and Prize Wheel keep their own existing stakes.
+The standard pool has EV feathers and Up-Grade, but no EV vitamins or Dubious
+Disc. The High Stakes pool removes the feathers and Up-Grade, adds the six EV
+vitamins and Dubious Disc, includes all eleven evolution stones, and adds a
+Super Potion. Tier-one material quantities rise from three to fifteen, and the
+Team Rocket Binder's owned-item replacement rises from one to five booster
+packs.
 
 | Pool entry | Quantity | Weight per entry | Rarity |
 | --- | ---: | ---: | --- |
 | Potion | 1 | 14 | Common |
+| Team Rocket Binder (or one booster pack if already owned) | 1 | 70 | Common |
 | Antidote | 1 | 12 | Common |
 | Each other single-status cure | 1 | 8 | Common |
-| XS Candy | 2 | 8 | Common |
-| S Candy | 2 | 6 | Common |
+| XS Candy | 1 | 1 | Uncommon |
+| S Candy | 1 | 1 | Uncommon |
 | Each type gem | 2 | 2 | Common |
 | Each tier-one Pokémon material | 3 | 2 | Common |
 | Full Heal | 1 | 2 | Uncommon |
@@ -89,8 +98,15 @@ Celadon has one UFO Catcher machine. It costs 30 Fun Tokens per attempt.
 | UFO Master title | 1 unlock | 1 | Uncommon |
 | Ultra Ball | 1 | 4 | Rare |
 | Rocket Ball | 1 | 2 | Rare |
-| Link Cable, Up-Grade, Dubious Disc, or Nugget | 1 | 0.5 each | Rare |
-| Each EV vitamin | 1 | 0.5 | Ultra rare |
+| Link Cable, Up-Grade, or Nugget | 1 | 0.5 each | Rare |
+| Each EV feather | 1 | 0.5 | Ultra rare |
+
+In the High Stakes pool, Up-Grade and EV feathers are replaced by Dubious Disc,
+the six EV vitamins, all eleven evolution stones, and Super Potion. Each added
+evolution stone and Dubious Disc has weight 0.5 (rare); each vitamin has weight
+0.5 (ultra rare); Super Potion has weight 8 (common). Material prize quantities
+are five times the standard amount, and the binder replacement awards five
+booster packs.
 
 Weights are relative and recalculate after each selected entry is removed. The
 grip profiles are 45–95% for common prizes, 30–85% for uncommon, 15–70% for
