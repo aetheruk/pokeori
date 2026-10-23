@@ -56,6 +56,15 @@ export const gridObjects = {
     collision: 'none',
     interaction: 'battle',
   },
+  channelerTrainer: {
+    id: 'channeler-trainer',
+    name: 'Channeler',
+    purpose: 'battle-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/games/grid-objects/channeler-trainer.png' },
+    collision: 'none',
+    interaction: 'battle',
+  },
   wildBattleTrigger: {
     id: 'wild-battle-trigger',
     name: 'Wild Battle Trigger',

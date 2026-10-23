@@ -744,6 +744,7 @@ describe('shared grid sprite sets', () => {
       'battleTrigger',
       'bugCatcherTrainer',
       'birdKeeperTrainer',
+      'channelerTrainer',
       'wildBattleTrigger',
       'route1RattataTrigger',
       'route1PidgeyTrigger',
@@ -812,6 +813,7 @@ describe('shared grid sprite sets', () => {
     const trainerFrames = [
       ['BUGCATCHER', 'bug-catcher-trainer'],
       ['BIRDKEEPER', 'bird-keeper-trainer'],
+      ['PSYCHIC_F', 'channeler-trainer'],
     ] as const
 
     for (const [sourceName, markerName] of trainerFrames) {

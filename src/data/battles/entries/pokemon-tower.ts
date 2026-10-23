@@ -630,3 +630,22 @@ export const pokemonTowerBattles: BattleConfig[] = [
     allowedItems: ['battle-potion', 'battle-super-potion'],
   },
 ]
+
+/** Repeatable, open-choice copies of the story Channeler battles for the Tower Grid Adventure. */
+export const pokemonTowerGauntletBattles: BattleConfig[] = pokemonTowerBattles
+  .filter((battle) => battle.id.startsWith('pokemon-tower-channeler-'))
+  .map((battle) => {
+    const prefix = 'pokemon-tower-channeler-'
+    const { id, requirements: _storyRequirements, ...reusableBattle } = battle
+    return {
+      ...reusableBattle,
+      id: `pokemon-tower-gauntlet-${id.slice(prefix.length)}`,
+      name: `Tower Trial: ${battle.trainerName}`,
+      description: `Repeatable Grid Adventure battle against ${battle.name}.`,
+      category: 'Secret',
+      subCategory: 'Pokemon Tower',
+      gridAdventureOnly: true,
+      requirements: [],
+      criteria: [],
+    }
+  })

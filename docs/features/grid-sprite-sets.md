@@ -58,7 +58,9 @@ dimensions remain possible for future content. The logical footprint remains
 one or two 16px cells.
 
 Buggy and Feathered Gauntlet trainer markers use the matching FRLG Bug Catcher
-and Bird Keeper sprites. Their original sheets stay unchanged under
+and Bird Keeper sprites. The Pokémon Tower Ghost Trial uses a female Psychic
+sprite from the same pack for its Channeler markers because the pack does not
+include a dedicated Channeler sheet. Their original sheets stay unchanged under
 `public/games/trainers/source/`; the sheets contain 32×48 frames. The object
 assets use nearest-neighbor 2× scaling of the complete first frame to 64×96;
 the grid contains them within the square 64×64 object cell. Source details and
@@ -126,6 +128,13 @@ never supplies the roll, and other game systems continue using the player's
 global roll. The repeatable Buggy and Feathered Gauntlets each use a 1-in-5 roll
 to place three separate one-item material pickups on the floor: Chitin
 Fragments in the forest and Wing Feathers on Route 14.
+
+Object placements may share a `randomGroup` with a stable id and `selectCount`.
+At run creation, the server uses the pinned roll to deterministically choose
+the requested number of group members. Only those placements are saved to the
+board and accepted by child-activity authorization. The Pokémon Tower Ghost
+Trial uses this to place five of its thirteen Secret Channeler battle copies on
+each run.
 
 Use the `minigame-trigger` object for any authored Mini Game under
 `interaction.type: 'minigame'`; use `field-research-trigger` for an authored
@@ -266,6 +275,6 @@ silhouette as the pushable boulder, so it does not introduce a square matte when
 rendered over any floor. Placement `properties` are available for per-instance
 state, while the shared definition remains terrain-independent.
 
-The current authored games use local themed sets: `basic-cave` for cave-oriented Echo/Voltorb boards, `grass` for outdoor Rock Push and rooftop boards, `wooden-interior` for Koga's Fuchsia Gym invisible mazes, `industrial-power` for Lt. Surge's substation, `laboratory` for Blaine's lab, and `psychic-quiet-room` for Sabrina's Quiet Room Echo Map. Each set supplies its own aligned common/rare floor pair, repeated back wall, 1×1/2×2 blockers, gameplay tiles, and floor/wall marker pair. The Quiet Room adds a calm indigo-violet floor and memory-void holes; the cave and grass sets retain their role-specific ladder/fairy-ring markers. There is no legacy `rock-cave` palette; unknown or retired ids resolve to the default palette. A solved Rock Push hole returns to the set's common floor after the drop animation, so sprite sets do not need a filled-hole asset. No external sprite pack is bundled. When an external set is selected, add its credit metadata to the manifest and `ATTRIBUTIONS.md` before assigning it to live content.
+The current authored games use local themed sets: `basic-cave` for cave-oriented Echo/Voltorb boards, `grass` for outdoor Rock Push and rooftop boards, `wooden-interior` for Koga's Fuchsia Gym invisible mazes, `industrial-power` for Lt. Surge's substation, `laboratory` for Blaine's lab, `psychic-quiet-room` for Sabrina's Quiet Room Echo Map, and `pokemon-tower` for the post-story Ghost Trial. The Tower palette pairs plum stone floors with a stained-glass shrine wall. Each set supplies its own repeated back wall, 1×1/2×2 blockers, gameplay tiles, and floor/wall marker pair; rare floor variants are optional. The Quiet Room adds a calm indigo-violet floor and memory-void holes; the cave and grass sets retain their role-specific ladder/fairy-ring markers. There is no legacy `rock-cave` palette; unknown or retired ids resolve to the default palette. A solved Rock Push hole returns to the set's common floor after the drop animation, so sprite sets do not need a filled-hole asset. No external sprite pack is bundled. When an external set is selected, add its credit metadata to the manifest and `ATTRIBUTIONS.md` before assigning it to live content.
 
 Native field QA renders for the six sets live under `docs/previews/`: grass, basic cave, and psychic quiet-room showcases plus the authored Fuchsia Gym, Surge substation, and Blaine laboratory fields. They are kept at native 64px-per-logical-cell scale so floor seams, marker silhouettes, blocker footprints, and transparent object edges can be inspected directly.

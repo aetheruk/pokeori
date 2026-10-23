@@ -151,6 +151,40 @@ export const gridTilePalettes = {
       external: false,
     }],
   },
+  'pokemon-tower': {
+    id: 'pokemon-tower',
+    name: 'Pokémon Tower',
+    logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
+    floor: {
+      common: { src: '/games/grid-tiles/pokemon-tower/floor/common.png' },
+      blockers: {
+        small: { src: '/games/grid-tiles/psychic-quiet-room/floor/blockers/small.png' },
+        large: { src: '/games/grid-tiles/psychic-quiet-room/floor/blockers/large.png' },
+      },
+      markers: {
+        goal: { src: '/games/grid-tiles/psychic-quiet-room/floor/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/psychic-quiet-room/floor/markers/teleporter.png' },
+      },
+    },
+    walls: {
+      back: { src: '/games/grid-tiles/pokemon-tower/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/psychic-quiet-room/walls/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/psychic-quiet-room/walls/markers/teleporter.png' },
+      },
+    },
+    gameplay: {
+      boulder: { src: '/games/rockpush/boulder.avif' },
+      ice: { src: '/games/grid-tiles/psychic-quiet-room/gameplay/ice.png' },
+      hole: { src: '/games/grid-tiles/psychic-quiet-room/gameplay/hole.png' },
+    },
+    credits: [{
+      label: 'Pokeori Pokémon Tower tile set',
+      notice: 'AI-generated 64×64 plum stone floor and stained-glass shrine wall tiles for the shared 16×16 logical grid. Generic blockers and gameplay markers reuse the Psychic Quiet Room set.',
+      external: false,
+    }],
+  },
   'wooden-interior': {
     id: 'wooden-interior',
     name: 'Wooden Gym Interior tile set',
