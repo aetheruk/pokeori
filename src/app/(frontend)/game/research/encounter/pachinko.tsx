@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { useGridActivityReturn } from '@/components/game/shared/GridActivityReturnContext'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { Button } from '@/components/ui/button'
@@ -150,6 +151,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   const bonusTargetBodiesRef = useRef<Map<string, Matter.Body[]>>(new Map())
   const bonusTargetsInWorldRef = useRef(true)
   const router = useRouter()
+  const gridActivityReturn = useGridActivityReturn()
   const { playSfx } = useAudio()
   const { user, refreshUser } = useUser()
   const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
@@ -527,8 +529,11 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     const res = await completeGame(encounter.id, true)
     completionInvalidatesRef.current = res.invalidates
     setResult({
-      success: true,
-      message: 'Session Ended',
+      success: res.success,
+      activitySuccess: res.activitySuccess,
+      message: res.success
+        ? 'Session Ended'
+        : res.error || 'The Pachinko session could not be ended.',
       rewards: res.summary,
     })
   }
@@ -722,15 +727,22 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
           background={encounter.background}
           onClose={() => {
             refreshUser(true, completionInvalidatesRef.current)
-            router.push('/game/explore')
+            if (gridActivityReturn) {
+              gridActivityReturn.returnFromActivity(
+                result.activitySuccess === true,
+              )
+            } else {
+              router.push('/game/explore')
+            }
           }}
           icon={encounter.icon}
           iconAlt={encounter.name}
           title="DONE"
           message="One more go...?"
           secondaryAction={
-            state?.encounter?.isEligibleForReplay ||
-            encounter?.isEligibleForReplay ? (
+            !gridActivityReturn &&
+            (state?.encounter?.isEligibleForReplay ||
+              encounter?.isEligibleForReplay) ? (
               <Button
                 size="lg"
                 onClick={async () => {
