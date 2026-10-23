@@ -808,6 +808,31 @@ describe('shared grid sprite sets', () => {
     expect(metadata.hasAlpha).toBe(true)
   })
 
+  test('gauntlet trainer markers contain the full 32×48 source frame', async () => {
+    const trainerFrames = [
+      ['BUGCATCHER', 'bug-catcher-trainer'],
+      ['BIRDKEEPER', 'bird-keeper-trainer'],
+    ] as const
+
+    for (const [sourceName, markerName] of trainerFrames) {
+      const sourcePath = `public/games/trainers/source/trainer_${sourceName}.png`
+      const markerPath = `public/games/grid-objects/${markerName}.png`
+      const expected = await sharp(sourcePath)
+        .extract({ left: 0, top: 0, width: 32, height: 48 })
+        .resize({ width: 64, height: 96, kernel: sharp.kernel.nearest })
+        .ensureAlpha()
+        .raw()
+        .toBuffer()
+      const marker = sharp(markerPath)
+      const metadata = await marker.metadata()
+      const actual = await marker.ensureAlpha().raw().toBuffer()
+
+      expect(metadata.width).toBe(64)
+      expect(metadata.height).toBe(96)
+      expect(actual.equals(expected)).toBe(true)
+    }
+  })
+
   test('bundled overworld sprites expose their upstream credit', () => {
     const credits = getGridTilePackCredits({ externalOnly: true })
     expect(credits).toHaveLength(1)

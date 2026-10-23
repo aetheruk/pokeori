@@ -59,10 +59,10 @@ one or two 16px cells.
 
 Buggy and Feathered Gauntlet trainer markers use the matching FRLG Bug Catcher
 and Bird Keeper sprites. Their original sheets stay unchanged under
-`public/games/trainers/source/`; the 64×64 PNG object assets use nearest-neighbor
-scaling of the first 32×32 frame to the grid's native size. Standalone PNGs
-avoid mobile browsers clipping the frame when rendering it from an embedded
-SVG. Source details and credits are in
+`public/games/trainers/source/`; the sheets contain 32×48 frames. The object
+assets use nearest-neighbor 2× scaling of the complete first frame to 64×96;
+the grid contains them within the square 64×64 object cell. Source details and
+credits are in
 `ATTRIBUTIONS.md`.
 
 Interactive object types can opt into `interaction: 'battle'` or
