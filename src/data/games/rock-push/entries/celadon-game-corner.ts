@@ -117,7 +117,7 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
     {
       id: 'game-plaza-match3',
       objectId: 'game-plaza-match3-cabinet',
-      x: 1,
+      x: 2,
       y: 3,
       interaction: {
         type: 'minigame',
@@ -128,7 +128,7 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
     {
       id: 'game-plaza-prize-wheel',
       objectId: 'game-plaza-prize-wheel',
-      x: 4,
+      x: 3,
       y: 3,
       interaction: {
         type: 'minigame',
@@ -139,7 +139,7 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
     {
       id: 'game-plaza-ufo-catcher',
       objectId: 'game-plaza-ufo-catcher',
-      x: 7,
+      x: 4,
       y: 3,
       interaction: {
         type: 'minigame',
@@ -155,7 +155,7 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
         id: 'game-plaza-high-stakes-match3',
         objectId: 'game-plaza-high-stakes-match3-cabinet',
         x: 2,
-        y: 3,
+        y: 1,
         interaction: {
           type: 'minigame',
           targetId: 'celadon-high-stakes-match-3',
@@ -165,8 +165,8 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
       {
         id: 'game-plaza-high-stakes-prize-wheel',
         objectId: 'game-plaza-high-stakes-prize-wheel',
-        x: 5,
-        y: 3,
+        x: 3,
+        y: 1,
         interaction: {
           type: 'minigame',
           targetId: 'celadon-high-stakes-prize-wheel',
@@ -176,8 +176,8 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
       {
         id: 'game-plaza-high-stakes-ufo-catcher',
         objectId: 'game-plaza-high-stakes-ufo-catcher',
-        x: 8,
-        y: 3,
+        x: 4,
+        y: 1,
         interaction: {
           type: 'minigame',
           targetId: 'celadon-high-stakes-ufo-catcher',
@@ -313,13 +313,13 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
       'Visit the Match 3 arcade cabinet, Prize Wheel, and UFO Catcher, then leave through the floor mat at the bottom of the room.',
     icon: { type: 'local', id: '/games/grid-objects/game-plaza-match3-cabinet.png' },
     requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
-    gridSize: 9,
-    playerStart: { x: 4, y: 7 },
+    gridSize: 7,
+    playerStart: { x: 3, y: 5 },
     startScreen: 'game-plaza',
     screens: [{
       id: 'game-plaza',
       objects: createGamePlazaPlacements(false),
-      winTiles: [{ x: 4, y: 8 }],
+      winTiles: [{ x: 3, y: 6 }],
     }],
   }),
   createGameCornerAdventure({
@@ -330,13 +330,13 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
     icon: { type: 'local', id: '/games/grid-objects/game-plaza-match3-cabinet.png' },
     requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
     overrides: 'grid-adventure-celadon-game-plaza',
-    gridSize: 9,
-    playerStart: { x: 4, y: 7 },
+    gridSize: 7,
+    playerStart: { x: 3, y: 5 },
     startScreen: 'game-plaza',
     screens: [{
       id: 'game-plaza',
       objects: createGamePlazaPlacements(true),
-      winTiles: [{ x: 4, y: 8 }],
+      winTiles: [{ x: 3, y: 6 }],
     }],
   }),
 ]
