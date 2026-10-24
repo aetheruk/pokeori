@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.57.3",
+  "version": "0.57.4",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -21,7 +21,7 @@
     "lint:fix": "biome lint --write .",
     "format": "biome format .",
     "format:fix": "biome format --write .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "bun check",
     "validate:data": "bun test tests/game-schema.test.ts tests/grid-tile-palettes.test.ts tests/data-references.test.ts tests/generated-data-integrity.test.ts tests/pokemon-form-exclusions.test.ts tests/requirements-semantics.test.ts tests/guilds.test.ts tests/source-hygiene.test.ts tests/api-response.test.ts tests/rate-limiter.test.ts tests/endless-milestones.test.ts tests/research-input-validation.test.ts tests/battle-action-validation.test.ts tests/battle-item-effects.test.ts tests/pvp-power-state.test.ts tests/pvp-turn-engine.test.ts tests/pvp-turn-sync.test.ts tests/pve-turn-engine.test.ts tests/dev-game-data-tools.test.ts tests/gym-leader-chronicles.test.ts tests/chronicle-gameplay-balance.test.ts",
     "payload": "payload",
     "start": "bun .next/standalone/server.js",
