@@ -76,6 +76,12 @@ Chronicle battle is launched from a matching Grid Adventure, its server-side
 settlement receipt is kept with the parent session and included in the board's
 activity proof so returning from the battle can still be verified.
 
+When a wild battle launched from a Grid Adventure offers an optional catch,
+starting that catch preserves the parent board return path. The battle victory
+is already settled, so either catching or missing the Pokémon returns to the
+board as a successful battle interaction; the catch result does not spend a
+Grid Adventure life or replace its completion rewards.
+
 Legacy `/game/research` and `/game/research/encounter` links resolve the
 player's old active session and redirect to its canonical route. Legacy
 `research:{userId}` sessions migrate lazily on first read.

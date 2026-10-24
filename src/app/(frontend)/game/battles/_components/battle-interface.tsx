@@ -1077,7 +1077,12 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                         setIsCaptureStarting(true)
                         try {
                           const result = await attemptBattleCapture()
-                          if (result.success) router.push('/game/locations/encounter')
+                          if (result.success) {
+                            const captureReturnTo = gridPuzzleReturnTo
+                              ? `?returnTo=${encodeURIComponent(gridPuzzleReturnTo)}`
+                              : ''
+                            router.push(`/game/locations/encounter${captureReturnTo}`)
+                          }
                           else toast.error(result.error || 'Could not start the capture attempt.')
                         } catch {
                           toast.error('Could not start the capture attempt. Please try again.')

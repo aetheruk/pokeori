@@ -23,7 +23,6 @@ import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { BadgeShowcase } from '@/components/game/trainer/badge-showcase'
 import { TrainerSettings } from '@/components/game/trainer/trainer-settings'
-import { TrainerGenderPicker } from '@/components/game/trainer/trainer-gender-picker'
 import { TrainerGuilds } from '@/components/game/guilds/trainer-guilds'
 import { Button } from '@/components/ui/button'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
@@ -53,10 +52,6 @@ import {
   icons,
   titles,
 } from '@/data/user'
-import {
-  getTrainerGender,
-  type TrainerGender,
-} from '@/utilities/trainer-appearance'
 import { getPvpRecord } from '@/utilities/battle/pvp-rating'
 import { cn } from '@/lib/utils'
 import {
@@ -472,7 +467,6 @@ export function TrainerLeveling({
   const [selectedBanner, setSelectedBanner] = useState<string | null>(null)
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null)
-  const [selectedGender, setSelectedGender] = useState<TrainerGender>('neither')
   const [isSaving, setIsSaving] = useState(false)
   const userSkills = (user?.skills || {}) as SkillDataMap
   const equipableTitleIdSet = useMemo(
@@ -514,7 +508,6 @@ export function TrainerLeveling({
               <button
                 type="button"
                 onClick={() => {
-                  setSelectedGender(getTrainerGender(user.trainerGender))
                   setSelectedBanner((user as any).banner || 'lab')
                   setSelectedIcon((user as any).icon || 'ditto')
                   const currentTitle = (user as any).title || 'new-beginnings'
@@ -733,11 +726,6 @@ export function TrainerLeveling({
       >
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
           <fieldset disabled={isSaving} className="min-w-0 space-y-4">
-            <TrainerGenderPicker
-              value={selectedGender}
-              onChange={setSelectedGender}
-            />
-
             <div className="space-y-2">
               <label htmlFor="trainer-banner" className="text-sm font-semibold">
                 Background
@@ -839,7 +827,6 @@ export function TrainerLeveling({
                   banner: selectedBanner || user.banner || 'lab',
                   icon: selectedIcon || user.icon || 'ditto',
                   title: selectedTitle || user.title || 'new-beginnings',
-                  trainerGender: selectedGender,
                 }
                 const result = await saveCustomization(changes)
                 if (result.success) {

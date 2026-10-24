@@ -127,6 +127,7 @@ export async function startBattle(
   if (!battleConfig) return { success: false, error: 'Battle not found' }
 
   let gridAdventurePlacement: import('@/data/games/grid-tiles/types').GridObjectPlacement | undefined
+  let gridAdventureContext: BattleState['gridAdventureContext']
   let gridAdventureRollSnapshot: number | undefined
   if (battleConfig.gridAdventureOnly && !options?.gridAdventureObjectKey) {
     return {
@@ -148,6 +149,7 @@ export async function startBattle(
       }
     }
     gridAdventurePlacement = authoredTarget.placement
+    gridAdventureContext = authoredTarget.context
     gridAdventureRollSnapshot = authoredTarget.context.rollSnapshot
   }
 
@@ -379,6 +381,7 @@ export async function startBattle(
   return startBattleFromConfig(user as User, resolvedBattleConfig, {
     dynamic: isRivalBattleConfig(battleConfig),
     encounterItemId,
+    gridAdventureContext,
   })
 }
 
@@ -388,6 +391,7 @@ export async function startBattleFromConfig(
   options: {
     dynamic?: boolean
     encounterItemId?: string
+    gridAdventureContext?: BattleState['gridAdventureContext']
     fixedWildPokemon?: {
       speciesId: number
       formId: string
@@ -876,6 +880,7 @@ export async function startBattleFromConfig(
   }
 
   const initialState: BattleState = {
+    gridAdventureContext: options.gridAdventureContext,
     format: battleConfig.format ?? 'single',
     activePlayerSlots: battleConfig.format === 'double' ? [0, 1] : undefined,
     activeEnemySlots: battleConfig.format === 'double' ? [0, 1] : undefined,

@@ -50,6 +50,12 @@ export function buildBattleCaptureEncounter(
   return {
     userId,
     locationId,
+    ...(state.gridAdventureContext
+      ? {
+          gridAdventureContext: structuredClone(state.gridAdventureContext),
+          gridAdventureReturnOutcome: 'won' as const,
+        }
+      : {}),
     pokemonId: pokemon.speciesId,
     formId: pokemon.formId,
     gender: pokemon.gender || undefined,

@@ -376,6 +376,11 @@ export interface PendingBattleSketch {
 }
 
 export interface BattleState {
+  gridAdventureContext?: {
+    encounterId: string
+    objectKey: string
+    rollSnapshot?: number
+  }
   battleCapturePokemon?: import('@/utilities/pokemon/alpha').BattleCapturePokemon
   battleCaptureStartedAt?: number
   battleCaptureId?: string

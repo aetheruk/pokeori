@@ -848,11 +848,15 @@ describe('shared grid sprite sets', () => {
     const gengarCredit = credits.find((credit) =>
       credit.href === 'https://www.mediafire.com/file/a44ikbbztunn66m/Generation_9_Pack_v3.3.8.rar/file',
     )
-    expect(credits).toHaveLength(5)
+    const playerSpriteCredit = credits.find((credit) =>
+      credit.href === 'https://eeveeexpo.com/resources/1797/',
+    )
+    expect(credits).toHaveLength(6)
     expect(followingPokemonCredit?.creator).toContain('Golisopod User')
     expect(followingPokemonCredit?.notice).toContain('credit')
     expect(gengarCredit?.label).toContain('Pokémon overworld follower sprites')
     expect(gengarCredit?.creator).toContain('Caruban')
+    expect(playerSpriteCredit?.label).toContain('Red and Leaf player walking sheets')
   })
 
   test('unknown palette ids use the default palette while role overrides remain isolated', () => {

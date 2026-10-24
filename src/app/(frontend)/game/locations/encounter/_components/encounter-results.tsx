@@ -314,8 +314,11 @@ export function EncounterResults({
           refreshUser()
           if (returnPath && !encounter.locationId?.startsWith('fishing:')) {
             const separator = returnPath.includes('?') ? '&' : '?'
+            const outcome =
+              encounter.gridAdventureReturnOutcome ||
+              (captureResult.caught ? 'won' : 'lost')
             router.push(
-              `${returnPath}${separator}outcome=${captureResult.caught ? 'won' : 'lost'}`,
+              `${returnPath}${separator}outcome=${outcome}`,
             )
           } else {
             router.push('/game/explore')

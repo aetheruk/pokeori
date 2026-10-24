@@ -84,33 +84,32 @@ for (const width of [390, 1280]) {
 }
 
 for (const width of [390, 1280]) {
-  test(`trainer editor previews and saves gender at ${width}px`, async ({ page }) => {
+  test(`trainer editor uses the selected avatar at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 850 })
     await page.goto('/ui-test')
     await page.getByRole('button', { name: 'Test trainer settings', exact: true }).click()
     const edit = page.getByRole('button', { name: 'Customize trainer card', exact: true })
     await edit.click()
     const editor = page.getByRole('dialog', { name: 'Test trainer', exact: true })
-    await expect(editor.getByRole('radio', { name: 'Neither', exact: true })).toBeChecked()
-    await editor.getByRole('radio', { name: 'Female', exact: true }).check()
+    await expect(editor.getByText('Gender', { exact: true })).toHaveCount(0)
+    await expect(editor.getByRole('radio')).toHaveCount(0)
+    const avatarPicker = editor.locator('summary').first()
+    await avatarPicker.click()
+    await editor.getByRole('button', { name: 'Use Red trainer avatar', exact: true }).click()
     await editor.getByRole('button', { name: 'Cancel', exact: true }).click()
     await edit.click()
-    await expect(editor.getByRole('radio', { name: 'Neither', exact: true })).toBeChecked()
-    await editor.getByRole('radio', { name: 'Male', exact: true }).check()
-    await editor.getByRole('radio', { name: 'Male', exact: true }).press('ArrowRight')
-    await expect(editor.getByRole('radio', { name: 'Female', exact: true })).toBeChecked()
+    await expect(avatarPicker).toContainText('Ditto')
     await editor.screenshot({ path: `/tmp/pokeori-trainer-editor-${width}.png` })
+    await avatarPicker.click()
+    await editor.getByRole('button', { name: 'Use Leaf trainer avatar', exact: true }).click()
     await editor.getByRole('button', { name: 'Save changes', exact: true }).click()
     await expect(editor).toBeHidden()
     await edit.click()
-    await expect(editor.getByRole('radio', { name: 'Female', exact: true })).toBeChecked()
+    await expect(avatarPicker).toContainText('Leaf')
     await expect.poll(async () => {
       const bounds = await editor.boundingBox()
       return !!bounds && bounds.x >= 0 && bounds.x + bounds.width <= width + 1
     }).toBe(true)
-    await editor.getByText('Avatar · Ditto', { exact: true }).click()
-    await editor.getByRole('button', { name: /Use .* trainer avatar/ }).last().click()
-    await expect(editor).toBeVisible()
     await editor.getByRole('combobox', { name: 'Background', exact: true }).click()
     await page.getByRole('option').first().click()
     await expect(editor).toBeVisible()
