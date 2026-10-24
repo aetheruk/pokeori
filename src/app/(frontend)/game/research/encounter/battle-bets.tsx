@@ -11,6 +11,7 @@ import { BattleScene } from '@/app/(frontend)/game/battles/_components/battle-sc
 import {
   advanceBattleBetsBattle,
   clearBattleBetsResult,
+  completeBattleBetsPricing,
   placeBattleBet,
   startBattleBets,
 } from '@/app/(frontend)/game/games/battle-bets-actions'
@@ -84,6 +85,45 @@ export function BattleBetsGame({
   const [busy, setBusy] = useState(false)
   const [selectedSide, setSelectedSide] = useState<BattleBetsSide>()
   const [stakeInput, setStakeInput] = useState('')
+
+  useEffect(() => {
+    if (state.phase !== 'inspect' || !state.pricingPending) return
+
+    let cancelled = false
+    const sessionId = state.sessionId
+
+    const finishPricing = async () => {
+      try {
+        let updated = await completeBattleBetsPricing()
+        while (
+          !cancelled &&
+          updated?.sessionId === sessionId &&
+          updated.pricingPending
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 750))
+          updated = await completeBattleBetsPricing()
+        }
+        if (
+          !cancelled &&
+          updated?.sessionId === sessionId &&
+          !updated.pricingPending
+        ) {
+          setState(updated)
+        }
+      } catch {
+        if (!cancelled) {
+          toast.error(
+            'Could not calculate the final matchup odds. Please reload and try again.',
+          )
+        }
+      }
+    }
+
+    void finishPricing()
+    return () => {
+      cancelled = true
+    }
+  }, [state.phase, state.pricingPending, state.sessionId])
 
   const selectedOdds =
     selectedSide === 'female'
@@ -191,19 +231,39 @@ export function BattleBetsGame({
         <TokenChip balance={state.tokenBalance} />
 
         <div className="flex flex-1 items-center py-3 sm:py-5">
-          <div className="grid w-full gap-3 lg:grid-cols-2">
-            <TeamCard
-              team={state.femaleTeam}
-              odds={state.femaleOdds}
-              disabled={busy || state.tokenBalance < 1}
-              onBet={() => openStakeDialog('female')}
-            />
-            <TeamCard
-              team={state.maleTeam}
-              odds={state.maleOdds}
-              disabled={busy || state.tokenBalance < 1}
-              onBet={() => openStakeDialog('male')}
-            />
+          <div className="w-full">
+            {state.pricingPending && (
+              <p
+                role="status"
+                className="mb-3 text-center text-sm text-game-night-ink/70"
+              >
+                Matchup ready — calculating final odds…
+              </p>
+            )}
+            <div className="grid w-full gap-3 lg:grid-cols-2">
+              <TeamCard
+                team={state.femaleTeam}
+                odds={state.femaleOdds}
+                pricingPending={state.pricingPending === true}
+                disabled={
+                  busy ||
+                  state.pricingPending === true ||
+                  state.tokenBalance < 1
+                }
+                onBet={() => openStakeDialog('female')}
+              />
+              <TeamCard
+                team={state.maleTeam}
+                odds={state.maleOdds}
+                pricingPending={state.pricingPending === true}
+                disabled={
+                  busy ||
+                  state.pricingPending === true ||
+                  state.tokenBalance < 1
+                }
+                onBet={() => openStakeDialog('male')}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -314,11 +374,13 @@ function TokenChip({ balance }: { balance: number }) {
 function TeamCard({
   team,
   odds,
+  pricingPending,
   disabled,
   onBet,
 }: {
   team: BattleBetsTeamPreview
   odds: number
+  pricingPending: boolean
   disabled: boolean
   onBet: () => void
 }) {
@@ -339,10 +401,10 @@ function TeamCard({
         </h2>
         <div className="text-right">
           <p className="font-mono text-base font-semibold leading-none text-game-ochre">
-            {formatOdds(odds)}
+            {pricingPending ? '…' : formatOdds(odds)}
           </p>
           <p className="mt-1 text-[0.55rem] uppercase tracking-wider text-game-night-ink/50">
-            odds
+            {pricingPending ? 'calculating' : 'odds'}
           </p>
         </div>
       </div>
