@@ -2,6 +2,10 @@ import type { RockPushGameConfig, RockPushScreenConfig } from '../types'
 import { pokemonTowerGauntletBattles } from '@/data/battles/entries/pokemon-tower'
 import type { GridObjectPlacement, GridTilePaletteId } from '@/data/games/grid-tiles'
 
+const GAUNTLET_GRID_SIZE = 7
+const GAUNTLET_CENTER = Math.floor(GAUNTLET_GRID_SIZE / 2)
+const GAUNTLET_ENTRY_Y = GAUNTLET_GRID_SIZE - 2
+
 const bugGauntletBattleIds = [
   'bug-gauntlet-barry',
   'bug-gauntlet-billy',
@@ -80,7 +84,7 @@ function createGauntletScreens(options: {
     return {
       id: screenId,
       ...(options.tilePaletteId ? { tilePaletteId: options.tilePaletteId } : {}),
-      grid_size: 9,
+      grid_size: GAUNTLET_GRID_SIZE,
       objects: floorNumber === 5
         ? options.finalObjects
         : options.getFloorObjects(floorNumber),
@@ -88,14 +92,14 @@ function createGauntletScreens(options: {
         ? {
             teleporters: [{
               id: `${screenId}-upstairs`,
-              x: 4,
+              x: GAUNTLET_CENTER,
               y: 0,
               target: {
                 screen: floorNumber === 1
                   ? `${options.firstScreenId}-2`
                   : `${options.firstScreenId}-${floorNumber + 1}`,
-                x: 4,
-                y: 7,
+                x: GAUNTLET_CENTER,
+                y: GAUNTLET_ENTRY_Y,
               },
               oneWay: true,
             }],
@@ -105,8 +109,8 @@ function createGauntletScreens(options: {
         ? {
             prizes: [{
               id: `${screenId}-center-material`,
-              x: 4,
-              y: 4,
+              x: GAUNTLET_CENTER,
+              y: GAUNTLET_CENTER,
               itemId: options.materialItemId,
               quantity: 1,
               requirements: rareMaterialRollRequirement,
@@ -126,7 +130,7 @@ function createFixedTrainerFloor(
     `trainer-floor-${floorNumber}`,
     battleId,
     objectId,
-    4,
+    GAUNTLET_CENTER,
     1,
   )]
 }
@@ -137,7 +141,7 @@ function createRandomBirdTrainerFloor(floorNumber: number) {
       `bird-trainer-floor-${floorNumber}-${battleId}`,
       battleId,
       'bird-keeper-trainer',
-      4,
+      GAUNTLET_CENTER,
       1,
       undefined,
       undefined,
@@ -152,7 +156,10 @@ function createRandomBirdTrainerFloor(floorNumber: number) {
 
 function createTowerTrainerPlacements(floorNumber: number): GridObjectPlacement[] {
   const isTopFloor = floorNumber === 5
-  const trainerPosition = { x: 4, y: isTopFloor ? 4 : 1 }
+  const trainerPosition = {
+    x: GAUNTLET_CENTER,
+    y: isTopFloor ? GAUNTLET_CENTER : 1,
+  }
   const createTrainerPool = (
     variant: 'standard' | 'gengar',
   ): GridObjectPlacement[] =>
@@ -188,8 +195,8 @@ function createTowerTrainerPlacements(floorNumber: number): GridObjectPlacement[
     {
       id: 'rare-gengar-catch',
       objectId: 'gengar-encounter-trigger',
-      x: 4,
-      y: 4,
+      x: GAUNTLET_CENTER,
+      y: GAUNTLET_CENTER,
       removeOnSuccess: true,
       requirements: towerGengarRollRequirement,
       interaction: {
@@ -211,12 +218,12 @@ function createTowerFloors() {
         ? {
             teleporters: [{
               id: `tower-${floorNumber}-upstairs`,
-              x: 4,
+              x: GAUNTLET_CENTER,
               y: 0,
               target: {
                 screen: `tower-${floorNumber + 1}`,
-                x: 4,
-                y: 7,
+                x: GAUNTLET_CENTER,
+                y: GAUNTLET_ENTRY_Y,
               },
               oneWay: true,
             }],
@@ -226,8 +233,8 @@ function createTowerFloors() {
         ? {
             prizes: [{
               id: `tower-${floorNumber}-ectoplasm`,
-              x: 4,
-              y: 4,
+              x: GAUNTLET_CENTER,
+              y: GAUNTLET_CENTER,
               itemId: 'spirit-wisp-t1',
               quantity: 1,
             }],
@@ -261,10 +268,10 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       variant: 'rock-push',
       tilePaletteId: 'forest',
       timeLimit: 1800,
-      grid_size: 9,
+      grid_size: GAUNTLET_GRID_SIZE,
       lives: 1,
       winCondition: { type: 'activity-successes', count: 5 },
-      playerStart: { x: 4, y: 7 },
+      playerStart: { x: GAUNTLET_CENTER, y: GAUNTLET_ENTRY_Y },
       startScreen: 'forest',
       screens: createGauntletScreens({
         firstScreenId: 'forest',
@@ -279,11 +286,11 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
         finalObjects: [
           createGauntletBattlePlacement(
             'bug-final-paras', 'bug-gauntlet-paras-day', 'pokemon-battle-trigger',
-            4, 4, daytimeRequirement, '46',
+            GAUNTLET_CENTER, GAUNTLET_CENTER, daytimeRequirement, '46',
           ),
           createGauntletBattlePlacement(
             'bug-final-venonat', 'bug-gauntlet-venonat-night', 'pokemon-battle-trigger',
-            4, 4, nighttimeRequirement, '48',
+            GAUNTLET_CENTER, GAUNTLET_CENTER, nighttimeRequirement, '48',
           ),
         ],
       }),
@@ -310,10 +317,10 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       variant: 'rock-push',
       tilePaletteId: 'grass',
       timeLimit: 1800,
-      grid_size: 9,
+      grid_size: GAUNTLET_GRID_SIZE,
       lives: 1,
       winCondition: { type: 'activity-successes', count: 5 },
-      playerStart: { x: 4, y: 7 },
+      playerStart: { x: GAUNTLET_CENTER, y: GAUNTLET_ENTRY_Y },
       startScreen: 'route-14',
       screens: createGauntletScreens({
         firstScreenId: 'route-14',
@@ -322,11 +329,11 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
         finalObjects: [
           createGauntletBattlePlacement(
             'bird-final-donald', 'route-14-gauntlet-donald', 'bird-keeper-trainer',
-            4, 4, commonFinalBattleRollRequirement,
+            GAUNTLET_CENTER, GAUNTLET_CENTER, commonFinalBattleRollRequirement,
           ),
           createGauntletBattlePlacement(
             'bird-final-farfetchd', 'route-14-gauntlet-farfetchd', 'pokemon-battle-trigger',
-            4, 4, rareMaterialRollRequirement, '83',
+            GAUNTLET_CENTER, GAUNTLET_CENTER, rareMaterialRollRequirement, '83',
           ),
         ],
       }),
@@ -361,10 +368,10 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       variant: 'rock-push',
       tilePaletteId: 'pokemon-tower',
       timeLimit: 1800,
-      grid_size: 9,
+      grid_size: GAUNTLET_GRID_SIZE,
       lives: 1,
       winCondition: { type: 'activity-successes', count: 5 },
-      playerStart: { x: 4, y: 7 },
+      playerStart: { x: GAUNTLET_CENTER, y: GAUNTLET_ENTRY_Y },
       startScreen: 'tower-1',
       screens: createTowerFloors(),
     },
