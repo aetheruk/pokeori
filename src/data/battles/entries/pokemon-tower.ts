@@ -85,7 +85,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
   {
     id: 'pokemon-tower-channeler-patricia',
@@ -103,7 +103,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
   {
     id: 'pokemon-tower-channeler-carly',
@@ -169,7 +169,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
       { speciesId: 92, formId: '92', level: 23 },
     ],
     rewards: [trainerPokeDollarReward('channeler', 23)],
-    maxPokemon: 3,
+    maxPokemon: 2,
   },
   {
     id: 'pokemon-tower-channeler-jody',
@@ -187,7 +187,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
   {
     id: 'pokemon-tower-channeler-paula',
@@ -205,7 +205,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
 
   // --- 5F ---
@@ -258,7 +258,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 22, initialStatus: 'sleep' }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
   {
     id: 'pokemon-tower-channeler-karina',
@@ -276,7 +276,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 93, formId: '93', level: 23 }],
     rewards: [trainerPokeDollarReward('channeler', 23)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
   {
     id: 'pokemon-tower-channeler-tammy',
@@ -294,7 +294,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 93, formId: '93', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
   {
     id: 'pokemon-tower-channeler-janae',
@@ -311,7 +311,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24, initialStatus: 'confusion' }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
 
   // --- 6F ---
@@ -379,7 +379,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
   {
     id: 'pokemon-tower-channeler-emilia',
@@ -397,7 +397,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
-    maxPokemon: 3,
+    maxPokemon: 1,
   },
 
   // --- Upper Floors Shadow Gauntlet ---

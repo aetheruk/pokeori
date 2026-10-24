@@ -774,7 +774,7 @@ describe('shared grid sprite sets', () => {
     expect(gridObjects.battleTrigger.interaction).toBe('battle')
     expect(gridObjects.encounterTrigger.interaction).toBe('encounter')
     expect(gridObjects.gengarEncounterTrigger.asset.src).toBe(
-      '/sprites/pokemon/gen-v/front/normal/94.avif',
+      '/games/overworld/gengar-idle.png',
     )
     expect(getGridObjectDefinition(gridObjects, 'battle-trigger')).toBe(
       gridObjects.battleTrigger,
@@ -841,10 +841,17 @@ describe('shared grid sprite sets', () => {
 
   test('bundled overworld sprites expose their upstream credit', () => {
     const credits = getGridTilePackCredits({ externalOnly: true })
-    expect(credits).toHaveLength(1)
-    expect(credits[0].href).toBe('https://eeveeexpo.com/resources/516/')
-    expect(credits[0].creator).toContain('Golisopod User')
-    expect(credits[0].notice).toContain('credit')
+    const followingPokemonCredit = credits.find((credit) =>
+      credit.href === 'https://eeveeexpo.com/resources/516/',
+    )
+    const gengarCredit = credits.find((credit) =>
+      credit.href === 'https://www.mediafire.com/file/a44ikbbztunn66m/Generation_9_Pack_v3.3.8.rar/file',
+    )
+    expect(credits).toHaveLength(2)
+    expect(followingPokemonCredit?.creator).toContain('Golisopod User')
+    expect(followingPokemonCredit?.notice).toContain('credit')
+    expect(gengarCredit?.label).toContain('Gengar overworld follower sprite')
+    expect(gengarCredit?.creator).toContain('Caruban')
   })
 
   test('unknown palette ids use the default palette while role overrides remain isolated', () => {

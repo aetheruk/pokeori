@@ -2,7 +2,7 @@ import type { GridObjectPlacement } from '@/data/games/grid-tiles/types'
 
 export interface GridAdventureObjectSelectionEntry {
   key: string
-  placement: Pick<GridObjectPlacement, 'randomGroup'>
+  placement: Pick<GridObjectPlacement, 'randomGroup' | 'interaction'>
 }
 
 function getGroupSeed(rollSnapshot: number, groupId: string) {
@@ -49,10 +49,25 @@ export function selectGridAdventureObjectKeys(
     groups.set(group.id, groupEntries)
   }
 
+  const selectedTargetsByPool = new Map<string, Set<string>>()
   for (const [groupId, groupEntries] of groups) {
-    const requestedCount = groupEntries[0]?.placement.randomGroup?.selectCount || 0
-    const selectionCount = Math.min(requestedCount, groupEntries.length)
-    const shuffled = [...groupEntries]
+    const randomGroup = groupEntries[0]?.placement.randomGroup
+    const requestedCount = randomGroup?.selectCount || 0
+    const uniquePoolId = randomGroup?.uniquePoolId
+    const selectedPoolTargets = uniquePoolId
+      ? selectedTargetsByPool.get(uniquePoolId) || new Set<string>()
+      : undefined
+    if (uniquePoolId && selectedPoolTargets) {
+      selectedTargetsByPool.set(uniquePoolId, selectedPoolTargets)
+    }
+    const eligibleEntries = selectedPoolTargets
+      ? groupEntries.filter(({ placement }) =>
+          !placement.interaction?.targetId ||
+          !selectedPoolTargets.has(placement.interaction.targetId),
+        )
+      : groupEntries
+    const selectionCount = Math.min(requestedCount, eligibleEntries.length)
+    const shuffled = [...eligibleEntries]
     const random = createSeededRandom(getGroupSeed(rollSnapshot, groupId))
 
     for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -60,8 +75,11 @@ export function selectGridAdventureObjectKeys(
       ;[shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]]
     }
 
-    for (const { key } of shuffled.slice(0, selectionCount)) {
+    for (const { key, placement } of shuffled.slice(0, selectionCount)) {
       selectedKeys.add(key)
+      if (uniquePoolId && placement.interaction?.targetId) {
+        selectedPoolTargets?.add(placement.interaction.targetId)
+      }
     }
   }
 

@@ -170,8 +170,8 @@ export const gridTilePalettes = {
     walls: {
       back: { src: '/games/grid-tiles/pokemon-tower/walls/back.png' },
       markers: {
-        goal: { src: '/games/grid-tiles/psychic-quiet-room/walls/markers/goal.png' },
-        teleporter: { src: '/games/grid-tiles/psychic-quiet-room/walls/markers/teleporter.png' },
+        goal: { src: '/games/grid-tiles/pokemon-tower/walls/markers/doorway.png' },
+        teleporter: { src: '/games/grid-tiles/pokemon-tower/walls/markers/doorway.png' },
       },
     },
     gameplay: {
@@ -181,7 +181,7 @@ export const gridTilePalettes = {
     },
     credits: [{
       label: 'Pokeori Pokémon Tower tile set',
-      notice: 'AI-generated 64×64 plum stone floor and stained-glass shrine wall tiles for the shared 16×16 logical grid. Generic blockers and gameplay markers reuse the Psychic Quiet Room set.',
+      notice: 'AI-generated 64×64 plum stone floor, stained-glass shrine wall, and centered doorway tiles for the shared 16×16 logical grid. Generic blockers and gameplay markers reuse the Psychic Quiet Room set.',
       external: false,
     }],
   },
@@ -567,6 +567,13 @@ export function getGridTilePackCredits(options?: { externalOnly?: boolean }): Gr
     creator: 'NoNonever, Golisopod User, Help-14, zingzags, Rayd12smitty, mej71, PurpleZaffre, Akizakura16, Thundaga, Armin and Maruno',
     href: 'https://eeveeexpo.com/resources/516/',
     notice: 'Resource requests credit when used. Pokémon artwork remains owned by its respective rights holders.',
+    external: true,
+  })
+  filtered.push({
+    label: 'Generation 9 Pack v3.3.8 — Gengar overworld follower sprite',
+    creator: 'Compiled by Caruban; Gen 1–5 overworld sprites credited in the pack to MissingLukey, help-14, Kymoyonian, cSc-A7X, 2and2makes5, Pokegirl4ever, Fernandojl, Silver-Skies, TyranitarDark, Getsuei-H, Kid1513, Milomilotic11, Kyt666, kdiamo11, Chocosrawlooid, Syledude, Gallanty, Gizamimi-Pichu, Zyon17 and LarryTurbo',
+    href: 'https://www.mediafire.com/file/a44ikbbztunn66m/Generation_9_Pack_v3.3.8.rar/file',
+    notice: 'The pack credits the Gen 1–5 overworld sprite contributors but does not map an individual artist to Gengar or state an open artwork license. The original follower sheet is retained, with its first 64×64 downward-facing frame used as the Grid Adventure encounter marker. Pokémon artwork remains owned by its respective rights holders.',
     external: true,
   })
   return Array.from(new Map(filtered.map((credit) => [`${credit.label}:${credit.href || 'local'}`, credit])).values())

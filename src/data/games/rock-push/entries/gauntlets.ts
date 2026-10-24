@@ -20,10 +20,14 @@ const birdGauntletBattleIds = [
 ]
 
 const rareMaterialRollRequirement = [{ type: 'roll' as const, count: 200_000 }]
-const towerGengarRollRequirement = [{ type: 'roll' as const, count: 66_667 }]
+const towerGengarRollThreshold = 150_000
+const towerGengarRollRequirement = [{
+  type: 'roll' as const,
+  count: towerGengarRollThreshold,
+}]
 const towerStandardRollRequirement = [{
   type: 'roll' as const,
-  count: 66_667,
+  count: towerGengarRollThreshold,
   inverse: true,
 }]
 
@@ -45,55 +49,41 @@ function createTrainerPlacements(
   }))
 }
 
-function createTowerTrainerPlacements(): GridObjectPlacement[] {
-  const positions = [
-    { x: 2, y: 1 },
-    { x: 4, y: 1 },
-    { x: 6, y: 1 },
-    { x: 1, y: 3 },
-    { x: 3, y: 3 },
-    { x: 5, y: 3 },
-    { x: 7, y: 3 },
-    { x: 2, y: 5 },
-    { x: 4, y: 5 },
-    { x: 6, y: 5 },
-    { x: 1, y: 6 },
-    { x: 3, y: 6 },
-    { x: 7, y: 6 },
+function createTowerTrainerPlacements(floorNumber: number): GridObjectPlacement[] {
+  const isTopFloor = floorNumber === 5
+  const trainerPosition = { x: 4, y: isTopFloor ? 4 : 1 }
+  const createTrainerPool = (
+    variant: 'standard' | 'gengar',
+  ): GridObjectPlacement[] =>
+    pokemonTowerGauntletBattles.map((battle) => ({
+      id: `${variant}-floor-${floorNumber}-${battle.id}`,
+      objectId: 'channeler-trainer',
+      ...trainerPosition,
+      removeOnSuccess: true,
+      requirements:
+        variant === 'standard'
+          ? towerStandardRollRequirement
+          : towerGengarRollRequirement,
+      randomGroup: {
+        id: `tower-channeler-${variant}-floor-${floorNumber}`,
+        selectCount: 1,
+        uniquePoolId: `tower-channeler-${variant}-pool`,
+      },
+      interaction: {
+        type: 'battle' as const,
+        targetId: battle.id,
+        victory: 'clear' as const,
+      },
+    }))
+
+  const trainers = [
+    ...createTrainerPool('standard'),
+    ...(!isTopFloor ? createTrainerPool('gengar') : []),
   ]
-
-  const trainerPlacements = pokemonTowerGauntletBattles.flatMap((battle, index) => {
-    const position = positions[index]
-    const interaction = {
-      type: 'battle' as const,
-      targetId: battle.id,
-      victory: 'clear' as const,
-    }
-
-    return [
-      {
-        id: `standard-trainer-${battle.id}`,
-        objectId: 'channeler-trainer',
-        ...position,
-        removeOnSuccess: true,
-        requirements: towerStandardRollRequirement,
-        randomGroup: { id: 'tower-channeler-standard-pool', selectCount: 5 },
-        interaction,
-      },
-      {
-        id: `rare-trainer-${battle.id}`,
-        objectId: 'channeler-trainer',
-        ...position,
-        removeOnSuccess: true,
-        requirements: towerGengarRollRequirement,
-        randomGroup: { id: 'tower-channeler-gengar-pool', selectCount: 4 },
-        interaction,
-      },
-    ]
-  })
+  if (!isTopFloor) return trainers
 
   return [
-    ...trainerPlacements,
+    ...trainers,
     {
       id: 'rare-gengar-catch',
       objectId: 'gengar-encounter-trigger',
@@ -108,6 +98,42 @@ function createTowerTrainerPlacements(): GridObjectPlacement[] {
       },
     },
   ]
+}
+
+function createTowerFloors() {
+  return Array.from({ length: 5 }, (_, index) => {
+    const floorNumber = index + 1
+    return {
+      id: `tower-${floorNumber}`,
+      objects: createTowerTrainerPlacements(floorNumber),
+      ...(floorNumber < 5
+        ? {
+            teleporters: [{
+              id: `tower-${floorNumber}-upstairs`,
+              x: 4,
+              y: 0,
+              target: {
+                screen: `tower-${floorNumber + 1}`,
+                x: 4,
+                y: 7,
+              },
+              oneWay: true,
+            }],
+          }
+        : {}),
+      ...(floorNumber > 1 && floorNumber < 5
+        ? {
+            prizes: [{
+              id: `tower-${floorNumber}-ectoplasm`,
+              x: 4,
+              y: 4,
+              itemId: 'spirit-wisp-t1',
+              quantity: 1,
+            }],
+          }
+        : {}),
+    }
+  })
 }
 
 export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
@@ -232,7 +258,6 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
     ],
     rewards: [
       { type: 'currency', targetId: 'pokedollars', quantity: 1200, dropChance: 100 },
-      { type: 'item', targetId: 'spirit-wisp-t1', quantity: 3, dropChance: 100 },
       { type: 'item', targetId: 'rare-candy-m', quantity: 1, dropChance: 100 },
     ],
     isEligibleForReplay: true,
@@ -244,11 +269,8 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       lives: 1,
       winCondition: { type: 'activity-successes', count: 5 },
       playerStart: { x: 4, y: 7 },
-      startScreen: 'tower',
-      screens: [{
-        id: 'tower',
-        objects: createTowerTrainerPlacements(),
-      }],
+      startScreen: 'tower-1',
+      screens: createTowerFloors(),
     },
   },
 ]

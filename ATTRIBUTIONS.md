@@ -38,6 +38,8 @@ rights holders.
 
 The Ditto, Rattata and Voltorb overworld sheets in `public/games/overworld/` come from [Following Pokémon EX 2.5.1 on Eevee Expo](https://eeveeexpo.com/resources/516/), downloaded 8 September 2026. The full 256×256 sheets are unchanged; `*-idle.png` files extract the first 64×64 downward-facing frame. The resource requests credit when used: NoNonever, Golisopod User, Help-14, zingzags, Rayd12smitty, mej71, PurpleZaffre, Akizakura16, Thundaga, Armin (Fairies Resource Pack), and Maruno. No separate open-source artwork license is stated; Pokémon rights remain with their respective owners.
 
+The Gengar follower sheet in `public/games/overworld/gengar.png` and its first 64×64 downward-facing frame in `gengar-idle.png` come from [Generation 9 Pack v3.3.8](https://www.mediafire.com/file/a44ikbbztunn66m/Generation_9_Pack_v3.3.8.rar/file), compiled by Caruban. The pack credits its Gen 1–5 overworld sprites to MissingLukey, help-14, Kymoyonian, cSc-A7X, 2and2makes5, Pokegirl4ever, Fernandojl, Silver-Skies, TyranitarDark, Getsuei-H, Kid1513, Milomilotic11, Kyt666, kdiamo11, Chocosrawlooid, Syledude, Gallanty, Gizamimi-Pichu, Zyon17, and LarryTurbo; it does not identify the individual Gengar artist or state an open artwork license. Pokémon artwork remains owned by its respective rights holders.
+
 ## Open-source software
 
 Pokeori is built with and thanks the maintainers of:
