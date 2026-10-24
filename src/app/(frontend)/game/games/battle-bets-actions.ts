@@ -72,12 +72,9 @@ import {
 const GAME_ID = 'celadon-high-stakes-battle-bets'
 const SESSION_TTL_SECONDS = 60 * 60
 const ACTION_LOCK_SECONDS = 120
-const MAX_FIXTURE_ATTEMPTS = 8
+const MAX_FIXTURE_ATTEMPTS = 2
+const PREVIEW_SIMULATION_COUNT = 8
 const MAX_BATTLE_TURNS = 100
-const MIN_EARLY_REJECTION_SIMULATIONS = 64
-const EARLY_REJECTION_BATCH_SIZE = 16
-const EARLY_REJECTION_CONFIDENCE_Z = 2.576
-const FALLBACK_FIXTURE_REFINEMENT_LIMIT = 3
 const FEMALE_USER_ID = 'battle-bets-rocket-f'
 const MALE_USER_ID = 'battle-bets-rocket-m'
 const HELD_BERRY_IDS = items
@@ -104,6 +101,11 @@ interface BattleBetsStoredState
   wagerActionId?: string
   lastTurnActionId?: string
   settled?: boolean
+  pricing?: {
+    femaleWins: number
+    simulations: number
+    target: number
+  }
   fixture: BattleBetsFixture
 }
 
@@ -241,13 +243,14 @@ function toPublicState(state: BattleBetsStoredState): BattleBetsPublicState {
     femaleTeam: state.femaleTeam,
     maleTeam: state.maleTeam,
     femaleOdds: calculateBattleBetsDecimalOdds({
-      selectedProbability: state.femaleChance,
+      selectedProbability: state.pricingPending ? 0 : state.femaleChance,
       houseEdge,
     }),
     maleOdds: calculateBattleBetsDecimalOdds({
-      selectedProbability: state.maleChance,
+      selectedProbability: state.pricingPending ? 0 : state.maleChance,
       houseEdge,
     }),
+    pricingPending: state.pricingPending,
     selectedSide: state.selectedSide,
     stake: state.stake,
     potentialPayout: state.potentialPayout,
@@ -672,29 +675,6 @@ async function simulateBattle(
   return { winner }
 }
 
-function getWilsonConfidenceInterval(
-  successes: number,
-  simulations: number,
-): { lower: number; upper: number } {
-  const zSquared = EARLY_REJECTION_CONFIDENCE_Z ** 2
-  const proportion = successes / simulations
-  const denominator = 1 + zSquared / simulations
-  const center =
-    (proportion + zSquared / (2 * simulations)) / denominator
-  const margin =
-    (EARLY_REJECTION_CONFIDENCE_Z *
-      Math.sqrt(
-        (proportion * (1 - proportion)) / simulations +
-          zSquared / (4 * simulations ** 2),
-      )) /
-    denominator
-
-  return {
-    lower: Math.max(0, center - margin),
-    upper: Math.min(1, center + margin),
-  }
-}
-
 async function addCandidateSimulations(params: {
   candidate: BattleBetsCandidate
   count: number
@@ -704,51 +684,6 @@ async function addCandidateSimulations(params: {
     if (result.winner === 'female') params.candidate.femaleWins += 1
     params.candidate.simulations += 1
   }
-}
-
-async function simulateCandidate(params: {
-  fixture: BattleBetsFixture
-  attempt: number
-  simulationCount: number
-  minimumWinChance: number
-  maximumWinChance: number
-}): Promise<BattleBetsCandidate> {
-  const candidate: BattleBetsCandidate = {
-    fixture: params.fixture,
-    femaleWins: 0,
-    simulations: 0,
-    attempt: params.attempt,
-  }
-
-  while (candidate.simulations < params.simulationCount) {
-    const result = await simulateBattle(candidate.fixture)
-    if (result.winner === 'female') candidate.femaleWins += 1
-    candidate.simulations += 1
-
-    if (
-      candidate.simulations < MIN_EARLY_REJECTION_SIMULATIONS ||
-      candidate.simulations >= params.simulationCount ||
-      candidate.simulations % EARLY_REJECTION_BATCH_SIZE !== 0
-    ) {
-      continue
-    }
-
-    const interval = getWilsonConfidenceInterval(
-      candidate.femaleWins,
-      candidate.simulations,
-    )
-    // Once even the 99% interval is outside the configured acceptance band,
-    // spend the remaining simulations trying a different matchup. Any fixture
-    // selected for play is still measured with the full configured sample.
-    if (
-      interval.upper < params.minimumWinChance ||
-      interval.lower > params.maximumWinChance
-    ) {
-      break
-    }
-  }
-
-  return candidate
 }
 
 async function resolveNextBattleBetsTurn(
@@ -886,19 +821,21 @@ async function createSession(params: {
   for (let attempt = 0; attempt < MAX_FIXTURE_ATTEMPTS; attempt += 1) {
     const fixture = createBattleBetsFixture({ pokemonPool, inventory })
     if (!fixture) break
-    const candidate = await simulateCandidate({
+    const candidate: BattleBetsCandidate = {
       fixture,
+      femaleWins: 0,
+      simulations: 0,
       attempt,
-      simulationCount,
-      minimumWinChance,
-      maximumWinChance,
+    }
+    await addCandidateSimulations({
+      candidate,
+      count: Math.min(simulationCount, PREVIEW_SIMULATION_COUNT),
     })
     candidates.push(candidate)
 
     if (
-      candidate.simulations === simulationCount &&
-      candidate.femaleWins / simulationCount >= minimumWinChance &&
-      candidate.femaleWins / simulationCount <= maximumWinChance
+      candidate.femaleWins / candidate.simulations >= minimumWinChance &&
+      candidate.femaleWins / candidate.simulations <= maximumWinChance
     ) {
       selected = candidate
       break
@@ -909,43 +846,15 @@ async function createSession(params: {
   }
 
   if (!selected) {
-    // If no candidate lands in the configured band, complete the sample for
-    // the three most balanced partial candidates. This preserves a full-size
-    // simulation estimate for the fallback matchup while avoiding full work
-    // for every clearly one-sided candidate.
-    const refinementCandidates = [...candidates]
-      .sort(
-        (left, right) =>
-          Math.abs(0.5 - left.femaleWins / left.simulations) -
-            Math.abs(0.5 - right.femaleWins / right.simulations) ||
-          left.attempt - right.attempt,
-      )
-      .slice(0, FALLBACK_FIXTURE_REFINEMENT_LIMIT)
-
-    for (const candidate of refinementCandidates) {
-      await addCandidateSimulations({ candidate, count: simulationCount })
-    }
-
-    selected =
-      candidates
-        .filter(
-          (candidate) =>
-            candidate.simulations === simulationCount &&
-            candidate.femaleWins / simulationCount >= minimumWinChance &&
-            candidate.femaleWins / simulationCount <= maximumWinChance,
-        )
-        .sort((left, right) => left.attempt - right.attempt)[0] ||
-      refinementCandidates.sort(
-        (left, right) =>
-          Math.abs(0.5 - left.femaleWins / simulationCount) -
-            Math.abs(0.5 - right.femaleWins / simulationCount) ||
-          left.attempt - right.attempt,
-      )[0]
+    selected = candidates.sort(
+      (left, right) =>
+        Math.abs(0.5 - left.femaleWins / left.simulations) -
+          Math.abs(0.5 - right.femaleWins / right.simulations) ||
+        left.attempt - right.attempt,
+    )[0]
   }
 
   if (!selected) return { error: 'The house could not prepare a valid matchup.' }
-
-  const femaleChance = selected.femaleWins / simulationCount
 
   const createdAt = Date.now()
   return {
@@ -956,8 +865,14 @@ async function createSession(params: {
       phase: 'inspect',
       femaleTeam: createTeamPreview('female', selected.fixture),
       maleTeam: createTeamPreview('male', selected.fixture),
-      femaleChance,
-      maleChance: 1 - femaleChance,
+      femaleChance: 0.5,
+      maleChance: 0.5,
+      pricingPending: true,
+      pricing: {
+        femaleWins: selected.femaleWins,
+        simulations: selected.simulations,
+        target: simulationCount,
+      },
       createdAt,
       expiresAt: createdAt + SESSION_TTL_SECONDS * 1000,
       fixture: selected.fixture,
@@ -1101,6 +1016,66 @@ export async function getBattleBetsState(): Promise<BattleBetsPublicState | null
   return state ? toPublicState(state) : null
 }
 
+export async function completeBattleBetsPricing(): Promise<BattleBetsPublicState | null> {
+  const { user } = await currentUser()
+  if (!user) return null
+
+  const lock = await acquireActionLock(
+    `lock:battle-bets-pricing:${user.id}`,
+    ACTION_LOCK_SECONDS,
+  )
+  if (!lock.acquired) {
+    const state = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
+    return state ? toPublicState(state) : null
+  }
+
+  try {
+    const state = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
+    if (state?.phase !== 'inspect' || !state.pricingPending || !state.pricing) {
+      return state ? toPublicState(state) : null
+    }
+    if (getRemainingSessionTtl(state.expiresAt) <= 0) {
+      await redis.del(sessionKey(user.id))
+      return null
+    }
+
+    const sessionId = state.sessionId
+    const candidate: BattleBetsCandidate = {
+      fixture: state.fixture,
+      femaleWins: state.pricing.femaleWins,
+      simulations: state.pricing.simulations,
+      attempt: 0,
+    }
+    await addCandidateSimulations({
+      candidate,
+      count: state.pricing.target,
+    })
+
+    const current = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
+    if (
+      !current ||
+      current.sessionId !== sessionId ||
+      current.phase !== 'inspect' ||
+      !current.pricingPending
+    ) {
+      return current ? toPublicState(current) : null
+    }
+
+    const femaleChance = candidate.femaleWins / candidate.simulations
+    const priced: BattleBetsStoredState = {
+      ...current,
+      femaleChance,
+      maleChance: 1 - femaleChance,
+      pricingPending: false,
+      pricing: undefined,
+    }
+    if (!(await saveLiveSession(user.id, priced))) return null
+    return toPublicState(priced)
+  } finally {
+    await releaseActionLock(lock)
+  }
+}
+
 export async function placeBattleBet(
   side: BattleBetsSide,
   stake: number,
@@ -1146,6 +1121,9 @@ export async function placeBattleBet(
     }
     if (state?.phase !== 'inspect') {
       return { success: false, error: 'There is no open wager.' }
+    }
+    if (state.pricingPending) {
+      return { success: false, error: 'The house is still calculating the final odds.' }
     }
     if (getRemainingSessionTtl(state.expiresAt) <= 0) {
       await redis.del(sessionKey(user.id))
