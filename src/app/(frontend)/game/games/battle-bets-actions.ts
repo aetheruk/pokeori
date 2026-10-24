@@ -72,10 +72,17 @@ import {
 const GAME_ID = 'celadon-high-stakes-battle-bets'
 const SESSION_TTL_SECONDS = 60 * 60
 const ACTION_LOCK_SECONDS = 120
-const MAX_FIXTURE_ATTEMPTS = 20
+const MAX_FIXTURE_ATTEMPTS = 8
 const MAX_BATTLE_TURNS = 100
+const MIN_EARLY_REJECTION_SIMULATIONS = 64
+const EARLY_REJECTION_BATCH_SIZE = 16
+const EARLY_REJECTION_CONFIDENCE_Z = 2.576
+const FALLBACK_FIXTURE_REFINEMENT_LIMIT = 3
 const FEMALE_USER_ID = 'battle-bets-rocket-f'
 const MALE_USER_ID = 'battle-bets-rocket-m'
+const HELD_BERRY_IDS = items
+  .filter((item) => item.category === 'berry' && item.heldConfig)
+  .map((item) => item.id)
 
 type SeenPokedex = Record<string, Record<string, { seen?: boolean }>>
 
@@ -107,6 +114,13 @@ interface TrainerItemRuntime {
 
 interface SimulatedBattle {
   winner: BattleBetsSide
+}
+
+interface BattleBetsCandidate {
+  fixture: BattleBetsFixture
+  femaleWins: number
+  simulations: number
+  attempt: number
 }
 
 type ActionFailure = { success: false; error: string }
@@ -328,20 +342,17 @@ function buildBattlePokemon(params: {
 }
 
 function createTeamConfig(params: {
-  pokedex: SeenPokedex
+  pokemonPool: ReturnType<typeof getSeenPokemonOptions>
   inventory: Record<string, number>
   random: () => number
 }): {
   enemies: BattleEnemy[]
   trainerItems?: TrainerBattleItemConfig[]
 } | null {
-  const pool = getSeenPokemonOptions(params.pokedex)
+  const pool = params.pokemonPool
   if (pool.length < 3) return null
 
   const level = getVsSeekerTrainerLevel(params.inventory)
-  const berryIds = items
-    .filter((item) => item.category === 'berry' && item.heldConfig)
-    .map((item) => item.id)
   const enemies = pickRandomUnique(pool, 3, params.random).map((entry) => {
     const enemy: BattleEnemy = {
       speciesId: entry.speciesId,
@@ -349,8 +360,11 @@ function createTeamConfig(params: {
       level,
       isShadow: true,
     }
-    if (berryIds.length > 0 && params.random() < VS_SEEKER_HELD_BERRY_CHANCE) {
-      enemy.heldItemId = pickRandom(berryIds, params.random)
+    if (
+      HELD_BERRY_IDS.length > 0 &&
+      params.random() < VS_SEEKER_HELD_BERRY_CHANCE
+    ) {
+      enemy.heldItemId = pickRandom(HELD_BERRY_IDS, params.random)
     }
     return enemy
   })
@@ -368,7 +382,7 @@ function createTeamConfig(params: {
 }
 
 function createBattleBetsFixture(params: {
-  pokedex: SeenPokedex
+  pokemonPool: ReturnType<typeof getSeenPokemonOptions>
   inventory: Record<string, number>
   random?: () => number
 }): BattleBetsFixture | null {
@@ -658,6 +672,85 @@ async function simulateBattle(
   return { winner }
 }
 
+function getWilsonConfidenceInterval(
+  successes: number,
+  simulations: number,
+): { lower: number; upper: number } {
+  const zSquared = EARLY_REJECTION_CONFIDENCE_Z ** 2
+  const proportion = successes / simulations
+  const denominator = 1 + zSquared / simulations
+  const center =
+    (proportion + zSquared / (2 * simulations)) / denominator
+  const margin =
+    (EARLY_REJECTION_CONFIDENCE_Z *
+      Math.sqrt(
+        (proportion * (1 - proportion)) / simulations +
+          zSquared / (4 * simulations ** 2),
+      )) /
+    denominator
+
+  return {
+    lower: Math.max(0, center - margin),
+    upper: Math.min(1, center + margin),
+  }
+}
+
+async function addCandidateSimulations(params: {
+  candidate: BattleBetsCandidate
+  count: number
+}): Promise<void> {
+  while (params.candidate.simulations < params.count) {
+    const result = await simulateBattle(params.candidate.fixture)
+    if (result.winner === 'female') params.candidate.femaleWins += 1
+    params.candidate.simulations += 1
+  }
+}
+
+async function simulateCandidate(params: {
+  fixture: BattleBetsFixture
+  attempt: number
+  simulationCount: number
+  minimumWinChance: number
+  maximumWinChance: number
+}): Promise<BattleBetsCandidate> {
+  const candidate: BattleBetsCandidate = {
+    fixture: params.fixture,
+    femaleWins: 0,
+    simulations: 0,
+    attempt: params.attempt,
+  }
+
+  while (candidate.simulations < params.simulationCount) {
+    const result = await simulateBattle(candidate.fixture)
+    if (result.winner === 'female') candidate.femaleWins += 1
+    candidate.simulations += 1
+
+    if (
+      candidate.simulations < MIN_EARLY_REJECTION_SIMULATIONS ||
+      candidate.simulations >= params.simulationCount ||
+      candidate.simulations % EARLY_REJECTION_BATCH_SIZE !== 0
+    ) {
+      continue
+    }
+
+    const interval = getWilsonConfidenceInterval(
+      candidate.femaleWins,
+      candidate.simulations,
+    )
+    // Once even the 99% interval is outside the configured acceptance band,
+    // spend the remaining simulations trying a different matchup. Any fixture
+    // selected for play is still measured with the full configured sample.
+    if (
+      interval.upper < params.minimumWinChance ||
+      interval.lower > params.maximumWinChance
+    ) {
+      break
+    }
+  }
+
+  return candidate
+}
+
 async function resolveNextBattleBetsTurn(
   fixture: BattleBetsFixture,
   random: () => number = Math.random,
@@ -779,42 +872,80 @@ async function createSession(params: {
   }
 
   const pokedex = buildSeenPokedex(userData.pokedex || [])
+  const pokemonPool = getSeenPokemonOptions(pokedex)
   const inventory = buildInventoryMap(userData.inventory || [])
-  if (getSeenPokemonOptions(pokedex).length < 3) {
+  if (pokemonPool.length < 3) {
     return {
       error:
         'You need at least three seen non-Legendary Pokémon before the book can make a match.',
     }
   }
 
-  let best:
-    | {
-        fixture: BattleBetsFixture
-        femaleChance: number
-        distance: number
-      }
-    | undefined
+  const candidates: BattleBetsCandidate[] = []
+  let selected: BattleBetsCandidate | undefined
   for (let attempt = 0; attempt < MAX_FIXTURE_ATTEMPTS; attempt += 1) {
-    const fixture = createBattleBetsFixture({ pokedex, inventory })
+    const fixture = createBattleBetsFixture({ pokemonPool, inventory })
     if (!fixture) break
-    let femaleWins = 0
-    for (let simulation = 0; simulation < simulationCount; simulation += 1) {
-      const result = await simulateBattle(fixture)
-      if (result.winner === 'female') femaleWins += 1
-    }
-    const femaleChance = femaleWins / simulationCount
-    const candidate = {
+    const candidate = await simulateCandidate({
       fixture,
-      femaleChance,
-      distance: Math.abs(0.5 - femaleChance),
-    }
-    if (!best || candidate.distance < best.distance) best = candidate
-    if (femaleChance >= minimumWinChance && femaleChance <= maximumWinChance) {
-      best = candidate
+      attempt,
+      simulationCount,
+      minimumWinChance,
+      maximumWinChance,
+    })
+    candidates.push(candidate)
+
+    if (
+      candidate.simulations === simulationCount &&
+      candidate.femaleWins / simulationCount >= minimumWinChance &&
+      candidate.femaleWins / simulationCount <= maximumWinChance
+    ) {
+      selected = candidate
       break
     }
   }
-  if (!best) return { error: 'The house could not prepare a valid matchup.' }
+  if (candidates.length === 0) {
+    return { error: 'The house could not prepare a valid matchup.' }
+  }
+
+  if (!selected) {
+    // If no candidate lands in the configured band, complete the sample for
+    // the three most balanced partial candidates. This preserves a full-size
+    // simulation estimate for the fallback matchup while avoiding full work
+    // for every clearly one-sided candidate.
+    const refinementCandidates = [...candidates]
+      .sort(
+        (left, right) =>
+          Math.abs(0.5 - left.femaleWins / left.simulations) -
+            Math.abs(0.5 - right.femaleWins / right.simulations) ||
+          left.attempt - right.attempt,
+      )
+      .slice(0, FALLBACK_FIXTURE_REFINEMENT_LIMIT)
+
+    for (const candidate of refinementCandidates) {
+      await addCandidateSimulations({ candidate, count: simulationCount })
+    }
+
+    selected =
+      candidates
+        .filter(
+          (candidate) =>
+            candidate.simulations === simulationCount &&
+            candidate.femaleWins / simulationCount >= minimumWinChance &&
+            candidate.femaleWins / simulationCount <= maximumWinChance,
+        )
+        .sort((left, right) => left.attempt - right.attempt)[0] ||
+      refinementCandidates.sort(
+        (left, right) =>
+          Math.abs(0.5 - left.femaleWins / simulationCount) -
+            Math.abs(0.5 - right.femaleWins / simulationCount) ||
+          left.attempt - right.attempt,
+      )[0]
+  }
+
+  if (!selected) return { error: 'The house could not prepare a valid matchup.' }
+
+  const femaleChance = selected.femaleWins / simulationCount
 
   const createdAt = Date.now()
   return {
@@ -823,13 +954,13 @@ async function createSession(params: {
       sessionId: crypto.randomUUID(),
       tokenBalance: getTokenBalance(params.user),
       phase: 'inspect',
-      femaleTeam: createTeamPreview('female', best.fixture),
-      maleTeam: createTeamPreview('male', best.fixture),
-      femaleChance: best.femaleChance,
-      maleChance: 1 - best.femaleChance,
+      femaleTeam: createTeamPreview('female', selected.fixture),
+      maleTeam: createTeamPreview('male', selected.fixture),
+      femaleChance,
+      maleChance: 1 - femaleChance,
       createdAt,
       expiresAt: createdAt + SESSION_TTL_SECONDS * 1000,
-      fixture: best.fixture,
+      fixture: selected.fixture,
     },
   }
 }
