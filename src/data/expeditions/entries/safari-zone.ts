@@ -524,6 +524,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       { type: 'xp', skill: 'researching', quantity: 1000, dropChance: 100 },
       { type: 'xp', skill: 'catching', quantity: 1000, dropChance: 100 },
       { type: 'guild_xp', targetId: 'fuchsia-research-guild', quantity: 100, dropChance: 100 },
+      { type: 'icon', targetId: 'pokemon-113', dropChance: 1 },
       {
         type: 'item',
         targetId: 'tm-strength',

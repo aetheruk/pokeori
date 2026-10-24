@@ -64,7 +64,7 @@ export const gridObjects = {
     purpose: 'battle-trigger',
     size: { cols: 1, rows: 1 },
     asset: { src: '/games/grid-objects/channeler-trainer.png' },
-    overworldSpriteId: 'trainer-psychic-f',
+    overworldSpriteId: 'trainer-channeler',
     collision: 'none',
     interaction: 'battle',
   },

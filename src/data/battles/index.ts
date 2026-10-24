@@ -19,6 +19,7 @@ import { celadonGameCornerBattles } from './entries/celadon-game-corner'
 import {
   pokemonTowerBattles,
   pokemonTowerGauntletBattles,
+  pokemonTowerGhostTrialAlphaGengarBattle,
 } from './entries/pokemon-tower'
 import { saffronCityBattles } from './entries/saffron-city'
 import { silphCoBattles } from './entries/silph-co'
@@ -61,6 +62,7 @@ const authoredBattles: BattleConfig[] = [
   ...celadonGameCornerBattles,
   ...pokemonTowerBattles,
   ...pokemonTowerGauntletBattles,
+  pokemonTowerGhostTrialAlphaGengarBattle,
   ...saffronCityBattles,
   ...silphCoBattles,
   ...cyclingRoadBattles,

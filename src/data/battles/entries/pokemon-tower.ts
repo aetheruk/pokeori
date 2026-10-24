@@ -658,3 +658,23 @@ export const pokemonTowerGauntletBattles: BattleConfig[] = pokemonTowerBattles
       criteria: [],
     }
   })
+
+/** Rare, repeatable Grid Adventure encounter; Alpha status is guaranteed. */
+export const pokemonTowerGhostTrialAlphaGengarBattle: BattleConfig = {
+  id: 'pokemon-tower-ghost-trial-alpha-gengar',
+  name: 'Alpha Gengar',
+  description: 'An enormous Gengar emerges from the tower shadows.',
+  category: 'Secret',
+  subCategory: 'Pokemon Tower',
+  icon: { type: 'pokemon', id: '94' },
+  background: towerBackground,
+  requirements: [],
+  criteria: [],
+  enemyTeam: [{ speciesId: 94, formId: '94', level: { min: 28, max: 30 }, isAlpha: true }],
+  rewards: [{ type: 'icon', targetId: 'pokemon-94', dropChance: 100 }],
+  maxPokemon: 6,
+  isWildBattle: true,
+  allowAlpha: false,
+  gridAdventureOnly: true,
+  enemyAttackTelegraphChance: 2,
+}

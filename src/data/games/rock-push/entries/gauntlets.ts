@@ -1,5 +1,12 @@
-import type { RockPushGameConfig, RockPushScreenConfig } from '../types'
-import { pokemonTowerGauntletBattles } from '@/data/battles/entries/pokemon-tower'
+import type {
+  RockPushGameConfig,
+  RockPushPrizeSquare,
+  RockPushScreenConfig,
+} from '../types'
+import {
+  pokemonTowerGauntletBattles,
+  pokemonTowerGhostTrialAlphaGengarBattle,
+} from '@/data/battles/entries/pokemon-tower'
 import type { GridObjectPlacement, GridTilePaletteId } from '@/data/games/grid-tiles'
 
 const GAUNTLET_GRID_SIZE = 7
@@ -22,9 +29,19 @@ const birdGauntletTrainerIds = [
 ]
 
 const rareMaterialRollRequirement = [{ type: 'roll' as const, count: 200_000 }]
+const extraCandyRollRequirement = [{ type: 'roll' as const, count: 300_000 }]
 const commonFinalBattleRollRequirement = [{
   type: 'roll' as const,
   count: 200_000,
+  inverse: true,
+}]
+const rareBirdFinalBattleRollRequirement = [{
+  type: 'roll' as const,
+  count: 150_000,
+}]
+const commonBirdFinalBattleRollRequirement = [{
+  type: 'roll' as const,
+  count: 150_000,
   inverse: true,
 }]
 const daytimeRequirement = [{
@@ -69,9 +86,38 @@ function createGauntletBattlePlacement(
   }
 }
 
+function createFinalCandyPrizes(itemId: string): RockPushPrizeSquare[] {
+  return [
+    {
+      id: 'final-candy-center',
+      x: GAUNTLET_CENTER,
+      y: 1,
+      itemId,
+      quantity: 1,
+    },
+    {
+      id: 'final-candy-top-left',
+      x: 0,
+      y: 1,
+      itemId,
+      quantity: 1,
+      requirements: extraCandyRollRequirement,
+    },
+    {
+      id: 'final-candy-top-right',
+      x: GAUNTLET_GRID_SIZE - 1,
+      y: 1,
+      itemId,
+      quantity: 1,
+      requirements: extraCandyRollRequirement,
+    },
+  ]
+}
+
 function createGauntletScreens(options: {
   firstScreenId: string
   materialItemId: string
+  finalPrizes: RockPushPrizeSquare[]
   finalObjects: GridObjectPlacement[]
   getFloorObjects: (floorNumber: number) => GridObjectPlacement[]
   tilePaletteId?: GridTilePaletteId
@@ -88,6 +134,9 @@ function createGauntletScreens(options: {
       objects: floorNumber === 5
         ? options.finalObjects
         : options.getFloorObjects(floorNumber),
+      ...(floorNumber === 5
+        ? { prizes: options.finalPrizes }
+        : {}),
       ...(floorNumber < 5
         ? {
             teleporters: [{
@@ -192,19 +241,15 @@ function createTowerTrainerPlacements(floorNumber: number): GridObjectPlacement[
 
   return [
     ...trainers,
-    {
-      id: 'rare-gengar-catch',
-      objectId: 'gengar-encounter-trigger',
-      x: GAUNTLET_CENTER,
-      y: GAUNTLET_CENTER,
-      removeOnSuccess: true,
-      requirements: towerGengarRollRequirement,
-      interaction: {
-        type: 'encounter',
-        targetId: 'pokemon-tower-ghost-trial-gengar',
-        victory: 'clear',
-      },
-    },
+    createGauntletBattlePlacement(
+      'rare-alpha-gengar-battle',
+      pokemonTowerGhostTrialAlphaGengarBattle.id,
+      'pokemon-battle-trigger',
+      GAUNTLET_CENTER,
+      GAUNTLET_CENTER,
+      towerGengarRollRequirement,
+      '94',
+    ),
   ]
 }
 
@@ -240,6 +285,9 @@ function createTowerFloors() {
             }],
           }
         : {}),
+      ...(floorNumber === 5
+        ? { prizes: createFinalCandyPrizes('rare-candy-m') }
+        : {}),
     }
   })
 }
@@ -260,7 +308,6 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       count: 1,
     }],
     rewards: [
-      { type: 'item', targetId: 'rare-candy-xs', quantity: 1, dropChance: 100 },
       { type: 'currency', targetId: 'pokedollars', quantity: 200, dropChance: 100 },
     ],
     isEligibleForReplay: true,
@@ -276,6 +323,7 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       screens: createGauntletScreens({
         firstScreenId: 'forest',
         materialItemId: 'chitin-fragment-t1',
+        finalPrizes: createFinalCandyPrizes('rare-candy-xs'),
         tilePaletteId: 'forest',
         getFloorObjects: (floorNumber) =>
           createFixedTrainerFloor(
@@ -286,11 +334,11 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
         finalObjects: [
           createGauntletBattlePlacement(
             'bug-final-paras', 'bug-gauntlet-paras-day', 'pokemon-battle-trigger',
-            GAUNTLET_CENTER, GAUNTLET_CENTER, daytimeRequirement, '46',
+            GAUNTLET_CENTER, GAUNTLET_CENTER, daytimeRequirement, '12',
           ),
           createGauntletBattlePlacement(
             'bug-final-venonat', 'bug-gauntlet-venonat-night', 'pokemon-battle-trigger',
-            GAUNTLET_CENTER, GAUNTLET_CENTER, nighttimeRequirement, '48',
+            GAUNTLET_CENTER, GAUNTLET_CENTER, nighttimeRequirement, '15',
           ),
         ],
       }),
@@ -310,7 +358,6 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
     }],
     rewards: [
       { type: 'currency', targetId: 'pokedollars', quantity: 1200, dropChance: 100 },
-      { type: 'item', targetId: 'rare-candy-m', quantity: 1, dropChance: 100 },
     ],
     isEligibleForReplay: true,
     settings: {
@@ -325,15 +372,16 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       screens: createGauntletScreens({
         firstScreenId: 'route-14',
         materialItemId: 'wing-feather-t1',
+        finalPrizes: createFinalCandyPrizes('rare-candy-m'),
         getFloorObjects: createRandomBirdTrainerFloor,
         finalObjects: [
           createGauntletBattlePlacement(
             'bird-final-donald', 'route-14-gauntlet-donald', 'bird-keeper-trainer',
-            GAUNTLET_CENTER, GAUNTLET_CENTER, commonFinalBattleRollRequirement,
+            GAUNTLET_CENTER, GAUNTLET_CENTER, commonBirdFinalBattleRollRequirement,
           ),
           createGauntletBattlePlacement(
             'bird-final-farfetchd', 'route-14-gauntlet-farfetchd', 'pokemon-battle-trigger',
-            GAUNTLET_CENTER, GAUNTLET_CENTER, rareMaterialRollRequirement, '83',
+            GAUNTLET_CENTER, GAUNTLET_CENTER, rareBirdFinalBattleRollRequirement, '83',
           ),
         ],
       }),
@@ -361,7 +409,6 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
     ],
     rewards: [
       { type: 'currency', targetId: 'pokedollars', quantity: 1200, dropChance: 100 },
-      { type: 'item', targetId: 'rare-candy-m', quantity: 1, dropChance: 100 },
     ],
     isEligibleForReplay: true,
     settings: {

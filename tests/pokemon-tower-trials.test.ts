@@ -2,9 +2,9 @@ import { describe, expect, test } from 'bun:test'
 import {
   pokemonTowerBattles,
   pokemonTowerGauntletBattles,
+  pokemonTowerGhostTrialAlphaGengarBattle,
 } from '@/data/battles/entries/pokemon-tower'
 import { gauntletGridAdventureEntries } from '@/data/games/rock-push/entries/gauntlets'
-import { pokemonTowerLocations } from '@/data/locations/entries/pokemon-tower'
 import { resolveTrainerBattleItemUseLimit, resolveTrainerBattleMoveUseLimit } from '@/utilities/skills/unlocks'
 
 const trial = (name: string) => pokemonTowerBattles.find((battle) => battle.id === `pokemon-tower-channeler-${name}`)!
@@ -69,7 +69,7 @@ describe('Pokemon Tower spirit trials', () => {
     ).toBe(true)
   })
 
-  test('Ghost Trial uses its pinned roll for a rare Gengar catch run', () => {
+  test('Ghost Trial uses its pinned roll for a rare Alpha Gengar battle', () => {
     const adventure = gauntletGridAdventureEntries.find(
       (entry) => entry.id === 'pokemon-tower-ghost-trial-grid-adventure',
     )!
@@ -82,10 +82,7 @@ describe('Pokemon Tower spirit trials', () => {
       placement.randomGroup?.uniquePoolId === 'tower-channeler-gengar-pool',
     )
     const gengar = placements.filter((placement) =>
-      placement.interaction?.targetId === 'pokemon-tower-ghost-trial-gengar',
-    )
-    const gengarLocation = pokemonTowerLocations.find(
-      (location) => location.id === 'pokemon-tower-ghost-trial-gengar',
+      placement.interaction?.targetId === pokemonTowerGhostTrialAlphaGengarBattle.id,
     )
 
     expect(adventure.settings.winCondition).toEqual({
@@ -115,35 +112,57 @@ describe('Pokemon Tower spirit trials', () => {
       expect((screen.prizes || []).map(({ itemId, quantity }) => ({ itemId, quantity }))).toEqual(
         index > 0 && index < 4
           ? [{ itemId: 'spirit-wisp-t1', quantity: 1 }]
-          : [],
+          : index === 4
+            ? [
+                { itemId: 'rare-candy-m', quantity: 1 },
+                { itemId: 'rare-candy-m', quantity: 1 },
+                { itemId: 'rare-candy-m', quantity: 1 },
+              ]
+            : [],
       )
     }
+    expect(screens[4]?.prizes?.map(({ x, y, requirements }) => ({
+      x,
+      y,
+      rollThreshold: requirements?.find((requirement) => requirement.type === 'roll')?.count,
+    }))).toEqual([
+      { x: 3, y: 1, rollThreshold: undefined },
+      { x: 0, y: 1, rollThreshold: 300_000 },
+      { x: 6, y: 1, rollThreshold: 300_000 },
+    ])
     expect(gengar).toHaveLength(1)
-    expect(
-      screens[4]?.objects?.some((placement) => placement.id === 'rare-gengar-catch'),
-    ).toBe(true)
+    expect(screens[4]?.objects?.some(
+      (placement) => placement.id === 'rare-alpha-gengar-battle',
+    )).toBe(true)
     expect(
       screens[4]?.objects?.some(
         (placement) => placement.randomGroup?.id === 'tower-channeler-gengar-floor-5',
       ),
     ).toBe(false)
     expect(gengar[0]).toMatchObject({
-      objectId: 'gengar-encounter-trigger',
+      objectId: 'pokemon-battle-trigger',
+      overworldSpriteId: '94',
       requirements: [{ type: 'roll', count: 150_000 }],
       interaction: {
-        type: 'encounter',
-        targetId: 'pokemon-tower-ghost-trial-gengar',
+        type: 'battle',
+        targetId: pokemonTowerGhostTrialAlphaGengarBattle.id,
         victory: 'clear',
       },
     })
-    expect(gengarLocation).toMatchObject({
+    expect(pokemonTowerGhostTrialAlphaGengarBattle).toMatchObject({
+      isWildBattle: true,
       gridAdventureOnly: true,
-      encounters: [{ speciesId: 94, formId: '94', chance: 100 }],
+      enemyTeam: [{ speciesId: 94, formId: '94', isAlpha: true }],
       rewards: [{ type: 'icon', targetId: 'pokemon-94', dropChance: 100 }],
     })
     expect(
       adventure.rewards?.some(
         (reward) => reward.type === 'item' && reward.targetId === 'spirit-wisp-t1',
+      ),
+    ).toBe(false)
+    expect(
+      adventure.rewards?.some(
+        (reward) => reward.type === 'item' && reward.targetId === 'rare-candy-m',
       ),
     ).toBe(false)
   })

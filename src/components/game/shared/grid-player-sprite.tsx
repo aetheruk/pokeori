@@ -93,27 +93,33 @@ export function GridPlayerToken({
       ],
       { duration: durationMs, easing: 'linear' },
     )
-    const walk = sprite.animate(
-      [0, 1, 2, 3, 0].map((frame) => ({
-        backgroundPosition: getGridPlayerAppearance(gender, facing, frame, iconId)
-          .backgroundPosition,
-        easing: 'steps(1, end)',
-      })),
-      {
-        duration: GRID_PLAYER_MOVE_MS,
-        iterations: durationMs / GRID_PLAYER_MOVE_MS,
-      },
-    )
+    const walk = appearance.isStatic
+      ? null
+      : sprite.animate(
+          [0, 1, 2, 3, 0].map((frame) => ({
+            backgroundPosition: getGridPlayerAppearance(
+              gender,
+              facing,
+              frame,
+              iconId,
+            ).backgroundPosition,
+            easing: 'steps(1, end)',
+          })),
+          {
+            duration: GRID_PLAYER_MOVE_MS,
+            iterations: durationMs / GRID_PLAYER_MOVE_MS,
+          },
+        )
     const cancel = () => {
       movement.cancel()
-      walk.cancel()
+      walk?.cancel()
     }
     reducedMotion.addEventListener('change', cancel)
     return () => {
       cancel()
       reducedMotion.removeEventListener('change', cancel)
     }
-  }, [position.x, position.y, step, durationMs, gender, facing, iconId])
+  }, [position.x, position.y, step, durationMs, gender, facing, iconId, appearance.isStatic])
 
   return (
     <div

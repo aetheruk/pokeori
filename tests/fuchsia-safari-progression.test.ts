@@ -605,6 +605,11 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(expedition?.maxLosses).toBe(10)
     expect(expedition?.staminaNoteLimit).toBe(5)
     expect(expedition?.safariBallAllowance).toBe(30)
+    expect(expedition?.rewards).toContainEqual({
+      type: 'icon',
+      targetId: 'pokemon-113',
+      dropChance: 1,
+    })
     expect(expedition?.requirements).toContainEqual({
       type: 'item_owned',
       targetId: 'safari-catching-permit',

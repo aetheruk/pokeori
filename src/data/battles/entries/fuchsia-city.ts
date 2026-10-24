@@ -35,11 +35,11 @@ const gymTrialGate = {
 
 const featheredGauntletRareRollRequirement = [{
   type: 'roll' as const,
-  count: 200_000,
+  count: 150_000,
 }]
 const featheredGauntletStandardRollRequirement = [{
   type: 'roll' as const,
-  count: 200_000,
+  count: 150_000,
   inverse: true,
 }]
 
@@ -869,8 +869,8 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-14-gauntlet-farfetchd',
-    name: 'Forest Encounter: Farfetch’d',
-    description: 'A fierce Farfetch’d charges through the clearing, clutching its leek like a duelling blade.',
+    name: 'Alpha Farfetch’d',
+    description: 'An enormous Farfetch’d charges through the clearing, clutching its leek like a duelling blade.',
     category: 'Kanto',
     gridAdventureOnly: true,
     subCategory: 'Fuchsia City',
@@ -883,9 +883,10 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       },
       ...featheredGauntletRareRollRequirement,
     ],
-    isWildBattle: false,
+    isWildBattle: true,
+    allowAlpha: false,
     enemyAttackTelegraphChance: 2,
-    enemyTeam: [{ speciesId: 83, formId: '83', level: 50 }],
+    enemyTeam: [{ speciesId: 83, formId: '83', level: 50, isAlpha: true }],
     rewards: [{ type: 'icon', targetId: 'pokemon-83', quantity: 1, dropChance: 100 }],
     maxPokemon: 1,
   },

@@ -2,12 +2,14 @@ import { describe, expect, test } from 'bun:test'
 import { existsSync } from 'node:fs'
 import pokemonSprites from '@/data/pokemon-overworld-sprite-manifest.json'
 import pokemonFollowerAssets from '@/data/pokemon-overworld-follower-assets.json'
+import { trainerSprites } from '@/data/trainers/classes'
 import {
   getGridOverworldSpriteAppearance,
   getOverworldSpriteIdForProfileIcon,
   getPokemonFollowerSpriteId,
   getTrainerOverworldSpriteId,
 } from '@/data/games/overworld-sprites'
+import { getGridPlayerAppearance } from '@/utilities/trainer-appearance'
 
 describe('overworld sprite registry', () => {
   test('every generated Pokémon mapping points to bundled source sheets', () => {
@@ -42,6 +44,21 @@ describe('overworld sprite registry', () => {
     expect(getOverworldSpriteIdForProfileIcon('bulbasaur')).toBe('1')
     expect(getOverworldSpriteIdForProfileIcon('bird-keeper')).toBe(
       'trainer-bird-keeper',
+    )
+    expect(getOverworldSpriteIdForProfileIcon('koga')).toBe(
+      'trainer-gym-kanto-koga',
+    )
+    expect(getOverworldSpriteIdForProfileIcon('trainer-gym-kanto-koga')).toBe(
+      'trainer-gym-kanto-koga',
+    )
+    expect(getOverworldSpriteIdForProfileIcon('gym-kanto-koga')).toBe(
+      'trainer-gym-kanto-koga',
+    )
+    expect(getOverworldSpriteIdForProfileIcon('trainer-oak')).toBe(
+      'trainer-oak',
+    )
+    expect(getOverworldSpriteIdForProfileIcon('trainer-researcher-f')).toBe(
+      'trainer-researcher-f',
     )
     expect(getOverworldSpriteIdForProfileIcon('nugget')).toBeUndefined()
     expect(getOverworldSpriteIdForProfileIcon('alolan-meowth')).toBe('10107')
@@ -84,7 +101,7 @@ describe('overworld sprite registry', () => {
     expect(getTrainerOverworldSpriteId('bug-catcher')).toBe(
       'trainer-bug-catcher',
     )
-    expect(getTrainerOverworldSpriteId('youngster')).toBeUndefined()
+    expect(getTrainerOverworldSpriteId('youngster')).toBe('trainer-youngster')
     const appearance = getGridOverworldSpriteAppearance('trainer-bug-catcher')
     expect(appearance).toMatchObject({
       src: '/games/trainers/source/trainer_BUGCATCHER.png',
@@ -94,5 +111,40 @@ describe('overworld sprite registry', () => {
       backgroundSize: '400% 400%',
       backgroundPosition: '0% 0%',
     })
+
+    expect(getGridOverworldSpriteAppearance('trainer-gym-kanto-koga')).toMatchObject({
+      src: '/games/trainers/source/trainer_LEADER_Koga.png',
+      frameWidth: 64,
+      frameHeight: 64,
+    })
+    expect(getGridPlayerAppearance('male', 'down', 0, 'koga').src).toBe(
+      '/games/trainers/source/trainer_LEADER_Koga.png',
+    )
+    expect(getGridPlayerAppearance('male', 'down', 0, 'gym-kanto-koga').src).toBe(
+      '/games/trainers/source/trainer_LEADER_Koga.png',
+    )
+    expect(getGridOverworldSpriteAppearance('trainer-oak')).toMatchObject({
+      src: '/games/trainers/source/trainer_OAK.png',
+      frameWidth: 32,
+      frameHeight: 48,
+    })
+    expect(getGridOverworldSpriteAppearance('trainer-researcher-f')).toMatchObject({
+      src: '/games/trainers/source/trainer_SCIENTIST_F.png',
+      frameWidth: 64,
+      frameHeight: 64,
+    })
+  })
+
+  test('every registered trainer icon keeps its identity on the grid', () => {
+    for (const trainer of trainerSprites) {
+      const appearance = getGridPlayerAppearance(
+        trainer.gender === 'f' ? 'female' : 'male',
+        'down',
+        0,
+        `trainer-${trainer.id}`,
+      )
+      expect(appearance.src).not.toMatch(/\/games\/trainers\/(lucas|dawn)\.png$/)
+      expect(appearance.src).not.toBe('/games/overworld/ditto.png')
+    }
   })
 })
