@@ -92,7 +92,7 @@ Each dependency remains under its own license. Their license texts are available
 ## Tile and environment packs
 
 - **Pokeori Basic Cave tile set** — supplied 16×16 test tiles arranged under `public/games/grid-tiles/basic-cave`, with existing Pokeori boulder, filled-hole, goal, and player artwork retained for gameplay compatibility.
-- **Pokeori Grass Field tile set** — supplied 16×16 and 32×32 grass test tiles arranged under `public/games/grid-tiles/grass`, with existing Pokeori gameplay artwork retained where the grass pack has no equivalent.
+- **Pokeori Grassy Route tile set** — grass floor tiles and generated wooden-fence back wall/open passage tiles arranged under `public/games/grid-tiles/grass`, with existing Pokeori gameplay artwork retained where the set has no equivalent.
 - **Pokeori Pokémon Tower tile set** — AI-generated plum stone floor and stained-glass shrine wall tiles under `public/games/grid-tiles/pokemon-tower`; shared blockers and gameplay markers reuse the Psychic Quiet Room palette.
 
 Every sprite set records its source, creator, link, license, and required notice in `src/data/games/grid-tiles`. External packs must be added both to that registry, which feeds the in-app Credits & Legal dialog, and to this file before their assets are used.
