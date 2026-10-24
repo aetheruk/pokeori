@@ -74,6 +74,8 @@ export interface GridWallSet {
   /** Optional 3x3 atlas: top/middle/bottom by left/centre/right. */
   frame?: GridTileAsset
   markers?: GridWallMarkers
+  /** Positive fraction of a cell to shift transparent wall markers down. */
+  markerVerticalOffset?: number
 }
 
 export type GridObjectPurpose =

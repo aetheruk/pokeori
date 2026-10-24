@@ -44,6 +44,7 @@ import {
   resolveGridObstacleSources,
   resolveGridTileSources,
   resolveGridWallMarkerSource,
+  resolveGridWallMarkerVerticalOffset,
   resolveGridWallSource,
 } from '@/data/games/grid-tiles'
 import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
@@ -1702,6 +1703,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const wallTeleporterSprite =
     resolveGridWallMarkerSource(activeTilePaletteId, 'teleporter') ||
     teleporterSprite
+  const wallMarkerVerticalOffset = resolveGridWallMarkerVerticalOffset(activeTilePaletteId)
   const backWallOnly = isGridBackWallOnly(activeTilePaletteId)
   const cellWidth = `${100 / Math.max(gridSize.w, 1)}%`
   const cellHeight = `${100 / Math.max(gridSize.h, 1)}%`
@@ -1952,7 +1954,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                     style={entityStyle(tile)}
                     aria-hidden="true"
                   >
-                    <div className="relative h-full w-full">
+                    <div
+                      className="relative h-full w-full"
+                      style={tile.y === 0 && wallMarkerVerticalOffset > 0
+                        ? { transform: `translateY(${wallMarkerVerticalOffset * 100}%)` }
+                        : undefined}
+                    >
                       <Image
                         src={goalSprite}
                         alt=""
@@ -1972,7 +1979,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                   style={entityStyle(teleporter)}
                   aria-hidden="true"
                 >
-                  <div className="relative h-full w-full">
+                  <div
+                    className="relative h-full w-full"
+                    style={teleporter.y === 0 && wallMarkerVerticalOffset > 0
+                      ? { transform: `translateY(${wallMarkerVerticalOffset * 100}%)` }
+                      : undefined}
+                  >
                     <Image
                       src={teleporter.y === 0 ? wallTeleporterSprite : teleporterSprite}
                       alt=""

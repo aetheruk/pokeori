@@ -203,6 +203,7 @@ export const gridTilePalettes = {
     },
     walls: {
       back: { src: '/games/grid-tiles/pokemon-tower/walls/back.png' },
+      markerVerticalOffset: 0.17,
       markers: {
         goal: { src: '/games/grid-tiles/pokemon-tower/walls/markers/doorway.png' },
         teleporter: { src: '/games/grid-tiles/pokemon-tower/walls/markers/doorway.png' },
@@ -528,6 +529,10 @@ export function resolveGridWallMarkerSource(
   return getGridTilePalette(paletteId).walls?.markers?.[marker]?.src
 }
 
+export function resolveGridWallMarkerVerticalOffset(paletteId: string | undefined): number {
+  return getGridTilePalette(paletteId).walls?.markerVerticalOffset || 0
+}
+
 export function resolveGridFloorMarkerSource(
   paletteId: string | undefined,
   marker: 'goal' | 'teleporter',
@@ -615,6 +620,20 @@ export function getGridTilePackCredits(options?: { externalOnly?: boolean }): Gr
     creator: 'Compiled by SoulfulLex; individual credits are included in the pack readme',
     href: 'https://www.mediafire.com/file/nbr92qe5uhorhlv/FRLG_Accurate_NPC_Megapack_%2528Relic_Castle_Edition%2529.zip/file',
     notice: 'The pack does not state an open artwork license. Original trainer sheets are retained; Pokémon characters and artwork remain owned by their respective rights holders.',
+    external: true,
+  })
+  filtered.push({
+    label: 'Gen 4 Overworld Collection — trainer walking sheets',
+    creator: 'Neo-Spriteman, VanillaSunshine, PurpleZaffre, Maicerochico and AtomicReactor; named files shared by Mecha1035',
+    href: 'https://eeveeexpo.com/resources/404/',
+    notice: 'The resource requests credit and asks that its pack not be redistributed. Selected original four-direction sheets are used; no open artwork license is stated. Pokémon characters and artwork remain owned by their respective rights holders.',
+    external: true,
+  })
+  filtered.push({
+    label: 'Gen 5 Characters in Gen 4 OW style — Unova Gym Leader walking sheets',
+    creator: 'DiegoWT',
+    href: 'https://eeveeexpo.com/resources/370/',
+    notice: 'The source requests credit and asks that its pack not be redistributed. Selected original four-direction sheets are used; no open artwork license is stated. Pokémon characters and artwork remain owned by their respective rights holders.',
     external: true,
   })
   return Array.from(new Map(filtered.map((credit) => [`${credit.label}:${credit.href || 'local'}`, credit])).values())

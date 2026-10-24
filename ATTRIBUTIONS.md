@@ -28,11 +28,32 @@ The unchanged FRLG trainer character sheets in
 compiled by SoulfulLex and released on 3 October 2021. Its included readme
 credits the Bird Keeper sprite to Spherical Ice and the female Psychic sprite
 to Kalarie, but does not identify every individual sprite artist or state an
-open artwork license. Grid Adventure keeps the original 128×192 sheets and
-uses the first directional frame for NPC markers; the female Psychic sprite
-is used for Channeler markers because the pack has no dedicated Channeler
-sheet. Pokémon artwork and characters remain the property of their respective
-rights holders.
+open artwork license. Grid Adventure keeps the original sheets and uses each
+sheet's full four-direction walking animation where registered. The pack does
+not include a dedicated Channeler sheet. Professor Oak uses the full
+four-direction `Anime Samuel Oak.png` sheet, credited to Kalarie in the pack.
+
+The Kanto, Johto, and Sinnoh Gym Leader, Channeler, and several other trainer
+walking sheets in `public/games/trainers/source/` come from the
+[Gen 4 overworld collection on Eevee Expo](https://eeveeexpo.com/resources/404/).
+The named files were shared in the
+[v20 name-format archive](https://www.mediafire.com/file/s0b3ss441tlj5mi/OWs_w_v20_name_format.rar/file)
+linked from the [Gen 4 and 5 trainer resource](https://eeveeexpo.com/resources/391/).
+The collection credits Neo-Spriteman, VanillaSunshine, PurpleZaffre &
+Maicerochico, and AtomicReactor. The selected 256×256 sheets are kept intact;
+their four-by-four animation frames are 64×64 pixels. The source requests that
+the resource pack itself not be redistributed and does not state an open artwork
+license. Pokémon artwork and characters remain the property of their respective
+rights holders. The matched leader sheets use NPC 63 for Jasmine, NPC 61 for
+Morty, NPC 75 for Byron, NPC 76 for Candice, NPC 65 for Clair, and NPC 58 for
+Falkner.
+
+The Unova Gym Leader walk sheets in `public/games/trainers/source/` come from
+the [Gen 5 Characters in Gen 4 OW style pack](https://eeveeexpo.com/resources/370/)
+by DiegoWT. The selected original four-direction sheets are kept intact, with
+64×64 animation frames. The source requests credit and asks that the pack not be
+redistributed; it does not state an open artwork license. Pokémon characters
+and artwork remain the property of their respective rights holders.
 
 ## Pokémon overworld sprites
 

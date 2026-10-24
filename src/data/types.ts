@@ -185,6 +185,8 @@ export interface BattleEnemy {
   initialStatus?: StatusEffectId
   heldItemId?: string
   aiMoves?: string[]
+  /** Pin this enemy's Alpha state instead of using the ordinary Alpha roll. */
+  isAlpha?: boolean
   isShadow?: boolean
   isRadiant?: boolean
   gender?: 'male' | 'female' | 'genderless'

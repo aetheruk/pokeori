@@ -22,18 +22,21 @@ export function TrainerGenderPicker({
   return (
     <fieldset className="space-y-2">
       <legend className="text-sm font-semibold">Gender</legend>
+      <p className="text-xs leading-relaxed text-game-muted">
+        Used when the selected avatar has no matching overworld sprite.
+      </p>
       <div className="grid grid-cols-3 gap-2">
         {choices.map(({ value: option, label, Icon }) => (
-          <label key={option} className="relative cursor-pointer">
+          <label key={option} className="relative block min-w-0 cursor-pointer">
             <input
-              className="peer absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+              className="peer sr-only"
               type="radio"
               name={name}
               value={option}
               checked={value === option}
               onChange={() => onChange(option)}
             />
-            <span className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-game-border bg-game-surface-raised p-2 peer-checked:border-game-moss peer-checked:bg-game-moss/10 peer-focus-visible:ring-2 peer-focus-visible:ring-game-moss peer-disabled:opacity-50">
+            <span className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-game-border bg-game-surface-raised p-2 peer-checked:border-game-charcoal peer-checked:bg-game-charcoal/5 peer-focus-visible:ring-2 peer-focus-visible:ring-game-charcoal peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-game-canvas peer-disabled:opacity-50">
               <GridPlayerSprite gender={option} className="h-12 w-12" />
               <span className="flex items-center gap-1.5 text-sm">
                 <Icon

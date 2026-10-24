@@ -4347,12 +4347,24 @@ describe('static data references', () => {
       quantity: 200,
       dropChance: 100,
     })
-    expect(bugGauntlet?.rewards).toContainEqual({
-      type: 'item',
-      targetId: 'rare-candy-xs',
-      quantity: 1,
-      dropChance: 100,
-    })
+    expect(bugGauntlet?.rewards).not.toContainEqual(
+      expect.objectContaining({ type: 'item', targetId: 'rare-candy-xs' }),
+    )
+    const bugFinalPrizes = (bugGauntlet?.settings as any)?.screens?.find(
+      (screen: any) => screen.id === 'forest-5',
+    )?.prizes || []
+    expect(bugFinalPrizes.map(({ x, y, itemId, quantity }: any) => ({
+      x, y, itemId, quantity,
+    }))).toEqual([
+      { x: 3, y: 1, itemId: 'rare-candy-xs', quantity: 1 },
+      { x: 0, y: 1, itemId: 'rare-candy-xs', quantity: 1 },
+      { x: 6, y: 1, itemId: 'rare-candy-xs', quantity: 1 },
+    ])
+    expect(bugFinalPrizes.slice(1).every((prize: any) =>
+      prize.requirements?.some((requirement: any) =>
+        requirement.type === 'roll' && requirement.count === 300_000,
+      ),
+    )).toBe(true)
 
     const featheredGauntlet = allGames.find(
       (entry) => entry.id === 'feathered-gauntlet-grid-adventure',
@@ -4375,12 +4387,24 @@ describe('static data references', () => {
       expect(battles.find((entry) => entry.id === battleId)?.gridAdventureOnly)
         .toBe(true)
     }
-    expect(featheredGauntlet?.rewards).toContainEqual({
-      type: 'item',
-      targetId: 'rare-candy-m',
-      quantity: 1,
-      dropChance: 100,
-    })
+    expect(featheredGauntlet?.rewards).not.toContainEqual(
+      expect.objectContaining({ type: 'item', targetId: 'rare-candy-m' }),
+    )
+    const featheredFinalPrizes = (featheredGauntlet?.settings as any)?.screens?.find(
+      (screen: any) => screen.id === 'route-14-5',
+    )?.prizes || []
+    expect(featheredFinalPrizes.map(({ x, y, itemId, quantity }: any) => ({
+      x, y, itemId, quantity,
+    }))).toEqual([
+      { x: 3, y: 1, itemId: 'rare-candy-m', quantity: 1 },
+      { x: 0, y: 1, itemId: 'rare-candy-m', quantity: 1 },
+      { x: 6, y: 1, itemId: 'rare-candy-m', quantity: 1 },
+    ])
+    expect(featheredFinalPrizes.slice(1).every((prize: any) =>
+      prize.requirements?.some((requirement: any) =>
+        requirement.type === 'roll' && requirement.count === 300_000,
+      ),
+    )).toBe(true)
     expect(expeditions.some((entry) =>
       entry.id === 'bug-gauntlet-expedition' ||
       entry.id === 'route-14-bird-gauntlet-expedition',

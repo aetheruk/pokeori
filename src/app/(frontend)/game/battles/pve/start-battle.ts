@@ -642,17 +642,19 @@ export async function startBattleFromConfig(
           const isAlpha =
             fixedWildPokemon
               ? fixedWildPokemon.isAlpha
-              : rollAlpha(
-                  canRollAlpha(
-                    battleConfig,
-                    enemy,
-                    !!(
-                      options.dynamic ||
-                      chronicleContext ||
-                      expeditionContext
+              : typeof enemy.isAlpha === 'boolean'
+                ? enemy.isAlpha
+                : rollAlpha(
+                    canRollAlpha(
+                      battleConfig,
+                      enemy,
+                      !!(
+                        options.dynamic ||
+                        chronicleContext ||
+                        expeditionContext
+                      ),
                     ),
-                  ),
-                )
+                  )
           const level =
             fixedWildPokemon
               ? fixedWildPokemon.level

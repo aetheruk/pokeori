@@ -98,19 +98,20 @@ export function TrainerDashboard({
     type: 'pokemon',
     id: '132',
   }
-  const genderAppearance = getGridPlayerAppearance(
+  const trainerAppearance = getGridPlayerAppearance(
     user?.trainerGender,
     'down',
     0,
+    user?.icon,
   )
   const trainerGenderIcon = (
     <span
       aria-hidden="true"
       className="block h-8 w-8 bg-no-repeat [image-rendering:pixelated]"
       style={{
-        backgroundImage: `url('${genderAppearance.src}')`,
-        backgroundSize: genderAppearance.backgroundSize,
-        backgroundPosition: genderAppearance.backgroundPosition,
+        backgroundImage: `url('${trainerAppearance.src}')`,
+        backgroundSize: trainerAppearance.backgroundSize,
+        backgroundPosition: trainerAppearance.backgroundPosition,
       }}
     />
   )

@@ -159,6 +159,7 @@ const enemy = z
     rarity: rarity.optional(),
     rarityChances: rarityChancesSchema.optional(),
     shiny: z.boolean().optional(),
+    isAlpha: z.boolean().optional(),
     isShadow: z.boolean().optional(),
     isRadiant: z.boolean().optional(),
     ivs: stats.optional(),

@@ -725,6 +725,8 @@ export function TrainerLeveling({
         heroLabel="Edit trainer card"
         desktopBreakpoint="lg"
         desktopWidth="min(44vw, 560px)"
+        heroClassName="min-h-[24dvh] pb-5 pt-[max(3rem,env(safe-area-inset-top))] md:min-h-[26dvh]"
+        iconClassName="!h-16 !w-16 md:!h-20 md:!w-20"
         className="flex flex-col overflow-hidden"
         headerClassName="shrink-0"
         dismissible={!isSaving}
@@ -759,12 +761,14 @@ export function TrainerLeveling({
             </div>
 
             <details className="rounded-md border border-game-border bg-game-surface">
-              <summary className="game-focus-ring cursor-pointer rounded-md p-3 text-sm font-semibold">
-                Avatar ·{' '}
-                {availableIcons.find((icon) => icon.id === selectedIcon)
-                  ?.name || 'Ditto'}
+              <summary className="game-focus-ring flex min-w-0 cursor-pointer items-center justify-between gap-3 rounded-md p-3 text-sm font-semibold">
+                <span className="shrink-0">Avatar</span>
+                <span className="min-w-0 truncate text-right font-normal text-game-muted">
+                  {availableIcons.find((icon) => icon.id === selectedIcon)
+                    ?.name || 'Ditto'}
+                </span>
               </summary>
-              <div className="grid max-h-48 grid-cols-5 gap-2 overflow-y-auto px-3 pb-3">
+              <div className="grid max-h-48 grid-cols-[repeat(auto-fill,minmax(3rem,1fr))] gap-2 overflow-x-hidden overflow-y-auto px-3 pb-3">
                 {availableIcons.map((icon) => (
                   <button
                     key={icon.id}
