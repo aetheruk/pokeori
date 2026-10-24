@@ -70,6 +70,7 @@ export const gridObjectDefinitionSchema = z
       .object({ cols: z.number().int().min(1).max(16), rows: z.number().int().min(1).max(16) })
       .strict(),
     asset: gridTileAssetSchema,
+    overworldSpriteId: z.string().min(1).max(120).optional(),
     collision: z.enum(['none', 'solid', 'pushable']).optional(),
     interaction: z
       .enum(['battle', 'encounter', 'minigame', 'field-research'])
@@ -91,6 +92,8 @@ export const gridObjectPlacementSchema = gridPositionSchema
   .extend({
     id: z.string().min(1).max(80).optional(),
     objectId: z.string().min(1).max(80),
+    overworldSpriteId: z.string().min(1).max(120).optional(),
+    trainerClassId: z.string().min(1).max(80).optional(),
     removeOnSuccess: z.boolean().optional(),
     randomGroup: gridObjectRandomGroupSchema.optional(),
     requirements: z.array(taskConditionSchema).optional(),

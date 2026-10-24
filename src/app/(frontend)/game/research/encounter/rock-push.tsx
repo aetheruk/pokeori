@@ -75,6 +75,10 @@ import { startFieldResearch } from '@/app/(frontend)/game/field-research/actions
 import { prepareGridAdventureInteraction } from '@/app/(frontend)/game/games/grid-adventure-actions'
 import { getGridActivityRouteForId } from '@/utilities/games/activity-domain'
 import { EndlessCollectibleSprite } from './endless-collectibles'
+import {
+  getGridOverworldSpriteAppearance,
+  getTrainerOverworldSpriteId,
+} from '@/data/games/overworld-sprites'
 
 interface RockPushGameProps {
   encounter: GridPuzzleRockPushGameConfig
@@ -2009,6 +2013,13 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                 if (!definition) return null
                 const objectKey = getGridObjectKey(placement, index)
                 if (clearedObjectKeys.has(objectKey)) return null
+                const spriteId =
+                  placement.overworldSpriteId ||
+                  getTrainerOverworldSpriteId(placement.trainerClassId) ||
+                  definition.overworldSpriteId
+                const sprite = spriteId
+                  ? getGridOverworldSpriteAppearance(spriteId)
+                  : null
                 return (
                   <div
                     key={`object:${objectKey}`}
@@ -2020,14 +2031,28 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                       height: `${(definition.size.rows * 100) / Math.max(gridSize.h, 1)}%`,
                     }}
                   >
-                    <div className="relative h-full w-full">
-                      <Image
-                        src={definition.asset.src}
-                        alt={definition.name}
-                        fill
-                        sizes="128px"
-                        className="object-contain drop-shadow-lg [image-rendering:pixelated]"
-                      />
+                    <div className="relative flex h-full w-full items-center justify-center">
+                      {sprite ? (
+                        <div
+                          role="img"
+                          aria-label={definition.name}
+                          className="h-full bg-no-repeat drop-shadow-lg [image-rendering:pixelated]"
+                          style={{
+                            width: `${Math.min(100, sprite.frameAspect * 100)}%`,
+                            backgroundImage: `url('${sprite.src}')`,
+                            backgroundSize: sprite.backgroundSize,
+                            backgroundPosition: sprite.backgroundPosition,
+                          }}
+                        />
+                      ) : (
+                        <Image
+                          src={definition.asset.src}
+                          alt={definition.name}
+                          fill
+                          sizes="128px"
+                          className="object-contain drop-shadow-lg [image-rendering:pixelated]"
+                        />
+                      )}
                     </div>
                   </div>
                 )
@@ -2088,6 +2113,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
               <GridPlayerToken
                 key={activeScreenId}
                 gender={user?.trainerGender}
+                iconId={user?.icon}
                 facing={facing}
                 step={moves}
                 position={playerPos}

@@ -222,6 +222,7 @@ export function GameNavigation() {
                 {item.name === 'Trainer' ? (
                   <GridPlayerSprite
                     gender={user?.trainerGender}
+                    iconId={user?.icon}
                     className={cn(
                       'mobile-nav-pixel-outline h-8 w-8',
                       user?.trainerGender === 'male' ||

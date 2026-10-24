@@ -1,134 +1,188 @@
 import type { TaskIcon } from '@/data/tasks'
+import { trainerSprites } from '@/data/trainers'
+import pokemonIconCatalog from './pokemon-icon-catalog.json'
+
+export type IconSource =
+  | { type: 'pokemon'; id: string; speciesId: number }
+  | { type: 'trainer'; id: string }
+  | { type: 'other'; id: string }
 
 export interface IconConfig {
   id: string
   name: string
   icon: TaskIcon
+  /** Stable link to the game entity represented by this reusable icon. */
+  source: IconSource
 }
 
-export const icons: IconConfig[] = [
-  { id: 'ditto', name: 'Ditto', icon: { type: 'pokemon', id: '132' } },
-  { id: 'raticate', name: 'Raticate', icon: { type: 'pokemon', id: '20' } },
-  { id: 'metapod', name: 'Metapod', icon: { type: 'pokemon', id: '11' } },
-  { id: 'jigglypuff', name: 'Jigglypuff', icon: { type: 'pokemon', id: '39' } },
-  {
-    id: 'alolan-meowth',
-    name: 'Alolan Meowth',
-    icon: { type: 'pokemon', id: '10107' },
+interface PokemonIconCatalogEntry {
+  formId: string
+  speciesId: number
+  name: string
+}
+
+const pokemonForms = pokemonIconCatalog as PokemonIconCatalogEntry[]
+const pokemonFormsById = new Map(pokemonForms.map((form) => [form.formId, form]))
+
+function pokemonIcon(form: PokemonIconCatalogEntry, id = `pokemon-${form.formId}`): IconConfig {
+  return {
+    id,
+    name: form.name,
+    icon: { type: 'pokemon', id: form.formId },
+    source: { type: 'pokemon', id: form.formId, speciesId: form.speciesId },
+  }
+}
+
+const pokemonIcons = pokemonForms.map((form) => pokemonIcon(form))
+
+// Keep previously saved profile/reward IDs stable. New entries use
+// `pokemon-${formId}` and are generated from the Pokémon data catalog.
+const legacyPokemonIconIds: Record<string, string> = {
+  ditto: '132',
+  raticate: '20',
+  metapod: '11',
+  jigglypuff: '39',
+  'alolan-meowth': '10107',
+  charmander: '4',
+  squirtle: '7',
+  bulbasaur: '1',
+  rotom: '479',
+  tauros: '128',
+  nidoking: '34',
+  nidoqueen: '31',
+  chikorita: '152',
+  cyndaquil: '155',
+  totodile: '158',
+  treecko: '252',
+  torchic: '255',
+  mudkip: '258',
+  turtwig: '387',
+  chimchar: '390',
+  piplup: '393',
+  snivy: '495',
+  tepig: '498',
+  oshawott: '501',
+  chespin: '650',
+  fennekin: '653',
+  froakie: '656',
+  rowlet: '722',
+  litten: '725',
+  popplio: '728',
+  grookey: '810',
+  scorbunny: '813',
+  sobble: '816',
+  sprigatito: '906',
+  fuecoco: '909',
+  quaxly: '912',
+}
+
+const legacyPokemonIcons = Object.entries(legacyPokemonIconIds).flatMap(
+  ([legacyId, formId]) => {
+    const form = pokemonFormsById.get(formId)
+    return form ? [pokemonIcon(form, legacyId)] : []
   },
-  { id: 'trainer-red', name: 'Red', icon: { type: 'trainer', id: 'red' } },
-  { id: 'trainer-leaf', name: 'Leaf', icon: { type: 'trainer', id: 'leaf' } },
-  { id: 'charmander', name: 'Charmander', icon: { type: 'pokemon', id: '4' } },
-  { id: 'squirtle', name: 'Squirtle', icon: { type: 'pokemon', id: '7' } },
-  { id: 'bulbasaur', name: 'Bulbasaur', icon: { type: 'pokemon', id: '1' } },
-  { id: 'brock', name: 'Brock', icon: { type: 'trainer', id: 'gym-kanto-brock' } },
-  { id: 'misty', name: 'Misty', icon: { type: 'trainer', id: 'gym-kanto-misty' } },
-  { id: 'lt-surge', name: 'Lt. Surge', icon: { type: 'trainer', id: 'gym-kanto-ltsurge' } },
-  { id: 'koga', name: 'Koga', icon: { type: 'trainer', id: 'gym-kanto-koga' } },
+)
+
+const trainerNameOverrides: Record<string, string> = {
+  'trainer-gb-red': 'Red (Red)',
+  'trainer-gb-blue': 'Blue (Red)',
+  'trainer-gb-red-2': 'Red (Blue)',
+  'trainer-gb-blue-2': 'Blue (Blue)',
+}
+
+const trainerIcons: IconConfig[] = trainerSprites.map((trainer) => ({
+  id: `trainer-${trainer.id}`,
+  name: trainerNameOverrides[`trainer-${trainer.id}`] || trainer.name,
+  icon: { type: 'trainer', id: trainer.id },
+  source: { type: 'trainer', id: trainer.id },
+}))
+
+// These IDs were used by prior rewards and saved profile selections. They are
+// aliases for canonical trainer records, rather than independent sprite data.
+const legacyTrainerAliases: Array<{
+  id: string
+  name: string
+  trainerId: string
+}> = [
+  { id: 'brock', name: 'Brock', trainerId: 'gym-kanto-brock' },
+  { id: 'misty', name: 'Misty', trainerId: 'gym-kanto-misty' },
+  { id: 'lt-surge', name: 'Lt. Surge', trainerId: 'gym-kanto-ltsurge' },
+  { id: 'koga', name: 'Koga', trainerId: 'gym-kanto-koga' },
+  { id: 'rocket-m', name: 'Team Rocket Grunt', trainerId: 'rocket-grunt-m' },
+  { id: 'rocket-f', name: 'Team Rocket Grunt', trainerId: 'rocket-grunt-f' },
+  { id: 'sailor', name: 'Sailor', trainerId: 'sailor' },
+  { id: 'hiker', name: 'Hiker', trainerId: 'hiker' },
+  { id: 'cyclist', name: 'Cyclist', trainerId: 'cyclist-m' },
+  { id: 'cyclist-f', name: 'Cyclist', trainerId: 'cyclist-f' },
+  { id: 'bird-keeper', name: 'Birdkeeper', trainerId: 'bird-keeper' },
+  { id: 'gambler', name: 'Gambler', trainerId: 'gamer' },
+]
+
+const trainerIds = new Set(trainerSprites.map((trainer) => trainer.id))
+const legacyTrainerIcons: IconConfig[] = legacyTrainerAliases.flatMap(
+  ({ id, name, trainerId }) =>
+    trainerIds.has(trainerId)
+      ? [
+          {
+            id,
+            name,
+            icon: { type: 'trainer', id: trainerId },
+            source: { type: 'trainer', id: trainerId },
+          },
+        ]
+      : [],
+)
+
+const otherIcons: IconConfig[] = [
   {
-    id: 'rocket-m',
-    name: 'Team Rocket Grunt',
-    icon: { type: 'trainer', id: 'rocket-grunt-m' },
+    id: 'nugget',
+    name: 'Nugget',
+    icon: { type: 'item', id: 'nugget' },
+    source: { type: 'other', id: 'nugget' },
   },
-  {
-    id: 'rocket-f',
-    name: 'Team Rocket Grunt',
-    icon: { type: 'trainer', id: 'rocket-grunt-f' },
-  },
-  {
-    id: 'sailor',
-    name: 'Sailor',
-    icon: { type: 'trainer', id: 'sailor' },
-  },
-  {
-    id: 'hiker',
-    name: 'Hiker',
-    icon: { type: 'trainer', id: 'hiker' },
-  },
-  {
-    id: 'cyclist',
-    name: 'Cyclist',
-    icon: { type: 'trainer', id: 'cyclist-m' },
-  },
-  {
-    id: 'cyclist-f',
-    name: 'Cyclist',
-    icon: { type: 'trainer', id: 'cyclist-f' },
-  },
-  {
-    id: 'bird-keeper',
-    name: 'Birdkeeper',
-    icon: { type: 'trainer', id: 'bird-keeper' },
-  },
-  {
-    id: 'gambler',
-    name: 'Gambler',
-    icon: { type: 'trainer', id: 'gamer' },
-  },
-  { id: 'rotom', name: 'Rotom', icon: { type: 'pokemon', id: '479' } },
-  {
-    id: 'trainer-gb-red',
-    name: 'Red (Red)',
-    icon: { type: 'trainer', id: 'gb-red' },
-  },
-  {
-    id: 'trainer-gb-blue',
-    name: 'Blue (Red)',
-    icon: { type: 'trainer', id: 'gb-blue' },
-  },
-  {
-    id: 'trainer-gb-red-2',
-    name: 'Red (Blue)',
-    icon: { type: 'trainer', id: 'gb-red-2' },
-  },
-  {
-    id: 'trainer-gb-blue-2',
-    name: 'Blue (Blue)',
-    icon: { type: 'trainer', id: 'gb-blue-2' },
-  },
-  { id: 'nugget', name: 'Nugget', icon: { type: 'item', id: 'nugget' } },
   {
     id: 'safari-ball',
     name: 'Safari Ball',
     icon: { type: 'item', id: 'safari-ball' },
+    source: { type: 'other', id: 'safari-ball' },
   },
-  { id: 'tauros', name: 'Tauros', icon: { type: 'pokemon', id: '128' } },
-  { id: 'nidoking', name: 'Nidoking', icon: { type: 'pokemon', id: '34' } },
-  { id: 'nidoqueen', name: 'Nidoqueen', icon: { type: 'pokemon', id: '31' } },
-  // Gen 2
-  { id: 'chikorita', name: 'Chikorita', icon: { type: 'pokemon', id: '152' } },
-  { id: 'cyndaquil', name: 'Cyndaquil', icon: { type: 'pokemon', id: '155' } },
-  { id: 'totodile', name: 'Totodile', icon: { type: 'pokemon', id: '158' } },
-  // Gen 3
-  { id: 'treecko', name: 'Treecko', icon: { type: 'pokemon', id: '252' } },
-  { id: 'torchic', name: 'Torchic', icon: { type: 'pokemon', id: '255' } },
-  { id: 'mudkip', name: 'Mudkip', icon: { type: 'pokemon', id: '258' } },
-  // Gen 4
-  { id: 'turtwig', name: 'Turtwig', icon: { type: 'pokemon', id: '387' } },
-  { id: 'chimchar', name: 'Chimchar', icon: { type: 'pokemon', id: '390' } },
-  { id: 'piplup', name: 'Piplup', icon: { type: 'pokemon', id: '393' } },
-  // Gen 5
-  { id: 'snivy', name: 'Snivy', icon: { type: 'pokemon', id: '495' } },
-  { id: 'tepig', name: 'Tepig', icon: { type: 'pokemon', id: '498' } },
-  { id: 'oshawott', name: 'Oshawott', icon: { type: 'pokemon', id: '501' } },
-  // Gen 6
-  { id: 'chespin', name: 'Chespin', icon: { type: 'pokemon', id: '650' } },
-  { id: 'fennekin', name: 'Fennekin', icon: { type: 'pokemon', id: '653' } },
-  { id: 'froakie', name: 'Froakie', icon: { type: 'pokemon', id: '656' } },
-  // Gen 7
-  { id: 'rowlet', name: 'Rowlet', icon: { type: 'pokemon', id: '722' } },
-  { id: 'litten', name: 'Litten', icon: { type: 'pokemon', id: '725' } },
-  { id: 'popplio', name: 'Popplio', icon: { type: 'pokemon', id: '728' } },
-  // Gen 8
-  { id: 'grookey', name: 'Grookey', icon: { type: 'pokemon', id: '810' } },
-  { id: 'scorbunny', name: 'Scorbunny', icon: { type: 'pokemon', id: '813' } },
-  { id: 'sobble', name: 'Sobble', icon: { type: 'pokemon', id: '816' } },
-  // Gen 9
-  { id: 'sprigatito', name: 'Sprigatito', icon: { type: 'pokemon', id: '906' } },
-  { id: 'fuecoco', name: 'Fuecoco', icon: { type: 'pokemon', id: '909' } },
-  { id: 'quaxly', name: 'Quaxly', icon: { type: 'pokemon', id: '912' } },
 ]
 
+const registry = new Map<string, IconConfig>()
+for (const icon of [
+  ...pokemonIcons,
+  ...trainerIcons,
+  ...legacyPokemonIcons,
+  ...legacyTrainerIcons,
+  ...otherIcons,
+]) {
+  if (!registry.has(icon.id)) registry.set(icon.id, icon)
+}
+
+export const icons = [...registry.values()]
+
+const sourceRegistry = new Map<string, IconConfig[]>()
+for (const icon of icons) {
+  const sourceKey = `${icon.source.type}:${icon.source.id}`
+  const sourceIcons = sourceRegistry.get(sourceKey) || []
+  sourceIcons.push(icon)
+  sourceRegistry.set(sourceKey, sourceIcons)
+}
+
 export function getIcon(id: string): IconConfig | undefined {
-  return icons.find((i) => i.id === id)
+  return registry.get(id)
+}
+
+/** Returns the canonical icon registered for a Pokémon, trainer, or other source. */
+export function getIconForSource(
+  source: Pick<IconSource, 'type' | 'id'>,
+): IconConfig | undefined {
+  return sourceRegistry.get(`${source.type}:${source.id}`)?.[0]
+}
+
+/** Includes legacy profile/reward aliases that resolve to the same source. */
+export function getIconsForSource(
+  source: Pick<IconSource, 'type' | 'id'>,
+): IconConfig[] {
+  return sourceRegistry.get(`${source.type}:${source.id}`) || []
 }

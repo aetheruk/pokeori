@@ -46,6 +46,7 @@ describe('trainer appearance', () => {
         for (let frame = 0; frame < 4; frame++) {
           expect(getGridPlayerAppearance(gender, facing, frame)).toEqual({
             src: GRID_TRAINER_SPRITES[gender],
+            frameAspect: 1,
             backgroundSize: '400% 400%',
             backgroundPosition: `${(frame * 100) / 3}% ${(row * 100) / 3}%`,
           })
@@ -67,6 +68,7 @@ describe('trainer appearance', () => {
     ).toBeGreaterThan(0)
     expect(getGridPlayerAppearance('neither', 'up', 3)).toEqual({
       src: GRID_TRAINER_SPRITES.neither,
+      frameAspect: 1,
       backgroundSize: '400% 400%',
       backgroundPosition: '100% 100%',
     })

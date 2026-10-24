@@ -139,6 +139,7 @@ describe('Pokemon Tower spirit trials', () => {
     expect(gengarLocation).toMatchObject({
       gridAdventureOnly: true,
       encounters: [{ speciesId: 94, formId: '94', chance: 100 }],
+      rewards: [{ type: 'icon', targetId: 'pokemon-94', dropChance: 100 }],
     })
     expect(
       adventure.rewards?.some(

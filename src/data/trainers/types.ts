@@ -5,6 +5,8 @@ export interface TrainerSpriteConfig {
   id: string
   name: string
   spriteId: string
+  /** Registered walkable sheet; remains distinct from the battle portrait. */
+  overworldSpriteId?: string
   gender: TrainerGender
   kind: TrainerKind
 }

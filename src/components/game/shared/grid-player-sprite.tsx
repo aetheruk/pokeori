@@ -12,16 +12,18 @@ export const GRID_PLAYER_MOVE_MS = 360
 
 export function GridPlayerSprite({
   gender,
+  iconId,
   facing = 'down',
   step = 0,
   className,
 }: {
   gender: unknown
+  iconId?: string | null
   facing?: GridPlayerDirection
   step?: number
   className?: string
 }) {
-  const appearance = getGridPlayerAppearance(gender, facing, step)
+  const appearance = getGridPlayerAppearance(gender, facing, step, iconId)
   return (
     <div
       aria-hidden="true"
@@ -31,6 +33,8 @@ export function GridPlayerSprite({
         className,
       )}
       style={{
+        width: `${Math.min(100, appearance.frameAspect * 100)}%`,
+        marginInline: 'auto',
         backgroundImage: `url('${appearance.src}')`,
         backgroundSize: appearance.backgroundSize,
         backgroundPosition: appearance.backgroundPosition,
@@ -41,6 +45,7 @@ export function GridPlayerSprite({
 
 export function GridPlayerToken({
   gender,
+  iconId,
   facing = 'down',
   step = 0,
   position,
@@ -49,6 +54,7 @@ export function GridPlayerToken({
   className,
 }: {
   gender: unknown
+  iconId?: string | null
   facing?: GridPlayerDirection
   step?: number
   position: { x: number; y: number }
@@ -56,7 +62,7 @@ export function GridPlayerToken({
   blockedOffset?: { x: number; y: number } | null
   className?: string
 }) {
-  const appearance = getGridPlayerAppearance(gender, facing, 0)
+  const appearance = getGridPlayerAppearance(gender, facing, 0, iconId)
   const playerRef = useRef<HTMLDivElement>(null)
   const spriteRef = useRef<HTMLDivElement>(null)
   const previousRef = useRef({ ...position, step })
@@ -89,7 +95,7 @@ export function GridPlayerToken({
     )
     const walk = sprite.animate(
       [0, 1, 2, 3, 0].map((frame) => ({
-        backgroundPosition: getGridPlayerAppearance(gender, facing, frame)
+        backgroundPosition: getGridPlayerAppearance(gender, facing, frame, iconId)
           .backgroundPosition,
         easing: 'steps(1, end)',
       })),
@@ -107,7 +113,7 @@ export function GridPlayerToken({
       cancel()
       reducedMotion.removeEventListener('change', cancel)
     }
-  }, [position.x, position.y, step, durationMs, gender, facing])
+  }, [position.x, position.y, step, durationMs, gender, facing, iconId])
 
   return (
     <div
@@ -135,8 +141,10 @@ export function GridPlayerToken({
         <div
           ref={spriteRef}
           data-grid-player-sprite={appearance.src}
-          className="relative h-full w-full bg-no-repeat [image-rendering:pixelated]"
+          className="relative h-full bg-no-repeat [image-rendering:pixelated]"
           style={{
+            width: `${Math.min(100, appearance.frameAspect * 100)}%`,
+            marginInline: 'auto',
             backgroundImage: `url('${appearance.src}')`,
             backgroundSize: appearance.backgroundSize,
             backgroundPosition: appearance.backgroundPosition,

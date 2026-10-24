@@ -847,10 +847,10 @@ describe('shared grid sprite sets', () => {
     const gengarCredit = credits.find((credit) =>
       credit.href === 'https://www.mediafire.com/file/a44ikbbztunn66m/Generation_9_Pack_v3.3.8.rar/file',
     )
-    expect(credits).toHaveLength(2)
+    expect(credits).toHaveLength(3)
     expect(followingPokemonCredit?.creator).toContain('Golisopod User')
     expect(followingPokemonCredit?.notice).toContain('credit')
-    expect(gengarCredit?.label).toContain('Gengar overworld follower sprite')
+    expect(gengarCredit?.label).toContain('Pokémon overworld follower sprites')
     expect(gengarCredit?.creator).toContain('Caruban')
   })
 

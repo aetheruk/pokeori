@@ -28,7 +28,13 @@ export const pokemonTowerLocations: Location[] = [
         chance: 100,
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'icon',
+        targetId: 'pokemon-94',
+        dropChance: 100,
+      },
+    ],
   },
   {
     id: 'pokemon-tower-1f-blocked',
