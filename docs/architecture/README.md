@@ -7,7 +7,7 @@ See [Tech Stack](/docs/architecture/tech-stack.md) for full dependency list.
 
 | Layer | Technology |
 |-------|-------------|
-| Runtime | Bun 1.3.13 |
+| Runtime | Bun 1.4.4 |
 | Frontend | Next.js 16 (App Router), React 19, TypeScript 5 |
 | Backend | Payload CMS 3 (headless CMS) |
 | Database | MongoDB (via @payloadcms/db-mongodb) |

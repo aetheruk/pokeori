@@ -18,7 +18,7 @@ game app and edits authored files without starting Payload, MongoDB, or Redis.
 - [Release Checklist](/docs/development/release-checklist.md) - Pre-deploy validation checklist
 
 ## Prerequisites
-- Bun 1.3.10 or newer
+- Bun 1.4.4 or newer
 - MongoDB database
 - Redis server (for local dev)
 - Git

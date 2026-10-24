@@ -179,11 +179,13 @@ For the 0.32.0 notification feature, follow [device notification setup](../featu
 
 ## Build and host resources
 
-The image pins Bun 1.4.2 for installation, Turbopack compilation, and the standalone server, matching `packageManager`. Frozen installs include build dependencies. GitHub Actions builds the image and reads/writes the private GHCR `buildcache` tag; Coolify only pulls and runs the published image. Next 16.3 enables Turbopack's filesystem build cache by default.
+The image pins Bun 1.4.4 for installation, Turbopack compilation, and the standalone server, matching `packageManager` and `.bun-version`. A Docker build assertion checks the exact Bun version in the shared base image inherited by the dependency, builder, and runner stages. GitHub Actions uses BuildKit to build and publish that image; its hosted runner does not run the app's Bun runtime. Frozen installs include build dependencies. Coolify only pulls and runs the published image. Next 16.3 enables Turbopack's filesystem build cache by default.
 
 The Alpine builder sets `POKEORI_BUILD_LIBC=musl` so tracing excludes unused glibc Sharp packages while retaining linuxmusl Sharp/libvips. Remove/change this setting if switching to a glibc base. Broad Payload runtime includes remain: earlier runtime tracing fixes required them, so further narrowing needs a complete image smoke test. The inspected 0.29.9 image contained approximately 18 MiB of unused glibc libvips; this is not a measured final-image size for the new release.
 
-The base stage updates Alpine packages before installing compatibility libraries. The upstream Bun 1.4.2 image scan found CVE-2026-14456 in libcrypto3/libssl3 3.5.7-r0, fixed by Alpine 3.5.8-r0. A cached RUN does not recheck repositories: when future OS advisories appear, refresh/rebuild the base stage and rescan it. Preserve ordinary application/compiler caches during routine releases.
+The base stage updates Alpine packages before installing compatibility libraries. An earlier scan of the Bun 1.4.2 image found CVE-2026-14456 in libcrypto3/libssl3 3.5.7-r0, fixed by Alpine 3.5.8-r0. A cached RUN does not recheck repositories: when future OS advisories appear, refresh/rebuild the base stage and rescan it. Preserve ordinary application/compiler caches during routine releases.
+
+The dependency audit pins `fast-uri`, both installed `undici` major lines, and `happy-dom` to patched releases in `package.json`. The Happy DOM pin is 21.0.4 because the current `@lexical/headless@0.50.0` range (`^20.9.0`) has no patched 20.x release; keep the override until upstream accepts a fixed version, and recheck Lexical behavior when updating it.
 
 On 2026-09-07, the rebuilt linux/amd64 base stage (Alpine 3.22.5, 21 OS packages) passed Trivy 0.74.0's HIGH/CRITICAL scan with zero findings after the OpenSSL update. This covers the base's OS packages, not the compiled Bun binary or the final application image.
 
