@@ -117,6 +117,8 @@ export interface Location {
   hide?: string
   /** Keep this encounter available to expedition paths without listing it separately in Explore. */
   expeditionOnly?: boolean
+  /** Only allow this encounter to start from a matching active Grid Adventure object. */
+  gridAdventureOnly?: boolean
   overrides?: string
   name: string
   description: string

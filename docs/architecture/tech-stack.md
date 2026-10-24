@@ -5,7 +5,7 @@ Full dependency list with versions and purposes.
 ## Core Framework
 | Package | Version | Purpose |
 |---------|---------|---------|
-| bun | 1.3.10 | Package manager, production runtime, build environment, test runner, and data tooling |
+| bun | 1.4.4 | Package manager, production runtime, build environment, test runner, and data tooling |
 | next | 16.2.9 | React framework (App Router) |
 | react | 19.2.7 | UI library |
 | react-dom | 19.2.7 | React DOM rendering |

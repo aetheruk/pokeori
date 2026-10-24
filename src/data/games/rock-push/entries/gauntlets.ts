@@ -1,5 +1,6 @@
 import type { RockPushGameConfig } from '../types'
 import { pokemonTowerGauntletBattles } from '@/data/battles/entries/pokemon-tower'
+import type { GridObjectPlacement } from '@/data/games/grid-tiles/types'
 
 const bugGauntletBattleIds = [
   'bug-gauntlet-barry',
@@ -19,6 +20,12 @@ const birdGauntletBattleIds = [
 ]
 
 const rareMaterialRollRequirement = [{ type: 'roll' as const, count: 200_000 }]
+const towerGengarRollRequirement = [{ type: 'roll' as const, count: 66_667 }]
+const towerStandardRollRequirement = [{
+  type: 'roll' as const,
+  count: 66_667,
+  inverse: true,
+}]
 
 function createTrainerPlacements(
   battleIds: string[],
@@ -38,7 +45,7 @@ function createTrainerPlacements(
   }))
 }
 
-function createTowerTrainerPlacements() {
+function createTowerTrainerPlacements(): GridObjectPlacement[] {
   const positions = [
     { x: 2, y: 1 },
     { x: 4, y: 1 },
@@ -55,18 +62,52 @@ function createTowerTrainerPlacements() {
     { x: 7, y: 6 },
   ]
 
-  return pokemonTowerGauntletBattles.map((battle, index) => ({
-    id: `trainer-${battle.id}`,
-    objectId: 'channeler-trainer',
-    ...positions[index],
-    removeOnSuccess: true,
-    randomGroup: { id: 'tower-channeler-pool', selectCount: 5 },
-    interaction: {
+  const trainerPlacements = pokemonTowerGauntletBattles.flatMap((battle, index) => {
+    const position = positions[index]
+    const interaction = {
       type: 'battle' as const,
       targetId: battle.id,
       victory: 'clear' as const,
+    }
+
+    return [
+      {
+        id: `standard-trainer-${battle.id}`,
+        objectId: 'channeler-trainer',
+        ...position,
+        removeOnSuccess: true,
+        requirements: towerStandardRollRequirement,
+        randomGroup: { id: 'tower-channeler-standard-pool', selectCount: 5 },
+        interaction,
+      },
+      {
+        id: `rare-trainer-${battle.id}`,
+        objectId: 'channeler-trainer',
+        ...position,
+        removeOnSuccess: true,
+        requirements: towerGengarRollRequirement,
+        randomGroup: { id: 'tower-channeler-gengar-pool', selectCount: 4 },
+        interaction,
+      },
+    ]
+  })
+
+  return [
+    ...trainerPlacements,
+    {
+      id: 'rare-gengar-catch',
+      objectId: 'gengar-encounter-trigger',
+      x: 4,
+      y: 4,
+      removeOnSuccess: true,
+      requirements: towerGengarRollRequirement,
+      interaction: {
+        type: 'encounter',
+        targetId: 'pokemon-tower-ghost-trial-gengar',
+        victory: 'clear',
+      },
     },
-  }))
+  ]
 }
 
 export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
@@ -175,7 +216,7 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
     id: 'pokemon-tower-ghost-trial-grid-adventure',
     name: 'The Ghost Trial Gauntlet',
     description:
-      'Face five of the Tower Channelers, chosen at random for each run. You have one life; defeat every trainer to clear the tower.',
+      'Face five of the Tower Channelers, chosen at random for each run. On rare runs, one Channeler is replaced by a catch encounter with Gengar. You have one life; complete all five activities to clear the tower.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: { type: 'trainer', id: 'channeler' },
