@@ -636,7 +636,12 @@ export const pokemonTowerGauntletBattles: BattleConfig[] = pokemonTowerBattles
   .filter((battle) => battle.id.startsWith('pokemon-tower-channeler-'))
   .map((battle) => {
     const prefix = 'pokemon-tower-channeler-'
-    const { id, requirements: _storyRequirements, ...reusableBattle } = battle
+    const {
+      id,
+      requirements: _storyRequirements,
+      allowedPlayerTypes: _storyAllowedPlayerTypes,
+      ...reusableBattle
+    } = battle
     const rewards = (battle.rewards || []).filter(
       (reward) => reward.type !== 'currency' || reward.targetId !== 'pokedollars',
     )
