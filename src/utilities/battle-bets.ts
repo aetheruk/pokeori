@@ -41,6 +41,32 @@ export interface BattleBetsPublicState {
   expiresAt: number
 }
 
+export function constrainBattleBetsWinChance(params: {
+  femaleWinChance: number
+  minimumWinChance: number
+  maximumWinChance: number
+}): number {
+  if (
+    !Number.isFinite(params.femaleWinChance) ||
+    !Number.isFinite(params.minimumWinChance) ||
+    !Number.isFinite(params.maximumWinChance)
+  ) {
+    return 0.5
+  }
+
+  const minimum = Math.max(
+    params.minimumWinChance,
+    1 - params.maximumWinChance,
+  )
+  const maximum = Math.min(
+    params.maximumWinChance,
+    1 - params.minimumWinChance,
+  )
+  if (minimum > maximum) return 0.5
+
+  return Math.max(minimum, Math.min(maximum, params.femaleWinChance))
+}
+
 export function calculateBattleBetsDecimalOdds(params: {
   selectedProbability: number
   houseEdge: number

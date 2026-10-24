@@ -39,6 +39,7 @@ import {
   type BattleBetsPublicState,
   type BattleBetsSide,
   type BattleBetsTeamPreview,
+  constrainBattleBetsWinChance,
   calculateBattleBetsDecimalOdds,
   calculateBattleBetsPayout,
   calculateBattleBetsSettlement,
@@ -201,6 +202,16 @@ function getBattleBetsGame() {
   return game?.gameType === 'battle-bets' ? game : null
 }
 
+function getEffectiveWinChances(femaleWinChance: number) {
+  const settings = getBattleBetsGame()?.settings
+  const femaleChance = constrainBattleBetsWinChance({
+    femaleWinChance,
+    minimumWinChance: settings?.minimumWinChance ?? 0.25,
+    maximumWinChance: settings?.maximumWinChance ?? 0.75,
+  })
+  return { femaleChance, maleChance: 1 - femaleChance }
+}
+
 function getTokenBalance(user: User): number {
   return Math.max(
     0,
@@ -235,6 +246,10 @@ function createBattleBetsRewardSummary(payout: number): RewardSummary {
 function toPublicState(state: BattleBetsStoredState): BattleBetsPublicState {
   const game = getBattleBetsGame()
   const houseEdge = game?.settings.houseEdge ?? 0.05
+  const chances =
+    state.phase === 'inspect' && !state.pricingPending
+      ? getEffectiveWinChances(state.femaleChance)
+      : { femaleChance: state.femaleChance, maleChance: state.maleChance }
   return {
     gameId: state.gameId,
     sessionId: state.sessionId,
@@ -243,11 +258,11 @@ function toPublicState(state: BattleBetsStoredState): BattleBetsPublicState {
     femaleTeam: state.femaleTeam,
     maleTeam: state.maleTeam,
     femaleOdds: calculateBattleBetsDecimalOdds({
-      selectedProbability: state.pricingPending ? 0 : state.femaleChance,
+      selectedProbability: state.pricingPending ? 0 : chances.femaleChance,
       houseEdge,
     }),
     maleOdds: calculateBattleBetsDecimalOdds({
-      selectedProbability: state.pricingPending ? 0 : state.maleChance,
+      selectedProbability: state.pricingPending ? 0 : chances.maleChance,
       houseEdge,
     }),
     pricingPending: state.pricingPending,
@@ -1061,11 +1076,13 @@ export async function completeBattleBetsPricing(): Promise<BattleBetsPublicState
       return current ? toPublicState(current) : null
     }
 
-    const femaleChance = candidate.femaleWins / candidate.simulations
+    const { femaleChance, maleChance } = getEffectiveWinChances(
+      candidate.femaleWins / candidate.simulations,
+    )
     const priced: BattleBetsStoredState = {
       ...current,
       femaleChance,
-      maleChance: 1 - femaleChance,
+      maleChance,
       pricingPending: false,
       pricing: undefined,
     }
@@ -1135,8 +1152,10 @@ export async function placeBattleBet(
 
     const game = getBattleBetsGame()
     if (!game) return { success: false, error: 'Battle Bets is unavailable.' }
-    const selectedProbability =
-      side === 'female' ? state.femaleChance : state.maleChance
+    const { femaleChance, maleChance } = getEffectiveWinChances(
+      state.femaleChance,
+    )
+    const selectedProbability = side === 'female' ? femaleChance : maleChance
     const potentialPayout = calculateBattleBetsPayout({
       stake,
       selectedProbability,
@@ -1169,6 +1188,8 @@ export async function placeBattleBet(
 
     const next: BattleBetsStoredState = {
       ...state,
+      femaleChance,
+      maleChance,
       phase: 'battle',
       selectedSide: side,
       stake,
