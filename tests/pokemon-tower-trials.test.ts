@@ -13,6 +13,16 @@ describe('Pokemon Tower spirit trials', () => {
   test('authors all thirteen rules without changing the trainer completion chain', () => {
     const names = ['hope', 'patricia', 'carly', 'laurel', 'jody', 'paula', 'ruth', 'karina', 'tammy', 'janae', 'angelica', 'jennifer', 'emilia']
     expect(pokemonTowerBattles.filter((battle) => battle.id.startsWith('pokemon-tower-channeler-'))).toHaveLength(13)
+    expect(
+      pokemonTowerBattles
+        .filter((battle) => battle.id.startsWith('pokemon-tower-channeler-'))
+        .every((battle) => battle.maxPokemon === battle.enemyTeam.length),
+    ).toBe(true)
+    expect(
+      pokemonTowerGauntletBattles.every(
+        (battle) => battle.maxPokemon === battle.enemyTeam.length,
+      ),
+    ).toBe(true)
     for (let index = 1; index < names.length; index++) {
       expect(trial(names[index]).requirements).toContainEqual({
         type: 'battle_result', targetId: trial(names[index - 1]).id, battleStatus: 'win', count: 1,
@@ -63,12 +73,13 @@ describe('Pokemon Tower spirit trials', () => {
     const adventure = gauntletGridAdventureEntries.find(
       (entry) => entry.id === 'pokemon-tower-ghost-trial-grid-adventure',
     )!
-    const placements = adventure.settings.screens?.[0]?.objects || []
+    const screens = adventure.settings.screens || []
+    const placements = screens.flatMap((screen) => screen.objects || [])
     const standardTrainers = placements.filter((placement) =>
-      placement.randomGroup?.id === 'tower-channeler-standard-pool',
+      placement.randomGroup?.uniquePoolId === 'tower-channeler-standard-pool',
     )
     const rareTrainers = placements.filter((placement) =>
-      placement.randomGroup?.id === 'tower-channeler-gengar-pool',
+      placement.randomGroup?.uniquePoolId === 'tower-channeler-gengar-pool',
     )
     const gengar = placements.filter((placement) =>
       placement.interaction?.targetId === 'pokemon-tower-ghost-trial-gengar',
@@ -81,24 +92,44 @@ describe('Pokemon Tower spirit trials', () => {
       type: 'activity-successes',
       count: 5,
     })
-    expect(standardTrainers).toHaveLength(13)
+    expect(screens).toHaveLength(5)
+    expect(standardTrainers).toHaveLength(65)
     expect(standardTrainers.every((placement) =>
-      placement.randomGroup?.selectCount === 5 &&
+      placement.randomGroup?.selectCount === 1 &&
       placement.requirements?.some((requirement) =>
-        requirement.type === 'roll' && requirement.count === 66_667 && requirement.inverse,
+        requirement.type === 'roll' && requirement.count === 150_000 && requirement.inverse,
       ),
     )).toBe(true)
-    expect(rareTrainers).toHaveLength(13)
+    expect(rareTrainers).toHaveLength(52)
     expect(rareTrainers.every((placement) =>
-      placement.randomGroup?.selectCount === 4 &&
+      placement.randomGroup?.selectCount === 1 &&
       placement.requirements?.some((requirement) =>
-        requirement.type === 'roll' && requirement.count === 66_667 && !requirement.inverse,
+        requirement.type === 'roll' && requirement.count === 150_000 && !requirement.inverse,
       ),
     )).toBe(true)
+    for (const [index, screen] of screens.entries()) {
+      expect(screen.objects?.filter((placement) =>
+        placement.randomGroup?.id === `tower-channeler-standard-floor-${index + 1}`,
+      )).toHaveLength(13)
+      expect(screen.teleporters || []).toHaveLength(index < 4 ? 1 : 0)
+      expect((screen.prizes || []).map(({ itemId, quantity }) => ({ itemId, quantity }))).toEqual(
+        index > 0 && index < 4
+          ? [{ itemId: 'spirit-wisp-t1', quantity: 1 }]
+          : [],
+      )
+    }
     expect(gengar).toHaveLength(1)
+    expect(
+      screens[4]?.objects?.some((placement) => placement.id === 'rare-gengar-catch'),
+    ).toBe(true)
+    expect(
+      screens[4]?.objects?.some(
+        (placement) => placement.randomGroup?.id === 'tower-channeler-gengar-floor-5',
+      ),
+    ).toBe(false)
     expect(gengar[0]).toMatchObject({
       objectId: 'gengar-encounter-trigger',
-      requirements: [{ type: 'roll', count: 66_667 }],
+      requirements: [{ type: 'roll', count: 150_000 }],
       interaction: {
         type: 'encounter',
         targetId: 'pokemon-tower-ghost-trial-gengar',
@@ -109,5 +140,10 @@ describe('Pokemon Tower spirit trials', () => {
       gridAdventureOnly: true,
       encounters: [{ speciesId: 94, formId: '94', chance: 100 }],
     })
+    expect(
+      adventure.rewards?.some(
+        (reward) => reward.type === 'item' && reward.targetId === 'spirit-wisp-t1',
+      ),
+    ).toBe(false)
   })
 })

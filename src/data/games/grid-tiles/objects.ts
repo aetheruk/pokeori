@@ -106,7 +106,7 @@ export const gridObjects = {
     name: 'Gengar',
     purpose: 'encounter-trigger',
     size: { cols: 1, rows: 1 },
-    asset: { src: '/sprites/pokemon/gen-v/front/normal/94.avif' },
+    asset: { src: '/games/overworld/gengar-idle.png' },
     collision: 'none',
     interaction: 'encounter',
   },

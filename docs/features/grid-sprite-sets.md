@@ -4,6 +4,8 @@ The combined `grid-adventure-test` has three connected outdoor scenes and five R
 
 Player appearance comes from the saved trainer gender in all three grid variants, independently of terrain sets: Lucas for male, Dawn for female, and Ditto for neither or an unset legacy profile. `GridPlayerSprite` renders all three 256×256 sheets as sixteen 64×64 frames, with down, left, right, and up rows and four movement frames per row. Ditto uses the Following Pokémon EX overworld sheet and shares the 360ms walking cycle. Voltorb and protected Kanto Rattata/Ditto use downward-facing overworld frames; full source sheets and extracted idle frames live in `public/games/overworld/`. Credits are recorded in `ATTRIBUTIONS.md` and the in-app Credits & Legal registry. Player appearance does not affect collisions or game rules. Legacy per-game player sprite overrides are no longer used by these renderers; the generic trainer asset remains available for NPC battle markers.
 
+The rare Gengar catch marker on the top floor of the Pokémon Tower Ghost Trial uses the first downward-facing 64×64 frame from the Gengar follower sheet in Generation 9 Pack v3.3.8, replacing the previous battle-front sprite. Its source sheet and pack credits are recorded in `ATTRIBUTIONS.md` and Credits & Legal.
+
 The shared grid renderer uses a 16×16 logical cell. Current production-ready art is authored at 64×64 native pixels per logical cell (and 128×128 for a 2×2 footprint), then scaled responsively by the renderer. This keeps movement, collision, and authored coordinates stable while giving mobile screens enough source detail. The renderer waits until it has measured its container before revealing the board, avoiding a visible scale and position correction on mount. Grid Adventure restores its saved scene before rendering the board after an integrated activity returns. A sprite set owns terrain and floor-layer art. Reusable entities are registered separately, and scene geometry is authored by each game.
 
 The live `Rocket Pachinko` Adventure follows the same one-entry/two-room pattern as Rocket Slots. Both rooms contain twelve reusable interactive cabinets; high-stakes cabinets use the green Pachinko sprite. The server saves each cabinet's stable bucket offsets (at most three board units), width changes (at most two units), and per-slot token payouts (within 8% of standard), then scales its wager and all payouts fivefold in the high-stakes room. Pachinko rounds verify that their exact cabinet placement is still part of the active Adventure before they can settle.
@@ -132,9 +134,14 @@ Fragments in the forest and Wing Feathers on Route 14.
 Object placements may share a `randomGroup` with a stable id and `selectCount`.
 At run creation, the server uses the pinned roll to deterministically choose
 the requested number of group members. Only those placements are saved to the
-board and accepted by child-activity authorization. The Pokémon Tower Ghost
-Trial uses this to place five of its thirteen Secret Channeler battle copies on
-each run.
+board and accepted by child-activity authorization. A group can also name a
+`uniquePoolId`; groups that share that pool select distinct interaction targets
+across their independent selections. This supports one random activity on each
+screen while avoiding duplicate targets. The Pokémon Tower Ghost Trial uses
+this to place five distinct Secret Channelers, one per floor, from the thirteen
+story trainers. Its five floors connect through centered back-wall doorways;
+floors two through four each hold an Ectoplasm pickup, and the top-floor trainer
+is replaced by a Gengar catch encounter on 15% of runs.
 
 Use the `minigame-trigger` object for any authored Mini Game under
 `interaction.type: 'minigame'`; use `field-research-trigger` for an authored
@@ -275,6 +282,6 @@ silhouette as the pushable boulder, so it does not introduce a square matte when
 rendered over any floor. Placement `properties` are available for per-instance
 state, while the shared definition remains terrain-independent.
 
-The current authored games use local themed sets: `basic-cave` for cave-oriented Echo/Voltorb boards, `grass` for outdoor Rock Push and rooftop boards, `wooden-interior` for Koga's Fuchsia Gym invisible mazes, `industrial-power` for Lt. Surge's substation, `laboratory` for Blaine's lab, `psychic-quiet-room` for Sabrina's Quiet Room Echo Map, and `pokemon-tower` for the post-story Ghost Trial. The Tower palette pairs plum stone floors with a stained-glass shrine wall. Each set supplies its own repeated back wall, 1×1/2×2 blockers, gameplay tiles, and floor/wall marker pair; rare floor variants are optional. The Quiet Room adds a calm indigo-violet floor and memory-void holes; the cave and grass sets retain their role-specific ladder/fairy-ring markers. There is no legacy `rock-cave` palette; unknown or retired ids resolve to the default palette. A solved Rock Push hole returns to the set's common floor after the drop animation, so sprite sets do not need a filled-hole asset. No external sprite pack is bundled. When an external set is selected, add its credit metadata to the manifest and `ATTRIBUTIONS.md` before assigning it to live content.
+The current authored games use local themed sets: `basic-cave` for cave-oriented Echo/Voltorb boards, `grass` for outdoor Rock Push and rooftop boards, `wooden-interior` for Koga's Fuchsia Gym invisible mazes, `industrial-power` for Lt. Surge's substation, `laboratory` for Blaine's lab, `psychic-quiet-room` for Sabrina's Quiet Room Echo Map, and `pokemon-tower` for the post-story Ghost Trial. The Tower palette pairs plum stone floors with a stained-glass shrine wall and a centered violet-arch doorway marker. Each set supplies its own repeated back wall, 1×1/2×2 blockers, gameplay tiles, and floor/wall marker pair; rare floor variants are optional. The Quiet Room adds a calm indigo-violet floor and memory-void holes; the cave and grass sets retain their role-specific ladder/fairy-ring markers. There is no legacy `rock-cave` palette; unknown or retired ids resolve to the default palette. A solved Rock Push hole returns to the set's common floor after the drop animation, so sprite sets do not need a filled-hole asset. No external sprite pack is bundled. When an external set is selected, add its credit metadata to the manifest and `ATTRIBUTIONS.md` before assigning it to live content.
 
 Native field QA renders for the six sets live under `docs/previews/`: grass, basic cave, and psychic quiet-room showcases plus the authored Fuchsia Gym, Surge substation, and Blaine laboratory fields. They are kept at native 64px-per-logical-cell scale so floor seams, marker silhouettes, blocker footprints, and transparent object edges can be inspected directly.

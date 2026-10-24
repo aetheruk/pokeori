@@ -29,6 +29,7 @@ const gridObjectRandomGroupSchema = z
   .object({
     id: z.string().min(1).max(80),
     selectCount: z.number().int().positive().max(100),
+    uniquePoolId: z.string().min(1).max(80).optional(),
   })
   .strict()
 
