@@ -29,6 +29,7 @@ export interface BattleBetsPublicState {
   maleTeam: BattleBetsTeamPreview
   femaleOdds: number
   maleOdds: number
+  pricingPending?: boolean
   selectedSide?: BattleBetsSide
   stake?: number
   potentialPayout?: number
