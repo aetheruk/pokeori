@@ -100,9 +100,9 @@ schema validation tests.
 ```bash
 bun test              # Run all tests
 bun run validate:data # Run Bun-backed schema, reference, and hygiene checks
-bun run typecheck     # Run TypeScript without emitting files
+bun run typecheck     # Run Bun's TypeScript checker
 bun run lint          # Run Biome lint checks
-bun run content-editor:typecheck # Typecheck the local authoring app
+bun run content-editor:typecheck # Run Bun's TypeScript checker on the local authoring app
 bun run content-editor:build # Build the local authoring app
 bun run test:int      # Integration tests
 bun run test:e2e      # E2E tests

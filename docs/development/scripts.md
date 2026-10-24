@@ -18,7 +18,7 @@ Data fetch and generation scripts for Pokeori.
 | Sync Pokemon Sprites | `bun run sync:pokemon-sprites` | Bundle app-known Pokemon sprites from PokeAPI sprites, optimize HOME sprites, and regenerate the missing-sprites report |
 | Sync Item Sprites | `bun run sync:item-sprites` | Regenerate the local item sprite manifest and missing-sprites report without copying sprite assets |
 | Clone Sprites | `bun run clone:sprites` | Prepare the sparse PokeAPI sprite repository cache without copying assets |
-| Typecheck | `bun run typecheck` | Run TypeScript validation without emitting files |
+| Typecheck | `bun run typecheck` | Run Bun's TypeScript checker |
 | Validate Data | `bun run validate:data` | Validate generated game schemas, references, requirements, and source hygiene |
 | Build Standalone | `bun run build:standalone` | Build Next's standalone artifact and copy the public/static assets needed for local production testing |
 | Start Standalone HTTPS | `bun run start:https` | Run the standalone server on port 3001 behind local Caddy HTTPS on port 3000 |
