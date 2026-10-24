@@ -4335,7 +4335,8 @@ describe('static data references', () => {
       'bug-gauntlet-billy',
       'bug-gauntlet-berry',
       'bug-gauntlet-benny',
-      'bug-gauntlet-champion',
+      'bug-gauntlet-paras-day',
+      'bug-gauntlet-venonat-night',
     ]) {
       expect(battles.find((entry) => entry.id === battleId)?.gridAdventureOnly)
         .toBe(true)
@@ -4360,7 +4361,7 @@ describe('static data references', () => {
     expect((featheredGauntlet?.settings as any)?.lives).toBe(1)
     expect((featheredGauntlet?.settings as any)?.winCondition).toEqual({
       type: 'activity-successes',
-      count: 6,
+      count: 5,
     })
     for (const battleId of [
       'route-14-gauntlet-carter',
@@ -4369,6 +4370,7 @@ describe('static data references', () => {
       'route-14-gauntlet-beck',
       'route-14-gauntlet-benny',
       'route-14-gauntlet-donald',
+      'route-14-gauntlet-farfetchd',
     ]) {
       expect(battles.find((entry) => entry.id === battleId)?.gridAdventureOnly)
         .toBe(true)

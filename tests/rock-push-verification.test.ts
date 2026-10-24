@@ -15,7 +15,9 @@ describe('rock-push transcript verification', () => {
       const encounter = gauntletGridAdventureEntries.find(
         (entry) => entry.id === encounterId,
       )
-      const prizes = encounter?.settings.screens?.[0]?.prizes || []
+      const prizes = encounter?.settings.screens
+        ?.slice(1, 4)
+        .flatMap((screen) => screen.prizes || []) || []
 
       expect(prizes).toHaveLength(3)
       expect(prizes.every((prize) => prize.itemId === itemId && prize.quantity === 1)).toBe(true)

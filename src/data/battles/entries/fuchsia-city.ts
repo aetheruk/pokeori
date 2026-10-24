@@ -33,6 +33,16 @@ const gymTrialGate = {
   targetId: 'fuchsia-gym-trial-ready',
 }
 
+const featheredGauntletRareRollRequirement = [{
+  type: 'roll' as const,
+  count: 200_000,
+}]
+const featheredGauntletStandardRollRequirement = [{
+  type: 'roll' as const,
+  count: 200_000,
+  inverse: true,
+}]
+
 export const fuchsiaCityBattles: BattleConfig[] = [
   {
     id: 'route-13-battle',
@@ -846,6 +856,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
         type: 'task_completed',
         targetId: 'route-14-bird-gauntlet-clear',
       },
+      ...featheredGauntletStandardRollRequirement,
     ],
     isWildBattle: false,
     enemyAttackTelegraphChance: 2,
@@ -855,6 +866,28 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 2,
+  },
+  {
+    id: 'route-14-gauntlet-farfetchd',
+    name: 'Forest Encounter: Farfetch’d',
+    description: 'A fierce Farfetch’d charges through the clearing, clutching its leek like a duelling blade.',
+    category: 'Kanto',
+    gridAdventureOnly: true,
+    subCategory: 'Fuchsia City',
+    icon: { type: 'pokemon', id: '83' },
+    background: '/backgrounds/grassy-route.avif',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'route-14-bird-gauntlet-clear',
+      },
+      ...featheredGauntletRareRollRequirement,
+    ],
+    isWildBattle: false,
+    enemyAttackTelegraphChance: 2,
+    enemyTeam: [{ speciesId: 83, formId: '83', level: 50 }],
+    rewards: [{ type: 'icon', targetId: 'pokemon-83', quantity: 1, dropChance: 100 }],
+    maxPokemon: 1,
   },
   // Junkyard Crew
   {
