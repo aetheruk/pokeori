@@ -44,6 +44,7 @@ import {
   resolveGridObstacleSources,
   resolveGridTileSources,
   resolveGridWallMarkerSource,
+  resolveGridWallMarkerScale,
   resolveGridWallMarkerVerticalOffset,
   resolveGridWallSource,
 } from '@/data/games/grid-tiles'
@@ -1704,6 +1705,15 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     resolveGridWallMarkerSource(activeTilePaletteId, 'teleporter') ||
     teleporterSprite
   const wallMarkerVerticalOffset = resolveGridWallMarkerVerticalOffset(activeTilePaletteId)
+  const wallMarkerScale = resolveGridWallMarkerScale(activeTilePaletteId)
+  const wallMarkerStyle = (y: number) => {
+    if (y !== 0 || (wallMarkerVerticalOffset <= 0 && wallMarkerScale === 1)) return undefined
+    const transform = [
+      wallMarkerVerticalOffset > 0 && `translateY(${wallMarkerVerticalOffset * 100}%)`,
+      wallMarkerScale !== 1 && `scale(${wallMarkerScale})`,
+    ].filter(Boolean).join(' ')
+    return { transform, transformOrigin: 'center' }
+  }
   const backWallOnly = isGridBackWallOnly(activeTilePaletteId)
   const cellWidth = `${100 / Math.max(gridSize.w, 1)}%`
   const cellHeight = `${100 / Math.max(gridSize.h, 1)}%`
@@ -1956,9 +1966,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                   >
                     <div
                       className="relative h-full w-full"
-                      style={tile.y === 0 && wallMarkerVerticalOffset > 0
-                        ? { transform: `translateY(${wallMarkerVerticalOffset * 100}%)` }
-                        : undefined}
+                      style={wallMarkerStyle(tile.y)}
                     >
                       <Image
                         src={goalSprite}
@@ -1981,9 +1989,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                 >
                   <div
                     className="relative h-full w-full"
-                    style={teleporter.y === 0 && wallMarkerVerticalOffset > 0
-                      ? { transform: `translateY(${wallMarkerVerticalOffset * 100}%)` }
-                      : undefined}
+                    style={wallMarkerStyle(teleporter.y)}
                   >
                     <Image
                       src={teleporter.y === 0 ? wallTeleporterSprite : teleporterSprite}

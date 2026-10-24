@@ -31,7 +31,7 @@ export function createGridWallVariants(directory: string): Record<GridWallMask, 
 export const gridTilePalettes = {
   grass: {
     id: 'grass',
-    name: 'Grass field tile set',
+    name: 'Grassy Route',
     logicalTileSize: GRID_LOGICAL_TILE_SIZE,
     nativeTileSize: 64,
     floor: {
@@ -64,8 +64,8 @@ export const gridTilePalettes = {
       hole: { src: '/games/grid-tiles/grass/gameplay/hole.png' },
     },
     credits: [{
-      label: 'Pokeori Grass Field tile set',
-      notice: 'Generated 64×64 native tiles (128×128 for 2×2 blockers) on a 16×16 logical grid for the reusable grass-themed puzzle set.',
+      label: 'Pokeori Grassy Route tile set',
+      notice: 'Generated 64×64 native tiles (128×128 for 2×2 blockers) on a 16×16 logical grid. Outdoor boards use a continuous wooden fence back wall and an open fence passage for exits and room connections.',
       external: false,
     }],
   },
@@ -203,7 +203,8 @@ export const gridTilePalettes = {
     },
     walls: {
       back: { src: '/games/grid-tiles/pokemon-tower/walls/back.png' },
-      markerVerticalOffset: 0.17,
+      markerVerticalOffset: 0.03,
+      markerScale: 1.5,
       markers: {
         goal: { src: '/games/grid-tiles/pokemon-tower/walls/markers/doorway.png' },
         teleporter: { src: '/games/grid-tiles/pokemon-tower/walls/markers/doorway.png' },
@@ -531,6 +532,10 @@ export function resolveGridWallMarkerSource(
 
 export function resolveGridWallMarkerVerticalOffset(paletteId: string | undefined): number {
   return getGridTilePalette(paletteId).walls?.markerVerticalOffset || 0
+}
+
+export function resolveGridWallMarkerScale(paletteId: string | undefined): number {
+  return getGridTilePalette(paletteId).walls?.markerScale || 1
 }
 
 export function resolveGridFloorMarkerSource(

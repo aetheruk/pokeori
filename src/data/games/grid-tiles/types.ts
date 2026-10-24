@@ -76,6 +76,8 @@ export interface GridWallSet {
   markers?: GridWallMarkers
   /** Positive fraction of a cell to shift transparent wall markers down. */
   markerVerticalOffset?: number
+  /** Uniform scale for wall markers, applied around their center. */
+  markerScale?: number
 }
 
 export type GridObjectPurpose =
