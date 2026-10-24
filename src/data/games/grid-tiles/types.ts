@@ -111,6 +111,8 @@ export interface GridObjectDefinition {
   purpose: GridObjectPurpose
   size: GridObjectSize
   asset: GridTileAsset
+  /** Optional registered character sheet used in place of the static marker. */
+  overworldSpriteId?: string
   collision?: 'none' | 'solid' | 'pushable'
   /** Optional activity trigger supported by this reusable object type. */
   interaction?: GridObjectInteractionType
@@ -161,6 +163,9 @@ export interface GridBlockerPlacement extends GridPosition {
 export interface GridObjectPlacement extends GridPosition {
   id?: string
   objectId: string
+  /** Optional per-placement character sheet or trainer class marker override. */
+  overworldSpriteId?: string
+  trainerClassId?: string
   /** Whether to remove this placement after its activity succeeds. Defaults to true. */
   removeOnSuccess?: boolean
   /**

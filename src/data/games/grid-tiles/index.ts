@@ -570,10 +570,17 @@ export function getGridTilePackCredits(options?: { externalOnly?: boolean }): Gr
     external: true,
   })
   filtered.push({
-    label: 'Generation 9 Pack v3.3.8 — Gengar overworld follower sprite',
+    label: 'Generation 9 Pack v3.3.8 — Pokémon overworld follower sprites',
     creator: 'Compiled by Caruban; Gen 1–5 overworld sprites credited in the pack to MissingLukey, help-14, Kymoyonian, cSc-A7X, 2and2makes5, Pokegirl4ever, Fernandojl, Silver-Skies, TyranitarDark, Getsuei-H, Kid1513, Milomilotic11, Kyt666, kdiamo11, Chocosrawlooid, Syledude, Gallanty, Gizamimi-Pichu, Zyon17 and LarryTurbo',
     href: 'https://www.mediafire.com/file/a44ikbbztunn66m/Generation_9_Pack_v3.3.8.rar/file',
-    notice: 'The pack credits the Gen 1–5 overworld sprite contributors but does not map an individual artist to Gengar or state an open artwork license. The original follower sheet is retained, with its first 64×64 downward-facing frame used as the Grid Adventure encounter marker. Pokémon artwork remains owned by its respective rights holders.',
+    notice: 'The pack credits the Gen 1–5 overworld sprite contributors but does not map individual artists to specific sprites or state an open artwork license. Original follower sheets are retained. Pokémon artwork remains owned by its respective rights holders.',
+    external: true,
+  })
+  filtered.push({
+    label: 'FRLG Accurate NPC Megapack (Relic Castle Edition) — trainer overworld sprites',
+    creator: 'Compiled by SoulfulLex; individual credits are included in the pack readme',
+    href: 'https://www.mediafire.com/file/nbr92qe5uhorhlv/FRLG_Accurate_NPC_Megapack_%2528Relic_Castle_Edition%2529.zip/file',
+    notice: 'The pack does not state an open artwork license. Original trainer sheets are retained; Pokémon characters and artwork remain owned by their respective rights holders.',
     external: true,
   })
   return Array.from(new Map(filtered.map((credit) => [`${credit.label}:${credit.href || 'local'}`, credit])).values())

@@ -113,7 +113,7 @@ export function ProjectInfoDialog() {
         {tilePackCredits.length > 0 && (
           <section className="space-y-2">
             <h2 className="font-display text-base font-semibold text-game-ink">
-              Tile and environment packs
+              Art and environment packs
             </h2>
             <ul className="space-y-2 text-sm text-game-muted">
               {tilePackCredits.map((credit) => (

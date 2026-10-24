@@ -374,6 +374,7 @@ function ExploreCardComponent({
                       {isConversation ? (
                         <GridPlayerSprite
                           gender={userData.user.trainerGender}
+                          iconId={userData.user.icon}
                           className="h-7 w-7"
                         />
                       ) : shopCurrencyId ? (
