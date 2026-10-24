@@ -69,6 +69,40 @@ export const gridTilePalettes = {
       external: false,
     }],
   },
+  forest: {
+    id: 'forest',
+    name: 'Forest Clearing',
+    logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
+    floor: {
+      common: { src: '/games/grid-tiles/forest/floor/common.png' },
+      blockers: {
+        small: { src: '/games/grid-tiles/grass/floor/blockers/small.png' },
+        large: { src: '/games/grid-tiles/grass/floor/blockers/large.png' },
+      },
+      markers: {
+        goal: { src: '/games/grid-tiles/grass/floor/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/grass/floor/markers/teleporter.png' },
+      },
+    },
+    walls: {
+      back: { src: '/games/grid-tiles/forest/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/forest/walls/markers/doorway.png' },
+        teleporter: { src: '/games/grid-tiles/forest/walls/markers/doorway.png' },
+      },
+    },
+    gameplay: {
+      boulder: { src: '/games/rockpush/boulder.avif' },
+      ice: { src: '/games/grid-tiles/grass/gameplay/ice.png' },
+      hole: { src: '/games/grid-tiles/grass/gameplay/hole.png' },
+    },
+    credits: [{
+      label: 'Pokeori Forest Clearing tile set',
+      notice: 'AI-generated 64×64 mossy forest floor, tree-line wall, and root-arch doorway. Generic blockers and gameplay markers reuse the Grass Field tile set.',
+      external: false,
+    }],
+  },
   'celadon-game-corner': {
     id: 'celadon-game-corner',
     name: 'Celadon Game Corner',

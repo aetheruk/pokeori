@@ -746,6 +746,7 @@ describe('shared grid sprite sets', () => {
       'birdKeeperTrainer',
       'channelerTrainer',
       'wildBattleTrigger',
+      'pokemonBattleTrigger',
       'route1RattataTrigger',
       'route1PidgeyTrigger',
       'encounterTrigger',

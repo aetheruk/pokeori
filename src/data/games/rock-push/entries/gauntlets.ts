@@ -1,25 +1,36 @@
-import type { RockPushGameConfig } from '../types'
+import type { RockPushGameConfig, RockPushScreenConfig } from '../types'
 import { pokemonTowerGauntletBattles } from '@/data/battles/entries/pokemon-tower'
-import type { GridObjectPlacement } from '@/data/games/grid-tiles/types'
+import type { GridObjectPlacement, GridTilePaletteId } from '@/data/games/grid-tiles'
 
 const bugGauntletBattleIds = [
   'bug-gauntlet-barry',
   'bug-gauntlet-billy',
   'bug-gauntlet-berry',
   'bug-gauntlet-benny',
-  'bug-gauntlet-champion',
 ]
 
-const birdGauntletBattleIds = [
+const birdGauntletTrainerIds = [
   'route-14-gauntlet-carter',
   'route-14-gauntlet-mitch',
   'route-14-gauntlet-marlon',
   'route-14-gauntlet-beck',
   'route-14-gauntlet-benny',
-  'route-14-gauntlet-donald',
 ]
 
 const rareMaterialRollRequirement = [{ type: 'roll' as const, count: 200_000 }]
+const commonFinalBattleRollRequirement = [{
+  type: 'roll' as const,
+  count: 200_000,
+  inverse: true,
+}]
+const daytimeRequirement = [{
+  type: 'time_range' as const,
+  timeRange: { start: '06:00', end: '17:59' },
+}]
+const nighttimeRequirement = [{
+  type: 'time_range' as const,
+  timeRange: { start: '18:00', end: '05:59' },
+}]
 const towerGengarRollThreshold = 150_000
 const towerGengarRollRequirement = [{
   type: 'roll' as const,
@@ -31,22 +42,112 @@ const towerStandardRollRequirement = [{
   inverse: true,
 }]
 
-function createTrainerPlacements(
-  battleIds: string[],
-  positions: Array<{ x: number; y: number }>,
-  objectId: 'bug-catcher-trainer' | 'bird-keeper-trainer',
-) {
-  return battleIds.map((targetId, index) => ({
-    id: `trainer-${index + 1}`,
+function createGauntletBattlePlacement(
+  id: string,
+  targetId: string,
+  objectId: string,
+  x: number,
+  y: number,
+  requirements?: GridObjectPlacement['requirements'],
+  overworldSpriteId?: string,
+  randomGroup?: GridObjectPlacement['randomGroup'],
+): GridObjectPlacement {
+  return {
+    id,
     objectId,
-    ...positions[index],
+    x,
+    y,
+    ...(requirements ? { requirements } : {}),
+    ...(overworldSpriteId ? { overworldSpriteId } : {}),
+    ...(randomGroup ? { randomGroup } : {}),
     removeOnSuccess: true,
-    interaction: {
-      type: 'battle' as const,
-      targetId,
-      victory: 'clear' as const,
-    },
-  }))
+    interaction: { type: 'battle', targetId, victory: 'clear' },
+  }
+}
+
+function createGauntletScreens(options: {
+  firstScreenId: string
+  materialItemId: string
+  finalObjects: GridObjectPlacement[]
+  getFloorObjects: (floorNumber: number) => GridObjectPlacement[]
+  tilePaletteId?: GridTilePaletteId
+}): RockPushScreenConfig[] {
+  return Array.from({ length: 5 }, (_, index) => {
+    const floorNumber = index + 1
+    const screenId = floorNumber === 1
+      ? options.firstScreenId
+      : `${options.firstScreenId}-${floorNumber}`
+    return {
+      id: screenId,
+      ...(options.tilePaletteId ? { tilePaletteId: options.tilePaletteId } : {}),
+      grid_size: 9,
+      objects: floorNumber === 5
+        ? options.finalObjects
+        : options.getFloorObjects(floorNumber),
+      ...(floorNumber < 5
+        ? {
+            teleporters: [{
+              id: `${screenId}-upstairs`,
+              x: 4,
+              y: 0,
+              target: {
+                screen: floorNumber === 1
+                  ? `${options.firstScreenId}-2`
+                  : `${options.firstScreenId}-${floorNumber + 1}`,
+                x: 4,
+                y: 7,
+              },
+              oneWay: true,
+            }],
+          }
+        : {}),
+      ...(floorNumber > 1 && floorNumber < 5
+        ? {
+            prizes: [{
+              id: `${screenId}-center-material`,
+              x: 4,
+              y: 4,
+              itemId: options.materialItemId,
+              quantity: 1,
+              requirements: rareMaterialRollRequirement,
+            }],
+          }
+        : {}),
+    }
+  })
+}
+
+function createFixedTrainerFloor(
+  battleId: string,
+  objectId: 'bug-catcher-trainer' | 'bird-keeper-trainer',
+  floorNumber: number,
+) {
+  return [createGauntletBattlePlacement(
+    `trainer-floor-${floorNumber}`,
+    battleId,
+    objectId,
+    4,
+    1,
+  )]
+}
+
+function createRandomBirdTrainerFloor(floorNumber: number) {
+  return birdGauntletTrainerIds.map((battleId) =>
+    createGauntletBattlePlacement(
+      `bird-trainer-floor-${floorNumber}-${battleId}`,
+      battleId,
+      'bird-keeper-trainer',
+      4,
+      1,
+      undefined,
+      undefined,
+      {
+        id: `bird-gauntlet-trainer-floor-${floorNumber}`,
+        selectCount: 1,
+        uniquePoolId: 'bird-gauntlet-trainer-pool',
+      },
+    ),
+  )
 }
 
 function createTowerTrainerPlacements(floorNumber: number): GridObjectPlacement[] {
@@ -152,39 +253,40 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       count: 1,
     }],
     rewards: [
-      { type: 'item', targetId: 'chitin-fragment-t1', quantity: 5, dropChance: 100 },
       { type: 'item', targetId: 'rare-candy-xs', quantity: 1, dropChance: 100 },
       { type: 'currency', targetId: 'pokedollars', quantity: 200, dropChance: 100 },
     ],
     isEligibleForReplay: true,
     settings: {
       variant: 'rock-push',
-      tilePaletteId: 'grass',
+      tilePaletteId: 'forest',
       timeLimit: 1800,
       grid_size: 9,
       lives: 1,
-      winCondition: { type: 'activity-successes', count: bugGauntletBattleIds.length },
+      winCondition: { type: 'activity-successes', count: 5 },
       playerStart: { x: 4, y: 7 },
       startScreen: 'forest',
-      screens: [{
-        id: 'forest',
-        prizes: [
-          { id: 'forest-chitin-1', x: 3, y: 2, itemId: 'chitin-fragment-t1', quantity: 1, requirements: rareMaterialRollRequirement },
-          { id: 'forest-chitin-2', x: 5, y: 4, itemId: 'chitin-fragment-t1', quantity: 1, requirements: rareMaterialRollRequirement },
-          { id: 'forest-chitin-3', x: 3, y: 6, itemId: 'chitin-fragment-t1', quantity: 1, requirements: rareMaterialRollRequirement },
+      screens: createGauntletScreens({
+        firstScreenId: 'forest',
+        materialItemId: 'chitin-fragment-t1',
+        tilePaletteId: 'forest',
+        getFloorObjects: (floorNumber) =>
+          createFixedTrainerFloor(
+            bugGauntletBattleIds[floorNumber - 1],
+            'bug-catcher-trainer',
+            floorNumber,
+          ),
+        finalObjects: [
+          createGauntletBattlePlacement(
+            'bug-final-paras', 'bug-gauntlet-paras-day', 'pokemon-battle-trigger',
+            4, 4, daytimeRequirement, '46',
+          ),
+          createGauntletBattlePlacement(
+            'bug-final-venonat', 'bug-gauntlet-venonat-night', 'pokemon-battle-trigger',
+            4, 4, nighttimeRequirement, '48',
+          ),
         ],
-        objects: createTrainerPlacements(
-          bugGauntletBattleIds,
-          [
-            { x: 2, y: 2 },
-            { x: 6, y: 2 },
-            { x: 1, y: 4 },
-            { x: 4, y: 4 },
-            { x: 7, y: 5 },
-          ],
-          'bug-catcher-trainer',
-        ),
-      }],
+      }),
     },
   },
   {
@@ -201,7 +303,6 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
     }],
     rewards: [
       { type: 'currency', targetId: 'pokedollars', quantity: 1200, dropChance: 100 },
-      { type: 'item', targetId: 'wing-feather-t1', quantity: 3, dropChance: 100 },
       { type: 'item', targetId: 'rare-candy-m', quantity: 1, dropChance: 100 },
     ],
     isEligibleForReplay: true,
@@ -211,29 +312,24 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
       timeLimit: 1800,
       grid_size: 9,
       lives: 1,
-      winCondition: { type: 'activity-successes', count: birdGauntletBattleIds.length },
+      winCondition: { type: 'activity-successes', count: 5 },
       playerStart: { x: 4, y: 7 },
       startScreen: 'route-14',
-      screens: [{
-        id: 'route-14',
-        prizes: [
-          { id: 'route-14-feather-1', x: 4, y: 2, itemId: 'wing-feather-t1', quantity: 1, requirements: rareMaterialRollRequirement },
-          { id: 'route-14-feather-2', x: 4, y: 4, itemId: 'wing-feather-t1', quantity: 1, requirements: rareMaterialRollRequirement },
-          { id: 'route-14-feather-3', x: 4, y: 6, itemId: 'wing-feather-t1', quantity: 1, requirements: rareMaterialRollRequirement },
+      screens: createGauntletScreens({
+        firstScreenId: 'route-14',
+        materialItemId: 'wing-feather-t1',
+        getFloorObjects: createRandomBirdTrainerFloor,
+        finalObjects: [
+          createGauntletBattlePlacement(
+            'bird-final-donald', 'route-14-gauntlet-donald', 'bird-keeper-trainer',
+            4, 4, commonFinalBattleRollRequirement,
+          ),
+          createGauntletBattlePlacement(
+            'bird-final-farfetchd', 'route-14-gauntlet-farfetchd', 'pokemon-battle-trigger',
+            4, 4, rareMaterialRollRequirement, '83',
+          ),
         ],
-        objects: createTrainerPlacements(
-          birdGauntletBattleIds,
-          [
-            { x: 2, y: 2 },
-            { x: 6, y: 2 },
-            { x: 2, y: 4 },
-            { x: 6, y: 4 },
-            { x: 2, y: 6 },
-            { x: 6, y: 6 },
-          ],
-          'bird-keeper-trainer',
-        ),
-      }],
+      }),
     },
   },
   {

@@ -77,6 +77,15 @@ export const gridObjects = {
     collision: 'none',
     interaction: 'battle',
   },
+  pokemonBattleTrigger: {
+    id: 'pokemon-battle-trigger',
+    name: 'Wild Pokémon',
+    purpose: 'battle-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/sprites/pokemon/gen-v/front/normal/666-poke-ball.avif' },
+    collision: 'none',
+    interaction: 'battle',
+  },
   route1RattataTrigger: {
     id: 'route-1-rattata-trigger',
     name: 'Route 1 Rattata',
