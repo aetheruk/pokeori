@@ -114,8 +114,7 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
   {
     id: 'buggy-gauntlet-grid-adventure',
     name: 'The Buggy Gauntlet',
-    description:
-      'Challenge the five Buggy Gauntlet trainers in any order. You have one life; defeat every trainer to clear the forest.',
+    description: 'Face off against the Buggy 4 again? Well I could use the practise!',
     category: 'Kanto',
     subCategory: 'Viridian Forest',
     icon: { type: 'trainer', id: 'bug-catcher' },
@@ -165,8 +164,7 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
   {
     id: 'feathered-gauntlet-grid-adventure',
     name: 'The Feathered Gauntlet',
-    description:
-      'Challenge the six Bird Keeper trainers in any order. You have one life; defeat every trainer to clear Route 14.',
+    description: 'This will be a great training opportunity!',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'bird-keeper' },
@@ -215,8 +213,7 @@ export const gauntletGridAdventureEntries: RockPushGameConfig[] = [
   {
     id: 'pokemon-tower-ghost-trial-grid-adventure',
     name: 'The Ghost Trial Gauntlet',
-    description:
-      'Face five of the Tower Channelers, chosen at random for each run. On rare runs, one Channeler is replaced by a catch encounter with Gengar. You have one life; complete all five activities to clear the tower.',
+    description: 'I have a huge hunch I’ll see a few Gastly here…',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: { type: 'trainer', id: 'channeler' },
