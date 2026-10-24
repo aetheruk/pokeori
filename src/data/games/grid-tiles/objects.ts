@@ -101,6 +101,15 @@ export const gridObjects = {
     collision: 'none',
     interaction: 'encounter',
   },
+  gengarEncounterTrigger: {
+    id: 'gengar-encounter-trigger',
+    name: 'Gengar',
+    purpose: 'encounter-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/sprites/pokemon/gen-v/front/normal/94.avif' },
+    collision: 'none',
+    interaction: 'encounter',
+  },
   minigameTrigger: {
     id: 'minigame-trigger',
     name: 'Mini-game Trigger',

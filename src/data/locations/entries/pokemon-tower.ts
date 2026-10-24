@@ -2,6 +2,35 @@ import { Location } from '../../types'
 
 export const pokemonTowerLocations: Location[] = [
   {
+    id: 'pokemon-tower-ghost-trial-gengar',
+    name: 'Restless Gengar',
+    description: 'A Gengar has emerged from the tower shadows. Catch it before it disappears.',
+    category: 'Secret',
+    subCategory: 'Pokemon Tower',
+    icon: {
+      type: 'pokemon',
+      id: '94',
+    },
+    background: '/backgrounds/pkmn-tower.avif',
+    timer: 45,
+    catchRateModifier: 2,
+    keyEncounter: true,
+    gridAdventureOnly: true,
+    levelRange: {
+      min: 28,
+      max: 30,
+    },
+    requirements: [],
+    encounters: [
+      {
+        speciesId: 94,
+        formId: '94',
+        chance: 100,
+      },
+    ],
+    rewards: [],
+  },
+  {
     id: 'pokemon-tower-1f-blocked',
     name: 'Pokemon Tower 1F',
     description: 'No trace of Fuji, I guess I will just have to press on.',

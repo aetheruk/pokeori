@@ -28,6 +28,33 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
+      - name: Verify Bun version pins
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+          const bunVersion = fs.readFileSync('.bun-version', 'utf8').trim()
+          const dockerfile = fs.readFileSync('Dockerfile', 'utf8')
+          const dockerImage = dockerfile.match(/^FROM mirror\.gcr\.io\/oven\/bun:(\S+) AS base$/m)?.[1]
+
+          if (packageJson.packageManager !== `bun@${bunVersion}`) {
+            throw new Error('packageManager and .bun-version do not match')
+          }
+          if (packageJson.engines?.bun !== `>=${bunVersion}`) {
+            throw new Error('The Bun engine requirement and .bun-version do not match')
+          }
+          if (packageJson.devDependencies?.['@types/bun'] !== bunVersion) {
+            throw new Error('The Bun type package and .bun-version do not match')
+          }
+          if (dockerImage !== `${bunVersion}-alpine`) {
+            throw new Error('The Docker base image and .bun-version do not match')
+          }
+          if (!dockerfile.includes(`RUN test "$(bun --version)" = "${bunVersion}"`)) {
+            throw new Error('The Docker base image is missing its Bun version assertion')
+          }
+          console.log(`Bun ${bunVersion} pins match package metadata and Docker stages`)
+          NODE
+
       - name: Confirm the stable build key is configured
         env:
           NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}

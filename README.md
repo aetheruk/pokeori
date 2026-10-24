@@ -27,7 +27,7 @@ See [ATTRIBUTIONS.md](./ATTRIBUTIONS.md) for source credits and important third-
 
 ## Technology
 
-- [Bun](https://bun.sh/) 1.3.10 (package manager, production runtime, builds, tests, and scripts)
+- [Bun](https://bun.sh/) 1.4.4 (package manager, production runtime, builds, tests, and scripts)
 - [Next.js](https://nextjs.org/)
 - [React](https://react.dev/)
 - [Payload CMS](https://payloadcms.com/)
@@ -40,7 +40,7 @@ See [ATTRIBUTIONS.md](./ATTRIBUTIONS.md) for source credits and important third-
 
 ### Requirements
 
-- Bun `1.3.10` or newer
+- Bun `1.4.4` or newer
 - MongoDB
 - Redis
 - A Resend API key if transactional email is enabled

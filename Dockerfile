@@ -2,11 +2,14 @@
 
 # Bun is the package manager, build runtime, and production runtime. Keep the
 # image on the same stable patch used by packageManager in package.json.
-FROM mirror.gcr.io/oven/bun:1.4.2-alpine AS base
+FROM mirror.gcr.io/oven/bun:1.4.4-alpine AS base
 WORKDIR /app
 
-# Refresh OS security packages when advancing this base stage. Bun's 1.4.2
-# image shipped OpenSSL 3.5.7; Alpine 3.5.8 fixes CVE-2026-14456.
+# Keep the package-manager, build, and runtime image on one exact Bun release.
+RUN test "$(bun --version)" = "1.4.4"
+
+# Refresh OS security packages when advancing this base stage. The 1.4.2 image
+# shipped OpenSSL 3.5.7; Alpine 3.5.8 fixes CVE-2026-14456.
 RUN apk upgrade --no-cache && apk add --no-cache libc6-compat
 
 # Copy lockfiles before application source so dependency installation is reused

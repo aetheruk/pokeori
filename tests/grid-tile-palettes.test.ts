@@ -749,6 +749,7 @@ describe('shared grid sprite sets', () => {
       'route1RattataTrigger',
       'route1PidgeyTrigger',
       'encounterTrigger',
+      'gengarEncounterTrigger',
       'minigameTrigger',
       'celadonSlotMachine',
       'celadonHighStakesSlotMachine',
@@ -772,6 +773,9 @@ describe('shared grid sprite sets', () => {
     )
     expect(gridObjects.battleTrigger.interaction).toBe('battle')
     expect(gridObjects.encounterTrigger.interaction).toBe('encounter')
+    expect(gridObjects.gengarEncounterTrigger.asset.src).toBe(
+      '/sprites/pokemon/gen-v/front/normal/94.avif',
+    )
     expect(getGridObjectDefinition(gridObjects, 'battle-trigger')).toBe(
       gridObjects.battleTrigger,
     )

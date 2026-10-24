@@ -637,8 +637,12 @@ export const pokemonTowerGauntletBattles: BattleConfig[] = pokemonTowerBattles
   .map((battle) => {
     const prefix = 'pokemon-tower-channeler-'
     const { id, requirements: _storyRequirements, ...reusableBattle } = battle
+    const rewards = (battle.rewards || []).filter(
+      (reward) => reward.type !== 'currency' || reward.targetId !== 'pokedollars',
+    )
     return {
       ...reusableBattle,
+      rewards,
       id: `pokemon-tower-gauntlet-${id.slice(prefix.length)}`,
       name: `Tower Trial: ${battle.trainerName}`,
       description: `Repeatable Grid Adventure battle against ${battle.name}.`,
