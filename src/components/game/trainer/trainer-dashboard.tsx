@@ -104,7 +104,7 @@ export function TrainerDashboard({
     0,
     user?.icon,
   )
-  const trainerGenderIcon = (
+  const trainerAppearanceIcon = (
     <span
       aria-hidden="true"
       className="block h-8 w-8 bg-no-repeat [image-rendering:pixelated]"
@@ -262,7 +262,7 @@ export function TrainerDashboard({
                   appearance="explore"
                   icon={renderSectionIcon(tab.id)}
                   iconPosition="left"
-                  selectionIcon={trainerGenderIcon}
+                  selectionIcon={trainerAppearanceIcon}
                   selected={selected}
                   onClick={() => selectSection(tab.id)}
                   className="min-h-20"
@@ -326,7 +326,7 @@ export function TrainerDashboard({
               />
             }
             iconPosition="left"
-            selectionIcon={trainerGenderIcon}
+            selectionIcon={trainerAppearanceIcon}
             onClick={() => setSectionDrawerOpen(true)}
             className="min-h-20"
           />
@@ -394,7 +394,7 @@ export function TrainerDashboard({
                 appearance="explore"
                 icon={renderSectionIcon(tab.id)}
                 iconPosition="left"
-                selectionIcon={trainerGenderIcon}
+                selectionIcon={trainerAppearanceIcon}
                 selected={selected}
                 onClick={() => {
                   selectSection(tab.id)

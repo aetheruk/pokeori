@@ -616,6 +616,13 @@ export function getGridTilePackCredits(options?: { externalOnly?: boolean }): Gr
     external: true,
   })
   filtered.push({
+    label: 'Essentials FRLG — Red and Leaf player walking sheets',
+    creator: 'TheTinfoilTemplar and the Pokémon Essentials development team',
+    href: 'https://eeveeexpo.com/resources/1797/',
+    notice: 'The resource author permits use without direct credit and requests credit for the Pokémon Essentials development team. The Red and Leaf character sprites remain Pokémon game assets owned by their respective rights holders.',
+    external: true,
+  })
+  filtered.push({
     label: 'FRLG Accurate NPC Megapack (Relic Castle Edition) — trainer overworld sprites',
     creator: 'Compiled by SoulfulLex; individual credits are included in the pack readme',
     href: 'https://www.mediafire.com/file/nbr92qe5uhorhlv/FRLG_Accurate_NPC_Megapack_%2528Relic_Castle_Edition%2529.zip/file',

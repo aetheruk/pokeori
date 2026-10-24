@@ -22,6 +22,8 @@ export interface EncounterState {
     objectKey: string
     rollSnapshot?: number
   }
+  /** A battle already completed successfully before its optional catch session. */
+  gridAdventureReturnOutcome?: 'won'
   battleCapturePokemon?: import('@/utilities/pokemon/alpha').BattleCapturePokemon
   battleCaptureId?: string
   alphaPokemon?: import('@/utilities/pokemon/alpha').AlphaCapturePokemon

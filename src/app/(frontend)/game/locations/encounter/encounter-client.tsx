@@ -128,6 +128,12 @@ import { AlphaIcon } from '@/components/game/shared/alpha-icon'
 import { AlphaParticles } from '@/components/game/shared/alpha-particles'
 
 interface EncounterData {
+  gridAdventureContext?: {
+    encounterId: string
+    objectKey: string
+    rollSnapshot?: number
+  }
+  gridAdventureReturnOutcome?: 'won'
   locationSnapshot?: import('@/data/types').Location
   pokemonId: number
   formId: string
@@ -568,12 +574,16 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const returnPathParam = searchParams.get('returnTo')
-  const returnPath =
+  const requestedReturnPath =
     returnPathParam?.startsWith('/') && !returnPathParam.startsWith('//')
       ? returnPathParam
       : null
   const { user, refreshUser } = useUser()
   const [encounter, setEncounter] = useState<EncounterData | null>(null)
+  const returnPath =
+    (encounter?.gridAdventureContext
+      ? `/game/games/grid-puzzle?gridReturn=1&gameId=${encodeURIComponent(encounter.gridAdventureContext.encounterId)}`
+      : requestedReturnPath)
   const [loading, setLoading] = useState(true)
   const [timeLeft, setTimeLeft] = useState(0)
   const [phase, setPhase] = useState<'quiz' | 'safari' | 'capture' | 'result'>(
@@ -767,12 +777,13 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
       stopMusic({ fade: true })
       if (returnPath) {
         const separator = returnPath.includes('?') ? '&' : '?'
-        router.replace(`${returnPath}${separator}outcome=lost`)
+        const outcome = encounter?.gridAdventureReturnOutcome || 'lost'
+        router.replace(`${returnPath}${separator}outcome=${outcome}`)
       } else {
         router.replace('/game/explore')
       }
     },
-    [clearAnswerFeedbackTimer, returnPath, router, stopMusic],
+    [clearAnswerFeedbackTimer, encounter?.gridAdventureReturnOutcome, returnPath, router, stopMusic],
   )
 
   const enterCaptureFromTimeUp = useCallback(() => {

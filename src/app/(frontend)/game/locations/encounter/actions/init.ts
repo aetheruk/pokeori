@@ -1139,6 +1139,8 @@ export const getEncounter = cache(async () => {
   }
 
   return {
+    gridAdventureContext: state.gridAdventureContext,
+    gridAdventureReturnOutcome: state.gridAdventureReturnOutcome,
     pokemonId: state.pokemonId,
     formId: state.formId,
     pokemonName,

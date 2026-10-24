@@ -48,6 +48,13 @@ rights holders. The matched leader sheets use NPC 63 for Jasmine, NPC 61 for
 Morty, NPC 75 for Byron, NPC 76 for Candice, NPC 65 for Clair, and NPC 58 for
 Falkner.
 
+The Red and Leaf player walking sheets in `public/games/trainers/source/` were
+extracted from [Essentials FRLG v1.1](https://eeveeexpo.com/resources/1797/),
+which adapts Pokémon Essentials for FireRed/LeafGreen. The resource author says
+their pack does not require direct credit and asks that the Pokémon Essentials
+development team be credited. These are Pokémon game sprites; their rights
+remain with their respective owners.
+
 The Unova Gym Leader walk sheets in `public/games/trainers/source/` come from
 the [Gen 5 Characters in Gen 4 OW style pack](https://eeveeexpo.com/resources/370/)
 by DiegoWT. The selected original four-direction sheets are kept intact, with
