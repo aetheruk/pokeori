@@ -69,7 +69,16 @@ requirements determine which objects are present when the board snapshot is
 created. Placement and activity criteria leave the object visible while
 disabling its A/E interaction until they are met. The server checks the rules
 again on interaction and child-session start, and routes item, currency, and
-Pokémon consumption through the existing criteria handling.
+Pokémon consumption through the existing criteria handling. Floor prizes also
+support requirements; a board pins one server-generated roll at entry and uses
+it for every conditional object and prize. The Buggy, Feathered, and Ghost
+Gauntlets' center floor materials always appear on floors two through four. In each
+Gauntlet, the center candy on the final floor is guaranteed, while the two
+corner candies share a one-in-five roll.
+
+Icon rewards already present in a player's unlocked-icon list are omitted from
+the result summary, so replaying content only shows icons the player newly
+unlocked.
 
 Chronicle battles do not write ordinary battle activity-stat rows. When a
 Chronicle battle is launched from a matching Grid Adventure, its server-side

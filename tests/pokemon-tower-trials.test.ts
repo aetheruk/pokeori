@@ -127,8 +127,8 @@ describe('Pokemon Tower spirit trials', () => {
       rollThreshold: requirements?.find((requirement) => requirement.type === 'roll')?.count,
     }))).toEqual([
       { x: 3, y: 1, rollThreshold: undefined },
-      { x: 0, y: 1, rollThreshold: 300_000 },
-      { x: 6, y: 1, rollThreshold: 300_000 },
+      { x: 0, y: 1, rollThreshold: 200_000 },
+      { x: 6, y: 1, rollThreshold: 200_000 },
     ])
     expect(gengar).toHaveLength(1)
     expect(screens[4]?.objects?.some(

@@ -158,6 +158,19 @@ describe('task_complete reward cascading', () => {
     ])
   })
 
+  test('only lists newly unlocked icons in the reward summary', async () => {
+    const { grantRewards } = await import('@/utilities/rewards/reward-logic')
+
+    const { summary } = await grantRewards('user-1', [
+      { type: 'icon', targetId: 'trainer-red', dropChance: 100 },
+      { type: 'icon', targetId: 'cyclist-f', dropChance: 100 },
+    ], transactionOptions)
+
+    expect(summary.icons).toEqual([
+      expect.objectContaining({ id: 'cyclist-f', name: 'Cyclist' }),
+    ])
+  })
+
   test('queues exit modals and research XP from cascaded task rewards', async () => {
     activityStatsState = {
       'rock-tunnel-1f-ne-field-observation': { wins: 10 },
