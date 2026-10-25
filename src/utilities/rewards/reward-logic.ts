@@ -969,9 +969,9 @@ export async function grantRewards(
       if (!unlockedIcons.includes(iconId)) {
         unlockedIcons.push(iconId)
         unlockedIconsChanged = true
+        const iconDef = getIcon(iconId)
+        summary.icons.push({ id: iconId, name: iconDef?.name || iconId })
       }
-      const iconDef = getIcon(iconId)
-      summary.icons.push({ id: iconId, name: iconDef?.name || iconId })
     } else if (reward.type === 'title' && reward.targetId) {
       const titleId = reward.targetId.toString()
       if (!unlockedTitles.includes(titleId)) {

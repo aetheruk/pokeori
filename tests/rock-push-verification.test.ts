@@ -5,7 +5,7 @@ import { testbasicEntries } from '@/data/games/rock-push/entries/test'
 import { gauntletGridAdventureEntries } from '@/data/games/rock-push/entries/gauntlets'
 
 describe('rock-push transcript verification', () => {
-  test('gauntlet bonus material appears as three one-item floor pickups on a 1-in-5 roll', () => {
+  test('gauntlet materials always appear as one-item floor pickups on floors two through four', () => {
     const expectedPickups = [
       ['buggy-gauntlet-grid-adventure', 'chitin-fragment-t1'],
       ['feathered-gauntlet-grid-adventure', 'wing-feather-t1'],
@@ -21,11 +21,7 @@ describe('rock-push transcript verification', () => {
 
       expect(prizes).toHaveLength(3)
       expect(prizes.every((prize) => prize.itemId === itemId && prize.quantity === 1)).toBe(true)
-      expect(prizes.every((prize) =>
-        prize.requirements?.length === 1 &&
-        prize.requirements[0]?.type === 'roll' &&
-        prize.requirements[0]?.count === 200_000,
-      )).toBe(true)
+      expect(prizes.every((prize) => !prize.requirements?.length)).toBe(true)
     }
   })
 

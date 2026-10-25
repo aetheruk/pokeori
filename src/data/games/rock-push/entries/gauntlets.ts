@@ -28,8 +28,7 @@ const birdGauntletTrainerIds = [
   'route-14-gauntlet-benny',
 ]
 
-const rareMaterialRollRequirement = [{ type: 'roll' as const, count: 200_000 }]
-const extraCandyRollRequirement = [{ type: 'roll' as const, count: 300_000 }]
+const extraCandyRollRequirement = [{ type: 'roll' as const, count: 200_000 }]
 const commonFinalBattleRollRequirement = [{
   type: 'roll' as const,
   count: 200_000,
@@ -162,7 +161,6 @@ function createGauntletScreens(options: {
               y: GAUNTLET_CENTER,
               itemId: options.materialItemId,
               quantity: 1,
-              requirements: rareMaterialRollRequirement,
             }],
           }
         : {}),

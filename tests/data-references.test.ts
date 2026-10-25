@@ -4362,7 +4362,7 @@ describe('static data references', () => {
     ])
     expect(bugFinalPrizes.slice(1).every((prize: any) =>
       prize.requirements?.some((requirement: any) =>
-        requirement.type === 'roll' && requirement.count === 300_000,
+        requirement.type === 'roll' && requirement.count === 200_000,
       ),
     )).toBe(true)
 
@@ -4402,7 +4402,7 @@ describe('static data references', () => {
     ])
     expect(featheredFinalPrizes.slice(1).every((prize: any) =>
       prize.requirements?.some((requirement: any) =>
-        requirement.type === 'roll' && requirement.count === 300_000,
+        requirement.type === 'roll' && requirement.count === 200_000,
       ),
     )).toBe(true)
     expect(expeditions.some((entry) =>
