@@ -6,7 +6,8 @@ import {
   type DragEndEvent,
   DragOverlay,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -18,17 +19,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import {
-  Check,
-  GripVertical,
-  Loader2,
-  LockKeyhole,
-  PackageOpen,
-  Pencil,
-  Sparkles,
-  Swords,
-  X,
-} from 'lucide-react'
+import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { setHeldItem } from '@/app/(frontend)/game/pokemon/actions/held-items'
@@ -72,6 +63,7 @@ import {
   getAvailablePokemonPowerOptions,
   normalizeSelectedPokemonPower,
 } from '@/utilities/pokemon/pokemon-powers'
+import { getPokemonPokedexBackground } from '@/utilities/pokemon/pokemon-background'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
 import {
   canUseTrainerHeldItems,
@@ -85,6 +77,82 @@ function getBattleTeamPosition(pokemon: Pokemon, fallbackIndex: number) {
   return typeof pokemon.battleTeamPosition === 'number'
     ? pokemon.battleTeamPosition
     : fallbackIndex + 1
+}
+
+function normalizePokemonBackgroundPath(path?: string | null) {
+  if (!path) return null
+
+  const filename = path.split('/').pop()
+  if (!filename) return null
+
+  return `/backgrounds/${filename
+    .replace(/\.(png|jpe?g|webp)$/i, '.avif')
+    .replaceAll('_', '-')}`
+}
+
+function BattleTeamCardFace({
+  pokemon,
+  index,
+}: {
+  pokemon: Pokemon
+  index: number
+}) {
+  const form = getPokemonForm(pokemon.formId)
+  const name = pokemon.name || form?.name || 'Pokémon'
+  const heldItem = getHeldItemDefinition(pokemon.heldItemId)
+  const background =
+    normalizePokemonBackgroundPath(pokemon.background) ||
+    getPokemonPokedexBackground({ types: form?.types || [] })
+
+  return (
+    <span className="relative isolate block aspect-[1.38] min-h-32 w-full overflow-hidden rounded-[inherit] bg-game-canvas text-left">
+      <Image
+        src={background}
+        alt=""
+        fill
+        sizes="(max-width: 640px) 46vw, 300px"
+        className="object-cover"
+      />
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-b from-game-ink/15 via-game-canvas/10 to-game-ink/85"
+      />
+      <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-game-ink/80 px-2 py-1 font-mono text-[10px] font-bold text-game-cream shadow-sm">
+        {index === 0 ? 'LEAD' : index + 1}
+      </span>
+      {heldItem && (
+        <span
+          className="absolute right-2.5 top-2.5 z-10 flex size-9 items-center justify-center rounded-full border border-game-border/80 bg-game-surface/90 shadow-sm"
+          title={heldItem.name}
+        >
+          <ItemSprite itemId={heldItem.id} alt="" width={28} height={28} />
+        </span>
+      )}
+      <span className="absolute inset-x-3 bottom-6 top-1 z-[1]">
+        <PokemonRaritySprite
+          formId={pokemon.formId}
+          view="home"
+          rarity={pokemon.rarity}
+          shiny={pokemon.shiny}
+          isShadow={pokemon.isShadow}
+          isRadiant={pokemon.isRadiant}
+          female={getOwnedPokemonGender(pokemon) === 'female'}
+          alt=""
+          className="h-full w-full"
+          imageClassName="drop-shadow-[0_3px_3px_rgba(20,25,23,0.38)]"
+          sizes="(max-width: 640px) 38vw, 220px"
+        />
+      </span>
+      <span className="absolute inset-x-3 bottom-2 z-10 flex min-w-0 items-end justify-between gap-2 text-game-cream">
+        <span className="min-w-0 truncate text-sm font-bold leading-tight drop-shadow-sm">
+          {name}
+        </span>
+        <span className="shrink-0 font-mono text-[10px] font-semibold text-game-cream/90">
+          Lv. {pokemon.level}
+        </span>
+      </span>
+    </span>
+  )
 }
 
 function SortableBattleTeamCard({
@@ -111,11 +179,7 @@ function SortableBattleTeamCard({
   } = useSortable({ id: pokemon.id, disabled })
   const form = getPokemonForm(pokemon.formId)
   const name = pokemon.name || form?.name || 'Pokémon'
-  const moves = normalizeAssignedMoveIds(pokemon.assignedMoves).length
   const heldItem = getHeldItemDefinition(pokemon.heldItemId)
-  const hasPower = Boolean(
-    normalizeSelectedPokemonPower(pokemon.selectedPokemonPower),
-  )
 
   return (
     <li
@@ -125,102 +189,28 @@ function SortableBattleTeamCard({
         transition,
       }}
       className={cn(
-        'relative list-none rounded-xl transition-shadow',
-        isDragging && 'z-20 opacity-35',
+        'relative list-none rounded-xl',
+        isDragging && 'z-20 opacity-30',
       )}
     >
       <button
-        type="button"
-        onClick={onSelect}
-        aria-pressed={selected}
-        className={cn(
-          'game-focus-ring flex min-h-[126px] w-full flex-col rounded-xl border bg-game-surface-raised p-2.5 text-left shadow-sm transition-colors',
-          selected
-            ? 'border-game-charcoal bg-game-charcoal/[0.035]'
-            : 'border-game-card-border hover:bg-game-surface',
-          'disabled:cursor-wait',
-        )}
-      >
-        <span
-          className={cn(
-            'absolute left-2.5 top-2.5 flex size-6 items-center justify-center rounded-md font-mono text-[11px] font-bold',
-            index === 0
-              ? 'bg-game-charcoal text-game-cream'
-              : 'border border-game-border bg-game-canvas text-game-muted',
-          )}
-          title={index === 0 ? 'Lead Pokémon' : `Team position ${index + 1}`}
-        >
-          {index === 0 ? 'L' : index + 1}
-        </span>
-        {selected && (
-          <span className="absolute right-10 top-2.5 flex size-6 items-center justify-center rounded-full bg-game-charcoal text-game-cream">
-            <Check className="size-3.5" aria-hidden="true" />
-          </span>
-        )}
-
-        <div className="flex w-full items-center gap-2 pt-5">
-          <PokemonRaritySprite
-            formId={pokemon.formId}
-            view="home"
-            rarity={pokemon.rarity}
-            shiny={pokemon.shiny}
-            isShadow={pokemon.isShadow}
-            isRadiant={pokemon.isRadiant}
-            female={getOwnedPokemonGender(pokemon) === 'female'}
-            alt=""
-            className="size-12 shrink-0"
-          />
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-[13px] font-bold leading-tight text-game-ink">
-              {name}
-            </span>
-            <span className="mt-1 block font-mono text-[10px] text-game-muted">
-              Lv. {pokemon.level}
-            </span>
-          </span>
-        </div>
-
-        <span className="mt-auto flex w-full items-center gap-3 border-t border-game-border/70 pt-2 text-game-muted">
-          <span
-            className="inline-flex items-center gap-1 text-[10px] font-semibold"
-            title={`${moves} battle ${moves === 1 ? 'move' : 'moves'}`}
-          >
-            <Swords className="size-3.5" aria-hidden="true" />
-            {moves}
-          </span>
-          <span
-            className="inline-flex size-5 items-center justify-center"
-            title={heldItem?.name || 'No held item'}
-          >
-            {heldItem ? (
-              <ItemSprite itemId={heldItem.id} alt="" width={20} height={20} />
-            ) : (
-              <PackageOpen className="size-3.5" aria-hidden="true" />
-            )}
-          </span>
-          <span
-            className={cn(
-              'ml-auto inline-flex size-5 items-center justify-center',
-              hasPower ? 'text-game-ochre' : 'text-game-muted/70',
-            )}
-            title={hasPower ? 'Pokémon Power selected' : 'No Pokémon Power'}
-          >
-            <Sparkles className="size-3.5" aria-hidden="true" />
-          </span>
-        </span>
-      </button>
-
-      <button
         ref={setActivatorNodeRef}
-        type="button"
         {...attributes}
         {...listeners}
+        type="button"
         disabled={disabled}
-        aria-label={`Drag to reorder ${name}`}
-        title={`Drag to reorder ${name}`}
-        className="game-focus-ring absolute right-2 top-2 z-10 flex size-8 touch-none items-center justify-center rounded-md text-game-muted hover:bg-game-charcoal/8 hover:text-game-ink disabled:cursor-not-allowed disabled:opacity-45"
+        onClick={onSelect}
+        aria-pressed={selected}
+        aria-label={`${name}, level ${pokemon.level}${index === 0 ? ', lead Pokémon' : `, position ${index + 1}`}${heldItem ? `, holding ${heldItem.name}` : ''}. Drag to reorder.`}
+        data-haptic-manual="true"
+        className={cn(
+          'game-focus-ring block w-full touch-pan-y rounded-xl border-2 text-left shadow-sm transition-[border-color,box-shadow] disabled:cursor-wait',
+          selected
+            ? 'border-game-ochre shadow-md'
+            : 'border-game-card-border hover:border-game-charcoal/60',
+        )}
       >
-        <GripVertical className="size-4" aria-hidden="true" />
+        <BattleTeamCardFace pokemon={pokemon} index={index} />
       </button>
     </li>
   )
@@ -249,7 +239,10 @@ export function GridAdventurePartyManager() {
   const [selectedMoveIds, setSelectedMoveIds] = useState<string[]>([])
   const [savingMoves, setSavingMoves] = useState(false)
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 180, tolerance: 8 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -577,13 +570,14 @@ export function GridAdventurePartyManager() {
       }}
       dismissible={!moveWorkspaceOpen && !moveDetail}
       title="Battle team"
-      description="Prepare your team for the battles ahead."
+      description="Reorder your team and prepare each Pokémon."
       showHero={false}
       className="game-paper-first flex w-full flex-col overflow-hidden bg-game-canvas p-0 text-game-ink"
       trigger={
         <Button
           type="button"
           variant="outline"
+          data-haptic-manual="true"
           className="size-12 rounded-full border border-game-border bg-game-surface-raised p-1 shadow-sm hover:border-game-charcoal hover:bg-game-surface"
           aria-label="Manage battle team"
           title="Manage battle team"
@@ -592,17 +586,17 @@ export function GridAdventurePartyManager() {
         </Button>
       }
     >
-      <header className="shrink-0 border-b border-game-border bg-game-surface-raised px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] pr-16 shadow-sm sm:px-6 sm:pr-20">
+      <header className="z-10 shrink-0 border-b border-game-border bg-game-surface-raised px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] pr-20 shadow-sm sm:px-6">
         <div className="mx-auto flex w-full max-w-4xl items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-game-charcoal text-game-cream">
-            <Swords className="size-5" aria-hidden="true" />
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-game-border bg-game-canvas">
+            <ItemSprite itemId="poke-ball" alt="" width={29} height={29} />
           </span>
           <div className="min-w-0">
-            <h1 className="font-display text-xl font-bold leading-tight text-game-ink">
+            <h1 className="font-display text-lg font-bold leading-tight text-game-ink">
               Battle team
             </h1>
-            <p className="mt-1 text-xs text-game-muted">
-              Drag to reorder · select a Pokémon to prepare it
+            <p className="mt-0.5 text-xs text-game-muted">
+              Hold and drag cards to reorder
             </p>
           </div>
           {sortedTeam.length > 0 && (
@@ -613,13 +607,12 @@ export function GridAdventurePartyManager() {
         </div>
       </header>
 
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:p-6">
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-5">
         {loading ? (
           <div
-            className="flex min-h-40 items-center justify-center gap-2 text-sm text-game-muted"
+            className="flex min-h-40 items-center justify-center text-sm text-game-muted"
             role="status"
           >
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
             Loading team…
           </div>
         ) : loadError ? (
@@ -630,19 +623,16 @@ export function GridAdventurePartyManager() {
             {loadError}
           </p>
         ) : sortedTeam.length === 0 ? (
-          <div className="mx-auto mt-8 flex max-w-sm flex-col items-center rounded-xl border border-game-card-border bg-game-surface-raised p-6 text-center shadow-sm">
-            <span className="mb-3 flex size-12 items-center justify-center rounded-full bg-game-charcoal/8 text-game-charcoal">
-              <PackageOpen className="size-6" aria-hidden="true" />
-            </span>
+          <div className="mx-auto mt-8 max-w-sm rounded-xl border border-game-card-border bg-game-surface-raised p-5 text-center shadow-sm">
             <h2 className="font-display text-lg font-semibold text-game-ink">
-              No Pokémon on your battle team
+              No battle team
             </h2>
             <p className="mt-1 text-sm text-game-muted">
-              Add Pokémon to your team before entering a battle.
+              Add Pokémon before entering a battle.
             </p>
           </div>
         ) : (
-          <main className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+          <main className="mx-auto w-full max-w-4xl">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -657,7 +647,7 @@ export function GridAdventurePartyManager() {
                 strategy={rectSortingStrategy}
               >
                 <ol
-                  className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3"
+                  className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4"
                   aria-label="Battle team order"
                 >
                   {sortedTeam.map((pokemon, index) => (
@@ -677,437 +667,298 @@ export function GridAdventurePartyManager() {
               </SortableContext>
               <DragOverlay>
                 {activePokemon ? (
-                  <div className="flex items-center gap-3 rounded-xl border border-game-charcoal bg-game-surface-raised p-3 shadow-lg">
-                    <PokemonRaritySprite
-                      formId={activePokemon.formId}
-                      view="home"
-                      rarity={activePokemon.rarity}
-                      shiny={activePokemon.shiny}
-                      isShadow={activePokemon.isShadow}
-                      isRadiant={activePokemon.isRadiant}
-                      female={getOwnedPokemonGender(activePokemon) === 'female'}
-                      alt=""
-                      className="size-12 shrink-0"
+                  <div className="rounded-xl border-2 border-game-ochre shadow-xl">
+                    <BattleTeamCardFace
+                      pokemon={activePokemon}
+                      index={sortedTeam.findIndex(
+                        (pokemon) => pokemon.id === activePokemon.id,
+                      )}
                     />
-                    <span className="font-semibold text-game-ink">
-                      {activePokemon.name ||
-                        getPokemonForm(activePokemon.formId)?.name ||
-                        'Pokémon'}
-                    </span>
                   </div>
                 ) : null}
               </DragOverlay>
             </DndContext>
-
-            {selectedPokemon && (
-              <section
-                aria-label={`${selectedPokemon.name || pokemonForm?.name || 'Pokémon'} loadout`}
-                className="rounded-xl border border-game-card-border bg-game-surface-raised p-3 shadow-sm sm:p-4"
-              >
-                <div className="flex items-center gap-3 border-b border-game-border/70 pb-3">
-                  <PokemonRaritySprite
-                    formId={selectedPokemon.formId}
-                    view="home"
-                    rarity={selectedPokemon.rarity}
-                    shiny={selectedPokemon.shiny}
-                    isShadow={selectedPokemon.isShadow}
-                    isRadiant={selectedPokemon.isRadiant}
-                    female={getOwnedPokemonGender(selectedPokemon) === 'female'}
-                    alt=""
-                    className="size-14 shrink-0"
-                  />
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-game-muted">
-                      Selected Pokémon
-                    </p>
-                    <h2 className="truncate font-display text-lg font-bold leading-tight text-game-ink">
-                      {selectedPokemon.name || pokemonForm?.name || 'Pokémon'}
-                    </h2>
-                    <p className="mt-0.5 font-mono text-[11px] text-game-muted">
-                      Lv. {selectedPokemon.level}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 pt-3">
-                  <div className="min-w-0 rounded-lg border border-game-border/80 bg-game-canvas/60 p-2">
-                    <div className="flex items-center gap-2">
-                      <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-game-charcoal/8 text-game-charcoal">
-                        {currentHeldItem ? (
-                          <ItemSprite
-                            itemId={currentHeldItem.id}
-                            alt=""
-                            width={26}
-                            height={26}
-                          />
-                        ) : (
-                          <PackageOpen className="size-4" aria-hidden="true" />
-                        )}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[9px] font-bold uppercase tracking-wide text-game-muted">
-                          Item
-                        </span>
-                        <span className="block truncate text-[11px] font-semibold text-game-ink">
-                          {currentHeldItem?.name || 'None'}
-                        </span>
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() =>
-                          setEditingSection((current) =>
-                            current === 'item' ? null : 'item',
-                          )
-                        }
-                        aria-label="Change held item"
-                        aria-expanded={editingSection === 'item'}
-                        title="Change held item"
-                        className="size-8 shrink-0 text-game-muted hover:bg-game-charcoal/5 hover:text-game-ink"
-                      >
-                        <Pencil className="size-3.5" aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="min-w-0 rounded-lg border border-game-border/80 bg-game-canvas/60 p-2">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          'flex size-8 shrink-0 items-center justify-center rounded-md',
-                          selectedPokemonPower
-                            ? 'bg-game-ochre/15 text-game-ochre'
-                            : 'bg-game-charcoal/8 text-game-muted',
-                        )}
-                      >
-                        <Sparkles className="size-4" aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[9px] font-bold uppercase tracking-wide text-game-muted">
-                          Power
-                        </span>
-                        <span className="block truncate text-[11px] font-semibold text-game-ink">
-                          {availablePokemonPowers.find(
-                            (power) => power.id === selectedPokemonPower,
-                          )?.name ||
-                            selectedPokemonPower ||
-                            'None'}
-                        </span>
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() =>
-                          setEditingSection((current) =>
-                            current === 'power' ? null : 'power',
-                          )
-                        }
-                        aria-label="Change Pokémon Power"
-                        aria-expanded={editingSection === 'power'}
-                        title="Change Pokémon Power"
-                        className="size-8 shrink-0 text-game-muted hover:bg-game-charcoal/5 hover:text-game-ink"
-                      >
-                        <Pencil className="size-3.5" aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="min-w-0 rounded-lg border border-game-border/80 bg-game-canvas/60 p-2">
-                    <div className="flex items-center gap-2">
-                      <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-game-charcoal/8 text-game-charcoal">
-                        <Swords className="size-4" aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[9px] font-bold uppercase tracking-wide text-game-muted">
-                          Moves
-                        </span>
-                        <span className="block truncate font-mono text-[11px] font-semibold text-game-ink">
-                          {selectedMoveIds.length}/{maxMoves}
-                        </span>
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setMoveWorkspaceOpen(true)}
-                        disabled={!!moveUnlockMessage || savingMoves}
-                        aria-label="Edit battle moves"
-                        title={moveUnlockMessage || 'Edit battle moves'}
-                        className="size-8 shrink-0 text-game-muted hover:bg-game-charcoal/5 hover:text-game-ink disabled:opacity-40"
-                      >
-                        <Pencil className="size-3.5" aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {moveUnlockMessage && (
-                  <p className="mt-2 text-[11px] text-game-muted">
-                    {moveUnlockMessage}
-                  </p>
-                )}
-
-                {editingSection === 'item' && (
-                  <div className="mt-3 rounded-lg border border-game-border bg-game-canvas/50 p-2.5">
-                    <div className="mb-2 flex items-center justify-between gap-3">
-                      <h3 className="text-xs font-bold text-game-ink">
-                        Held items
-                      </h3>
-                      {heldItemUnlockMessage && (
-                        <span
-                          className="flex items-center gap-1 text-[10px] text-game-muted"
-                          title={heldItemUnlockMessage}
-                        >
-                          <LockKeyhole
-                            className="size-3.5"
-                            aria-hidden="true"
-                          />
-                          Locked
-                        </span>
-                      )}
-                    </div>
-                    {heldItemUnlockMessage ? (
-                      <p className="text-xs text-game-muted">
-                        {heldItemUnlockMessage}
-                      </p>
-                    ) : (
-                      <div className="custom-scrollbar grid max-h-56 grid-cols-2 gap-2 overflow-y-auto">
-                        <button
-                          type="button"
-                          onClick={() => void saveHeldItem(null)}
-                          disabled={
-                            !currentHeldItemId || savingHeldItemId !== null
-                          }
-                          aria-pressed={!currentHeldItemId}
-                          className={cn(
-                            'game-focus-ring flex min-h-14 items-center gap-2 rounded-lg border p-2 text-left transition-colors disabled:opacity-50',
-                            !currentHeldItemId
-                              ? 'border-game-charcoal bg-game-charcoal/5'
-                              : 'border-game-border bg-game-surface-raised hover:bg-game-surface',
-                          )}
-                        >
-                          <PackageOpen
-                            className="ml-1 size-5 shrink-0 text-game-muted"
-                            aria-hidden="true"
-                          />
-                          <span className="min-w-0 flex-1 truncate text-xs font-semibold text-game-ink">
-                            None
-                          </span>
-                          {!currentHeldItemId && (
-                            <Check
-                              className="size-3.5 text-game-charcoal"
-                              aria-hidden="true"
-                            />
-                          )}
-                        </button>
-                        {heldItemOptions.map((item) => {
-                          const skillLock = getItemSkillLockReason(
-                            item,
-                            user?.skills,
-                          )
-                          const selected = currentHeldItemId === item.id
-                          const disabled =
-                            selected ||
-                            !!skillLock ||
-                            savingHeldItemId !== null ||
-                            !!heldItemUnlockMessage
-                          return (
-                            <button
-                              key={item.id}
-                              type="button"
-                              onClick={() => void saveHeldItem(item.id)}
-                              disabled={disabled}
-                              aria-pressed={selected}
-                              aria-label={
-                                item.name +
-                                ', ' +
-                                (inventoryMap[item.id] || 0) +
-                                ' available' +
-                                (skillLock ? `, ${skillLock}` : '')
-                              }
-                              title={skillLock || item.name}
-                              className={cn(
-                                'game-focus-ring flex min-h-14 min-w-0 items-center gap-2 rounded-lg border p-2 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-                                selected
-                                  ? 'border-game-charcoal bg-game-charcoal/5'
-                                  : 'border-game-border bg-game-surface-raised hover:bg-game-surface',
-                              )}
-                            >
-                              <ItemSprite
-                                itemId={item.id}
-                                alt=""
-                                width={28}
-                                height={28}
-                              />
-                              <span className="min-w-0 flex-1">
-                                <span className="block truncate text-[11px] font-semibold text-game-ink">
-                                  {item.name}
-                                </span>
-                                <span className="block font-mono text-[9px] text-game-muted">
-                                  x{inventoryMap[item.id] || 0}
-                                </span>
-                              </span>
-                              {selected ? (
-                                <Check
-                                  className="size-3.5 shrink-0 text-game-charcoal"
-                                  aria-hidden="true"
-                                />
-                              ) : skillLock ? (
-                                <LockKeyhole
-                                  className="size-3.5 shrink-0 text-game-muted"
-                                  aria-hidden="true"
-                                />
-                              ) : savingHeldItemId === item.id ? (
-                                <Loader2
-                                  className="size-3.5 shrink-0 animate-spin"
-                                  aria-hidden="true"
-                                />
-                              ) : null}
-                            </button>
-                          )
-                        })}
-                        {heldItemOptions.length === 0 && (
-                          <p className="col-span-2 py-3 text-center text-xs text-game-muted">
-                            No held items in your bag.
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {editingSection === 'power' && (
-                  <div className="mt-3 rounded-lg border border-game-border bg-game-canvas/50 p-2.5">
-                    <div className="mb-2 flex items-center justify-between gap-3">
-                      <h3 className="text-xs font-bold text-game-ink">
-                        Pokémon Powers
-                      </h3>
-                      {pokemonResearchLevel < 3 && (
-                        <span
-                          className="flex items-center gap-1 text-[10px] text-game-muted"
-                          title="Research Level 3 required"
-                        >
-                          <LockKeyhole
-                            className="size-3.5"
-                            aria-hidden="true"
-                          />
-                          Locked
-                        </span>
-                      )}
-                    </div>
-                    {pokemonResearchLevel < 3 ? (
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-xs text-game-muted">
-                          Research Level 3 required.
-                        </p>
-                        {selectedPokemonPower && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => void savePokemonPower(null)}
-                            disabled={savingPowerId !== null}
-                            aria-label="Clear Pokémon Power"
-                            title="Clear Pokémon Power"
-                            className="size-8 shrink-0 text-game-muted hover:bg-game-charcoal/5 hover:text-game-ink"
-                          >
-                            {savingPowerId === 'none' ? (
-                              <Loader2
-                                className="size-3.5 animate-spin"
-                                aria-hidden="true"
-                              />
-                            ) : (
-                              <X className="size-3.5" aria-hidden="true" />
-                            )}
-                          </Button>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="custom-scrollbar grid max-h-56 grid-cols-2 gap-2 overflow-y-auto">
-                        <button
-                          type="button"
-                          onClick={() => void savePokemonPower(null)}
-                          disabled={
-                            !selectedPokemonPower || savingPowerId !== null
-                          }
-                          aria-pressed={!selectedPokemonPower}
-                          className={cn(
-                            'game-focus-ring flex min-h-14 items-center gap-2 rounded-lg border p-2 text-left transition-colors disabled:opacity-50',
-                            !selectedPokemonPower
-                              ? 'border-game-charcoal bg-game-charcoal/5'
-                              : 'border-game-border bg-game-surface-raised hover:bg-game-surface',
-                          )}
-                        >
-                          <Sparkles
-                            className="ml-1 size-5 shrink-0 text-game-muted"
-                            aria-hidden="true"
-                          />
-                          <span className="min-w-0 flex-1 truncate text-xs font-semibold text-game-ink">
-                            None
-                          </span>
-                          {!selectedPokemonPower && (
-                            <Check
-                              className="size-3.5 text-game-charcoal"
-                              aria-hidden="true"
-                            />
-                          )}
-                        </button>
-                        {availablePokemonPowers.map((power) => {
-                          const selected = selectedPokemonPower === power.id
-                          return (
-                            <button
-                              key={power.id}
-                              type="button"
-                              onClick={() => void savePokemonPower(power.id)}
-                              disabled={selected || savingPowerId !== null}
-                              aria-pressed={selected}
-                              title={power.description}
-                              className={cn(
-                                'game-focus-ring flex min-h-14 min-w-0 items-center gap-2 rounded-lg border p-2 text-left transition-colors disabled:opacity-50',
-                                selected
-                                  ? 'border-game-charcoal bg-game-charcoal/5'
-                                  : 'border-game-border bg-game-surface-raised hover:bg-game-surface',
-                              )}
-                            >
-                              <ItemSprite
-                                itemId={power.itemId}
-                                alt=""
-                                width={28}
-                                height={28}
-                              />
-                              <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-game-ink">
-                                {power.name}
-                              </span>
-                              {selected ? (
-                                <Check
-                                  className="size-3.5 shrink-0 text-game-charcoal"
-                                  aria-hidden="true"
-                                />
-                              ) : savingPowerId === power.id ? (
-                                <Loader2
-                                  className="size-3.5 shrink-0 animate-spin"
-                                  aria-hidden="true"
-                                />
-                              ) : null}
-                            </button>
-                          )
-                        })}
-                        {availablePokemonPowers.length === 0 && (
-                          <p className="col-span-2 py-3 text-center text-xs text-game-muted">
-                            No Pokémon Powers unlocked.
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </section>
-            )}
           </main>
         )}
       </div>
+
+      {selectedPokemon && (
+        <footer className="z-20 max-h-[48dvh] shrink-0 border-t border-game-border bg-game-surface-raised shadow-[0_-8px_24px_rgba(39,48,43,0.12)]">
+          <div className="custom-scrollbar mx-auto max-h-[48dvh] w-full max-w-4xl overflow-y-auto overscroll-contain px-3 pb-[max(0.7rem,env(safe-area-inset-bottom))] pt-2.5 sm:px-5">
+            <div className="flex items-center gap-2.5">
+              <PokemonRaritySprite
+                formId={selectedPokemon.formId}
+                view="home"
+                rarity={selectedPokemon.rarity}
+                shiny={selectedPokemon.shiny}
+                isShadow={selectedPokemon.isShadow}
+                isRadiant={selectedPokemon.isRadiant}
+                female={getOwnedPokemonGender(selectedPokemon) === 'female'}
+                alt=""
+                className="size-11 shrink-0"
+                sizes="44px"
+              />
+              <div className="min-w-0">
+                <h2 className="truncate font-display text-base font-bold leading-tight text-game-ink">
+                  {selectedPokemon.name || pokemonForm?.name || 'Pokémon'}
+                </h2>
+                <p className="mt-0.5 font-mono text-[11px] text-game-muted">
+                  Lv. {selectedPokemon.level}
+                </p>
+              </div>
+            </div>
+
+            <fieldset
+              className="mt-2 grid grid-cols-3 gap-2"
+              aria-label="Edit selected Pokémon"
+            >
+              <button
+                type="button"
+                data-haptic-manual="true"
+                onClick={() => {
+                  setEditingSection(null)
+                  setMoveWorkspaceOpen(true)
+                }}
+                disabled={!!moveUnlockMessage || savingMoves}
+                aria-label={`Edit moves, ${selectedMoveIds.length} of ${maxMoves} selected`}
+                title={moveUnlockMessage || 'Edit moves'}
+                className="game-focus-ring flex min-h-12 min-w-0 flex-col justify-center rounded-lg border border-game-border bg-game-canvas px-2.5 text-left transition-colors hover:border-game-charcoal disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <span className="text-xs font-bold text-game-ink">Moves</span>
+                <span className="truncate font-mono text-[10px] text-game-muted">
+                  {selectedMoveIds.length}/{maxMoves} assigned
+                </span>
+              </button>
+              <button
+                type="button"
+                data-haptic-manual="true"
+                onClick={() =>
+                  setEditingSection((current) =>
+                    current === 'item' ? null : 'item',
+                  )
+                }
+                aria-pressed={editingSection === 'item'}
+                aria-expanded={editingSection === 'item'}
+                className={cn(
+                  'game-focus-ring flex min-h-12 min-w-0 flex-col justify-center rounded-lg border px-2.5 text-left transition-colors',
+                  editingSection === 'item'
+                    ? 'border-game-charcoal bg-game-charcoal/5'
+                    : 'border-game-border bg-game-canvas hover:border-game-charcoal',
+                )}
+              >
+                <span className="text-xs font-bold text-game-ink">
+                  Held item
+                </span>
+                <span className="truncate text-[10px] text-game-muted">
+                  {currentHeldItem?.name || 'None'}
+                </span>
+              </button>
+              <button
+                type="button"
+                data-haptic-manual="true"
+                onClick={() =>
+                  setEditingSection((current) =>
+                    current === 'power' ? null : 'power',
+                  )
+                }
+                aria-pressed={editingSection === 'power'}
+                aria-expanded={editingSection === 'power'}
+                className={cn(
+                  'game-focus-ring flex min-h-12 min-w-0 flex-col justify-center rounded-lg border px-2.5 text-left transition-colors',
+                  editingSection === 'power'
+                    ? 'border-game-charcoal bg-game-charcoal/5'
+                    : 'border-game-border bg-game-canvas hover:border-game-charcoal',
+                )}
+              >
+                <span className="text-xs font-bold text-game-ink">Power</span>
+                <span className="truncate text-[10px] text-game-muted">
+                  {availablePokemonPowers.find(
+                    (power) => power.id === selectedPokemonPower,
+                  )?.name ||
+                    selectedPokemonPower ||
+                    'None'}
+                </span>
+              </button>
+            </fieldset>
+
+            {moveUnlockMessage && (
+              <p className="mt-1.5 text-[11px] text-game-muted">
+                {moveUnlockMessage}
+              </p>
+            )}
+
+            {editingSection === 'item' && (
+              <div className="mt-2 border-t border-game-border pt-2">
+                <p className="mb-1.5 text-xs font-semibold text-game-ink">
+                  Choose a held item
+                </p>
+                {heldItemUnlockMessage ? (
+                  <p className="text-xs text-game-muted">
+                    {heldItemUnlockMessage}
+                  </p>
+                ) : (
+                  <fieldset
+                    className="custom-scrollbar flex gap-2 overflow-x-auto overscroll-x-contain pb-1"
+                    aria-label="Held item choices"
+                  >
+                    <button
+                      type="button"
+                      data-haptic-manual="true"
+                      onClick={() => void saveHeldItem(null)}
+                      disabled={!currentHeldItemId || savingHeldItemId !== null}
+                      aria-pressed={!currentHeldItemId}
+                      className={cn(
+                        'game-focus-ring flex min-h-14 min-w-28 shrink-0 flex-col justify-center rounded-lg border px-3 text-left disabled:opacity-50',
+                        !currentHeldItemId
+                          ? 'border-game-charcoal bg-game-charcoal/5'
+                          : 'border-game-border bg-game-canvas',
+                      )}
+                    >
+                      <span className="text-xs font-semibold text-game-ink">
+                        None
+                      </span>
+                    </button>
+                    {heldItemOptions.map((item) => {
+                      const skillLock = getItemSkillLockReason(
+                        item,
+                        user?.skills,
+                      )
+                      const selected = currentHeldItemId === item.id
+                      const disabled =
+                        selected ||
+                        !!skillLock ||
+                        savingHeldItemId !== null ||
+                        !!heldItemUnlockMessage
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          data-haptic-manual="true"
+                          onClick={() => void saveHeldItem(item.id)}
+                          disabled={disabled}
+                          aria-pressed={selected}
+                          aria-label={`${item.name}, ${inventoryMap[item.id] || 0} available${skillLock ? `, ${skillLock}` : ''}`}
+                          title={skillLock || item.name}
+                          className={cn(
+                            'game-focus-ring flex min-h-14 min-w-32 shrink-0 items-center gap-2 rounded-lg border px-2.5 text-left disabled:cursor-not-allowed disabled:opacity-50',
+                            selected
+                              ? 'border-game-charcoal bg-game-charcoal/5'
+                              : 'border-game-border bg-game-canvas',
+                          )}
+                        >
+                          <ItemSprite
+                            itemId={item.id}
+                            alt=""
+                            width={32}
+                            height={32}
+                          />
+                          <span className="min-w-0">
+                            <span className="block max-w-28 truncate text-[11px] font-semibold text-game-ink">
+                              {item.name}
+                            </span>
+                            <span className="block font-mono text-[9px] text-game-muted">
+                              x{inventoryMap[item.id] || 0}
+                            </span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                    {heldItemOptions.length === 0 && (
+                      <p className="py-2 text-xs text-game-muted">
+                        No held items in your bag.
+                      </p>
+                    )}
+                  </fieldset>
+                )}
+              </div>
+            )}
+
+            {editingSection === 'power' && (
+              <div className="mt-2 border-t border-game-border pt-2">
+                <p className="mb-1.5 text-xs font-semibold text-game-ink">
+                  Choose a Pokémon Power
+                </p>
+                {pokemonResearchLevel < 3 ? (
+                  <div className="flex min-h-14 items-center justify-between gap-3">
+                    <p className="text-xs text-game-muted">
+                      Research Level 3 required.
+                    </p>
+                    {selectedPokemonPower && (
+                      <button
+                        type="button"
+                        data-haptic-manual="true"
+                        onClick={() => void savePokemonPower(null)}
+                        disabled={savingPowerId !== null}
+                        className="game-focus-ring min-h-10 shrink-0 rounded-lg border border-game-border bg-game-canvas px-3 text-xs font-semibold text-game-ink"
+                      >
+                        Clear power
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <fieldset
+                    className="custom-scrollbar flex gap-2 overflow-x-auto overscroll-x-contain pb-1"
+                    aria-label="Pokémon Power choices"
+                  >
+                    <button
+                      type="button"
+                      data-haptic-manual="true"
+                      onClick={() => void savePokemonPower(null)}
+                      disabled={!selectedPokemonPower || savingPowerId !== null}
+                      aria-pressed={!selectedPokemonPower}
+                      className={cn(
+                        'game-focus-ring flex min-h-14 min-w-28 shrink-0 flex-col justify-center rounded-lg border px-3 text-left disabled:opacity-50',
+                        !selectedPokemonPower
+                          ? 'border-game-charcoal bg-game-charcoal/5'
+                          : 'border-game-border bg-game-canvas',
+                      )}
+                    >
+                      <span className="text-xs font-semibold text-game-ink">
+                        None
+                      </span>
+                    </button>
+                    {availablePokemonPowers.map((power) => {
+                      const selected = selectedPokemonPower === power.id
+                      return (
+                        <button
+                          key={power.id}
+                          type="button"
+                          data-haptic-manual="true"
+                          onClick={() => void savePokemonPower(power.id)}
+                          disabled={selected || savingPowerId !== null}
+                          aria-pressed={selected}
+                          title={power.description}
+                          className={cn(
+                            'game-focus-ring flex min-h-14 min-w-36 shrink-0 items-center gap-2 rounded-lg border px-2.5 text-left disabled:opacity-50',
+                            selected
+                              ? 'border-game-charcoal bg-game-charcoal/5'
+                              : 'border-game-border bg-game-canvas',
+                          )}
+                        >
+                          <ItemSprite
+                            itemId={power.itemId}
+                            alt=""
+                            width={32}
+                            height={32}
+                          />
+                          <span className="truncate text-[11px] font-semibold text-game-ink">
+                            {power.name}
+                          </span>
+                        </button>
+                      )
+                    })}
+                    {availablePokemonPowers.length === 0 && (
+                      <p className="py-2 text-xs text-game-muted">
+                        No Pokémon Powers unlocked.
+                      </p>
+                    )}
+                  </fieldset>
+                )}
+              </div>
+            )}
+          </div>
+        </footer>
+      )}
 
       {selectedPokemon && (
         <>
