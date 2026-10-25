@@ -883,7 +883,22 @@ export function resolvePvpCombat(params: {
     attackType: damageResult.usedType,
   })
   const nextDamage = applyNextDamageModifier(attacker, reductionResult.damage)
-  if (params.doublesDamageModifier && nextDamage.damage>0) nextDamage.damage=Math.max(0,Math.floor(params.doublesDamageModifier(nextDamage.damage,damageResult.usedType,moveStance)))
+  if (
+    params.doublesDamageModifier &&
+    nextDamage.damage > 0 &&
+    specialMove?.damageRule?.type !== 'ohko'
+  ) {
+    nextDamage.damage = Math.max(
+      0,
+      Math.floor(
+        params.doublesDamageModifier(
+          nextDamage.damage,
+          damageResult.usedType,
+          moveStance,
+        ),
+      ),
+    )
+  }
   const typeImmunityBypassAttackTypes =
     getSecondaryStatusTypeImmunityBypassAttackTypes({
       state,
