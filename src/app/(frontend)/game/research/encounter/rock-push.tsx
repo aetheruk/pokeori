@@ -51,6 +51,7 @@ import {
 import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
 import type { TaskCondition } from '@/data/tasks/types'
 import { PokemonSelectionList } from '@/components/game/shared/PokemonSelectionList'
+import { GridAdventurePartyManager } from './grid-adventure-party-manager'
 import type { Pokemon } from '@/payload-types'
 import type {
   GridObjectDefinition,
@@ -396,6 +397,11 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   )
   const hasPushableRocks = screenConfigs.some(
     (screen) => (screen.boulders || []).length > 0,
+  )
+  const hasBattleContent = screenConfigs.some((screen) =>
+    (screen.objects || []).some(
+      (placement) => placement.interaction?.type === 'battle',
+    ),
   )
   const requiredActivitySuccesses =
     encounter.settings.winCondition?.type === 'activity-successes'
@@ -2144,7 +2150,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         </div>
 
         {/* Board Actions */}
-        <div className="flex-none mt-2 mb-12 z-50 flex items-center gap-3">
+        <div className="flex w-full max-w-[min(92vw,500px)] flex-none items-center gap-3 z-50 mt-2 mb-12">
           {hasPushableRocks && (
             <Button
               size="icon"
@@ -2197,6 +2203,11 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             >
               <RefreshCw className="w-5 h-5" />
             </Button>
+          )}
+          {hasBattleContent && gameStarted && !gameEnded && (
+            <div className="ml-auto">
+              <GridAdventurePartyManager />
+            </div>
           )}
         </div>
         {interactionAhead && !interactionAhead.canInteract && (
