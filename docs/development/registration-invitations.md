@@ -1,16 +1,23 @@
 # Registration invitations
 
-Registration uses signed, expiring, single-use invitations. The old shared beta
-code is no longer accepted. Generic Payload user creation is administrator-only;
+Registration accepts either signed, expiring, single-use invitations or a
+reusable shared beta code. Generic Payload user creation is administrator-only;
 the application registration action is the player signup entry point.
 
 ## Configure the signing secret
 
-Generate a random secret with `openssl rand -base64 32` and configure it as
-`BETA_INVITATION_SECRET` in the application runtime and the trusted operator's
-local environment. Keep the same value in both places. Never commit it or put it
-in a `NEXT_PUBLIC_` variable. Missing or short secrets disable registration.
+For individual invitations, generate a random signing secret with
+`openssl rand -base64 32` and configure it as `BETA_INVITATION_SECRET` in the
+application runtime and the trusted operator's local environment. Keep the same
+value in both places. Never commit it or put it in a `NEXT_PUBLIC_` variable.
 Rotating this secret invalidates all unredeemed invitations.
+
+For a reusable shared beta code, configure a nonempty value shorter than 32
+bytes as `BETA_INVITATION_SECRET`. The exact value is accepted directly at
+signup; it does not provide the security or single-use guarantees of signed
+invitations. Anyone who knows the shared code can register. Values of 32 bytes
+or more are treated only as signing secrets and require an issued token. The
+current shared code configuration uses this compatibility mode.
 
 Registration also needs MongoDB transaction support and the existing unique
 `economy-action-receipts.key` index. Follow the performance-index migration in the

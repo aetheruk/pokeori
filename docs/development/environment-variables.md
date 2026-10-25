@@ -2,7 +2,7 @@
 
 Required environment variables for Pokeori.
 
-Audit remediation adds `BETA_INVITATION_SECRET` (at least 32 characters), required to issue/accept signed, expiring, single-use registration invitations. There is no shared public beta-code fallback. See [registration invitations](registration-invitations.md).
+`BETA_INVITATION_SECRET` configures registration access. Values at least 32 bytes long are signing secrets for expiring, single-use invitations; shorter nonempty values are accepted as reusable shared beta codes. See [registration invitations](registration-invitations.md).
 
 The nonce CSP is enforced by default. `CSP_ENFORCE=false` temporarily switches to report-only for diagnosis; restore enforcement after resolving violations. Client Zod validation runs without dynamic code generation, and Payload uses its local default avatar. `GAME_PERFORMANCE_LOGS=true` emits structured sync timing/size measurements without user IDs or game payloads. Leave it off unless collecting a profiling window. `POKEORI_UI_TEST` and `POKEORI_TEST_DIST_DIR` are local test settings, not production deployment inputs.
 

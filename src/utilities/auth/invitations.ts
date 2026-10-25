@@ -13,6 +13,11 @@ export function hasInvitationSecret(secret: string | undefined): secret is strin
   return typeof secret === 'string' && Buffer.byteLength(secret) >= 32
 }
 
+/** A short configured value is a reusable shared beta code, not an HMAC key. */
+export function hasConfiguredInvitationCode(code: string | undefined): code is string {
+  return typeof code === 'string' && code.length > 0
+}
+
 /** Offline issuance; only the server/operator holds the signing key. */
 export function issueRegistrationInvitation(secret: string, lifetimeSeconds = 7 * 24 * 60 * 60, now = Date.now()) {
   if (!hasInvitationSecret(secret)) throw new Error('Invitation signing secret must contain at least 32 bytes')
@@ -26,7 +31,15 @@ export function issueRegistrationInvitation(secret: string, lifetimeSeconds = 7 
 }
 
 export function verifyRegistrationInvitation(token: string, secret: string | undefined, now = Date.now()): RegistrationInvitation | null {
-  if (!hasInvitationSecret(secret) || typeof token !== 'string' || token.length > 256) return null
+  if (!hasConfiguredInvitationCode(secret) || typeof token !== 'string' || token.length > 256) return null
+
+  // Preserve the existing short shared beta code configuration. It is reusable
+  // by design; only long, random values are treated as signing keys.
+  if (!hasInvitationSecret(secret)) {
+    if (token !== secret) return null
+    return { id: randomUUID(), exp: Math.floor(now / 1000) + 60 }
+  }
+
   const parts = token.split('.')
   if (parts.length !== 3 || parts[0] !== 'v1' || !/^[a-zA-Z0-9_-]+$/.test(parts[1]) || !/^[a-zA-Z0-9_-]{43}$/.test(parts[2])) return null
   const expected = createHmac('sha256', secret).update(`v1.${parts[1]}`).digest('base64url')
