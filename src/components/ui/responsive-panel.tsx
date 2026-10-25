@@ -34,6 +34,8 @@ export interface ResponsivePanelProps {
   /** Retained for call-site compatibility. Use showHero to opt out of the scenic title frame. */
   showHeader?: boolean
   showCloseButton?: boolean
+  closeButtonClassName?: string
+  closeIconClassName?: string
   dismissible?: boolean
   headerClassName?: string
   className?: string
@@ -73,6 +75,8 @@ export function ResponsivePanel({
   trigger,
   showHeader = true,
   showCloseButton = true,
+  closeButtonClassName,
+  closeIconClassName,
   dismissible = true,
   headerClassName,
   className,
@@ -113,9 +117,10 @@ export function ResponsivePanel({
         'game-focus-ring absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-50 flex size-11 items-center justify-center rounded-full border border-white/55 bg-game-night-canvas/55 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-game-night-canvas/75 focus-visible:ring-white/80',
         !showHero &&
           'border-game-border/60 bg-game-night-surface/80 text-white hover:bg-game-night-surface',
+        closeButtonClassName,
       )}
     >
-      <XIcon className="size-5" aria-hidden="true" />
+      <XIcon className={closeIconClassName || 'size-5'} aria-hidden="true" />
       <span className="sr-only">Close</span>
     </DialogClose>
   ) : null
@@ -233,7 +238,9 @@ export function ResponsivePanel({
           </>
         )}
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+        <div className="flex min-h-0 min-w-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto">
+          {children}
+        </div>
       </DialogContent>
     </Dialog>
   )

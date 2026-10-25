@@ -572,7 +572,9 @@ export function GridAdventurePartyManager() {
       title="Battle team"
       description="Reorder your team and prepare each Pokémon."
       showHero={false}
-      className="game-paper-first flex w-full flex-col overflow-hidden bg-game-canvas p-0 text-game-ink"
+      closeButtonClassName="right-3 top-[max(0.75rem,env(safe-area-inset-top))] size-8 rounded-md border-0 bg-transparent text-game-muted shadow-none backdrop-blur-none hover:bg-game-charcoal/5 hover:text-game-ink focus-visible:ring-game-charcoal/50"
+      closeIconClassName="size-4"
+      className="game-paper-first flex w-full min-w-0 flex-col overflow-hidden bg-game-canvas p-0 text-game-ink"
       trigger={
         <Button
           type="button"
@@ -586,18 +588,13 @@ export function GridAdventurePartyManager() {
         </Button>
       }
     >
-      <header className="z-10 shrink-0 border-b border-game-border bg-game-surface-raised px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] pr-20 shadow-sm sm:px-6">
-        <div className="mx-auto flex w-full max-w-4xl items-center gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-game-border bg-game-canvas">
-            <ItemSprite itemId="poke-ball" alt="" width={29} height={29} />
-          </span>
+      <header className="z-10 w-full min-w-0 shrink-0 border-b border-game-border bg-game-surface-raised px-4 pb-2.5 pt-[max(0.75rem,env(safe-area-inset-top))] pr-14 shadow-sm sm:px-6 sm:pr-16">
+        <div className="mx-auto flex w-full min-w-0 max-w-4xl items-center gap-2.5">
+          <ItemSprite itemId="poke-ball" alt="" width={28} height={28} />
           <div className="min-w-0">
             <h1 className="font-display text-lg font-bold leading-tight text-game-ink">
               Battle team
             </h1>
-            <p className="mt-0.5 text-xs text-game-muted">
-              Hold and drag cards to reorder
-            </p>
           </div>
           {sortedTeam.length > 0 && (
             <span className="ml-auto rounded-full border border-game-border bg-game-canvas px-2.5 py-1 font-mono text-xs font-semibold text-game-ink">
@@ -607,7 +604,7 @@ export function GridAdventurePartyManager() {
         </div>
       </header>
 
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-5">
+      <div className="custom-scrollbar min-h-0 min-w-0 w-full max-w-full flex-1 overflow-x-hidden overflow-y-auto overscroll-contain p-3 sm:p-5">
         {loading ? (
           <div
             className="flex min-h-40 items-center justify-center text-sm text-game-muted"
@@ -632,7 +629,7 @@ export function GridAdventurePartyManager() {
             </p>
           </div>
         ) : (
-          <main className="mx-auto w-full max-w-4xl">
+          <main className="mx-auto w-full min-w-0 max-w-4xl">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -683,9 +680,9 @@ export function GridAdventurePartyManager() {
       </div>
 
       {selectedPokemon && (
-        <footer className="z-20 max-h-[48dvh] shrink-0 border-t border-game-border bg-game-surface-raised shadow-[0_-8px_24px_rgba(39,48,43,0.12)]">
-          <div className="custom-scrollbar mx-auto max-h-[48dvh] w-full max-w-4xl overflow-y-auto overscroll-contain px-3 pb-[max(0.7rem,env(safe-area-inset-bottom))] pt-2.5 sm:px-5">
-            <div className="flex items-center gap-2.5">
+        <footer className="z-20 w-full min-w-0 max-w-full shrink-0 overflow-hidden border-t border-game-border bg-game-surface-raised shadow-[0_-4px_16px_rgba(39,48,43,0.1)]">
+          <div className="mx-auto w-full min-w-0 max-w-4xl px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 sm:px-5">
+            <div className="flex min-w-0 items-center gap-2">
               <PokemonRaritySprite
                 formId={selectedPokemon.formId}
                 view="home"
@@ -695,21 +692,21 @@ export function GridAdventurePartyManager() {
                 isRadiant={selectedPokemon.isRadiant}
                 female={getOwnedPokemonGender(selectedPokemon) === 'female'}
                 alt=""
-                className="size-11 shrink-0"
-                sizes="44px"
+                className="size-9 shrink-0"
+                sizes="36px"
               />
-              <div className="min-w-0">
-                <h2 className="truncate font-display text-base font-bold leading-tight text-game-ink">
+              <div className="flex min-w-0 items-baseline gap-2">
+                <h2 className="min-w-0 truncate font-display text-sm font-bold leading-tight text-game-ink">
                   {selectedPokemon.name || pokemonForm?.name || 'Pokémon'}
                 </h2>
-                <p className="mt-0.5 font-mono text-[11px] text-game-muted">
+                <span className="shrink-0 font-mono text-[10px] text-game-muted">
                   Lv. {selectedPokemon.level}
-                </p>
+                </span>
               </div>
             </div>
 
             <fieldset
-              className="mt-2 grid grid-cols-3 gap-2"
+              className="mt-2 grid min-w-0 grid-cols-3 gap-1.5"
               aria-label="Edit selected Pokémon"
             >
               <button
@@ -722,11 +719,11 @@ export function GridAdventurePartyManager() {
                 disabled={!!moveUnlockMessage || savingMoves}
                 aria-label={`Edit moves, ${selectedMoveIds.length} of ${maxMoves} selected`}
                 title={moveUnlockMessage || 'Edit moves'}
-                className="game-focus-ring flex min-h-12 min-w-0 flex-col justify-center rounded-lg border border-game-border bg-game-canvas px-2.5 text-left transition-colors hover:border-game-charcoal disabled:cursor-not-allowed disabled:opacity-50"
+                className="game-focus-ring flex min-h-11 min-w-0 flex-col justify-center rounded-lg border border-game-border bg-game-canvas px-2 text-left transition-colors hover:border-game-charcoal disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <span className="text-xs font-bold text-game-ink">Moves</span>
+                <span className="text-[11px] font-bold text-game-ink">Moves</span>
                 <span className="truncate font-mono text-[10px] text-game-muted">
-                  {selectedMoveIds.length}/{maxMoves} assigned
+                  {selectedMoveIds.length}/{maxMoves}
                 </span>
               </button>
               <button
@@ -740,15 +737,13 @@ export function GridAdventurePartyManager() {
                 aria-pressed={editingSection === 'item'}
                 aria-expanded={editingSection === 'item'}
                 className={cn(
-                  'game-focus-ring flex min-h-12 min-w-0 flex-col justify-center rounded-lg border px-2.5 text-left transition-colors',
+                  'game-focus-ring flex min-h-11 min-w-0 flex-col justify-center rounded-lg border px-2 text-left transition-colors',
                   editingSection === 'item'
                     ? 'border-game-charcoal bg-game-charcoal/5'
                     : 'border-game-border bg-game-canvas hover:border-game-charcoal',
                 )}
               >
-                <span className="text-xs font-bold text-game-ink">
-                  Held item
-                </span>
+                <span className="text-[11px] font-bold text-game-ink">Item</span>
                 <span className="truncate text-[10px] text-game-muted">
                   {currentHeldItem?.name || 'None'}
                 </span>
@@ -764,13 +759,13 @@ export function GridAdventurePartyManager() {
                 aria-pressed={editingSection === 'power'}
                 aria-expanded={editingSection === 'power'}
                 className={cn(
-                  'game-focus-ring flex min-h-12 min-w-0 flex-col justify-center rounded-lg border px-2.5 text-left transition-colors',
+                  'game-focus-ring flex min-h-11 min-w-0 flex-col justify-center rounded-lg border px-2 text-left transition-colors',
                   editingSection === 'power'
                     ? 'border-game-charcoal bg-game-charcoal/5'
                     : 'border-game-border bg-game-canvas hover:border-game-charcoal',
                 )}
               >
-                <span className="text-xs font-bold text-game-ink">Power</span>
+                <span className="text-[11px] font-bold text-game-ink">Power</span>
                 <span className="truncate text-[10px] text-game-muted">
                   {availablePokemonPowers.find(
                     (power) => power.id === selectedPokemonPower,
@@ -788,17 +783,14 @@ export function GridAdventurePartyManager() {
             )}
 
             {editingSection === 'item' && (
-              <div className="mt-2 border-t border-game-border pt-2">
-                <p className="mb-1.5 text-xs font-semibold text-game-ink">
-                  Choose a held item
-                </p>
+              <div className="mt-2 w-full min-w-0 max-w-full overflow-hidden border-t border-game-border pt-2">
                 {heldItemUnlockMessage ? (
                   <p className="text-xs text-game-muted">
                     {heldItemUnlockMessage}
                   </p>
                 ) : (
                   <fieldset
-                    className="custom-scrollbar flex gap-2 overflow-x-auto overscroll-x-contain pb-1"
+                    className="custom-scrollbar flex w-full min-w-0 max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-1 touch-pan-x"
                     aria-label="Held item choices"
                   >
                     <button
@@ -874,10 +866,7 @@ export function GridAdventurePartyManager() {
             )}
 
             {editingSection === 'power' && (
-              <div className="mt-2 border-t border-game-border pt-2">
-                <p className="mb-1.5 text-xs font-semibold text-game-ink">
-                  Choose a Pokémon Power
-                </p>
+              <div className="mt-2 w-full min-w-0 max-w-full overflow-hidden border-t border-game-border pt-2">
                 {pokemonResearchLevel < 3 ? (
                   <div className="flex min-h-14 items-center justify-between gap-3">
                     <p className="text-xs text-game-muted">
@@ -897,7 +886,7 @@ export function GridAdventurePartyManager() {
                   </div>
                 ) : (
                   <fieldset
-                    className="custom-scrollbar flex gap-2 overflow-x-auto overscroll-x-contain pb-1"
+                    className="custom-scrollbar flex w-full min-w-0 max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-1 touch-pan-x"
                     aria-label="Pokémon Power choices"
                   >
                     <button
