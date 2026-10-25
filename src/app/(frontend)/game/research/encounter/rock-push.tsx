@@ -2164,34 +2164,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
               <Undo2 className="w-5 h-5" />
             </Button>
           )}
-          <Button
-            size="icon"
-            variant="outline"
-            className="h-12 w-12 rounded-full border-2 border-game-charcoal bg-game-charcoal text-2xl font-black text-game-cream shadow-sm hover:bg-game-charcoal-strong disabled:opacity-35"
-            onClick={interactWithGridObject}
-            disabled={
-              !interactionAhead ||
-              (interactionAhead && !interactionAhead.canInteract) ||
-              gameEnded ||
-              isSliding
-            }
-            aria-label={
-              interactionAhead
-                ? interactionAhead.canInteract
-                  ? `Interact with ${interactionAhead.definition.name}`
-                  : `Entry criteria not met for ${interactionAhead.definition.name}`
-                : 'No object in front to interact with'
-            }
-            title={
-              interactionAhead
-                ? interactionAhead.canInteract
-                  ? `Interact with ${interactionAhead.definition.name} (E)`
-                  : `Entry criteria not met for ${interactionAhead.definition.name}`
-                : 'Face an object to interact (E)'
-            }
-          >
-            A
-          </Button>
           {hasPushableRocks && (
             <Button
               size="icon"
@@ -2234,6 +2206,36 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
         {/* Mobile Controls */}
         <div className="flex-none max-w-[200px] w-full z-40 mb-8">
+          <div className="mb-2 flex justify-center">
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-12 w-12 rounded-full border-2 border-game-charcoal bg-game-charcoal text-2xl font-black text-game-cream shadow-sm hover:bg-game-charcoal-strong disabled:opacity-35"
+              onClick={interactWithGridObject}
+              disabled={
+                !interactionAhead ||
+                (interactionAhead && !interactionAhead.canInteract) ||
+                gameEnded ||
+                isSliding
+              }
+              aria-label={
+                interactionAhead
+                  ? interactionAhead.canInteract
+                    ? `Interact with ${interactionAhead.definition.name}`
+                    : `Entry criteria not met for ${interactionAhead.definition.name}`
+                  : 'No object in front to interact with'
+              }
+              title={
+                interactionAhead
+                  ? interactionAhead.canInteract
+                    ? `Interact with ${interactionAhead.definition.name} (E)`
+                    : `Entry criteria not met for ${interactionAhead.definition.name}`
+                  : 'Face an object to interact (E)'
+              }
+            >
+              A
+            </Button>
+          </div>
           <div className="grid grid-cols-3 gap-2 mx-auto">
             <div />
             <Button
