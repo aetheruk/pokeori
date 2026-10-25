@@ -1,6 +1,6 @@
 # Account and game-state access
 
-Generic Users creation is administrator-only; player signup uses the validated invitation action. Invitations are signed, expiring and single-use, with account creation and redemption in one MongoDB transaction. See [registration invitations](../development/registration-invitations.md) for issuance and configuration. Owner-scoped account updates retain Payload's built-in email/password fields and trainer name.
+Generic Users creation is administrator-only; player signup uses the validated invitation action. Signup supports signed, expiring, single-use invitations or a reusable shared beta code, with account creation and invitation receipt in one MongoDB transaction. See [registration invitations](../development/registration-invitations.md) for issuance and configuration. Owner-scoped account updates retain Payload's built-in email/password fields and trainer name.
 
 All other authored writable fields are server-controlled by default. Their field-level create/update access requires an authenticated admin; this includes `isAdmin`, currency, skills, profile selections/unlocks, kid mode, collection capacity, statistics, gifts, friends, voyages, and weather state. Join/UI fields are excluded from this policy. New authored game fields inherit protection automatically.
 

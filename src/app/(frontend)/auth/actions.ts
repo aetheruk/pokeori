@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation'
 import { createHash } from 'node:crypto'
 import { getClientIp, rateLimit } from '@/utilities/rate-limiter'
 import { registrationSchema } from '@/utilities/auth/registration-validation'
-import { hasInvitationSecret, verifyRegistrationInvitation } from '@/utilities/auth/invitations'
+import { hasConfiguredInvitationCode, verifyRegistrationInvitation } from '@/utilities/auth/invitations'
 import { registerInvitedAccount } from '@/utilities/auth/register-invited-account'
 
 export async function login(prevState: unknown, formData: FormData) {
@@ -69,7 +69,7 @@ export async function register(prevState: unknown, formData: FormData) {
     const emailKey = createHash('sha256').update(email).digest('hex')
     const emailLimit = await rateLimit('registration-email', emailKey, 5, 3600)
     if (!emailLimit.allowed) return { error: 'Too many registration attempts. Please try again later.' }
-    if (!hasInvitationSecret(process.env.BETA_INVITATION_SECRET)) return { error: 'Registration is temporarily unavailable.' }
+    if (!hasConfiguredInvitationCode(process.env.BETA_INVITATION_SECRET)) return { error: 'Registration is temporarily unavailable.' }
     const invitation = verifyRegistrationInvitation(betaCode, process.env.BETA_INVITATION_SECRET)
     if (!invitation) {
       return { error: 'Invalid or expired invitation code' }

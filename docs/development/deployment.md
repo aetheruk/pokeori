@@ -162,7 +162,7 @@ Configure runtime values in Coolify and the build key in GitHub Actions, never i
 | `PAYLOAD_SECRET` | Disabled; compiler uses a placeholder | Required, stable private secret |
 | `RESEND_API_KEY` | Disabled; compiler uses a placeholder | Required |
 | `NEXT_PUBLIC_APP_URL` | Production URL | Production URL |
-| `BETA_INVITATION_SECRET` | Disabled | Private signing secret, at least 32 characters; required for restricted registration |
+| `BETA_INVITATION_SECRET` | Disabled | Runtime signing secret (at least 32 bytes) or nonempty short shared beta code |
 | `CSP_ENFORCE` | Disabled | Enforcement is the default; `false` explicitly selects report-only |
 | `TRUSTED_PROXY_HOPS` | Disabled | Number of trusted proxies counted from the right of X-Forwarded-For; default 1 |
 | `GAME_PERFORMANCE_LOGS` | Disabled | Optional privacy-safe timing/size diagnostics |
