@@ -20,6 +20,12 @@ export interface CoinPusherBoard {
   bodies: CoinPusherBody[]
 }
 
+export type CoinPusherFrameBody = Pick<CoinPusherBody, 'id' | 'shelf' | 'kind' | 'prizeId' | 'x' | 'y'>
+export interface CoinPusherFrame {
+  tick: number
+  bodies: CoinPusherFrameBody[]
+}
+
 export const COIN_PUSHER_WIDTH = 320
 export const COIN_PUSHER_DEPTH = 170
 const RADIUS = 12
@@ -88,8 +94,10 @@ export function advanceCoinPusher(
       Matter.Bodies.rectangle(160, -8, 320, 16, { isStatic: true }),
     ])
   }
-  const pushers = engines.map((engine) => {
-    const body = Matter.Bodies.rectangle(160, 20, 320, 20, { isStatic: true, friction: 0.1 })
+  const pusherY = (tick: number, shelf: number) =>
+    20 + (1 - Math.cos(tick / 90 * Math.PI * 2 + shelf * Math.PI / 2)) * 15
+  const pushers = engines.map((engine, shelf) => {
+    const body = Matter.Bodies.rectangle(160, pusherY(board.tick, shelf), 320, 20, { isStatic: true, friction: 0.1 })
     Matter.Composite.add(engine.world, body)
     return body
   })
@@ -102,8 +110,14 @@ export function advanceCoinPusher(
     mappings.set(data.id, { data, body })
   }
   board.bodies.forEach(add)
-  const pusherY = (tick: number, shelf: number) =>
-    20 + (1 - Math.cos(tick / 90 * Math.PI * 2 + shelf * Math.PI / 2)) * 15
+  const frames: CoinPusherFrame[] = []
+  const captureFrame = () => {
+    frames.push({ tick: board.tick, bodies: Array.from(mappings.values(), ({ data, body }) => ({
+      id: data.id, shelf: data.shelf, kind: data.kind, prizeId: data.prizeId,
+      x: Math.round(body.position.x * 10) / 10, y: Math.round(body.position.y * 10) / 10,
+    })) })
+  }
+  captureFrame()
   for (const position of drops) {
     const data: CoinPusherBody = { id: board.nextId++, shelf: 0, kind: 'coin', x: 20 + position * 280, y: pusherY(board.tick, 0) + 25, vx: 0, vy: 3 }
     board.bodies.push(data)
@@ -118,6 +132,7 @@ export function advanceCoinPusher(
       }
     }
   }
+  if (drops.length) captureFrame()
   let coinsWon = 0
   const prizesWon: string[] = []
   for (let step = 0; step < steps; step++) {
@@ -154,6 +169,7 @@ export function advanceCoinPusher(
         prizesWon.push(data.prizeId)
       }
     }
+    if ((step + 1) % 10 === 0 || step + 1 === steps) captureFrame()
   }
   board.bodies = Array.from(mappings.values(), ({ data, body }) => ({
     ...data, x: body.position.x, y: body.position.y, vx: body.velocity.x, vy: body.velocity.y,
@@ -163,5 +179,5 @@ export function advanceCoinPusher(
     Matter.Composite.clear(engine.world, false)
     Matter.Engine.clear(engine)
   }
-  return { board, coinsWon, prizesWon, sideLosses }
+  return { board, coinsWon, prizesWon, sideLosses, frames }
 }
