@@ -421,6 +421,13 @@ describe('blackout void chronicles and time divergence', () => {
         targetId: 'celadon-timeline-divergence',
       }),
     )
+    expect(saffronAvoidance?.requirements).toContainEqual({
+      type: 'battle_result',
+      targetId: 'fuchsia-gym-leader-koga',
+      battleStatus: 'win',
+      count: 1,
+      inverse: true,
+    })
 
     expect(route16Snorlax).toBeDefined()
     expect(route16Snorlax?.subCategory).toBe('Celadon City')
