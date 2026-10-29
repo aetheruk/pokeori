@@ -623,11 +623,11 @@ export function PokemonSnapGame({
             {/* Viewfinder HUD */}
             <div className="pointer-events-none absolute inset-0 z-10 border-[16px] border-[#081014]/80">
               {/* Corner crosshairs */}
-              <div className="absolute left-4 top-4 h-8 w-8 border-l-4 border-t-4 border-[#f7ecd6]/50" />
-              <div className="absolute right-4 top-4 h-8 w-8 border-r-4 border-t-4 border-[#f7ecd6]/50" />
-              <div className="absolute bottom-4 left-4 h-8 w-8 border-b-4 border-l-4 border-[#f7ecd6]/50" />
-              <div className="absolute bottom-4 right-4 h-8 w-8 border-b-4 border-r-4 border-[#f7ecd6]/50" />
-              <div className="absolute left-1/2 top-1/2 hidden h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f7ecd6]/30 sm:block">
+              <div className="absolute left-4 top-4 h-8 w-8 border-l-4 border-t-4 border-[#f9f9f9]/50" />
+              <div className="absolute right-4 top-4 h-8 w-8 border-r-4 border-t-4 border-[#f9f9f9]/50" />
+              <div className="absolute bottom-4 left-4 h-8 w-8 border-b-4 border-l-4 border-[#f9f9f9]/50" />
+              <div className="absolute bottom-4 right-4 h-8 w-8 border-b-4 border-r-4 border-[#f9f9f9]/50" />
+              <div className="absolute left-1/2 top-1/2 hidden h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f9f9f9]/30 sm:block">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-red-500/80 rounded-full" />
               </div>
             </div>
@@ -658,7 +658,7 @@ export function PokemonSnapGame({
                     <div className="absolute inset-0 animate-ping rounded-full border-2 border-game-ochre/30" />
                     <div className="absolute inset-2 animate-ping rounded-full border-2 border-game-ochre/50 [animation-delay:300ms]" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Camera className="h-6 w-6 text-[#f7ecd6]" />
+                      <Camera className="h-6 w-6 text-[#f9f9f9]" />
                     </div>
                   </div>
                 </div>

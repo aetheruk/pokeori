@@ -507,10 +507,10 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
               timeLeft={countdown}
               totalTime={3}
               size="xl"
-              className="text-[#fff8e8] drop-shadow-xl"
+              className="text-[#f9f9f9] drop-shadow-xl"
               colorOverride="text-[#f0cc75]"
             />
-            <p className="mt-5 rounded-md border border-[#fff8e8]/25 bg-[#102f3a]/75 px-4 py-2 text-center text-sm font-semibold text-[#fff8e8] shadow-lg">
+            <p className="mt-5 rounded-md border border-[#f9f9f9]/25 bg-[#102f3a]/75 px-4 py-2 text-center text-sm font-semibold text-[#f9f9f9] shadow-lg">
               Drag side to side to steer
             </p>
           </div>

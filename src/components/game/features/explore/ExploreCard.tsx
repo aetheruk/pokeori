@@ -393,7 +393,7 @@ function ExploreCardComponent({
                       )}
                       {groupedItem.type === 'game' &&
                         /\s+EX$/i.test(groupedItem.name) && (
-                          <span className="absolute inset-x-0 bottom-0 z-10 text-center text-[9px] font-black italic leading-[9px] text-game-charcoal [text-shadow:0_0_2px_#fff8e8]">
+                          <span className="absolute inset-x-0 bottom-0 z-10 text-center text-[9px] font-black italic leading-[9px] text-game-charcoal [text-shadow:0_0_2px_#f9f9f9]">
                             EX
                           </span>
                         )}

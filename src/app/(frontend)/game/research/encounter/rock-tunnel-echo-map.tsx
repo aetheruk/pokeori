@@ -583,7 +583,7 @@ export function RockTunnelEchoMapGame({
           )}
           {introText && (
             <div
-              className="mt-6 rounded-full border border-[#f7ecd6]/15 bg-[#f7ecd6]/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#f7ecd6]"
+              className="mt-6 rounded-full border border-[#f9f9f9]/15 bg-[#f9f9f9]/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#f9f9f9]"
               role="status"
               aria-live="polite"
             >

@@ -333,7 +333,7 @@ export function SlidingPuzzleGame({
                   >
                     {(puzzleImage || currentPokemon) && (
                       <div
-                        className="absolute inset-0 h-full w-full bg-[#e8dcc5]"
+                        className="absolute inset-0 h-full w-full bg-[#f9f9f9]"
                         style={{
                           backgroundImage: puzzleImage
                             ? `url(${puzzleImage})`
