@@ -1223,6 +1223,18 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
     })
     .passthrough(),
   pachinko: pachinkoSettingsSchema,
+  'coin-pusher': z.object({
+    cost: costSchema.extend({ amount: z.number().int().positive().max(1000000) }),
+    payout: costSchema.extend({ amount: z.number().int().positive().max(1000000) }),
+    bubbleChance: z.number().min(0).max(1),
+    maxBubbles: z.number().int().min(0).max(10),
+    prizePool: z.array(z.object({
+      id: z.string().min(1),
+      weight: z.number().positive(),
+      icon: taskIconSchema,
+      rewards: z.array(rewardSchema).min(1),
+    }).strict()).min(1),
+  }).strict(),
   'ufo-catcher': ufoCatcherSettingsSchema,
   'prize-wheel': z
     .object({

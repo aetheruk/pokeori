@@ -31,6 +31,7 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   surf: dynamic(() => import('@/app/(frontend)/game/research/encounter/surf').then((module) => module.SurfGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   slots: dynamic(() => import('@/app/(frontend)/game/research/encounter/slots').then((module) => module.SlotGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   pachinko: dynamic(() => import('@/app/(frontend)/game/research/encounter/pachinko').then((module) => module.PachinkoGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
+  'coin-pusher': dynamic(() => import('@/app/(frontend)/game/research/encounter/coin-pusher').then((module) => module.CoinPusherGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   'ufo-catcher': dynamic(() => import('@/app/(frontend)/game/research/encounter/ufo-catcher').then((module) => module.UfoCatcherGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   'prize-wheel': dynamic(() => import('@/app/(frontend)/game/research/encounter/prize-wheel').then((module) => module.PrizeWheelGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
   fishing: dynamic(() => import('@/app/(frontend)/game/research/encounter/fishing').then((module) => module.FishingGame), { loading: GameLoading }) as unknown as ComponentType<GameProps>,
