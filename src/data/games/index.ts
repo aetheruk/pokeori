@@ -54,6 +54,9 @@ export { slotGames } from './slots'
 export type { PachinkoGameConfig } from './pachinko/types'
 export { pachinkoGames } from './pachinko'
 
+export type { CoinPusherGameConfig, CoinPusherSettings } from './coin-pusher/types'
+export { coinPusherGames } from './coin-pusher'
+
 // UFO Catcher game
 export type {
   UfoCatcherGameConfig,
@@ -192,6 +195,7 @@ import { basicEntries as flapGames } from './flap'
 import { surfGames } from './surf'
 import { slotGames } from './slots'
 import { pachinkoGames } from './pachinko'
+import { coinPusherGames } from './coin-pusher'
 import { ufoCatcherGames } from './ufo-catcher'
 import { chanseyEntries as prizeWheelGames } from './prize-wheel'
 import { fishingGames } from './fishing'
@@ -224,6 +228,7 @@ export type GameType =
   | 'surf'
   | 'slots'
   | 'pachinko'
+  | 'coin-pusher'
   | 'ufo-catcher'
   | 'prize-wheel'
   | 'fishing'
@@ -339,6 +344,10 @@ export interface GameSettings {
   showSlotLabels?: boolean
   // Pachinko specific
   board?: import('./pachinko/types').PachinkoBoard
+  payout?: import('./coin-pusher/types').CoinPusherSettings['payout']
+  prizePool?: import('./coin-pusher/types').CoinPusherPrize[]
+  bubbleChance?: number
+  maxBubbles?: number
   ballRadius?: number
   ballBounciness?: number
   gravityScale?: number
@@ -490,6 +499,7 @@ export const allGames: GameItem[] = [
   ...surfGames.map((g) => ({ ...g, gameType: 'surf' as const })),
   ...slotGames.map((g) => ({ ...g, gameType: 'slots' as const })),
   ...pachinkoGames.map((g) => ({ ...g, gameType: 'pachinko' as const })),
+  ...coinPusherGames,
   ...ufoCatcherGames.map(
     (g) =>
       ({ ...g, gameType: 'ufo-catcher' as const }) as unknown as GameItem,

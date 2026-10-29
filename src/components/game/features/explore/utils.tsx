@@ -97,6 +97,8 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <Coins className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'pachinko')
         return <CircleDot className="w-4 h-4 text-game-moss-strong" />
+      if (gameType === 'coin-pusher')
+        return <Coins className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'ufo-catcher')
         return <Joystick className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'prize-wheel')
@@ -208,6 +210,8 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'SLOTS'
     case 'pachinko':
       return 'PACHINKO'
+    case 'coin-pusher':
+      return 'COIN PUSHER'
     case 'ufo-catcher':
       return 'UFO CATCHER'
     case 'prize-wheel':

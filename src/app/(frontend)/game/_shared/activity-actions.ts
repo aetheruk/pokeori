@@ -145,6 +145,8 @@ import type { RockTunnelEchoMapSettings } from '@/data/games/rock-tunnel-echo-ma
 import type { VoltorbGridSettings } from '@/data/games/voltorb-grid/types'
 import type { RockPushGameConfig } from '@/data/games/rock-push/types'
 import type { PachinkoGameConfig, PachinkoGameSettings } from '@/data/games/pachinko/types'
+import type { CoinPusherSettings } from '@/data/games/coin-pusher/types'
+import { createCoinPusherBoard, type CoinPusherBoard } from '@/utilities/research/coin-pusher-simulation'
 import type { GridObjectPlacement } from '@/data/games/grid-tiles/types'
 import type { TaskCondition } from '@/data/tasks/types'
 import {
@@ -222,6 +224,11 @@ export interface GameActivityState {
   }
   // Pachinko specific
   pachinkoSession?: {
+    totalRewards: any
+    totalCost: number
+  }
+  coinPusherSession?: {
+    board: CoinPusherBoard
     totalRewards: any
     totalCost: number
   }
@@ -1867,7 +1874,9 @@ export async function startGameActivity(
       )
 
       let roundData: any
-      if (isArcadeGameType(encounter.gameType)) {
+      if (encounter.gameType === 'coin-pusher') {
+        expiry = startTime + 7_200_000
+      } else if (isArcadeGameType(encounter.gameType)) {
         roundData = createArcadeRound(encounter.gameType, getArcadeSessionSettings(encounter.gameType, encounter.settings, sessionTimeLimit), startTime, randomInt(0, 2 ** 32))
         // Simulation time bounds gameplay; the durable lifetime also permits
         // paused tabs and network-recovery retries without consuming play time.
@@ -2291,7 +2300,8 @@ export async function startGameActivity(
         gridAdventureRollSnapshot:
           domain === 'grid-adventure' ? gridAdventureRollSnapshot : undefined,
         eventConfigSnapshot:
-          domain === 'field-research' || domain === 'grid-adventure'
+          domain === 'field-research' || domain === 'grid-adventure' ||
+          (encounter.gameType === 'coin-pusher' && encounter.gridAdventureOnly)
             ? encounter
             : undefined,
         startTime,
@@ -2311,13 +2321,18 @@ export async function startGameActivity(
         activeAbilityId,
         activeAbilitySourceFormId,
         slotsSession: slotsSessionData,
+        coinPusherSession: encounter.gameType === 'coin-pusher' ? {
+          board: createCoinPusherBoard(encounter.settings as CoinPusherSettings, () => randomInt(0, 1_000_000) / 1_000_000),
+          totalRewards: {},
+          totalCost: 0,
+        } : undefined,
       }
 
       // Endless mode games use per-turn timers and can run indefinitely - use 1 hour TTL
       const isEndlessMode =
         (encounter as any).settings?.endless?.enabled || false
       const sessionTTL =
-        isArcadeGameType(encounter.gameType) || encounter.gameType === 'underground-mining'
+        isArcadeGameType(encounter.gameType) || encounter.gameType === 'underground-mining' || encounter.gameType === 'coin-pusher'
           ? Math.ceil((expiry - startTime) / 1000) + 120
           : isEndlessMode || encounter.gameType === 'tcg-battle'
           ? 3600
@@ -3525,6 +3540,7 @@ export async function completeGameActivity(
       const isGamblingGame =
         encounter.gameType === 'slots' ||
         encounter.gameType === 'pachinko' ||
+        encounter.gameType === 'coin-pusher' ||
         encounter.gameType === 'ufo-catcher' ||
         encounter.gameType === 'prize-wheel'
       const isScoreCompletionGame =
@@ -3602,7 +3618,7 @@ export async function completeGameActivity(
         async ({ payload, req }) => {
       const state = structuredClone(settlementState)
       // Chance games persist their attempts in their own paid settlement.
-      if (!['slots', 'pachinko', 'ufo-catcher', 'prize-wheel', 'fishing'].includes(encounter.gameType)) {
+      if (!['slots', 'pachinko', 'coin-pusher', 'ufo-catcher', 'prize-wheel', 'fishing'].includes(encounter.gameType)) {
         await incrementUserActivityResult(
           payload as any,
           user.id,
@@ -3746,7 +3762,8 @@ export async function completeGameActivity(
       } else if (
         actualSuccess ||
         encounter.gameType === 'slots' ||
-        encounter.gameType === 'pachinko'
+        encounter.gameType === 'pachinko' ||
+        encounter.gameType === 'coin-pusher'
       ) {
         // Normal mode rewards
         if (encounter.gameType === 'slots') {
@@ -3760,6 +3777,13 @@ export async function completeGameActivity(
               quantity: -state.slotsSession.totalCost,
               label: 'Total Spent',
             })
+          }
+        } else if (encounter.gameType === 'coin-pusher') {
+          rewardSummary = state.coinPusherSession?.totalRewards || {}
+          const cost = encounter.settings.cost
+          if (cost && state.coinPusherSession?.totalCost) {
+            rewardSummary.currency = rewardSummary.currency || []
+            rewardSummary.currency.push({ type: cost.currencyType, quantity: -state.coinPusherSession.totalCost, label: 'Total Spent' })
           }
         } else if (encounter.gameType === 'pachinko') {
           rewardSummary = state.pachinkoSession?.totalRewards || {}

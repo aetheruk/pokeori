@@ -15,6 +15,7 @@ import {
 } from '@/app/(frontend)/game/_shared/activity-actions'
 import { allGames } from '@/data/games'
 import { exitPrizeWheel } from '@/app/(frontend)/game/research/games/wheel'
+import { recoverCoinPusherSettlement } from '@/app/(frontend)/game/research/games/coin-pusher'
 import { startBattleBets } from './battle-bets-actions'
 
 export type GameState = GameActivityState
@@ -100,6 +101,10 @@ export async function completeGame(
   gameplayProof?: unknown,
 ) {
   const encounter = allGames.find((entry) => entry.id === gameId)
+  if (encounter?.gameType === 'coin-pusher') {
+    const recovered = await recoverCoinPusherSettlement(gameId)
+    if (!recovered.success) return { success: false, error: recovered.error }
+  }
   const isRockPushAdventure =
     encounter?.gameType === 'grid-puzzle' &&
     'variant' in encounter.settings &&
