@@ -503,7 +503,6 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
               (left.battleTeamPosition || 0) - (right.battleTeamPosition || 0),
           ),
       )
-      toast.success('Battle order saved.')
     } catch {
       setBattleTeam(previousTeam)
       toast.error('Could not reorder the battle team.')
@@ -526,7 +525,6 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
         return
       }
       if (result.pokemon) updatePokemon(result.pokemon as Pokemon)
-      toast.success(itemId ? 'Held item equipped.' : 'Held item cleared.')
       setEditingSection(null)
       void refreshUser()
     } catch {
@@ -546,9 +544,6 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
         return
       }
       if (result.pokemon) updatePokemon(result.pokemon as Pokemon)
-      toast.success(
-        powerId ? 'Pokémon Power selected.' : 'Pokémon Power cleared.',
-      )
       setEditingSection(null)
     } catch {
       toast.error('Could not select this Pokémon Power.')
@@ -568,7 +563,6 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
       }
       if (result.pokemon) updatePokemon(result.pokemon as Pokemon)
       setSelectedMoveIds(result.assignedMoveIds || moveIds)
-      toast.success('Moves assigned.')
       if (close) setMoveWorkspaceOpen(false)
     } catch {
       toast.error('Could not assign moves.')
