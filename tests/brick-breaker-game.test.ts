@@ -190,7 +190,7 @@ describe('Brick Breaker presentation', () => {
     expect(source).toContain('bg-[#c84d43]')
     expect(source).toContain('rounded-full border-2 border-[#202826] bg-white')
     expect(source).toContain(
-      'border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)]',
+      'border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(40,127,122,0.55)]',
     )
     expect(source).toContain('motion-safe:animate-ping')
     expect(source).toContain('void session.abandon()')

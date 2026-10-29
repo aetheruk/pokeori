@@ -20,7 +20,7 @@ export const gymLeaderChronicleVoltorbGridEntries: VoltorbGridGameConfig[] = [
       voltorbs: [{ id: 'west-cell', x: 1, y: 5, blastRadius: 2 }, { id: 'east-cell', x: 5, y: 3, blastRadius: 2 }],
       protectedPokemon: [{ id: 'magnemite', speciesId: 81, x: 5, y: 4 }, { id: 'pikachu', speciesId: 25, x: 6, y: 5 }],
       requiredCleared: 2, timeLimit: 100, maxMoves: 30, maxDischarges: 1, winRate: 1,
-      themeColour: '#b58a43', background: '/backgrounds/chronicle-surge-blackout-streets.avif',
+      themeColour: '#287f7a', background: '/backgrounds/chronicle-surge-blackout-streets.avif',
     },
   },
 ]

@@ -359,13 +359,13 @@ function getSafariChanceTone(percentage: number) {
   }
   if (percentage >= 34) {
     return {
-      accent: '#c4773c',
-      track: 'rgb(196 119 60 / 0.18)',
+      accent: '#287f7a',
+      track: 'rgb(40 127 122 / 0.18)',
     }
   }
   return {
-    accent: '#b86148',
-    track: 'rgb(184 97 72 / 0.18)',
+      accent: '#9a4337',
+      track: 'rgb(154 67 55 / 0.18)',
   }
 }
 

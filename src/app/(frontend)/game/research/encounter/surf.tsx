@@ -577,7 +577,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
               </p>
             ) : null}
             {choiceError ? (
-              <p role="alert" className="mt-3 text-sm text-game-clay">
+              <p role="alert" className="mt-3 text-sm text-game-danger">
                 {choiceError}
               </p>
             ) : null}

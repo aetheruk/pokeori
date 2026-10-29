@@ -90,7 +90,7 @@ export const gymLeaderChronicleProcedureOrderEntries: ProcedureOrderGameConfig[]
       ],
       timeLimit: 100,
       maxSubmissions: 3,
-      themeColour: '#b86148',
+      themeColour: '#287f7a',
       background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif',
     },
   },

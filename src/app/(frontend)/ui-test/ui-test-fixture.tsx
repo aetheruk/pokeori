@@ -50,7 +50,7 @@ export function UiTestFixture() {
   const [artisanBalance, setArtisanBalance] = useState(false)
   const [status, setStatus] = useState('Ready')
   const artState = useMemo(() => ({ expiry: Date.now() + 3600000, roundData: { artAcademy: {
-    spriteUrl: '/sprites/pokemon/home/normal/1.avif', palette: ['#293532', '#b86148'], referenceCells: encodeArtAcademyCells(new Uint8Array(1024)), scoreGridSize: 32, guideGridSize: 3,
+    spriteUrl: '/sprites/pokemon/home/normal/1.avif', palette: ['#293532', '#287f7a'], referenceCells: encodeArtAcademyCells(new Uint8Array(1024)), scoreGridSize: 32, guideGridSize: 3,
   } } }), [])
   const artActions = useMemo(() => ({
     start: async () => ({ success: true, ...artState }),

@@ -61,6 +61,8 @@
   --color-game-muted: var(--game-muted);
   --color-game-charcoal: var(--game-charcoal);
   --color-game-charcoal-strong: var(--game-charcoal-strong);
+  --color-game-teal: var(--game-teal);
+  --color-game-teal-strong: var(--game-teal-strong);
   /* Legacy aliases kept while authored surfaces finish migrating. */
   --color-game-moss: var(--game-moss);
   --color-game-moss-strong: var(--game-moss-strong);
@@ -75,6 +77,7 @@
   --color-game-battle-orange: var(--game-battle-orange);
   --color-game-battle-orange-strong: var(--game-battle-orange-strong);
   --color-game-ochre: var(--game-ochre);
+  --color-game-ochre-strong: var(--game-ochre-strong);
   --color-game-danger: var(--game-danger);
   --color-game-night-canvas: var(--game-night-canvas);
   --color-game-night-surface: var(--game-night-surface);
@@ -271,8 +274,8 @@
   --game-surface: #f9f9f9;
   --game-surface-raised: #fcfcfc;
   --game-cream: #f9f9f9;
-  --game-border: rgb(103 88 62 / 0.2);
-  --game-border-strong: rgb(103 88 62 / 0.34);
+  --game-border: rgb(40 127 122 / 0.18);
+  --game-border-strong: rgb(40 127 122 / 0.32);
   --game-card-border: color-mix(in srgb, var(--game-ink) 28%, transparent);
   --game-ink: #293532;
   --game-muted: #6b6f6d;
@@ -280,24 +283,27 @@
   --game-charcoal-strong: #1d2522;
   --game-moss: var(--game-charcoal);
   --game-moss-strong: var(--game-charcoal-strong);
-  --game-clay: #b86148;
-  --game-clay-strong: #974837;
+  --game-teal: #287f7a;
+  --game-teal-strong: #1d625e;
+  --game-clay: #328982;
+  --game-clay-strong: var(--game-teal-strong);
   --game-stance-blue: #5d83ae;
   --game-stance-blue-strong: #345f8d;
   --game-research: #6f8d5c;
   --game-research-strong: #4d6d43;
   --game-health: #6f9b63;
   --game-health-strong: #4d7445;
-  --game-battle-orange: #c4773c;
-  --game-battle-orange-strong: #a45d2d;
-  --game-ochre: #b58a43;
+  --game-battle-orange: var(--game-teal);
+  --game-battle-orange-strong: var(--game-teal-strong);
+  --game-ochre: var(--game-teal);
+  --game-ochre-strong: var(--game-teal-strong);
   --game-danger: #9a4337;
   --game-night-canvas: #172733;
   --game-night-surface: #22353d;
   --game-night-border: rgb(247 236 214 / 0.16);
   --game-night-ink: #f9f9f9;
   --game-night-muted: #b8bbb5;
-  --game-accent: var(--game-charcoal);
+  --game-accent: var(--game-teal);
   --background: #f5f5f5;
   --foreground: #293532;
   --card: #f9f9f9;
@@ -313,8 +319,8 @@
   --accent: #f1f1f1;
   --accent-foreground: #293532;
   --destructive: #a9473c;
-  --border: rgb(103 88 62 / 0.2);
-  --input: rgb(103 88 62 / 0.26);
+  --border: rgb(40 127 122 / 0.18);
+  --input: rgb(40 127 122 / 0.24);
   --ring: var(--game-charcoal);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -327,7 +333,7 @@
   --sidebar-primary-foreground: #f9f9f9;
   --sidebar-accent: #f1f1f1;
   --sidebar-accent-foreground: #293532;
-  --sidebar-border: rgb(103 88 62 / 0.2);
+  --sidebar-border: rgb(40 127 122 / 0.18);
   --sidebar-ring: var(--game-charcoal);
 }
 
@@ -616,17 +622,21 @@
     --game-charcoal-strong: #d0d5ce;
     --game-moss: var(--game-charcoal);
     --game-moss-strong: var(--game-charcoal-strong);
-    --game-clay: #d78467;
+    --game-teal: #66c4bc;
+    --game-teal-strong: #9ee0da;
+    --game-clay: #72cec6;
+    --game-clay-strong: #a6e5df;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
     --game-research: #9bb789;
     --game-research-strong: #c0d7b2;
     --game-health: #9fca8d;
     --game-health-strong: #c9e3b9;
-    --game-battle-orange: #e3a06e;
-    --game-battle-orange-strong: #f1bd94;
-    --game-ochre: #d3ad63;
-    --game-accent: var(--game-charcoal);
+    --game-battle-orange: var(--game-teal);
+    --game-battle-orange-strong: var(--game-teal-strong);
+    --game-ochre: var(--game-teal);
+    --game-ochre-strong: var(--game-teal-strong);
+    --game-accent: var(--game-teal);
     --background: var(--game-night-canvas);
     --foreground: var(--game-night-ink);
     --card: var(--game-night-surface);
@@ -656,27 +666,30 @@
     --game-canvas: #f5f5f5;
     --game-surface: #f9f9f9;
     --game-surface-raised: #fcfcfc;
-    --game-border: rgb(103 88 62 / 0.2);
-    --game-border-strong: rgb(103 88 62 / 0.34);
+    --game-border: rgb(40 127 122 / 0.18);
+    --game-border-strong: rgb(40 127 122 / 0.32);
     --game-ink: #293532;
     --game-muted: #6b6f6d;
     --game-charcoal: #293532;
     --game-charcoal-strong: #1d2522;
     --game-moss: var(--game-charcoal);
     --game-moss-strong: var(--game-charcoal-strong);
-    --game-clay: #b86148;
-    --game-clay-strong: #974837;
+    --game-teal: #287f7a;
+    --game-teal-strong: #1d625e;
+    --game-clay: #328982;
+    --game-clay-strong: var(--game-teal-strong);
     --game-stance-blue: #5d83ae;
     --game-stance-blue-strong: #345f8d;
     --game-research: #6f8d5c;
     --game-research-strong: #4d6d43;
     --game-health: #6f9b63;
     --game-health-strong: #4d7445;
-    --game-battle-orange: #c4773c;
-    --game-battle-orange-strong: #a45d2d;
-    --game-ochre: #b58a43;
+    --game-battle-orange: var(--game-teal);
+    --game-battle-orange-strong: var(--game-teal-strong);
+    --game-ochre: var(--game-teal);
+    --game-ochre-strong: var(--game-teal-strong);
     --game-danger: #9a4337;
-    --game-accent: var(--game-charcoal);
+    --game-accent: var(--game-teal);
     --background: #f5f5f5;
     --foreground: #293532;
     --card: #f9f9f9;
@@ -691,8 +704,8 @@
     --muted-foreground: #6b6f6d;
     --accent: #f1f1f1;
     --accent-foreground: #293532;
-    --border: rgb(103 88 62 / 0.2);
-    --input: rgb(103 88 62 / 0.26);
+    --border: rgb(40 127 122 / 0.18);
+    --input: rgb(40 127 122 / 0.24);
     --ring: var(--game-charcoal);
     background: var(--game-canvas);
     color: var(--game-ink);
@@ -734,17 +747,21 @@
     --game-charcoal-strong: #d0d5ce;
     --game-moss: var(--game-charcoal);
     --game-moss-strong: var(--game-charcoal-strong);
-    --game-clay: #d78467;
+    --game-teal: #66c4bc;
+    --game-teal-strong: #9ee0da;
+    --game-clay: #72cec6;
+    --game-clay-strong: #a6e5df;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
     --game-research: #9bb789;
     --game-research-strong: #c0d7b2;
     --game-health: #9fca8d;
     --game-health-strong: #c9e3b9;
-    --game-battle-orange: #e3a06e;
-    --game-battle-orange-strong: #f1bd94;
-    --game-ochre: #d3ad63;
-    --game-accent: var(--game-charcoal);
+    --game-battle-orange: var(--game-teal);
+    --game-battle-orange-strong: var(--game-teal-strong);
+    --game-ochre: var(--game-teal);
+    --game-ochre-strong: var(--game-teal-strong);
+    --game-accent: var(--game-teal);
     --game-paper-background: var(--game-night-canvas);
     --background: var(--game-night-canvas);
     --foreground: var(--game-night-ink);
@@ -781,17 +798,21 @@
     --game-charcoal-strong: #d0d5ce;
     --game-moss: var(--game-charcoal);
     --game-moss-strong: var(--game-charcoal-strong);
-    --game-clay: #d78467;
+    --game-teal: #66c4bc;
+    --game-teal-strong: #9ee0da;
+    --game-clay: #72cec6;
+    --game-clay-strong: #a6e5df;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
     --game-research: #9bb789;
     --game-research-strong: #c0d7b2;
     --game-health: #9fca8d;
     --game-health-strong: #c9e3b9;
-    --game-battle-orange: #e3a06e;
-    --game-battle-orange-strong: #f1bd94;
-    --game-ochre: #d3ad63;
-    --game-accent: var(--game-charcoal);
+    --game-battle-orange: var(--game-teal);
+    --game-battle-orange-strong: var(--game-teal-strong);
+    --game-ochre: var(--game-teal);
+    --game-ochre-strong: var(--game-teal-strong);
+    --game-accent: var(--game-teal);
     --game-paper-background: var(--game-night-canvas);
     background-color: var(--game-night-canvas) !important;
     color: var(--game-ink);
@@ -1830,8 +1851,8 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
   --accent: #f1f1f1;
   --accent-foreground: #293532;
   --destructive: #a9473c;
-  --border: rgb(103 88 62 / 0.2);
-  --input: rgb(103 88 62 / 0.26);
+  --border: rgb(40 127 122 / 0.18);
+  --input: rgb(40 127 122 / 0.24);
   --ring: var(--game-charcoal);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -1844,7 +1865,7 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
   --sidebar-primary-foreground: #f9f9f9;
   --sidebar-accent: #f1f1f1;
   --sidebar-accent-foreground: #293532;
-  --sidebar-border: rgb(103 88 62 / 0.2);
+  --sidebar-border: rgb(40 127 122 / 0.18);
   --sidebar-ring: var(--game-charcoal);
 }
 
@@ -3740,13 +3761,22 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
     --game-canvas: #f5f5f5;
     --game-surface: #f9f9f9;
     --game-surface-raised: #fcfcfc;
-    --game-border: rgb(103 88 62 / 0.2);
-    --game-border-strong: rgb(103 88 62 / 0.34);
+    --game-border: rgb(40 127 122 / 0.18);
+    --game-border-strong: rgb(40 127 122 / 0.32);
+    --game-teal: #287f7a;
+    --game-teal-strong: #1d625e;
+    --game-clay: #328982;
+    --game-clay-strong: var(--game-teal-strong);
+    --game-ochre: var(--game-teal);
+    --game-ochre-strong: var(--game-teal-strong);
+    --game-battle-orange: var(--game-teal);
+    --game-battle-orange-strong: var(--game-teal-strong);
+    --game-accent: var(--game-teal);
     --game-ink: #293532;
     --game-muted: #6b6f6d;
     --game-night-canvas: #f5f5f5;
     --game-night-surface: #f9f9f9;
-    --game-night-border: rgb(103 88 62 / 0.2);
+    --game-night-border: rgb(40 127 122 / 0.18);
     --game-night-ink: #293532;
     --game-night-muted: #6b6f6d;
     background: var(--game-canvas);
@@ -3794,38 +3824,38 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
   }
 
   /* Do not remap white foregrounds globally. They are used deliberately on
-     scene boards, status chips, and clay/destructive actions. */
+     scene boards, status chips, teal accents, and destructive actions. */
 
   :is([class~='bg-black'], [class~='bg-black/20'], [class~='bg-black/25'], [class~='bg-black/50'], [class~='bg-black/60']) {
     background-color: color-mix(in srgb, var(--game-canvas) 78%, transparent);
   }
 
   :is([class~='text-teal-50'], [class~='text-teal-100'], [class~='text-teal-200'], [class~='text-teal-300'], [class~='text-teal-400'], [class~='text-teal-500']) {
-    color: var(--game-moss-strong);
+    color: var(--game-teal-strong);
   }
 
   :is([class^='text-teal-'], [class*=' text-teal-']) {
-    color: var(--game-moss-strong);
+    color: var(--game-teal-strong);
   }
 
   :is([class~='bg-teal-400'], [class~='bg-teal-500']) {
-    background-color: var(--game-moss);
+    background-color: var(--game-teal);
   }
 
   :is([class~='bg-teal-600'], [class~='bg-teal-700']) {
-    background-color: var(--game-clay);
+    background-color: var(--game-teal-strong);
   }
 
   :is([class~='bg-teal-950'], [class~='bg-teal-950/30'], [class~='bg-teal-950/40'], [class~='bg-teal-950/60'], [class~='bg-teal-950/90']) {
-    background-color: color-mix(in srgb, var(--game-moss) 14%, var(--game-surface));
+    background-color: color-mix(in srgb, var(--game-teal) 14%, var(--game-surface));
   }
 
   :is([class^='bg-teal-400/'], [class*=' bg-teal-400/'], [class^='bg-teal-500/'], [class*=' bg-teal-500/'], [class^='bg-teal-600/'], [class*=' bg-teal-600/']) {
-    background-color: color-mix(in srgb, var(--game-moss) 16%, transparent);
+    background-color: color-mix(in srgb, var(--game-teal) 16%, transparent);
   }
 
   :is([class^='border-teal-'], [class*=' border-teal-']) {
-    border-color: color-mix(in srgb, var(--game-moss) 58%, transparent);
+    border-color: color-mix(in srgb, var(--game-teal) 58%, transparent);
   }
 
   :is([class^='text-emerald-'], [class*=' text-emerald-'], [class^='text-green-'], [class*=' text-green-']) {
@@ -3857,11 +3887,11 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
   }
 
   :is([class~='hover:border-teal-400']:hover, [class~='hover:border-teal-400/35']:hover, [class~='hover:border-teal-400/40']:hover, [class~='hover:border-teal-400/60']:hover, [class~='hover:border-teal-500/30']:hover) {
-    border-color: var(--game-moss);
+    border-color: var(--game-teal);
   }
 
   :is([class~='hover:text-teal-100']:hover, [class~='hover:text-teal-200']:hover, [class~='hover:text-teal-300']:hover, [class~='hover:text-teal-400']:hover) {
-    color: var(--game-moss-strong);
+    color: var(--game-teal-strong);
   }
 
   /* Keep legacy accent buttons readable in night mode. The raised surface

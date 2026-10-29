@@ -46,11 +46,11 @@ export function BattleSurrenderButton({
           <Button
             type="button"
             variant="outline"
-            className="game-focus-ring h-12 w-12 rounded-xl border-game-charcoal/45 bg-game-surface-raised p-0 text-game-clay-strong shadow-sm transition-colors hover:border-game-charcoal hover:bg-game-charcoal/10"
+            className="game-focus-ring h-12 w-12 rounded-xl border-game-charcoal/45 bg-game-surface-raised p-0 text-game-danger shadow-sm transition-colors hover:border-game-charcoal hover:bg-game-charcoal/10"
             disabled={isDisabled}
             aria-label="Surrender battle"
           >
-            <Flag className="h-4 w-4 text-game-clay-strong" />
+            <Flag className="h-4 w-4 text-game-danger" />
           </Button>
         )}
       </DialogTrigger>

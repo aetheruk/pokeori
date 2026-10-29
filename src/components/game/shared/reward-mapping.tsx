@@ -559,7 +559,7 @@ export function mapRewardToDisplayItem(
           normalizeVisibleBounds
         />
       ) : (
-        <Heart className="h-6 w-6 text-game-clay" />
+        <Heart className="h-6 w-6 text-game-danger" />
       )
       subLabel = 'Active Companion'
       break

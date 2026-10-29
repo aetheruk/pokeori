@@ -340,7 +340,7 @@ function drawCollectibles(
     }
 
     context.save()
-    context.fillStyle = '#b58a43'
+    context.fillStyle = '#287f7a'
     context.fillRect(x + 4, y + 4, collectible.size - 8, collectible.size - 8)
     context.strokeStyle = '#f9f9f9'
     context.lineWidth = 2
