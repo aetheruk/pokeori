@@ -121,7 +121,7 @@ export function MoveLoadoutWorkspace({
 
           <div className="min-h-0 flex-1 py-2">
             {visibleEntries.length ? (
-              <List rowComponent={MoveRow} rowCount={visibleEntries.length} rowHeight={62} rowProps={{ entries: visibleEntries, selectedMoveIds, maxMoves, onToggleMove, onDetails }} rowKey={rowKey} overscanCount={6} defaultHeight={480} className="custom-scrollbar" style={{ height: '100%', minHeight: 0 }} aria-label="Available moves" />
+              <List rowComponent={MoveRow} rowCount={visibleEntries.length} rowHeight={62} rowProps={{ entries: visibleEntries, selectedMoveIds, maxMoves, onToggleMove, onDetails }} rowKey={rowKey} overscanCount={6} defaultHeight={480} className="custom-scrollbar touch-pan-y" style={{ height: '100%', minHeight: 0 }} aria-label="Available moves" />
             ) : (
               <p className="py-8 text-center text-sm text-game-muted">No matching moves</p>
             )}
@@ -156,7 +156,7 @@ function MoveRow({ index, style, ariaAttributes, entries, selectedMoveIds, maxMo
   return (
     <div style={style} {...ariaAttributes} className="pb-1.5">
       <div className={cn('flex h-full min-w-0 items-center overflow-hidden rounded-lg border bg-game-surface-raised', selected ? 'border-game-moss bg-game-moss/10' : 'border-game-border')}>
-        <button type="button" onClick={() => onToggleMove(entry.move.id)} disabled={disabled} aria-pressed={selected} aria-label={`${selected ? 'Remove' : 'Assign'} ${entry.move.name}`} className="game-focus-ring flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left disabled:opacity-50">
+        <button type="button" data-haptic-manual="true" onClick={() => onToggleMove(entry.move.id)} disabled={disabled} aria-pressed={selected} aria-label={`${selected ? 'Remove' : 'Assign'} ${entry.move.name}`} className="game-focus-ring flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left disabled:opacity-50">
           <ItemSprite itemId={getMoveTypeSpriteItemId(entry.move)} alt="" width={30} height={30} className="size-8 shrink-0 object-contain" />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold">{entry.move.name}</span>
@@ -164,7 +164,7 @@ function MoveRow({ index, style, ariaAttributes, entries, selectedMoveIds, maxMo
           </span>
           {selected && <span aria-hidden="true" className="shrink-0 text-sm font-bold text-game-moss-strong">✓</span>}
         </button>
-        <button type="button" onClick={() => onDetails(entry.move.id)} aria-label={`View ${entry.move.name} details`} className="game-focus-ring flex h-full w-11 shrink-0 items-center justify-center border-l border-game-border text-sm font-bold text-game-muted hover:bg-game-canvas">i</button>
+        <button type="button" data-haptic-manual="true" onClick={() => onDetails(entry.move.id)} aria-label={`View ${entry.move.name} details`} className="game-focus-ring flex h-full w-11 shrink-0 items-center justify-center border-l border-game-border text-sm font-bold text-game-muted hover:bg-game-canvas">i</button>
       </div>
     </div>
   )

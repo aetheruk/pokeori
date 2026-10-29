@@ -29,6 +29,12 @@ import { PokemonDetailsDialog } from '@/app/(frontend)/game/pokemon/_components/
 import type { Pokemon } from '@/payload-types'
 import { ArtisanBalanceFixture } from './artisan-balance-fixture'
 import { PartyManagerFixture } from './party-manager-fixture'
+import { MoveLoadoutWorkspace } from '@/components/game/moves'
+import { getAllMoves } from '@/data/moves'
+
+const scrollFixtureMoves = getAllMoves().slice(0, 60).map((move) => ({
+  move, source: 'tm' as const, sourceLabel: 'Owned TM',
+}))
 
 /** Local-only fixtures: no account, reward, database or gameplay actions are invoked. */
 export function UiTestFixture() {
@@ -45,6 +51,8 @@ export function UiTestFixture() {
   const [ufo, setUfo] = useState(false)
   const [inspector, setInspector] = useState(false)
   const [partyManager, setPartyManager] = useState(false)
+  const [moveScrolling, setMoveScrolling] = useState(false)
+  const [scrollFixtureSelected, setScrollFixtureSelected] = useState<string[]>([])
   const [navigation, setNavigation] = useState(false)
   const [dexLayout, setDexLayout] = useState(false)
   const [settings, setSettings] = useState(false)
@@ -104,6 +112,7 @@ export function UiTestFixture() {
       <Button onClick={() => setUfo(true)}>Test UFO Catcher</Button>
       <Button onClick={() => setInspector(true)}>Test Pokemon inspector</Button>
       <Button onClick={() => setPartyManager(true)}>Test party manager</Button>
+      <Button onClick={() => setMoveScrolling(true)}>Test move scrolling</Button>
       <Button onClick={() => setNavigation(true)}>Test game navigation</Button>
       <Button onClick={() => setDexLayout(true)}>Test dex layouts</Button>
       <Button onClick={() => setSettings(true)}>Test trainer settings</Button>
@@ -134,6 +143,21 @@ export function UiTestFixture() {
     {ufo && <UfoFixture />}
     {inspector && <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer', skills: { researching: { level: 10 } } }, inventory: [{ itemId: 'tm-rollout', quantity: 1 }], pokedex: [{ speciesId: 108, formId: '108', researchLevel: 1, caught: true }], pokemon: [] } as unknown as RequirementData}><AudioProvider><PokemonDetailsDialog pokemon={{ id: 'ui-test-pokemon', speciesId: 108, formId: '108', name: 'Inspector fixture', level: 5, identified: true } as Pokemon} boxes={[]} trigger={<Button>Open fixture inspector</Button>} /></AudioProvider></UserProvider></SWRConfig>}
     {partyManager && <PartyManagerFixture />}
+    <MoveLoadoutWorkspace
+      open={moveScrolling}
+      onOpenChange={setMoveScrolling}
+      pokemonName="Scroll fixture"
+      entries={scrollFixtureMoves}
+      selectedMoveIds={scrollFixtureSelected}
+      maxMoves={4}
+      hasChanges={scrollFixtureSelected.length > 0}
+      isSaving={false}
+      onToggleMove={(moveId) => setScrollFixtureSelected((current) => current.includes(moveId) ? current.filter((id) => id !== moveId) : [...current, moveId])}
+      onClear={() => setScrollFixtureSelected([])}
+      onAutoPick={() => {}}
+      onSave={() => setMoveScrolling(false)}
+      onDetails={() => {}}
+    />
     {arcade ? <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><AudioProvider><ArcadeFixture /></AudioProvider></UserProvider></SWRConfig> : null}
     <ScratchCardModal open={scratch} onOpenChange={setScratch} onClose={() => setScratch(false)} background="" icon={{ type: 'item', id: 'poke-ball' }} rewards={[]} />
     {intro && <VSAnimation player={{ name: 'Test trainer' }} enemy={{ name: 'Test rival' }} onComplete={() => setIntro(false)} />}
