@@ -93,9 +93,11 @@ function normalizePokemonBackgroundPath(path?: string | null) {
 function BattleTeamCardFace({
   pokemon,
   index,
+  label,
 }: {
   pokemon: Pokemon
   index: number
+  label?: string
 }) {
   const form = getPokemonForm(pokemon.formId)
   const name = pokemon.name || form?.name || 'Pokémon'
@@ -118,7 +120,7 @@ function BattleTeamCardFace({
         className="absolute inset-0 bg-gradient-to-b from-game-ink/15 via-game-canvas/10 to-game-ink/85"
       />
       <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-game-ink/80 px-2 py-1 font-mono text-[10px] font-bold text-game-cream shadow-sm">
-        {index === 0 ? 'LEAD' : index + 1}
+        {label || (index === 0 ? 'LEAD' : index + 1)}
       </span>
       {heldItem && (
         <span
@@ -216,10 +218,29 @@ function SortableBattleTeamCard({
   )
 }
 
-export function GridAdventurePartyManager() {
+type BoxTeamManagerOptions = {
+  open: boolean
+  selectedPokemonId?: string | null
+  battleTeam: Pokemon[]
+  companion: Pokemon | null
+  onOpenChange: (open: boolean) => void
+  onChooseFromBox: (role: 'battle-team' | 'companion') => void
+  onRemove: (pokemon: Pokemon) => Promise<boolean>
+  onPokemonUpdated: (pokemon: Pokemon) => void
+  onTeamPositionsChanged: (placements: { pokemonId: string; position: number }[]) => void
+}
+
+export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions } = {}) {
   const { user, gameData, refreshUser } = useUser()
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = box ? box.open : internalOpen
+  const setOpen = (nextOpen: boolean) => {
+    if (box) box.onOpenChange(nextOpen)
+    else setInternalOpen(nextOpen)
+  }
   const [battleTeam, setBattleTeam] = useState<Pokemon[]>([])
+  const [companion, setCompanion] = useState<Pokemon | null>(null)
+  const [removing, setRemoving] = useState(false)
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [selectedPokemonId, setSelectedPokemonId] = useState<string | null>(
@@ -250,6 +271,20 @@ export function GridAdventurePartyManager() {
 
   useEffect(() => {
     if (!open) return
+    if (box) {
+      setBattleTeam(box.battleTeam)
+      setCompanion(box.companion)
+      const preferredId = box.selectedPokemonId
+      const hasPreferred = preferredId && (
+        box.battleTeam.some((pokemon) => pokemon.id === preferredId) ||
+        box.companion?.id === preferredId
+      )
+      setSelectedPokemonId(hasPreferred ? preferredId : box.battleTeam[0]?.id || box.companion?.id || null)
+      setEditingSection(null)
+      setLoadError(null)
+      setLoading(false)
+      return
+    }
     let current = true
     setLoading(true)
     setLoadError(null)
@@ -257,6 +292,7 @@ export function GridAdventurePartyManager() {
       .then((layout) => {
         if (current) {
           setBattleTeam(layout.battleTeam as Pokemon[])
+          setCompanion(layout.companion as Pokemon | null)
           setSelectedPokemonId(layout.battleTeam[0]?.id || null)
           setEditingSection(null)
         }
@@ -281,7 +317,8 @@ export function GridAdventurePartyManager() {
     [battleTeam],
   )
   const selectedPokemon =
-    sortedTeam.find((pokemon) => pokemon.id === selectedPokemonId) || null
+    sortedTeam.find((pokemon) => pokemon.id === selectedPokemonId) ||
+    (box && companion?.id === selectedPokemonId ? companion : null) || null
   const activePokemon = activePokemonId
     ? sortedTeam.find((pokemon) => pokemon.id === activePokemonId) || null
     : null
@@ -403,6 +440,8 @@ export function GridAdventurePartyManager() {
         pokemon.id === updatedPokemon.id ? updatedPokemon : pokemon,
       ),
     )
+    setCompanion((current) => current?.id === updatedPokemon.id ? updatedPokemon : current)
+    box?.onPokemonUpdated(updatedPokemon)
   }
 
   const handleDragEnd = async ({ active, over }: DragEndEvent) => {
@@ -451,6 +490,7 @@ export function GridAdventurePartyManager() {
           position,
         ]),
       )
+      box?.onTeamPositionsChanged(result.placements)
       setBattleTeam((current) =>
         current
           .map((pokemon) => ({
@@ -557,6 +597,27 @@ export function GridAdventurePartyManager() {
     await saveMoves(picked)
   }
 
+  const removeSelectedPokemon = async () => {
+    if (!box || !selectedPokemon || removing) return
+    setRemoving(true)
+    try {
+      if (await box.onRemove(selectedPokemon)) {
+        setBattleTeam((current) => {
+          if (!current.some((pokemon) => pokemon.id === selectedPokemon.id)) return current
+          return current
+            .filter((pokemon) => pokemon.id !== selectedPokemon.id)
+            .sort((a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0))
+            .map((pokemon, index) => ({ ...pokemon, battleTeamPosition: index + 1 }))
+        })
+        setCompanion((current) => current?.id === selectedPokemon.id ? null : current)
+        setSelectedPokemonId(null)
+        setEditingSection(null)
+      }
+    } finally {
+      setRemoving(false)
+    }
+  }
+
   return (
     <ResponsivePanel
       open={open}
@@ -575,7 +636,7 @@ export function GridAdventurePartyManager() {
       closeButtonClassName="right-3 top-[max(0.75rem,env(safe-area-inset-top))] size-8 rounded-md border-0 bg-transparent text-game-muted shadow-none backdrop-blur-none hover:bg-game-charcoal/5 hover:text-game-ink focus-visible:ring-game-charcoal/50"
       closeIconClassName="size-4"
       className="game-paper-first flex w-full min-w-0 flex-col overflow-hidden bg-game-canvas p-0 text-game-ink"
-      trigger={
+      trigger={box ? undefined : (
         <Button
           type="button"
           variant="outline"
@@ -586,7 +647,7 @@ export function GridAdventurePartyManager() {
         >
           <ItemSprite itemId="poke-ball" alt="" width={36} height={36} />
         </Button>
-      }
+      )}
     >
       <header className="z-10 w-full min-w-0 shrink-0 border-b border-game-border bg-game-surface-raised px-4 pb-2.5 pt-[max(0.75rem,env(safe-area-inset-top))] pr-14 shadow-sm sm:px-6 sm:pr-16">
         <div className="mx-auto flex w-full min-w-0 max-w-4xl items-center gap-2.5">
@@ -619,7 +680,7 @@ export function GridAdventurePartyManager() {
           >
             {loadError}
           </p>
-        ) : sortedTeam.length === 0 ? (
+        ) : sortedTeam.length === 0 && !box ? (
           <div className="mx-auto mt-8 max-w-sm rounded-xl border border-game-card-border bg-game-surface-raised p-5 text-center shadow-sm">
             <h2 className="font-display text-lg font-semibold text-game-ink">
               No battle team
@@ -660,6 +721,18 @@ export function GridAdventurePartyManager() {
                       }}
                     />
                   ))}
+                  {box && Array.from({ length: Math.max(0, 6 - sortedTeam.length) }, (_, index) => (
+                    <li key={`empty-${index}`} className="list-none">
+                      <button
+                        type="button"
+                        onClick={() => box.onChooseFromBox('battle-team')}
+                        aria-label="Choose a Pokémon for the battle team"
+                        className="game-focus-ring flex aspect-[1.38] min-h-32 w-full items-center justify-center rounded-xl border-2 border-dashed border-game-border bg-game-surface-raised/50 text-2xl text-game-muted hover:border-game-charcoal/60"
+                      >
+                        <span aria-hidden="true">+</span>
+                      </button>
+                    </li>
+                  ))}
                 </ol>
               </SortableContext>
               <DragOverlay>
@@ -675,6 +748,33 @@ export function GridAdventurePartyManager() {
                 ) : null}
               </DragOverlay>
             </DndContext>
+            {box && (
+              <section className="mt-5" aria-label="Partner Pokémon">
+                <h2 className="mb-2 text-sm font-bold text-game-ink">Partner</h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                  {companion ? (
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedPokemonId(companion.id); setEditingSection(null) }}
+                      aria-pressed={selectedPokemonId === companion.id}
+                      aria-label={`Select partner ${companion.name || getPokemonForm(companion.formId)?.name || 'Pokémon'}`}
+                      className={cn('game-focus-ring block w-full rounded-xl border-2 text-left shadow-sm', selectedPokemonId === companion.id ? 'border-game-ochre shadow-md' : 'border-game-card-border hover:border-game-charcoal/60')}
+                    >
+                      <BattleTeamCardFace pokemon={companion} index={0} label="PARTNER" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => box.onChooseFromBox('companion')}
+                      aria-label="Choose a partner Pokémon"
+                      className="game-focus-ring flex aspect-[1.38] min-h-32 w-full items-center justify-center rounded-xl border-2 border-dashed border-game-border bg-game-surface-raised/50 text-2xl text-game-muted hover:border-game-charcoal/60"
+                    >
+                      <span aria-hidden="true">+</span>
+                    </button>
+                  )}
+                </div>
+              </section>
+            )}
           </main>
         )}
       </div>
@@ -703,6 +803,16 @@ export function GridAdventurePartyManager() {
                   Lv. {selectedPokemon.level}
                 </span>
               </div>
+              {box && (
+                <button
+                  type="button"
+                  onClick={() => void removeSelectedPokemon()}
+                  disabled={removing}
+                  className="game-focus-ring ml-auto min-h-10 shrink-0 rounded-md px-3 text-xs font-semibold text-game-danger hover:bg-game-danger/10 disabled:opacity-50"
+                >
+                  {removing ? 'Removing…' : 'Remove'}
+                </button>
+              )}
             </div>
 
             <fieldset

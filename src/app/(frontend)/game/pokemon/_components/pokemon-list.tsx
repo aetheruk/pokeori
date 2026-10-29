@@ -111,7 +111,7 @@ import {
   setPokemonRosterRole,
 } from '../actions'
 import { PokemonDetailsDialog } from './pokemon-details-dialog'
-import { PokemonBattleTeamManager } from './pokemon-battle-team-manager'
+import { GridAdventurePartyManager } from '../../research/encounter/grid-adventure-party-manager'
 import { getPokemonBoxInitialState } from '../actions/box'
 
 const POKEMON_BOX_PAGE_SIZE = 18
@@ -172,6 +172,7 @@ export function PokemonList({
 
   const [isPanelExpanded, setIsPanelExpanded] = useState(false)
   const [isBattleTeamManagerOpen, setIsBattleTeamManagerOpen] = useState(false)
+  const [rosterSelectedPokemonId, setRosterSelectedPokemonId] = useState<string | null>(null)
   const inventoryMap = useMemo(
     () =>
       Object.fromEntries(
@@ -425,6 +426,8 @@ export function PokemonList({
     )
     if (success) {
       setRosterSelection(null)
+      setRosterSelectedPokemonId(pokemon.id)
+      setIsBattleTeamManagerOpen(true)
     }
   }
 
@@ -1251,6 +1254,7 @@ export function PokemonList({
             className="shrink-0 border-game-border bg-game-surface-raised text-game-ink"
             onClick={() => {
               setRosterSelection(null)
+              setIsBattleTeamManagerOpen(true)
             }}
           >
             Cancel
@@ -1577,7 +1581,10 @@ export function PokemonList({
                       type="button"
                       size="icon"
                       variant="outline"
-                      onClick={() => setIsBattleTeamManagerOpen(true)}
+                      onClick={() => {
+                        setRosterSelectedPokemonId(null)
+                        setIsBattleTeamManagerOpen(true)
+                      }}
                       aria-label="Manage battle team and partner"
                       title="Manage battle team"
                       className="h-10 w-10 border-game-border bg-game-surface text-game-ink hover:border-game-moss/50"
@@ -1689,20 +1696,23 @@ export function PokemonList({
         </div>
       </DndContext>
 
-      <PokemonBattleTeamManager
-        open={isBattleTeamManagerOpen}
-        onOpenChange={setIsBattleTeamManagerOpen}
-        battleTeam={battleTeam}
-        companion={companion}
-        busy={isAssigningRoster || isReorderingBattleTeam}
-        onChooseFromBox={(role) => beginRosterSelection({ role })}
-        onRemove={(pokemon) => void assignRosterRole(pokemon, 'box')}
-        onReorder={(placements) => {
-          const currentPlacements = getBattleTeamPlacements()
-          void saveBattleTeamLayout(
-            placements,
-            currentPlacements.map(({ position }) => position),
-          )
+      <GridAdventurePartyManager
+        box={{
+          open: isBattleTeamManagerOpen,
+          selectedPokemonId: rosterSelectedPokemonId,
+          battleTeam,
+          companion,
+          onOpenChange: setIsBattleTeamManagerOpen,
+          onChooseFromBox: (role) => beginRosterSelection({ role }),
+          onRemove: (pokemon) => assignRosterRole(pokemon, 'box'),
+          onPokemonUpdated: syncPokemonAssignment,
+          onTeamPositionsChanged: (placements) => {
+            const positions = new Map(placements.map(({ pokemonId, position }) => [pokemonId, position]))
+            setBattleTeam((current) => current.map((pokemon) => ({
+              ...pokemon,
+              battleTeamPosition: positions.get(pokemon.id) ?? pokemon.battleTeamPosition,
+            })).sort((a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0)))
+          },
         }}
       />
 
