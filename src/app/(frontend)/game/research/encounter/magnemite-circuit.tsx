@@ -371,7 +371,7 @@ export function MagnemiteCircuitGame({
                       : 'border-[#40545c] bg-[#0d1820]/80',
                     tile &&
                       !tile.locked &&
-                      'hover:border-[#c9d8a7]/60 hover:bg-[#f7ecd6]/10',
+                      'hover:border-[#c9d8a7]/60 hover:bg-[#f9f9f9]/10',
                     powered &&
                       'border-yellow-200 bg-yellow-300/15 shadow-[0_0_18px_rgba(250,204,21,0.35)]',
                     target &&

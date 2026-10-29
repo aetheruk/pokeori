@@ -67,7 +67,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
   }
 
   return (
-    <main className="relative h-dvh min-h-0 w-full overflow-hidden bg-[#18211e] text-[#fff8e8]">
+    <main className="relative h-dvh min-h-0 w-full overflow-hidden bg-[#18211e] text-[#f9f9f9]">
       <Image
         src={encounter.background || '/backgrounds/cave.avif'}
         alt="A dim geological survey cave"

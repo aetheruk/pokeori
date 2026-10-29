@@ -296,7 +296,7 @@ function FishingScene({
           )}
         />
         {isSplash && (
-          <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#f7ecd6]/70 opacity-80 motion-safe:animate-[fishing_splash_0.65s_ease-out_both]" />
+          <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#f9f9f9]/70 opacity-80 motion-safe:animate-[fishing_splash_0.65s_ease-out_both]" />
         )}
       </div>
     </div>

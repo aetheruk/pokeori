@@ -82,7 +82,7 @@
   --color-game-night-ink: var(--game-night-ink);
   --color-game-night-muted: var(--game-night-muted);
   /* Fixed light foreground for controls on charcoal, clay, and danger fills. */
-  --color-game-cream: #f7ecd6;
+  --color-game-cream: #f9f9f9;
   --font-display: var(--font-sans);
   --font-sans: 'Nunito Sans', 'Avenir Next', Avenir, 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -266,11 +266,11 @@
 
 :root {
   --radius: 0.625rem;
-  --game-paper-background: #f4eacf;
-  --game-canvas: #efe4cf;
-  --game-surface: #f7efdf;
-  --game-surface-raised: #fff8e8;
-  --game-cream: #f7ecd6;
+  --game-paper-background: #f9f9f9;
+  --game-canvas: #f5f5f5;
+  --game-surface: #f9f9f9;
+  --game-surface-raised: #fcfcfc;
+  --game-cream: #f9f9f9;
   --game-border: rgb(103 88 62 / 0.2);
   --game-border-strong: rgb(103 88 62 / 0.34);
   --game-card-border: color-mix(in srgb, var(--game-ink) 28%, transparent);
@@ -295,22 +295,22 @@
   --game-night-canvas: #172733;
   --game-night-surface: #22353d;
   --game-night-border: rgb(247 236 214 / 0.16);
-  --game-night-ink: #f7ecd6;
+  --game-night-ink: #f9f9f9;
   --game-night-muted: #b8bbb5;
   --game-accent: var(--game-charcoal);
-  --background: #efe4cf;
+  --background: #f5f5f5;
   --foreground: #293532;
-  --card: #f7efdf;
+  --card: #f9f9f9;
   --card-foreground: #293532;
-  --popover: #fff8e8;
+  --popover: #fcfcfc;
   --popover-foreground: #293532;
   --primary: var(--game-charcoal);
-  --primary-foreground: #fff8e8;
-  --secondary: #e4d7bd;
+  --primary-foreground: #f9f9f9;
+  --secondary: #f1f1f1;
   --secondary-foreground: #293532;
-  --muted: #e8dcc5;
+  --muted: #f3f3f3;
   --muted-foreground: #6b6f6d;
-  --accent: #e4d7bd;
+  --accent: #f1f1f1;
   --accent-foreground: #293532;
   --destructive: #a9473c;
   --border: rgb(103 88 62 / 0.2);
@@ -321,11 +321,11 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: #e6d8bd;
+  --sidebar: #f9f9f9;
   --sidebar-foreground: #293532;
   --sidebar-primary: var(--game-charcoal);
-  --sidebar-primary-foreground: #fff8e8;
-  --sidebar-accent: #d7c8a9;
+  --sidebar-primary-foreground: #f9f9f9;
+  --sidebar-accent: #f1f1f1;
   --sidebar-accent-foreground: #293532;
   --sidebar-border: rgb(103 88 62 / 0.2);
   --sidebar-ring: var(--game-charcoal);
@@ -652,9 +652,10 @@
      complete semantic palette rather than only the surface and text colors. */
   .game-paper-first,
   .game-paper-modal:not(.game-night) {
-    --game-canvas: #efe4cf;
-    --game-surface: #fff8e8;
-    --game-surface-raised: #fff8e8;
+    --game-paper-background: #f9f9f9;
+    --game-canvas: #f5f5f5;
+    --game-surface: #f9f9f9;
+    --game-surface-raised: #fcfcfc;
     --game-border: rgb(103 88 62 / 0.2);
     --game-border-strong: rgb(103 88 62 / 0.34);
     --game-ink: #293532;
@@ -676,19 +677,19 @@
     --game-ochre: #b58a43;
     --game-danger: #9a4337;
     --game-accent: var(--game-charcoal);
-    --background: #efe4cf;
+    --background: #f5f5f5;
     --foreground: #293532;
-    --card: #f7efdf;
+    --card: #f9f9f9;
     --card-foreground: #293532;
-    --popover: #fff8e8;
+    --popover: #fcfcfc;
     --popover-foreground: #293532;
     --primary: var(--game-charcoal);
-    --primary-foreground: #fff8e8;
-    --secondary: #e4d7bd;
+    --primary-foreground: #f9f9f9;
+    --secondary: #f1f1f1;
     --secondary-foreground: #293532;
-    --muted: #e8dcc5;
+    --muted: #f3f3f3;
     --muted-foreground: #6b6f6d;
-    --accent: #e4d7bd;
+    --accent: #f1f1f1;
     --accent-foreground: #293532;
     --border: rgb(103 88 62 / 0.2);
     --input: rgb(103 88 62 / 0.26);
@@ -701,9 +702,13 @@
     background-color: var(--game-paper-background) !important;
   }
 
+  .daily-challenges-modal {
+    --game-paper-background: #ffffff;
+  }
+
   /* Filled action controls keep a cream foreground even in light activity chrome. */
   .game-accent-button {
-    color: #f7ecd6 !important;
+    color: #f9f9f9 !important;
   }
 
   .game-accent-button :where(svg, span) {
@@ -1810,19 +1815,19 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
 }
 
 .dark {
-  --background: #efe4cf;
+  --background: #f5f5f5;
   --foreground: #293532;
-  --card: #f7efdf;
+  --card: #f9f9f9;
   --card-foreground: #293532;
-  --popover: #fff8e8;
+  --popover: #fcfcfc;
   --popover-foreground: #293532;
   --primary: var(--game-charcoal);
-  --primary-foreground: #fff8e8;
-  --secondary: #e4d7bd;
+  --primary-foreground: #f9f9f9;
+  --secondary: #f1f1f1;
   --secondary-foreground: #293532;
-  --muted: #e8dcc5;
+  --muted: #f3f3f3;
   --muted-foreground: #6b6f6d;
-  --accent: #e4d7bd;
+  --accent: #f1f1f1;
   --accent-foreground: #293532;
   --destructive: #a9473c;
   --border: rgb(103 88 62 / 0.2);
@@ -1833,11 +1838,11 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: #e6d8bd;
+  --sidebar: #f9f9f9;
   --sidebar-foreground: #293532;
   --sidebar-primary: var(--game-charcoal);
-  --sidebar-primary-foreground: #fff8e8;
-  --sidebar-accent: #d7c8a9;
+  --sidebar-primary-foreground: #f9f9f9;
+  --sidebar-accent: #f1f1f1;
   --sidebar-accent-foreground: #293532;
   --sidebar-border: rgb(103 88 62 / 0.2);
   --sidebar-ring: var(--game-charcoal);
@@ -3732,15 +3737,15 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
   /* Full-screen activities inherit a light journal interface from GameShell.
    * Individual boards can still use an explicit scene image or deep-ink layer. */
   .game-activity-chrome .game-night {
-    --game-canvas: #efe4cf;
-    --game-surface: #f7efdf;
-    --game-surface-raised: #fff8e8;
+    --game-canvas: #f5f5f5;
+    --game-surface: #f9f9f9;
+    --game-surface-raised: #fcfcfc;
     --game-border: rgb(103 88 62 / 0.2);
     --game-border-strong: rgb(103 88 62 / 0.34);
     --game-ink: #293532;
     --game-muted: #6b6f6d;
-    --game-night-canvas: #efe4cf;
-    --game-night-surface: #f7efdf;
+    --game-night-canvas: #f5f5f5;
+    --game-night-surface: #f9f9f9;
     --game-night-border: rgb(103 88 62 / 0.2);
     --game-night-ink: #293532;
     --game-night-muted: #6b6f6d;

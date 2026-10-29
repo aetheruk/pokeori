@@ -424,7 +424,7 @@ export function PrizeWheelGame({
               return (
                 <div
                   key={slot.id}
-                  className="absolute left-1/2 top-1/2 flex flex-col items-center justify-center font-bold text-[#f7ecd6]"
+                  className="absolute left-1/2 top-1/2 flex flex-col items-center justify-center font-bold text-[#f9f9f9]"
                   style={{
                     width: '60px',
                     height: '60px',
