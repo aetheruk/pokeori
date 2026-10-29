@@ -28,7 +28,6 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -199,16 +198,9 @@ export function MoveLoadoutWorkspace({
       <DialogContent className="game-paper-first !left-0 !top-0 grid h-dvh !max-h-none !w-screen !max-w-none !translate-x-0 !translate-y-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-none border-0 bg-game-canvas p-0 sm:p-0">
         <header className="border-b border-game-border bg-game-surface-raised px-4 py-3 pr-14 sm:px-6 sm:py-4 sm:pr-16">
           <DialogHeader className="gap-0.5">
-            <p className="game-field-label text-game-moss-strong">
-              Battle loadout
-            </p>
             <DialogTitle className="text-xl sm:text-2xl">
               Choose {pokemonName}&apos;s moves
             </DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm">
-              Fill up to {maxMoves} slots. Open a field note for full move
-              details.
-            </DialogDescription>
           </DialogHeader>
         </header>
 
@@ -216,11 +208,11 @@ export function MoveLoadoutWorkspace({
           <aside className="border-b border-game-border bg-game-surface px-4 py-3 lg:border-b-0 lg:border-r lg:px-5 lg:py-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="font-display text-sm font-bold text-game-ink">
-                  Field kit
+              <h3 className="font-display text-sm font-bold text-game-ink">
+                  Assigned moves
                 </h3>
                 <p className="font-mono text-[11px] text-game-muted">
-                  {selectedMoveIds.length}/{maxMoves} slots filled
+                  {selectedMoveIds.length}/{maxMoves}
                 </p>
               </div>
               <Button
@@ -250,7 +242,7 @@ export function MoveLoadoutWorkspace({
                     )}
                   >
                     <span className="font-mono text-[10px] font-bold text-game-muted">
-                      {String(index + 1).padStart(2, '0')}
+                      {index + 1}
                     </span>
                     {entry ? (
                       <>
@@ -273,9 +265,7 @@ export function MoveLoadoutWorkspace({
                           <X className="size-3.5" aria-hidden="true" />
                         </button>
                       </>
-                    ) : (
-                      <span className="text-xs text-game-muted">Open slot</span>
-                    )}
+                    ) : null}
                   </li>
                 )
               })}
@@ -290,18 +280,18 @@ export function MoveLoadoutWorkspace({
                 className="mt-2 min-h-10 w-full text-game-muted"
               >
                 <RotateCcw className="size-3.5" aria-hidden="true" />
-                Clear selection
+                Clear moves
               </Button>
             ) : null}
           </aside>
 
           <main className="flex min-h-0 flex-col">
             <div className="border-b border-game-border bg-game-surface-raised px-4 py-3 sm:px-5">
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 xl:grid-cols-[minmax(13rem,1.4fr)_repeat(5,minmax(8rem,1fr))]">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
                 <div className="space-y-2">
                   <label
                     htmlFor="move-loadout-search"
-                    className="text-xs font-medium text-game-muted"
+                    className="sr-only"
                   >
                     Search
                   </label>
@@ -317,7 +307,7 @@ export function MoveLoadoutWorkspace({
                       onChange={(event) =>
                         updateFilter('query', event.target.value)
                       }
-                      placeholder="Search names or effects"
+                      placeholder="Find a move"
                       className="pl-9"
                     />
                   </div>
@@ -328,7 +318,7 @@ export function MoveLoadoutWorkspace({
                   aria-expanded={filtersExpanded}
                   aria-controls="move-loadout-filter-fields"
                   onClick={() => setFiltersExpanded((current) => !current)}
-                  className="mt-[1.625rem] min-h-11 px-3 xl:hidden"
+                  className="mt-[1.625rem] min-h-11 px-3"
                 >
                   <SlidersHorizontal className="size-4" aria-hidden="true" />
                   Filters
@@ -336,8 +326,8 @@ export function MoveLoadoutWorkspace({
                 <div
                   id="move-loadout-filter-fields"
                   className={cn(
-                    'col-span-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:contents',
-                    !filtersExpanded && 'hidden xl:contents',
+                    'col-span-2 grid grid-cols-2 gap-2 sm:grid-cols-3',
+                    !filtersExpanded && 'hidden',
                   )}
                 >
                   <PremiumSelect
@@ -437,9 +427,6 @@ export function MoveLoadoutWorkspace({
                   <h3 className="mt-3 font-display text-base font-bold text-game-ink">
                     No matching moves
                   </h3>
-                  <p className="mt-1 text-sm text-game-muted">
-                    Clear a filter or try a broader search.
-                  </p>
                 </div>
               )}
             </div>
@@ -447,17 +434,13 @@ export function MoveLoadoutWorkspace({
         </div>
 
         <footer className="flex items-center gap-3 border-t border-game-border bg-game-surface-raised px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:justify-end sm:px-6">
-          <p className="mr-auto hidden text-xs text-game-muted sm:block">
-            Auto-pick creates a balanced starting point. You can change every
-            slot before saving.
-          </p>
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
             className="min-h-11 flex-1 sm:flex-none"
           >
-            Keep editing later
+            Cancel
           </Button>
           <Button
             type="button"
@@ -465,7 +448,7 @@ export function MoveLoadoutWorkspace({
             disabled={!hasChanges || isSaving}
             className="min-h-11 flex-1 bg-game-charcoal text-game-cream hover:bg-game-charcoal-strong sm:flex-none"
           >
-            {isSaving ? 'Saving…' : 'Save loadout'}
+            {isSaving ? 'Saving…' : 'Save moves'}
           </Button>
         </footer>
       </DialogContent>

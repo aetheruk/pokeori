@@ -70,6 +70,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { ItemSprite } from '@/components/ui/item-sprite'
 import { Label } from '@/components/ui/label'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
@@ -110,6 +111,7 @@ import {
   setPokemonRosterRole,
 } from '../actions'
 import { PokemonDetailsDialog } from './pokemon-details-dialog'
+import { PokemonBattleTeamManager } from './pokemon-battle-team-manager'
 import { getPokemonBoxInitialState } from '../actions/box'
 
 const POKEMON_BOX_PAGE_SIZE = 18
@@ -128,7 +130,7 @@ function normalizePokemonBackgroundPath(path?: string | null) {
 }
 
 type RosterSelection =
-  | { role: 'battle-team'; position: number }
+  | { role: 'battle-team' }
   | { role: 'companion' }
 
 type BoxEgg = {
@@ -169,6 +171,7 @@ export function PokemonList({
   )
 
   const [isPanelExpanded, setIsPanelExpanded] = useState(false)
+  const [isBattleTeamManagerOpen, setIsBattleTeamManagerOpen] = useState(false)
   const inventoryMap = useMemo(
     () =>
       Object.fromEntries(
@@ -411,6 +414,7 @@ export function PokemonList({
   const beginRosterSelection = (selection: RosterSelection) => {
     setRosterSelection(selection)
     setIsPanelExpanded(false)
+    setIsBattleTeamManagerOpen(false)
   }
 
   const choosePokemonForRoster = async (pokemon: Pokemon) => {
@@ -418,13 +422,9 @@ export function PokemonList({
     const success = await assignRosterRole(
       pokemon,
       rosterSelection.role,
-      rosterSelection.role === 'battle-team'
-        ? rosterSelection.position
-        : undefined,
     )
     if (success) {
       setRosterSelection(null)
-      setIsPanelExpanded(true)
     }
   }
 
@@ -1241,7 +1241,7 @@ export function PokemonList({
             <p className="truncate text-xs text-game-muted">
               {rosterSelection.role === 'companion'
                 ? 'Select your new partner from this box.'
-                : `Select a Pokemon for battle team slot ${rosterSelection.position}.`}
+                : 'Select a Pokémon to add to your battle team.'}
             </p>
           </div>
           <Button
@@ -1251,7 +1251,6 @@ export function PokemonList({
             className="shrink-0 border-game-border bg-game-surface-raised text-game-ink"
             onClick={() => {
               setRosterSelection(null)
-              setIsPanelExpanded(true)
             }}
           >
             Cancel
@@ -1321,7 +1320,7 @@ export function PokemonList({
         collisionDetection={closestCenter}
         onDragEnd={handleRosterDragEnd}
       >
-        <div className="contents xl:grid xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="flex min-h-0 flex-1 flex-col">
           <PokemonBoxDropZone className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-6 w-full max-w-7xl mx-auto custom-scrollbar xl:min-w-0 xl:max-w-none">
             <div className="w-full flex-1">
               <div className="min-h-[40vh] p-4">
@@ -1379,11 +1378,11 @@ export function PokemonList({
             </div>
           </PokemonBoxDropZone>
 
-          <div className="z-30 flex w-full shrink-0 flex-col border-t border-game-border bg-game-surface/96 shadow-[0_-10px_30px_rgba(75,62,39,0.14)] backdrop-blur-xl xl:h-full xl:min-w-0 xl:border-l xl:border-t-0 xl:shadow-none">
+          <div className="w-full shrink-0 border-t border-game-border bg-game-surface/96 shadow-[0_-10px_30px_rgba(75,62,39,0.14)] backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-              className="game-focus-ring group flex h-10 w-full items-center justify-center border-b border-game-border hover:bg-game-moss/5 xl:hidden"
+              className="hidden"
               aria-expanded={isPanelExpanded}
               aria-controls="pokemon-team-panel"
             >
@@ -1401,12 +1400,7 @@ export function PokemonList({
 
             <div
               id="pokemon-team-panel"
-              className={cn(
-                'invisible grid overflow-hidden border-b border-game-border transition-[grid-template-rows,opacity,visibility] duration-200',
-                isPanelExpanded
-                  ? 'grid-rows-[1fr] opacity-100 visible'
-                  : 'grid-rows-[0fr] opacity-0 xl:grid-rows-[1fr] xl:opacity-100 xl:visible',
-              )}
+              className="hidden"
             >
               <div className="min-h-0 overflow-hidden">
                 <div className="w-full max-w-7xl mx-auto px-4 md:px-6 py-3">
@@ -1456,10 +1450,7 @@ export function PokemonList({
                                   key={`empty-${i}`}
                                   type="button"
                                   onClick={() =>
-                                    beginRosterSelection({
-                                      role: 'battle-team',
-                                      position: i + 1,
-                                    })
+                                    beginRosterSelection({ role: 'battle-team' })
                                   }
                                   className="game-focus-ring group/slot flex aspect-square w-full max-w-[104px] items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised hover:border-game-moss/50 hover:bg-game-moss/5"
                                   aria-label={`Choose a Pokemon for battle team slot ${i + 1}`}
@@ -1582,6 +1573,17 @@ export function PokemonList({
                         </DialogContent>
                       </Dialog>
                     )}
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      onClick={() => setIsBattleTeamManagerOpen(true)}
+                      aria-label="Manage battle team and partner"
+                      title="Manage battle team"
+                      className="h-10 w-10 border-game-border bg-game-surface text-game-ink hover:border-game-moss/50"
+                    >
+                      <ItemSprite itemId="poke-ball" alt="" width={30} height={30} />
+                    </Button>
                     {typeof selectedBoxId === 'string' &&
                       selectedBoxId !== 'battle-team' && (
                         <>
@@ -1686,6 +1688,23 @@ export function PokemonList({
           </div>
         </div>
       </DndContext>
+
+      <PokemonBattleTeamManager
+        open={isBattleTeamManagerOpen}
+        onOpenChange={setIsBattleTeamManagerOpen}
+        battleTeam={battleTeam}
+        companion={companion}
+        busy={isAssigningRoster || isReorderingBattleTeam}
+        onChooseFromBox={(role) => beginRosterSelection({ role })}
+        onRemove={(pokemon) => void assignRosterRole(pokemon, 'box')}
+        onReorder={(placements) => {
+          const currentPlacements = getBattleTeamPlacements()
+          void saveBattleTeamLayout(
+            placements,
+            currentPlacements.map(({ position }) => position),
+          )
+        }}
+      />
 
       <ResponsivePanel
         open={!!quickMenuPokemon}
