@@ -17,6 +17,7 @@ RUN apk upgrade --no-cache && apk add --no-cache libc6-compat
 # downloads even when the dependency layer must be rebuilt.
 FROM base AS deps
 COPY package.json bun.lock ./
+COPY patches ./patches
 RUN --mount=type=cache,id=pokeori-bun-cache,target=/root/.bun/install/cache,sharing=locked \
     NODE_ENV=development bun install --frozen-lockfile
 
