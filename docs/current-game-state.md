@@ -1,5 +1,7 @@
 # Current Game State
 
+Unreleased: Coin Pusher buffers its next server simulation during playback and shows a falling coin as soon as a drop is queued. The pushers continue to move between server updates, and the initial layout and coin artwork use varied positions and visual heights.
+
 Unreleased: Coin Pusher plays sampled server-side physics positions so the pushers, coins, shelf transfers and payouts animate through the actual simulated movement. The cabinet and aiming control have been redesigned, and restored physics steps resume each pusher at its saved phase.
 
 Unreleased: Kanto/Test includes a repeatable two-shelf Coin Pusher. Each drop costs one Fun Token; coins collected from the lower shelf pay one Fun Token, and prize bubbles contain one Broken Ball. Bubbles begin on the board and can be replenished by paid drops. The board resets when the player leaves and can be resumed during an active session.

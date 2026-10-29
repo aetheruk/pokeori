@@ -48,7 +48,9 @@ export function createCoinPusherBoard(settings: CoinPusherSettings, random: () =
   for (const shelf of [0, 1] as const) {
     for (let row = 0; row < 3; row++) {
       for (let col = 0; col < 10; col++) {
-        board.bodies.push({ id: board.nextId++, shelf, kind: 'coin', x: 42 + col * 26, y: 90 + row * 25, vx: 0, vy: 0 })
+        const xOffset = (row % 2 ? 9 : -3) + (row * 13 + col * 7 + shelf * 3) % 7 - 3
+        const yOffset = (row * 7 + col * 3 + shelf) % 7 - 3
+        board.bodies.push({ id: board.nextId++, shelf, kind: 'coin', x: 42 + col * 26 + xOffset, y: 90 + row * 25 + yOffset, vx: 0, vy: 0 })
       }
     }
   }

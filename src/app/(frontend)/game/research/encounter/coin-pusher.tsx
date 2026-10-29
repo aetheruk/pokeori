@@ -17,6 +17,8 @@ import { advanceCoinPusherGame } from '../games/coin-pusher'
 
 type Session = { board: CoinPusherBoard; totalCost: number; totalRewards: any }
 type Request = { encounterId: string; revision: number; actionId: string; drops: number[] }
+type QueuedDrop = { id: string; position: number; started: number }
+type Playback = { frames: CoinPusherFrame[]; board: CoinPusherBoard; dropIds: string[]; started: number; duration: number }
 
 function point(body: Pick<CoinPusherFrameBody, 'x' | 'y' | 'shelf'>) {
   const depth = Math.max(0, Math.min(1, body.y / COIN_PUSHER_DEPTH))
@@ -24,7 +26,7 @@ function point(body: Pick<CoinPusherFrameBody, 'x' | 'y' | 'shelf'>) {
   return { x: 180 + (body.x - COIN_PUSHER_WIDTH / 2) * scale, y: (body.shelf === 0 ? 111 : 249) + depth * 91, scale }
 }
 
-function drawMachine(ctx: CanvasRenderingContext2D, board: CoinPusherBoard, frames: CoinPusherFrame[] | null, progress: number, sprites: Map<string, HTMLImageElement>, aim: number, now: number) {
+function drawMachine(ctx: CanvasRenderingContext2D, board: CoinPusherBoard, frames: CoinPusherFrame[] | null, progress: number, sprites: Map<string, HTMLImageElement>, aim: number, tick: number, ghosts: QueuedDrop[], now: number) {
   ctx.clearRect(0, 0, 360, 460)
   const gradient = (y: number, height: number, colors: string[]) => {
     const g = ctx.createLinearGradient(0, y, 0, y + height)
@@ -49,20 +51,27 @@ function drawMachine(ctx: CanvasRenderingContext2D, board: CoinPusherBoard, fram
   // Subtle reflections are painted beneath the moving mechanisms.
   ctx.fillStyle = '#fff1'; ctx.beginPath(); ctx.moveTo(43, 83); ctx.lineTo(80, 83); ctx.lineTo(35, 247); ctx.lineTo(35, 191); ctx.closePath(); ctx.fill()
   ctx.fillStyle = '#e6bd78'; ctx.fillRect(53, 88, 254, 2)
-  const frameIndex = frames && frames.length > 1 ? Math.min(frames.length - 2, Math.floor(progress * (frames.length - 1))) : 0
-  const fraction = frames && frames.length > 1 ? Math.min(1, progress * (frames.length - 1) - frameIndex) : 1
+  const targetTick = frames?.length ? frames[0].tick + (frames[frames.length - 1].tick - frames[0].tick) * progress : 0
+  let frameIndex = 0
+  if (frames && frames.length > 1) {
+    while (frameIndex < frames.length - 2 && frames[frameIndex + 1].tick <= targetTick) frameIndex++
+  }
   const before = frames?.[frameIndex]
   const after = frames?.[frameIndex + 1]
+  const fraction = before && after && after.tick > before.tick ? Math.max(0, Math.min(1, (targetTick - before.tick) / (after.tick - before.tick))) : 1
   const beforeBodies = before?.bodies || board.bodies
   const afterBodies = after?.bodies || board.bodies
   const oldById = new Map(beforeBodies.map((body) => [body.id, body]))
   const newById = new Map(afterBodies.map((body) => [body.id, body]))
-  const tick = before && after ? before.tick + (after.tick - before.tick) * fraction : board.tick + (board.tick === 0 ? now / (1000 / 60) : 0)
   const drawBody = (body: CoinPusherFrameBody, x: number, y: number, scale: number, opacity = 1) => {
-    const radius = (body.kind === 'coin' ? 11 : 14) * scale
+    const variant = Math.abs(body.id)
+    const radius = (body.kind === 'coin' ? 11.4 + (variant % 5) * .3 : 14) * scale
+    const lift = body.kind === 'coin' && body.id > 0 ? (variant % 9 === 0 ? 6 : variant % 5 === 0 ? 3 : 0) * scale : 0
     ctx.save(); ctx.globalAlpha = opacity; ctx.translate(x, y)
     ctx.fillStyle = '#09151380'; ctx.beginPath(); ctx.ellipse(1, 5, radius * 1.05, radius * .43, 0, 0, Math.PI * 2); ctx.fill()
     if (body.kind === 'coin') {
+      ctx.translate(0, -lift)
+      ctx.rotate(((variant % 9) - 4) * .025)
       ctx.fillStyle = '#81501e'; ctx.beginPath(); ctx.ellipse(0, 2, radius, radius * .57, 0, 0, Math.PI * 2); ctx.fill()
       ctx.fillStyle = gradient(-radius, radius * 2, ['#fff2b7', '#edbb54', '#b9792e']); ctx.beginPath(); ctx.ellipse(0, 0, radius, radius * .53, 0, 0, Math.PI * 2); ctx.fill()
       ctx.strokeStyle = '#ae752f'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(0, 0, radius * .72, radius * .36, 0, 0, Math.PI * 2); ctx.stroke()
@@ -104,9 +113,16 @@ function drawMachine(ctx: CanvasRenderingContext2D, board: CoinPusherBoard, fram
     ctx.fillStyle = '#251d21'; ctx.fillRect(31, top + 111, 298, 6)
   }
   for (const item of transfers) drawBody(item.body, item.x, item.y, item.scale, item.opacity)
+  for (const ghost of ghosts) {
+    const p = point({ x: 20 + ghost.position * 280, y: 60, shelf: 0 })
+    const fall = Math.min(1, Math.max(0, (now - ghost.started) / 350))
+    const eased = fall * fall
+    drawBody({ id: -1, shelf: 0, kind: 'coin', x: 0, y: 0 }, p.x, 92 + (p.y - 92) * eased, p.scale, 1)
+  }
   // Moving drop guide and coin return.
-  ctx.strokeStyle = '#fff1c580'; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.moveTo(40 + aim * 280, 94); ctx.lineTo(40 + aim * 280, 108); ctx.stroke(); ctx.setLineDash([])
-  ctx.fillStyle = '#f8d48f'; ctx.beginPath(); ctx.moveTo(40 + aim * 280, 94); ctx.lineTo(34 + aim * 280, 85); ctx.lineTo(46 + aim * 280, 85); ctx.closePath(); ctx.fill()
+  const guideX = point({ x: 20 + aim * 280, y: 60, shelf: 0 }).x
+  ctx.strokeStyle = '#fff1c580'; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.moveTo(guideX, 94); ctx.lineTo(guideX, 108); ctx.stroke(); ctx.setLineDash([])
+  ctx.fillStyle = '#f8d48f'; ctx.beginPath(); ctx.moveTo(guideX, 94); ctx.lineTo(guideX - 6, 85); ctx.lineTo(guideX + 6, 85); ctx.closePath(); ctx.fill()
   rounded(91, 389, 178, 33, 8, '#2b2024'); rounded(97, 393, 166, 23, 5, gradient(393, 23, ['#100f17', '#282027']))
   ctx.fillStyle = '#e2ba7b'; ctx.fillRect(106, 393, 148, 2)
   for (const x of [37, 323]) for (const y of [37, 430]) { ctx.fillStyle = '#f3d3a2'; ctx.beginPath(); ctx.arc(x, y, 2, 0, 7); ctx.fill() }
@@ -130,8 +146,13 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const reducedMotion = useRef(false)
   const sprites = useRef(new Map<string, HTMLImageElement>())
-  const playback = useRef<{ frames: CoinPusherFrame[]; started: number; duration: number } | null>(null)
-  const queue = useRef<number[]>([])
+  const playback = useRef<Playback | null>(null)
+  const playbackQueue = useRef<Playback[]>([])
+  const displayBoard = useRef<CoinPusherBoard | undefined>(initial?.board)
+  const animationStart = useRef<number | null>(null)
+  const queue = useRef<QueuedDrop[]>([])
+  const ghosts = useRef<QueuedDrop[]>([])
+  const requestDrops = useRef<QueuedDrop[]>([])
   const busy = useRef(false)
   const failed = useRef(false)
   const requestRef = useRef<Request | null>(null)
@@ -143,7 +164,10 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
       const image = new Image(); image.src = getItemSpriteUrl(prize.icon.id)
       sprites.current.set(prize.id, image)
     }
-    try { requestRef.current = JSON.parse(sessionStorage.getItem(storageKey) || 'null') } catch { requestRef.current = null }
+    try {
+      requestRef.current = JSON.parse(sessionStorage.getItem(storageKey) || 'null')
+      requestDrops.current = (requestRef.current?.drops || []).map((position) => ({ id: crypto.randomUUID(), position, started: performance.now() }))
+    } catch { requestRef.current = null }
   }, [encounter.settings.prizePool, storageKey])
 
   useEffect(() => {
@@ -158,13 +182,24 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
     let frame = 0
     const draw = () => {
       const context = canvasRef.current?.getContext('2d')
-      const board = sessionRef.current?.board
+      const board = displayBoard.current
       if (context && board) {
-        const current = playback.current
-        const progress = current && !reducedMotion.current ? Math.min(1, (performance.now() - current.started) / current.duration) : 1
+        const now = performance.now()
+        animationStart.current ??= now
+        let current = playback.current
+        if (current && now >= current.started + current.duration) {
+          displayBoard.current = current.board
+          current = playbackQueue.current.shift() || null
+          if (current) {
+            current.started = now
+            ghosts.current = ghosts.current.filter((ghost) => !current!.dropIds.includes(ghost.id))
+          }
+          playback.current = current
+        }
+        const progress = current && !reducedMotion.current ? Math.min(1, (now - current.started) / current.duration) : 1
+        const tick = reducedMotion.current ? board.tick : (initial?.board.tick || 0) + (now - animationStart.current) / (1000 / 60)
         context.setTransform(2, 0, 0, 2, 0, 0)
-        drawMachine(context, board, current?.frames || null, progress, sprites.current, aimRef.current, reducedMotion.current ? 0 : performance.now())
-        if (current && progress >= 1) playback.current = null
+        drawMachine(context, displayBoard.current || board, current?.frames || null, progress, sprites.current, aimRef.current, tick, ghosts.current, now)
       }
       frame = requestAnimationFrame(draw)
     }
@@ -174,10 +209,14 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
 
   const flush = useCallback(async () => {
     if (busy.current || failed.current || !sessionRef.current) return false
-    if (playback.current && performance.now() < playback.current.started + playback.current.duration) return false
+    // Keep one advance ready before the current playback ends. This keeps
+    // network and settlement latency out of the visible animation.
+    if (playbackQueue.current.length > 0) return false
     busy.current = true
     const oldRequest = requestRef.current
-    const drops = oldRequest ? oldRequest.drops : queue.current.splice(0, 3)
+    const selected = oldRequest ? requestDrops.current : queue.current.splice(0, 3)
+    const drops = oldRequest ? oldRequest.drops : selected.map((drop) => drop.position)
+    if (!oldRequest) requestDrops.current = selected
     setPending(queue.current.length + drops.length)
     const request = oldRequest || { encounterId: encounter.id, revision: sessionRef.current.board.revision, actionId: crypto.randomUUID(), drops }
     if (!drops.length && !requestRef.current && request.revision === 0) { busy.current = false; return true }
@@ -187,17 +226,32 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
       const response = await advanceCoinPusherGame(request)
       if (!response.success) {
         if (response.error === 'Not enough currency to drop a coin.') {
+          const failedIds = new Set(selected.map((drop) => drop.id))
+          ghosts.current = ghosts.current.filter((ghost) => !failedIds.has(ghost.id))
+          requestDrops.current = []
           requestRef.current = null; try { sessionStorage.removeItem(storageKey) } catch {} setPending(queue.current.length); setMessage(response.error)
           return false
         }
         failed.current = true; setMessage(response.error); return false
       }
       if ('frames' in response && response.frames?.length) {
-        playback.current = { frames: response.frames, started: performance.now(), duration: 1250 }
+        const segment: Playback = { frames: response.frames, board: response.session.board, dropIds: response.replayed ? [] : selected.map((drop) => drop.id), started: performance.now(), duration: 1500 }
+        if (playback.current) playbackQueue.current.push(segment)
+        else {
+          playback.current = segment
+          ghosts.current = ghosts.current.filter((ghost) => !segment.dropIds.includes(ghost.id))
+        }
+      } else {
+        displayBoard.current = response.session.board
+        if (!response.replayed) {
+          const confirmedIds = new Set(selected.map((drop) => drop.id))
+          ghosts.current = ghosts.current.filter((ghost) => !confirmedIds.has(ghost.id))
+        }
       }
       sessionRef.current = response.session
       setSession(response.session)
-      if (response.replayed) queue.current.unshift(...drops)
+      if (response.replayed) queue.current.unshift(...selected)
+      requestDrops.current = []
       requestRef.current = null
       try { sessionStorage.removeItem(storageKey) } catch {}
       setPending(queue.current.length)
@@ -218,7 +272,7 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
 
   useEffect(() => {
     void flush()
-    const timer = window.setInterval(() => { if (!closing && !result) void flush() }, 1500)
+    const timer = window.setInterval(() => { if (!closing && !result) void flush() }, 120)
     return () => window.clearInterval(timer)
   }, [flush, closing, result])
 
@@ -228,7 +282,8 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
     if (available < encounter.settings.cost.amount * (outstanding + 1)) { setMessage('Not enough currency to drop a coin.'); return }
     if (queue.current.length >= 12 || closing || result) return
     playSfx('select')
-    queue.current.push(position); setPending(outstanding + 1); void flush()
+    const queued = { id: crypto.randomUUID(), position, started: performance.now() }
+    queue.current.push(queued); ghosts.current.push(queued); setPending(outstanding + 1); void flush()
   }
   const leave = async () => {
     setClosing(true)
@@ -249,7 +304,9 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
       <div className="relative my-auto w-full max-w-[410px] py-3">
         <canvas ref={canvasRef} width={720} height={920} className="w-full touch-manipulation" aria-label="Coin pusher machine. Tap to drop a coin." onPointerDown={(event) => {
           const rect = event.currentTarget.getBoundingClientRect()
-          const value = Math.max(0, Math.min(1, ((event.clientX - rect.left) / rect.width * 360 - 40) / 280))
+          const left = point({ x: 20, y: 60, shelf: 0 }).x
+          const right = point({ x: 300, y: 60, shelf: 0 }).x
+          const value = Math.max(0, Math.min(1, ((event.clientX - rect.left) / rect.width * 360 - left) / (right - left)))
           aimRef.current = value; setAim(value); drop(value)
         }} />
         <div className="relative mx-auto mt-1 h-12 w-[82%] rounded-full focus-within:ring-2 focus-within:ring-[#f9d99e]">
