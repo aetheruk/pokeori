@@ -2276,7 +2276,7 @@ function ArenaBackdrop() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 bg-game-canvas" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(181,138,67,0.09),transparent_58%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(40,127,122,0.09),transparent_58%)]" />
       <div className="absolute inset-x-0 top-1/2 h-px bg-game-border/45" />
     </div>
   )
@@ -2439,7 +2439,7 @@ function EvolutionEnergyBurst() {
       className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.75rem)] z-[70] mx-auto flex w-[min(92vw,780px)] items-center justify-center"
     >
       <div className="relative overflow-hidden rounded-md border border-game-ochre/40 bg-game-surface-raised/95 px-4 py-3 text-center backdrop-blur-md">
-        <div className="pointer-events-none absolute inset-0 animate-[tcg-energy-sweep_900ms_ease-out] bg-[linear-gradient(to_right,transparent,rgba(211,173,99,0.18),transparent)]" />
+        <div className="pointer-events-none absolute inset-0 animate-[tcg-energy-sweep_900ms_ease-out] bg-[linear-gradient(to_right,transparent,rgba(40,127,122,0.18),transparent)]" />
         <p className="relative text-xs font-black uppercase tracking-[0.18em] text-game-ink sm:text-sm">
           A burst of Evolution Energy sweeps across the battlefield
         </p>
@@ -3483,7 +3483,7 @@ function SetupHandCard({
       className={cn(
         'tcg-motion group relative aspect-[240/330] w-[calc((100vw-4.5rem)/3.5)] max-w-[9rem] shrink-0 snap-center touch-manipulation overflow-hidden rounded-md border bg-game-surface-raised p-0 transition duration-200 active:scale-[0.97] sm:w-[clamp(7.5rem,15vw,9.5rem)]',
         selected
-          ? 'border-game-ochre shadow-[0_0_0_3px_rgba(211,173,99,0.18)]'
+          ? 'border-game-ochre shadow-[0_0_0_3px_rgba(40,127,122,0.18)]'
           : 'border-game-border shadow-[0_6px_14px_rgba(24,35,39,0.16)] hover:border-game-ochre/55',
         inactive ? 'cursor-default opacity-35 saturate-50' : 'cursor-pointer',
         disabled && 'pointer-events-none opacity-50',
@@ -3671,7 +3671,7 @@ function CombatantSummary({
     <div
       className={cn(
         'grid min-w-0 grid-cols-[auto_1fr] items-center gap-2 border bg-game-surface-raised/80 p-1.5',
-        tone === 'player' ? 'border-game-charcoal/35' : 'border-game-clay/35',
+        tone === 'player' ? 'border-game-charcoal/35' : 'border-game-danger/35',
         align === 'right' && 'grid-cols-[1fr_auto]',
       )}
     >
@@ -3716,7 +3716,7 @@ function CombatantThumb({
     <div
       className={cn(
         'relative h-9 w-7 shrink-0 overflow-hidden border bg-game-surface-raised',
-        tone === 'player' ? 'border-game-charcoal/40' : 'border-game-clay/40',
+        tone === 'player' ? 'border-game-charcoal/40' : 'border-game-danger/40',
       )}
     >
       {card ? (
@@ -3803,7 +3803,7 @@ function TinyHpPill({
     <div
       className={cn(
         'border bg-game-surface-raised/80 px-2 py-1',
-        tone === 'player' ? 'border-game-charcoal/35' : 'border-game-clay/35',
+        tone === 'player' ? 'border-game-charcoal/35' : 'border-game-danger/35',
       )}
     >
       <div className="flex items-center justify-between gap-1 text-[10px] font-black uppercase tracking-[0.06em] text-game-muted">

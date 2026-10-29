@@ -196,7 +196,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
         {specimens.filter((specimen) => !specimen.brickId).map((specimen) => (
           <div
             key={specimen.id}
-            className="absolute flex items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)]"
+            className="absolute flex items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(40,127,122,0.55)]"
             style={{
               left: `${((specimen.x - specimen.size / 2) / width) * 100}%`,
               top: `${((specimen.y - specimen.size / 2) / height) * 100}%`,

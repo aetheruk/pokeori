@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.58.12",
+  "version": "0.58.13",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -163,5 +163,8 @@
     "happy-dom": "21.0.4",
     "undici@7": "7.30.1",
     "undici@8": "8.12.2"
+  },
+  "patchedDependencies": {
+    "deepmerge@4.3.1": "patches/deepmerge@4.3.1.patch"
   }
 }

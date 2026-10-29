@@ -2102,7 +2102,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                       )}
                     >
                       {isDeadlocked && (
-                        <div className="absolute inset-0 z-30 rounded-full ring-2 ring-game-danger/90 shadow-[0_0_14px_rgba(184,97,72,0.65)] [animation:rock-push-warning_1.2s_ease-in-out_infinite]" />
+                        <div className="absolute inset-0 z-30 rounded-full ring-2 ring-game-danger/90 shadow-[0_0_14px_rgba(154,67,55,0.65)] [animation:rock-push-warning_1.2s_ease-in-out_infinite]" />
                       )}
                       <Image
                         src={boulderSprite}

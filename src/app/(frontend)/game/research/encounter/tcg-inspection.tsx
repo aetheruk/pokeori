@@ -271,7 +271,7 @@ export function TcgInspectionGame({
               <Heart
                 key={index}
                 className={
-                  index < lives ? 'text-game-clay' : 'text-game-night-muted'
+                  index < lives ? 'text-game-danger' : 'text-game-night-muted'
                 }
                 fill="currentColor"
                 size={14}

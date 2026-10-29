@@ -475,7 +475,7 @@ const ufoCatcherSettings: UfoCatcherSettings = {
   prizeCount: 5,
   timeLimit: 600,
   background: '/backgrounds/celadon-game-corner-arcade.avif',
-  themeColour: '#b86148',
+  themeColour: '#287f7a',
   tiers: itemPrizePool,
 }
 

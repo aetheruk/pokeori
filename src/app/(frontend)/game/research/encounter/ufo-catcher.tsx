@@ -554,7 +554,7 @@ export function UfoCatcherGame({
             aspectRatio: '4 / 3',
           }}
         >
-          <div className="absolute inset-0 overflow-hidden rounded-xl border-[5px] border-[#8a4739] bg-game-clay shadow-[0_18px_44px_rgba(90,48,39,0.34)]">
+          <div className="absolute inset-0 overflow-hidden rounded-xl border-[5px] border-[#8a4739] bg-[#8a4739] shadow-[0_18px_44px_rgba(90,48,39,0.34)]">
             <MachineScrew className="left-1.5 top-1.5" />
             <MachineScrew className="right-1.5 top-1.5" />
             <MachineScrew className="bottom-1.5 left-1.5" />
@@ -608,7 +608,7 @@ export function UfoCatcherGame({
                     }}
                   />
                   <div
-                    className="absolute z-20 size-[7%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-game-ochre shadow-[0_0_0_3px_rgba(181,138,67,0.18)]"
+                    className="absolute z-20 size-[7%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-game-ochre shadow-[0_0_0_3px_rgba(40,127,122,0.18)]"
                     style={stagePoint}
                     aria-hidden="true"
                   >
@@ -633,7 +633,7 @@ export function UfoCatcherGame({
                 >
                   <div
                     className={cn(
-                      'absolute inset-x-[8%] top-[10%] h-[38%] origin-top rounded-b-sm border-b border-[#d19a7b] bg-game-clay transition-transform duration-300 motion-reduce:duration-0',
+                      'absolute inset-x-[8%] top-[10%] h-[38%] origin-top rounded-b-sm border-b border-[#d19a7b] bg-[#9a503f] transition-transform duration-300 motion-reduce:duration-0',
                       motion === 'delivering' ? 'scale-y-50' : 'scale-y-100',
                     )}
                   />
@@ -752,7 +752,7 @@ export function UfoCatcherGame({
 
               <div
                 className={cn(
-                  'pointer-events-none absolute inset-0 z-[600] overflow-hidden border-b-4 border-[#7d4438] bg-game-clay shadow-[0_8px_14px_rgba(90,48,39,0.28)] transition-transform duration-700 ease-in-out motion-reduce:duration-0',
+                  'pointer-events-none absolute inset-0 z-[600] overflow-hidden border-b-4 border-[#7d4438] bg-[#9a503f] shadow-[0_8px_14px_rgba(90,48,39,0.28)] transition-transform duration-700 ease-in-out motion-reduce:duration-0',
                   shutterOpen ? '-translate-y-[105%]' : 'translate-y-0',
                 )}
                 aria-hidden="true"

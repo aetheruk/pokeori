@@ -154,7 +154,7 @@ export function SnakeGame({ encounter, initialState, actions }: SnakeGameProps) 
         {sceneRewards.map((reward) => (
           <div
             key={reward.id}
-            className="absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_14px_rgba(181,138,67,0.48)]"
+            className="absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_14px_rgba(40,127,122,0.48)]"
             style={sceneCircleStyle(
               reward.position,
               settings.rewardRadius * 2,

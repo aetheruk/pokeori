@@ -408,7 +408,7 @@ export function CryRecognitionGame({
                 initial={{ top: '-10%' }}
                 animate={{ top: '110%' }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-                className="pointer-events-none absolute left-0 right-0 z-20 h-1 bg-[#d3ad63]/60 shadow-[0_0_15px_rgba(211,173,99,0.65)]"
+                className="pointer-events-none absolute left-0 right-0 z-20 h-1 bg-game-ochre/60 shadow-[0_0_15px_rgba(40,127,122,0.65)]"
               />
             )}
 
@@ -486,14 +486,14 @@ export function CryRecognitionGame({
                           ease: 'easeOut',
                           delay: 0.2,
                         }}
-                        className="pointer-events-none absolute h-20 w-20 rounded-full border-2 border-[#d3ad63]/35"
+                        className="pointer-events-none absolute h-20 w-20 rounded-full border-2 border-game-ochre/35"
                       />
                     </>
                   )}
                   <div className="relative z-10 flex h-20 w-20 items-center justify-center rounded-md border border-[#f9f9f9]/20 bg-[#172733]/85 backdrop-blur-sm">
                     <div aria-hidden="true">
                       {isPlaying ? (
-                        <Volume2 className="h-8 w-8 animate-pulse text-[#d3ad63]" />
+                        <Volume2 className="h-8 w-8 animate-pulse text-game-ochre" />
                       ) : (
                         <Volume2 className="h-8 w-8 text-[#f9f9f9]" />
                       )}

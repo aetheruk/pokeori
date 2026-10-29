@@ -125,7 +125,7 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
       deckFormat: 'champions',
       requiredSeries: 'Base',
       matchmakingModes: ['friendly', 'quick'],
-      themeColour: '#b58a43',
+      themeColour: '#287f7a',
     },
   },
   battle({

@@ -80,7 +80,7 @@ export function EndlessCollectibleSprite({
         alt={item?.name || itemId}
         width={size}
         height={size}
-        className="h-full w-full object-contain drop-shadow-[0_0_8px_rgba(181,138,67,0.65)]"
+        className="h-full w-full object-contain drop-shadow-[0_0_8px_rgba(40,127,122,0.65)]"
       />
     )
   }
@@ -95,12 +95,12 @@ export function EndlessCollectibleSprite({
         alt={form?.name || 'Pokemon Research XP'}
         fill
         sizes={`${size}px`}
-        className="object-contain pixelated drop-shadow-[0_0_8px_rgba(181,138,67,0.65)]"
+        className="object-contain pixelated drop-shadow-[0_0_8px_rgba(40,127,122,0.65)]"
       />
     )
   }
 
   return (
-    <Package className="h-full w-full text-game-ochre drop-shadow-[0_0_8px_rgba(181,138,67,0.65)]" />
+    <Package className="h-full w-full text-game-ochre drop-shadow-[0_0_8px_rgba(40,127,122,0.65)]" />
   )
 }

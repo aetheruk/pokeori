@@ -171,7 +171,7 @@ export function DiglettTunnelTapGame({
               lives <= 1 ? 'border-red-500/50 bg-red-500/70' : '',
             )}
           >
-            <Heart className="h-3 w-3 fill-current text-game-clay" />
+            <Heart className="h-3 w-3 fill-current text-game-danger" />
             <span>
               {lives} <span className="text-game-muted">/ {maxLives}</span>
             </span>

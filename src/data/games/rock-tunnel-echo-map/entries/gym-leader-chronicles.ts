@@ -50,6 +50,6 @@ export const gymLeaderChronicleEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
     background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif',
     requirements: [{ type: 'task_completed', targetId: 'volcano-badge-memory-revealed' }],
     criteria: [], rewards: [],
-    settings: { ...common, tilePaletteId: 'laboratory', revealDurationMs: 1200, themeColour: '#b86148', background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif' },
+    settings: { ...common, tilePaletteId: 'laboratory', revealDurationMs: 1200, themeColour: '#287f7a', background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif' },
   },
 ]

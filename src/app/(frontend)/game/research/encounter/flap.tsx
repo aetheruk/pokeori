@@ -107,7 +107,7 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
                     totalTime={3}
                     size="xl"
                     className="text-[#f9f9f9] drop-shadow-2xl"
-                    colorOverride="text-[#d3ad63]"
+                    colorOverride="text-game-ochre"
                   />
                 </div>
               </div>

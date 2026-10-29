@@ -40,7 +40,7 @@ export const gymLeaderChronicleCircuitEntries: MagnemiteCircuitGameConfig[] = [
         { x: 6, y: 5, type: 'straight', rotation: 0 },
         { x: 7, y: 5, type: 'straight', rotation: 1, locked: true },
       ],
-      timeLimit: 115, maxRotations: 18, winRate: 1, themeColour: '#b58a43',
+      timeLimit: 115, maxRotations: 18, winRate: 1, themeColour: '#287f7a',
       background: '/backgrounds/chronicle-surge-blackout-streets.avif',
     },
   },

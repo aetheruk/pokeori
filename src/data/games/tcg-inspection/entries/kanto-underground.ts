@@ -30,7 +30,7 @@ export const kantoUndergroundTcgInspectionEntries: TcgInspectionGameConfig[] = [
       studySeconds: 30,
       lives: 2,
       timeLimit: 60,
-      themeColour: '#b58a43',
+      themeColour: '#287f7a',
     },
   },
 ]

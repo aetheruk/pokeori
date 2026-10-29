@@ -35,9 +35,9 @@ const typeIdMap: Record<string, number> = {
 
 /* Status effect colors and display names */
 const statusConfig: Record<string, { color: string; name: string }> = {
-  poison: { color: 'text-game-clay-strong', name: 'Poison' },
+  poison: { color: 'text-game-danger', name: 'Poison' },
   'bad-poison': { color: 'text-game-danger', name: 'Bad Poison' },
-  burn: { color: 'text-game-clay-strong', name: 'Burn' },
+  burn: { color: 'text-game-battle-orange-strong', name: 'Burn' },
   paralysis: { color: 'text-game-ochre-strong', name: 'Paralysis' },
   sleep: { color: 'text-game-muted', name: 'Sleep' },
   freeze: { color: 'text-game-moss-strong', name: 'Freeze' },

@@ -4,7 +4,7 @@ Use this checklist before deploying gameplay, schema, security, or generated-dat
 changes.
 
 ## Security
-- Run `bun run security:audit`. The 0.44.0 dependency set reports no advisories. Payload packages must stay on matching versions (currently 3.90.2); Sharp is 0.35.5. Overrides keep fast-copy, shell-quote, and source-map-js on patched releases, while Sass 1.105.1 removes the unpatched braces dependency from the old watcher chain. The audit still verifies the admin-only unlock policy if the earlier named Payload advisory is ever reported again, and rejects other advisories.
+- Run `bun run security:audit`. Payload packages must stay on matching versions (currently 3.90.2); Sharp is 0.35.5. Overrides keep fast-copy, shell-quote, and source-map-js on patched releases, while Sass 1.105.1 removes the unpatched braces dependency from the old watcher chain. The audit verifies the admin-only unlock policy for the known Payload advisory, checks the local `deepmerge@4.3.1` prototype-key patch, and checks the installed `graphql-scalars` version against its advisory before allowing the known safe package. It rejects other advisories.
 - Rotate credentials known to have been exposed to unauthorized parties.
 - Confirm production has `DATABASE_URI`, `PAYLOAD_SECRET`, and `RESEND_API_KEY`.
 - Confirm GitHub Actions has `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` as a build secret and Coolify has the same stable value at runtime. Keep the unlinked `pokeori-production` GHCR package and its registry build cache private.

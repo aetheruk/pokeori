@@ -377,7 +377,7 @@ export function RewardResultOverlay({
           <>
             <p className="mt-1 text-sm text-game-ink">One life was lost.</p>
             <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-game-ink">
-              <Heart className="h-4 w-4 text-game-clay" />
+              <Heart className="h-4 w-4 text-game-danger" />
               Lives left: {expeditionProgress.livesLeft}/
               {expeditionProgress.maxLosses}.
             </p>

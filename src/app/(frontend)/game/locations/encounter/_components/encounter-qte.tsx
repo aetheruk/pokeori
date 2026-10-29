@@ -276,7 +276,7 @@ export function EncounterQte({
               cy="50"
               r="45"
               fill="none"
-              stroke="#b58a43"
+              stroke="var(--game-ochre)"
               strokeLinecap="round"
               strokeWidth="5"
               strokeDasharray={`${Math.max(0.01, focusLoopProgress) * 282.7} 282.7`}
@@ -288,7 +288,7 @@ export function EncounterQte({
                 key={trail.id}
                 points={formatPoints(trail.points)}
                 fill="none"
-                stroke={trail.success ? '#b58a43' : '#5f794f'}
+                stroke={trail.success ? 'var(--game-ochre)' : '#5f794f'}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeOpacity={trail.success ? 0.82 : 0.34}

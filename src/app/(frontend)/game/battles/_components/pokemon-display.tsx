@@ -230,13 +230,13 @@ function DamageSplat({
 
   // Status-based colors
   const statusColors: Record<string, { glow: string; text: string; shadow: string }> = {
-    poison: { glow: 'bg-game-clay-strong', text: 'text-game-clay-strong', shadow: 'rgba(184,97,72,0.8)' },
+    poison: { glow: 'bg-game-danger', text: 'text-game-danger', shadow: 'rgba(154,67,55,0.8)' },
     'bad-poison': {
       glow: 'bg-game-danger',
       text: 'text-game-danger',
       shadow: 'rgba(189,90,71,0.8)',
     },
-    burn: { glow: 'bg-game-clay', text: 'text-game-clay', shadow: 'rgba(184,97,72,0.8)' },
+    burn: { glow: 'bg-game-danger', text: 'text-game-danger', shadow: 'rgba(154,67,55,0.8)' },
     frostbite: { glow: 'bg-game-moss-strong', text: 'text-game-moss-strong', shadow: 'rgba(95,121,79,0.8)' },
   }
 
@@ -249,17 +249,17 @@ function DamageSplat({
 
   const glowClass =
     (isHealing ? 'bg-game-moss' : statusColor?.glow) ||
-    (isCritical ? 'bg-game-danger' : isHighDamage ? 'bg-game-clay' : 'bg-game-ochre')
+    (isCritical ? 'bg-game-danger' : isHighDamage ? 'bg-game-danger' : 'bg-game-ochre')
   const textClass =
     (isHealing ? 'text-game-moss-strong' : statusColor?.text) ||
-    (isCritical ? 'text-game-danger' : isHighDamage ? 'text-game-clay' : 'text-game-ochre')
+    (isCritical ? 'text-game-danger' : isHighDamage ? 'text-game-danger' : 'text-game-ochre')
   const shadowColor =
     (isHealing ? 'rgba(95,121,79,0.8)' : statusColor?.shadow) ||
     (isCritical
       ? 'rgba(189,90,71,0.8)'
       : isHighDamage
-        ? 'rgba(184,97,72,0.8)'
-        : 'rgba(181,138,67,0.6)')
+        ? 'rgba(154,67,55,0.8)'
+        : 'rgba(40,127,122,0.6)')
 
   return (
     <div
