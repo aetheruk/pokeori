@@ -1,0 +1,30 @@
+import { expect, test } from '@playwright/test'
+
+for (const width of [390, 1280]) {
+  test(`box team manager keeps its shared bottom panel and returns from selection at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 })
+    await page.goto('/ui-test')
+    await page.getByRole('button', { name: 'Test party manager' }).click()
+    const manager = page.getByRole('dialog', { name: 'Battle team' })
+    await expect(manager).toBeVisible()
+    await expect(manager.getByRole('button', { name: /Edit moves/ })).toBeVisible()
+    await expect(manager.getByRole('button', { name: 'Item' })).toBeVisible()
+    await expect(manager.getByRole('button', { name: 'Power' })).toBeVisible()
+    await expect(manager.getByRole('button', { name: 'Choose a Pokémon for the battle team' })).toHaveCount(4)
+    await expect(manager.getByRole('button', { name: 'Select partner Squirtle' })).toBeVisible()
+    await manager.getByRole('button', { name: 'Choose a Pokémon for the battle team' }).first().click()
+    await page.getByRole('button', { name: 'Choose Pikachu from box' }).click()
+    await expect(manager).toBeVisible()
+    await expect(manager.getByRole('heading', { name: 'Pikachu' })).toBeVisible()
+    await expect(manager.getByRole('button', { name: 'Remove' })).toBeVisible()
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: `/tmp/pokeori-party-manager-${width}.png` })
+    await manager.getByRole('button', { name: 'Remove' }).click()
+    await expect(manager.getByRole('button', { name: 'Choose a Pokémon for the battle team' })).toHaveCount(4)
+    await manager.getByRole('button', { name: 'Select partner Squirtle' }).click()
+    await expect(manager.getByRole('heading', { name: 'Squirtle' })).toBeVisible()
+    await manager.getByRole('button', { name: 'Remove' }).click()
+    await expect(manager.getByRole('button', { name: 'Choose a partner Pokémon' })).toBeVisible()
+    await expect.poll(() => manager.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+  })
+}

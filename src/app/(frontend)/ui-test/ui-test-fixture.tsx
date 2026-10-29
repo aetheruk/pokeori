@@ -28,6 +28,7 @@ import { DexLayoutFixture } from './dex-layout-fixture'
 import { PokemonDetailsDialog } from '@/app/(frontend)/game/pokemon/_components/pokemon-details-dialog'
 import type { Pokemon } from '@/payload-types'
 import { ArtisanBalanceFixture } from './artisan-balance-fixture'
+import { PartyManagerFixture } from './party-manager-fixture'
 
 /** Local-only fixtures: no account, reward, database or gameplay actions are invoked. */
 export function UiTestFixture() {
@@ -43,6 +44,7 @@ export function UiTestFixture() {
   const [sideScroller, setSideScroller] = useState<'run' | 'flap' | null>(null)
   const [ufo, setUfo] = useState(false)
   const [inspector, setInspector] = useState(false)
+  const [partyManager, setPartyManager] = useState(false)
   const [navigation, setNavigation] = useState(false)
   const [dexLayout, setDexLayout] = useState(false)
   const [settings, setSettings] = useState(false)
@@ -101,6 +103,7 @@ export function UiTestFixture() {
       <Button onClick={() => setSideScroller('flap')}>Test Flap canvas</Button>
       <Button onClick={() => setUfo(true)}>Test UFO Catcher</Button>
       <Button onClick={() => setInspector(true)}>Test Pokemon inspector</Button>
+      <Button onClick={() => setPartyManager(true)}>Test party manager</Button>
       <Button onClick={() => setNavigation(true)}>Test game navigation</Button>
       <Button onClick={() => setDexLayout(true)}>Test dex layouts</Button>
       <Button onClick={() => setSettings(true)}>Test trainer settings</Button>
@@ -130,6 +133,7 @@ export function UiTestFixture() {
     {snake && <SnakeFixture />}
     {ufo && <UfoFixture />}
     {inspector && <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer', skills: { researching: { level: 10 } } }, inventory: [{ itemId: 'tm-rollout', quantity: 1 }], pokedex: [{ speciesId: 108, formId: '108', researchLevel: 1, caught: true }], pokemon: [] } as unknown as RequirementData}><AudioProvider><PokemonDetailsDialog pokemon={{ id: 'ui-test-pokemon', speciesId: 108, formId: '108', name: 'Inspector fixture', level: 5, identified: true } as Pokemon} boxes={[]} trigger={<Button>Open fixture inspector</Button>} /></AudioProvider></UserProvider></SWRConfig>}
+    {partyManager && <PartyManagerFixture />}
     {arcade ? <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><AudioProvider><ArcadeFixture /></AudioProvider></UserProvider></SWRConfig> : null}
     <ScratchCardModal open={scratch} onOpenChange={setScratch} onClose={() => setScratch(false)} background="" icon={{ type: 'item', id: 'poke-ball' }} rewards={[]} />
     {intro && <VSAnimation player={{ name: 'Test trainer' }} enemy={{ name: 'Test rival' }} onComplete={() => setIntro(false)} />}
