@@ -1136,7 +1136,7 @@ Route 8 unlocks after `celadon-police-hq-lead`.
 - `thirstier-work-route-7` is a repeatable daily Celadon guard task that appears after `underground-path-route-8`, consumes one Soda Pop, and rewards two Great Balls.
 - `explore-celadon-city` unlocks after `underground-path-route-8` and requires 3 Route 7 wild battle wins, 3 Route 7 catches, and 1 successful Route 7 Field Observation before entering Celadon City.
 - **Post-Timeline Divergence Celadon & Saffron Guidance**:
-  - `saffron-avoidance-reflection` (_Steer Clear of Saffron_): A repeatable task under Saffron City after `celadon-timeline-divergence`. From the player's perspective, remembering the lethal assassination trap, they have no intention of entering Saffron City while it remains under Team Rocket quarantine.
+  - `saffron-avoidance-reflection` (_Steer Clear of Saffron_): A repeatable task under Saffron City after `celadon-timeline-divergence`. From the player's perspective, remembering the lethal assassination trap, they have no intention of entering Saffron City while it remains under Team Rocket quarantine. It disappears from Explore after the player defeats Koga in `fuchsia-gym-leader-koga`.
   - `route-16-sleeping-snorlax`, `route-16-furious-snorlax`, and `route-16-dazed-snorlax`: The western Route 16 Snorlax blocking Cycling Road can now be awakened using the Azure Flute obtained from Pokémon Tower.
   - `celadon-cycling-road-caution` (_The Path South_): An uncompletable task under Celadon City unlocked after resolving the Route 16 Dazed Snorlax (`route-16-dazed-snorlax`). Displays Snorlax icon and overview noting the player's decision to travel south to Fuchsia via Lavender Town and Route 12 to avoid the Rocket Factory.
 

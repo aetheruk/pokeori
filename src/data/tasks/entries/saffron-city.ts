@@ -820,6 +820,13 @@ export const saffronCityTasks: Task[] = [
         type: 'task_completed',
         targetId: 'celadon-timeline-divergence',
       },
+      {
+        type: 'battle_result',
+        targetId: 'fuchsia-gym-leader-koga',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
     ],
     criteria: [],
     rewards: [],
