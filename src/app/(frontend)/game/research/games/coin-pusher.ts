@@ -109,7 +109,7 @@ export async function advanceCoinPusherGame(input: {
           const session = { ...state.coinPusherSession, board: simulation.board }
           const saved = await redis.setManyIfValue(key, state, [{ key, value: { ...state, coinPusherSession: session }, ttlSeconds: Math.max(60, Math.ceil((state.expiry - Date.now()) / 1000) + 120) }])
           if (!saved) return { success: false as const, error: 'The machine state could not be saved. Please retry.' }
-          return { success: true as const, replayed: false, actionId: input.actionId, session, rewards: null }
+          return { success: true as const, replayed: false, actionId: input.actionId, session, rewards: null, frames: simulation.frames }
         }
       }
     }
@@ -138,12 +138,12 @@ export async function advanceCoinPusherGame(input: {
         totalCost: state.coinPusherSession!.totalCost + cost,
         totalRewards: summary ? mergeCoinPusherSummaries(state.coinPusherSession!.totalRewards, summary) : state.coinPusherSession!.totalRewards,
       }
-      return { actionId: input.actionId, session, rewards: summary, previousState: state }
+      return { actionId: input.actionId, session, rewards: summary, frames: simulation.frames, previousState: state }
     })
     const nextState = { ...state, coinPusherSession: result.session }
     const saved = await redis.setManyIfValue(key, result.previousState, [{ key, value: nextState, ttlSeconds: Math.max(60, Math.ceil((state.expiry - Date.now()) / 1000) + 120) }])
     if (!saved) return { success: false as const, error: 'The machine state could not be saved. Please retry.' }
-    return { success: true as const, replayed: result.actionId !== input.actionId, actionId: result.actionId, session: result.session, rewards: result.rewards }
+    return { success: true as const, replayed: result.actionId !== input.actionId, actionId: result.actionId, session: result.session, rewards: result.rewards, frames: result.frames }
   } catch (error) {
     if (error instanceof Error && error.message === 'COIN_PUSHER_INSUFFICIENT_FUNDS') {
       return { success: false as const, error: 'Not enough currency to drop a coin.' }
