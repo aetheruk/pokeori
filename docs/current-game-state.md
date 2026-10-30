@@ -1,10 +1,12 @@
 # Current Game State
 
+Unreleased: Coin Pusher leave results now include the accumulated session rewards and total spend, even if completion omits its summary. The shared door icon replaces the text leave control. Shelves mix three sized coin denominations: bronze, silver, and gold. Their values are configured per machine; Kanto/Test uses 1, 10, and 25 Fun Tokens. Prize bubbles are weighted by rarity and can award any of the 18 base Pokemon materials x3, two Team Rocket Booster Packs, or one Shiny Koban.
+
 Unreleased: Coin Pusher buffers its next server simulation during playback and shows a queued coin at the drop slot. Pushers and coins now share the server simulation timeline, and playback slows together if the next segment is delayed. Coin placement and markings vary; the two shelf simulations do not yet support physical stacking.
 
 Unreleased: Coin Pusher plays sampled server-side physics positions so the pushers, coins, shelf transfers and payouts animate through the actual simulated movement. The cabinet and aiming control have been redesigned, and restored physics steps resume each pusher at its saved phase.
 
-Unreleased: Kanto/Test includes a repeatable two-shelf Coin Pusher. Each drop costs one Fun Token; coins collected from the lower shelf pay one Fun Token, and prize bubbles contain one Broken Ball. Bubbles begin on the board and can be replenished by paid drops. The board resets when the player leaves and can be resumed during an active session.
+Unreleased: Kanto/Test includes a repeatable two-shelf Coin Pusher. Each drop costs one Fun Token. Bubbles begin on the board and can be replenished by paid drops. The board resets when the player leaves and can be resumed during an active session.
 
 Unreleased: Grid Adventure objects and floor prizes now support Explore-style `requirements` and `criteria`. Placement and linked-activity requirements decide what is included in the saved board; unmet criteria keep interactive objects visible but prevent interaction. Each board generates and pins a fresh server-side roll, and every Grid Adventure requirement check uses that same roll for the life of the run. The Buggy, Feathered, and Ghost Gauntlets' center floor materials always appear on floors 2–4. All three Gauntlets guarantee one center candy on the final floor, with two additional corner candies sharing a 1-in-5 roll. The roll is never accepted from the client, so child battles and activities remain consistent if reward settlement changes the player's global roll. Item, currency, and Pokémon criteria use the existing consumption flow, including Pokémon selection when required.
 

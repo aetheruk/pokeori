@@ -6,6 +6,7 @@ export interface CoinPusherBody {
   id: number
   shelf: 0 | 1
   kind: 'coin' | 'bubble'
+  denomination?: 'bronze' | 'silver' | 'gold'
   prizeId?: string
   x: number
   y: number
@@ -20,7 +21,7 @@ export interface CoinPusherBoard {
   bodies: CoinPusherBody[]
 }
 
-export type CoinPusherFrameBody = Pick<CoinPusherBody, 'id' | 'shelf' | 'kind' | 'prizeId' | 'x' | 'y'>
+export type CoinPusherFrameBody = Pick<CoinPusherBody, 'id' | 'shelf' | 'kind' | 'denomination' | 'prizeId' | 'x' | 'y'>
 export interface CoinPusherFrame {
   tick: number
   bodies: CoinPusherFrameBody[]
@@ -31,6 +32,15 @@ export const COIN_PUSHER_DEPTH = 170
 const RADIUS = 12
 const STEP_MS = 1000 / 60
 const MAX_BODIES = 120
+const DEFAULT_DENOMINATIONS: CoinPusherSettings['coinDenominations'] = {
+  bronze: { value: 1, weight: 76 },
+  silver: { value: 10, weight: 20 },
+  gold: { value: 25, weight: 4 },
+}
+
+function getCoinDenominations(settings: CoinPusherSettings) {
+  return settings.coinDenominations || DEFAULT_DENOMINATIONS
+}
 
 /** The rendered plate and collision body must use the same simulation phase. */
 export function getCoinPusherPusherY(tick: number, shelf: 0 | 1) {
@@ -48,6 +58,21 @@ function choosePrize(settings: CoinPusherSettings, random: () => number) {
   return settings.prizePool.at(-1)?.id
 }
 
+function chooseDenomination(settings: CoinPusherSettings, random: () => number) {
+  const denominations = [
+    ['bronze', getCoinDenominations(settings).bronze],
+    ['silver', getCoinDenominations(settings).silver],
+    ['gold', getCoinDenominations(settings).gold],
+  ] as const
+  const total = denominations.reduce((sum, [, denomination]) => sum + denomination.weight, 0)
+  let roll = random() * total
+  for (const [id, denomination] of denominations) {
+    roll -= denomination.weight
+    if (roll < 0) return id
+  }
+  return 'bronze'
+}
+
 export function createCoinPusherBoard(settings: CoinPusherSettings, random: () => number = Math.random): CoinPusherBoard {
   const board: CoinPusherBoard = { revision: 0, nextId: 1, tick: 0, bodies: [] }
   for (const shelf of [0, 1] as const) {
@@ -55,7 +80,7 @@ export function createCoinPusherBoard(settings: CoinPusherSettings, random: () =
       for (let col = 0; col < 10; col++) {
         const xOffset = (row % 2 ? 9 : -3) + (row * 13 + col * 7 + shelf * 3) % 7 - 3
         const yOffset = (row * 7 + col * 3 + shelf) % 7 - 3
-        board.bodies.push({ id: board.nextId++, shelf, kind: 'coin', x: 42 + col * 26 + xOffset, y: 90 + row * 25 + yOffset, vx: 0, vy: 0 })
+        board.bodies.push({ id: board.nextId++, shelf, kind: 'coin', denomination: chooseDenomination(settings, random), x: 42 + col * 26 + xOffset, y: 90 + row * 25 + yOffset, vx: 0, vy: 0 })
       }
     }
   }
@@ -107,7 +132,9 @@ export function advanceCoinPusher(
     return body
   })
   const add = (data: CoinPusherBody) => {
-    const body = Matter.Bodies.circle(data.x, data.y, data.kind === 'bubble' ? 15 : RADIUS, {
+    const denomination = data.denomination || 'bronze'
+    const radius = data.kind === 'bubble' ? 15 : RADIUS * ({ bronze: 1, silver: 1.12, gold: 1.24 }[denomination])
+    const body = Matter.Bodies.circle(data.x, data.y, radius, {
       friction: 0.03, frictionAir: 0.08, restitution: 0.08,
     })
     Matter.Body.setVelocity(body, { x: data.vx, y: data.vy })
@@ -118,13 +145,13 @@ export function advanceCoinPusher(
   const frames: CoinPusherFrame[] = []
   const captureFrame = () => {
     frames.push({ tick: board.tick, bodies: Array.from(mappings.values(), ({ data, body }) => ({
-      id: data.id, shelf: data.shelf, kind: data.kind, prizeId: data.prizeId,
+      id: data.id, shelf: data.shelf, kind: data.kind, denomination: data.denomination || 'bronze', prizeId: data.prizeId,
       x: Math.round(body.position.x * 10) / 10, y: Math.round(body.position.y * 10) / 10,
     })) })
   }
   captureFrame()
   for (const position of drops) {
-    const data: CoinPusherBody = { id: board.nextId++, shelf: 0, kind: 'coin', x: 20 + position * 280, y: getCoinPusherPusherY(board.tick, 0) + 25, vx: 0, vy: 3 }
+    const data: CoinPusherBody = { id: board.nextId++, shelf: 0, kind: 'coin', denomination: 'bronze', x: 20 + position * 280, y: getCoinPusherPusherY(board.tick, 0) + 25, vx: 0, vy: 3 }
     board.bodies.push(data)
     add(data)
     const bubbles = board.bodies.filter((body) => body.kind === 'bubble').length
@@ -138,6 +165,7 @@ export function advanceCoinPusher(
     }
   }
   let coinsWon = 0
+  let coinPayout = 0
   const prizesWon: string[] = []
   for (let step = 0; step < steps; step++) {
     board.tick++
@@ -166,6 +194,7 @@ export function advanceCoinPusher(
         add(data)
       } else if (data.kind === 'coin') {
         coinsWon++
+        coinPayout += getCoinDenominations(settings)[data.denomination || 'bronze'].value
       } else if (data.prizeId) {
         prizesWon.push(data.prizeId)
       }
@@ -180,5 +209,5 @@ export function advanceCoinPusher(
     Matter.Composite.clear(engine.world, false)
     Matter.Engine.clear(engine)
   }
-  return { board, coinsWon, prizesWon, sideLosses, frames }
+  return { board, coinsWon, coinPayout, prizesWon, sideLosses, frames }
 }
