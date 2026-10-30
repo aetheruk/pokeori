@@ -178,6 +178,7 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const reducedMotion = useRef(false)
   const sprites = useRef(new Map<string, HTMLImageElement>())
+  const collectedItemRewards = useRef(new Map<string, { id: string; name: string; quantity: number }>())
   const playback = useRef<Playback | null>(null)
   const playbackQueue = useRef<Playback[]>([])
   const displayBoard = useRef<CoinPusherBoard | undefined>(initial?.board)
@@ -278,6 +279,17 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
         }
         failed.current = true; setMessage(response.error); return false
       }
+      if (!response.replayed) {
+        const awardedItems = (response.rewards as { items?: Array<{ id: string; name: string; quantity: number }> } | null)?.items || []
+        for (const item of awardedItems) {
+          const existing = collectedItemRewards.current.get(item.id)
+          collectedItemRewards.current.set(item.id, {
+            id: item.id,
+            name: item.name,
+            quantity: (existing?.quantity || 0) + item.quantity,
+          })
+        }
+      }
       if ('frames' in response && response.frames?.length) {
         const segment: Playback = { frames: response.frames, board: response.session.board, dropIds: response.replayed ? [] : selected.map((drop) => drop.id), rewards: response.rewards, lastFrameAt: performance.now(), progress: 0, speed: 1 }
         if (playback.current) playbackQueue.current.push(segment)
@@ -335,26 +347,39 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
     const res = await completeGame(encounter.id, true)
     if (!res.success) { setMessage(res.error || 'Could not leave the machine.'); setClosing(false); return }
     const accumulated = sessionRef.current?.totalRewards || {}
-    const summary = res.summary || accumulated
-    const hasResultRewards = Boolean(
-      summary && Object.values(summary).some((value) => Array.isArray(value) && value.length > 0),
-    )
-    const fallbackSummary = {
+    const completedSummary = res.summary || {}
+    const allItemSummaries = [
+      ...(completedSummary.items || []),
+      ...(accumulated.items || []),
+      ...collectedItemRewards.current.values(),
+    ]
+    const itemsById = new Map<string, { id: string; name: string; quantity: number }>()
+    for (const item of allItemSummaries) {
+      const existing = itemsById.get(item.id)
+      if (!existing || item.quantity > existing.quantity) itemsById.set(item.id, item)
+    }
+    const completionCurrency = completedSummary.currency || []
+    const currency = completionCurrency.some((entry: any) => entry.label !== 'Total Spent')
+      ? [...completionCurrency]
+      : [...(accumulated.currency || [])]
+    if (sessionRef.current?.totalCost && !currency.some((entry: any) => entry.label === 'Total Spent')) {
+      currency.push({
+        type: encounter.settings.cost.currencyType,
+        quantity: -sessionRef.current.totalCost,
+        label: 'Total Spent',
+      })
+    }
+    const summary = {
       ...accumulated,
-      currency: [
-        ...(accumulated.currency || []),
-        ...(sessionRef.current?.totalCost ? [{
-          type: encounter.settings.cost.currencyType,
-          quantity: -sessionRef.current.totalCost,
-          label: 'Total Spent',
-        }] : []),
-      ],
+      ...completedSummary,
+      items: [...itemsById.values()],
+      currency,
     }
     setResult({
       success: res.success,
       activitySuccess: res.activitySuccess,
       message: res.success ? 'Session ended' : res.error,
-      rewards: hasResultRewards ? summary : fallbackSummary,
+      rewards: summary,
     })
     setClosing(false)
   }
