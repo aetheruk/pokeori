@@ -1,6 +1,6 @@
 # Current Game State
 
-Unreleased: Coin Pusher leave results now include the accumulated session rewards and total spend, even if completion omits its summary. The shared door icon replaces the text leave control. Shelves mix three sized coin denominations: bronze, silver, and gold. Their values are configured per machine; Kanto/Test uses 1, 10, and 25 Fun Tokens. Prize bubbles are weighted by rarity and can award any of the 18 base Pokemon materials x3, two Team Rocket Booster Packs, or one Shiny Koban.
+Unreleased: Coin Pusher leave results merge confirmed prize items from each settled drop with the server's accumulated rewards and total spend, so a prize bubble remains visible if the final completion summary omits it. The shared door icon replaces the text leave control. Shelves mix three sized coin denominations: bronze, silver, and gold. Their values are configured per machine; Kanto/Test uses 1, 10, and 25 Fun Tokens. Prize bubbles are weighted by rarity and can award any of the 18 base Pokemon materials x3, two Team Rocket Booster Packs, or one Shiny Koban.
 
 Unreleased: Coin Pusher buffers its next server simulation during playback and shows a queued coin at the drop slot. Pushers and coins now share the server simulation timeline, and playback slows together if the next segment is delayed. Coin placement and markings vary; the two shelf simulations do not yet support physical stacking.
 
