@@ -122,7 +122,7 @@ export async function advanceCoinPusherGame(input: {
       const currentBalance = freshUser.currency?.[settings.cost.currencyType] || 0
       if (currentBalance < cost) throw new Error('COIN_PUSHER_INSUFFICIENT_FUNDS')
       const simulation = advanceCoinPusher(state.coinPusherSession!.board, settings, input.drops, random)
-      const payout = simulation.coinsWon * settings.payout.amount
+      const payout = simulation.coinPayout * settings.payout.amount
       const currency = { ...freshUser.currency }
       currency[settings.cost.currencyType] = currentBalance - cost
       currency[settings.payout.currencyType] = (currency[settings.payout.currencyType] || 0) + payout

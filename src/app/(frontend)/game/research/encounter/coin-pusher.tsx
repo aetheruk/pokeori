@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { DoorOpen, Loader2 } from 'lucide-react'
 import { useUser } from '@/context/UserContext'
 import { useAudio } from '@/context/AudioContext'
 import { useGameMusic } from '@/hooks/useGameMusic'
@@ -20,13 +21,19 @@ type Request = { encounterId: string; revision: number; actionId: string; drops:
 type QueuedDrop = { id: string; position: number; started: number; confirmedAt?: number }
 type Playback = { frames: CoinPusherFrame[]; board: CoinPusherBoard; dropIds: string[]; rewards: unknown; lastFrameAt: number; progress: number; speed: number }
 
+const defaultDenominations: CoinPusherGameConfig['settings']['coinDenominations'] = {
+  bronze: { value: 1, weight: 76 },
+  silver: { value: 10, weight: 20 },
+  gold: { value: 25, weight: 4 },
+}
+
 function point(body: Pick<CoinPusherFrameBody, 'x' | 'y' | 'shelf'>) {
   const depth = Math.max(0, Math.min(1, body.y / COIN_PUSHER_DEPTH))
   const scale = 0.78 + depth * 0.16
   return { x: 180 + (body.x - COIN_PUSHER_WIDTH / 2) * scale, y: (body.shelf === 0 ? 111 : 249) + depth * 91, scale }
 }
 
-function drawMachine(ctx: CanvasRenderingContext2D, board: CoinPusherBoard, frames: CoinPusherFrame[] | null, progress: number, sprites: Map<string, HTMLImageElement>, aim: number, ghosts: QueuedDrop[], now: number) {
+function drawMachine(ctx: CanvasRenderingContext2D, board: CoinPusherBoard, frames: CoinPusherFrame[] | null, progress: number, sprites: Map<string, HTMLImageElement>, prizeRarities: Map<string, string>, denominations: CoinPusherGameConfig['settings']['coinDenominations'], aim: number, ghosts: QueuedDrop[], now: number) {
   ctx.clearRect(0, 0, 360, 460)
   const gradient = (y: number, height: number, colors: string[]) => {
     const g = ctx.createLinearGradient(0, y, 0, y + height)
@@ -66,18 +73,30 @@ function drawMachine(ctx: CanvasRenderingContext2D, board: CoinPusherBoard, fram
   const newById = new Map(afterBodies.map((body) => [body.id, body]))
   const drawBody = (body: CoinPusherFrameBody, x: number, y: number, scale: number, opacity = 1) => {
     const variant = Math.abs(body.id)
-    const radius = (body.kind === 'coin' ? 12 : 15) * scale
+    const denomination = body.denomination || 'bronze'
+    const size = body.kind === 'coin' ? ({ bronze: 1, silver: 1.12, gold: 1.24 }[denomination]) : 1
+    const radius = (body.kind === 'coin' ? 12 : 15) * size * scale
     ctx.save(); ctx.globalAlpha = opacity; ctx.translate(x, y)
     ctx.fillStyle = '#09151380'; ctx.beginPath(); ctx.ellipse(1, 5, radius * 1.05, radius * .43, 0, 0, Math.PI * 2); ctx.fill()
     if (body.kind === 'coin') {
       ctx.rotate(((variant % 9) - 4) * .025)
-      ctx.fillStyle = '#81501e'; ctx.beginPath(); ctx.ellipse(0, 2, radius, radius * .57, 0, 0, Math.PI * 2); ctx.fill()
-      ctx.fillStyle = gradient(-radius, radius * 2, ['#fff2b7', '#edbb54', '#b9792e']); ctx.beginPath(); ctx.ellipse(0, 0, radius, radius * .53, 0, 0, Math.PI * 2); ctx.fill()
-      ctx.strokeStyle = '#ae752f'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(0, 0, radius * .72, radius * .36, 0, 0, Math.PI * 2); ctx.stroke()
-      ctx.strokeStyle = '#fff1b0'; ctx.beginPath(); ctx.moveTo(-radius * .4, -radius * .19); ctx.lineTo(radius * .25, -radius * .25); ctx.stroke()
+      const colors = denomination === 'gold'
+        ? ['#fff2ad', '#e3aa32', '#94601f']
+        : denomination === 'silver'
+          ? ['#ffffff', '#bfc9ce', '#737f88']
+          : ['#ffe0aa', '#c77b3d', '#704129']
+      const trim = denomination === 'gold' ? '#97641d' : denomination === 'silver' ? '#707a82' : '#704129'
+      ctx.fillStyle = trim; ctx.beginPath(); ctx.ellipse(0, 2, radius, radius * .57, 0, 0, Math.PI * 2); ctx.fill()
+      ctx.fillStyle = gradient(-radius, radius * 2, colors); ctx.beginPath(); ctx.ellipse(0, 0, radius, radius * .53, 0, 0, Math.PI * 2); ctx.fill()
+      ctx.strokeStyle = trim; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(0, 0, radius * .72, radius * .36, 0, 0, Math.PI * 2); ctx.stroke()
+      ctx.strokeStyle = '#ffffffa0'; ctx.beginPath(); ctx.moveTo(-radius * .4, -radius * .19); ctx.lineTo(radius * .25, -radius * .25); ctx.stroke()
+      ctx.fillStyle = '#35291e'; ctx.font = `bold ${Math.max(7, radius * .68)}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.fillText(String(denominations[denomination].value), 0, 1)
     } else {
-      ctx.fillStyle = '#c3f9ecb8'; ctx.beginPath(); ctx.arc(0, -3, radius, 0, Math.PI * 2); ctx.fill()
-      ctx.strokeStyle = '#f3fff5'; ctx.lineWidth = 1.5; ctx.stroke()
+      const rarity = body.prizeId ? prizeRarities.get(body.prizeId) : undefined
+      const tint = rarity === 'ultra-rare' ? '#f5bc49' : rarity === 'rare' ? '#dcaaff' : rarity === 'uncommon' ? '#9ed5ff' : '#8ce6d4'
+      ctx.fillStyle = `${tint}b8`; ctx.beginPath(); ctx.arc(0, -3, radius, 0, Math.PI * 2); ctx.fill()
+      ctx.strokeStyle = rarity === 'ultra-rare' ? '#fff0a5' : '#f3fff5'; ctx.lineWidth = rarity === 'ultra-rare' ? 2.5 : 1.5; ctx.stroke()
       const image = body.prizeId ? sprites.get(body.prizeId) : undefined
       if (image?.complete && image.naturalWidth) ctx.drawImage(image, -radius * .68, -radius * .68 - 3, radius * 1.36, radius * 1.36)
       ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(-radius * .38, -radius * .45 - 3, 3, 1.7, -.6, 0, Math.PI * 2); ctx.fill()
@@ -146,6 +165,8 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
   const { user, refreshUser } = useUser()
   const { playSfx } = useAudio()
   const initial = state?.coinPusherSession as Session | undefined
+  const prizeRarities = useMemo(() => new Map(encounter.settings.prizePool.map((prize) => [prize.id, prize.rarity])), [encounter.settings.prizePool])
+  const denominations = encounter.settings.coinDenominations || defaultDenominations
   const [session, setSession] = useState<Session | undefined>(initial)
   const sessionRef = useRef(initial)
   const [aim, setAim] = useState(.5)
@@ -221,14 +242,14 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
         }
         const progress = current && !reducedMotion.current ? current.progress : 1
         context.setTransform(2, 0, 0, 2, 0, 0)
-        drawMachine(context, displayBoard.current || board, current?.frames || null, progress, sprites.current, aimRef.current, ghosts.current, now)
+        drawMachine(context, displayBoard.current || board, current?.frames || null, progress, sprites.current, prizeRarities, denominations, aimRef.current, ghosts.current, now)
         ghosts.current = ghosts.current.filter((ghost) => ghost.confirmedAt === undefined || now - ghost.confirmedAt < 170)
       }
       frame = requestAnimationFrame(draw)
     }
     frame = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(frame)
-  }, [playSfx, refreshUser])
+  }, [denominations, playSfx, prizeRarities, refreshUser])
 
   const flush = useCallback(async () => {
     if (busy.current || failed.current || !sessionRef.current) return false
@@ -313,7 +334,28 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
     if (busy.current || requestRef.current || queue.current.length) { setClosing(false); setMessage('Please wait for your coins to settle.'); return }
     const res = await completeGame(encounter.id, true)
     if (!res.success) { setMessage(res.error || 'Could not leave the machine.'); setClosing(false); return }
-    setResult({ success: res.success, activitySuccess: res.activitySuccess, message: res.success ? 'Session ended' : res.error, rewards: res.summary })
+    const accumulated = sessionRef.current?.totalRewards || {}
+    const summary = res.summary || accumulated
+    const hasResultRewards = Boolean(
+      summary && Object.values(summary).some((value) => Array.isArray(value) && value.length > 0),
+    )
+    const fallbackSummary = {
+      ...accumulated,
+      currency: [
+        ...(accumulated.currency || []),
+        ...(sessionRef.current?.totalCost ? [{
+          type: encounter.settings.cost.currencyType,
+          quantity: -sessionRef.current.totalCost,
+          label: 'Total Spent',
+        }] : []),
+      ],
+    }
+    setResult({
+      success: res.success,
+      activitySuccess: res.activitySuccess,
+      message: res.success ? 'Session ended' : res.error,
+      rewards: hasResultRewards ? summary : fallbackSummary,
+    })
     setClosing(false)
   }
   if (!session) return <div className="p-8 text-center">This machine could not be loaded.</div>
@@ -322,7 +364,9 @@ export function CoinPusherGame({ encounter, state }: { encounter: CoinPusherGame
       <div className="absolute inset-0 bg-cover bg-center opacity-25" style={{ backgroundImage: `linear-gradient(#17252b88, #101a22cc), url(${encounter.background})` }} />
       <header className="relative flex w-full max-w-md items-center justify-between gap-4">
         <div className="flex items-center gap-2 rounded-full bg-[#10282e]/90 px-3 py-2 font-bold"><CurrencySprite currencyId={encounter.settings.cost.currencyType} width={24} height={24} /><span>{(user?.currency as any)?.[encounter.settings.cost.currencyType] || 0}</span></div>
-        <button onClick={leave} disabled={closing} className="rounded-full border border-white/35 bg-[#10282e]/90 px-5 py-2 font-semibold">Leave</button>
+        <button onClick={leave} disabled={closing} aria-label="Leave Coin Pusher" className="flex size-10 items-center justify-center rounded-full border border-white/35 bg-[#10282e]/90 disabled:opacity-60">
+          {closing ? <Loader2 className="size-4 animate-spin" /> : <DoorOpen className="size-4" />}
+        </button>
       </header>
       <div className="relative my-auto w-full max-w-[410px] py-3">
         <canvas ref={canvasRef} width={720} height={920} className="w-full touch-manipulation" aria-label="Coin pusher machine. Tap to drop a coin." onPointerDown={(event) => {

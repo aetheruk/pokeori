@@ -1,5 +1,26 @@
 import type { CoinPusherGameConfig } from '../types'
 
+const baseMaterials = [
+  ['soft-fluff-t1', 'Soft Fluff'],
+  ['cinder-shard-t1', 'Cinder Shards'],
+  ['aqua-solvent-t1', 'Aqua Solvent'],
+  ['electric-component-t1', 'Electric Components'],
+  ['wood-scraps-t1', 'Wood Scraps'],
+  ['frost-crystal-t1', 'Frost Crystals'],
+  ['grip-weave-t1', 'Grip Weave'],
+  ['toxic-resin-t1', 'Toxic Resin'],
+  ['terra-dust-t1', 'Soft Clay'],
+  ['wing-feather-t1', 'Wing Feathers'],
+  ['mind-thread-t1', 'Rune Stones'],
+  ['chitin-fragment-t1', 'Chitin Fragments'],
+  ['small-stone-t1', 'Small Stones'],
+  ['spirit-wisp-t1', 'Ectoplasm'],
+  ['drake-scale-t1', 'Drake Scales'],
+  ['shadow-fiber-t1', 'Shadow Cloth'],
+  ['metal-scrap-t1', 'Metal Scrap'],
+  ['pixie-powder-t1', 'Fairy Charms'],
+] as const
+
 export const testCoinPusherEntries: CoinPusherGameConfig[] = [{
   id: 'coin-pusher-test',
   gameType: 'coin-pusher',
@@ -15,13 +36,38 @@ export const testCoinPusherEntries: CoinPusherGameConfig[] = [{
   settings: {
     cost: { currencyType: 'fun-tokens', amount: 1 },
     payout: { currencyType: 'fun-tokens', amount: 1 },
+    coinDenominations: {
+      bronze: { value: 1, weight: 76 },
+      silver: { value: 10, weight: 20 },
+      gold: { value: 25, weight: 4 },
+    },
     bubbleChance: 1 / 12,
     maxBubbles: 3,
-    prizePool: [{
-      id: 'broken-ball',
-      weight: 1,
-      icon: { type: 'item', id: 'broken-ball-t1' },
-      rewards: [{ type: 'item', targetId: 'broken-ball-t1', quantity: 1, dropChance: 100 }],
-    }],
+    prizePool: [
+      ...baseMaterials.map(([id, label]) => ({
+        id,
+        label: `3 ${label}`,
+        rarity: 'common' as const,
+        weight: 10,
+        icon: { type: 'item' as const, id },
+        rewards: [{ type: 'item' as const, targetId: id, quantity: 3, dropChance: 100 }],
+      })),
+      {
+        id: 'team-rocket-booster-packs',
+        label: '2 Team Rocket Booster Packs',
+        rarity: 'rare',
+        weight: 2,
+        icon: { type: 'item', id: 'pack-base5' },
+        rewards: [{ type: 'item', targetId: 'pack-base5', quantity: 2, dropChance: 100 }],
+      },
+      {
+        id: 'koban',
+        label: 'Koban',
+        rarity: 'ultra-rare',
+        weight: 0.5,
+        icon: { type: 'item', id: 'shiny-konban' },
+        rewards: [{ type: 'item', targetId: 'shiny-konban', quantity: 1, dropChance: 100 }],
+      },
+    ],
   },
 }]

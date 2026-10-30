@@ -1226,10 +1226,17 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
   'coin-pusher': z.object({
     cost: costSchema.extend({ amount: z.number().int().positive().max(1000000) }),
     payout: costSchema.extend({ amount: z.number().int().positive().max(1000000) }),
+    coinDenominations: z.object({
+      bronze: z.object({ value: z.number().int().positive(), weight: z.number().positive() }).strict(),
+      silver: z.object({ value: z.number().int().positive(), weight: z.number().positive() }).strict(),
+      gold: z.object({ value: z.number().int().positive(), weight: z.number().positive() }).strict(),
+    }).strict(),
     bubbleChance: z.number().min(0).max(1),
     maxBubbles: z.number().int().min(0).max(10),
     prizePool: z.array(z.object({
       id: z.string().min(1),
+      label: z.string().min(1),
+      rarity: z.enum(['common', 'uncommon', 'rare', 'ultra-rare']),
       weight: z.number().positive(),
       icon: taskIconSchema,
       rewards: z.array(rewardSchema).min(1),
