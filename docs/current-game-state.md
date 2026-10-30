@@ -1,5 +1,7 @@
 # Current Game State
 
+Unreleased: Successful paid minigames launched from a Grid Adventure now record their server-verified activity result so the parent board can verify the interaction when the player returns and exits. Standalone paid sessions keep their existing activity-stat behavior.
+
 Unreleased: Coin Pusher leave results merge confirmed prize items from each settled drop with the server's accumulated rewards and total spend, so a prize bubble remains visible if the final completion summary omits it. The shared door icon replaces the text leave control. Shelves mix three sized coin denominations: bronze, silver, and gold. Their values are configured per machine; Kanto/Test uses 1, 10, and 25 Fun Tokens. Prize bubbles are weighted by rarity and can award any of the 18 base Pokemon materials x3, two Team Rocket Booster Packs, or one Shiny Koban.
 
 Unreleased: The Celadon Game Plaza adds standard and High Stakes Coin Pusher machines beside the other arcade games. The standard machine unlocks with the other base Game Plaza activities; High Stakes unlocks with `high-roller`. The standard bubble pool gives each of the 18 base materials, two Team Rocket Booster Packs, and one Koban the same common weight. High Stakes costs and pays ten times the standard Fun Token amount; its common bubbles award ten materials or five booster packs, rare bubbles award elemental stones, and very rare bubbles award Up-Grade or Dubious Disc. Koban is exclusive to the standard machine.
