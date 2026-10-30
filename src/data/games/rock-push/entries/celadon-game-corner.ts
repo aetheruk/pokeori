@@ -117,7 +117,7 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
     {
       id: 'game-plaza-match3',
       objectId: 'game-plaza-match3-cabinet',
-      x: 2,
+      x: 1,
       y: 3,
       interaction: {
         type: 'minigame',
@@ -128,7 +128,7 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
     {
       id: 'game-plaza-prize-wheel',
       objectId: 'game-plaza-prize-wheel',
-      x: 3,
+      x: 2,
       y: 3,
       interaction: {
         type: 'minigame',
@@ -147,6 +147,17 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
         victory: 'clear',
       },
     },
+    {
+      id: 'game-plaza-coin-pusher',
+      objectId: 'game-plaza-coin-pusher',
+      x: 5,
+      y: 3,
+      interaction: {
+        type: 'minigame',
+        targetId: 'celadon-rocket-coin-pusher',
+        victory: 'clear',
+      },
+    },
   ]
 
   if (includeHighStakes) {
@@ -154,7 +165,7 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
       {
         id: 'game-plaza-high-stakes-match3',
         objectId: 'game-plaza-high-stakes-match3-cabinet',
-        x: 2,
+        x: 1,
         y: 1,
         interaction: {
           type: 'minigame',
@@ -165,7 +176,7 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
       {
         id: 'game-plaza-high-stakes-prize-wheel',
         objectId: 'game-plaza-high-stakes-prize-wheel',
-        x: 3,
+        x: 2,
         y: 1,
         interaction: {
           type: 'minigame',
@@ -181,6 +192,17 @@ function createGamePlazaPlacements(includeHighStakes: boolean): GridObjectPlacem
         interaction: {
           type: 'minigame',
           targetId: 'celadon-high-stakes-ufo-catcher',
+          victory: 'clear',
+        },
+      },
+      {
+        id: 'game-plaza-high-stakes-coin-pusher',
+        objectId: 'game-plaza-high-stakes-coin-pusher',
+        x: 5,
+        y: 1,
+        interaction: {
+          type: 'minigame',
+          targetId: 'celadon-high-stakes-coin-pusher',
           victory: 'clear',
         },
       },
@@ -310,7 +332,7 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
     id: 'grid-adventure-celadon-game-plaza',
     name: 'Game Plaza',
     description:
-      'Visit the Match 3 arcade cabinet, Prize Wheel, and UFO Catcher, then leave through the floor mat at the bottom of the room.',
+      'Visit the Match 3 cabinet, Prize Wheel, UFO Catcher, and Coin Pusher, then leave through the floor mat at the bottom of the room.',
     icon: { type: 'local', id: '/games/grid-objects/game-plaza-match3-cabinet.png' },
     requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
     gridSize: 7,
@@ -326,7 +348,7 @@ export const celadonGameCornerbasicEntries: RockPushGameConfig[] = [
     id: 'grid-adventure-celadon-high-stakes-game-plaza',
     name: 'Game Plaza',
     description:
-      'Try the standard and High Stakes versions of the Match 3 cabinet, Prize Wheel, and UFO Catcher in the same room.',
+      'Try the standard and High Stakes versions of the Match 3 cabinet, Prize Wheel, UFO Catcher, and Coin Pusher in the same room.',
     icon: { type: 'local', id: '/games/grid-objects/game-plaza-match3-cabinet.png' },
     requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
     overrides: 'grid-adventure-celadon-game-plaza',

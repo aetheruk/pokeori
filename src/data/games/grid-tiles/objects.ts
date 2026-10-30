@@ -194,6 +194,15 @@ export const gridObjects = {
     collision: 'none',
     interaction: 'minigame',
   },
+  gamePlazaCoinPusher: {
+    id: 'game-plaza-coin-pusher',
+    name: 'Game Plaza Coin Pusher',
+    purpose: 'minigame-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/games/grid-objects/game-plaza-coin-pusher.png' },
+    collision: 'none',
+    interaction: 'minigame',
+  },
   gamePlazaHighStakesMatch3Cabinet: {
     id: 'game-plaza-high-stakes-match3-cabinet',
     name: 'High Stakes Game Plaza Match 3 Cabinet',
@@ -224,6 +233,15 @@ export const gridObjects = {
     asset: {
       src: '/games/grid-objects/game-plaza-ufo-catcher-high-stakes.png',
     },
+    collision: 'none',
+    interaction: 'minigame',
+  },
+  gamePlazaHighStakesCoinPusher: {
+    id: 'game-plaza-high-stakes-coin-pusher',
+    name: 'High Stakes Game Plaza Coin Pusher',
+    purpose: 'minigame-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/games/grid-objects/game-plaza-coin-pusher-high-stakes.png' },
     collision: 'none',
     interaction: 'minigame',
   },

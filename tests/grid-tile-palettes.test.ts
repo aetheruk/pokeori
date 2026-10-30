@@ -759,9 +759,11 @@ describe('shared grid sprite sets', () => {
       'gamePlazaMatch3Cabinet',
       'gamePlazaPrizeWheel',
       'gamePlazaUfoCatcher',
+      'gamePlazaCoinPusher',
       'gamePlazaHighStakesMatch3Cabinet',
       'gamePlazaHighStakesPrizeWheel',
       'gamePlazaHighStakesUfoCatcher',
+      'gamePlazaHighStakesCoinPusher',
       'fieldResearchTrigger',
     ])
     for (const object of Object.values(gridObjects)) {
