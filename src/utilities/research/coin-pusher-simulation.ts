@@ -32,6 +32,11 @@ const RADIUS = 12
 const STEP_MS = 1000 / 60
 const MAX_BODIES = 120
 
+/** The rendered plate and collision body must use the same simulation phase. */
+export function getCoinPusherPusherY(tick: number, shelf: 0 | 1) {
+  return 20 + (1 - Math.cos(tick / 90 * Math.PI * 2 + shelf * Math.PI / 2)) * 15
+}
+
 function choosePrize(settings: CoinPusherSettings, random: () => number) {
   const total = settings.prizePool.reduce((sum, prize) => sum + prize.weight, 0)
   if (total <= 0) return undefined
@@ -96,10 +101,8 @@ export function advanceCoinPusher(
       Matter.Bodies.rectangle(160, -8, 320, 16, { isStatic: true }),
     ])
   }
-  const pusherY = (tick: number, shelf: number) =>
-    20 + (1 - Math.cos(tick / 90 * Math.PI * 2 + shelf * Math.PI / 2)) * 15
   const pushers = engines.map((engine, shelf) => {
-    const body = Matter.Bodies.rectangle(160, pusherY(board.tick, shelf), 320, 20, { isStatic: true, friction: 0.1 })
+    const body = Matter.Bodies.rectangle(160, getCoinPusherPusherY(board.tick, shelf as 0 | 1), 320, 20, { isStatic: true, friction: 0.1 })
     Matter.Composite.add(engine.world, body)
     return body
   })
@@ -121,30 +124,26 @@ export function advanceCoinPusher(
   }
   captureFrame()
   for (const position of drops) {
-    const data: CoinPusherBody = { id: board.nextId++, shelf: 0, kind: 'coin', x: 20 + position * 280, y: pusherY(board.tick, 0) + 25, vx: 0, vy: 3 }
+    const data: CoinPusherBody = { id: board.nextId++, shelf: 0, kind: 'coin', x: 20 + position * 280, y: getCoinPusherPusherY(board.tick, 0) + 25, vx: 0, vy: 3 }
     board.bodies.push(data)
     add(data)
     const bubbles = board.bodies.filter((body) => body.kind === 'bubble').length
     if (bubbles < settings.maxBubbles && board.bodies.length < MAX_BODIES && random() < settings.bubbleChance) {
       const prizeId = choosePrize(settings, random)
       if (prizeId) {
-        const bubble: CoinPusherBody = { id: board.nextId++, shelf: 0, kind: 'bubble', prizeId, x: 35 + random() * 250, y: pusherY(board.tick, 0) + 30, vx: 0, vy: 2 }
+        const bubble: CoinPusherBody = { id: board.nextId++, shelf: 0, kind: 'bubble', prizeId, x: 35 + random() * 250, y: getCoinPusherPusherY(board.tick, 0) + 30, vx: 0, vy: 2 }
         board.bodies.push(bubble)
         add(bubble)
       }
     }
   }
-  if (drops.length) captureFrame()
   let coinsWon = 0
   const prizesWon: string[] = []
   for (let step = 0; step < steps; step++) {
     board.tick++
-    const previousPhase = (board.tick - 1) / 90 * Math.PI * 2
-    const phase = board.tick / 90 * Math.PI * 2
     for (let shelf = 0; shelf < 2; shelf++) {
-      const offset = shelf * Math.PI / 2
-      const y = 20 + (1 - Math.cos(phase + offset)) * 15
-      const previousY = 20 + (1 - Math.cos(previousPhase + offset)) * 15
+      const y = getCoinPusherPusherY(board.tick, shelf as 0 | 1)
+      const previousY = getCoinPusherPusherY(board.tick - 1, shelf as 0 | 1)
       Matter.Body.setPosition(pushers[shelf], { x: 160, y })
       Matter.Body.setVelocity(pushers[shelf], { x: 0, y: y - previousY })
       Matter.Engine.update(engines[shelf], STEP_MS)
@@ -161,7 +160,7 @@ export function advanceCoinPusher(
       } else if (data.shelf === 0) {
         data.shelf = 1
         data.x = body.position.x
-        data.y = pusherY(board.tick, 1) + 25
+        data.y = getCoinPusherPusherY(board.tick, 1) + 25
         data.vx = body.velocity.x
         data.vy = Math.max(1, body.velocity.y)
         add(data)
