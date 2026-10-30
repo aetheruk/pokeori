@@ -3,6 +3,7 @@ import { verifyRockPushProof } from '@/utilities/research/rock-push-verification
 import type { RockPushGameConfig } from '@/data/games/rock-push/types'
 import { testbasicEntries } from '@/data/games/rock-push/entries/test'
 import { gauntletGridAdventureEntries } from '@/data/games/rock-push/entries/gauntlets'
+import { celadonGameCornerbasicEntries } from '@/data/games/rock-push/entries/celadon-game-corner'
 
 describe('rock-push transcript verification', () => {
   test('gauntlet materials always appear as one-item floor pickups on floors two through four', () => {
@@ -98,6 +99,19 @@ describe('rock-push transcript verification', () => {
     expect(verifyRockPushProof(multi, { kind: 'rock-push', moves: [...enterHighStakes, 'down'] }).solved).toBe(false)
     const moves = [...enterHighStakes, 'down', 'down']
     expect(verifyRockPushProof(multi, { kind: 'rock-push', moves }).solved).toBe(true)
+  })
+  test('accepts a verified Grid Adventure minigame result before leaving Game Plaza', () => {
+    const gamePlaza = celadonGameCornerbasicEntries.find(
+      (entry) => entry.id === 'grid-adventure-celadon-game-plaza',
+    )!
+    const proof = {
+      kind: 'rock-push',
+      moves: ['up', 'up', 'interact:left', 'down', 'down', 'down'],
+    }
+    const objectWins = { 'game-plaza:game-plaza-prize-wheel': 1 }
+
+    expect(verifyRockPushProof(gamePlaza.settings, proof).solved).toBe(false)
+    expect(verifyRockPushProof(gamePlaza.settings, proof, objectWins).solved).toBe(true)
   })
   test('object victory requires new server-recorded wins, one per interaction', () => {
     const objectBoard: RockPushGameConfig['settings'] = {

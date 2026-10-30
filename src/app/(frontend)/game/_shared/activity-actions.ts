@@ -3617,8 +3617,14 @@ export async function completeGameActivity(
         },
         async ({ payload, req }) => {
       const state = structuredClone(settlementState)
-      // Chance games persist their attempts in their own paid settlement.
-      if (!['slots', 'pachinko', 'coin-pusher', 'ufo-catcher', 'prize-wheel', 'fishing'].includes(encounter.gameType)) {
+      // Chance games normally persist paid attempts in their own settlement.
+      // When launched from a Grid Adventure, their verified result must also
+      // update activity stats: the parent puzzle replays its interaction proof
+      // against the start-time stats baseline when the player returns.
+      if (
+        !['slots', 'pachinko', 'coin-pusher', 'ufo-catcher', 'prize-wheel', 'fishing'].includes(encounter.gameType) ||
+        state.gridAdventureContext
+      ) {
         await incrementUserActivityResult(
           payload as any,
           user.id,

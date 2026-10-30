@@ -53,7 +53,11 @@ session while the child runs in its normal `game` or `field-research` domain.
 The client start-action recovery wrapper preserves the exact object key on the
 initial request and retries, allowing the server to enforce the placement guard.
 The return result is matched to the authored object and activity wins are
-verified from the board's start-time baseline before success is recorded. A
+verified from the board's start-time baseline before success is recorded.
+Chance-game results launched from a Grid Adventure also update that activity
+counter, while standalone paid attempts continue to use their game-specific
+settlement only. This lets the parent verify completed slot, Pachinko, Prize
+Wheel, UFO Catcher, Coin Pusher, and fishing interactions on return. A
 completed session is distinct from an activity win, so a Slots session with no
 winning spin returns as a loss for the board proof. Object placements disappear
 on success by default; `removeOnSuccess: false` keeps an object visible and
