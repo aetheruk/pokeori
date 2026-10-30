@@ -1,6 +1,6 @@
 # Current Game State
 
-Unreleased: Coin Pusher buffers its next server simulation during playback and shows a falling coin as soon as a drop is queued. The pushers continue to move between server updates, and the initial layout and coin artwork use varied positions and visual heights.
+Unreleased: Coin Pusher buffers its next server simulation during playback and shows a queued coin at the drop slot. Pushers and coins now share the server simulation timeline, and playback slows together if the next segment is delayed. Coin placement and markings vary; the two shelf simulations do not yet support physical stacking.
 
 Unreleased: Coin Pusher plays sampled server-side physics positions so the pushers, coins, shelf transfers and payouts animate through the actual simulated movement. The cabinet and aiming control have been redesigned, and restored physics steps resume each pusher at its saved phase.
 
