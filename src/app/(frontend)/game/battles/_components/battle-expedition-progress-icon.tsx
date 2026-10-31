@@ -11,7 +11,7 @@ export function BattleExpeditionProgressIcon({
     return (
       <TaskIconDisplay
         icon={icon}
-        className="h-6 w-6"
+        className="h-7 w-7"
         normalizeVisibleBounds
         outlineVisiblePixels
       />

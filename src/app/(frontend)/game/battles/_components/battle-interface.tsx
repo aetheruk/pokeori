@@ -1,6 +1,6 @@
 'use client'
 
-import { Heart, Loader2, MapIcon, RefreshCw, Swords, Trophy } from 'lucide-react'
+import { Loader2, RefreshCw, Swords, Trophy } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Component,
@@ -1139,47 +1139,46 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                   </div>
                 )}
                 {expeditionProgress && (
-                  <div className="flex items-start gap-3 rounded-md border border-game-border bg-game-surface p-4 text-left shadow-sm">
-                    <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
-                      <BattleExpeditionProgressIcon
-                        icon={expeditionProgress.stepIcon}
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[11px] font-black uppercase tracking-wide text-game-moss-strong">
-                        {expeditionProgress.expeditionName || 'Expedition'}
-                      </p>
-                      {expeditionProgress.progressed ? (
-                        expeditionProgress.status === 'ready_to_claim' ? (
+                  <div className="text-left">
+                    <SectionDivider>Expedition Progress</SectionDivider>
+                    <div className="flex min-h-12 items-center gap-3 border-b border-game-border/75 px-2 py-2">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
+                        <BattleExpeditionProgressIcon
+                          icon={expeditionProgress.stepIcon}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-game-ink">
+                          {expeditionProgress.expeditionName || 'Expedition'}
+                        </p>
+                        <p className="mt-0.5 text-xs text-game-muted">
+                          Progress {expeditionProgress.currentStep}/
+                          {expeditionProgress.totalSteps} · Lives remaining{' '}
+                          {expeditionProgress.canFail === false
+                            ? 'Unlimited'
+                            : `${expeditionProgress.livesLeft}/${expeditionProgress.maxLosses}`}
+                        </p>
+                        {expeditionProgress.progressed ? (
+                          expeditionProgress.status === 'ready_to_claim' ? (
+                            <p className="mt-1 text-sm text-game-ink">
+                              You completed the expedition. Your rewards are
+                              ready to claim.
+                            </p>
+                          ) : null
+                        ) : expeditionProgress.status === 'failed' ? (
+                          <p className="mt-1 text-sm text-game-danger">
+                            The expedition ended here.
+                          </p>
+                        ) : expeditionProgress.canFail === false ? (
                           <p className="mt-1 text-sm text-game-ink">
-                            You've Completed the Expedition! Time to claim your
-                            rewards.
+                            Try this step again to continue.
                           </p>
                         ) : (
                           <p className="mt-1 text-sm text-game-ink">
-                            You've Made Progress.
+                            One life was lost.
                           </p>
-                        )
-                      ) : expeditionProgress.status === 'failed' ? (
-                        <p className="mt-1 text-sm text-game-danger">
-                          You've Failed the Expedition.
-                        </p>
-                      ) : expeditionProgress.canFail === false ? (
-                        <p className="mt-1 text-sm text-game-ink">
-                          Try the step again to continue.
-                        </p>
-                      ) : (
-                        <>
-                          <p className="mt-1 text-sm text-game-ink">
-                            You've Lost a Life.
-                          </p>
-                          <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-game-ink">
-                            <Heart className="h-4 w-4 text-game-danger" />
-                            Lives left: {expeditionProgress.livesLeft}/
-                            {expeditionProgress.maxLosses}.
-                          </p>
-                        </>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
