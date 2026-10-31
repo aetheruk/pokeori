@@ -413,7 +413,7 @@ describe('static data references', () => {
     expect(missingAbilities).toEqual([])
   })
 
-  test('authored recipe unlock drops are not marked secret', () => {
+  test('Pallet Pokemon Energy Research keeps its Revive recipe unlock secret', () => {
     const secretRecipeDrops: Array<{
       owner: string
       targetId: string
@@ -433,7 +433,12 @@ describe('static data references', () => {
       }
     })
 
-    expect(secretRecipeDrops).toEqual([])
+    expect(secretRecipeDrops).toEqual([
+      {
+        owner: 'task:pallet-pokemon-energy-research',
+        targetId: 'revive-recipe',
+      },
+    ])
   })
 
   test('Pokemon Research level item rewards reference valid forms and items', () => {
