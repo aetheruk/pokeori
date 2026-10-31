@@ -6099,6 +6099,11 @@
     "normal": "/games/overworld/pokemon-pack/Graphics/Characters/Followers/DIPPLIN.png",
     "shiny": "/games/overworld/pokemon-pack/Graphics/Characters/Followers-shiny/DIPPLIN.png"
   },
+  "1012": {
+    "name": "Poltchageist",
+    "speciesId": 1012,
+    "normal": "/games/overworld/pokemon-pack/Graphics/Characters/Followers/POLTCHAGEIST.png"
+  },
   "1013": {
     "name": "Sinistcha",
     "speciesId": 1013,

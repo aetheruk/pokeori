@@ -29,7 +29,7 @@ describe('overworld sprite registry', () => {
   })
 
   test('every extracted follower file is addressable by its source filename', () => {
-    expect(Object.keys(pokemonFollowerAssets).length).toBe(2739)
+    expect(Object.keys(pokemonFollowerAssets).length).toBe(2740)
     for (const sprite of Object.values(pokemonFollowerAssets)) {
       expect(existsSync(`public${sprite.src}`)).toBe(true)
     }
@@ -60,10 +60,30 @@ describe('overworld sprite registry', () => {
     expect(getOverworldSpriteIdForProfileIcon('trainer-researcher-f')).toBe(
       'trainer-researcher-f',
     )
-    expect(getOverworldSpriteIdForProfileIcon('nugget')).toBeUndefined()
+    expect(getOverworldSpriteIdForProfileIcon('nugget')).toBe('1000')
+    expect(getOverworldSpriteIdForProfileIcon('safari-ball')).toBe('128')
+    expect(getOverworldSpriteIdForProfileIcon('trainer-rival-late')).toBe(
+      'trainer-gb-blue',
+    )
+    expect(getOverworldSpriteIdForProfileIcon('trainer-rocket')).toBe(
+      'trainer-rocket-grunt-m',
+    )
+    expect(getOverworldSpriteIdForProfileIcon('trainer-fuji')).toBe(
+      'trainer-gentleman',
+    )
+    expect(getOverworldSpriteIdForProfileIcon('trainer-gym-kalos-clemont')).toBe(
+      'trainer-gym-kalos-clemont',
+    )
     expect(getOverworldSpriteIdForProfileIcon('alolan-meowth')).toBe('10107')
     expect(getOverworldSpriteIdForProfileIcon('pokemon-10033')).toBe('3')
     expect(getOverworldSpriteIdForProfileIcon('pokemon-10195')).toBe('3')
+    expect(getOverworldSpriteIdForProfileIcon('pokemon-1012')).toBe('1012')
+    expect(pokemonSprites['1012'].normal).toContain('POLTCHAGEIST.png')
+    expect(getTrainerOverworldSpriteId('bill')).toBe('trainer-pokemaniac')
+    expect(getTrainerOverworldSpriteId('ariana')).toBe('trainer-rocket-grunt-f')
+    expect(getTrainerOverworldSpriteId('detective')).toBe('trainer-gentleman')
+    expect(getTrainerOverworldSpriteId('old-couple')).toBe('trainer-expert-m')
+    expect(getTrainerOverworldSpriteId('tcg-kid')).toBe('trainer-pokemaniac')
   })
 
   test('manually mapped regional, breed, and punctuation forms use their exact follower sheets', () => {
@@ -127,6 +147,34 @@ describe('overworld sprite registry', () => {
       src: '/games/trainers/source/trainer_OAK.png',
       frameWidth: 32,
       frameHeight: 48,
+    })
+    expect(getGridOverworldSpriteAppearance('trainer-gym-kalos-clemont')).toMatchObject({
+      src: '/games/trainers/source/kalos/trGymLeaderClemont.png',
+      frameWidth: 64,
+      frameHeight: 64,
+      columns: 4,
+      rows: 4,
+    })
+    expect(getGridOverworldSpriteAppearance('trainer-gym-alola-mallow')).toMatchObject({
+      src: '/games/trainers/source/alola/010-Mallow.png',
+      frameWidth: 32,
+      frameHeight: 48,
+      columns: 4,
+      rows: 4,
+    })
+    expect(getGridOverworldSpriteAppearance('trainer-gym-galar-milo')).toMatchObject({
+      src: '/games/trainers/source/galar/01o9if40.webp',
+      frameWidth: 32,
+      frameHeight: 32,
+      columns: 3,
+      rows: 4,
+    })
+    expect(getGridOverworldSpriteAppearance('trainer-gym-paldea-iono')).toMatchObject({
+      src: '/games/trainers/source/paldea/01ng5w44.webp',
+      frameWidth: 32,
+      frameHeight: 32,
+      columns: 3,
+      rows: 4,
     })
     expect(getGridOverworldSpriteAppearance('trainer-researcher-f')).toMatchObject({
       src: '/games/trainers/source/trainer_SCIENTIST_F.png',

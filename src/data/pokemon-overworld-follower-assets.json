@@ -2091,6 +2091,10 @@
     "src": "/games/overworld/pokemon-pack/Graphics/Characters/Followers/HIPPOWDON.png",
     "palette": "normal"
   },
+  "pokemon-follower-normal:POLTCHAGEIST": {
+    "src": "/games/overworld/pokemon-pack/Graphics/Characters/Followers/POLTCHAGEIST.png",
+    "palette": "normal"
+  },
   "pokemon-follower-normal:TOEDSCOOL": {
     "src": "/games/overworld/pokemon-pack/Graphics/Characters/Followers/TOEDSCOOL.png",
     "palette": "normal"
