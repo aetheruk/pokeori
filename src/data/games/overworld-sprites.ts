@@ -24,6 +24,36 @@ export function getPokemonFollowerSpriteId(
 }
 
 const trainerSpritePaths: Record<string, string> = {
+  'trainer-gym-alola-acerola': 'alola/013-Acerola.png',
+  'trainer-gym-alola-hala': 'alola/007-Hala.png',
+  'trainer-gym-alola-hapu': 'alola/016-Hapu.png',
+  'trainer-gym-alola-ilima': 'alola/006-Illima.png',
+  'trainer-gym-alola-kiawe': 'alola/009-Kiawe.png',
+  'trainer-gym-alola-lana': 'alola/008-Lana.png',
+  'trainer-gym-alola-mallow': 'alola/010-Mallow.png',
+  'trainer-gym-alola-mina': 'alola/015-Mina.png',
+  'trainer-gym-alola-nanu': 'alola/014-Nanu.png',
+  'trainer-gym-alola-olivia': 'alola/011-Olivia.png',
+  'trainer-gym-alola-sophocles': 'alola/012-Sophocles.png',
+  'trainer-gym-galar-allister': 'galar/0115fddl.webp',
+  'trainer-gym-galar-bea': 'galar/01a5bwe7.webp',
+  'trainer-gym-galar-gordie': 'galar/01zuecx4.webp',
+  'trainer-gym-galar-kabu': 'galar/01w7a5vi.webp',
+  'trainer-gym-galar-melony': 'galar/01klfd6q.webp',
+  'trainer-gym-galar-milo': 'galar/01o9if40.webp',
+  'trainer-gym-galar-nessa': 'galar/01ipzmzp.webp',
+  'trainer-gym-galar-opal': 'galar/01csl0fi.webp',
+  'trainer-gym-galar-piers': 'galar/01pgheek.webp',
+  'trainer-gym-galar-raihan': 'galar/01km6ox3.webp',
+  'trainer-gym-paldea-brassius': 'paldea/017dym5u.webp',
+  'trainer-gym-paldea-grusha': 'paldea/01mrnw4i.webp',
+  'trainer-gym-paldea-iono': 'paldea/01ng5w44.webp',
+  'trainer-gym-paldea-katy': 'paldea/01so438i.webp',
+  'trainer-gym-paldea-kofu': 'paldea/015t4fis.webp',
+  'trainer-gym-paldea-larry': 'paldea/01qeiu7c.webp',
+  'trainer-gym-paldea-ryme': 'paldea/01yffzi4.webp',
+  'trainer-gym-paldea-tulip': 'paldea/01hrwa9d.webp',
+  'trainer-butler': 'kalos/trButler.png',
   'trainer-ace-trainer-f': 'trainer_ACETRAINER_F.png',
   'trainer-ace-trainer-m': 'trainer_ACETRAINER_M.png',
   'trainer-aroma-lady': 'trainer_AROMALADY.png',
@@ -47,6 +77,9 @@ const trainerSpritePaths: Record<string, string> = {
   'trainer-gamer': 'trainer_GAMBLER.png',
   'trainer-leaf': 'trainer_POKEMONTRAINER_Leaf.png',
   'trainer-gentleman': 'trainer_GENTLEMAN.png',
+  // Original Gen I Red/Blue character sprites, adapted to the shared 4×4 walker sheet.
+  'trainer-gb-blue': 'trainer_GB_BLUE.png',
+  'trainer-gb-red': 'trainer_GB_RED.png',
   'trainer-hex-maniac': 'trainer_HEXMANIAC.png',
   'trainer-hiker': 'trainer_HIKER.png',
   'trainer-juggler': 'trainer_JUGGLER.png',
@@ -106,6 +139,14 @@ const trainerSpritePaths: Record<string, string> = {
   'trainer-gym-kanto-misty': 'trainer_LEADER_Misty.png',
   'trainer-gym-kanto-sabrina': 'trainer_LEADER_Sabrina.png',
   'trainer-gym-kanto-surge': 'trainer_LEADER_Surge.png',
+  'trainer-gym-kalos-clemont': 'kalos/trGymLeaderClemont.png',
+  'trainer-gym-kalos-grant': 'kalos/trGymLeaderGrant.png',
+  'trainer-gym-kalos-korrina': 'kalos/trGymLeaderKorinna.png',
+  'trainer-gym-kalos-olympia': 'kalos/trGymLeaderOlympia.png',
+  'trainer-gym-kalos-ramos': 'kalos/trGymLeaderRamos.png',
+  'trainer-gym-kalos-valerie': 'kalos/trGymLeaderValerie.png',
+  'trainer-gym-kalos-viola': 'kalos/trGymLeaderViola.png',
+  'trainer-gym-kalos-wulfric': 'kalos/trGymLeaderWulfric.png',
   'trainer-gym-hoenn-brawly': 'trainer_LEADER_Brawly.png',
   'trainer-gym-hoenn-flannery': 'trainer_LEADER_Flannery.png',
   'trainer-gym-hoenn-norman': 'trainer_LEADER_Norman.png',
@@ -145,6 +186,35 @@ const trainerSpritePaths: Record<string, string> = {
 }
 
 const trainerSpriteFrameSizes: Record<string, { width: number; height: number }> = {
+  'trainer-gym-alola-acerola': { width: 32, height: 48 },
+  'trainer-gym-alola-hala': { width: 32, height: 48 },
+  'trainer-gym-alola-hapu': { width: 32, height: 48 },
+  'trainer-gym-alola-ilima': { width: 32, height: 48 },
+  'trainer-gym-alola-kiawe': { width: 32, height: 48 },
+  'trainer-gym-alola-lana': { width: 32, height: 48 },
+  'trainer-gym-alola-mallow': { width: 32, height: 48 },
+  'trainer-gym-alola-mina': { width: 32, height: 48 },
+  'trainer-gym-alola-nanu': { width: 32, height: 48 },
+  'trainer-gym-alola-olivia': { width: 32, height: 48 },
+  'trainer-gym-alola-sophocles': { width: 32, height: 48 },
+  'trainer-gym-galar-allister': { width: 32, height: 32 },
+  'trainer-gym-galar-bea': { width: 32, height: 32 },
+  'trainer-gym-galar-gordie': { width: 32, height: 32 },
+  'trainer-gym-galar-kabu': { width: 32, height: 32 },
+  'trainer-gym-galar-melony': { width: 32, height: 32 },
+  'trainer-gym-galar-milo': { width: 32, height: 32 },
+  'trainer-gym-galar-nessa': { width: 32, height: 32 },
+  'trainer-gym-galar-opal': { width: 32, height: 32 },
+  'trainer-gym-galar-piers': { width: 32, height: 32 },
+  'trainer-gym-galar-raihan': { width: 32, height: 32 },
+  'trainer-gym-paldea-brassius': { width: 32, height: 32 },
+  'trainer-gym-paldea-grusha': { width: 32, height: 32 },
+  'trainer-gym-paldea-iono': { width: 32, height: 32 },
+  'trainer-gym-paldea-katy': { width: 32, height: 32 },
+  'trainer-gym-paldea-kofu': { width: 32, height: 32 },
+  'trainer-gym-paldea-larry': { width: 32, height: 32 },
+  'trainer-gym-paldea-ryme': { width: 32, height: 32 },
+  'trainer-gym-paldea-tulip': { width: 32, height: 32 },
   'trainer-cyclist-f': { width: 48, height: 48 },
   'trainer-cyclist-m': { width: 48, height: 48 },
   'trainer-researcher-f': { width: 64, height: 64 },
@@ -154,6 +224,9 @@ const trainerSpriteFrameSizes: Record<string, { width: number; height: number }>
   'trainer-gym-hoenn-roxanne': { width: 40, height: 48 },
   'trainer-gym-hoenn-tateandliza': { width: 64, height: 48 },
   'trainer-channeler': { width: 64, height: 64 },
+  'trainer-butler': { width: 64, height: 64 },
+  'trainer-gb-blue': { width: 16, height: 16 },
+  'trainer-gb-red': { width: 16, height: 16 },
   'trainer-gamer': { width: 64, height: 64 },
   'trainer-maid': { width: 64, height: 64 },
   'trainer-nurse': { width: 64, height: 64 },
@@ -174,6 +247,14 @@ const trainerSpriteFrameSizes: Record<string, { width: number; height: number }>
   'trainer-gym-kanto-misty': { width: 64, height: 64 },
   'trainer-gym-kanto-sabrina': { width: 64, height: 64 },
   'trainer-gym-kanto-surge': { width: 64, height: 64 },
+  'trainer-gym-kalos-clemont': { width: 64, height: 64 },
+  'trainer-gym-kalos-grant': { width: 64, height: 64 },
+  'trainer-gym-kalos-korrina': { width: 64, height: 64 },
+  'trainer-gym-kalos-olympia': { width: 64, height: 64 },
+  'trainer-gym-kalos-ramos': { width: 64, height: 64 },
+  'trainer-gym-kalos-valerie': { width: 64, height: 64 },
+  'trainer-gym-kalos-viola': { width: 64, height: 64 },
+  'trainer-gym-kalos-wulfric': { width: 64, height: 64 },
   'trainer-gym-johto-bugsy': { width: 64, height: 64 },
   'trainer-gym-johto-chuck': { width: 64, height: 64 },
   'trainer-gym-johto-clair': { width: 64, height: 64 },
@@ -201,6 +282,27 @@ const trainerSpriteFrameSizes: Record<string, { width: number; height: number }>
   'trainer-gym-unova-iris': { width: 64, height: 64 },
   'trainer-gym-unova-lenora': { width: 64, height: 64 },
   'trainer-gym-unova-skyla': { width: 64, height: 64 },
+}
+
+const trainerSpriteColumns: Record<string, number> = {
+  'trainer-gym-galar-allister': 3,
+  'trainer-gym-galar-bea': 3,
+  'trainer-gym-galar-gordie': 3,
+  'trainer-gym-galar-kabu': 3,
+  'trainer-gym-galar-melony': 3,
+  'trainer-gym-galar-milo': 3,
+  'trainer-gym-galar-nessa': 3,
+  'trainer-gym-galar-opal': 3,
+  'trainer-gym-galar-piers': 3,
+  'trainer-gym-galar-raihan': 3,
+  'trainer-gym-paldea-brassius': 3,
+  'trainer-gym-paldea-grusha': 3,
+  'trainer-gym-paldea-iono': 3,
+  'trainer-gym-paldea-katy': 3,
+  'trainer-gym-paldea-kofu': 3,
+  'trainer-gym-paldea-larry': 3,
+  'trainer-gym-paldea-ryme': 3,
+  'trainer-gym-paldea-tulip': 3,
 }
 
 export function getTrainerOverworldSpriteId(trainerClassId: string | undefined) {
@@ -284,7 +386,7 @@ export function getOverworldSpriteSheet(
       src: `/games/trainers/source/${trainerFilename}`,
       frameWidth: frameSize?.width ?? 32,
       frameHeight: frameSize?.height ?? 48,
-      columns: 4,
+      columns: trainerSpriteColumns[spriteId] ?? 4,
       rows: 4,
       directionRows: directions,
     }
@@ -301,6 +403,13 @@ export function getOverworldSpriteIdForProfileIcon(iconId: string | null | undef
     return iconId
       ? trainerClassById[iconId as keyof typeof trainerClassById]?.overworldSpriteId
       : undefined
+  }
+  if (icon.type === 'item') {
+    const itemWalkerIds: Record<string, string> = {
+      nugget: '1000',
+      'safari-ball': '128',
+    }
+    return itemWalkerIds[String(icon.id)]
   }
   if (icon.type === 'pokemon') {
     const key = String(icon.id)
