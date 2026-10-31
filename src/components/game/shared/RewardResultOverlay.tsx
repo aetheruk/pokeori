@@ -339,17 +339,17 @@ export function RewardResultOverlay({
     : 'Expedition step'
 
   const expeditionUpdateContent = expeditionProgress ? (
-    <div className="flex items-start gap-3 rounded-md border border-game-border bg-game-surface p-4 text-left shadow-sm">
-      <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
+    <div className="flex items-start gap-2.5 text-left">
+      <div className="mt-0.5 shrink-0 text-game-ochre">
         {expeditionProgress.stepIcon ? (
           <TaskIconDisplay
             icon={expeditionProgress.stepIcon}
-            className="h-6 w-6"
+            className="h-5 w-5"
             normalizeVisibleBounds
             outlineVisiblePixels
           />
         ) : (
-          <MapIcon className="h-6 w-6" aria-hidden="true" />
+          <MapIcon className="h-5 w-5" aria-hidden="true" />
         )}
       </div>
       <div className="min-w-0 flex-1">

@@ -848,10 +848,16 @@ function FieldDropButton({
     <button
       type="button"
       aria-label={`Collect ${drop.label}`}
-      onClick={onCollect}
+      onPointerDown={(event) => {
+        if (!event.isPrimary || event.button !== 0) return
+        onCollect()
+      }}
+      onClick={(event) => {
+        if (event.detail === 0) onCollect()
+      }}
       disabled={collecting}
       className={cn(
-        'game-focus-ring absolute z-[220] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-transparent bg-transparent transition-transform active:scale-90',
+        'game-focus-ring absolute z-[220] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 touch-manipulation select-none items-center justify-center rounded-full border border-transparent bg-transparent transition-transform active:scale-90',
         collecting && 'field-observation-drop-collect pointer-events-none',
       )}
       aria-busy={collecting}

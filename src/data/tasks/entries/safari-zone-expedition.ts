@@ -399,7 +399,7 @@ function itemTask(
     icon: typeof icon === 'string' ? { type: 'item', id: icon } : icon,
     rewards: [{ ...reward, dropChance: 100 }],
     includeSafariNote: true,
-    completeButtonText: 'Search the Find',
+    completeButtonText: 'Search the Area',
   })
 }
 
