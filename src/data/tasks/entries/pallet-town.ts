@@ -349,6 +349,44 @@ export const palletTownTasks: Task[] = [
     id: 'tutorial-16',
   },
   {
+    id: 'pallet-pokemon-energy-research',
+    name: 'Pokemon Energy Research',
+    description:
+      "One of Professor Oak's Aides is going to show me something useful that can be made with Pokemon Energy, but only if I can show him good progress on my Pokédex.",
+    category: 'Kanto',
+    subCategory: 'Pallet Town',
+    background: '/backgrounds/lab.avif',
+    icon: {
+      type: 'trainer',
+      id: 'researcher',
+    },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Show My Pokédex',
+    requirements: [{ type: 'task_completed', targetId: 'tutorial-16' }],
+    criteria: [{ type: 'pokedex_caught_total', count: 100 }],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'revive-recipe',
+        dropChance: 100,
+        secret: true,
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/lab.avif',
+      title: 'Oaks Aide',
+      message:
+        'Pokemon energy is very complicated unlike Humans they all share an energy waveform no matter what the species that links them all together. Although it’s not fully understood, it’s the same energy that causes evolution, moves and even the ability to miraculously heal and revive. Here let me show you!',
+      closeButtonText: 'Thanks for showing me',
+      icon: {
+        type: 'trainer',
+        id: 'researcher',
+      },
+    },
+  },
+  {
     id: 'pallet-rival-selection-catch-up',
     name: 'Choose Your Rival',
     description:
