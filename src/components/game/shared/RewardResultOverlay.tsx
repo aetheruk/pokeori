@@ -1,6 +1,6 @@
 'use client'
 
-import { Heart, MapIcon } from 'lucide-react'
+import { MapIcon } from 'lucide-react'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useAudio } from '@/context/AudioContext'
@@ -18,6 +18,7 @@ import { markExpeditionReturn } from '@/components/game/features/explore/expedit
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { useGridActivityReturn } from '@/components/game/shared/GridActivityReturnContext'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
+import { SectionDivider } from '@/components/ui/section-divider'
 import type { TaskExitModal, TaskIcon } from '@/data/tasks'
 import type { CompleteTaskResult } from '@/utilities/tasks/actions'
 import type {
@@ -339,49 +340,54 @@ export function RewardResultOverlay({
     : 'Expedition step'
 
   const expeditionUpdateContent = expeditionProgress ? (
-    <div className="flex items-start gap-2.5 text-left">
-      <div className="mt-0.5 shrink-0 text-game-ochre">
-        {expeditionProgress.stepIcon ? (
-          <TaskIconDisplay
-            icon={expeditionProgress.stepIcon}
-            className="h-5 w-5"
-            normalizeVisibleBounds
-            outlineVisiblePixels
-          />
-        ) : (
-          <MapIcon className="h-5 w-5" aria-hidden="true" />
-        )}
+    <div className="text-left">
+      <SectionDivider>Expedition Progress</SectionDivider>
+      <div className="flex min-h-12 items-center gap-3 border-b border-game-border/75 py-2">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
+          {expeditionProgress.stepIcon ? (
+            <TaskIconDisplay
+              icon={expeditionProgress.stepIcon}
+              className="h-6 w-6"
+              normalizeVisibleBounds
+              outlineVisiblePixels
+            />
+          ) : (
+            <MapIcon className="h-6 w-6" aria-hidden="true" />
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-game-ink">
+            {expeditionProgress.expeditionName || expeditionLabel}
+          </p>
+          <p className="mt-0.5 text-xs text-game-muted">
+            Progress {expeditionProgress.currentStep}/
+            {expeditionProgress.totalSteps} · Lives remaining{' '}
+            {expeditionProgress.canFail === false
+              ? 'Unlimited'
+              : `${expeditionProgress.livesLeft}/${expeditionProgress.maxLosses}`}
+          </p>
+        </div>
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-game-moss-strong">
-          {expeditionProgress.expeditionName || expeditionLabel}
-        </p>
+      <div className="mt-2 space-y-1">
         {expeditionProgress.progressed ? (
           expeditionProgress.status === 'ready_to_claim' ? (
-            <p className="mt-1 text-sm text-game-ink">
+            <p className="text-sm text-game-ink">
               You completed the {expeditionLabel.toLowerCase()}. Your rewards
               are ready to claim.
             </p>
           ) : (
-            <p className="mt-1 text-sm text-game-ink">Progress recorded.</p>
+            null
           )
         ) : expeditionProgress.status === 'failed' ? (
-          <p className="mt-1 text-sm text-game-danger">
+          <p className="text-sm text-game-danger">
             The {expeditionLabel.toLowerCase()} ended here.
           </p>
         ) : expeditionProgress.canFail === false ? (
-          <p className="mt-1 text-sm text-game-ink">
+          <p className="text-sm text-game-ink">
             Try the {expeditionStepLabel.toLowerCase()} again to continue.
           </p>
         ) : (
-          <>
-            <p className="mt-1 text-sm text-game-ink">One life was lost.</p>
-            <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-game-ink">
-              <Heart className="h-4 w-4 text-game-danger" />
-              Lives left: {expeditionProgress.livesLeft}/
-              {expeditionProgress.maxLosses}.
-            </p>
-          </>
+          <p className="text-sm text-game-ink">One life was lost.</p>
         )}
       </div>
     </div>
