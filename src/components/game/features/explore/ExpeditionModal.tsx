@@ -566,7 +566,9 @@ function ExpeditionModalContent({
                           ) : meta.icon ? (
                             <TaskIconDisplay
                               icon={meta.icon}
-                              className="w-6 h-6"
+                              className="h-7 w-7"
+                              normalizeVisibleBounds
+                              outlineVisiblePixels
                             />
                           ) : (
                             getFallbackTypeIcon(step.activityType)

@@ -342,12 +342,12 @@ export function RewardResultOverlay({
   const expeditionUpdateContent = expeditionProgress ? (
     <div className="text-left">
       <SectionDivider>Expedition Progress</SectionDivider>
-      <div className="flex min-h-12 items-center gap-3 border-b border-game-border/75 py-2">
+      <div className="flex min-h-12 items-center gap-3 border-b border-game-border/75 px-2 py-2">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
           {expeditionProgress.stepIcon ? (
             <TaskIconDisplay
               icon={expeditionProgress.stepIcon}
-              className="h-6 w-6"
+              className="h-7 w-7"
               normalizeVisibleBounds
               outlineVisiblePixels
             />
