@@ -181,20 +181,20 @@ export function EncounterResults({
     captureResult.messages && captureResult.messages.length > 0 ? (
       <div>
         <SectionDivider>Capture Notes</SectionDivider>
-        <div className="flex items-start gap-3 rounded-md border border-game-border bg-game-surface-raised p-4 shadow-sm">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center">
+        <div className="flex min-h-12 items-center gap-3 border-b border-game-border/75 py-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center">
             <TaskIconDisplay
               icon={{ type: 'pokemon', id: capturePokemonFormId }}
-              className="h-12 w-12"
+              className="h-8 w-8"
               normalizeVisibleBounds
               outlineVisiblePixels
             />
           </div>
-          <div className="flex min-h-12 flex-col justify-center gap-2">
+          <div className="min-w-0 flex-1 space-y-1">
             {captureResult.messages.map((msg, i) => (
               <p
                 key={i}
-                className="font-medium leading-relaxed text-game-charcoal-strong"
+                className="text-sm font-medium leading-relaxed text-game-charcoal-strong"
               >
                 {msg}
               </p>
