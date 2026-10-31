@@ -549,12 +549,12 @@ function ExpeditionModalContent({
 
                         <div
                           className={cn(
-                            'game-icon-orb absolute left-0 top-2 h-11 w-11',
+                            'absolute left-0 top-2 flex h-11 w-11 items-center justify-center',
                             isDone
-                              ? 'border-game-charcoal/70 text-game-charcoal-strong'
+                              ? 'text-game-charcoal-strong'
                               : isCurrent
-                                ? 'border-game-ochre/70 text-game-ochre'
-                                : 'border-game-border text-game-muted',
+                                ? 'text-game-ochre'
+                                : 'text-game-muted',
                           )}
                         >
                           {shouldHideSecret ? (

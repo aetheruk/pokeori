@@ -1100,20 +1100,20 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                 {trainerResultMessage && (
                   <div>
                     <SectionDivider>Trainer's Words</SectionDivider>
-                    <div className="flex items-start gap-3 rounded-md border border-game-card-border bg-game-surface-raised p-4 text-left shadow-sm">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center text-game-battle-orange">
+                    <div className="flex min-h-12 items-center gap-3 border-b border-game-border/75 py-2 text-left">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-battle-orange">
                         {resultIcon ? (
                           <TaskIconDisplay
                             icon={resultIcon}
-                            className="h-12 w-12"
+                            className="h-6 w-6"
                             normalizeVisibleBounds
                             outlineVisiblePixels
                           />
                         ) : (
-                          <Swords className="h-6 w-6" aria-hidden="true" />
+                          <Swords className="h-5 w-5" aria-hidden="true" />
                         )}
                       </div>
-                      <p className="min-w-0 flex-1 self-center font-medium leading-relaxed text-game-charcoal-strong">
+                      <p className="min-w-0 flex-1 text-sm font-medium leading-relaxed text-game-charcoal-strong">
                         {trainerResultMessage}
                       </p>
                     </div>
