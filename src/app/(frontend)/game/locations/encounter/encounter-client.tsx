@@ -350,14 +350,15 @@ function CatchRateRing({ percentage }: { percentage: number }) {
   )
 }
 
-function getSafariChanceTone(percentage: number) {
-  if (percentage >= 67) {
+function getSafariChanceTone(percentage: number, lowerIsBetter = false) {
+  const favorableChance = lowerIsBetter ? 100 - percentage : percentage
+  if (favorableChance >= 67) {
     return {
       accent: '#5f794f',
       track: 'rgb(95 121 79 / 0.18)',
     }
   }
-  if (percentage >= 34) {
+  if (favorableChance >= 34) {
     return {
       accent: '#287f7a',
       track: 'rgb(40 127 122 / 0.18)',
@@ -373,13 +374,15 @@ function SafariChanceCircle({
   percentage,
   label,
   icon,
+  lowerIsBetter = false,
 }: {
   percentage: number
   label: string
   icon: ReactNode
+  lowerIsBetter?: boolean
 }) {
   const safePercentage = Math.max(0, Math.min(100, percentage))
-  const tone = getSafariChanceTone(safePercentage)
+  const tone = getSafariChanceTone(safePercentage, lowerIsBetter)
 
   return (
     <div className="flex min-w-0 flex-col items-center gap-2">
@@ -447,6 +450,7 @@ function SafariOdds({
         <SafariChanceCircle
           percentage={fleeChance}
           label="Flee chance"
+          lowerIsBetter
           icon={
             <PokemonRaritySprite
               formId={formId}
