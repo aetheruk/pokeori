@@ -50,7 +50,7 @@ function RewardLedgerRow({
     <div
       {...props}
       className={cn(
-        'flex min-h-12 items-center gap-3 border-b border-game-border/75 py-2 last:border-b-0',
+        'flex min-h-12 items-center gap-3 border-b border-game-border/75 px-2 py-2 last:border-b-0',
         '!rounded-none !border-x-0 !border-t-0 !bg-transparent !shadow-none',
         className,
       )}
