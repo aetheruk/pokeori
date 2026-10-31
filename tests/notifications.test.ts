@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { runInNewContext } from 'node:vm'
+import { decodePushPublicKey, pushSubscriptionUsesPublicKey } from '@/utilities/notifications/key-match'
 import { dailyResetDue, dueVoyages, isPushEndpoint, notificationPreferencesSchema, notificationsOff, pushSubscriptionSchema, voyageNotificationKey } from '@/utilities/notifications/model'
 import { notificationServiceWorker } from '@/utilities/notifications/service-worker'
 import { PushSubscriptions } from '@/collections/PushSubscriptions'
@@ -16,6 +17,16 @@ describe('notification subscriptions', () => {
     for (const endpoint of ['https://fcm.googleapis.com/fcm/send/example', 'https://web.push.apple.com/Q/example', 'https://updates.push.services.mozilla.com/wpush/v2/example', 'https://wns2.notify.windows.com/w/?token=example']) expect(isPushEndpoint(endpoint)).toBe(true)
     for (const endpoint of ['http://fcm.googleapis.com/push', 'https://127.0.0.1/push', 'https://localhost/push', 'https://fcm.googleapis.com.evil.test/push', 'https://evilpush.apple.com/push', 'https://fcm.googleapis.com@evil.test/push', 'https://user:password@fcm.googleapis.com/push', 'https://fcm.googleapis.com:8000/push', 'https://fcm.googleapis.com/push#fragment', 'file:///tmp/secret']) expect(isPushEndpoint(endpoint)).toBe(false)
     expect(pushSubscriptionSchema.safeParse({ endpoint: 'https://fcm.googleapis.com/fcm/send/example', keys: { auth: 'bad', p256dh: 'bad' } }).success).toBe(false)
+  })
+
+  test('device subscriptions are matched against the configured VAPID public key', () => {
+    const publicKeyBytes = Uint8Array.from([1, 2, 3, 4])
+    const publicKey = Buffer.from(publicKeyBytes).toString('base64url')
+    const staleKey = Uint8Array.from([4, 3, 2, 1]).buffer
+    expect(decodePushPublicKey(publicKey)).toEqual(publicKeyBytes)
+    expect(pushSubscriptionUsesPublicKey(publicKeyBytes.buffer as ArrayBuffer, publicKey)).toBe(true)
+    expect(pushSubscriptionUsesPublicKey(staleKey as ArrayBuffer, publicKey)).toBe(false)
+    expect(pushSubscriptionUsesPublicKey(null, publicKey)).toBe(false)
   })
 
   test('raw subscription collection is inaccessible through the public CMS API', () => {
