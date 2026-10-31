@@ -366,29 +366,25 @@ export function RewardResultOverlay({
               ? 'Unlimited'
               : `${expeditionProgress.livesLeft}/${expeditionProgress.maxLosses}`}
           </p>
-        </div>
-      </div>
-      <div className="mt-2 space-y-1">
-        {expeditionProgress.progressed ? (
-          expeditionProgress.status === 'ready_to_claim' ? (
-            <p className="text-sm text-game-ink">
-              You completed the {expeditionLabel.toLowerCase()}. Your rewards
-              are ready to claim.
+          {expeditionProgress.progressed ? (
+            expeditionProgress.status === 'ready_to_claim' ? (
+              <p className="mt-1 text-sm text-game-ink">
+                You completed the {expeditionLabel.toLowerCase()}. Your rewards
+                are ready to claim.
+              </p>
+            ) : null
+          ) : expeditionProgress.status === 'failed' ? (
+            <p className="mt-1 text-sm text-game-danger">
+              The {expeditionLabel.toLowerCase()} ended here.
+            </p>
+          ) : expeditionProgress.canFail === false ? (
+            <p className="mt-1 text-sm text-game-ink">
+              Try the {expeditionStepLabel.toLowerCase()} again to continue.
             </p>
           ) : (
-            null
-          )
-        ) : expeditionProgress.status === 'failed' ? (
-          <p className="text-sm text-game-danger">
-            The {expeditionLabel.toLowerCase()} ended here.
-          </p>
-        ) : expeditionProgress.canFail === false ? (
-          <p className="text-sm text-game-ink">
-            Try the {expeditionStepLabel.toLowerCase()} again to continue.
-          </p>
-        ) : (
-          <p className="text-sm text-game-ink">One life was lost.</p>
-        )}
+            <p className="mt-1 text-sm text-game-ink">One life was lost.</p>
+          )}
+        </div>
       </div>
     </div>
   ) : undefined
