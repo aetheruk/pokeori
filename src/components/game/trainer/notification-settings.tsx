@@ -3,7 +3,8 @@
 import { Bell } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { getNotificationSettings, saveNotificationSettings } from '@/utilities/notifications/actions'
+import { getNotificationSettings, resetDeviceNotifications, saveNotificationSettings } from '@/utilities/notifications/actions'
+import { decodePushPublicKey, pushSubscriptionUsesPublicKey } from '@/utilities/notifications/key-match'
 import { notificationsOff, type NotificationPreferences } from '@/utilities/notifications/model'
 
 export function NotificationSettings() {
@@ -51,6 +52,7 @@ export function NotificationSettings() {
     setMessage('')
     let current = subscription
     let created = false
+    let staleSubscription: PushSubscription | null = null
     try {
       if (next.voyages || next.dailyReset || next.gameEvents) {
         // Must be the direct result of a tap for iOS; no server await before this call.
@@ -59,13 +61,18 @@ export function NotificationSettings() {
           if (permission !== 'granted') throw new Error('Notifications were not enabled. Allow them in your browser or device settings, then try again.')
         }
         if (!publicKey) throw new Error('Notifications are not configured on the server yet.')
+        if (current && !pushSubscriptionUsesPublicKey(current.options.applicationServerKey, publicKey)) {
+          staleSubscription = current
+          await current.unsubscribe()
+          current = null
+        }
         if (!current) {
-          const bytes = Uint8Array.from(atob(publicKey.replace(/-/g, '+').replace(/_/g, '/')), char => char.charCodeAt(0))
-          current = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: bytes })
+          current = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: decodePushPublicKey(publicKey) })
           created = true
         }
       }
       if (current) {
+        if (staleSubscription) await resetDeviceNotifications(staleSubscription.toJSON())
         await saveNotificationSettings(current.toJSON(), next)
         setPreferences(next)
         setSubscription(current)

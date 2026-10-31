@@ -1,5 +1,7 @@
 # Current Game State
 
+Unreleased: Trainer notification settings replace a device subscription when its VAPID key no longer matches the server, clearing the stale server record before creating a fresh subscription.
+
 Unreleased: After completing the Pallet Town tutorial, the one-time `Pokemon Energy Research` task offers the Revive crafting recipe as a secret reward. The Oaks Aide requires 100 caught Pokémon before sharing the research.
 
 Unreleased: Successful paid minigames launched from a Grid Adventure now record their server-verified activity result so the parent board can verify the interaction when the player returns and exits. Standalone paid sessions keep their existing activity-stat behavior.
