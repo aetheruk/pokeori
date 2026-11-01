@@ -2319,7 +2319,7 @@ export function ArtisanPanel({
                         : 'border-game-danger/30 bg-game-danger/10',
                     )}
                   >
-                    <div className="game-icon-orb h-12 w-12 shrink-0">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center">
                       {cost.type === 'currency' ? (
                         <CurrencySprite
                           currencyId={cost.id}
