@@ -83,14 +83,15 @@ export interface RockPushGameConfig extends BaseGameConfig {
     invisibleMaze?: boolean
     boulderSprite?: string
     barrierSprite?: string
-  floorSprite?: string
-  iceSprite?: string
-  holeSprite?: string
-  /** Optional override for a goal occupying the reserved wall row. */
-  wallGoalSprite?: string
-  /** Floor goal override; wall goals use the palette wall marker instead. */
-  winTileSprite?: string
+    floorSprite?: string
+    iceSprite?: string
+    holeSprite?: string
+    /** Optional override for a goal occupying the reserved wall row. */
+    wallGoalSprite?: string
+    /** Floor goal override; wall goals use the palette wall marker instead. */
+    winTileSprite?: string
     teleporterSprite?: string
     playerSprite?: string
+    playerIconId?: string
   }
 }

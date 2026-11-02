@@ -299,6 +299,7 @@ export interface GameSettings {
   winTileSprite?: string
   teleporterSprite?: string
   playerSprite?: string
+  playerIconId?: string
   // Run game specific
   winScore?: number
   speed?: number

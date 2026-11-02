@@ -863,7 +863,7 @@ export function VoltorbGridGame({
             })}
             <GridPlayerToken
               gender={user?.trainerGender}
-              iconId={user?.icon}
+              iconId={encounter.settings.playerIconId || user?.icon}
               facing={facing}
               step={moves}
               position={player}

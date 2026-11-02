@@ -36,6 +36,7 @@ import {
   type ExpeditionProgressSnapshot,
 } from '@/utilities/expeditions/server'
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
+import { getActiveChronicleContext } from '@/utilities/chronicles'
 import { createEconomyRequestId, EconomyTransactionsUnavailableError, getEconomyActionErrorMessage, getEconomyActionResult, runEconomyAction } from '@/utilities/economy/transactions'
 import { isDailyExcludedGameType } from '@/utilities/tasks/daily-activity'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
@@ -1025,6 +1026,35 @@ function getSnapTargetId(
     : undefined
 }
 
+async function applyChronicleGridPlayerIcon(
+  encounter: (typeof allGames)[number],
+  userId: string,
+  force = false,
+): Promise<(typeof allGames)[number]> {
+  if (
+    encounter.gameType !== 'grid-puzzle' ||
+    (!force && encounter.settings.playerIconId) ||
+    !isExpeditionActivity('game', encounter.id)
+  ) {
+    return encounter
+  }
+
+  const chronicleContext = await getActiveChronicleContext({
+    userId,
+    activityType: 'game',
+    activityId: encounter.id,
+  })
+  if (!chronicleContext?.playerIconId) return encounter
+
+  return {
+    ...encounter,
+    settings: {
+      ...encounter.settings,
+      playerIconId: chronicleContext.playerIconId,
+    },
+  }
+}
+
 function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
   if (encounter.gameType === 'underground-mining') return 7200
   if (encounter.gameType === 'field-observation') {
@@ -1336,6 +1366,8 @@ export async function startGameActivity(
           error: 'Grid Adventure sessions require the Rock Push ruleset.',
         }
       }
+
+      encounter = await applyChronicleGridPlayerIcon(encounter, user.id, true)
 
       if (domain === 'grid-minigame') {
         const parentGridState = await ensureGridAdventureSessionForUser(user.id)
@@ -2301,6 +2333,8 @@ export async function startGameActivity(
           domain === 'grid-adventure' ? gridAdventureRollSnapshot : undefined,
         eventConfigSnapshot:
           domain === 'field-research' || domain === 'grid-adventure' ||
+          (encounter.gameType === 'grid-puzzle' &&
+            Boolean(encounter.settings.playerIconId)) ||
           (encounter.gameType === 'coin-pusher' && encounter.gridAdventureOnly)
             ? encounter
             : undefined,
@@ -4043,8 +4077,9 @@ export async function getGameActivityState(domain: GameActivityDomain) {
       state = await ensureGridAdventureRollSnapshot(user.id, state)
     }
 
-    const encounter = state.eventConfigSnapshot || allGames.find((e) => e.id === state.encounterId)
+    let encounter = state.eventConfigSnapshot || allGames.find((e) => e.id === state.encounterId)
     if (!encounter) return null
+    encounter = await applyChronicleGridPlayerIcon(encounter, user.id)
     if (!isGameActivityDomainAllowed(encounter.gameType, domain)) return null
 
     const timeLimit = getResearchSessionTimeLimit(encounter)

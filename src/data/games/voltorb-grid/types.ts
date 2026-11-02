@@ -50,6 +50,7 @@ export interface VoltorbGridSettings {
   /** Floor goal override; wall goals use the palette wall marker instead. */
   winTileSprite?: string
   playerSprite?: string
+  playerIconId?: string
 }
 
 export interface VoltorbGridGameConfig extends BaseGameConfig {
