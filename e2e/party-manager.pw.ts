@@ -1,5 +1,28 @@
 import { expect, test } from '@playwright/test'
 
+for (const viewport of [
+  { width: 390, height: 844 },
+  { width: 390, height: 667 },
+  { width: 320, height: 568 },
+  { width: 844, height: 390 },
+]) {
+  test(`box team manager fits without scrolling at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    await page.goto('/ui-test')
+    await page.getByRole('button', { name: 'Test party manager' }).click()
+
+    const manager = page.getByRole('dialog', { name: 'Battle team' })
+    await expect(manager).toBeVisible()
+    await manager.getByRole('button', { name: /Bulbasaur/ }).click()
+
+    const content = manager.locator('main').locator('xpath=..')
+    await expect.poll(() => content.evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true)
+    await expect(manager.getByRole('button', { name: 'Select partner Squirtle' })).toBeInViewport()
+    await expect(manager.getByRole('button', { name: 'Stats' })).toBeInViewport()
+    await expect(manager.getByRole('button', { name: 'Remove' })).toBeInViewport()
+  })
+}
+
 for (const width of [390, 1280]) {
   test(`box team manager opens Stats and returns from selection at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 })

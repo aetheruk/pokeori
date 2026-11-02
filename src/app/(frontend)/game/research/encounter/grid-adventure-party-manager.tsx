@@ -80,6 +80,11 @@ function getBattleTeamPosition(pokemon: Pokemon, fallbackIndex: number) {
     : fallbackIndex + 1
 }
 
+const compactBattleTeamCard =
+  'h-[clamp(3.5rem,12svh,5.5rem)] min-h-0 aspect-auto [@media(min-width:640px)_and_(min-height:700px)]:h-auto [@media(min-width:640px)_and_(min-height:700px)]:min-h-32 [@media(min-width:640px)_and_(min-height:700px)]:aspect-[1.38]'
+const compactPartnerCard =
+  'w-[clamp(6rem,16svh,8rem)] [@media(min-width:640px)_and_(min-height:700px)]:w-full [@media(min-width:640px)_and_(min-height:700px)]:max-w-[18rem]'
+
 function normalizePokemonBackgroundPath(path?: string | null) {
   if (!path) return null
 
@@ -95,10 +100,12 @@ function BattleTeamCardFace({
   pokemon,
   index,
   label,
+  compact = false,
 }: {
   pokemon: Pokemon
   index: number
   label?: string
+  compact?: boolean
 }) {
   const form = getPokemonForm(pokemon.formId)
   const name = pokemon.name || form?.name || 'Pokémon'
@@ -108,7 +115,12 @@ function BattleTeamCardFace({
     getPokemonPokedexBackground({ types: form?.types || [] })
 
   return (
-    <span className="relative isolate block aspect-[1.38] min-h-32 w-full overflow-hidden rounded-[inherit] bg-game-canvas text-left">
+    <span
+      className={cn(
+        'relative isolate block w-full overflow-hidden rounded-[inherit] bg-game-canvas text-left',
+        compact ? compactBattleTeamCard : 'aspect-[1.38] min-h-32',
+      )}
+    >
       <Image
         src={background}
         alt=""
@@ -120,15 +132,33 @@ function BattleTeamCardFace({
         aria-hidden="true"
         className="absolute inset-0 bg-gradient-to-b from-game-ink/15 via-game-canvas/10 to-game-ink/85"
       />
-      <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-game-ink/80 px-2 py-1 font-mono text-[10px] font-bold text-game-cream shadow-sm">
+      <span
+        className={cn(
+          'absolute left-2.5 top-2.5 z-10 rounded-md bg-game-ink/80 px-2 py-1 font-mono text-[10px] font-bold text-game-cream shadow-sm',
+          compact && 'left-1.5 top-1.5 rounded px-1.5 py-0.5 text-[9px] [@media(min-width:640px)_and_(min-height:700px)]:left-2.5 [@media(min-width:640px)_and_(min-height:700px)]:top-2.5 [@media(min-width:640px)_and_(min-height:700px)]:rounded-md [@media(min-width:640px)_and_(min-height:700px)]:px-2 [@media(min-width:640px)_and_(min-height:700px)]:py-1 [@media(min-width:640px)_and_(min-height:700px)]:text-[10px]',
+        )}
+      >
         {label || (index === 0 ? 'LEAD' : index + 1)}
       </span>
       {heldItem && (
         <span
-          className="absolute right-2.5 top-2.5 z-10 flex size-9 items-center justify-center rounded-full border border-game-border/80 bg-game-surface/90 shadow-sm"
+          className={cn(
+            'absolute right-2.5 top-2.5 z-10 flex size-9 items-center justify-center rounded-full border border-game-border/80 bg-game-surface/90 shadow-sm',
+            compact && 'right-1.5 top-1.5 size-7 [@media(min-width:640px)_and_(min-height:700px)]:right-2.5 [@media(min-width:640px)_and_(min-height:700px)]:top-2.5 [@media(min-width:640px)_and_(min-height:700px)]:size-9',
+          )}
           title={heldItem.name}
         >
-          <ItemSprite itemId={heldItem.id} alt="" width={28} height={28} />
+          <ItemSprite
+            itemId={heldItem.id}
+            alt=""
+            width={compact ? 20 : 28}
+            height={compact ? 20 : 28}
+            className={
+              compact
+                ? '[@media(min-width:640px)_and_(min-height:700px)]:h-7 [@media(min-width:640px)_and_(min-height:700px)]:w-7'
+                : undefined
+            }
+          />
         </span>
       )}
       <span className="absolute inset-x-3 bottom-6 top-1 z-[1]">
@@ -146,11 +176,26 @@ function BattleTeamCardFace({
           sizes="(max-width: 640px) 38vw, 220px"
         />
       </span>
-      <span className="absolute inset-x-3 bottom-2 z-10 flex min-w-0 items-end justify-between gap-2 text-game-cream">
-        <span className="min-w-0 truncate text-sm font-bold leading-tight drop-shadow-sm">
+      <span
+        className={cn(
+          'absolute inset-x-3 bottom-2 z-10 flex min-w-0 items-end justify-between gap-2 text-game-cream',
+          compact && 'inset-x-1.5 bottom-1.5 gap-1 [@media(min-width:640px)_and_(min-height:700px)]:inset-x-3 [@media(min-width:640px)_and_(min-height:700px)]:bottom-2 [@media(min-width:640px)_and_(min-height:700px)]:gap-2',
+        )}
+      >
+        <span
+          className={cn(
+            'min-w-0 truncate text-sm font-bold leading-tight drop-shadow-sm',
+            compact && 'text-[11px] [@media(min-width:640px)_and_(min-height:700px)]:text-sm',
+          )}
+        >
           {name}
         </span>
-        <span className="shrink-0 font-mono text-[10px] font-semibold text-game-cream/90">
+        <span
+          className={cn(
+            'shrink-0 font-mono text-[10px] font-semibold text-game-cream/90',
+            compact && 'text-[9px] [@media(min-width:640px)_and_(min-height:700px)]:text-[10px]',
+          )}
+        >
           Lv. {pokemon.level}
         </span>
       </span>
@@ -163,12 +208,14 @@ function SortableBattleTeamCard({
   index,
   selected,
   disabled,
+  compact,
   onSelect,
 }: {
   pokemon: Pokemon
   index: number
   selected: boolean
   disabled: boolean
+  compact: boolean
   onSelect: () => void
 }) {
   const {
@@ -213,7 +260,7 @@ function SortableBattleTeamCard({
             : 'border-game-card-border hover:border-game-charcoal/60',
         )}
       >
-        <BattleTeamCardFace pokemon={pokemon} index={index} />
+        <BattleTeamCardFace pokemon={pokemon} index={index} compact={compact} />
       </button>
     </li>
   )
@@ -660,7 +707,7 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
         </div>
       </header>
 
-      <div className="custom-scrollbar min-h-0 min-w-0 w-full max-w-full flex-1 overflow-x-hidden overflow-y-auto overscroll-contain p-3 sm:p-5">
+      <div className="custom-scrollbar min-h-0 min-w-0 w-full max-w-full flex-1 overflow-x-hidden overflow-y-auto overscroll-contain p-3 sm:p-5 [@media(max-height:500px)]:p-2">
         {loading ? (
           <div
             className="flex min-h-40 items-center justify-center text-sm text-game-muted"
@@ -700,7 +747,12 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                 strategy={rectSortingStrategy}
               >
                 <ol
-                  className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4"
+                  className={cn(
+                    'grid sm:grid-cols-3 sm:gap-4',
+                    box
+                      ? 'grid-cols-3 gap-2 [@media(min-width:640px)_and_(max-height:500px)]:grid-cols-6'
+                      : 'grid-cols-2 gap-3',
+                  )}
                   aria-label="Battle team order"
                 >
                   {sortedTeam.map((pokemon, index) => (
@@ -710,6 +762,7 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                       index={index}
                       selected={pokemon.id === selectedPokemonId}
                       disabled={!!reorderingPokemonId}
+                      compact={Boolean(box)}
                       onSelect={() => {
                         setSelectedPokemonId(pokemon.id)
                         setEditingSection(null)
@@ -722,7 +775,10 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                         type="button"
                         onClick={() => box.onChooseFromBox('battle-team')}
                         aria-label="Choose a Pokémon for the battle team"
-                        className="game-focus-ring flex aspect-[1.38] min-h-32 w-full items-center justify-center rounded-xl border-2 border-dashed border-game-border bg-game-surface-raised/50 text-2xl text-game-muted hover:border-game-charcoal/60"
+                        className={cn(
+                          'game-focus-ring flex w-full items-center justify-center rounded-xl border-2 border-dashed border-game-border bg-game-surface-raised/50 text-xl text-game-muted hover:border-game-charcoal/60 sm:text-2xl',
+                          compactBattleTeamCard,
+                        )}
                       >
                         <span aria-hidden="true">+</span>
                       </button>
@@ -738,6 +794,7 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                       index={sortedTeam.findIndex(
                         (pokemon) => pokemon.id === activePokemon.id,
                       )}
+                      compact={Boolean(box)}
                     />
                   </div>
                 ) : null}
@@ -745,10 +802,10 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
             </DndContext>
             {box && (
               <section
-                className="-mx-3 mt-5 bg-game-surface-raised/60 px-3 py-4 sm:-mx-5 sm:px-5"
+                className="-mx-3 mt-3 bg-game-surface-raised/60 px-3 py-2 sm:-mx-5 sm:mt-5 sm:px-5 sm:py-4"
                 aria-label="Partner Pokémon"
               >
-                <h2 className="mb-3 text-center text-sm font-bold text-game-ink">
+                <h2 className="mb-2 text-center text-sm font-bold text-game-ink sm:mb-3">
                   Partner
                 </h2>
                 <div className="flex justify-center">
@@ -758,16 +815,20 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                       onClick={() => { setSelectedPokemonId(companion.id); setEditingSection(null) }}
                       aria-pressed={selectedPokemonId === companion.id}
                       aria-label={`Select partner ${companion.name || getPokemonForm(companion.formId)?.name || 'Pokémon'}`}
-                      className={cn('game-focus-ring block w-full max-w-[18rem] rounded-xl border-2 text-left shadow-sm', selectedPokemonId === companion.id ? 'border-game-ochre shadow-md' : 'border-game-card-border hover:border-game-charcoal/60')}
+                      className={cn('game-focus-ring block rounded-xl border-2 text-left shadow-sm', compactPartnerCard, selectedPokemonId === companion.id ? 'border-game-ochre shadow-md' : 'border-game-card-border hover:border-game-charcoal/60')}
                     >
-                      <BattleTeamCardFace pokemon={companion} index={0} label="PARTNER" />
+                      <BattleTeamCardFace pokemon={companion} index={0} label="PARTNER" compact />
                     </button>
                   ) : (
                     <button
                       type="button"
                       onClick={() => box.onChooseFromBox('companion')}
                       aria-label="Choose a partner Pokémon"
-                      className="game-focus-ring flex aspect-[1.38] min-h-32 w-full max-w-[18rem] items-center justify-center rounded-xl border-2 border-dashed border-game-border bg-game-surface-raised/50 text-2xl text-game-muted hover:border-game-charcoal/60"
+                      className={cn(
+                        'game-focus-ring flex items-center justify-center rounded-xl border-2 border-dashed border-game-border bg-game-surface-raised/50 text-2xl text-game-muted hover:border-game-charcoal/60',
+                        compactBattleTeamCard,
+                        compactPartnerCard,
+                      )}
                     >
                       <span aria-hidden="true">+</span>
                     </button>
