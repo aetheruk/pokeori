@@ -19,6 +19,7 @@ export interface ActiveChronicleContext {
   expeditionId: string
   expeditionName: string
   chronicle: ExpeditionChronicleConfig
+  playerIconId?: string
 }
 
 export function normalizeChronicleConfig(
@@ -62,6 +63,10 @@ export async function getActiveChronicleContext(params: {
   return {
     expeditionId: activeRun.expeditionId,
     expeditionName: activeRun.expeditionName,
+    playerIconId:
+      expedition?.icon.type === 'trainer'
+        ? `trainer-${String(expedition.icon.id)}`
+        : undefined,
     chronicle: (() => {
       const loadout = chronicle.activityLoadouts?.[params.activityId]
       if (!loadout) return chronicle

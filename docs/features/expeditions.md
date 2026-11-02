@@ -32,6 +32,7 @@ Expeditions are authored multi-step Explore routes made from tasks, battles, loc
 ## Chronicle Expeditions
 - Expeditions can set `chronicle` to run story content from a non-player perspective.
 - Chronicle battle steps use activity-specific authored Pokemon, assigned moves, and battle item inventory, falling back to the route team only when no per-battle loadout exists. Authored Chronicle loadouts ignore the player's TM ownership, Researcher move-slot cap, Pokemon research-level move gate, Trainer battle move/item use limits, item skill requirements, and Trainer IV cap.
+- Spatial grid-game steps use the active Chronicle trainer's overworld sprite for the walking character, matching Chronicle battle identity; ordinary grid games continue using the player's selected profile sprite.
 - Chronicle catching steps use authored ball inventory and ignore the player's companion Pokemon.
 - Chronicle battle/catch completion advances expedition progress without granting player rewards, candies, caught Pokemon, Pokedex progress, daily progress, or normal activity stats.
 - Chronicle expeditions appear in Explore under `Chronicles` instead of the normal `Expeditions` header, and player-facing Explore copy labels active/complete/failed Chronicle runs as Chronicles even though they use the expedition runtime internally.

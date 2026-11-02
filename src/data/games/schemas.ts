@@ -658,6 +658,7 @@ const gridPuzzleSettingsSchema = z.union([
         count: z.number().int().min(1).max(20),
       }).strict().optional(),
       invisibleMaze: z.boolean().optional(),
+      playerIconId: z.string().optional(),
     })
     .passthrough()
     .superRefine((settings, ctx) => {
@@ -704,6 +705,7 @@ const gridPuzzleSettingsSchema = z.union([
       wallGoalSprite: z.string().optional(),
       winTileSprite: z.string().optional(),
       playerSprite: z.string().optional(),
+      playerIconId: z.string().optional(),
     })
     .passthrough()
     .superRefine((settings, ctx) => {
@@ -771,6 +773,7 @@ const gridPuzzleSettingsSchema = z.union([
       wallGoalSprite: z.string().optional(),
       winTileSprite: z.string().optional(),
       playerSprite: z.string().optional(),
+      playerIconId: z.string().optional(),
     })
     .passthrough()
     .superRefine((settings, ctx) => {
