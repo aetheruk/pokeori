@@ -29,6 +29,7 @@ import {
   getPokemonTeamLayout,
   reorderBattleTeam,
 } from '@/app/(frontend)/game/pokemon/actions/team'
+import { PokemonDetailsDialog } from '@/app/(frontend)/game/pokemon/_components/pokemon-details-dialog'
 import { MoveFieldNote, MoveLoadoutWorkspace } from '@/components/game/moves'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { Button } from '@/components/ui/button'
@@ -743,16 +744,21 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
               </DragOverlay>
             </DndContext>
             {box && (
-              <section className="mt-5" aria-label="Partner Pokémon">
-                <h2 className="mb-2 text-sm font-bold text-game-ink">Partner</h2>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+              <section
+                className="-mx-3 mt-5 bg-game-surface-raised/60 px-3 py-4 sm:-mx-5 sm:px-5"
+                aria-label="Partner Pokémon"
+              >
+                <h2 className="mb-3 text-center text-sm font-bold text-game-ink">
+                  Partner
+                </h2>
+                <div className="flex justify-center">
                   {companion ? (
                     <button
                       type="button"
                       onClick={() => { setSelectedPokemonId(companion.id); setEditingSection(null) }}
                       aria-pressed={selectedPokemonId === companion.id}
                       aria-label={`Select partner ${companion.name || getPokemonForm(companion.formId)?.name || 'Pokémon'}`}
-                      className={cn('game-focus-ring block w-full rounded-xl border-2 text-left shadow-sm', selectedPokemonId === companion.id ? 'border-game-ochre shadow-md' : 'border-game-card-border hover:border-game-charcoal/60')}
+                      className={cn('game-focus-ring block w-full max-w-[18rem] rounded-xl border-2 text-left shadow-sm', selectedPokemonId === companion.id ? 'border-game-ochre shadow-md' : 'border-game-card-border hover:border-game-charcoal/60')}
                     >
                       <BattleTeamCardFace pokemon={companion} index={0} label="PARTNER" />
                     </button>
@@ -761,7 +767,7 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                       type="button"
                       onClick={() => box.onChooseFromBox('companion')}
                       aria-label="Choose a partner Pokémon"
-                      className="game-focus-ring flex aspect-[1.38] min-h-32 w-full items-center justify-center rounded-xl border-2 border-dashed border-game-border bg-game-surface-raised/50 text-2xl text-game-muted hover:border-game-charcoal/60"
+                      className="game-focus-ring flex aspect-[1.38] min-h-32 w-full max-w-[18rem] items-center justify-center rounded-xl border-2 border-dashed border-game-border bg-game-surface-raised/50 text-2xl text-game-muted hover:border-game-charcoal/60"
                     >
                       <span aria-hidden="true">+</span>
                     </button>
@@ -775,7 +781,7 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
 
       {selectedPokemon && (
         <footer className="z-20 w-full min-w-0 max-w-full shrink-0 overflow-hidden border-t border-game-border bg-game-surface-raised shadow-[0_-4px_16px_rgba(39,48,43,0.1)]">
-          <div className="mx-auto w-full min-w-0 max-w-4xl px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 sm:px-5">
+          <div className="mx-auto w-full min-w-0 max-w-4xl px-3 pb-[max(1rem,calc(env(safe-area-inset-bottom)_+_0.75rem))] pt-2 sm:px-5">
             <div className="flex min-w-0 items-center gap-2">
               <PokemonRaritySprite
                 formId={selectedPokemon.formId}
@@ -797,19 +803,42 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                   Lv. {selectedPokemon.level}
                 </span>
               </div>
-              {box && (
+            </div>
+
+            {box && (
+              <fieldset
+                className="mt-2 grid min-w-0 grid-cols-2 gap-2"
+                aria-label="Selected Pokémon actions"
+              >
+                <PokemonDetailsDialog
+                  pokemon={selectedPokemon}
+                  battleTeam={sortedTeam}
+                  boxes={user?.boxes || []}
+                  inventory={gameData?.inventory || []}
+                  onRename={updatePokemon}
+                  trigger={(
+                    <button
+                      type="button"
+                      data-haptic-manual="true"
+                      className="game-focus-ring min-h-11 rounded-lg border border-game-border bg-game-canvas px-3 text-sm font-semibold text-game-ink transition-colors hover:border-game-charcoal"
+                    >
+                      Stats
+                    </button>
+                  )}
+                />
                 <button
                   type="button"
+                  data-haptic-manual="true"
                   onClick={() => void removeSelectedPokemon()}
                   disabled={removing}
-                  className="game-focus-ring ml-auto min-h-10 shrink-0 rounded-md px-3 text-xs font-semibold text-game-danger hover:bg-game-danger/10 disabled:opacity-50"
+                  className="game-focus-ring min-h-11 rounded-lg border border-game-danger/30 bg-game-danger/5 px-3 text-sm font-semibold text-game-danger transition-colors hover:bg-game-danger/10 disabled:opacity-50"
                 >
                   {removing ? 'Removing…' : 'Remove'}
                 </button>
-              )}
-            </div>
+              </fieldset>
+            )}
 
-            <fieldset
+            {!box && <fieldset
               className="mt-2 grid min-w-0 grid-cols-3 gap-1.5"
               aria-label="Edit selected Pokémon"
             >
@@ -878,15 +907,15 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                     'None'}
                 </span>
               </button>
-            </fieldset>
+            </fieldset>}
 
-            {moveUnlockMessage && (
+            {!box && moveUnlockMessage && (
               <p className="mt-1.5 text-[11px] text-game-muted">
                 {moveUnlockMessage}
               </p>
             )}
 
-            {editingSection === 'item' && (
+            {!box && editingSection === 'item' && (
               <div className="mt-2 w-full min-w-0 max-w-full overflow-hidden border-t border-game-border pt-2">
                 {heldItemUnlockMessage ? (
                   <p className="text-xs text-game-muted">
@@ -969,7 +998,7 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
               </div>
             )}
 
-            {editingSection === 'power' && (
+            {!box && editingSection === 'power' && (
               <div className="mt-2 w-full min-w-0 max-w-full overflow-hidden border-t border-game-border pt-2">
                 {pokemonResearchLevel < 3 ? (
                   <div className="flex min-h-14 items-center justify-between gap-3">
@@ -1053,7 +1082,7 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
         </footer>
       )}
 
-      {selectedPokemon && (
+      {selectedPokemon && !box && (
         <>
           <MoveLoadoutWorkspace
             open={moveWorkspaceOpen}

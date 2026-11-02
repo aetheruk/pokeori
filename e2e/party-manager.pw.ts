@@ -1,17 +1,23 @@
 import { expect, test } from '@playwright/test'
 
 for (const width of [390, 1280]) {
-  test(`box team manager keeps its shared bottom panel and returns from selection at ${width}px`, async ({ page }) => {
+  test(`box team manager opens Stats and returns from selection at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 })
     await page.goto('/ui-test')
     await page.getByRole('button', { name: 'Test party manager' }).click()
     const manager = page.getByRole('dialog', { name: 'Battle team' })
     await expect(manager).toBeVisible()
-    await expect(manager.getByRole('button', { name: /Edit moves/ })).toBeVisible()
-    await expect(manager.getByRole('button', { name: 'Item' })).toBeVisible()
-    await expect(manager.getByRole('button', { name: 'Power' })).toBeVisible()
+    await expect(manager.getByRole('button', { name: 'Stats' })).toBeVisible()
+    await expect(manager.getByRole('button', { name: 'Remove' })).toBeVisible()
+    await expect(manager.getByRole('button', { name: /Edit moves|Item|Power/ })).toHaveCount(0)
     await expect(manager.getByRole('button', { name: 'Choose a Pokémon for the battle team' })).toHaveCount(4)
     await expect(manager.getByRole('button', { name: 'Select partner Squirtle' })).toBeVisible()
+    await manager.getByRole('button', { name: 'Stats' }).click()
+    const statsDialog = page.getByRole('dialog', { name: /Bulbasaur/ })
+    await expect(statsDialog).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(statsDialog).not.toBeVisible()
+    await expect(manager).toBeVisible()
     await manager.getByRole('button', { name: 'Choose a Pokémon for the battle team' }).first().click()
     await page.getByRole('button', { name: 'Choose Pikachu from box' }).click()
     await expect(manager).toBeVisible()

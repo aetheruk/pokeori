@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { SWRConfig } from 'swr'
 import { GridAdventurePartyManager } from '@/app/(frontend)/game/research/encounter/grid-adventure-party-manager'
 import { Button } from '@/components/ui/button'
+import { AudioProvider } from '@/context/AudioContext'
 import { UserProvider } from '@/context/UserContext'
 import type { Pokemon } from '@/payload-types'
 import type { RequirementData } from '@/utilities/requirements'
@@ -23,24 +24,26 @@ export function PartyManagerFixture() {
   return (
     <SWRConfig value={{ isPaused: () => true }}>
       <UserProvider initialGameData={{ user: { id: 'ui-test', skills: { researching: { level: 10 }, battling: { level: 10 } } }, inventory: [], pokedex: [], pokemon: [] } as unknown as RequirementData}>
-        {choosing && <Button onClick={() => {
-          if (choosing === 'battle-team') setTeam((current) => [...current, { ...newPokemon, onBattleTeam: true, battleTeamPosition: current.length + 1 }])
-          else setCompanion({ ...newPokemon, isCompanion: true })
-          setSelectedId(newPokemon.id)
-          setChoosing(null)
-          setOpen(true)
-        }}>Choose Pikachu from box</Button>}
-        <GridAdventurePartyManager box={{
-          open, onOpenChange: setOpen, selectedPokemonId: selectedId, battleTeam: team, companion,
-          onChooseFromBox: (role) => { setOpen(false); setChoosing(role) },
-          onRemove: async (pokemon) => {
-            setTeam((current) => current.filter((member) => member.id !== pokemon.id))
-            setCompanion((current) => current?.id === pokemon.id ? null : current)
-            return true
-          },
-          onPokemonUpdated: () => {},
-          onTeamPositionsChanged: () => {},
-        }} />
+        <AudioProvider>
+          {choosing && <Button onClick={() => {
+            if (choosing === 'battle-team') setTeam((current) => [...current, { ...newPokemon, onBattleTeam: true, battleTeamPosition: current.length + 1 }])
+            else setCompanion({ ...newPokemon, isCompanion: true })
+            setSelectedId(newPokemon.id)
+            setChoosing(null)
+            setOpen(true)
+          }}>Choose Pikachu from box</Button>}
+          <GridAdventurePartyManager box={{
+            open, onOpenChange: setOpen, selectedPokemonId: selectedId, battleTeam: team, companion,
+            onChooseFromBox: (role) => { setOpen(false); setChoosing(role) },
+            onRemove: async (pokemon) => {
+              setTeam((current) => current.filter((member) => member.id !== pokemon.id))
+              setCompanion((current) => current?.id === pokemon.id ? null : current)
+              return true
+            },
+            onPokemonUpdated: () => {},
+            onTeamPositionsChanged: () => {},
+          }} />
+        </AudioProvider>
       </UserProvider>
     </SWRConfig>
   )
