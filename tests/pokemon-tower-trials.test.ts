@@ -150,6 +150,7 @@ describe('Pokemon Tower spirit trials', () => {
       },
     })
     expect(pokemonTowerGhostTrialAlphaGengarBattle).toMatchObject({
+      category: 'Kanto',
       isWildBattle: true,
       gridAdventureOnly: true,
       enemyTeam: [{ speciesId: 94, formId: '94', isAlpha: true }],

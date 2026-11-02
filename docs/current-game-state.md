@@ -1,5 +1,7 @@
 # Current Game State
 
+Unreleased: The repeatable Lavender Tower Ghost Trial's Alpha Gengar battle is categorized as Kanto so its Alpha capture attempt records Kanto as the Pokémon's obtained region.
+
 Unreleased: Trainer notification settings replace a device subscription when its VAPID key no longer matches the server, clearing the stale server record before creating a fresh subscription.
 
 Unreleased: After completing the Pallet Town tutorial, the one-time `Pokemon Energy Research` task offers the Revive crafting recipe as a secret reward. The Oaks Aide requires 100 caught Pokémon before sharing the research.
