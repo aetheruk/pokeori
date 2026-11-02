@@ -81,9 +81,9 @@ function getBattleTeamPosition(pokemon: Pokemon, fallbackIndex: number) {
 }
 
 const compactBattleTeamCard =
-  'h-[clamp(3.5rem,12svh,5.5rem)] min-h-0 aspect-auto [@media(min-width:640px)_and_(min-height:700px)]:h-auto [@media(min-width:640px)_and_(min-height:700px)]:min-h-32 [@media(min-width:640px)_and_(min-height:700px)]:aspect-[1.38]'
+  'h-[clamp(4.5rem,16svh,6rem)] min-h-0 aspect-auto [@media(max-height:500px)]:h-14 [@media(max-width:639px)_and_(min-height:740px)]:h-auto [@media(max-width:639px)_and_(min-height:740px)]:aspect-[1.38] [@media(min-width:640px)_and_(min-height:700px)]:h-auto [@media(min-width:640px)_and_(min-height:700px)]:min-h-32 [@media(min-width:640px)_and_(min-height:700px)]:aspect-[1.38]'
 const compactPartnerCard =
-  'w-[clamp(6rem,16svh,8rem)] [@media(min-width:640px)_and_(min-height:700px)]:w-full [@media(min-width:640px)_and_(min-height:700px)]:max-w-[18rem]'
+  'w-[clamp(7rem,23svh,9rem)] [@media(max-height:500px)]:w-24 [@media(max-width:639px)_and_(min-height:740px)]:w-48 [@media(min-width:640px)_and_(min-height:700px)]:w-full [@media(min-width:640px)_and_(min-height:700px)]:max-w-[18rem]'
 
 function normalizePokemonBackgroundPath(path?: string | null) {
   if (!path) return null
@@ -135,7 +135,8 @@ function BattleTeamCardFace({
       <span
         className={cn(
           'absolute left-2.5 top-2.5 z-10 rounded-md bg-game-ink/80 px-2 py-1 font-mono text-[10px] font-bold text-game-cream shadow-sm',
-          compact && 'left-1.5 top-1.5 rounded px-1.5 py-0.5 text-[9px] [@media(min-width:640px)_and_(min-height:700px)]:left-2.5 [@media(min-width:640px)_and_(min-height:700px)]:top-2.5 [@media(min-width:640px)_and_(min-height:700px)]:rounded-md [@media(min-width:640px)_and_(min-height:700px)]:px-2 [@media(min-width:640px)_and_(min-height:700px)]:py-1 [@media(min-width:640px)_and_(min-height:700px)]:text-[10px]',
+          compact &&
+            'left-1.5 top-1.5 rounded px-1.5 py-0.5 text-[9px] [@media(max-width:639px)_and_(min-height:740px)]:left-2.5 [@media(max-width:639px)_and_(min-height:740px)]:top-2.5 [@media(max-width:639px)_and_(min-height:740px)]:rounded-md [@media(max-width:639px)_and_(min-height:740px)]:px-2 [@media(max-width:639px)_and_(min-height:740px)]:py-1 [@media(max-width:639px)_and_(min-height:740px)]:text-[10px] [@media(min-width:640px)_and_(min-height:700px)]:left-2.5 [@media(min-width:640px)_and_(min-height:700px)]:top-2.5 [@media(min-width:640px)_and_(min-height:700px)]:rounded-md [@media(min-width:640px)_and_(min-height:700px)]:px-2 [@media(min-width:640px)_and_(min-height:700px)]:py-1 [@media(min-width:640px)_and_(min-height:700px)]:text-[10px]',
         )}
       >
         {label || (index === 0 ? 'LEAD' : index + 1)}
@@ -144,7 +145,8 @@ function BattleTeamCardFace({
         <span
           className={cn(
             'absolute right-2.5 top-2.5 z-10 flex size-9 items-center justify-center rounded-full border border-game-border/80 bg-game-surface/90 shadow-sm',
-            compact && 'right-1.5 top-1.5 size-7 [@media(min-width:640px)_and_(min-height:700px)]:right-2.5 [@media(min-width:640px)_and_(min-height:700px)]:top-2.5 [@media(min-width:640px)_and_(min-height:700px)]:size-9',
+            compact &&
+              'right-1.5 top-1.5 size-7 [@media(max-width:639px)_and_(min-height:740px)]:right-2.5 [@media(max-width:639px)_and_(min-height:740px)]:top-2.5 [@media(max-width:639px)_and_(min-height:740px)]:size-9 [@media(min-width:640px)_and_(min-height:700px)]:right-2.5 [@media(min-width:640px)_and_(min-height:700px)]:top-2.5 [@media(min-width:640px)_and_(min-height:700px)]:size-9',
           )}
           title={heldItem.name}
         >
@@ -155,7 +157,7 @@ function BattleTeamCardFace({
             height={compact ? 20 : 28}
             className={
               compact
-                ? '[@media(min-width:640px)_and_(min-height:700px)]:h-7 [@media(min-width:640px)_and_(min-height:700px)]:w-7'
+                ? '[@media(max-width:639px)_and_(min-height:740px)]:h-7 [@media(max-width:639px)_and_(min-height:740px)]:w-7 [@media(min-width:640px)_and_(min-height:700px)]:h-7 [@media(min-width:640px)_and_(min-height:700px)]:w-7'
                 : undefined
             }
           />
@@ -179,13 +181,15 @@ function BattleTeamCardFace({
       <span
         className={cn(
           'absolute inset-x-3 bottom-2 z-10 flex min-w-0 items-end justify-between gap-2 text-game-cream',
-          compact && 'inset-x-1.5 bottom-1.5 gap-1 [@media(min-width:640px)_and_(min-height:700px)]:inset-x-3 [@media(min-width:640px)_and_(min-height:700px)]:bottom-2 [@media(min-width:640px)_and_(min-height:700px)]:gap-2',
+          compact &&
+            'inset-x-1.5 bottom-1.5 gap-1 [@media(max-width:639px)_and_(min-height:740px)]:inset-x-3 [@media(max-width:639px)_and_(min-height:740px)]:bottom-2 [@media(max-width:639px)_and_(min-height:740px)]:gap-2 [@media(min-width:640px)_and_(min-height:700px)]:inset-x-3 [@media(min-width:640px)_and_(min-height:700px)]:bottom-2 [@media(min-width:640px)_and_(min-height:700px)]:gap-2',
         )}
       >
         <span
           className={cn(
             'min-w-0 truncate text-sm font-bold leading-tight drop-shadow-sm',
-            compact && 'text-[11px] [@media(min-width:640px)_and_(min-height:700px)]:text-sm',
+            compact &&
+              'text-[11px] [@media(max-width:639px)_and_(min-height:740px)]:text-sm [@media(min-width:640px)_and_(min-height:700px)]:text-sm',
           )}
         >
           {name}
@@ -193,7 +197,8 @@ function BattleTeamCardFace({
         <span
           className={cn(
             'shrink-0 font-mono text-[10px] font-semibold text-game-cream/90',
-            compact && 'text-[9px] [@media(min-width:640px)_and_(min-height:700px)]:text-[10px]',
+            compact &&
+              'text-[9px] [@media(max-width:639px)_and_(min-height:740px)]:text-[10px] [@media(min-width:640px)_and_(min-height:700px)]:text-[10px]',
           )}
         >
           Lv. {pokemon.level}
@@ -750,7 +755,7 @@ export function GridAdventurePartyManager({ box }: { box?: BoxTeamManagerOptions
                   className={cn(
                     'grid sm:grid-cols-3 sm:gap-4',
                     box
-                      ? 'grid-cols-3 gap-2 [@media(min-width:640px)_and_(max-height:500px)]:grid-cols-6'
+                      ? 'grid-cols-3 gap-2 [@media(max-width:639px)_and_(min-height:740px)]:grid-cols-2 [@media(min-width:640px)_and_(max-height:500px)]:grid-cols-6'
                       : 'grid-cols-2 gap-3',
                   )}
                   aria-label="Battle team order"

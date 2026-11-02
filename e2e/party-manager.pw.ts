@@ -13,7 +13,14 @@ for (const viewport of [
 
     const manager = page.getByRole('dialog', { name: 'Battle team' })
     await expect(manager).toBeVisible()
-    await manager.getByRole('button', { name: /Bulbasaur/ }).click()
+    const firstPokemonCard = manager.getByRole('button', { name: /Bulbasaur/ })
+    await firstPokemonCard.click()
+
+    if (viewport.width === 390 && viewport.height === 844) {
+      const cardBounds = await firstPokemonCard.boundingBox()
+      expect(cardBounds?.width).toBeGreaterThanOrEqual(160)
+      expect(cardBounds?.height).toBeGreaterThanOrEqual(120)
+    }
 
     const content = manager.locator('main').locator('xpath=..')
     await expect.poll(() => content.evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true)
