@@ -415,22 +415,22 @@ const {
 store.set('game:owner', { encounterId: fishingConfig.id })
 let castTime = Date.now()
 try {
-  // The actual cast/hook/net path persists a concrete bundle quantity once.
+  // Global material catches keep their fixed quantity through the cast/hook/net path.
   inventory['old-rod'] = 1
   let materialRolls = [0.9, 0.5, 0, 0.99, 0.5]
   Math.random = () => materialRolls.shift() ?? 0.5
   assert.equal((await castFishingLine('old')).success, true)
   const materialHook = store.get('fishing:owner')
   assert.equal(materialHook.hookedResult.entry.itemId, 'soft-fluff-t1')
-  assert.equal(materialHook.hookedResult.entry.quantity, 2)
+  assert.equal(materialHook.hookedResult.entry.quantity, 1)
   materialHook.phase = 'nibble'
   materialHook.appearTime = Date.now() - 1
   store.set('fishing:owner', materialHook)
-  assert.equal((await attemptHook()).quantity, 2)
+  assert.equal((await attemptHook()).quantity, 1)
   Math.random = () => { throw new Error('A hooked item must not reroll its quantity') }
-  assert.equal((await attemptHook()).quantity, 2)
+  assert.equal((await attemptHook()).quantity, 1)
   assert.equal((await keepFishingCatch()).success, true)
-  assert.equal(store.get('fishing:keep-net:owner').entries[0].quantity, 2)
+  assert.equal(store.get('fishing:keep-net:owner').entries[0].quantity, 1)
   store.delete('fishing:owner')
   store.delete('fishing:keep-net:owner')
 
@@ -452,7 +452,7 @@ try {
   materialRolls = [0.9, 0.5, 0, 0.99, 0.5]
   Math.random = () => materialRolls.shift() ?? 0.5
   assert.equal((await castFishingLine('old')).success, true)
-  assert.equal(store.get('fishing:owner').hookedResult.entry.quantity, 2)
+  assert.equal(store.get('fishing:owner').hookedResult.entry.quantity, 1)
   delete oldRod.items
   delete inventory['unknown-tm']
   store.delete('fishing:owner')
