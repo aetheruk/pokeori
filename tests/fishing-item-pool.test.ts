@@ -31,14 +31,14 @@ const has = (entries: Array<{ itemId?: string }>, id: string) =>
   entries.some((entry) => entry.itemId === id)
 
 describe('fishing common and rare tables', () => {
-  test('every rod offers all eighteen base materials and broken balls in bundles of one or two', () => {
+  test('every rod offers all eighteen base materials and broken balls at quantity one', () => {
     expect(TIER_ONE_POKEMON_MATERIAL_IDS).toHaveLength(18)
     for (const pool of Object.values(globalFishingCommonItemPools)) {
       expect(pool.every((entry) => entry.weight === 1)).toBe(true)
       for (const id of [...TIER_ONE_POKEMON_MATERIAL_IDS, 'broken-ball-t1']) {
-        expect(
-          pool.find((entry) => entry.itemId === id)?.quantityRange,
-        ).toEqual({ min: 1, max: 2 })
+        const entry = pool.find((candidate) => candidate.itemId === id)
+        expect(entry?.quantity).toBe(1)
+        expect(entry?.quantityRange).toBeUndefined()
       }
       expect(
         pool.find((entry) => entry.currencyId === 'pokedollars')?.quantity,
@@ -186,7 +186,7 @@ describe('fishing common and rare tables', () => {
     ).toBe(1)
   })
 
-  test('table selection is separate from equal entry selection and quantity resolves once', () => {
+  test('table selection is separate from equal entry selection and material quantity stays fixed', () => {
     const rng =
       (...values: number[]) =>
       () =>
@@ -195,11 +195,21 @@ describe('fishing common and rare tables', () => {
       expect(rollGlobalFishingItem(rod, {}, [], rng(0.00999, 0)).itemId).toBe(
         'golden-scale-1',
       )
-      const one = rollGlobalFishingItem(rod, {}, [], rng(0.01, 0, 0))
-      const two = rollGlobalFishingItem(rod, {}, [], rng(0.99, 0, 0.99999))
+      const one = rollGlobalFishingItem(rod, {}, [], rng(0.01, 0))
+      let materialRollCount = 0
+      const materialRolls = [0.99, 0]
+      const two = rollGlobalFishingItem(rod, {}, [], () => {
+        const roll = materialRolls[materialRollCount]
+        if (roll === undefined) {
+          throw new Error('Fixed material quantities must not consume an extra roll')
+        }
+        materialRollCount += 1
+        return roll
+      })
       expect(one.itemId).toBe(TIER_ONE_POKEMON_MATERIAL_IDS[0])
       expect(one.quantity).toBe(1)
-      expect(two.quantity).toBe(2)
+      expect(two.quantity).toBe(1)
+      expect(materialRollCount).toBe(2)
       expect('quantityRange' in two).toBe(false)
       expect(
         rollGlobalFishingItem(
