@@ -838,21 +838,6 @@ function MountedPokemonDetailsDialog({
     currentAssignedMoveIds,
   )
   const [moveDetail, setMoveDetail] = useState<MoveConfig | null>(null)
-  const evolutionMoveNames = Array.from(
-    new Set(
-      (EVOLUTIONS[pokemon.speciesId] || []).flatMap(({ conditions }) => {
-        if (
-          !conditions.knownMoveId ||
-          !matchesEvolutionRegion(conditions, pokemon) ||
-          (conditions.requiredSourceForm &&
-            conditions.requiredSourceForm !== (formInfo?.form || 'base'))
-        )
-          return []
-        const move = getMove(conditions.knownMoveId)
-        return move ? [move.name] : []
-      }),
-    ),
-  )
   const [moveWorkspaceOpen, setMoveWorkspaceOpen] = useState(false)
   const [isSavingMoves, setIsSavingMoves] = useState(false)
   useEffect(() => {
@@ -1912,13 +1897,6 @@ function MountedPokemonDetailsDialog({
                 Battle Moves
               </SectionDivider>
               <div className="space-y-3 border-y border-game-border/75 py-4">
-                {evolutionMoveNames.length > 0 && (
-                  <p className="text-xs text-game-muted">
-                    Evolution move: {evolutionMoveNames.join(' or ')}. Equip and
-                    save the move to meet this evolution requirement.
-                  </p>
-                )}
-
                 {battleMovesUnlockMessage ? (
                   <div className="py-2 text-xs text-game-muted">
                     {battleMovesUnlockMessage}
