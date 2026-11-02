@@ -664,7 +664,7 @@ export const pokemonTowerGhostTrialAlphaGengarBattle: BattleConfig = {
   id: 'pokemon-tower-ghost-trial-alpha-gengar',
   name: 'Alpha Gengar',
   description: 'An enormous Gengar emerges from the tower shadows.',
-  category: 'Secret',
+  category: 'Kanto',
   subCategory: 'Pokemon Tower',
   icon: { type: 'pokemon', id: '94' },
   background: towerBackground,
