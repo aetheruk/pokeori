@@ -245,7 +245,8 @@ export const pokemonTowerBattles: BattleConfig[] = [
   },
   {
     id: 'pokemon-tower-channeler-ruth',
-    winMessage: 'My spell backfired!',
+    winMessage:
+      'Have you met the Gengar that loves to lick, someone needs to show it a taste of its own medicine!',
     ...trainerBattleIdentity({ trainerClass: 'channeler', trainerName: 'Ruth' }),
     description: "The sanctuary has quieted Ruth's restless Gastly. It begins the battle asleep, giving you a moment to act.",
     category: 'Kanto',
