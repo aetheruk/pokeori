@@ -436,6 +436,15 @@ function resolveChargeRewardItemId(
   return windowReward?.rewardItemId || effect.rewardItemId
 }
 
+export function getHeldItemChargeRewardItemId(
+  itemId: string | null | undefined,
+  now: Date = new Date(),
+): string | undefined {
+  const effect = getHeldItemDefinition(itemId)?.heldConfig.effect
+  if (effect?.type !== 'item-charge') return undefined
+  return resolveChargeRewardItemId(effect, now)
+}
+
 export function applyHeldItemChargeOnHit(params: {
   state?: BattleState
   pokemon: BattlePokemon
@@ -481,7 +490,7 @@ export function applyHeldItemChargeOnHit(params: {
     }
   }
 
-  const rewardItemId = resolveChargeRewardItemId(effect, now)
+  const rewardItemId = getHeldItemChargeRewardItemId(item.id, now)
   const ownerId = getPersistentOwnerId(pokemon)
   if (ownerId && rewardItemId && pokemon.id) {
     if (state) {
@@ -490,6 +499,7 @@ export function applyHeldItemChargeOnHit(params: {
         ownerId,
         pokemonId: pokemon.id,
         itemId: rewardItemId,
+        sourceItemId: item.id,
         quantity: 1,
       })
     }

@@ -494,6 +494,7 @@ export interface BattleState {
     ownerId: string
     pokemonId: string
     itemId: string
+    sourceItemId?: string
     quantity: number
   }[]
   delayedDamage?: BattleDelayedDamageEntry[]
