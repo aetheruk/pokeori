@@ -239,6 +239,16 @@ function ExploreListContent({
     voyageId: string
     endTime: string
   }[]
+  const activeVoyageCardItems = useMemo<ExploreItem[]>(
+    () =>
+      activeVoyages.flatMap(({ voyageId }) => {
+        const voyage = voyages.find((entry) => entry.id === voyageId)
+        return voyage
+          ? [{ ...voyage, type: 'voyage', originalData: voyage } as ExploreItem]
+          : []
+      }),
+    [activeVoyages],
+  )
   const activeExpedition = (userData as any).activeExpedition || null
   const activeExpeditionConfig = activeExpedition
     ? expeditions.find((entry) => entry.id === activeExpedition.expeditionId)
@@ -536,6 +546,7 @@ function ExploreListContent({
           activeCategory={displayCategory}
           takeoverStyle={isTakeover}
           activeVoyages={activeVoyages}
+          activeVoyageItems={activeVoyageCardItems}
           activeExpedition={activeExpedition}
           activeExpeditionItem={activeExpeditionCardItem}
           trainerName={trainerName}

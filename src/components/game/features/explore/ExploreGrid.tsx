@@ -17,6 +17,7 @@ interface ExploreGridProps {
   eventsCard?: ReactNode
   activeCategory: string
   activeVoyages: { voyageId: string; endTime: string }[]
+  activeVoyageItems: ExploreItem[]
   activeExpedition: any | null
   activeExpeditionItem: ExploreItem | null
   trainerName: string
@@ -36,6 +37,7 @@ function ExploreGridComponent({
   eventsCard,
   activeCategory,
   activeVoyages,
+  activeVoyageItems,
   activeExpedition,
   activeExpeditionItem,
   trainerName,
@@ -281,7 +283,7 @@ function ExploreGridComponent({
     !randomEvent &&
     !vsSeekerEvent &&
     !eventsCard &&
-    !(activeCategory === 'Dailies' && activeExpeditionItem)
+    !(activeCategory === 'Dailies' && (activeExpeditionItem || activeVoyageItems.length > 0))
   ) {
     if (hideEmptyState) return null
     return (
@@ -320,6 +322,29 @@ function ExploreGridComponent({
               setActiveShop={setActiveShop}
               setSelectedItem={setSelectedItem}
             />
+          </div>
+        </div>
+      )}
+      {activeCategory === 'Dailies' && activeVoyageItems.length > 0 && (
+        <div>
+          <SectionDivider className="mb-6" variant="chip">
+            Active Voyages
+          </SectionDivider>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            {activeVoyageItems.map((item) => (
+              <ExploreCard
+                key={item.id}
+                entry={{ kind: 'single', item }}
+                trainerName={trainerName}
+                userData={userData}
+                activeVoyages={activeVoyages}
+                activeExpedition={activeExpedition}
+                onAction={onAction}
+                playSelectSfx={playSelectSfx}
+                setActiveShop={setActiveShop}
+                setSelectedItem={setSelectedItem}
+              />
+            ))}
           </div>
         </div>
       )}
