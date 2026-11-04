@@ -32,6 +32,7 @@ export function EventCardFixture() {
           filteredItems={[]}
           activeCategory="Kanto"
           activeVoyages={[]}
+          activeVoyageItems={[]}
           activeExpedition={null}
           activeExpeditionItem={null}
           trainerName="Trainer"
