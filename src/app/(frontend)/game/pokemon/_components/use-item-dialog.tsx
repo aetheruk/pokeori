@@ -472,6 +472,7 @@ export function UseItemDialog({
                         >
                           <Button
                             variant="outline"
+                            data-haptic-manual="true"
                             className="flex h-full min-h-[76px] w-full items-center justify-between gap-3 whitespace-normal rounded-xl border-game-border bg-game-surface-raised p-3 text-left text-game-ink shadow-sm hover:border-game-moss/45 hover:bg-game-moss/5"
                             onClick={() => handleItemClick(item)}
                             disabled={!!usingItem}
