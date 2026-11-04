@@ -1,6 +1,7 @@
 import { getPayload, type Payload } from 'payload'
 import configPromise from '@payload-config'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
+import { getHeldItemChargeRewardItemId } from '@/utilities/battle/held-items'
 import { calculateStats } from '@/utilities/battle/stats-calc'
 import {
   getHeldItemDefinition,
@@ -26,6 +27,72 @@ function getPersistentPokemonId(pokemon: BattlePokemon): string | null {
 
 function getRuntimeHeldItemId(pokemon: BattlePokemon): string | null {
   return pokemon.heldItem?.id || pokemon.heldItemId || null
+}
+
+function reconcileFullyChargedHeldItems(state: BattleState) {
+  const rewards = state.heldItemChargeRewards || []
+  state.heldItemChargeRewards = rewards
+  const allPokemon = [...(state.playerTeam || []), ...(state.enemyTeam || [])]
+
+  for (const pokemon of allPokemon) {
+    const pokemonId = getPersistentPokemonId(pokemon)
+    const ownerId =
+      typeof pokemon.user === 'object'
+        ? (pokemon.user as any).id
+        : pokemon.user
+    const item = getHeldItemDefinition(getRuntimeHeldItemId(pokemon))
+    const effect = item?.heldConfig.effect
+    if (
+      !pokemonId ||
+      typeof ownerId !== 'string' ||
+      ownerId === 'enemy' ||
+      !item ||
+      effect?.type !== 'item-charge' ||
+      (pokemon.itemCharge ?? 0) < Math.max(1, effect.maxCharge ?? 100)
+    ) {
+      continue
+    }
+
+    const rewardItemId = getHeldItemChargeRewardItemId(item.id)
+    if (!rewardItemId) continue
+
+    if (
+      !rewards.some(
+        (reward) =>
+          reward.pokemonId === pokemonId &&
+          (reward.sourceItemId === item.id ||
+            (!reward.sourceItemId && reward.itemId === rewardItemId)),
+      )
+    ) {
+      rewards.push({
+        ownerId,
+        pokemonId,
+        itemId: rewardItemId,
+        sourceItemId: item.id,
+        quantity: 1,
+      })
+    }
+
+    if (effect.consumeHeldItem !== false) {
+      pokemon.consumedHeldItems ??= []
+      if (
+        !pokemon.consumedHeldItems.some(
+          (consumed) => consumed.itemId === item.id && consumed.forceClear,
+        )
+      ) {
+        pokemon.consumedHeldItems.push({
+          itemId: item.id,
+          name: item.name,
+          persistent: pokemon.heldItemBattleOnly ? false : undefined,
+          forceClear: true,
+        })
+      }
+      pokemon.heldItem = undefined
+      pokemon.heldItemId = null
+      pokemon.heldItemBattleOnly = undefined
+    }
+    pokemon.itemCharge = 0
+  }
 }
 
 function shouldConsumeHeldItemOnWin(
@@ -207,6 +274,7 @@ export async function persistConsumedHeldItems(
   if (state.chronicle) return
   if (state.status === 'ongoing') return
   if (state.heldItemsSettled) return
+  reconcileFullyChargedHeldItems(state)
   if (!(state.heldItemChargeRewards?.length || [...(state.playerTeam || []), ...(state.enemyTeam || [])].some((pokemon) =>
     getPersistentPokemonId(pokemon) && (typeof pokemon.itemCharge === 'number' || pokemon.consumedHeldItems?.some((item) => item.persistent !== false)),
   ))) return

@@ -599,6 +599,7 @@ describe('battle item effects', () => {
         ownerId: 'player-1',
         pokemonId: 'pokemon-1',
         itemId: 'fire-stone',
+        sourceItemId: 'inferior-fire-stone',
         quantity: 1,
       },
     ])
