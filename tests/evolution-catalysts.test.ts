@@ -20,7 +20,7 @@ describe('level evolution catalysts', () => {
       catalyst.powderCost,
     ])).toEqual([
       [0, 20, 5, 25, 'poke-powder-xs', 10],
-      [21, 40, 20, 300, 'poke-powder-s', 25],
+      [21, 40, 20, 300, 'poke-powder-s', 10],
       [41, Number.POSITIVE_INFINITY, 40, 500, 'poke-powder-m', 50],
     ])
 

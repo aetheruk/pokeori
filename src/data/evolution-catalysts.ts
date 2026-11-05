@@ -21,7 +21,7 @@ export const LEVEL_EVOLUTION_CATALYSTS = [
     artisanLevel: 20,
     crystalCost: 300,
     powderId: 'poke-powder-s',
-    powderCost: 25,
+    powderCost: 10,
   },
   {
     id: 'evolution-catalyst-ex',
