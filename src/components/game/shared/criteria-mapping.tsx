@@ -619,6 +619,14 @@ export function mapCriteriaToDisplayItem(
         subLabel: 'Profile Customization',
       }
     }
+    case 'title_owned': {
+      const titleDef = getTitle(condition.targetId as string)
+      return {
+        icon: <Trophy className="w-5 h-5 text-game-moss-strong" />,
+        label: `${condition.inverse ? 'Do not own' : 'Own'} Title: ${titleDef?.name || condition.targetId}`,
+        subLabel: 'Profile Customization',
+      }
+    }
     case 'battle_team': {
       const check = condition.battleTeamCheck
       if (!check) {

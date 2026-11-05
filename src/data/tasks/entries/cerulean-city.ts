@@ -1985,10 +1985,6 @@ export const ceruleanCityTasks: Task[] = [
         type: 'title',
         targetId: 'cascade-caller',
       },
-      {
-        type: 'icon',
-        targetId: 'misty',
-      },
     ],
     exitModal: {
       background: '/backgrounds/gym-water.avif',
