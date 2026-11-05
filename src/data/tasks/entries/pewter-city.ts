@@ -1904,10 +1904,6 @@ export const pewterCityTasks: Task[] = [
         type: 'title',
         targetId: 'boulder-breaker',
       },
-      {
-        type: 'icon',
-        targetId: 'brock',
-      },
     ],
     exitModal: {
       background: '/backgrounds/gym-rock.avif',

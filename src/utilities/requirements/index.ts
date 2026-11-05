@@ -686,6 +686,15 @@ export function getRequirementProgress(
       break
     }
 
+    case 'title_owned': {
+      const extendedUser = user as ExtendedUser
+      const unlockedTitles = Array.isArray(extendedUser.unlockedTitles)
+        ? extendedUser.unlockedTitles
+        : []
+      current = unlockedTitles.includes(String(condition.targetId || '')) ? 1 : 0
+      break
+    }
+
     case 'battle_team': {
       if (!condition.battleTeamCheck) {
         current = 0

@@ -83,6 +83,7 @@ export const taskConditionSchema: z.ZodType<any> = z.lazy(() =>
         'user_banner',
         'user_icon',
         'user_title',
+        'title_owned',
         'battle_team',
         'companion',
         'research_level',

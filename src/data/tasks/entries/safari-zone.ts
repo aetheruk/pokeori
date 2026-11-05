@@ -1335,12 +1335,6 @@ export const safariZoneTasks: Task[] = ([
     criteria: [],
     rewards: [
       {
-        type: 'icon',
-        targetId: 'koga',
-        quantity: 1,
-        dropChance: 100,
-      },
-      {
         type: 'title',
         targetId: 'poison-pro',
         quantity: 1,

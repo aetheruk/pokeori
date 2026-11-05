@@ -143,10 +143,6 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
         type: 'title',
         targetId: 'lightning-lieutenant',
       },
-      {
-        type: 'icon',
-        targetId: 'lt-surge',
-      },
     ],
   },
   {

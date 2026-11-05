@@ -402,7 +402,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     }
   })
 
-  test('Koga grants Swift Poison, the Gym Challenge binder, and a matching daily', () => {
+  test('Koga grants Swift Poison, the Gym Challenge binder, and The Antidote without his icon', () => {
     const trial = expeditions.find(
       (entry) => entry.id === 'fuchsia-gym-trial-expedition',
     )
@@ -432,14 +432,14 @@ describe('Fuchsia Gym and Safari progression', () => {
       tasks
         .find((task) => task.id === 'fuchsia-gym-koga-rewards')
         ?.rewards.map((reward) => reward.targetId),
-    ).toEqual(['koga', 'poison-pro'])
+    ).toEqual(['poison-pro'])
     expect(getIcon('koga')).toMatchObject({
       name: 'Koga',
       icon: { type: 'trainer', id: 'gym-kanto-koga' },
     })
     expect(getTitle('poison-pro')).toEqual({
       id: 'poison-pro',
-      name: 'Poison Pro',
+      name: 'The Antidote',
     })
 
     const swiftPoison = getMove('swift-poison')

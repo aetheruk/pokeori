@@ -1448,6 +1448,19 @@ export const celadonCityTasks: Task[] = [
         "targetId": "tm-protective-pollen",
         "quantity": 1,
         "dropChance": 100
+      },
+      {
+        "type": "title",
+        "targetId": "weedkiller",
+        "quantity": 1,
+        "dropChance": 100,
+        "requirements": [
+          {
+            "type": "title_owned",
+            "targetId": "weedkiller",
+            "inverse": true
+          }
+        ]
       }
     ],
     "exitModal": {

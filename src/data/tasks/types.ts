@@ -30,6 +30,7 @@ export type TaskRequirementType =
   | 'user_banner'
   | 'user_icon'
   | 'user_title'
+  | 'title_owned'
   | 'battle_team'
   | 'companion'
   | 'research_level'
