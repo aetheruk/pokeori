@@ -548,6 +548,15 @@ function advanceTurn(state: TcgBattleState, nextSide: TcgBattleSide) {
       if (effect.remainingTurns <= 0) delete card.temporaryEffects?.attackDamageTakenBuff
     }
   }
+  for (const sideKey of ['player', 'opponent'] as const) {
+    for (const card of [...state[sideKey].front, ...state[sideKey].back]) {
+      const history = card.temporaryEffects?.lastNightEyesAttackBySide
+      if (!history?.[state.activeSide]) continue
+      history[state.activeSide] = (history[state.activeSide] || 0) - 1
+      if ((history[state.activeSide] || 0) <= 0) delete history[state.activeSide]
+      if (Object.keys(history).length === 0) delete card.temporaryEffects?.lastNightEyesAttackBySide
+    }
+  }
   for (const card of [...state[state.activeSide].front, ...state[state.activeSide].back]) {
     delete card.temporaryEffects?.lastIncomingAttackDamage
   }
@@ -772,7 +781,9 @@ function applyTcgBattleSpecialEffects(params: {
       ].includes(rule.kind) ||
       (rule.kind === 'switch' && rule.target === 'opponent') ||
       (rule.kind === 'cannotAttack' && rule.target !== 'self') ||
-      (rule.kind === 'buffAttack' && rule.target === 'opponent')
+      (rule.kind === 'buffAttack' && rule.target === 'opponent') ||
+      (rule.kind === 'clearStatus' && rule.target === 'opponent') ||
+      (rule.kind === 'preventStatus' && rule.target === 'opponent')
     if (blockTargetEffects && targetsOpponent) continue
 
     if (rule.kind === 'switch' && rule.beforeDamage) continue
@@ -806,6 +817,7 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
     if (rule.kind === 'disableAttack' && choice?.kind === 'disabledAttack') {
+      if (rule.targetBasicOnly && !target.subtypes.includes('Basic')) continue
       getTemporaryEffects(target).disabledAttack = {
         attackIndex: choice.attackIndex,
         remainingTurns: 2,
@@ -873,6 +885,33 @@ function applyTcgBattleSpecialEffects(params: {
         targetId: affected.instanceId,
         label: `${affected.name} cannot attack next turn`,
       })
+      continue
+    }
+    if (rule.kind === 'preventStatus') {
+      const affected = rule.target === 'self'
+        ? choice?.kind === 'benchSwitch'
+          ? state[sideKey].front.find((card) => card.instanceId === choice.cardId) || attacker
+          : attacker
+        : target
+      getTemporaryEffects(affected).preventStatusConditions = {
+        statuses: rule.statuses,
+        remainingTurns: rule.whileActive ? 99 : 2,
+        whileActive: rule.whileActive,
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: affected.instanceId,
+        label: `${affected.name} is protected from ${rule.statuses.join(', ')}`,
+      })
+      continue
+    }
+    if (rule.kind === 'clearStatus') {
+      const affected = rule.target === 'self' ? attacker : target
+      affected.statusConditions = (affected.statusConditions || []).filter(
+        (status) => !rule.statuses.includes(status),
+      )
+      if (affected.statusConditions.length === 0) affected.statusConditions = undefined
       continue
     }
     if (rule.kind === 'preventRetreat') {
@@ -994,6 +1033,8 @@ function applyTcgBattleSpecialEffects(params: {
     }
     if (rule.kind === 'reviveDiscardPokemon' && choice?.kind === 'discardPokemon') {
       if (blockTargetEffects && choice.side !== sideKey) continue
+      if (rule.side === 'self' && choice.side !== sideKey) continue
+      if (rule.side === 'opponent' && choice.side === sideKey) continue
       const destination = state[choice.side]
       const cardIndex = destination.discard.findIndex(
         (card) => card.instanceId === choice.cardId && card.subtypes.includes('Basic'),
@@ -1320,6 +1361,11 @@ function applyAttack(
     target.incomingAttackModifier = undefined
   }
   getTemporaryEffects(target).lastIncomingAttackDamage = resolution.targetDamage
+  if (attack.name.toLowerCase() === 'night eyes') {
+    const history = getTemporaryEffects(target).lastNightEyesAttackBySide || {}
+    history[sideKey] = 2
+    getTemporaryEffects(target).lastNightEyesAttackBySide = history
+  }
   if (resolution.targetDamage > 0) {
     recordDamageEvent(state, {
       sourceId: attacker.instanceId,
@@ -1375,6 +1421,17 @@ function applyAttack(
       targetId: attacker.instanceId,
       targetSide: sideKey,
       damage: selfDamage,
+      reason: 'self',
+    })
+  }
+  if (resolution.incomingReflectedDamage && attacker.currentHp > 0) {
+    const reflected = Math.min(attacker.currentHp, resolution.incomingReflectedDamage)
+    attacker.currentHp -= reflected
+    recordDamageEvent(state, {
+      sourceId: target.instanceId,
+      targetId: attacker.instanceId,
+      targetSide: sideKey,
+      damage: reflected,
       reason: 'self',
     })
   }
