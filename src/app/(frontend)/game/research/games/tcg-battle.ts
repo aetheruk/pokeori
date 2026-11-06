@@ -1173,7 +1173,7 @@ function applyTcgBattleSpecialEffects(params: {
         kind: 'marker',
         sourceId: attacker.instanceId,
         targetId: target.instanceId,
-        label: 'Lightning Rod',
+        label: rule.marker === 'shockWave' ? 'Shock-wave marker' : 'Lightning Rod',
       })
     }
   }

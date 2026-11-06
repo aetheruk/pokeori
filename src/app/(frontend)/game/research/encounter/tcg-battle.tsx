@@ -4459,15 +4459,19 @@ function CardImageButton({
           ))}
         </div>
       )}
-      {card.markers?.includes('lightningRod') && (
+      {card.markers?.some((marker) => marker === 'lightningRod' || marker === 'shockWave') && (
         <div
           className={cn(
-            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-md border border-game-ochre/50 bg-game-surface-raised px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-game-ink shadow-sm',
+            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-md border border-game-ochre/50 bg-game-surface-raised px-1.5 py-1 text-[8px] font-bold uppercase tracking-wide text-game-ink shadow-sm',
             side === 'opponent' && 'rotate-180',
           )}
-          title="Lightning Rod marker"
+          title={`${card.markers
+            .filter((marker) => marker === 'lightningRod' || marker === 'shockWave')
+            .map((marker) => marker === 'lightningRod' ? 'Lightning Rod' : 'Shock-wave')
+            .join(', ')} marker`}
         >
-          Rod
+          {card.markers.includes('lightningRod') && <span>Rod</span>}
+          {card.markers.includes('shockWave') && <span>Shock</span>}
         </div>
       )}
     </button>

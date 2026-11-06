@@ -80,6 +80,7 @@ export type TcgBattleDamageRule =
   | { kind: 'countComparisonBonus'; baseDamage: number; bonusDamage: number; addSource: TcgBattleCountSource; subtractSource: TcgBattleCountSource }
   | { kind: 'evolvedTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'stage2TargetBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'deltaSpeciesTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'namedTargetBonus'; baseDamage: number; bonusDamage: number; names: string[] }
   | { kind: 'resistanceTypeBonus'; baseDamage: number; bonusDamage: number; resistanceType: string }
   | { kind: 'darknessOrNameTargetBonus'; baseDamage: number; bonusDamage: number; nameContains: string }
@@ -127,6 +128,7 @@ export type TcgBattleStatusRule = {
   target: 'self' | 'opponent'
   statuses: TcgBattleStatusCondition[]
   condition?: TcgBattleCoinCondition
+  targetSubtype?: 'ex' | 'stage2'
   useChosenStatus?: boolean
   useChosenStatusPair?: boolean
 }
@@ -153,12 +155,13 @@ export type TcgBattleBenchDamageRule = {
   maxTargetsFrom?: TcgBattleCountSource
   condition?: TcgBattleCoinCondition
   excludeTarget?: boolean
+  selectedEnergyType?: boolean
   typeFilter?: { include?: string[]; exclude?: string[] }
   subtypeFilter?: { include?: string[]; exclude?: string[] }
 }
 
 export type TcgBattleCounterDamageRule =
-  | { amount: number; target: 'self' | 'opponent' }
+  | { amount: number; target: 'self' | 'opponent'; deltaTargetBonus?: number }
   | {
       amount: number
       side: 'own' | 'opponent' | 'both'
@@ -267,8 +270,8 @@ export type TcgBattleSpecialRule =
   | { kind: 'destinyBond' }
   | { kind: 'mirrorLastDamage' }
   | { kind: 'reflectDamage'; damageMultiplier?: number; reflectFixedDamage?: number; preventIncomingOnHeads?: boolean; coinGate?: TcgBattleCoinCondition }
-  | { kind: 'placeMarker'; marker: 'lightningRod' }
-  | { kind: 'markerDamage'; marker: 'lightningRod'; amount: number }
+  | { kind: 'placeMarker'; marker: 'lightningRod' | 'shockWave' }
+  | { kind: 'markerDamage'; marker: 'lightningRod' | 'shockWave'; amount: number }
   | { kind: 'copyAttack'; coinGate?: TcgBattleCoinCondition; preserveExtraCosts: boolean }
 
 export type TcgBattleStatusResolution = {
@@ -324,6 +327,7 @@ export interface TcgBattleAttackEffect {
   protection?: TcgBattleProtectionRule[]
   targetScope?: 'front' | 'bench' | 'any'
   targetMustBeDamaged?: boolean
+  targetMustHaveDeltaMark?: boolean
   ignoreWeaknessResistance?: boolean
   ignoreTargetDamageModifiers?: boolean
   choiceRequirement?: TcgBattleChoiceRequirement
@@ -374,7 +378,7 @@ export interface TcgBattleCardState extends TcgBattleCardSummary {
   statusConditions?: TcgBattleStatusCondition[]
   incomingAttackModifier?: TcgBattleIncomingAttackModifier
   temporaryEffects?: TcgBattleTemporaryEffects
-  markers?: Array<'lightningRod'>
+  markers?: Array<'lightningRod' | 'shockWave'>
 }
 
 export interface TcgBattleSideState {
@@ -1091,6 +1095,7 @@ function inferExTcgBattleAttackEffect(
   if (setId === 'ex12') return inferEx12TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex13') return inferEx13TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex14') return inferEx14TcgBattleAttackEffect(attack, text, baseDamage)
+  if (setId === 'ex15') return inferEx15TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId !== 'ex1') return null
 
   const name = attack.name.toLowerCase()
@@ -3968,6 +3973,171 @@ function inferEx14TcgBattleAttackEffect(
   return null
 }
 
+function inferEx15TcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const textBonus = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+  const anyTargetDamage = (amount: number, ignoreTargetDamageModifiers = false): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+    ...(ignoreTargetDamageModifiers ? { ignoreTargetDamageModifiers: true } : {}),
+  })
+
+  if (name === 'delta circle') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'deltaPokemonInPlay', side: 'own' },
+      },
+    }
+  }
+  if (name === 'extra claws') return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: textBonus } }
+  if (name === 'linear attack') return anyTargetDamage(30)
+  if (name === 'vengeance') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        maxUnits: 6,
+        source: { kind: 'pokemonInDiscard', side: 'own', max: 6 },
+      },
+    }
+  }
+  if (name === 'delta copy') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      targetMustHaveDeltaMark: true,
+      choiceRequirement: 'copyAttack',
+      special: [{ kind: 'copyAttack', preserveExtraCosts: true }],
+    }
+  }
+  if (name === 'strangle') {
+    return { damage: { kind: 'deltaSpeciesTargetBonus', baseDamage, bonusDamage: textBonus } }
+  }
+  if (name === 'grind') {
+    const timesEnergy = attack.damage?.includes('×') || /damage times the amount of energy/.test(text)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: timesEnergy ? 0 : baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'surge') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: textBonus,
+        source: { kind: 'energy', side: 'own' },
+        minimumUnits: 2,
+      },
+    }
+  }
+  if (name === 'pump out') return { damage: { kind: 'fixed', amount: baseDamage } }
+  if (name === 'tail sting') {
+    return {
+      damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: textBonus },
+      status: [{ target: 'opponent', statuses: ['poisoned'], targetSubtype: 'ex' }],
+    }
+  }
+  if (name === 'delta mind') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      counterDamage: [{ amount: 10, target: 'opponent', deltaTargetBonus: 20 }],
+    }
+  }
+  if (name === 'quick blow' || name === 'quick attack') {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  }
+  if (name === 'scary face') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [
+        { kind: 'cannotAttack', target: 'opponent', condition: 'heads' },
+        { kind: 'preventRetreat', condition: 'heads' },
+      ],
+    }
+  }
+  if (name === 'extra ball') {
+    return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: textBonus } }
+  }
+  if (name === 'flickering tail') {
+    return {
+      damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: textBonus },
+      status: [{ target: 'opponent', statuses: ['asleep'], targetSubtype: 'ex' }],
+    }
+  }
+  if (name === 'charm') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 20, attackerOnly: true }] }
+  }
+  if (name === 'thunder spear') return anyTargetDamage(10)
+  if (name === 'tail whip') {
+    return {
+      ...zero(),
+      choiceRequirement: 'disableAttack',
+      coinFlipCount: 1,
+      special: [{ kind: 'disableAttack', condition: 'heads' }],
+    }
+  }
+  if (name === 'psychic boom') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'calm mind') return { ...zero(), healing: [{ target: 'self', amount: 20 }] }
+  if (name === 'splash about') return { damage: { kind: 'energyComparisonBonus', baseDamage, bonusDamage: textBonus } }
+  if (name === 'quick bind') {
+    return {
+      ...anyTargetDamage(baseDamage || 10, true),
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (name === 'special circuit') return anyTargetDamage(30)
+  if (name === 'electromark') {
+    return { ...zero(), targetScope: 'any', special: [{ kind: 'placeMarker', marker: 'shockWave' }] }
+  }
+  if (name === 'hyper claws') {
+    return { damage: { kind: 'stage2TargetBonus', baseDamage, bonusDamage: textBonus } }
+  }
+  if (name === 'shock-wave') {
+    return {
+      damage: { kind: 'targetToRemainingHp', remainingHp: 0 },
+      targetScope: 'any',
+      ignoreWeaknessResistance: true,
+      ignoreTargetDamageModifiers: true,
+      special: [{ kind: 'markerDamage', marker: 'shockWave', amount: 0 }],
+    }
+  }
+  if (name === 'mimicry') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      choiceRequirement: 'copyAttack',
+      special: [{ kind: 'copyAttack', preserveExtraCosts: true }],
+    }
+  }
+  if (name === 'rainbow wave') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 20, side: 'opponent', zone: 'play', selectedEnergyType: true }],
+    }
+  }
+
+  return null
+}
+
 function inferECardTcgBattleAttackEffect(
   attack: TcgCardAttack,
   _text: string,
@@ -5190,7 +5360,7 @@ export function resolveTcgBattleAttack(params: {
     targetDamage = 0
     energyDiscards = []
   }
-  const statusConditions = calculateTcgBattleStatusConditions(effect.status || [], coinFlips, choice)
+  const statusConditions = calculateTcgBattleStatusConditions(effect.status || [], coinFlips, choice, attacker, target)
   const benchDamage = calculateTcgBattleBenchDamage(effect.benchDamage || [], state, sideKey, attacker, target, random, coinFlips)
   const counterDamage = calculateTcgBattleCounterDamage(
     effect.counterDamage || [],
@@ -6720,6 +6890,10 @@ function calculateTcgBattleBenchDamage(
       if (card.currentHp <= 0) return false
       if (rule.excludeTarget && targetSide !== sideKey && card.instanceId === target.instanceId) return false
       const cardTypes = card.types.map((type) => type.toLowerCase())
+      if (
+        rule.selectedEnergyType &&
+        (!state[sideKey].selectedEnergy || !cardTypes.includes(state[sideKey].selectedEnergy.toLowerCase()))
+      ) return false
       if (rule.typeFilter?.include?.length && !rule.typeFilter.include.some((type) => cardTypes.includes(type.toLowerCase()))) return false
       if (rule.typeFilter?.exclude?.some((type) => cardTypes.includes(type.toLowerCase()))) return false
       const cardSubtypes = card.subtypes.map((subtype) => subtype.toLowerCase())
@@ -6780,7 +6954,8 @@ function calculateTcgBattleCounterDamage(
     if ('target' in rule) {
       const targetSide = rule.target === 'self' ? sideKey : sideKey === 'player' ? 'opponent' : 'player'
       const targetId = rule.target === 'self' ? attacker.instanceId : target.instanceId
-      const amount = 'amountPerUnit' in rule
+      const targetCard = rule.target === 'self' ? attacker : target
+      const amount = ('amountPerUnit' in rule
         ? rule.amountPerUnit * getTcgBattleCount(rule.source, {
             state,
             sideKey,
@@ -6790,7 +6965,7 @@ function calculateTcgBattleCounterDamage(
             coinMode: 'actual',
             choice,
           })
-        : rule.amount
+        : rule.amount) + ('deltaTargetBonus' in rule && targetCard.name.includes('δ') ? rule.deltaTargetBonus || 0 : 0)
       if (amount > 0) results.push({ targetSide, targetId, damage: amount })
       continue
     }
@@ -7420,6 +7595,7 @@ export function getValidTcgBattleTargets(
   return candidates.filter((card) => {
     if (card.currentHp <= 0) return false
     if (effect.targetMustBeDamaged && card.currentHp >= card.hp) return false
+    if (effect.targetMustHaveDeltaMark && !card.name.includes('δ')) return false
     if (attacker.temporaryEffects?.cannotTarget?.targetId === card.instanceId) return false
     const markerRule = effect.special?.find((rule) => rule.kind === 'markerDamage')
     if (markerRule?.kind === 'markerDamage' && !card.markers?.includes(markerRule.marker)) return false
@@ -7852,6 +8028,8 @@ function calculateTcgBattleRawDamage(
       )
     case 'evolvedTargetBonus':
       return rule.baseDamage + (context.target.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)) ? rule.bonusDamage : 0)
+    case 'deltaSpeciesTargetBonus':
+      return rule.baseDamage + (context.target.name.includes('δ') ? rule.bonusDamage : 0)
     case 'stage2TargetBonus':
       return rule.baseDamage + (context.target.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2') ? rule.bonusDamage : 0)
     case 'namedTargetBonus': {
@@ -8245,10 +8423,15 @@ function calculateTcgBattleStatusConditions(
   rules: TcgBattleStatusRule[],
   coinFlips?: TcgBattleAttackResolution['coinFlips'],
   choice?: TcgBattleAttackChoice,
+  attacker?: TcgBattleCardState,
+  target?: TcgBattleCardState,
 ): TcgBattleStatusResolution[] {
   return rules
     .filter((rule) => doesTcgBattleConditionPass(rule.condition, coinFlips))
     .flatMap((rule) => {
+      const affectedCard = rule.target === 'self' ? attacker : target
+      if (rule.targetSubtype === 'ex' && !affectedCard?.subtypes.some((subtype) => subtype.toLowerCase() === 'ex')) return []
+      if (rule.targetSubtype === 'stage2' && !affectedCard?.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2')) return []
       const statuses = rule.useChosenStatusPair && choice?.kind === 'statusPair'
         ? [choice.first, choice.second]
         : rule.useChosenStatusPair
