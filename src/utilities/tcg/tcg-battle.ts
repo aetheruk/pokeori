@@ -36,6 +36,7 @@ export type TcgBattleCountSource =
   | { kind: 'pokemonInDiscard'; side: 'own' | 'opponent'; max?: number }
   | { kind: 'pokemonExInPlay'; side: 'own' | 'opponent' }
   | { kind: 'pokemonEvolvedInPlay'; side: 'own' | 'opponent' | 'both' }
+  | { kind: 'pokemonEvolvedOnBench'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'pokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[] }
   | { kind: 'unusedEnergy' }
   | { kind: 'chosenEnergy' }
@@ -1081,6 +1082,7 @@ function inferExTcgBattleAttackEffect(
   if (setId === 'ex9') return inferEx9TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex10') return inferEx10TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex11') return inferEx11TcgBattleAttackEffect(attack, text, baseDamage)
+  if (setId === 'ex12') return inferEx12TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId !== 'ex1') return null
 
   const name = attack.name.toLowerCase()
@@ -3460,6 +3462,173 @@ function inferEx11TcgBattleAttackEffect(
   }
   if (name === 'second bite') {
     return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'target' } } }
+  }
+
+  return null
+}
+
+function inferEx12TcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const textBonus = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+  const anyTargetDamage = (amount: number, ignoreTargetDamageModifiers = false): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+    ...(ignoreTargetDamageModifiers ? { ignoreTargetDamageModifiers: true } : {}),
+  })
+
+  if (name === 'power blow') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'heavy blow') {
+    return { damage: { kind: 'subtractCount', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } } }
+  }
+  if (name === 'bound crush') {
+    return {
+      ...anyTargetDamage(baseDamage || 60),
+      special: [{ kind: 'disableSelfAttack', attackName: 'Bound Crush' }],
+    }
+  }
+  if (name === 'linear attack' || name === 'tongue whip' || name === 'random spark' || name === 'water arrow') {
+    const amount = Number.parseInt(text.match(/does (\d+) damage to that pokemon/)?.[1] || String(baseDamage), 10)
+    return anyTargetDamage(amount)
+  }
+  if (name === 'cursed reaction') {
+    return { ...zero(), targetScope: 'any', counterDamage: [{ amount: 20, target: 'opponent' }] }
+  }
+  if (name === 'mend') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }], healing: [{ target: 'self', amount: 20 }] }
+  }
+  if (name === 'enraged linear attack') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'extra claws' || name === 'bite off') {
+    return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 30 } }
+  }
+  if (name === 'swift blow') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'cross-cut') return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 30 } }
+  if (name === 'sharp leaf' || name === 'tumbling attack' || name === 'quick attack' || name === 'firebreathing' || name === 'rising lunge' || name === 'jump on') {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  }
+  if (name === 'rely on friends') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonEvolvedOnBench', side: 'own' },
+      },
+    }
+  }
+  if (name === 'feint attack') return anyTargetDamage(baseDamage || 20, true)
+  if (name === 'multiple force') {
+    return {
+      damage: {
+        kind: 'gatedCount',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'namedPokemonContains', side: 'both', zone: 'play', values: ['Magnemite', 'Magneton'] },
+        gateSource: { kind: 'energy', side: 'own' },
+        minimumGateUnits: 1,
+      },
+    }
+  }
+  if (name === 'bi-blast') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeNames: ['Lunatone'] }],
+    }
+  }
+  if (name === 'grind') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'influence') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: 2,
+        includeNames: ['Omanyte', 'Kabuto', 'Aerodactyl', 'Lileep', 'Anorith'],
+        treatAsBasic: true,
+      }],
+    }
+  }
+  if (name === 'quick blow') return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  if (name === 'rest') {
+    return {
+      ...zero(),
+      healing: [{ target: 'self', amount: 50 }],
+      status: [{ target: 'self', statuses: ['asleep'] }],
+      special: [{ kind: 'clearStatus', target: 'self', statuses: ['poisoned', 'burned', 'paralyzed', 'confused'] }],
+    }
+  }
+  if (name === 'split kick' || name === 'double tackle') {
+    const amount = Number.parseInt(text.match(/does (\d+) damage to each defending pokemon/)?.[1] || '20', 10)
+    return {
+      damage: { kind: 'fixed', amount },
+      benchDamage: [{ amount, side: 'opponent', zone: 'front', excludeTarget: true }],
+    }
+  }
+  if (name === 'self charge' || name === 'drawup power' || name === 'important errands') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'iron defense') {
+    return { ...zero(), coinFlipCount: 1, protection: [{ target: 'self', kind: 'preventAllEffects', condition: 'heads' }] }
+  }
+  if (name === 'continuous tumble' || name === 'iron tail') {
+    return { damage: { kind: 'headsMultiplier', damagePerHeads: name === 'iron tail' ? 20 : 10, coinFlipCount: 0 }, flipUntilTails: true }
+  }
+  if (name === 'pebble throw') {
+    return { damage: { kind: 'fixed', amount: 10 }, targetScope: 'bench', ignoreWeaknessResistance: true }
+  }
+  if (name === 'string pull') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'reactive blast') {
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 30, source: { kind: 'chosenEnergy' } },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+    }
+  }
+  if (name === 'power move') {
+    return {
+      ...zero(),
+      energyGain: [{ target: 'self', amount: 1 }],
+      choiceRequirement: 'optionalOwnBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'final laser') {
+    return { ...zero(), targetScope: 'any', counterDamage: [{ amount: 30, target: 'opponent' }] }
   }
 
   return null
@@ -7493,6 +7662,15 @@ function getTcgBattleCount(
   if (source.kind === 'pokemonEvolvedInPlay') {
     const countFor = (side: TcgBattleSideState) => getLivingTcgBattleCards(side).filter((card) =>
       card.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)),
+    ).length
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
+  if (source.kind === 'pokemonEvolvedOnBench') {
+    const countFor = (side: TcgBattleSideState) => side.back.filter((card) =>
+      card.currentHp > 0 && card.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)),
     ).length
     if (source.side === 'own') return countFor(own)
     if (source.side === 'opponent') return countFor(opponent)
