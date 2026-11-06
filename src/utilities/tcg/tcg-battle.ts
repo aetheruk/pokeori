@@ -128,6 +128,7 @@ export type TcgBattleStatusRule = {
   statuses: TcgBattleStatusCondition[]
   condition?: TcgBattleCoinCondition
   useChosenStatus?: boolean
+  useChosenStatusPair?: boolean
 }
 
 export type TcgBattleProtectionRule = {
@@ -205,6 +206,7 @@ export type TcgBattleAttackChoice =
   | { kind: 'deckPokemon'; cardIds: string[] }
   | { kind: 'optionalBonus'; enabled: boolean }
   | { kind: 'statusCondition'; status: TcgBattleStatusCondition }
+  | { kind: 'statusPair'; first: 'burned' | 'poisoned'; second: 'asleep' | 'confused' }
   | { kind: 'discardPokemon'; side: TcgBattleSide; cardId: string }
   | { kind: 'energyAmount'; amount: number }
   | { kind: 'typeChange'; type: TcgBattleEnergyType }
@@ -225,12 +227,13 @@ export type TcgBattleChoiceRequirement =
   | 'optionalOpponentBench'
   | 'optionalOwnBench'
   | 'statusCondition'
+  | 'statusPair'
   | 'energyAmount'
   | 'typeChange'
   | 'textureMagic'
 
 export type TcgBattleSpecialRule =
-  | { kind: 'searchDeckPokemon'; maxCount: number; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; treatAsBasic?: boolean }
+  | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; treatAsBasic?: boolean }
   | {
       kind: 'switch'
       target: 'self' | 'opponent'
@@ -1087,6 +1090,7 @@ function inferExTcgBattleAttackEffect(
   if (setId === 'ex11') return inferEx11TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex12') return inferEx12TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex13') return inferEx13TcgBattleAttackEffect(attack, text, baseDamage)
+  if (setId === 'ex14') return inferEx14TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId !== 'ex1') return null
 
   const name = attack.name.toLowerCase()
@@ -3791,6 +3795,179 @@ function inferEx13TcgBattleAttackEffect(
   return null
 }
 
+function inferEx14TcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const textBonus = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+  const anyTargetDamage = (amount: number, ignoreTargetDamageModifiers = false): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+    ...(ignoreTargetDamageModifiers ? { ignoreTargetDamageModifiers: true } : {}),
+  })
+
+  if (name === 'enraged linear attack') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'linear attack' || name === 'bass control') {
+    const amount = Number.parseInt(text.match(/does (\d+) damage to that pokemon/)?.[1] || String(baseDamage), 10)
+    return anyTargetDamage(amount)
+  }
+  if (name === 'even game') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: 6,
+        maxCountFrom: { kind: 'pokemonInPlay', side: 'opponent' },
+        basicOnly: true,
+      }],
+    }
+  }
+  if (name === 'bite off') return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: textBonus } }
+  if (name === 'pick and choose') {
+    return {
+      ...zero(),
+      choiceRequirement: 'statusPair',
+      status: [{
+        target: 'opponent',
+        statuses: ['burned', 'poisoned', 'asleep', 'confused'],
+        useChosenStatusPair: true,
+      }],
+    }
+  }
+  if (name === 'reactive poison') {
+    return {
+      damage: {
+        kind: 'statusCountBonus',
+        baseDamage,
+        bonusDamagePerStatus: textBonus,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+    }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: attack.name.toLowerCase() === 'call for family' && text.includes('up to 2') ? 2 : 1, basicOnly: true }],
+    }
+  }
+  if (name === 'pester') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: textBonus,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+    }
+  }
+  if (name === 'triple needle') {
+    return {
+      ...anyTargetDamage(10),
+      benchDamage: [{ amount: 10, side: 'opponent', zone: 'play', maxTargets: 2, excludeTarget: true }],
+    }
+  }
+  if (name === 'focus energy') {
+    return {
+      ...zero(),
+      special: [{ kind: 'buffAttack', target: 'self', attackName: 'High Jump Kick', baseDamage: 70 }],
+    }
+  }
+  if (name === 'circular steps') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonInPlay', side: 'both', excludeAttacker: true },
+      },
+    }
+  }
+  if (name === 'prop-up pinchers' || name === 'hyper tail') {
+    // Pokémon Tool cards and Poké-Powers/Poké-Bodies are not represented in these decks.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'green blast') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'firebreathing' || name === 'sharp leaf' || name === 'rising lunge' || name === 'quick blow' || name === 'vital pinchers') {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  }
+  if (name === 'detect') {
+    return { ...zero(), coinFlipCount: 1, protection: [{ target: 'self', kind: 'preventAllEffects', condition: 'heads' }] }
+  }
+  if (name === 'stretch vine') {
+    const amount = Number.parseInt(text.match(/does (\d+) damage to that pokemon/)?.[1] || String(baseDamage), 10)
+    return { damage: { kind: 'fixed', amount }, targetScope: 'bench', ignoreWeaknessResistance: true }
+  }
+  if (name === 'roar') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'self charge' || name === 'growth') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'feint attack') return { ...anyTargetDamage(baseDamage || 20, true), ignoreWeaknessResistance: true }
+  if (name === 'tail whip') {
+    return {
+      ...zero(),
+      choiceRequirement: 'disableAttack',
+      coinFlipCount: 1,
+      special: [{ kind: 'disableAttack', condition: 'heads' }],
+    }
+  }
+  if (name === 'retaliate') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } } }
+  }
+  if (name === 'pure power') {
+    return { ...zero(), targetScope: 'any', counterDamage: [{ amount: 20, target: 'opponent' }] }
+  }
+  if (name === 'nap') return { ...zero(), healing: [{ target: 'self', amount: 20 }] }
+  if (name === 'psywave') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'split bomb') {
+    return {
+      ...anyTargetDamage(30),
+      benchDamage: [{ amount: 30, side: 'opponent', zone: 'play', maxTargets: 1, excludeTarget: true }],
+    }
+  }
+  if (name === 'hydro shot') {
+    return {
+      ...anyTargetDamage(70),
+      energyDiscard: [{ target: 'self', amount: 2 }],
+    }
+  }
+  if (name === 'power revenge') return { damage: { kind: 'fixed', amount: baseDamage } }
+  if (name === 'target attack') {
+    return {
+      ...anyTargetDamage(30),
+      damage: { kind: 'damagedTargetBonus', baseDamage: 30, bonusDamage: 20 },
+    }
+  }
+  if (name === 'leaf shade') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      counterDamage: [{ amountPerUnit: 10, source: { kind: 'energy', side: 'own' }, target: 'opponent' }],
+    }
+  }
+
+  return null
+}
+
 function inferECardTcgBattleAttackEffect(
   attack: TcgCardAttack,
   _text: string,
@@ -5327,6 +5504,25 @@ export function getOpenTcgBattleBenchSlots(side: TcgBattleSideState): number {
   const livingBench = side.back.filter((card) => card.currentHp > 0).length
   const livingPokemon = getLivingTcgBattleCards(side).length
   return Math.max(0, Math.min(3 - livingBench, 6 - livingPokemon))
+}
+
+export function getTcgBattleDeckSearchMaxCount(params: {
+  state: TcgBattleState
+  sideKey: TcgBattleSide
+  attacker: TcgBattleCardState
+  target: TcgBattleCardState
+  rule: Extract<TcgBattleSpecialRule, { kind: 'searchDeckPokemon' }>
+}): number {
+  const { state, sideKey, attacker, target, rule } = params
+  if (!rule.maxCountFrom) return rule.maxCount
+  const count = getTcgBattleCount(rule.maxCountFrom, {
+    state,
+    sideKey,
+    attacker,
+    target,
+    coinMode: 'actual',
+  })
+  return Math.max(0, Math.min(rule.maxCount, Math.floor(count)))
 }
 
 export function getAvailableTcgBattleDeckPokemon(
@@ -7268,7 +7464,7 @@ export function validateTcgBattleAttackChoice(params: {
     if (rule?.kind !== 'searchDeckPokemon') return 'That attack cannot search the deck.'
     const available = getAvailableTcgBattleDeckPokemon(own, rule)
     const eligibleIds = new Set(available.map((card) => card.id))
-    const maxCount = Math.min(rule.maxCount, getOpenTcgBattleBenchSlots(own))
+      const maxCount = Math.min(getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }), getOpenTcgBattleBenchSlots(own))
     if (
       choice.cardIds.length > maxCount ||
       new Set(choice.cardIds).size !== choice.cardIds.length ||
@@ -7288,6 +7484,13 @@ export function validateTcgBattleAttackChoice(params: {
       ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'].includes(choice.status)
       ? null
       : 'Choose a Special Condition.'
+  }
+  if (required === 'statusPair') {
+    return choice.kind === 'statusPair' &&
+      ['burned', 'poisoned'].includes(choice.first) &&
+      ['asleep', 'confused'].includes(choice.second)
+      ? null
+      : 'Choose one Special Condition from each group.'
   }
 
   if (required === 'copyAttack') {
@@ -7380,7 +7583,7 @@ export function chooseTcgBattleAttackChoice(params: {
     const rule = effect?.special?.find((entry) => entry.kind === 'searchDeckPokemon')
     if (rule?.kind !== 'searchDeckPokemon') return undefined
     const side = state[sideKey]
-    const maxCount = Math.min(rule.maxCount, getOpenTcgBattleBenchSlots(side))
+    const maxCount = Math.min(getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }), getOpenTcgBattleBenchSlots(side))
     const cardIds = getAvailableTcgBattleDeckPokemon(side, rule)
       .sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a) || a.name.localeCompare(b.name))
       .slice(0, maxCount)
@@ -7399,6 +7602,7 @@ export function chooseTcgBattleAttackChoice(params: {
     return { kind: 'optionalBonus', enabled }
   }
   if (required === 'statusCondition') return { kind: 'statusCondition', status: 'paralyzed' }
+  if (required === 'statusPair') return { kind: 'statusPair', first: 'poisoned', second: 'confused' }
   if (required === 'copyAttack') {
     const candidates = target.attacks
       .map((candidate, attackIndex) => {
@@ -8045,11 +8249,15 @@ function calculateTcgBattleStatusConditions(
   return rules
     .filter((rule) => doesTcgBattleConditionPass(rule.condition, coinFlips))
     .flatMap((rule) => {
-      const statuses = rule.useChosenStatus && choice?.kind === 'statusCondition'
-        ? [choice.status]
-        : rule.useChosenStatus
+      const statuses = rule.useChosenStatusPair && choice?.kind === 'statusPair'
+        ? [choice.first, choice.second]
+        : rule.useChosenStatusPair
           ? []
-          : rule.statuses
+          : rule.useChosenStatus && choice?.kind === 'statusCondition'
+            ? [choice.status]
+            : rule.useChosenStatus
+              ? []
+              : rule.statuses
       return statuses.length > 0 ? [{ target: rule.target, statuses }] : []
     })
 }

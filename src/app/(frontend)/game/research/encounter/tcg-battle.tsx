@@ -52,6 +52,7 @@ import {
   calculateTcgBattleDamage,
   chooseTcgBattleAttackChoice,
   getAvailableTcgBattleDeckPokemon,
+  getTcgBattleDeckSearchMaxCount,
   getEffectiveTcgBattleAttackCost,
   getOpenTcgBattleBenchSlots,
   getTcgBattleAttackEffect,
@@ -2584,6 +2585,8 @@ function AttackChoiceDrawer({
   )
   const [energyAmount, setEnergyAmount] = useState(0)
   const [selectedStatus, setSelectedStatus] = useState<TcgBattleStatusCondition>('asleep')
+  const [selectedFirstPairStatus, setSelectedFirstPairStatus] = useState<'burned' | 'poisoned'>('poisoned')
+  const [selectedSecondPairStatus, setSelectedSecondPairStatus] = useState<'asleep' | 'confused'>('asleep')
   const [selectedDeckPokemonIds, setSelectedDeckPokemonIds] = useState<string[]>([])
   const [useOptionalBonus, setUseOptionalBonus] = useState(false)
   const [skipOptionalBenchSwitch, setSkipOptionalBenchSwitch] = useState(false)
@@ -2614,7 +2617,13 @@ function AttackChoiceDrawer({
     : []
   const maxDeckPokemonSelection = deckPokemonRule?.kind === 'searchDeckPokemon'
     ? Math.min(
-        deckPokemonRule.maxCount,
+        getTcgBattleDeckSearchMaxCount({
+          state,
+          sideKey: 'player',
+          attacker,
+          target: target || attacker,
+          rule: deckPokemonRule,
+        }),
         getOpenTcgBattleBenchSlots(state.player),
         availableDeckPokemon.length,
       )
@@ -2724,6 +2733,9 @@ function AttackChoiceDrawer({
     if (required === 'statusCondition') {
       return { kind: 'statusCondition', status: selectedStatus }
     }
+    if (required === 'statusPair') {
+      return { kind: 'statusPair', first: selectedFirstPairStatus, second: selectedSecondPairStatus }
+    }
     if (required === 'energyAmount') {
       return { kind: 'energyAmount', amount: energyAmount }
     }
@@ -2764,6 +2776,9 @@ function AttackChoiceDrawer({
           ? Boolean(selectedDiscardPokemon)
         : activeRequirement === 'statusCondition'
           ? TCG_CHOICE_STATUSES.includes(selectedStatus)
+        : activeRequirement === 'statusPair'
+          ? ['burned', 'poisoned'].includes(selectedFirstPairStatus) &&
+            ['asleep', 'confused'].includes(selectedSecondPairStatus)
         : true)
   const choiceReady =
     !requirement ||
@@ -3023,6 +3038,50 @@ function AttackChoiceDrawer({
                     {status}
                   </button>
                 ))}
+              </div>
+            </section>
+          )}
+          {activeRequirement === 'statusPair' && (
+            <section className="space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold text-game-ink">First Special Condition</h3>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {(['burned', 'poisoned'] as const).map((status) => (
+                    <button
+                      type="button"
+                      key={status}
+                      onClick={() => setSelectedFirstPairStatus(status)}
+                      className={cn(
+                        'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold capitalize transition-colors',
+                        selectedFirstPairStatus === status
+                          ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                          : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                      )}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-game-ink">Second Special Condition</h3>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {(['asleep', 'confused'] as const).map((status) => (
+                    <button
+                      type="button"
+                      key={status}
+                      onClick={() => setSelectedSecondPairStatus(status)}
+                      className={cn(
+                        'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold capitalize transition-colors',
+                        selectedSecondPairStatus === status
+                          ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                          : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                      )}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
               </div>
             </section>
           )}

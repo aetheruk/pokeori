@@ -27,6 +27,7 @@ import {
   getValidTcgBattleTargets,
   getTcgBattleCardUnlockTurnForCard,
   getAvailableTcgBattleDeckPokemon,
+  getTcgBattleDeckSearchMaxCount,
   getOpenTcgBattleBenchSlots,
   getNextTcgBattleTurnNumber,
   normalizeTcgBattleEnergyType,
@@ -797,7 +798,10 @@ function applyTcgBattleSpecialEffects(params: {
       const availableById = new Map(
         getAvailableTcgBattleDeckPokemon(destination, rule).map((card) => [card.id, card]),
       )
-      const maxCount = Math.min(rule.maxCount, getOpenTcgBattleBenchSlots(destination))
+      const maxCount = Math.min(
+        getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }),
+        getOpenTcgBattleBenchSlots(destination),
+      )
       const selectedIds = choice.cardIds.slice(0, maxCount)
       for (const [index, cardId] of selectedIds.entries()) {
         const cardSummary = availableById.get(cardId)
