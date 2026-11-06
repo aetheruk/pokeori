@@ -2532,6 +2532,14 @@ const TCG_CHOICE_TYPES: TcgBattleEnergyType[] = [
   'Dragon',
 ]
 
+const TCG_CHOICE_STATUSES: TcgBattleStatusCondition[] = [
+  'asleep',
+  'burned',
+  'confused',
+  'paralyzed',
+  'poisoned',
+]
+
 function AttackChoiceDrawer({
   open,
   state,
@@ -2575,6 +2583,7 @@ function AttackChoiceDrawer({
     null,
   )
   const [energyAmount, setEnergyAmount] = useState(0)
+  const [selectedStatus, setSelectedStatus] = useState<TcgBattleStatusCondition>('asleep')
   const [selectedDeckPokemonIds, setSelectedDeckPokemonIds] = useState<string[]>([])
   const [useOptionalBonus, setUseOptionalBonus] = useState(false)
   const [selectedType, setSelectedType] = useState<TcgBattleEnergyType>('Grass')
@@ -2690,6 +2699,9 @@ function AttackChoiceDrawer({
     if (required === 'optionalBonus') {
       return { kind: 'optionalBonus', enabled: useOptionalBonus }
     }
+    if (required === 'statusCondition') {
+      return { kind: 'statusCondition', status: selectedStatus }
+    }
     if (required === 'energyAmount') {
       return { kind: 'energyAmount', amount: energyAmount }
     }
@@ -2726,6 +2738,8 @@ function AttackChoiceDrawer({
           ? benchChoices.every((card) => card.currentHp <= 0) || Boolean(selectedCardId)
         : activeRequirement === 'discardPokemon'
           ? Boolean(selectedDiscardPokemon)
+        : activeRequirement === 'statusCondition'
+          ? TCG_CHOICE_STATUSES.includes(selectedStatus)
         : true)
   const choiceReady =
     !requirement ||
@@ -2906,37 +2920,64 @@ function AttackChoiceDrawer({
               )}
             </section>
           )}
-          {activeRequirement === 'optionalBonus' && activeEffect?.damage.kind === 'optionalChoiceBonus' && (
+          {activeRequirement === 'optionalBonus' &&
+            activeEffect &&
+            (activeEffect.damage.kind === 'optionalChoiceBonus' ||
+              activeEffect.damage.kind === 'optionalCoinDamage') && (
+              <section className="space-y-2">
+                <h3 className="text-sm font-semibold text-game-ink">Optional attack bonus</h3>
+                <p className="text-sm text-game-muted">
+                  {activeEffect.damage.kind === 'optionalCoinDamage'
+                    ? `Flip for ${activeEffect.damage.successDamage} damage? Tails does ${activeEffect.damage.failureDamage} damage.`
+                    : `Take +${activeEffect.damage.bonusDamage} damage and accept the recoil?`}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setUseOptionalBonus(false)}
+                    className={cn(
+                      'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
+                      !useOptionalBonus
+                        ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                        : 'border-game-border/60 bg-game-surface-raised text-game-muted',
+                    )}
+                  >
+                    {activeEffect.damage.kind === 'optionalCoinDamage' ? 'Do not flip' : 'No bonus'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUseOptionalBonus(true)}
+                    className={cn(
+                      'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
+                      useOptionalBonus
+                        ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                        : 'border-game-border/60 bg-game-surface-raised text-game-muted',
+                    )}
+                  >
+                    {activeEffect.damage.kind === 'optionalCoinDamage' ? 'Flip a coin' : 'Take bonus'}
+                  </button>
+                </div>
+              </section>
+            )}
+          {activeRequirement === 'statusCondition' && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-ink">Optional attack bonus</h3>
-              <p className="text-sm text-game-muted">
-                Take +{activeEffect.damage.bonusDamage} damage and accept the recoil?
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setUseOptionalBonus(false)}
-                  className={cn(
-                    'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
-                    !useOptionalBonus
-                      ? 'border-game-moss bg-game-moss/25 text-game-ink'
-                      : 'border-game-border/60 bg-game-surface-raised text-game-muted',
-                  )}
-                >
-                  No bonus
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUseOptionalBonus(true)}
-                  className={cn(
-                    'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
-                    useOptionalBonus
-                      ? 'border-game-moss bg-game-moss/25 text-game-ink'
-                      : 'border-game-border/60 bg-game-surface-raised text-game-muted',
-                  )}
-                >
-                  Take bonus
-                </button>
+              <h3 className="text-sm font-semibold text-game-ink">Special Condition</h3>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {TCG_CHOICE_STATUSES.map((status) => (
+                  <button
+                    type="button"
+                    key={status}
+                    onClick={() => setSelectedStatus(status)}
+                    className={cn(
+                      'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold capitalize transition-colors',
+                      selectedStatus === status
+                        ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                        : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                    )}
+                  >
+                    {status}
+                  </button>
+                ))}
               </div>
             </section>
           )}
