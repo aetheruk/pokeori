@@ -51,7 +51,9 @@ import type {
 import {
   calculateTcgBattleDamage,
   chooseTcgBattleAttackChoice,
+  getAvailableTcgBattleDeckPokemon,
   getEffectiveTcgBattleAttackCost,
+  getOpenTcgBattleBenchSlots,
   getTcgBattleAttackEffect,
   getTcgBattleCardUnlockTurnForCard,
   getValidTcgBattleTargets,
@@ -2573,6 +2575,7 @@ function AttackChoiceDrawer({
     null,
   )
   const [energyAmount, setEnergyAmount] = useState(0)
+  const [selectedDeckPokemonIds, setSelectedDeckPokemonIds] = useState<string[]>([])
   const [selectedType, setSelectedType] = useState<TcgBattleEnergyType>('Grass')
   const [resistanceType, setResistanceType] =
     useState<TcgBattleEnergyType>('Grass')
@@ -2591,6 +2594,20 @@ function AttackChoiceDrawer({
   const copiedEffect = copiedAttack
     ? getTcgBattleAttackEffect(copiedAttack)
     : null
+  const activeEffect = requirement === 'copyAttack' ? copiedEffect : effect
+  const deckPokemonRule = activeEffect?.special?.find(
+    (rule) => rule.kind === 'searchDeckPokemon',
+  )
+  const availableDeckPokemon = deckPokemonRule?.kind === 'searchDeckPokemon'
+    ? getAvailableTcgBattleDeckPokemon(state.player, deckPokemonRule)
+    : []
+  const maxDeckPokemonSelection = deckPokemonRule?.kind === 'searchDeckPokemon'
+    ? Math.min(
+        deckPokemonRule.maxCount,
+        getOpenTcgBattleBenchSlots(state.player),
+        availableDeckPokemon.length,
+      )
+    : 0
   const activeRequirement:
     | Exclude<TcgBattleChoiceRequirement, 'copyAttack'>
     | undefined =
@@ -2659,6 +2676,15 @@ function AttackChoiceDrawer({
     }
     if (required === 'discardPokemon' && selectedDiscardPokemon) {
       return { kind: 'discardPokemon', ...selectedDiscardPokemon }
+    }
+    if (required === 'deckPokemon') {
+      const availableIds = new Set(availableDeckPokemon.map((card) => card.id))
+      return {
+        kind: 'deckPokemon',
+        cardIds: selectedDeckPokemonIds
+          .filter((cardId) => availableIds.has(cardId))
+          .slice(0, maxDeckPokemonSelection),
+      }
     }
     if (required === 'energyAmount') {
       return { kind: 'energyAmount', amount: energyAmount }
@@ -2823,6 +2849,52 @@ function AttackChoiceDrawer({
                       >
                         <span className="block truncate text-sm font-semibold">{card.name}</span>
                         <span className="text-xs text-game-muted">{side === 'player' ? 'Your' : "Opponent’s"} discard · returns at {remainingHp}/{card.hp} HP</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'deckPokemon' && deckPokemonRule?.kind === 'searchDeckPokemon' && (
+            <section className="space-y-2">
+              <div>
+                <h3 className="text-sm font-semibold text-game-ink">Choose Pokémon from your deck</h3>
+                <p className="text-xs text-game-muted">
+                  Select up to {maxDeckPokemonSelection}. You may leave some or all Bench spaces open.
+                </p>
+              </div>
+              {availableDeckPokemon.length === 0 ? (
+                <p className="text-sm text-game-muted">No eligible Pokémon remain in your deck.</p>
+              ) : maxDeckPokemonSelection === 0 ? (
+                <p className="text-sm text-game-muted">Your Bench is full.</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {availableDeckPokemon.map((card) => {
+                    const selected = selectedDeckPokemonIds.includes(card.id)
+                    const disabled = !selected && selectedDeckPokemonIds.length >= maxDeckPokemonSelection
+                    return (
+                      <button
+                        type="button"
+                        key={card.id}
+                        disabled={disabled}
+                        onClick={() => setSelectedDeckPokemonIds((current) =>
+                          current.includes(card.id)
+                            ? current.filter((id) => id !== card.id)
+                            : current.length < maxDeckPokemonSelection
+                              ? [...current, card.id]
+                              : current,
+                        )}
+                        className={cn(
+                          'game-focus-ring min-h-11 rounded-md border bg-game-surface-raised px-3 py-2 text-left text-game-ink transition-colors',
+                          selected
+                            ? 'border-game-moss bg-game-moss/25'
+                            : 'border-game-border/60 hover:border-game-moss/60',
+                          disabled && 'cursor-not-allowed opacity-40',
+                        )}
+                      >
+                        <span className="block truncate text-sm font-semibold">{card.name}</span>
+                        <span className="text-xs text-game-muted">{card.types.join(' / ')} · {card.hp} HP</span>
                       </button>
                     )
                   })}

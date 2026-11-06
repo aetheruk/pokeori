@@ -18,12 +18,15 @@ import {
   chooseTcgBattleAttackChoice,
   chooseOpponentTcgBattleAttack,
   compactTcgBattleBoard,
+  createTcgBattleCardState,
   drawTcgBattleCards,
   getAllowedTcgBattleAttackCost,
   getEffectiveTcgBattleAttackCost,
   getTcgBattleAttackEffect,
   getValidTcgBattleTargets,
   getTcgBattleCardUnlockTurnForCard,
+  getAvailableTcgBattleDeckPokemon,
+  getOpenTcgBattleBenchSlots,
   getNextTcgBattleTurnNumber,
   normalizeTcgBattleEnergyType,
   tickTcgBattleIncomingAttackModifiers,
@@ -785,6 +788,29 @@ function applyTcgBattleSpecialEffects(params: {
       (rule.kind === 'clearStatus' && rule.target === 'opponent') ||
       (rule.kind === 'preventStatus' && rule.target === 'opponent')
     if (blockTargetEffects && targetsOpponent) continue
+
+    if (rule.kind === 'searchDeckPokemon' && choice?.kind === 'deckPokemon') {
+      const destination = state[sideKey]
+      const availableById = new Map(
+        getAvailableTcgBattleDeckPokemon(destination, rule).map((card) => [card.id, card]),
+      )
+      const maxCount = Math.min(rule.maxCount, getOpenTcgBattleBenchSlots(destination))
+      const selectedIds = choice.cardIds.slice(0, maxCount)
+      for (const [index, cardId] of selectedIds.entries()) {
+        const cardSummary = availableById.get(cardId)
+        if (!cardSummary) continue
+        const newPokemon = createTcgBattleCardState(cardSummary, destination.back.length + index)
+        if (rule.treatAsBasic) newPokemon.subtypes = ['Basic']
+        destination.back.push(newPokemon)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: newPokemon.instanceId,
+          label: `${newPokemon.name} joined the Bench`,
+        })
+      }
+      continue
+    }
 
     if (rule.kind === 'switch' && rule.beforeDamage) continue
     if (rule.kind === 'switch' && rule.ifTargetSurvives && target.currentHp <= 0) continue
