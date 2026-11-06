@@ -786,6 +786,7 @@ function applyTcgBattleSpecialEffects(params: {
       (rule.kind === 'cannotAttack' && rule.target !== 'self') ||
       (rule.kind === 'buffAttack' && rule.target === 'opponent') ||
       (rule.kind === 'clearStatus' && rule.target === 'opponent') ||
+      (rule.kind === 'clearStatusOnSide' && rule.side === 'opponent') ||
       (rule.kind === 'setStatus' && rule.target === 'opponent') ||
       (rule.kind === 'preventStatus' && rule.target === 'opponent')
     if (blockTargetEffects && targetsOpponent) continue
@@ -939,6 +940,16 @@ function applyTcgBattleSpecialEffects(params: {
         (status) => !rule.statuses.includes(status),
       )
       if (affected.statusConditions.length === 0) affected.statusConditions = undefined
+      continue
+    }
+    if (rule.kind === 'clearStatusOnSide') {
+      const affectedSide = rule.side === 'own' ? state[sideKey] : state[opponentKey]
+      for (const affected of affectedSide.front) {
+        affected.statusConditions = (affected.statusConditions || []).filter(
+          (status) => !rule.statuses.includes(status),
+        )
+        if (affected.statusConditions.length === 0) affected.statusConditions = undefined
+      }
       continue
     }
     if (rule.kind === 'setStatus') {

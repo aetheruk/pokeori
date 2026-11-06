@@ -2586,6 +2586,7 @@ function AttackChoiceDrawer({
   const [selectedStatus, setSelectedStatus] = useState<TcgBattleStatusCondition>('asleep')
   const [selectedDeckPokemonIds, setSelectedDeckPokemonIds] = useState<string[]>([])
   const [useOptionalBonus, setUseOptionalBonus] = useState(false)
+  const [skipOptionalBenchSwitch, setSkipOptionalBenchSwitch] = useState(false)
   const [selectedType, setSelectedType] = useState<TcgBattleEnergyType>('Grass')
   const [resistanceType, setResistanceType] =
     useState<TcgBattleEnergyType>('Grass')
@@ -2626,6 +2627,18 @@ function AttackChoiceDrawer({
         ? undefined
         : copiedEffect?.choiceRequirement
       : requirement
+  const optionalSwitchTarget =
+    activeRequirement === 'optionalOwnBench'
+      ? 'self'
+      : activeRequirement === 'optionalOpponentBench'
+        ? 'opponent'
+        : null
+  const canSkipBenchSwitch = Boolean(
+    optionalSwitchTarget &&
+      activeEffect?.special?.some(
+        (rule) => rule.kind === 'switch' && rule.target === optionalSwitchTarget && rule.optional,
+      ),
+  )
   const benchChoices =
     activeRequirement === 'ownBench' || activeRequirement === 'optionalOwnBench'
       ? state.player.back
@@ -2641,6 +2654,7 @@ function AttackChoiceDrawer({
   )
 
   useEffect(() => {
+    if (canSkipBenchSwitch && skipOptionalBenchSwitch) return
     if (
       !benchChoices.some(
         (card) => card.instanceId === selectedCardId && card.currentHp > 0,
@@ -2650,7 +2664,11 @@ function AttackChoiceDrawer({
         benchChoices.find((card) => card.currentHp > 0)?.instanceId || '',
       )
     }
-  }, [benchChoices, selectedCardId])
+  }, [benchChoices, selectedCardId, canSkipBenchSwitch, skipOptionalBenchSwitch])
+
+  useEffect(() => {
+    setSkipOptionalBenchSwitch(false)
+  }, [attacker.instanceId, attackIndex, activeRequirement, selectedAttackIndex, followUpAttackIndex])
 
   useEffect(() => {
     if (activeRequirement === 'energyAmount') setEnergyAmount(availableChoiceEnergy)
@@ -2679,9 +2697,13 @@ function AttackChoiceDrawer({
       return { kind: 'disabledAttack', attackIndex: attackChoiceIndex }
     }
     if (
-      (required === 'opponentBench' || required === 'ownBench' || required === 'optionalOpponentBench' || required === 'optionalOwnBench') &&
-      selectedCardId
+      required === 'opponentBench' ||
+        required === 'ownBench' ||
+        required === 'optionalOpponentBench' ||
+        required === 'optionalOwnBench'
     ) {
+      if (canSkipBenchSwitch && skipOptionalBenchSwitch) return { kind: 'skipBenchSwitch' }
+      if (!selectedCardId) return undefined
       return { kind: 'benchSwitch', cardId: selectedCardId }
     }
     if (required === 'discardPokemon' && selectedDiscardPokemon) {
@@ -2735,7 +2757,9 @@ function AttackChoiceDrawer({
           activeRequirement === 'ownBench'
         ? Boolean(selectedCardId)
         : activeRequirement === 'optionalOpponentBench' || activeRequirement === 'optionalOwnBench'
-          ? benchChoices.every((card) => card.currentHp <= 0) || Boolean(selectedCardId)
+          ? benchChoices.every((card) => card.currentHp <= 0) ||
+            Boolean(selectedCardId) ||
+            (canSkipBenchSwitch && skipOptionalBenchSwitch)
         : activeRequirement === 'discardPokemon'
           ? Boolean(selectedDiscardPokemon)
         : activeRequirement === 'statusCondition'
@@ -2838,7 +2862,28 @@ function AttackChoiceDrawer({
               {renderCardChoices(
                 benchChoices,
                 selectedCardId,
-                setSelectedCardId,
+                (cardId) => {
+                  setSelectedCardId(cardId)
+                  setSkipOptionalBenchSwitch(false)
+                },
+              )}
+              {canSkipBenchSwitch && (
+                <button
+                  type="button"
+                  aria-pressed={skipOptionalBenchSwitch}
+                  onClick={() => {
+                    setSelectedCardId('')
+                    setSkipOptionalBenchSwitch(true)
+                  }}
+                  className={cn(
+                    'game-focus-ring min-h-11 w-full rounded-md border px-3 py-2 text-sm font-semibold transition-colors',
+                    skipOptionalBenchSwitch
+                      ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                      : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                  )}
+                >
+                  {optionalSwitchTarget === 'self' ? 'Keep this Pokémon Active' : 'Leave the opponent Active'}
+                </button>
               )}
             </section>
           )}
