@@ -2576,6 +2576,7 @@ function AttackChoiceDrawer({
   )
   const [energyAmount, setEnergyAmount] = useState(0)
   const [selectedDeckPokemonIds, setSelectedDeckPokemonIds] = useState<string[]>([])
+  const [useOptionalBonus, setUseOptionalBonus] = useState(false)
   const [selectedType, setSelectedType] = useState<TcgBattleEnergyType>('Grass')
   const [resistanceType, setResistanceType] =
     useState<TcgBattleEnergyType>('Grass')
@@ -2685,6 +2686,9 @@ function AttackChoiceDrawer({
           .filter((cardId) => availableIds.has(cardId))
           .slice(0, maxDeckPokemonSelection),
       }
+    }
+    if (required === 'optionalBonus') {
+      return { kind: 'optionalBonus', enabled: useOptionalBonus }
     }
     if (required === 'energyAmount') {
       return { kind: 'energyAmount', amount: energyAmount }
@@ -2900,6 +2904,40 @@ function AttackChoiceDrawer({
                   })}
                 </div>
               )}
+            </section>
+          )}
+          {activeRequirement === 'optionalBonus' && activeEffect?.damage.kind === 'optionalChoiceBonus' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Optional attack bonus</h3>
+              <p className="text-sm text-game-muted">
+                Take +{activeEffect.damage.bonusDamage} damage and accept the recoil?
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setUseOptionalBonus(false)}
+                  className={cn(
+                    'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
+                    !useOptionalBonus
+                      ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                      : 'border-game-border/60 bg-game-surface-raised text-game-muted',
+                  )}
+                >
+                  No bonus
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUseOptionalBonus(true)}
+                  className={cn(
+                    'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
+                    useOptionalBonus
+                      ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                      : 'border-game-border/60 bg-game-surface-raised text-game-muted',
+                  )}
+                >
+                  Take bonus
+                </button>
+              </div>
             </section>
           )}
           {requirement === 'copyAttack' && target && (
