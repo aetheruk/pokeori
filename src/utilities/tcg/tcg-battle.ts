@@ -78,6 +78,7 @@ export type TcgBattleDamageRule =
   | { kind: 'evolvedTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'stage2TargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'namedTargetBonus'; baseDamage: number; bonusDamage: number; names: string[] }
+  | { kind: 'resistanceTypeBonus'; baseDamage: number; bonusDamage: number; resistanceType: string }
   | { kind: 'knockOutOnCoinCondition'; condition: TcgBattleCoinCondition }
   | { kind: 'pokemonExTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'damagedTargetBonus'; baseDamage: number; bonusDamage: number }
@@ -1069,6 +1070,7 @@ function inferExTcgBattleAttackEffect(
   if (setId === 'ex6') return inferEx6TcgBattleAttackEffect(attack, baseDamage)
   if (setId === 'ex7') return inferEx7TcgBattleAttackEffect(attack, baseDamage)
   if (setId === 'ex8') return inferEx8TcgBattleAttackEffect(attack, text, baseDamage)
+  if (setId === 'ex9') return inferEx9TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId !== 'ex1') return null
 
   const name = attack.name.toLowerCase()
@@ -2700,6 +2702,104 @@ function inferEx8TcgBattleAttackEffect(
   if (name === 'thunderous blow') {
     return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
   }
+
+  return null
+}
+
+function inferEx9TcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const textBonus = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+  const boardSweep = text.match(/does (\d+) damage to each of your opponent's pokemon/)
+  if (boardSweep && ['spinning tail', 'hailstone', 'wide laser'].includes(name)) {
+    const amount = Number.parseInt(boardSweep[1], 10)
+    return {
+      damage: { kind: 'fixed', amount },
+      ignoreWeaknessResistanceOnBench: true,
+      benchDamage: [{ amount, side: 'opponent', zone: 'bench', ignoreWeaknessResistance: true }],
+    }
+  }
+
+  if (name === 'damage burn' || name === 'spike rend') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 20 } }
+  }
+  if (name === 'mega throw') return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 40 } }
+  if (name === 'dragon dance') {
+    return { ...zero(), special: [{ kind: 'buffAttack', target: 'self', attackName: '*', damageBonus: 30 }] }
+  }
+  if (name === 'super slash' || name === 'cross-cut') {
+    return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 20 } }
+  }
+  if (name === 'scary face') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [
+        { kind: 'cannotAttack', target: 'opponent', condition: 'heads' },
+        { kind: 'preventRetreat', condition: 'heads' },
+      ],
+    }
+  }
+  if (name === 'bite off') return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 30 } }
+  if (name === 'extra claws') return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 20 } }
+  if (name === 'power blow') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'extra flame') return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 30 } }
+  if (['quick attack', 'rock smash', 'sharp claws', 'cross chop', 'tail strike', 'knock away', 'firebreathing'].includes(name)) {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  }
+  if (name === 'snap tail') return anyTargetDamage(10)
+  if (name === 'skill dive') return anyTargetDamage(40)
+  if (name === 'water arrow') return anyTargetDamage(10)
+  if (name === 'call for friend') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, basicOnly: true }],
+    }
+  }
+  if (name === 'pure power') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      counterDamage: [{ amount: 30, target: 'opponent' }],
+    }
+  }
+  if (name === 'sky kick') {
+    return {
+      damage: { kind: 'resistanceTypeBonus', baseDamage, bonusDamage: 40, resistanceType: 'Fighting' },
+    }
+  }
+  if (name === 'power short') return anyTargetDamage(30)
+  if (name === 'mend') {
+    return {
+      ...zero(),
+      energyGain: [{ target: 'self', amount: 1 }],
+      healing: [{ target: 'self', amount: 10 }],
+    }
+  }
+  if (name === 'metal crush') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        maxUnits: 1,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: ['Registeel ex'] },
+      },
+    }
+  }
+  if (name === 'eruption') return { damage: { kind: 'fixed', amount: baseDamage } }
 
   return null
 }
@@ -6554,6 +6654,14 @@ function calculateTcgBattleRawDamage(
       const targetName = normalizeName(context.target.name)
       return rule.baseDamage + (rule.names.some((name) => normalizeName(name) === targetName) ? rule.bonusDamage : 0)
     }
+    case 'resistanceTypeBonus':
+      return rule.baseDamage + (
+        context.target.resistances.some((resistance) =>
+          resistance.type.toLowerCase() === rule.resistanceType.toLowerCase(),
+        )
+          ? rule.bonusDamage
+          : 0
+      )
     case 'knockOutOnCoinCondition':
       return doesTcgBattleConditionPass(rule.condition, context.coinFlips) ? context.target.currentHp : 0
     case 'pokemonExTargetBonus':
