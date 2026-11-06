@@ -145,6 +145,7 @@ export type TcgBattleBenchDamageRule = {
   zone?: 'bench' | 'front' | 'play'
   ignoreWeaknessResistance?: boolean
   maxTargets?: number
+  maxTargetsFrom?: TcgBattleCountSource
   condition?: TcgBattleCoinCondition
   excludeTarget?: boolean
   typeFilter?: { include?: string[]; exclude?: string[] }
@@ -236,7 +237,7 @@ export type TcgBattleSpecialRule =
       poisonAfterSwitch?: boolean
     }
   | { kind: 'disableAttack'; condition?: TcgBattleCoinCondition; targetBasicOnly?: boolean }
-  | { kind: 'buffAttack'; attackName?: string; target?: 'self' | 'opponent'; baseDamage?: number; damageBonus?: number; damageMultiplier?: number; selfDamageMultiplier?: number }
+  | { kind: 'buffAttack'; attackName?: string; target?: 'self' | 'opponent'; baseDamage?: number; damageBonus?: number; damageMultiplier?: number; selfDamageMultiplier?: number; condition?: TcgBattleCoinCondition }
   | { kind: 'buffDefendingPokemon'; damageBonus: number }
   | { kind: 'blockTargeting'; condition?: TcgBattleCoinCondition; targetMaxHpAtMost?: number }
   | { kind: 'cannotAttack'; target?: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
@@ -1079,6 +1080,7 @@ function inferExTcgBattleAttackEffect(
   if (setId === 'ex8') return inferEx8TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex9') return inferEx9TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex10') return inferEx10TcgBattleAttackEffect(attack, text, baseDamage)
+  if (setId === 'ex11') return inferEx11TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId !== 'ex1') return null
 
   const name = attack.name.toLowerCase()
@@ -3317,6 +3319,151 @@ function inferEx10TcgBattleAttackEffect(
   return null
 }
 
+
+function inferEx11TcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTargetDamage = (amount: number, ignoreTargetDamageModifiers = false): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+    ...(ignoreTargetDamageModifiers ? { ignoreTargetDamageModifiers: true } : {}),
+  })
+  const textBonus = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+
+  if (name === 'super slash') return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: textBonus } }
+  if (name === 'target attack') {
+    return {
+      damage: { kind: 'damagedTargetBonus', baseDamage: 40, bonusDamage: 20 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'psychic rage') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'black magic') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'bench', side: 'opponent' } } }
+  }
+  if (name === 'energy bone') {
+    return {
+      ...zero(),
+      benchDamage: [{
+        amount: 20,
+        side: 'opponent',
+        zone: 'play',
+        maxTargetsFrom: { kind: 'energy', side: 'own' },
+      }],
+    }
+  }
+  if (name === 'crush and burn') {
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'chosenEnergy' } },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+    }
+  }
+  if (name === 'energy burst') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'both' } } }
+  }
+  if (name === 'power blow') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'delta crush') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 20 },
+      energyDiscard: [{ target: 'self', amount: 1, optional: true }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'feint attack') return anyTargetDamage(baseDamage || 30, true)
+  if (name === 'extra ball') return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 20 } }
+  if (name === 'gang up') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: ['Darkness', 'Metal'] },
+      },
+    }
+  }
+  if (name === 'holon splash') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'rend') return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 20 } }
+  if (name === 'holon search' || name === 'pickup power') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'steep dive') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAllEffects', condition: 'heads' }],
+      special: [{ kind: 'buffAttack', target: 'self', attackName: 'Glide', baseDamage: 100, condition: 'tails' }],
+    }
+  }
+  if (name === 'mist attack') {
+    return {
+      damage: { kind: 'fixed', amount: 10 },
+      benchDamage: [{ amount: 10, side: 'opponent', zone: 'bench', ignoreWeaknessResistance: true }],
+    }
+  }
+  if (name === 'copy') {
+    return { ...zero(), choiceRequirement: 'copyAttack', special: [{ kind: 'copyAttack', preserveExtraCosts: true }] }
+  }
+  if (name === 'slam') {
+    return { damage: { kind: 'headsMultiplier', damagePerHeads: 20, coinFlipCount: 2 }, coinFlipCount: 2 }
+  }
+  if (name === 'sonic signal') {
+    return {
+      damage: { kind: 'fixed', amount: 10 },
+      targetScope: 'any',
+      benchDamage: [{ amount: 10, side: 'opponent', zone: 'play', maxTargets: 1, excludeTarget: true }],
+    }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, basicOnly: true }],
+    }
+  }
+  if (name === 'calm mind') return { ...zero(), healing: [{ target: 'self', amount: 30 }] }
+  if (name === 'psychic boom') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'disable') {
+    return { ...zero(), choiceRequirement: 'disableAttack', special: [{ kind: 'disableAttack' }] }
+  }
+  if (name === 'roar') {
+    return {
+      ...zero(),
+      choiceRequirement: 'optionalOpponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (['sharp claws', 'stomp', 'rising lunge', 'ambush', 'quick blow', 'jump on'].includes(name)) {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  }
+  if (['snap tail', 'skill dive', 'linear attack'].includes(name)) {
+    const amount = Number.parseInt(text.match(/does (\d+) damage to that pokemon/)?.[1] || String(baseDamage), 10)
+    return anyTargetDamage(amount)
+  }
+  if (name === 'second bite') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'target' } } }
+  }
+
+  return null
+}
 
 function inferECardTcgBattleAttackEffect(
   attack: TcgCardAttack,
@@ -6058,7 +6205,12 @@ function calculateTcgBattleBenchDamage(
       if (rule.subtypeFilter?.exclude?.some((subtype) => cardSubtypes.includes(subtype.toLowerCase()))) return false
       return true
     })
-    const selected = rule.maxTargets ? pickRandomTcgBattleCards(candidates, rule.maxTargets, random) : candidates
+    const maxTargets = rule.maxTargetsFrom
+      ? getTcgBattleCount(rule.maxTargetsFrom, { state, sideKey, attacker, target, coinMode: 'actual' })
+      : rule.maxTargets
+    const selected = typeof maxTargets === 'number'
+      ? pickRandomTcgBattleCards(candidates, maxTargets, random)
+      : candidates
     for (const card of selected) {
       const isFront = state[targetSide].front.some((frontCard) => frontCard.instanceId === card.instanceId)
       const amount = rule.source && typeof rule.amountPerUnit === 'number'
@@ -7592,7 +7744,7 @@ function isTcgBattleControlStatus(
   return status === 'asleep' || status === 'paralyzed' || status === 'confused'
 }
 
-function doesTcgBattleConditionPass(
+export function doesTcgBattleConditionPass(
   condition: TcgBattleCoinCondition | undefined,
   coinFlips: TcgBattleAttackResolution['coinFlips'],
 ): boolean {

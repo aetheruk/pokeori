@@ -20,6 +20,7 @@ import {
   compactTcgBattleBoard,
   createTcgBattleCardState,
   drawTcgBattleCards,
+  doesTcgBattleConditionPass,
   getAllowedTcgBattleAttackCost,
   getEffectiveTcgBattleAttackCost,
   getTcgBattleAttackEffect,
@@ -859,6 +860,7 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
     if (rule.kind === 'buffAttack') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const affected = rule.target === 'opponent' ? target : attacker
       getTemporaryEffects(affected).nextAttackBuff = {
         attackName: rule.attackName || '*',
