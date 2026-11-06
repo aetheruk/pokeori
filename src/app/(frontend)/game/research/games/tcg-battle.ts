@@ -821,6 +821,11 @@ function applyTcgBattleSpecialEffects(params: {
 
     if (rule.kind === 'switch' && rule.beforeDamage) continue
     if (rule.kind === 'switch' && rule.ifTargetSurvives && target.currentHp <= 0) continue
+    if (
+      rule.kind === 'switch' &&
+      rule.ifCounterDamage &&
+      !resolution.counterDamage?.some((hit) => hit.targetId === target.instanceId && hit.damage > 0)
+    ) continue
     if (rule.kind === 'switch' && choice?.kind === 'benchSwitch') {
       const switched = swapTcgBattleCards(
         state,
@@ -1412,7 +1417,10 @@ function applyAttack(
     })
   }
   const opponentSideKey = sideKey === 'player' ? 'opponent' : 'player'
-  applyAttackDamageToCard(state, sideKey, attacker.instanceId, opponentSideKey, target, resolution.targetDamage)
+  const targetSideKey = [...side.front, ...side.back].some((card) => card.instanceId === target.instanceId)
+    ? sideKey
+    : opponentSideKey
+  applyAttackDamageToCard(state, sideKey, attacker.instanceId, targetSideKey, target, resolution.targetDamage)
   if (
     resolution.targetDamage > 0 &&
     target.incomingAttackModifier?.kind === 'coinPreventDamage' &&
@@ -1430,7 +1438,7 @@ function applyAttack(
     recordDamageEvent(state, {
       sourceId: attacker.instanceId,
       targetId: target.instanceId,
-      targetSide: sideKey === 'player' ? 'opponent' : 'player',
+      targetSide: targetSideKey,
       damage: resolution.targetDamage,
       reason: 'attack',
     })
