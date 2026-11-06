@@ -27,10 +27,11 @@ export type TcgBattleStatusCondition = 'asleep' | 'poisoned' | 'burned' | 'paral
 
 export type TcgBattleCountSource =
   | { kind: 'bench'; side: 'own' | 'opponent' | 'both' }
-  | { kind: 'pokemonInPlay'; side: 'own' | 'opponent' | 'both' }
+  | { kind: 'pokemonInPlay'; side: 'own' | 'opponent' | 'both'; excludeAttacker?: boolean }
   | { kind: 'injuredPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play' }
   | { kind: 'damageCounters'; target: 'attacker' | 'target' }
   | { kind: 'damageCountersOnSide'; side: 'own' | 'opponent' | 'both'; zone: 'front' | 'play' }
+  | { kind: 'damageCountersOnNamedPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'play'; names: string[] }
   | { kind: 'retreatCost'; target: 'attacker' | 'target' }
   | { kind: 'pokemonInDiscard'; side: 'own' | 'opponent'; max?: number }
   | { kind: 'pokemonExInPlay'; side: 'own' | 'opponent' }
@@ -65,7 +66,7 @@ export type TcgBattleDamageRule =
   | { kind: 'headsMultiplier'; damagePerHeads: number; coinFlipCount: number }
   | { kind: 'tailsBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'tailsMultiplier'; damagePerTails: number }
-  | { kind: 'count'; baseDamage: number; perUnitDamage: number; source: TcgBattleCountSource; maxUnits?: number }
+  | { kind: 'count'; baseDamage: number; perUnitDamage: number; source: TcgBattleCountSource; maxUnits?: number; optional?: boolean }
   | { kind: 'gatedCount'; baseDamage: number; perUnitDamage: number; source: TcgBattleCountSource; gateSource: TcgBattleCountSource; minimumGateUnits: number }
   | { kind: 'subtractCount'; baseDamage: number; perUnitDamage: number; source: TcgBattleCountSource }
   | { kind: 'remainingHpHalf' }
@@ -104,6 +105,8 @@ export type TcgBattleEnergyDiscardRule = {
   target: 'self' | 'opponent'
   amount: number | 'all' | 'heads' | 'choice' | 'opponentPokemon'
   condition?: TcgBattleCoinCondition
+  optional?: boolean
+  targetSubtype?: 'ex' | 'stage2'
 }
 
 export type TcgBattleEnergyDiscardResolution = {
@@ -132,6 +135,8 @@ export type TcgBattleProtectionRule = {
 
 export type TcgBattleBenchDamageRule = {
   amount: number
+  amountPerUnit?: number
+  source?: TcgBattleCountSource
   side: 'own' | 'opponent' | 'both'
   zone?: 'bench' | 'front' | 'play'
   ignoreWeaknessResistance?: boolean
@@ -139,6 +144,7 @@ export type TcgBattleBenchDamageRule = {
   condition?: TcgBattleCoinCondition
   excludeTarget?: boolean
   typeFilter?: { include?: string[]; exclude?: string[] }
+  subtypeFilter?: { include?: string[]; exclude?: string[] }
 }
 
 export type TcgBattleCounterDamageRule =
@@ -1062,6 +1068,7 @@ function inferExTcgBattleAttackEffect(
   if (setId === 'ex5') return inferEx5TcgBattleAttackEffect(attack, baseDamage)
   if (setId === 'ex6') return inferEx6TcgBattleAttackEffect(attack, baseDamage)
   if (setId === 'ex7') return inferEx7TcgBattleAttackEffect(attack, baseDamage)
+  if (setId === 'ex8') return inferEx8TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId !== 'ex1') return null
 
   const name = attack.name.toLowerCase()
@@ -2432,6 +2439,271 @@ function inferEx7TcgBattleAttackEffect(
   return null
 }
 
+function inferEx8TcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const textBonus = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+  const sweep = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    ignoreWeaknessResistanceOnBench: true,
+    benchDamage: [{ amount, side: 'opponent', zone: 'bench', ignoreWeaknessResistance: true }],
+  })
+
+  if (name === 'double wing attack') return sweep(20)
+  if (name === 'split bomb' || name === 'triple breach') {
+    const amount = name === 'split bomb' ? 30 : 10
+    const extraTargets = name === 'split bomb' ? 1 : 2
+    return {
+      damage: { kind: 'fixed', amount },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+      benchDamage: [{
+        amount,
+        side: 'opponent',
+        zone: 'bench',
+        maxTargets: extraTargets,
+        excludeTarget: true,
+        ignoreWeaknessResistance: true,
+      }],
+    }
+  }
+  if (name === 'cross-cut') return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 20 } }
+  if (name === 'dragon spark' || name === 'spinning horn') return sweep(10)
+  if (name === 'full retaliation') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'damageCountersOnNamedPokemon', side: 'own', zone: 'play', names: ['Magikarp'] },
+      },
+    }
+  }
+  if (name === 'pulverize') return { damage: { kind: 'damageCounterThresholdBonus', baseDamage, bonusDamage: 50, minimumCounters: 2 } }
+  if (name === 'circular steps') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonInPlay', side: 'both', excludeAttacker: true },
+      },
+    }
+  }
+  if (name === 'energy crush') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'back burner') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'hustle punch') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      special: [{ kind: 'buffAttack', target: 'self', attackName: 'Hustle Punch', baseDamage: 50 }],
+    }
+  }
+  if (name === 'water punch') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'tumbling attack' || name === 'quick blow' || name === 'rock smash') {
+    const bonusDamage = name === 'tumbling attack' || name === 'quick blow' ? 20 : 10
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage }, coinFlipCount: 1 }
+  }
+  if (name === 'rend') return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 20 } }
+  if (name === 'heavy metal') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'miracle blow' || name === 'miracle essence') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      choiceRequirement: 'statusCondition',
+      status: [{ target: 'opponent', statuses: [], condition: 'heads', useChosenStatus: true }],
+    }
+  }
+  if (name === 'stomp' || name === 'quick attack' || name === 'trip over' || name === 'aqua wave' || name === 'rising lunge' || name === 'ambush') {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  }
+  if (name === 'raging tremble') {
+    const source: TcgBattleCountSource = { kind: 'damageCounters', target: 'attacker' }
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source },
+      coinFlipCount: 1,
+      benchDamage: [{
+        amount: 0,
+        amountPerUnit: 10,
+        source,
+        side: 'opponent',
+        zone: 'bench',
+        condition: 'heads',
+        ignoreWeaknessResistance: true,
+      }],
+    }
+  }
+  if (name === 'dwindling wave') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'extra ball') return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 30 } }
+  if (name === 'target beam') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: ['Solrock'] },
+      },
+    }
+  }
+  if (name === 'magnetic tackle') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'energy', side: 'own' },
+        optional: true,
+      },
+      selfDamage: [{ kind: 'optionalChoice', amount: 10 }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'psychic boom') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'one-two strike') return { damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 2 }, coinFlipCount: 2 }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, basicOnly: true }],
+    }
+  }
+  if (name === 'thunder spear') return anyTargetDamage(20)
+  if (name === 'reflected beam') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 10,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: ['Lunatone'] },
+      },
+      targetScope: 'bench',
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (name === 'energy flip') {
+    return { damage: { kind: 'fixed', amount: 10 }, targetScope: 'bench', ignoreWeaknessResistance: true }
+  }
+  if (name === 'mid-air crush') {
+    return {
+      ...anyTargetDamage(20),
+      coinFlipCount: 1,
+      energyDiscard: [{ target: 'opponent', amount: 1, condition: 'heads' }],
+    }
+  }
+  if (name === 'liability') {
+    return {
+      damage: { kind: 'targetToRemainingHp', remainingHp: 10 },
+      selfDamage: [{ kind: 'fixed', amount: 70 }],
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (name === 'leap out') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'pester') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 40,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+    }
+  }
+  if (name === 'energy burst') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'both' } } }
+  }
+  if (name === 'psyburst') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'opponent' },
+        optional: true,
+      },
+      energyDiscard: [{ target: 'self', amount: 2, optional: true }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'spiral blast') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'flame jet') {
+    return { ...anyTargetDamage(40), ignoreWeaknessResistance: true }
+  }
+  if (name === 'shooting star') {
+    return {
+      damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 100 },
+      energyDiscard: [{ target: 'self', amount: 'all', targetSubtype: 'ex' }],
+    }
+  }
+  if (name === 'shining star') {
+    return {
+      damage: { kind: 'stage2TargetBonus', baseDamage, bonusDamage: 100 },
+      energyDiscard: [{ target: 'self', amount: 'all', targetSubtype: 'stage2' }],
+    }
+  }
+  if (name === 'spiral rush') {
+    return { damage: { kind: 'headsMultiplier', damagePerHeads: 30, coinFlipCount: 0 }, flipUntilTails: true }
+  }
+  if (name === 'holy star') {
+    return {
+      damage: { kind: 'pokemonExTargetBonus', baseDamage: 0, bonusDamage: 100 },
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+      benchDamage: [{
+        amount: 100,
+        side: 'opponent',
+        zone: 'bench',
+        ignoreWeaknessResistance: true,
+        subtypeFilter: { include: ['ex'] },
+      }],
+    }
+  }
+  if (name === 'thunderous blow') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+
+  return null
+}
+
 function inferECardTcgBattleAttackEffect(
   attack: TcgCardAttack,
   _text: string,
@@ -3642,6 +3914,7 @@ export function resolveTcgBattleAttack(params: {
     state,
     sideKey,
     attack,
+    target,
     paidAttackCost,
     coinFlips,
     choice,
@@ -5166,14 +5439,26 @@ function calculateTcgBattleBenchDamage(
       const cardTypes = card.types.map((type) => type.toLowerCase())
       if (rule.typeFilter?.include?.length && !rule.typeFilter.include.some((type) => cardTypes.includes(type.toLowerCase()))) return false
       if (rule.typeFilter?.exclude?.some((type) => cardTypes.includes(type.toLowerCase()))) return false
+      const cardSubtypes = card.subtypes.map((subtype) => subtype.toLowerCase())
+      if (rule.subtypeFilter?.include?.length && !rule.subtypeFilter.include.some((subtype) => cardSubtypes.includes(subtype.toLowerCase()))) return false
+      if (rule.subtypeFilter?.exclude?.some((subtype) => cardSubtypes.includes(subtype.toLowerCase()))) return false
       return true
     })
     const selected = rule.maxTargets ? pickRandomTcgBattleCards(candidates, rule.maxTargets, random) : candidates
     for (const card of selected) {
       const isFront = state[targetSide].front.some((frontCard) => frontCard.instanceId === card.instanceId)
-      const damage = targetSide !== sideKey && isFront && !rule.ignoreWeaknessResistance
-        ? applyTcgWeaknessAndResistance(attacker, card, rule.amount)
+      const amount = rule.source && typeof rule.amountPerUnit === 'number'
+        ? rule.amount + rule.amountPerUnit * getTcgBattleCount(rule.source, {
+            state,
+            sideKey,
+            attacker,
+            target,
+            coinMode: 'actual',
+          })
         : rule.amount
+      const damage = targetSide !== sideKey && isFront && !rule.ignoreWeaknessResistance
+        ? applyTcgWeaknessAndResistance(attacker, card, amount)
+        : amount
       results.push({ targetSide, targetId: card.instanceId, damage })
     }
   }
@@ -6216,6 +6501,9 @@ function calculateTcgBattleRawDamage(
       return rule.damagePerTails * tails
     }
     case 'count':
+      if (rule.optional && !(context.choice?.kind === 'optionalBonus' && context.choice.enabled)) {
+        return rule.baseDamage
+      }
       return (
         rule.baseDamage +
         rule.perUnitDamage *
@@ -6483,9 +6771,29 @@ function getTcgBattleCount(
     )
   }
 
-  if (source.side === 'own') return getLivingTcgBattleCards(own).length
-  if (source.side === 'opponent') return getLivingTcgBattleCards(opponent).length
-  return getLivingTcgBattleCards(own).length + getLivingTcgBattleCards(opponent).length
+  if (source.kind === 'pokemonInPlay') {
+    const countFor = (side: TcgBattleSideState) =>
+      getLivingTcgBattleCards(side).filter((card) =>
+        !source.excludeAttacker || card.instanceId !== context.attacker.instanceId,
+      ).length
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
+  if (source.kind === 'damageCountersOnNamedPokemon') {
+    const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const names = new Set(source.names.map(normalizeName))
+    const countFor = (side: TcgBattleSideState) =>
+      [...side.front, ...side.back]
+        .filter((card) => card.currentHp > 0 && names.has(normalizeName(card.name)))
+        .reduce((sum, card) => sum + Math.max(0, Math.floor((card.hp - card.currentHp) / 10)), 0)
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
+  return 0
 }
 
 function calculateTcgBattleSelfDamage(
@@ -6526,6 +6834,7 @@ function calculateTcgBattleEnergyDiscards(
     state: TcgBattleState
     sideKey: TcgBattleSide
     attack: TcgBattleAttack
+    target: TcgBattleCardState
     paidAttackCost?: number
     coinFlips?: TcgBattleAttackResolution['coinFlips']
     choice?: TcgBattleAttackChoice
@@ -6541,7 +6850,10 @@ function calculateTcgBattleEnergyDiscards(
   const discards: TcgBattleEnergyDiscardResolution[] = []
 
   for (const rule of rules) {
+    if (rule.optional && !(context.choice?.kind === 'optionalBonus' && context.choice.enabled)) continue
     if (!doesTcgBattleConditionPass(rule.condition, context.coinFlips)) continue
+    if (rule.targetSubtype === 'ex' && !context.target.subtypes.some((subtype) => subtype.toLowerCase() === 'ex')) continue
+    if (rule.targetSubtype === 'stage2' && !context.target.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2')) continue
 
     const available = remaining[rule.target]
     const requested =
