@@ -456,6 +456,26 @@ const gen9Data: PokemonData = [
           "specialAttack": 0,
           "specialDefense": 0,
           "speed": 0
+        },
+        "genderVariants": {
+          "female": {
+            "stats": {
+              "hp": 115,
+              "attack": 90,
+              "defense": 70,
+              "special-attack": 59,
+              "special-defense": 90,
+              "speed": 65
+            },
+            "evYield": {
+              "hp": 2,
+              "attack": 0,
+              "defense": 0,
+              "specialAttack": 0,
+              "specialDefense": 0,
+              "speed": 0
+            }
+          }
         }
       }
     ]

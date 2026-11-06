@@ -60,5 +60,7 @@ export const {
   getPrimaryFormAbilityId,
   rollNaturalFormAbility,
   isNaturalFormAbilityForForm,
+  isGenderCompatibleFormAbility,
+  resolveGenderCompatibleFormAbility,
   resolveEvolvedAbility,
 } = createAbilityFormResolvers(ABILITY_FORM_MAP)

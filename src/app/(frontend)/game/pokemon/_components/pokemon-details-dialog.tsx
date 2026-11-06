@@ -62,7 +62,7 @@ import {
 } from '@/components/ui/select'
 import { Vortex } from '@/components/ui/vortex'
 import { useUser } from '@/context/UserContext'
-import { ABILITIES } from '@/data/abilities'
+import { ABILITIES, resolveGenderCompatibleFormAbility } from '@/data/abilities'
 import { getLevelEvolutionCatalystForEvolution } from '@/data/evolution-catalysts'
 import { EVOLUTIONS } from '@/data/evolutions'
 import { items } from '@/data/items'
@@ -695,7 +695,7 @@ function MountedPokemonDetailsDialog({
   const [isEvolving, setIsEvolving] = useState<number | null>(null)
   const [isOpen, setIsOpen] = useState(initialOpen)
 
-  const formInfo = getPokemonForm(pokemon.formId)
+  const formInfo = getPokemonForm(pokemon.formId, pokemon.gender)
   const formLabel =
     formInfo?.form && formInfo.form !== 'base'
       ? capitalizeFirstLetter(formInfo.form.replaceAll('-', ' '))
@@ -2002,7 +2002,12 @@ function MountedPokemonDetailsDialog({
 
             {/* Ability Section */}
             {(() => {
-              const abilityId = (pokemon as any).ability
+              const abilityId =
+                resolveGenderCompatibleFormAbility(
+                  pokemon.formId,
+                  (pokemon as any).ability,
+                  pokemon.gender,
+                ) || (pokemon as any).ability
               const ability = abilityId ? ABILITIES[abilityId] : null
               if (!ability) return null
               const partnerEffects = getAbilityDexPartnerEffectLines(ability)

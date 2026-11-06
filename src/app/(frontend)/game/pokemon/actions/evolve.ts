@@ -46,7 +46,10 @@ import {
   resolveEvolutionTimeRegion,
 } from '@/utilities/pokemon/evolution-conditions'
 import { matchesEvolutionMove } from '@/utilities/pokemon/evolution-moves'
-import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
+import {
+  getOwnedPokemonGender,
+  rollPokemonGender,
+} from '@/utilities/pokemon/gender'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { getUser, serializePokemon, type StatName } from './utils'
 import {
@@ -381,6 +384,7 @@ export async function evolvePokemon(
           newFormId,
           Math.random,
           getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+          pokemonGender,
         )
 
         await payload.update({
@@ -413,11 +417,13 @@ export async function evolvePokemon(
           )
           if (!battleTeamPosition)
             throw new Error('Your party has no room for the additional Pokemon')
+          const additionalGender = rollPokemonGender(conditions.additionalSpeciesId)
           const additionalAbility =
-            getPrimaryFormAbilityId(additionalSpecies.id) || ''
+            getPrimaryFormAbilityId(additionalSpecies.id, additionalGender) || ''
           const additionalPokemonData = {
             speciesId: conditions.additionalSpeciesId,
             formId: additionalSpecies.id,
+            gender: additionalGender,
             level: pokemon.level || 1,
             nature: pokemon.nature,
             ivs: pokemon.ivs,
@@ -443,7 +449,7 @@ export async function evolvePokemon(
               shiny: pokemon.shiny,
               isAlpha: pokemon.isAlpha,
               ability: additionalAbility,
-              gender: pokemon.gender,
+              gender: additionalGender,
               identified: true,
               originalTrainer: user.id,
               ballType: pokemon.ballType,

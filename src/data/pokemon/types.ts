@@ -16,6 +16,14 @@ export interface PokemonEVYield {
   speed: number;
 }
 
+export type PokemonGender = 'male' | 'female' | 'genderless';
+export type PokemonSex = Exclude<PokemonGender, 'genderless'>;
+
+export interface PokemonGenderVariant {
+  stats: PokemonStats;
+  evYield: PokemonEVYield;
+}
+
 export interface PokemonForm {
   id: string;
   height: number;
@@ -26,6 +34,7 @@ export interface PokemonForm {
   types: string[];
   stats: PokemonStats;
   evYield: PokemonEVYield;
+  genderVariants?: Partial<Record<PokemonSex, PokemonGenderVariant>>;
 }
 
 export type PokemonGrowthRate =

@@ -901,6 +901,7 @@ describe('generated data integrity', () => {
             rate: assignment.chance,
             hidden: assignment.hidden,
             slot: assignment.slot,
+            gender: assignment.gender,
           })
         }
       }
@@ -914,30 +915,35 @@ describe('generated data integrity', () => {
       rate: 5,
       hidden: true,
       slot: 3,
+      gender: undefined,
     })
     expect(ABILITY_FORM_MAP['1']).toContainEqual({
       id: 'overgrow',
       rate: 100,
       hidden: undefined,
       slot: 1,
+      gender: undefined,
     })
     expect(ABILITY_FORM_MAP['16']).toContainEqual({
       id: 'keen_eye',
       rate: 50,
       hidden: undefined,
       slot: 1,
+      gender: undefined,
     })
     expect(ABILITY_FORM_MAP['16']).toContainEqual({
       id: 'tangled_feet',
       rate: 100,
       hidden: undefined,
       slot: 2,
+      gender: undefined,
     })
     expect(ABILITY_FORM_MAP['16']).toContainEqual({
       id: 'big_pecks',
       rate: 5,
       hidden: true,
       slot: 3,
+      gender: undefined,
     })
     expect(ABILITIES.kick_sand).toBeUndefined()
     expect(ABILITIES.scavenge).toBeUndefined()

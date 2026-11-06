@@ -554,18 +554,20 @@ export async function grantRewards(
       // ... (Pokemon creation logic remains mostly same, interacting with 'pokemon' collection)
       // ... But Pokedex updates must change to use the Map
 
+      const speciesId = parseInt(reward.targetId.toString())
+      const pokemonGender =
+        reward.pokemonData?.gender || rollPokemonGender(speciesId)
       let speciesData = null
 
       // If formId is provided, use it to get the specific form
       if (reward.pokemonData?.formId) {
-        speciesData = getPokemonForm(reward.pokemonData.formId)
+        speciesData = getPokemonForm(reward.pokemonData.formId, pokemonGender)
       } else {
         // Otherwise use targetId (assuming it's a form ID or species ID that matches a form ID)
-        speciesData = getPokemonSpecies(reward.targetId)
+        speciesData = getPokemonSpecies(reward.targetId, undefined, pokemonGender)
       }
 
       if (speciesData) {
-        const speciesId = parseInt(reward.targetId.toString())
         const level = reward.pokemonData?.level || 5
         const ballType = reward.pokemonData?.ballType || 'poke-ball'
         const rarity = resolvePokemonRarity(reward.pokemonData || {})
@@ -612,6 +614,7 @@ export async function grantRewards(
           formId: speciesData.id,
           level,
           nature,
+          gender: pokemonGender,
           ivs,
           evs,
           ...rarityLegacyFields,
@@ -623,8 +626,9 @@ export async function grantRewards(
           reward.pokemonData?.ability ||
           rollNaturalFormAbility(speciesData.id, Math.random, {
             hiddenEligible: false,
+            gender: pokemonGender,
           }) ||
-          getPrimaryFormAbilityId(speciesData.id)
+          getPrimaryFormAbilityId(speciesData.id, pokemonGender)
 
         await payload.create({
           collection: 'pokemon',
@@ -640,7 +644,7 @@ export async function grantRewards(
             ),
             rarity,
             ability: rewardAbilityId,
-            gender: reward.pokemonData?.gender || rollPokemonGender(speciesId),
+            gender: pokemonGender,
             identified: true,
             originalTrainer: userId,
             ballType: ballType,

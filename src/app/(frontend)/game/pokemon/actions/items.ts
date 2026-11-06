@@ -27,7 +27,7 @@ import {
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import { POKEMON_EV_CAPS, getPokemonEvTotal } from '@/utilities/pokemon/evs'
 import { items } from '@/data/items'
-import { ABILITIES } from '@/data/abilities'
+import { ABILITIES, isGenderCompatibleFormAbility } from '@/data/abilities'
 import { rollResearchXp } from '@/utilities/research/research-levels'
 import { EVOLUTIONS } from '@/data/evolutions'
 import { getUser, serializePokemon, type StatName } from './utils'
@@ -658,6 +658,17 @@ export async function applyItemToPokemon(
           }
 
           const newAbilityId = teachAbility
+          if (
+            !isGenderCompatibleFormAbility(
+              pokemon.formId,
+              newAbilityId,
+              pokemon.gender,
+            )
+          ) {
+            throw new Error(
+              'This ability is not compatible with this Pokémon’s gender.',
+            )
+          }
           const currentAbilityId =
             typeof pokemon.ability === 'string' ? pokemon.ability : undefined
           const currentAbility = currentAbilityId

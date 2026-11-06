@@ -21,7 +21,8 @@ function getEnemyEvYield(pokemon: BattlePokemon): PokemonEvBlock {
     pokemon.battleAbilityState?.originalTransform?.formId ||
     pokemon.formId
   const form =
-    getPokemonForm(sourceFormId) || getPokemonSpecies(pokemon.speciesId)
+    getPokemonForm(sourceFormId, pokemon.gender) ||
+    getPokemonSpecies(pokemon.speciesId, undefined, pokemon.gender)
   return form?.evYield || getEmptyPokemonEvs()
 }
 

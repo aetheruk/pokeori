@@ -5,9 +5,9 @@ Data fetch and generation scripts for Pokeori.
 ## Data Scripts
 | Script | Command | Description |
 |--------|---------|-------------|
-| Generate Game Data | `bun run generate:game-data` | Unified pipeline for Pokemon, bundled sprites, item sprites, evolutions, TCG, booster packs, mega stones, entry scaffolds, and validation |
+| Generate Game Data | `bun run generate:game-data` | Unified pipeline for Pokemon, icon catalog, bundled sprites, item sprites, evolutions, TCG, booster packs, mega stones, entry scaffolds, and validation |
 | Fetch Pokemon | `bun run fetch:pokemon` | Fetch Pokemon data from PokeAPI |
-| Generate Pokemon | `bun run generate:pokemon` | Generate TypeScript modules from fetched data |
+| Generate Pokemon | `bun run generate:pokemon` | Generate TypeScript modules, canonical ability assignments, and the Pokémon icon catalog from fetched data |
 | Fetch TCG | `bun run fetch:tcg` | Fetch TCG card data from Pokemon TCG API |
 | Generate TCG | `bun run generate:tcg` | Generate TCG data modules |
 | Sync TCG Sprites | `bun run sync:tcg-sprites` | Cache TCG set artwork and generate set-specific booster pack and binder item sprites |
@@ -41,7 +41,7 @@ Runs the full game-data pipeline in dependency order:
 1. Fetch Pokemon source data.
 2. Fetch TCG source data.
 3. Sync bundled TCG set sprites and generated TCG pack/binder item sprites.
-4. Generate Pokemon modules.
+4. Generate Pokemon modules and the Pokémon icon catalog.
 5. Sync bundled Pokemon sprites.
 6. Generate split evolution modules and the compatibility wrapper.
 7. Generate TCG modules and booster-pack items.

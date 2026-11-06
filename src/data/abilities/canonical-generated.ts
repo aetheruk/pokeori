@@ -106,7 +106,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "955",
       "956",
       "10050",
-      "10288",
     ],
     naturalAssignments: [
       {
@@ -121,7 +120,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "545",
           "955",
           "956",
-          "10288",
         ],
         chance: 5,
         hidden: true,
@@ -164,7 +162,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "772",
       "863",
       "870",
-      "10303",
     ],
     naturalAssignments: [
       {
@@ -182,7 +179,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "348",
           "772",
           "870",
-          "10303",
         ],
         chance: 100,
         slot: 1,
@@ -340,7 +336,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "damp",
     name: "Damp",
-    description: "Prevents Self Destruct, Explosion, and Aftermath from working while the Pokémon is in battle.",
+    description: "Prevents Self-Destruct, Explosion, and Aftermath from working while the Pokémon is in battle.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -511,7 +507,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10105",
       "10106",
       "10218",
-      "10309",
     ],
     naturalAssignments: [
       {
@@ -545,7 +540,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "443",
           "444",
           "445",
-          "10309",
         ],
         chance: 100,
         slot: 1,
@@ -1413,6 +1407,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "713",
       "749",
       "750",
+      "876",
       "924",
       "926",
       "938",
@@ -1451,6 +1446,14 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         ],
         chance: 50,
         slot: 1,
+      },
+      {
+        forms: [
+          "876",
+        ],
+        chance: 50,
+        slot: 1,
+        gender: "female",
       },
       {
         forms: [
@@ -1495,7 +1498,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "346",
       "686",
       "687",
-      "10297",
     ],
     naturalAssignments: [
       {
@@ -1517,7 +1519,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         forms: [
           "686",
           "687",
-          "10297",
         ],
         chance: 100,
         slot: 2,
@@ -1579,7 +1580,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10261",
       "10262",
       "10289",
-      "10308",
     ],
     naturalAssignments: [
       {
@@ -1592,7 +1592,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "727",
           "904",
           "10234",
-          "10289",
         ],
         chance: 5,
         hidden: true,
@@ -1640,7 +1639,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "398",
           "10021",
           "10055",
-          "10308",
+          "10289",
         ],
         chance: 100,
         slot: 1,
@@ -1708,7 +1707,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "444",
       "445",
       "621",
-      "10309",
     ],
     naturalAssignments: [
       {
@@ -1716,7 +1714,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "443",
           "444",
           "445",
-          "10309",
         ],
         chance: 5,
         hidden: true,
@@ -1837,9 +1834,9 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10062",
       "10063",
       "10167",
-      "10290",
       "10293",
       "10306",
+      "10309",
     ],
     naturalAssignments: [
       {
@@ -1907,9 +1904,9 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "10012",
           "10062",
           "10063",
-          "10290",
           "10293",
           "10306",
+          "10309",
         ],
         chance: 100,
         slot: 1,
@@ -2691,6 +2688,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "282",
       "10037",
       "10314",
+      "10326",
     ],
     naturalAssignments: [
       {
@@ -2705,6 +2703,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         forms: [
           "10037",
           "10314",
+          "10326",
         ],
         chance: 100,
         slot: 1,
@@ -2793,8 +2792,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "980",
       "10234",
       "10253",
-      "10288",
-      "10299",
     ],
     naturalAssignments: [
       {
@@ -2816,8 +2813,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "980",
           "10234",
           "10253",
-          "10288",
-          "10299",
         ],
         chance: 50,
         slot: 1,
@@ -2879,7 +2874,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10068",
       "10176",
       "10235",
-      "10310",
     ],
     naturalAssignments: [
       {
@@ -2922,11 +2916,18 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "619",
           "620",
           "765",
-          "876",
           "10235",
         ],
         chance: 50,
         slot: 1,
+      },
+      {
+        forms: [
+          "876",
+        ],
+        chance: 50,
+        slot: 1,
+        gender: "male",
       },
       {
         forms: [
@@ -2941,7 +2942,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "624",
           "625",
           "979",
-          "10310",
         ],
         chance: 100,
         slot: 2,
@@ -3285,7 +3285,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10212",
       "10245",
       "10246",
-      "10307",
     ],
     naturalAssignments: [
       {
@@ -3338,7 +3337,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "823",
           "903",
           "10212",
-          "10307",
         ],
         chance: 50,
         slot: 1,
@@ -4349,7 +4347,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "953",
       "967",
       "10218",
-      "10289",
     ],
     naturalAssignments: [
       {
@@ -4384,7 +4381,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         forms: [
           "559",
           "560",
-          "10289",
         ],
         chance: 50,
         slot: 1,
@@ -4862,7 +4858,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "919",
       "920",
       "10213",
-      "10288",
     ],
     naturalAssignments: [
       {
@@ -4918,7 +4913,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "543",
           "544",
           "545",
-          "10288",
         ],
         chance: 100,
         slot: 2,
@@ -5246,6 +5240,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10214",
       "10241",
       "10242",
+      "10288",
     ],
     naturalAssignments: [
       {
@@ -5275,6 +5270,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "366",
           "776",
           "10071",
+          "10288",
         ],
         chance: 100,
         slot: 1,
@@ -5440,7 +5436,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "612",
       "667",
       "668",
-      "10295",
     ],
     naturalAssignments: [
       {
@@ -5464,7 +5459,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "612",
           "667",
           "668",
-          "10295",
         ],
         chance: 50,
         slot: 1,
@@ -5507,7 +5501,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10043",
       "10166",
       "10201",
-      "10310",
     ],
     naturalAssignments: [
       {
@@ -5530,7 +5523,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "447",
           "448",
           "475",
-          "10310",
         ],
         chance: 50,
         slot: 1,
@@ -6139,7 +6131,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10090",
       "10205",
       "10247",
-      "10299",
       "10321",
     ],
     naturalAssignments: [
@@ -6152,7 +6143,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "691",
           "734",
           "735",
-          "10299",
         ],
         chance: 5,
         hidden: true,
@@ -6468,7 +6458,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "817",
       "818",
       "10211",
-      "10298",
     ],
     naturalAssignments: [
       {
@@ -6498,7 +6487,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "452",
           "688",
           "689",
-          "10298",
         ],
         chance: 100,
         slot: 2,
@@ -6954,7 +6942,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "519",
       "520",
       "521",
-      "10307",
     ],
     naturalAssignments: [
       {
@@ -6975,7 +6962,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "519",
           "520",
           "521",
-          "10307",
         ],
         chance: 100,
         slot: 2,
@@ -7038,7 +7024,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "anticipation",
     name: "Anticipation",
-    description: "Notifies all trainers upon entering battle if an opponent has a super-effective move, Self Destruct, Explosion, or a one-hit KO move.",
+    description: "Notifies all trainers upon entering battle if an opponent has a super-effective move, Self-Destruct, Explosion, or a one-hit KO move.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -7479,7 +7465,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "998",
       "10168",
       "10243",
-      "10325",
     ],
     naturalAssignments: [
       {
@@ -7493,7 +7478,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "997",
           "998",
           "10168",
-          "10325",
         ],
         chance: 5,
         hidden: true,
@@ -7767,7 +7751,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "620",
       "626",
       "862",
-      "10308",
     ],
     naturalAssignments: [
       {
@@ -7781,7 +7764,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "500",
           "619",
           "620",
-          "10308",
         ],
         chance: 5,
         hidden: true,
@@ -7927,7 +7909,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "959",
       "10222",
       "10235",
-      "10298",
     ],
     naturalAssignments: [
       {
@@ -7947,7 +7928,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "959",
           "10222",
           "10235",
-          "10298",
         ],
         chance: 5,
         hidden: true,
@@ -8086,6 +8066,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "754",
       "905",
       "10297",
+      "10308",
     ],
     naturalAssignments: [
       {
@@ -8107,9 +8088,16 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         forms: [
           "686",
           "687",
-          "10297",
         ],
         chance: 50,
+        slot: 1,
+      },
+      {
+        forms: [
+          "10297",
+          "10308",
+        ],
+        chance: 100,
         slot: 1,
       },
     ],
@@ -8150,7 +8138,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10161",
       "10200",
       "10212",
-      "10295",
     ],
     naturalAssignments: [
       {
@@ -8196,7 +8183,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "822",
           "823",
           "10212",
-          "10295",
         ],
         chance: 100,
         slot: 2,
@@ -8243,7 +8229,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "862",
           "870",
           "979",
-          "10303",
         ],
         chance: 5,
         hidden: true,
@@ -8262,6 +8247,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         forms: [
           "1017",
           "10170",
+          "10303",
         ],
         chance: 100,
         slot: 1,
@@ -9002,7 +8988,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "945",
       "10112",
       "10113",
-      "10299",
     ],
     naturalAssignments: [
       {
@@ -9031,7 +9016,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "690",
           "691",
           "945",
-          "10299",
         ],
         chance: 100,
         slot: 2,
@@ -9073,6 +9057,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10164",
       "10165",
       "10172",
+      "10299",
     ],
     naturalAssignments: [
       {
@@ -9105,6 +9090,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       {
         forms: [
           "10019",
+          "10299",
         ],
         chance: 100,
         slot: 1,
@@ -9406,7 +9392,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "946",
       "947",
       "10291",
-      "10297",
     ],
     naturalAssignments: [
       {
@@ -9427,7 +9412,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "687",
           "946",
           "947",
-          "10297",
         ],
         chance: 5,
         hidden: true,
@@ -9503,8 +9487,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "912",
       "913",
       "914",
-      "10289",
-      "10295",
     ],
     naturalAssignments: [
       {
@@ -9520,7 +9502,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "912",
           "913",
           "914",
-          "10295",
         ],
         chance: 5,
         hidden: true,
@@ -9533,7 +9514,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "553",
           "559",
           "560",
-          "10289",
         ],
         chance: 100,
         slot: 2,
@@ -9558,8 +9538,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "640",
       "647",
       "10024",
-      "10307",
-      "10310",
     ],
     naturalAssignments: [
       {
@@ -9569,8 +9547,6 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "359",
           "448",
           "475",
-          "10307",
-          "10310",
         ],
         chance: 5,
         hidden: true,
@@ -9845,13 +9821,21 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "447",
           "509",
           "510",
-          "678",
           "944",
           "945",
         ],
         chance: 5,
         hidden: true,
         slot: 3,
+      },
+      {
+        forms: [
+          "678",
+        ],
+        chance: 5,
+        hidden: true,
+        slot: 3,
+        gender: "male",
       },
       {
         forms: [
@@ -10082,6 +10066,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "868",
       "869",
       "915",
+      "916",
       "927",
       "10223",
     ],
@@ -10105,6 +10090,14 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         ],
         chance: 50,
         slot: 1,
+      },
+      {
+        forms: [
+          "916",
+        ],
+        chance: 50,
+        slot: 1,
+        gender: "female",
       },
     ],
   },
@@ -10411,6 +10404,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "574",
       "575",
       "576",
+      "678",
       "836",
       "940",
       "941",
@@ -10429,6 +10423,15 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         chance: 5,
         hidden: true,
         slot: 3,
+      },
+      {
+        forms: [
+          "678",
+        ],
+        chance: 5,
+        hidden: true,
+        slot: 3,
+        gender: "female",
       },
       {
         forms: [
@@ -10578,7 +10581,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "stance_change",
     name: "Stance Change",
-    description: "Changes Aegislash to Blade Forme before using a damaging move, or Shield Forme before using Kings Shield.",
+    description: "Changes Aegislash to Blade Forme before using a damaging move, or Shield Forme before using King’s Shield.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -10740,13 +10743,13 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "10152",
       "10161",
       "10298",
+      "10316",
     ],
     naturalAssignments: [
       {
         forms: [
           "688",
           "689",
-          "10298",
         ],
         chance: 50,
         slot: 1,
@@ -10757,6 +10760,8 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
           "10042",
           "10076",
           "10152",
+          "10298",
+          "10316",
         ],
         chance: 100,
         slot: 1,
@@ -11068,13 +11073,11 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
     rate: 100,
     forms: [
       "768",
-      "10316",
     ],
     naturalAssignments: [
       {
         forms: [
           "768",
-          "10316",
         ],
         chance: 100,
         slot: 1,
@@ -12833,7 +12836,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "as_one_glastrier",
     name: "As One",
-    description: "Main-game ability: As One.",
+    description: "Combines the effects of Unnerve and Chilling Neigh.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -12853,7 +12856,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "as_one_spectrier",
     name: "As One",
-    description: "Main-game ability: As One.",
+    description: "Combines the effects of Unnerve and Grim Neigh.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -12887,6 +12890,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         ],
         chance: 50,
         slot: 1,
+        gender: "male",
       },
     ],
   },
@@ -13456,6 +13460,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       "900",
       "976",
       "10236",
+      "10307",
     ],
     naturalAssignments: [
       {
@@ -13467,6 +13472,13 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
         chance: 5,
         hidden: true,
         slot: 3,
+      },
+      {
+        forms: [
+          "10307",
+        ],
+        chance: 100,
+        slot: 1,
       },
       {
         forms: [
@@ -13773,7 +13785,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "piercing_drill",
     name: "Piercing Drill",
-    description: "Main-game ability: Piercing Drill.",
+    description: "When the Pokémon uses contact moves, it can hit even targets that are protecting themselves.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -13793,7 +13805,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "dragonize",
     name: "Dragonize",
-    description: "Main-game ability: Dragonize.",
+    description: "The Pokémon's Normal-type moves become Dragon-type moves and their power is boosted by 20%.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -13813,7 +13825,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "mega_sol",
     name: "Mega Sol",
-    description: "Main-game ability: Mega Sol.",
+    description: "The Pokémon can use its moves as if the weather were harsh sunlight.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -13833,7 +13845,7 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
   {
     id: "spicy_spray",
     name: "Spicy Spray",
-    description: "Main-game ability: Spicy Spray.",
+    description: "When the Pokémon takes damage from a move, it burns the attacker.",
     type: 'answer',
     value: 1,
     rate: 100,
@@ -13844,6 +13856,66 @@ export const CANONICAL_ABILITIES: AbilityConfig[] = [
       {
         forms: [
           "10320",
+        ],
+        chance: 100,
+        slot: 1,
+      },
+    ],
+  },
+  {
+    id: "eelevate",
+    name: "Eelevate",
+    description: "The Pokémon floats off the ground, making it immune to Ground-type moves, as well as the Spikes, Toxic Spikes, and Sticky Web statuses. When the Pokémon knocks out a target with an attack, its highest stat is boosted by 1 stage.",
+    type: 'answer',
+    value: 1,
+    rate: 100,
+    forms: [
+      "10290",
+    ],
+    naturalAssignments: [
+      {
+        forms: [
+          "10290",
+        ],
+        chance: 100,
+        slot: 1,
+      },
+    ],
+  },
+  {
+    id: "fire_mane",
+    name: "Fire Mane",
+    description: "Boosts the power of the Pokémon's Fire-type moves by 50%.",
+    type: 'answer',
+    value: 1,
+    rate: 100,
+    forms: [
+      "10295",
+    ],
+    naturalAssignments: [
+      {
+        forms: [
+          "10295",
+        ],
+        chance: 100,
+        slot: 1,
+      },
+    ],
+  },
+  {
+    id: "aura_guard",
+    name: "Aura Guard",
+    description: "A Pokémon with Aura Guard takes half damage from moves that make contact.",
+    type: 'answer',
+    value: 1,
+    rate: 100,
+    forms: [
+      "10310",
+    ],
+    naturalAssignments: [
+      {
+        forms: [
+          "10310",
         ],
         chance: 100,
         slot: 1,

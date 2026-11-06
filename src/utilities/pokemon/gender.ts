@@ -1,6 +1,7 @@
 import { getPokemonSpecies } from './pokedex'
+import type { PokemonGender } from '@/data/pokemon/types'
 
-export type PokemonGender = 'male' | 'female' | 'genderless'
+export type { PokemonGender } from '@/data/pokemon/types'
 
 const VALID_GENDERS = new Set<PokemonGender>(['male', 'female', 'genderless'])
 

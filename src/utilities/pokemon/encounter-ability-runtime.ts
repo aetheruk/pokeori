@@ -10,6 +10,7 @@ import type { FieldObservationSettings } from '@/data/games/field-observation'
 import type { EncounterState } from '@/app/(frontend)/game/locations/encounter/actions/types'
 import { resolveDropMaterialTier } from '@/utilities/artisan/material-drops'
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
+import type { PokemonGender } from '@/data/pokemon/types'
 
 export interface AbilityQuizOption {
   value: string
@@ -268,14 +269,18 @@ export function matchesAbilityEffectCondition(
   return true
 }
 
-export function resolveStartAbilityId(activeAbilityId: string | undefined, targetFormId: string) {
+export function resolveStartAbilityId(
+  activeAbilityId: string | undefined,
+  targetFormId: string,
+  targetGender?: PokemonGender | null,
+) {
   const ability = activeAbilityId ? ABILITIES[activeAbilityId] : undefined
   const effect = getAbilityEffects(ability).find(
     (candidate) =>
       candidate.type === 'temporary-copy-target-primary-ability' && rollPercent(candidate.chance),
   )
   if (!effect) return activeAbilityId
-  const copiedId = getPrimaryFormAbilityId(targetFormId)
+  const copiedId = getPrimaryFormAbilityId(targetFormId, targetGender)
   return copiedId && copiedId !== activeAbilityId ? copiedId : activeAbilityId
 }
 

@@ -2551,6 +2551,33 @@ const gen6Data: PokemonData = [
           "specialDefense": 0,
           "speed": 0
         }
+      },
+      {
+        "id": "10326",
+        "height": 8,
+        "weight": 101,
+        "base_experience": 0,
+        "name": "Mega Meowstic",
+        "form": "Mega",
+        "types": [
+          "Psychic"
+        ],
+        "stats": {
+          "hp": 74,
+          "attack": 48,
+          "defense": 76,
+          "special-attack": 143,
+          "special-defense": 101,
+          "speed": 124
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
+        }
       }
     ]
   },

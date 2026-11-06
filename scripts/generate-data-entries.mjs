@@ -22,7 +22,8 @@ const categoryRegex = /'\s*([^']+)\s*'\s*:\s*{/g
 let match
 const categories = []
 while ((match = categoryRegex.exec(subRegionMapContent)) !== null) {
-  categories.push(match[1])
+  const category = match[1].trim()
+  if (category && toKebabCase(category)) categories.push(category)
 }
 
 console.log(`Found ${categories.length} categories.`)

@@ -597,6 +597,7 @@ export default function Pokedex() {
                     species={selectedSpecies}
                     progress={selectedFormProgress}
                     inventoryMap={inventoryMap}
+                    gender={selectedGender}
                   />
                 </div>
               </div>
@@ -651,15 +652,18 @@ function PokemonCard({
   species,
   progress,
   inventoryMap,
+  gender,
 }: {
   pokemon: PokemonForm
   species: PokemonSpecies
   progress?: PokedexEntry
   inventoryMap: Record<string, number>
+  gender: 'male' | 'female'
 }) {
   const discoveryAccess = getPokedexDiscoveryAccess(progress)
   const hasSeen = discoveryAccess.identity
   const hasCaught = discoveryAccess.stats
+  const displayStats = pokemon.genderVariants?.[gender]?.stats || pokemon.stats
 
   return (
     <div className="relative h-full overflow-hidden bg-game-canvas text-game-ink">
@@ -785,27 +789,27 @@ function PokemonCard({
               {[
                 {
                   label: 'HP',
-                  value: pokemon.stats.hp,
+                  value: displayStats.hp,
                 },
                 {
                   label: 'ATK',
-                  value: pokemon.stats.attack,
+                  value: displayStats.attack,
                 },
                 {
                   label: 'DEF',
-                  value: pokemon.stats.defense,
+                  value: displayStats.defense,
                 },
                 {
                   label: 'SPA',
-                  value: pokemon.stats['special-attack'],
+                  value: displayStats['special-attack'],
                 },
                 {
                   label: 'SPD',
-                  value: pokemon.stats['special-defense'],
+                  value: displayStats['special-defense'],
                 },
                 {
                   label: 'SPE',
-                  value: pokemon.stats.speed,
+                  value: displayStats.speed,
                 },
               ].map((stat) => (
                 <div key={stat.label} className="group flex items-center gap-4 py-2.5">

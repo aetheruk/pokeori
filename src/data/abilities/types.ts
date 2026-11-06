@@ -4,6 +4,7 @@ import type {
   SecondaryStatusTrigger,
   StatusEffectId,
 } from '../moves/types'
+import type { PokemonSex } from '../pokemon/types'
 
 export type AbilityType =
   | 'timer'
@@ -37,6 +38,7 @@ export interface AbilityNaturalAssignment {
   chance: number
   hidden?: boolean
   slot?: number
+  gender?: PokemonSex
 }
 
 export type AbilityEffectTrigger = 'correct' | 'wrong' | 'complete'
@@ -768,4 +770,5 @@ export interface AbilityAssignment {
   rate: number
   hidden?: boolean
   slot?: number
+  gender?: PokemonSex
 }

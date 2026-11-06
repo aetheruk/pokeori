@@ -256,6 +256,13 @@ export const evolutionItems: Item[] = [
     spriteId: 'cracked-pot',
   },
   {
+    id: 'chipped-pot',
+    name: 'Chipped Pot',
+    description: 'An old teapot with a small chip along its rim.',
+    category: 'evolution',
+    spriteId: 'chipped-pot',
+  },
+  {
     id: 'unremarkable-teacup',
     name: 'Unremarkable Teacup',
     description: 'A plain teacup with simple craftsmanship and a quiet charm.',

@@ -11,7 +11,10 @@ import {
   getHeldItemDefinition,
 } from '@/utilities/pokemon/held-items'
 import { getEffectivePokemonIvs } from '@/utilities/skills/unlocks'
-import { getPrimaryFormAbilityId } from '@/data/abilities'
+import {
+  getPrimaryFormAbilityId,
+  resolveGenderCompatibleFormAbility,
+} from '@/data/abilities'
 import {
   getBattleAbilityEntryFormChange,
   getBattleAbilityStatMultiplier,
@@ -220,11 +223,19 @@ export function calculateStats(
   specialDefense: number
   speed: number
 } {
+  const formData = getPokemonForm(pokemon.formId, pokemon.gender)
+  const hasGenderSpecificStats =
+    pokemon.gender === 'female'
+      ? !!formData?.genderVariants?.female
+      : pokemon.gender === 'male'
+        ? !!formData?.genderVariants?.male
+        : false
   // If stats are already calculated and stored, use them
   // BUT ONLY IF NO LEVEL CAP IS SET. If level cap is set, we must recalculate.
   if (
     !levelCap &&
     !trainerLevel &&
+    !hasGenderSpecificStats &&
     !(pokemon as any).isShadow &&
     pokemon.stats?.hp &&
     pokemon.stats?.attack &&
@@ -244,7 +255,6 @@ export function calculateStats(
   }
 
   // Otherwise calculate from base stats
-  const formData = getPokemonForm(pokemon.formId)
   if (!formData) {
     // Fallback if data missing
     return {
@@ -396,8 +406,18 @@ export function initializeBattlePokemon(
   pokemonResearchLevel?: number,
   battleStatMultiplier?: number,
 ): BattlePokemon {
-  if (!pokemon.ability) {
-    const primaryAbilityId = getPrimaryFormAbilityId(pokemon.formId)
+  const compatibleAbilityId = resolveGenderCompatibleFormAbility(
+    pokemon.formId,
+    pokemon.ability,
+    pokemon.gender,
+  )
+  if (compatibleAbilityId) {
+    pokemon = { ...pokemon, ability: compatibleAbilityId }
+  } else if (!pokemon.ability) {
+    const primaryAbilityId = getPrimaryFormAbilityId(
+      pokemon.formId,
+      pokemon.gender,
+    )
     if (primaryAbilityId) {
       pokemon = { ...pokemon, ability: primaryAbilityId }
     }
@@ -417,7 +437,7 @@ export function initializeBattlePokemon(
   if (maxHpOverride) {
     stats.hp = maxHpOverride
   }
-  const formData = getPokemonForm(pokemon.formId)
+  const formData = getPokemonForm(pokemon.formId, pokemon.gender)
   const battleIvs = trainerLevel
     ? getEffectivePokemonIvs(pokemon.ivs, trainerLevel)
     : pokemon.ivs

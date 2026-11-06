@@ -87,7 +87,6 @@ async function main() {
         relax_quotes: true,
         relax_column_count: true,
         relax_column_count_more: true,
-        escape: null,
         trim: true,
       })
     } catch (err) {

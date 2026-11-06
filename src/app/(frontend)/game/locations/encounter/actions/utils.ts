@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import type { User } from '@/payload-types'
+import type { PokemonGender } from '@/data/pokemon/types'
 import {
   ABILITY_FORM_MAP,
   ABILITY_TYPE_MAP,
@@ -16,6 +17,7 @@ export function rollAbility(
   researchLevel?: number,
   globalAbilityRolls = 1,
   hiddenAbilitiesUnlocked = false,
+  gender?: PokemonGender | null,
 ): string | undefined {
   const doRoll = (): string | undefined => {
     // 1. Form Map
@@ -26,6 +28,7 @@ export function rollAbility(
           hiddenAbilitiesUnlocked && researchLevel && researchLevel >= 4
             ? 10
             : undefined,
+        gender,
       })
       if (formResult) return formResult
     }

@@ -720,7 +720,12 @@ export async function startEncounter(
         formId = speciesData?.id || pokemonId.toString()
       }
     }
-    const effectiveAbilityId = resolveStartAbilityId(activeAbilityId, formId)
+    const gender = rollPokemonGender(pokemonId)
+    const effectiveAbilityId = resolveStartAbilityId(
+      activeAbilityId,
+      formId,
+      gender,
+    )
     const effectiveAbility = effectiveAbilityId
       ? ABILITIES[effectiveAbilityId]
       : undefined
@@ -810,7 +815,7 @@ export async function startEncounter(
       isShiny,
       rarity: encounterRarity,
       locationSnapshot: location,
-      gender: rollPokemonGender(pokemonId),
+      gender,
       startTime,
       expiry,
       baseCatchRate: modifiedBaseRate,
@@ -929,6 +934,7 @@ export async function startEncounter(
           formResearchLvl,
           getResearcherAbilityRolls(researcherLevel),
           getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+          state.gender,
         ),
         background: location.background,
       }

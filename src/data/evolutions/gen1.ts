@@ -1150,6 +1150,14 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
       }
     },
     {
+      "speciesId": 470,
+      "name": "leafeon",
+      "trigger": "level-up",
+      "conditions": {
+        "locationId": "750"
+      }
+    },
+    {
       "speciesId": 471,
       "name": "glaceon",
       "trigger": "level-up",
@@ -1187,6 +1195,14 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
       "trigger": "level-up",
       "conditions": {
         "locationId": "445"
+      }
+    },
+    {
+      "speciesId": 471,
+      "name": "glaceon",
+      "trigger": "level-up",
+      "conditions": {
+        "locationId": "775"
       }
     },
     {

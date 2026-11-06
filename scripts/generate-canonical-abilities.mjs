@@ -69,9 +69,28 @@ for (const rows of pokemonAbilitiesByPokemonId.values()) {
 }
 
 const defaultPokemonIdBySpecies = new Map()
+const sourcePokemonById = new Map(
+  sourcePokemon.map((pokemon) => [String(pokemon.id), pokemon]),
+)
 for (const pokemon of sourcePokemon) {
   if (pokemon.is_default === '1') {
     defaultPokemonIdBySpecies.set(String(pokemon.species_id), String(pokemon.id))
+  }
+}
+
+// PokeAPI represents a small number of female forms as separate Pokemon rows.
+// Keep them attached to the default species form, but preserve gender-specific
+// ability assignments for the runtime resolver.
+const femalePokemonByDefaultId = new Map()
+for (const pokemon of sourcePokemon) {
+  if (pokemon.is_default === '1' || !pokemon.identifier.endsWith('-female')) continue
+  const defaultPokemonId = defaultPokemonIdBySpecies.get(String(pokemon.species_id))
+  const defaultPokemon = defaultPokemonId
+    ? sourcePokemonById.get(defaultPokemonId)
+    : undefined
+  const defaultIdentifier = defaultPokemon?.identifier?.replace(/-male$/, '')
+  if (defaultIdentifier && pokemon.identifier === `${defaultIdentifier}-female`) {
+    femalePokemonByDefaultId.set(defaultPokemonId, pokemon)
   }
 }
 
@@ -79,18 +98,19 @@ const abilityByNumericId = new Map(abilities.map((ability) => [ability.id, abili
 const entriesByAbilityId = new Map()
 const formIdsByAbilityId = new Map()
 
-function addNaturalAssignment(row, formId, chance) {
+function addNaturalAssignment(row, formId, chance, gender) {
   const ability = abilityByNumericId.get(row.ability_id)
   if (!ability) return
   const id = abilityId(ability.identifier)
   const hidden = row.is_hidden === '1'
   const slot = Number(row.slot)
-  const key = `${id}|${chance}|${hidden ? 'hidden' : 'normal'}|${slot}`
+  const key = `${id}|${chance}|${hidden ? 'hidden' : 'normal'}|${slot}|${gender || 'any'}`
   const entry = entriesByAbilityId.get(key) || {
     abilityId: id,
     chance,
     hidden,
     slot,
+    gender,
     forms: [],
   }
   entry.forms.push(formId)
@@ -99,6 +119,28 @@ function addNaturalAssignment(row, formId, chance) {
   const formIds = formIdsByAbilityId.get(id) || new Set()
   formIds.add(formId)
   formIdsByAbilityId.set(id, formIds)
+}
+
+function buildNaturalAssignments(rows) {
+  const hiddenRows = rows.filter((row) => row.is_hidden === '1')
+  const normalRows = rows.filter((row) => row.is_hidden !== '1')
+  return [
+    ...hiddenRows.map((row) => ({ row, chance: 5 })),
+    ...normalRows.map((row, index) => {
+      const remainingSlots = normalRows.length - index
+      const chance = remainingSlots <= 1 ? 100 : Number((100 / remainingSlots).toFixed(4))
+      return { row, chance }
+    }),
+  ]
+}
+
+function getNaturalAssignmentKey(assignment) {
+  return [
+    assignment.row.ability_id,
+    assignment.chance,
+    assignment.row.is_hidden === '1' ? 'hidden' : 'normal',
+    assignment.row.slot,
+  ].join('|')
 }
 
 for (const species of allPokemon) {
@@ -111,16 +153,40 @@ for (const species of allPokemon) {
       []
     if (rows.length === 0) continue
 
-    const hiddenRows = rows.filter((row) => row.is_hidden === '1')
-    const normalRows = rows.filter((row) => row.is_hidden !== '1')
-    for (const row of hiddenRows) {
-      addNaturalAssignment(row, formId, 5)
+    const femaleVariant = femalePokemonByDefaultId.get(formId)
+    const femaleRows = femaleVariant
+      ? pokemonAbilitiesByPokemonId.get(String(femaleVariant.id)) || []
+      : []
+    const maleAssignments = buildNaturalAssignments(rows)
+    const femaleAssignments = buildNaturalAssignments(femaleRows)
+
+    if (
+      femaleAssignments.length > 0 &&
+      maleAssignments.map(getNaturalAssignmentKey).sort().join(',') !==
+        femaleAssignments.map(getNaturalAssignmentKey).sort().join(',')
+    ) {
+      const unmatchedFemaleAssignments = [...femaleAssignments]
+      for (const assignment of maleAssignments) {
+        const matchingFemaleIndex = unmatchedFemaleAssignments.findIndex(
+          (femaleAssignment) =>
+            getNaturalAssignmentKey(femaleAssignment) ===
+            getNaturalAssignmentKey(assignment),
+        )
+        if (matchingFemaleIndex >= 0) {
+          unmatchedFemaleAssignments.splice(matchingFemaleIndex, 1)
+          addNaturalAssignment(assignment.row, formId, assignment.chance)
+        } else {
+          addNaturalAssignment(assignment.row, formId, assignment.chance, 'male')
+        }
+      }
+      for (const assignment of unmatchedFemaleAssignments) {
+        addNaturalAssignment(assignment.row, formId, assignment.chance, 'female')
+      }
+    } else {
+      for (const assignment of maleAssignments) {
+        addNaturalAssignment(assignment.row, formId, assignment.chance)
+      }
     }
-    normalRows.forEach((row, index) => {
-      const remainingSlots = normalRows.length - index
-      const chance = remainingSlots <= 1 ? 100 : Number((100 / remainingSlots).toFixed(4))
-      addNaturalAssignment(row, formId, chance)
-    })
   }
 }
 
@@ -180,6 +246,7 @@ for (const ability of abilities) {
     lines.push(`        chance: ${assignment.chance},`)
     if (assignment.hidden) lines.push('        hidden: true,')
     lines.push(`        slot: ${assignment.slot},`)
+    if (assignment.gender) lines.push(`        gender: ${quote(assignment.gender)},`)
     lines.push('      },')
   }
   lines.push('    ],')
