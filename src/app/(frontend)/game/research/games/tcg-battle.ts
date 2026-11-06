@@ -1155,13 +1155,14 @@ function applyTcgBattleSpecialEffects(params: {
       getTemporaryEffects(attacker).reflectDamage = {
         remainingTurns: 1,
         damageMultiplier: rule.damageMultiplier,
+        reflectFixedDamage: rule.reflectFixedDamage,
         coinGate: rule.coinGate,
       }
       recordEffectEvent(state, {
         kind: 'control',
         sourceId: attacker.instanceId,
         targetId: attacker.instanceId,
-        label: rule.damageMultiplier === 2 ? 'Crosscounter' : 'Mirror Shell',
+        label: rule.reflectFixedDamage ? 'Spike Armor' : rule.damageMultiplier === 2 ? 'Crosscounter' : 'Mirror Shell',
       })
       continue
     }
@@ -1516,7 +1517,8 @@ function applyAttack(
     if (reflectDamage) {
       const reflected = Math.min(
         attacker.currentHp,
-        resolution.targetDamage * (targetReflectDamage.damageMultiplier || 1),
+        targetReflectDamage.reflectFixedDamage ??
+          resolution.targetDamage * (targetReflectDamage.damageMultiplier || 1),
       )
       attacker.currentHp -= reflected
       recordDamageEvent(state, {
