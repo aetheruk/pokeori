@@ -1096,6 +1096,7 @@ function inferExTcgBattleAttackEffect(
   if (setId === 'ex13') return inferEx13TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex14') return inferEx14TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId === 'ex15') return inferEx15TcgBattleAttackEffect(attack, text, baseDamage)
+  if (setId === 'ex16') return inferEx16TcgBattleAttackEffect(attack, text, baseDamage)
   if (setId !== 'ex1') return null
 
   const name = attack.name.toLowerCase()
@@ -4132,6 +4133,139 @@ function inferEx15TcgBattleAttackEffect(
     return {
       ...zero(),
       benchDamage: [{ amount: 20, side: 'opponent', zone: 'play', selectedEnergyType: true }],
+    }
+  }
+
+  return null
+}
+
+function inferEx16TcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const textBonus = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+
+  if (name === 'rock blast') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'chosenEnergy' } },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+      choiceEnergyMax: 5,
+      targetScope: 'any',
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (name === 'grudge') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonInDiscard', side: 'own', max: 6 },
+      },
+    }
+  }
+  if (name === 'max energy source' || name === 'magnetic force') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'energy burst') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'both' } } }
+  }
+  if (name === 'cross chop') {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: text.includes('up to 2 basic pokemon') ? 2 : 1, basicOnly: true }],
+    }
+  }
+  if (name === 'dark burst' || name === 'wreck') {
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'quick attack' || name === 'sharp claws' || name === 'stomp' || name === 'steady punch' || name === 'ambush' || name === 'positive ion') {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: textBonus }, coinFlipCount: 1 }
+  }
+  if (name === 'feint attack') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage || Number.parseInt(text.match(/does (\d+) damage/)?.[1] || '0', 10) },
+      targetScope: 'any',
+      ignoreWeaknessResistance: true,
+      ignoreTargetDamageModifiers: true,
+    }
+  }
+  if (name === 'fury cutter') {
+    return {
+      damage: { kind: 'headsTable', damages: [baseDamage, baseDamage + 10, baseDamage + 30, baseDamage + 50], coinFlipCount: 3 },
+      coinFlipCount: 3,
+    }
+  }
+  if (name === 'scary face') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [
+        { kind: 'cannotAttack', target: 'opponent', condition: 'heads' },
+        { kind: 'preventRetreat', condition: 'heads' },
+      ],
+    }
+  }
+  if (name === 'extra comet punch') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      special: [{ kind: 'buffAttack', target: 'self', attackName: 'Extra Comet Punch', baseDamage, damageBonus: textBonus }],
+    }
+  }
+  if (name === 'dig deep' || name === 'charge') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'retaliate') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'influence') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, includeNames: ['Omanyte', 'Kabuto', 'Aerodactyl', 'Lileep', 'Anorith'], treatAsBasic: true }],
+    }
+  }
+  if (name === 'nap') return { ...zero(), healing: [{ target: 'self', amount: 20 }] }
+  if (name === 'double spin') {
+    return { damage: { kind: 'headsMultiplier', damagePerHeads: 20, coinFlipCount: 2 }, coinFlipCount: 2 }
+  }
+  if (name === 'tail whip') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [{ kind: 'cannotAttack', target: 'opponent', condition: 'heads' }],
+    }
+  }
+  if (name === 'pebble throw') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage || Number.parseInt(text.match(/does (\d+) damage/)?.[1] || '0', 10) },
+      targetScope: 'bench',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'psychic boom') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'skill hack') {
+    return {
+      ...zero(),
+      choiceRequirement: 'copyAttack',
+      special: [{ kind: 'copyAttack', preserveExtraCosts: true }],
     }
   }
 
