@@ -1262,7 +1262,11 @@ function applyAttack(
   })
   if (choiceError) throw new Error(choiceError)
 
-  const statusCheck = resolveTcgBattleStatusAttackCheck(attacker)
+  const statusCheck = resolveTcgBattleStatusAttackCheck(
+    attacker,
+    Math.random,
+    getTcgBattleAttackEffect(attack)?.allowWhileAsleep,
+  )
   if (statusCheck.coinFlips) {
     recordCoinFlipEvent(state, {
       sourceId: attacker.instanceId,
