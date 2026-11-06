@@ -540,6 +540,17 @@ function finishByStallIfNeeded(state: TcgBattleState) {
 }
 
 function advanceTurn(state: TcgBattleState, nextSide: TcgBattleSide) {
+  for (const sideKey of ['player', 'opponent'] as const) {
+    for (const card of [...state[sideKey].front, ...state[sideKey].back]) {
+      const effect = card.temporaryEffects?.attackDamageTakenBuff
+      if (!effect || effect.sourceSide !== state.activeSide) continue
+      effect.remainingTurns -= 1
+      if (effect.remainingTurns <= 0) delete card.temporaryEffects?.attackDamageTakenBuff
+    }
+  }
+  for (const card of [...state[state.activeSide].front, ...state[state.activeSide].back]) {
+    delete card.temporaryEffects?.lastIncomingAttackDamage
+  }
   state.turnNumber = getNextTcgBattleTurnNumber(
     state.turnNumber,
     state.activeSide,
@@ -569,6 +580,47 @@ function recordDamageEvent(
   }
   state.lastDamageEvent = damageEvent
   state.lastDamageEvents = [...(state.lastDamageEvents || []), damageEvent]
+}
+
+function applyAttackDamageToCard(
+  state: TcgBattleState,
+  attackerSide: TcgBattleSide,
+  sourceId: string,
+  targetSide: TcgBattleSide,
+  target: TcgBattleCardState,
+  damage: number,
+) {
+  if (damage <= 0) return
+
+  let enduredKnockout = false
+  if (
+    targetSide !== attackerSide &&
+    target.temporaryEffects?.endure &&
+    target.currentHp - damage <= 0
+  ) {
+    const result = Math.random() >= 0.5 ? 'heads' : 'tails'
+    recordCoinFlipEvent(state, {
+      sourceId: target.instanceId,
+      side: targetSide,
+      results: [result],
+      heads: result === 'heads' ? 1 : 0,
+      tails: result === 'tails' ? 1 : 0,
+    })
+    if (result === 'heads') {
+      target.currentHp = 10
+      enduredKnockout = true
+      state.log.unshift(`${target.name} endured the knockout and held on with 10 HP.`)
+    }
+    delete target.temporaryEffects.endure
+  }
+  if (!enduredKnockout) target.currentHp = Math.max(0, target.currentHp - damage)
+  recordDamageEvent(state, {
+    sourceId,
+    targetId: target.instanceId,
+    targetSide,
+    damage,
+    reason: 'attack',
+  })
 }
 
 function recordCoinFlipEvent(
@@ -622,12 +674,32 @@ function getTemporaryEffects(card: TcgBattleCardState) {
   return card.temporaryEffects
 }
 
+function clearSourceLinkedControlsForInactiveSources(state: TcgBattleState) {
+  for (const sideKey of ['player', 'opponent'] as const) {
+    const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+    for (const affectedCard of [...state[opponentKey].front, ...state[opponentKey].back]) {
+      const effects = affectedCard.temporaryEffects
+      const retreatSourceId = effects?.cannotRetreat?.sourceId
+      if (
+        retreatSourceId &&
+        !state[sideKey].front.some((card) => card.instanceId === retreatSourceId && card.currentHp > 0)
+      ) delete effects?.cannotRetreat
+      const switchSourceId = effects?.cannotSwitch?.sourceId
+      if (
+        switchSourceId &&
+        !state[sideKey].front.some((card) => card.instanceId === switchSourceId && card.currentHp > 0)
+      ) delete effects?.cannotSwitch
+    }
+  }
+}
+
 function swapTcgBattleCards(
   state: TcgBattleState,
   sideKey: TcgBattleSide,
   frontCard: TcgBattleCardState,
   benchCardId: string,
 ) {
+  if (frontCard.temporaryEffects?.cannotSwitch) return false
   const side = state[sideKey]
   const frontIndex = side.front.findIndex(
     (card) => card.instanceId === frontCard.instanceId,
@@ -644,6 +716,8 @@ function swapTcgBattleCards(
     if (card.temporaryEffects?.cannotTarget?.targetId === frontCard.instanceId) {
       delete card.temporaryEffects.cannotTarget
     }
+    if (card.temporaryEffects?.cannotRetreat?.sourceId === frontCard.instanceId) delete card.temporaryEffects.cannotRetreat
+    if (card.temporaryEffects?.cannotSwitch?.sourceId === frontCard.instanceId) delete card.temporaryEffects.cannotSwitch
   }
   side.front[frontIndex] = replacement
   side.back[benchIndex] = frontCard
@@ -693,9 +767,12 @@ function applyTcgBattleSpecialEffects(params: {
         'placeMarker',
         'preventRetreat',
         'attackFailsOnTails',
+        'preventSwitch',
+        'buffDefendingPokemon',
       ].includes(rule.kind) ||
       (rule.kind === 'switch' && rule.target === 'opponent') ||
-      (rule.kind === 'cannotAttack' && rule.target !== 'self')
+      (rule.kind === 'cannotAttack' && rule.target !== 'self') ||
+      (rule.kind === 'buffAttack' && rule.target === 'opponent')
     if (blockTargetEffects && targetsOpponent) continue
 
     if (rule.kind === 'switch' && rule.beforeDamage) continue
@@ -742,9 +819,11 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
     if (rule.kind === 'buffAttack') {
-      getTemporaryEffects(attacker).nextAttackBuff = {
-        attackName: rule.attackName,
+      const affected = rule.target === 'opponent' ? target : attacker
+      getTemporaryEffects(affected).nextAttackBuff = {
+        attackName: rule.attackName || '*',
         baseDamage: rule.baseDamage,
+        damageBonus: rule.damageBonus,
         damageMultiplier: rule.damageMultiplier,
         selfDamageMultiplier: rule.selfDamageMultiplier,
         remainingTurns: 2,
@@ -752,8 +831,22 @@ function applyTcgBattleSpecialEffects(params: {
       recordEffectEvent(state, {
         kind: 'control',
         sourceId: attacker.instanceId,
-        targetId: attacker.instanceId,
-        label: `${rule.attackName} empowered`,
+        targetId: affected.instanceId,
+        label: `${rule.attackName || 'Next attack'} empowered`,
+      })
+      continue
+    }
+    if (rule.kind === 'buffDefendingPokemon') {
+      getTemporaryEffects(target).attackDamageTakenBuff = {
+        sourceSide: sideKey,
+        damageBonus: rule.damageBonus,
+        remainingTurns: 2,
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${target.name} will take ${rule.damageBonus} extra damage from the next attack`,
       })
       continue
     }
@@ -783,12 +876,39 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
     if (rule.kind === 'preventRetreat') {
-      getTemporaryEffects(target).cannotRetreat = { remainingTurns: 2 }
+      getTemporaryEffects(target).cannotRetreat = rule.untilSourceLeaves
+        ? { remainingTurns: 99, sourceId: attacker.instanceId, untilSourceLeaves: true }
+        : rule.untilTargetLeaves
+          ? { remainingTurns: 99, untilTargetLeaves: true }
+          : { remainingTurns: 2, sourceId: rule.sourceLeavesClears ? attacker.instanceId : undefined }
       recordEffectEvent(state, {
         kind: 'control',
         sourceId: attacker.instanceId,
         targetId: target.instanceId,
         label: `${target.name} cannot retreat next turn`,
+      })
+      continue
+    }
+    if (rule.kind === 'preventSwitch') {
+      getTemporaryEffects(target).cannotSwitch = {
+        remainingTurns: 2,
+        sourceId: rule.sourceLeavesClears ? attacker.instanceId : undefined,
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${target.name} cannot be switched next turn`,
+      })
+      continue
+    }
+    if (rule.kind === 'endure') {
+      getTemporaryEffects(attacker).endure = { remainingTurns: 1 }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `${attacker.name} will endure a knockout`,
       })
       continue
     }
@@ -1010,6 +1130,7 @@ function applyEndOfRoundStatusDamage(state: TcgBattleState) {
       state.log.unshift(`${card.name} took ${damage} poison/burn damage.`)
     }
   }
+  clearSourceLinkedControlsForInactiveSources(state)
 }
 
 function finishOpponentTurn(state: TcgBattleState) {
@@ -1155,6 +1276,10 @@ function applyAttack(
     : resolution.energyDiscards
   applyTcgBattleEnergyDiscards(state, sideKey, applicableEnergyDiscards)
   for (const gain of resolution.energyGains || []) {
+    if (
+      gain.requiresSourceSurvival &&
+      (resolution.selfKnockOut || attacker.currentHp - resolution.selfDamage <= 0)
+    ) continue
     const targetSide =
       gain.target === 'self'
         ? sideKey
@@ -1185,7 +1310,8 @@ function applyAttack(
       tails: resolution.coinFlips.tails,
     })
   }
-  target.currentHp = Math.max(0, target.currentHp - resolution.targetDamage)
+  const opponentSideKey = sideKey === 'player' ? 'opponent' : 'player'
+  applyAttackDamageToCard(state, sideKey, attacker.instanceId, opponentSideKey, target, resolution.targetDamage)
   if (
     resolution.targetDamage > 0 &&
     target.incomingAttackModifier?.kind === 'coinPreventDamage' &&
@@ -1209,14 +1335,7 @@ function applyAttack(
         (card) => card.instanceId === benchHit.targetId && card.currentHp > 0,
       )
       if (!benchCard) continue
-      benchCard.currentHp = Math.max(0, benchCard.currentHp - benchHit.damage)
-      recordDamageEvent(state, {
-        sourceId: attacker.instanceId,
-        targetId: benchCard.instanceId,
-        targetSide: benchHit.targetSide,
-        damage: benchHit.damage,
-        reason: 'attack',
-      })
+      applyAttackDamageToCard(state, sideKey, attacker.instanceId, benchHit.targetSide, benchCard, benchHit.damage)
     }
   }
   if (resolution.counterDamage && resolution.counterDamage.length > 0) {
@@ -1227,14 +1346,7 @@ function applyAttack(
         (card) => card.instanceId === counterHit.targetId && card.currentHp > 0,
       )
       if (!hitCard) continue
-      hitCard.currentHp = Math.max(0, hitCard.currentHp - counterHit.damage)
-      recordDamageEvent(state, {
-        sourceId: attacker.instanceId,
-        targetId: hitCard.instanceId,
-        targetSide: counterHit.targetSide,
-        damage: counterHit.damage,
-        reason: 'attack',
-      })
+      applyAttackDamageToCard(state, sideKey, attacker.instanceId, counterHit.targetSide, hitCard, counterHit.damage)
     }
   }
   if (resolution.healing && resolution.healing.length > 0) {
@@ -1346,10 +1458,11 @@ function applyAttack(
     resolution,
     blockTargetEffects,
   })
+  clearSourceLinkedControlsForInactiveSources(state)
 
   if (
-    attacker.temporaryEffects?.nextAttackBuff?.attackName.toLowerCase() ===
-    attack.name.toLowerCase()
+    attacker.temporaryEffects?.nextAttackBuff?.attackName === '*' ||
+    attacker.temporaryEffects?.nextAttackBuff?.attackName.toLowerCase() === attack.name.toLowerCase()
   ) {
     delete attacker.temporaryEffects.nextAttackBuff
   }
