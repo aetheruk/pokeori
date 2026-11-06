@@ -2583,6 +2583,7 @@ function AttackChoiceDrawer({
   const requirement = effect?.choiceRequirement
   const attackCost = attack ? getAttackCost(attack, state) : 0
   const availableEnergy = Math.max(0, state.player.energy - attackCost)
+  const availableChoiceEnergy = Math.min(availableEnergy, effect?.choiceEnergyMax ?? Number.POSITIVE_INFINITY)
   const copiedAttack =
     requirement === 'copyAttack' && target && selectedAttackIndex !== null
       ? target.attacks[selectedAttackIndex]
@@ -2625,8 +2626,8 @@ function AttackChoiceDrawer({
   }, [benchChoices, selectedCardId])
 
   useEffect(() => {
-    if (activeRequirement === 'energyAmount') setEnergyAmount(availableEnergy)
-  }, [activeRequirement, availableEnergy])
+    if (activeRequirement === 'energyAmount') setEnergyAmount(availableChoiceEnergy)
+  }, [activeRequirement, availableChoiceEnergy])
 
   useEffect(() => {
     if (
@@ -2919,7 +2920,7 @@ function AttackChoiceDrawer({
                 Extra Energy
               </h3>
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-                {Array.from({ length: availableEnergy + 1 }, (_, amount) => (
+                {Array.from({ length: availableChoiceEnergy + 1 }, (_, amount) => (
                   <button
                     type="button"
                     key={amount}
