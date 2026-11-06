@@ -297,6 +297,10 @@ TCG Battle has a separate, simplified attack interpreter in `src/utilities/tcg/t
 
 Attacks whose effects exist only in the physical game's deck, hand, prize-card, discard-pile, Trainer-card, or evolution systems remain filtered. The audit test fixes that boundary at 31 unsupported attack occurrences across 19 attack names; `base3-3`, `base3-18`, `basep-31`, and `basep-35` are the only audited cards with no mechanics-compatible attack.
 
+The Gym Heroes (`gym1`) and Gym Challenge (`gym2`) audit covers 186 Pokemon cards and 316 attacks. The interpreter supports 292 attacks; 24 remain filtered because they rely on deck, hand, discard-pile, Trainer-card, or attached-Energy systems. Gym support adds series-scoped move mappings so similarly named attacks in other TCG sets do not inherit Gym-specific behavior. Supported Gym effects include conditional multi-coin damage and statuses, per-card and all-bench damage, temporary retreat/attack restrictions, counter swapping, card revival from either discard pile, and damage-before/after-switch choices.
+
+Some card text still needs mechanics the simplified format does not represent. Phoenix Flame, Call of the Night, Obscuring Gas, and Star Boomerang return cards to decks/hands; Electric Current moves attached Energy; Crystal Beam blocks attachments to one Pokemon; High Voltage prevents Trainer cards; Group Attack can search the deck for more Pokemon; and Detonate can discard a Stadium. Those riders are omitted. Growth and Energy-removal effects use the shared Energy pool and cannot preserve card color or attachment ownership; Bonfire cannot enforce its discard-or-nothing condition, and Super Removal approximates discarding one Energy per living opposing Pokemon. The game's attacker-selected switch choice also stands in for card text where the opposing player chooses a benched Pokemon.
+
 ## Reserved Future Content
 
 The following are defined in data or engine support but not yet naturally obtainable through authored progression:

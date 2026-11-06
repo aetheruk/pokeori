@@ -2563,6 +2563,9 @@ function AttackChoiceDrawer({
     : validTargets[0]?.instanceId || ''
   const [selectedTargetId, setSelectedTargetId] = useState(initialTarget)
   const [selectedCardId, setSelectedCardId] = useState('')
+  const [selectedDiscardPokemon, setSelectedDiscardPokemon] = useState<
+    { side: 'player' | 'opponent'; cardId: string } | null
+  >(null)
   const [selectedAttackIndex, setSelectedAttackIndex] = useState<number | null>(
     null,
   )
@@ -2596,11 +2599,18 @@ function AttackChoiceDrawer({
         : copiedEffect?.choiceRequirement
       : requirement
   const benchChoices =
-    activeRequirement === 'ownBench'
+    activeRequirement === 'ownBench' || activeRequirement === 'optionalOwnBench'
       ? state.player.back
-      : activeRequirement === 'opponentBench'
+      : activeRequirement === 'opponentBench' || activeRequirement === 'optionalOpponentBench'
         ? state.opponent.back
         : []
+  const discardChoices = (['player', 'opponent'] as const).flatMap((side) =>
+    state[side].back.length < 3 && state[side].front.length + state[side].back.length < 6
+      ? state[side].discard
+          .filter((card) => card.subtypes.includes('Basic'))
+          .map((card) => ({ side, card }))
+      : [],
+  )
 
   useEffect(() => {
     if (
@@ -2618,6 +2628,17 @@ function AttackChoiceDrawer({
     if (activeRequirement === 'energyAmount') setEnergyAmount(availableEnergy)
   }, [activeRequirement, availableEnergy])
 
+  useEffect(() => {
+    if (
+      !discardChoices.some(
+        ({ side, card }) => side === selectedDiscardPokemon?.side && card.instanceId === selectedDiscardPokemon.cardId,
+      )
+    ) {
+      const first = discardChoices[0]
+      setSelectedDiscardPokemon(first ? { side: first.side, cardId: first.card.instanceId } : null)
+    }
+  }, [discardChoices, selectedDiscardPokemon])
+
   if (!attack || !effect) return null
 
   const buildChoiceFor = (
@@ -2630,10 +2651,13 @@ function AttackChoiceDrawer({
       return { kind: 'disabledAttack', attackIndex: attackChoiceIndex }
     }
     if (
-      (required === 'opponentBench' || required === 'ownBench') &&
+      (required === 'opponentBench' || required === 'ownBench' || required === 'optionalOpponentBench' || required === 'optionalOwnBench') &&
       selectedCardId
     ) {
       return { kind: 'benchSwitch', cardId: selectedCardId }
+    }
+    if (required === 'discardPokemon' && selectedDiscardPokemon) {
+      return { kind: 'discardPokemon', ...selectedDiscardPokemon }
     }
     if (required === 'energyAmount') {
       return { kind: 'energyAmount', amount: energyAmount }
@@ -2667,6 +2691,10 @@ function AttackChoiceDrawer({
       : activeRequirement === 'opponentBench' ||
           activeRequirement === 'ownBench'
         ? Boolean(selectedCardId)
+        : activeRequirement === 'optionalOpponentBench' || activeRequirement === 'optionalOwnBench'
+          ? benchChoices.every((card) => card.currentHp <= 0) || Boolean(selectedCardId)
+        : activeRequirement === 'discardPokemon'
+          ? Boolean(selectedDiscardPokemon)
         : true)
   const choiceReady =
     !requirement ||
@@ -2753,10 +2781,12 @@ function AttackChoiceDrawer({
             </section>
           )}
           {(activeRequirement === 'opponentBench' ||
-            activeRequirement === 'ownBench') && (
+            activeRequirement === 'ownBench' ||
+            activeRequirement === 'optionalOpponentBench' ||
+            activeRequirement === 'optionalOwnBench') && benchChoices.some((card) => card.currentHp > 0) && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
-                {activeRequirement === 'ownBench'
+                {activeRequirement === 'ownBench' || activeRequirement === 'optionalOwnBench'
                   ? 'Switch with'
                   : 'Bring forward'}
               </h3>
@@ -2764,6 +2794,38 @@ function AttackChoiceDrawer({
                 benchChoices,
                 selectedCardId,
                 setSelectedCardId,
+              )}
+            </section>
+          )}
+          {activeRequirement === 'discardPokemon' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">
+                Basic Pokémon to revive
+              </h3>
+              {discardChoices.length === 0 ? (
+                <p className="text-sm text-game-muted">Neither side has a Basic Pokémon that can be revived.</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {discardChoices.map(({ side, card }) => {
+                    const selected = selectedDiscardPokemon?.side === side && selectedDiscardPokemon.cardId === card.instanceId
+                    const damageCounters = Math.floor(card.hp / 20)
+                    const remainingHp = Math.max(1, card.hp - damageCounters * 10)
+                    return (
+                      <button
+                        type="button"
+                        key={`${side}-${card.instanceId}`}
+                        onClick={() => setSelectedDiscardPokemon({ side, cardId: card.instanceId })}
+                        className={cn(
+                          'game-focus-ring min-h-11 rounded-md border bg-game-surface-raised px-3 py-2 text-left text-game-ink transition-colors',
+                          selected ? 'border-game-moss bg-game-moss/25' : 'border-game-border/60 hover:border-game-moss/60',
+                        )}
+                      >
+                        <span className="block truncate text-sm font-semibold">{card.name}</span>
+                        <span className="text-xs text-game-muted">{side === 'player' ? 'Your' : "Opponent’s"} discard · returns at {remainingHp}/{card.hp} HP</span>
+                      </button>
+                    )
+                  })}
+                </div>
               )}
             </section>
           )}
@@ -3886,7 +3948,9 @@ function BenchSheet({
   const description = isPromotion
     ? 'Fill the open front slot.'
     : isRetreat
-      ? `${attacker?.name || 'Selected card'} retreat cost ${attacker?.convertedRetreatCost ?? 0}.`
+      ? attacker?.temporaryEffects?.cannotRetreat
+        ? `${attacker.name} cannot retreat this turn.`
+        : `${attacker?.name || 'Selected card'} retreat cost ${attacker?.convertedRetreatCost ?? 0}.`
       : `${state.player.back.length} ready / ${state.player.discard.length} discarded.`
   const icon = isPromotion ? (
     <span className="text-xs font-bold uppercase tracking-wide">Promote</span>
@@ -3924,7 +3988,7 @@ function BenchSheet({
               <CardImageButton
                 key={card.instanceId}
                 card={card}
-                disabled={isPending || (isRetreat && !attacker)}
+                disabled={isPending || (isRetreat && (!attacker || Boolean(attacker.temporaryEffects?.cannotRetreat)))}
                 onClick={() => {
                   if (isPromotion) onPromote(card.instanceId)
                   else if (isRetreat) onRetreat(card.instanceId)
