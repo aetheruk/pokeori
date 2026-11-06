@@ -786,6 +786,7 @@ function applyTcgBattleSpecialEffects(params: {
       (rule.kind === 'cannotAttack' && rule.target !== 'self') ||
       (rule.kind === 'buffAttack' && rule.target === 'opponent') ||
       (rule.kind === 'clearStatus' && rule.target === 'opponent') ||
+      (rule.kind === 'setStatus' && rule.target === 'opponent') ||
       (rule.kind === 'preventStatus' && rule.target === 'opponent')
     if (blockTargetEffects && targetsOpponent) continue
 
@@ -938,6 +939,17 @@ function applyTcgBattleSpecialEffects(params: {
         (status) => !rule.statuses.includes(status),
       )
       if (affected.statusConditions.length === 0) affected.statusConditions = undefined
+      continue
+    }
+    if (rule.kind === 'setStatus') {
+      const affected = rule.target === 'self' ? attacker : target
+      affected.statusConditions = [...new Set([...(affected.statusConditions || []), ...rule.statuses])]
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: affected.instanceId,
+        label: `${affected.name} is now ${rule.statuses.join(', ')}`,
+      })
       continue
     }
     if (rule.kind === 'preventRetreat') {
