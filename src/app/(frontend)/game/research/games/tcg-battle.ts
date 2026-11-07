@@ -981,6 +981,8 @@ function applyTcgBattleSpecialEffects(params: {
       const destination = state[destinationSideKey]
       const discardCount = typeof rule.untilHandSize === 'number'
         ? Math.max(0, destination.hand.length - rule.untilHandSize)
+        : rule.amount !== undefined
+          ? rule.amount
         : rule.amountPerHead !== undefined
           ? rule.amountPerHead * (resolution.coinFlips?.heads || 0)
           : rule.amountPerTail
