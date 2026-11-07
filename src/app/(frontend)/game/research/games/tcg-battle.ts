@@ -1480,12 +1480,12 @@ function applyAttack(
   }
   if (resolution.benchDamage && resolution.benchDamage.length > 0) {
     for (const benchHit of resolution.benchDamage) {
-      const benchCard = state[benchHit.targetSide].back.find(
+      const hitCard = [...state[benchHit.targetSide].front, ...state[benchHit.targetSide].back].find(
         (card) => card.instanceId === benchHit.targetId && card.currentHp > 0,
       )
-      if (!benchCard) continue
-      applyAttackDamageToCard(state, sideKey, attacker.instanceId, benchHit.targetSide, benchCard, benchHit.damage)
-      if (benchHit.damage > 0) recordTcgBattleAttackHit(benchCard, sideKey)
+      if (!hitCard) continue
+      applyAttackDamageToCard(state, sideKey, attacker.instanceId, benchHit.targetSide, hitCard, benchHit.damage)
+      if (benchHit.damage > 0) recordTcgBattleAttackHit(hitCard, sideKey)
     }
   }
   if (resolution.counterDamage && resolution.counterDamage.length > 0) {

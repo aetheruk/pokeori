@@ -1087,6 +1087,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const nextDestiniesEffect = inferNextDestiniesTcgBattleAttackEffect(attack, baseDamage)
     if (nextDestiniesEffect) return applyAttackTextModifiers(nextDestiniesEffect)
   }
+  if (setId === 'bw5') {
+    const darkExplorersEffect = inferDarkExplorersTcgBattleAttackEffect(attack, baseDamage)
+    if (darkExplorersEffect) return applyAttackTextModifiers(darkExplorersEffect)
+  }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
     if (platinumEffect) return applyAttackTextModifiers(platinumEffect)
@@ -8216,6 +8220,137 @@ function inferNextDestiniesTcgBattleAttackEffect(
 
   // Prize-card counts, draw/search into hand, opponent hand inspection, and
   // Stadium state are not represented in this battle mode.
+  return null
+}
+
+function inferDarkExplorersTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const optionalEnergyBonus = (bonusDamage: number): TcgBattleAttackEffect => ({
+    damage: {
+      kind: 'countThresholdBonus',
+      baseDamage,
+      bonusDamage,
+      source: { kind: 'chosenEnergy' },
+      minimumUnits: 1,
+    },
+    choiceRequirement: 'energyAmount',
+    choiceEnergyMax: 1,
+    energyDiscard: [{ target: 'self', amount: 'choice' }],
+  })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'fire slash') return optionalEnergyBonus(30)
+  if (name === 'dual splash') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 50, side: 'opponent', zone: 'play', maxTargets: 2 }],
+    }
+  }
+  if (name === 'attack command') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonInPlay', side: 'both' },
+      },
+    }
+  }
+  if (name === 'healing dance') {
+    return { ...zero(), healing: [{ amount: 30, side: 'own', zone: 'play' }] }
+  }
+  if (name === 'incessant peck') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'electrigun') return optionalEnergyBonus(40)
+  if (name === 'volt bolt') {
+    return {
+      ...anyTargetDamage(100),
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+    }
+  }
+  if (name === 'negative ion') {
+    return {
+      ...zero(),
+      special: [{ kind: 'buffAttack', target: 'opponent', attackName: '*', damageBonus: -30 }],
+    }
+  }
+  if (name === 'electrishower') {
+    return { ...zero(), benchDamage: [{ amount: 10, side: 'opponent', zone: 'play' }] }
+  }
+  if (name === 'quick turn') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 20, coinFlipCount: 2 },
+      coinFlipCount: 2,
+    }
+  }
+  if (name === 'electrisilk') {
+    return { damage: { kind: 'retreatCostZeroBonus', baseDamage, bonusDamage: 40 } }
+  }
+  if (name === 'slurp shakedown') {
+    return {
+      damage: { kind: 'fixed', amount: 60 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', beforeDamage: true }],
+    }
+  }
+  if (name === 'hand press') {
+    return { damage: { kind: 'handSizeComparisonBonus', baseDamage, bonusDamage: 30, comparison: 'more' } }
+  }
+  if (name === 'giant claw') {
+    return { damage: { kind: 'damageCounterThresholdBonus', baseDamage, bonusDamage: 40, minimumCounters: 2 } }
+  }
+  if (name === 'reinforced drill' || name === 'special fang' || name === 'blow through') {
+    // Tool, Special Energy, and Stadium attachments are not represented in this battle mode.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'brutal bash') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: ['Darkness'] },
+      },
+    }
+  }
+  if (name === 'fury cutter') {
+    return {
+      damage: { kind: 'headsTable', damages: [30, 40, 60, 90], coinFlipCount: 3 },
+      coinFlipCount: 3,
+    }
+  }
+  if (name === 'metal blast') {
+    // Metal Energy attached to this Pokémon is approximated by shared Energy.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'continuous tumble') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 30, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'roar') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+
+  // Returning active cards, draw/search to hand, Tool recovery, Prize counts,
+  // and in-battle evolution are not represented in this battle mode.
   return null
 }
 
