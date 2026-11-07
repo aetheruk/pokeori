@@ -1126,7 +1126,8 @@ function applyTcgBattleSpecialEffects(params: {
     if (
       rule.kind === 'knockOutTarget' &&
       target.currentHp > 0 &&
-      (!rule.requiresAnyTargetStatus || Boolean(target.statusConditions?.length))
+      (!rule.requiresAnyTargetStatus || Boolean(target.statusConditions?.length)) &&
+      (!rule.requiresTargetStatus || Boolean(target.statusConditions?.includes(rule.requiresTargetStatus)))
     ) {
       target.currentHp = 0
       recordEffectEvent(state, {

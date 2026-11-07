@@ -2974,9 +2974,10 @@ function AttackChoiceDrawer({
   const renderTypeChoices = (
     value: TcgBattleEnergyType,
     onChange: (value: TcgBattleEnergyType) => void,
+    allowedTypes: TcgBattleEnergyType[] = TCG_CHOICE_TYPES,
   ) => (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-      {TCG_CHOICE_TYPES.map((type) => (
+      {allowedTypes.map((type) => (
         <button
           type="button"
           key={type}
@@ -3526,7 +3527,7 @@ function AttackChoiceDrawer({
             </section>
           )}
           {activeRequirement === 'typeChange' &&
-            renderTypeChoices(selectedType, setSelectedType)}
+            renderTypeChoices(selectedType, setSelectedType, activeEffect?.choiceAllowedTypes)}
           {activeRequirement === 'textureMagic' && (
             <>
               <section className="space-y-2">
