@@ -15,6 +15,11 @@ const chanseyAvailabilityRequirement = {
   targetId: 'safari-catch-partner-chansey',
 }
 
+const wardenPermitRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-wardens-permit',
+}
+
 function safariArea({
   id,
   name,
@@ -75,6 +80,12 @@ const expeditionSafariLocations: Location[] = [
         formId: '113',
         chance: 1,
         requirements: [chanseyAvailabilityRequirement],
+      },
+      {
+        speciesId: 143,
+        formId: '143',
+        chance: 1,
+        requirements: [wardenPermitRequirement],
       },
     ],
   }),
@@ -199,11 +210,6 @@ const expeditionSafariLocations: Location[] = [
     ],
   }),
 ]
-
-const wardenPermitRequirement = {
-  type: 'task_completed' as const,
-  targetId: 'safari-wardens-permit',
-}
 
 const standardSafariAreaDefinitions = [
   {
