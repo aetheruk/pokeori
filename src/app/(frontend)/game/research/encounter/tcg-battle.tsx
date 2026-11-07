@@ -2604,7 +2604,11 @@ function AttackChoiceDrawer({
   const target = validTargets.find(
     (card) => card.instanceId === selectedTargetId,
   )
-  const requirement = effect?.choiceRequirement
+  const requirement = effect?.choiceRequirement === 'optionalBonus' &&
+    effect.damage.kind === 'handDiscardBonus' &&
+    state.player.hand.length === 0
+    ? undefined
+    : effect?.choiceRequirement
   const attackCost = attack ? getAttackCost(attack, state) : 0
   const availableEnergy = Math.max(0, state.player.energy - attackCost)
   const energyTypeAllowed = !effect?.choiceEnergyType || state.player.selectedEnergy === effect.choiceEnergyType
@@ -3325,7 +3329,8 @@ function AttackChoiceDrawer({
           {activeRequirement === 'optionalBonus' &&
             activeEffect &&
             (activeEffect.damage.kind === 'optionalChoiceBonus' ||
-              activeEffect.damage.kind === 'optionalCoinDamage') && (
+              activeEffect.damage.kind === 'optionalCoinDamage' ||
+              activeEffect.damage.kind === 'handDiscardBonus') && (
               <section className="space-y-2">
                 <h3 className="text-sm font-semibold text-game-ink">Optional attack bonus</h3>
                 <p className="text-sm text-game-muted">

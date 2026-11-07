@@ -1021,6 +1021,7 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'discardAllHandCards') {
+      if (rule.requiresOptionalChoice && !(choice?.kind === 'optionalBonus' && choice.enabled)) continue
       const discarded = state[sideKey].hand
       state[sideKey].hand = []
       state[sideKey].discard.push(...discarded)
