@@ -106,6 +106,7 @@ export type TcgBattleDamageRule =
   | { kind: 'pokemonExTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'damagedTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'remainingHpComparisonBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'attackerRemainingHpLessBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'optionalChoiceBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'healthyTarget'; healthyDamage: number; damagedDamage: number }
   | { kind: 'headsTable'; damages: number[]; coinFlipCount: number }
@@ -1081,6 +1082,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'bw3') {
     const nobleVictoriesEffect = inferNobleVictoriesTcgBattleAttackEffect(attack, baseDamage)
     if (nobleVictoriesEffect) return applyAttackTextModifiers(nobleVictoriesEffect)
+  }
+  if (setId === 'bw4') {
+    const nextDestiniesEffect = inferNextDestiniesTcgBattleAttackEffect(attack, baseDamage)
+    if (nextDestiniesEffect) return applyAttackTextModifiers(nextDestiniesEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -8066,6 +8071,154 @@ function inferNobleVictoriesTcgBattleAttackEffect(
   return null
 }
 
+function inferNextDestiniesTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTarget = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'synthesis') {
+    // A Grass Energy search becomes a single shared-Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'stoke') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      energyGain: [{ target: 'self', amount: 1, condition: 'heads' }],
+    }
+  }
+  if (name === 'stadium burn' || name === 'stadium wave') {
+    // Stadiums are not part of this battle mode, so retain the printed base damage only.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'outrage' || name === 'raging hammer') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: attack.text?.toLowerCase().includes('up to 2') ? 2 : 1, basicOnly: true }],
+    }
+  }
+  if (name === 'water arrow') return anyTarget(20)
+  if (name === 'random spark') return anyTarget(50)
+  if (name === 'crushing ice') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+  if (name === 'vengeful wish') {
+    return { damage: { kind: 'lastIncomingDamage' }, ignoreWeaknessResistance: true }
+  }
+  if (name === 'sniffle') {
+    return {
+      ...zero(),
+      special: [{ kind: 'buffAttack', target: 'self', attackName: 'Belt', baseDamage: 40 }],
+    }
+  }
+  if (name === 'lightning crash') {
+    return {
+      ...anyTarget(80),
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+    }
+  }
+  if (name === 'x ball') {
+    return {
+      damage: {
+        kind: 'weightedCount',
+        baseDamage: 0,
+        sources: [
+          { source: { kind: 'energy', side: 'own' }, perUnitDamage: 20 },
+          { source: { kind: 'energyOnTarget' }, perUnitDamage: 20 },
+        ],
+      },
+    }
+  }
+  if (name === 'psychic') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'energyOnTarget' },
+      },
+    }
+  }
+  if (name === 'darmaxitan') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 50, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'triple smash') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 10, coinFlipCount: 3 },
+      coinFlipCount: 3,
+    }
+  }
+  if (name === 'hammer kick') {
+    return { damage: { kind: 'attackerRemainingHpLessBonus', baseDamage, bonusDamage: 30 } }
+  }
+  if (name === 'oracle inflict') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'handSize', side: 'opponent' },
+      },
+    }
+  }
+  if (name === 'round') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: baseDamage,
+        source: { kind: 'pokemonWithAttack', side: 'own', attackName: 'Round', zone: 'play' },
+      },
+    }
+  }
+  if (name === 'giga power') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 20 },
+      selfDamage: [{ kind: 'optionalChoice', amount: 20 }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'foul play') {
+    return {
+      ...zero(),
+      choiceRequirement: 'copyAttack',
+      special: [{ kind: 'copyAttack', preserveExtraCosts: false }],
+    }
+  }
+
+  // Prize-card counts, draw/search into hand, opponent hand inspection, and
+  // Stadium state are not represented in this battle mode.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -12847,6 +13000,8 @@ function calculateTcgBattleRawDamage(
       )
     case 'remainingHpComparisonBonus':
       return rule.baseDamage + (context.target.currentHp < context.attacker.currentHp ? rule.bonusDamage : 0)
+    case 'attackerRemainingHpLessBonus':
+      return rule.baseDamage + (context.attacker.currentHp < context.target.currentHp ? rule.bonusDamage : 0)
     case 'optionalChoiceBonus':
       return rule.baseDamage + (context.choice?.kind === 'optionalBonus' && context.choice.enabled ? rule.bonusDamage : 0)
     case 'energyComparisonBonus': {
