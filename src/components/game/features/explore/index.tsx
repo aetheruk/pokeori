@@ -555,7 +555,9 @@ function ExploreListContent({
         <FilterBar
           activeCategory={activeCategory}
           activeSubCategory={activeSubCategory}
-          returnRegionName={areaSelectorLocation.category}
+          returnLocationName={
+            areaSelectorLocation.subCategory || areaSelectorLocation.category
+          }
           onOpenRegionModal={() => setRegionModalOpen(true)}
           onOpenAreaModal={() => setAreaModalOpen(true)}
           onOpenDailies={openDailyChallenges}
