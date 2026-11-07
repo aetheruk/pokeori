@@ -51,6 +51,7 @@ import type {
 import {
   calculateTcgBattleDamage,
   chooseTcgBattleAttackChoice,
+  doesTcgBattleSubtypeFilterMatch,
   getAvailableTcgBattleDeckPokemon,
   getTcgBattleDeckSearchMaxCount,
   getEffectiveTcgBattleAttackCost,
@@ -2681,9 +2682,24 @@ function AttackChoiceDrawer({
         (rule) => rule.kind === 'switch' && rule.target === optionalSwitchTarget && rule.optional,
       ),
   )
+  const ownBenchHealingRule = activeRequirement === 'ownBench'
+    ? activeEffect?.healing?.find(
+        (rule) => 'target' in rule && rule.target === 'selectedOwnBench',
+      )
+    : undefined
   const benchChoices =
-    activeRequirement === 'ownBench' || activeRequirement === 'optionalOwnBench'
-      ? state.player.back
+    activeRequirement === 'ownBench'
+      ? state.player.back.filter((card) =>
+          !ownBenchHealingRule ||
+          doesTcgBattleSubtypeFilterMatch(
+            card.subtypes,
+            'subtypeFilter' in ownBenchHealingRule
+              ? ownBenchHealingRule.subtypeFilter
+              : undefined,
+          ),
+        )
+      : activeRequirement === 'optionalOwnBench'
+        ? state.player.back
       : activeRequirement === 'opponentBench' || activeRequirement === 'optionalOpponentBench'
         ? state.opponent.back
         : []

@@ -1020,6 +1020,21 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
 
+    if (rule.kind === 'discardAllHandCards') {
+      const discarded = state[sideKey].hand
+      state[sideKey].hand = []
+      state[sideKey].discard.push(...discarded)
+      if (discarded.length > 0) {
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: attacker.instanceId,
+          label: `${discarded.map((card) => card.name).join(', ')} discarded from the attacker's hand`,
+        })
+      }
+      continue
+    }
+
     if (rule.kind === 'recoverRandomPokemonFromDiscardToHand') {
       const discard = state[sideKey].discard
       const recoverCount = Math.min(rule.amountPerHead * (resolution.coinFlips?.heads || 0), discard.length)
