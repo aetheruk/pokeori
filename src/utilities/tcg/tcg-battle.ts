@@ -109,7 +109,9 @@ export type TcgBattleDamageRule =
   | { kind: 'damagedTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'remainingHpComparisonBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'attackerRemainingHpLessBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'attackerHpExactBonus'; baseDamage: number; bonusDamage: number; remainingHp: number }
   | { kind: 'attackerFullHpBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'targetSubtypeKnockOut'; subtype: string }
   | { kind: 'optionalChoiceBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'healthyTarget'; healthyDamage: number; damagedDamage: number }
   | { kind: 'headsTable'; damages: number[]; coinFlipCount: number }
@@ -159,6 +161,7 @@ export type TcgBattleStatusRule = {
   requiresTargetStatusAbsent?: TcgBattleStatusCondition
   requiresEnergy?: { side: 'own' | 'opponent'; minimum: number; maximum?: number }
   requiresAttackerStatus?: TcgBattleStatusCondition
+  requiresTargetSubtype?: string
   requiresAttackerDamaged?: boolean
   requiresAttackerAtFullHp?: boolean
   requiresHandSizeComparison?: 'equal'
@@ -198,6 +201,7 @@ export type TcgBattleBenchDamageRule = {
 
 export type TcgBattleCounterDamageRule =
   | { amount: number; target: 'self' | 'opponent' | 'target'; deltaTargetBonus?: number }
+  | { amountPerCounter: number; target: 'distributed' }
   | {
       amount: number
       side: 'own' | 'opponent' | 'both'
@@ -247,6 +251,7 @@ export type TcgBattleAttackChoice =
   | { kind: 'discardHandCards'; cardIds: string[] }
   | { kind: 'discardPokemonToHand'; cardId: string }
   | { kind: 'ownPokemon'; cardId: string }
+  | { kind: 'counterDistribution'; assignments: Array<{ cardId: string; counters: number }> }
   | { kind: 'disabledAttack'; attackIndex: number }
   | { kind: 'benchSwitch'; cardId: string }
   | { kind: 'skipBenchSwitch' }
@@ -269,6 +274,7 @@ export type TcgBattleChoiceRequirement =
   | 'discardHandCards'
   | 'discardPokemonToHand'
   | 'ownPokemon'
+  | 'counterDistribution'
   | 'disableAttack'
   | 'discardPokemon'
   | 'deckPokemon'
@@ -285,6 +291,7 @@ export type TcgBattleChoiceRequirement =
 
 export type TcgBattleSpecialRule =
   | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; includeResistanceTypes?: string[]; destination?: 'bench' | 'hand'; random?: boolean; condition?: TcgBattleCoinCondition; treatAsBasic?: boolean; damageCountersOnSearch?: number }
+  | { kind: 'revealTopDeckPokemon'; amount: number; includeSubtypes: string[] }
   | { kind: 'drawCards'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; shuffleHandIntoDeck?: boolean; condition?: TcgBattleCoinCondition }
   | { kind: 'shuffleRandomHandCardIntoDeck'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
   | { kind: 'discardRandomHandCard'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
@@ -396,6 +403,7 @@ export interface TcgBattleAttackEffect {
   ignoreTargetDamageModifiers?: boolean
   choiceRequirement?: TcgBattleChoiceRequirement
   choiceEnergyMax?: number
+  choiceCounterCount?: number
   allowWhileAsleep?: boolean
   ignoreWeaknessResistanceOnBench?: boolean
   special?: TcgBattleSpecialRule[]
@@ -1128,6 +1136,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'bw9') {
     const plasmaFreezeEffect = inferPlasmaFreezeTcgBattleAttackEffect(attack, baseDamage)
     if (plasmaFreezeEffect) return applyAttackTextModifiers(plasmaFreezeEffect)
+  }
+  if (setId === 'bw10') {
+    const plasmaBlastEffect = inferPlasmaBlastTcgBattleAttackEffect(attack, baseDamage)
+    if (plasmaBlastEffect) return applyAttackTextModifiers(plasmaBlastEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -9350,6 +9362,188 @@ function inferPlasmaFreezeTcgBattleAttackEffect(
   return null
 }
 
+function inferPlasmaBlastTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'sweet scent') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownPokemon',
+      healing: [{ target: 'selectedOwnPokemon', amount: 20 }],
+    }
+  }
+  if (name === 'lifesplosion') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: 3,
+        maxCountFrom: { kind: 'energy', side: 'own' },
+        includeSubtypes: ['Stage 2'],
+        destination: 'bench',
+      }],
+    }
+  }
+  if (name === 'energy press') {
+    // Energy attached to the Defending Pokémon uses the opponent's shared pool.
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energyOnTarget' },
+      },
+    }
+  }
+  if (name === 'call for family') {
+    const grassOnly = /\bgrass basic\b/i.test(attack.text)
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: 2,
+        basicOnly: true,
+        ...(grassOnly ? { includeTypes: ['Grass'] } : {}),
+      }],
+    }
+  }
+  if (name === 'solar transporter') {
+    return {
+      ...zero(),
+      special: [{ kind: 'revealTopDeckPokemon', amount: 5, includeSubtypes: ['Team Plasma'] }],
+    }
+  }
+  if (name === 'hydro pump') {
+    // Water Energy attached to this Pokémon is approximated by shared Energy.
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'sharpshooting') {
+    return {
+      damage: { kind: 'fixed', amount: 30 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'splatter') {
+    return {
+      damage: { kind: 'fixed', amount: 20 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'outrage') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'crush and burn') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 30, source: { kind: 'chosenEnergy' } },
+      choiceRequirement: 'energyAmount',
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+    }
+  }
+  if (name === 'psypower') {
+    return {
+      ...zero(),
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: 3,
+      counterDamage: [{ target: 'distributed', amountPerCounter: 10 }],
+    }
+  }
+  if (name === 'trading places') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'hide') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAll', condition: 'heads' }],
+    }
+  }
+  if (name === 'last-chance chop') {
+    return {
+      damage: { kind: 'attackerHpExactBonus', baseDamage, bonusDamage: 70, remainingHp: 10 },
+    }
+  }
+  if (name === 'shoulder throw') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+  if (name === 'kick of righteousness') {
+    return {
+      damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage: 40, subtype: 'Team Plasma' },
+    }
+  }
+  if (name === 'roar') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'blazing claws') {
+    return {
+      damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage: 60, subtype: 'Team Plasma' },
+      status: [{ target: 'opponent', statuses: ['burned'], requiresTargetSubtype: 'Team Plasma' }],
+    }
+  }
+  if (name === 'iron head') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: baseDamage, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'dragonaxe') {
+    // Metal Energy attached to this Pokémon uses the side's shared Energy pool.
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 40, source: { kind: 'energy', side: 'own' } },
+    }
+  }
+  if (name === 'strike of the champion') {
+    return {
+      damage: { kind: 'targetSubtypeKnockOut', subtype: 'Team Plasma' },
+      ignoreWeaknessResistance: true,
+      ignoreTargetDamageModifiers: true,
+    }
+  }
+  if (name === 'double draw') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 2 }] }
+  }
+
+  // Fossil and Supporter cards, Special Energy, and Pokémon Tools are absent
+  // from this Pokémon-only battle format, so attacks that need them stay filtered.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -12856,6 +13050,21 @@ function calculateTcgBattleCounterDamage(
     if ('condition' in rule && !doesTcgBattleConditionPass(rule.condition, coinFlips)) continue
     if ('requiresTargetStatus' in rule && rule.requiresTargetStatus && !target.statusConditions?.includes(rule.requiresTargetStatus)) continue
     if ('target' in rule) {
+      if (rule.target === 'distributed') {
+        if (choice?.kind !== 'counterDistribution') continue
+        const distributedSideKey = sideKey === 'player' ? 'opponent' : 'player'
+        for (const assignment of choice.assignments) {
+          const card = [...state[distributedSideKey].front, ...state[distributedSideKey].back]
+            .find((candidate) => candidate.instanceId === assignment.cardId && candidate.currentHp > 0)
+          if (!card || assignment.counters <= 0) continue
+          results.push({
+            targetSide: distributedSideKey,
+            targetId: card.instanceId,
+            damage: rule.amountPerCounter * assignment.counters,
+          })
+        }
+        continue
+      }
       const targetSide = rule.target === 'self'
         ? sideKey
         : rule.target === 'target'
@@ -13581,6 +13790,7 @@ export function validateTcgBattleAttackChoice(params: {
   if (!choice) {
     if (required === 'optionalOpponentBench' && opponent.back.every((card) => card.currentHp <= 0)) return null
     if (required === 'optionalOwnBench' && own.back.every((card) => card.currentHp <= 0)) return null
+    if (required === 'ownBench' && own.back.every((card) => card.currentHp <= 0)) return null
     if (required === 'damageCounterTransfer' &&
       [...own.front, ...own.back].every((card) => card.currentHp <= 0 || card.currentHp >= card.hp)) return null
     if (required === 'discardHandCards' && own.hand.length === 0) return null
@@ -13595,6 +13805,25 @@ export function validateTcgBattleAttackChoice(params: {
     return 'Choose how that attack should resolve.'
   }
   const validType = (type: TcgBattleEnergyType | undefined) => Boolean(type && type !== 'Colorless')
+
+  if (required === 'counterDistribution') {
+    if (choice.kind !== 'counterDistribution') return 'Assign all damage counters to opposing Pokémon.'
+    const expectedCounters = effect.choiceCounterCount || 0
+    const livingOpponentIds = new Set(
+      [...opponent.front, ...opponent.back]
+        .filter((card) => card.currentHp > 0)
+        .map((card) => card.instanceId),
+    )
+    const totalCounters = choice.assignments.reduce((sum, assignment) => sum + assignment.counters, 0)
+    return choice.assignments.length > 0 &&
+      totalCounters === expectedCounters &&
+      new Set(choice.assignments.map((assignment) => assignment.cardId)).size === choice.assignments.length &&
+      choice.assignments.every((assignment) =>
+        livingOpponentIds.has(assignment.cardId) && Number.isInteger(assignment.counters) && assignment.counters > 0,
+      )
+      ? null
+      : `Assign exactly ${expectedCounters} damage counters among living opposing Pokémon.`
+  }
 
   if (required === 'damageCounterTransfer') {
     if (choice.kind !== 'damageCounterTransfer') return 'Choose a damaged Pokémon to move counters from.'
@@ -13624,7 +13853,6 @@ export function validateTcgBattleAttackChoice(params: {
       card.instanceId === choice.cardId && card.currentHp > 0,
     ) ? null : 'Choose one of your living Pokémon.'
   }
-
   if (required === 'discardPokemonToHand') {
     if (choice.kind !== 'discardPokemonToHand') return 'Choose a Pokémon from your discard pile.'
     const rule = effect.special?.find((entry) => entry.kind === 'recoverPokemonFromDiscardToHand')
@@ -13790,6 +14018,10 @@ export function chooseTcgBattleAttackChoice(params: {
       .filter((card) => card.currentHp > 0)
       .sort((a, b) => (b.hp - b.currentHp) - (a.hp - a.currentHp))[0] || attacker
     return { kind: 'ownPokemon', cardId: picked.instanceId }
+  }
+  if (required === 'counterDistribution') {
+    const counters = effect?.choiceCounterCount || 0
+    return { kind: 'counterDistribution', assignments: [{ cardId: target.instanceId, counters }] }
   }
   if (required === 'discardPokemonToHand') {
     const rule = effect?.special?.find((entry) => entry.kind === 'recoverPokemonFromDiscardToHand')
@@ -14231,8 +14463,14 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (context.target.currentHp < context.attacker.currentHp ? rule.bonusDamage : 0)
     case 'attackerRemainingHpLessBonus':
       return rule.baseDamage + (context.attacker.currentHp < context.target.currentHp ? rule.bonusDamage : 0)
+    case 'attackerHpExactBonus':
+      return rule.baseDamage + (context.attacker.currentHp === rule.remainingHp ? rule.bonusDamage : 0)
     case 'attackerFullHpBonus':
       return rule.baseDamage + (context.attacker.currentHp === context.attacker.hp ? rule.bonusDamage : 0)
+    case 'targetSubtypeKnockOut':
+      return context.target.subtypes.some((subtype) => subtype.toLowerCase() === rule.subtype.toLowerCase())
+        ? context.target.currentHp
+        : 0
     case 'optionalChoiceBonus':
       return rule.baseDamage + (context.choice?.kind === 'optionalBonus' && context.choice.enabled ? rule.bonusDamage : 0)
     case 'energyComparisonBonus': {
@@ -14690,6 +14928,9 @@ function calculateTcgBattleStatusConditions(
       const affectedCard = rule.target === 'self' ? attacker : target
       if (rule.targetSubtype === 'ex' && !affectedCard?.subtypes.some((subtype) => subtype.toLowerCase() === 'ex')) return []
       if (rule.targetSubtype === 'stage2' && !affectedCard?.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2')) return []
+      if (rule.requiresTargetSubtype && !affectedCard?.subtypes.some(
+        (subtype) => subtype.toLowerCase() === rule.requiresTargetSubtype?.toLowerCase(),
+      )) return []
       if (rule.requiresTargetStatusAbsent && affectedCard?.statusConditions?.includes(rule.requiresTargetStatusAbsent)) return []
       if (rule.requiresAttackerStatus && !attacker?.statusConditions?.includes(rule.requiresAttackerStatus)) return []
       if (rule.requiresAttackerDamaged && (!attacker || attacker.currentHp >= attacker.hp)) return []

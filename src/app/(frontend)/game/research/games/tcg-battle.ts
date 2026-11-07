@@ -815,6 +815,32 @@ function applyTcgBattleSpecialEffects(params: {
       (rule.kind === 'preventStatus' && rule.target === 'opponent')
     if (blockTargetEffects && targetsOpponent) continue
 
+    if (rule.kind === 'revealTopDeckPokemon') {
+      const destination = state[sideKey]
+      const inUseIds = new Set(
+        [...destination.hand, ...destination.front, ...destination.back, ...destination.discard].map((card) => card.id),
+      )
+      const available = destination.deck.filter((card) => !inUseIds.has(card.id))
+      const revealed = drawTcgBattleCards(available, rule.amount)
+      const eligibleSubtypes = new Set(rule.includeSubtypes.map((subtype) => subtype.toLowerCase()))
+      let addedToHand = 0
+      for (const pokemon of revealed) {
+        if (pokemon.subtypes.some((subtype) => eligibleSubtypes.has(subtype.toLowerCase()))) {
+          destination.hand.push(pokemon)
+          addedToHand += 1
+        } else {
+          destination.discard.push(pokemon)
+        }
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `Revealed ${revealed.length} Pokémon and added ${addedToHand} Team Plasma Pokémon to your hand`,
+      })
+      continue
+    }
+
     if (rule.kind === 'searchDeckPokemon' && (choice?.kind === 'deckPokemon' || rule.random)) {
       const destination = state[sideKey]
       const availableCards = getAvailableTcgBattleDeckPokemon(destination, rule)

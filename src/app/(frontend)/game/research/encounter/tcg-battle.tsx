@@ -2578,6 +2578,7 @@ function AttackChoiceDrawer({
     { side: 'player' | 'opponent'; cardId: string } | null
   >(null)
   const [selectedDamageCounterSourceId, setSelectedDamageCounterSourceId] = useState('')
+  const [selectedCounterAssignments, setSelectedCounterAssignments] = useState<Record<string, number>>({})
   const [selectedDiscardHandPokemonIds, setSelectedDiscardHandPokemonIds] = useState<string[]>([])
   const [selectedOwnPokemonId, setSelectedOwnPokemonId] = useState('')
   const [selectedRecoveryPokemonId, setSelectedRecoveryPokemonId] = useState('')
@@ -2679,6 +2680,11 @@ function AttackChoiceDrawer({
   const handPokemonChoices = state.player.hand
   const ownPokemonChoices = [...state.player.front, ...state.player.back]
     .filter((card) => card.currentHp > 0)
+  const counterDistributionChoices = [...state.opponent.front, ...state.opponent.back]
+    .filter((card) => card.currentHp > 0)
+  const counterDistributionCardIds = counterDistributionChoices.map((card) => card.instanceId).join('|')
+  const counterDistributionCount = activeEffect?.choiceCounterCount || 0
+  const assignedCounterCount = Object.values(selectedCounterAssignments).reduce((sum, count) => sum + count, 0)
 
   useEffect(() => {
     if (canSkipBenchSwitch && skipOptionalBenchSwitch) return
@@ -2696,6 +2702,17 @@ function AttackChoiceDrawer({
   useEffect(() => {
     setSkipOptionalBenchSwitch(false)
   }, [attacker.instanceId, attackIndex, activeRequirement, selectedAttackIndex, followUpAttackIndex])
+
+  useEffect(() => {
+    setSelectedCounterAssignments({})
+  }, [attacker.instanceId, attackIndex, activeRequirement, selectedAttackIndex, followUpAttackIndex])
+
+  useEffect(() => {
+    const eligibleIds = new Set(counterDistributionChoices.map((card) => card.instanceId))
+    setSelectedCounterAssignments((current) => Object.fromEntries(
+      Object.entries(current).filter(([cardId, counters]) => eligibleIds.has(cardId) && counters > 0),
+    ))
+  }, [counterDistributionCardIds])
 
   useEffect(() => {
     if (activeRequirement === 'energyAmount') setEnergyAmount(availableChoiceEnergy)
@@ -2768,6 +2785,14 @@ function AttackChoiceDrawer({
     if (required === 'ownPokemon' && selectedOwnPokemonId) {
       return { kind: 'ownPokemon', cardId: selectedOwnPokemonId }
     }
+    if (required === 'counterDistribution') {
+      return {
+        kind: 'counterDistribution',
+        assignments: Object.entries(selectedCounterAssignments)
+          .filter(([, counters]) => counters > 0)
+          .map(([cardId, counters]) => ({ cardId, counters })),
+      }
+    }
     if (required === 'discardPokemonToHand' && selectedRecoveryPokemonId) {
       return { kind: 'discardPokemonToHand', cardId: selectedRecoveryPokemonId }
     }
@@ -2831,9 +2856,10 @@ function AttackChoiceDrawer({
       ? (requirement === 'copyAttack'
           ? followUpAttackIndex
           : selectedAttackIndex) !== null
-      : activeRequirement === 'opponentBench' ||
-          activeRequirement === 'ownBench'
+      : activeRequirement === 'opponentBench'
         ? Boolean(selectedCardId)
+        : activeRequirement === 'ownBench'
+          ? benchChoices.every((card) => card.currentHp <= 0) || Boolean(selectedCardId)
         : activeRequirement === 'optionalOpponentBench' || activeRequirement === 'optionalOwnBench'
           ? benchChoices.every((card) => card.currentHp <= 0) ||
             Boolean(selectedCardId) ||
@@ -2844,6 +2870,8 @@ function AttackChoiceDrawer({
           ? true
         : activeRequirement === 'ownPokemon'
           ? Boolean(selectedOwnPokemonId)
+        : activeRequirement === 'counterDistribution'
+          ? assignedCounterCount === counterDistributionCount
         : activeRequirement === 'discardPokemonToHand'
           ? recoverablePokemonChoices.length === 0 || Boolean(selectedRecoveryPokemonId)
         : activeRequirement === 'discardPokemon'
@@ -2990,6 +3018,63 @@ function AttackChoiceDrawer({
               ) : (
                 <p className="text-sm text-game-muted">Your Pokémon have no damage counters to move.</p>
               )}
+            </section>
+          )}
+          {activeRequirement === 'counterDistribution' && (
+            <section className="space-y-2">
+              <div>
+                <h3 className="text-sm font-semibold text-game-ink">Place damage counters</h3>
+                <p className="text-xs text-game-muted">
+                  Assign all {counterDistributionCount} counters. {assignedCounterCount}/{counterDistributionCount} assigned.
+                </p>
+              </div>
+              <div className="space-y-2">
+                {counterDistributionChoices.map((card) => {
+                  const counters = selectedCounterAssignments[card.instanceId] || 0
+                  const canAddCounter = assignedCounterCount < counterDistributionCount
+                  return (
+                    <div key={card.instanceId} className="flex items-center justify-between gap-3 rounded-md border border-game-border/60 bg-game-surface-raised px-3 py-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-game-ink">{card.name}</p>
+                        <p className="text-xs text-game-muted">{card.currentHp}/{card.hp} HP</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          aria-label={`Remove a damage counter from ${card.name}`}
+                          disabled={counters === 0}
+                          onClick={() => setSelectedCounterAssignments((current) => {
+                            const nextCount = (current[card.instanceId] || 0) - 1
+                            if (nextCount <= 0) {
+                              const remaining = { ...current }
+                              delete remaining[card.instanceId]
+                              return remaining
+                            }
+                            return { ...current, [card.instanceId]: nextCount }
+                          })}
+                          className="game-focus-ring h-9 w-9 rounded-md border border-game-border/60 text-lg font-semibold text-game-ink disabled:opacity-40"
+                        >
+                          −
+                        </button>
+                        <span className="w-5 text-center font-mono text-sm font-semibold text-game-ink">{counters}</span>
+                        <button
+                          type="button"
+                          aria-label={`Add a damage counter to ${card.name}`}
+                          disabled={!canAddCounter}
+                          onClick={() => setSelectedCounterAssignments((current) => {
+                            const total = Object.values(current).reduce((sum, count) => sum + count, 0)
+                            if (total >= counterDistributionCount) return current
+                            return { ...current, [card.instanceId]: (current[card.instanceId] || 0) + 1 }
+                          })}
+                          className="game-focus-ring h-9 w-9 rounded-md border border-game-border/60 text-lg font-semibold text-game-ink disabled:opacity-40"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </section>
           )}
           {activeRequirement === 'ownPokemon' && (
