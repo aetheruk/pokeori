@@ -407,6 +407,8 @@ Energy remains a side-wide pool, so effects tied to one Pokémon or typed Energy
 
 White Flare (`rsv10pt5`) covers 162 Pokémon cards and 257 attacks: 251 are supported and six remain filtered. Mappings add Basic-Pokémon team healing, shared-Energy formulas, gains and typed discards, Pokémon draw/search, hand-size comparisons, counter transfers, next-turn damage reduction, forced switches, and copied attacks. The engine's hand is empty after opening setup; attacks may refill it with Pokémon cards, which remain unplayable from hand. Roar uses the attack user's choice for the replacement because opponent-controlled choices are not modeled. Energy is shared by side, so individual attachments and Energy-card deck/discard effects are approximated or omitted. Trainer cards, Prize cards, and Special Energy are not represented. The six filtered attacks involve optional top-card discard, opponent deck ordering, or Item-card search.
 
+Black Bolt (`zsv10pt5`) covers 161 Pokémon cards and 245 attacks: 236 are supported and nine remain filtered. Its mappings add healed-this-turn and Special Condition bonuses, until-tails attacks, hand-size and Energy formulas, Basic-Pokémon searches, hand draw/reveal, retreat-cost scaling, Evolution counts, and Basic-target knockouts. Charge and Abundant Harvest add shared Energy only when the selected type matches Lightning or Fighting; other individual Energy attachments use the side-wide pool approximation. Nine attacks involving Trainer/Energy-card searches, in-battle evolution, or individual Energy movement remain filtered.
+
 ## Reserved Future Content
 
 The following are defined in data or engine support but not yet naturally obtainable through authored progression:

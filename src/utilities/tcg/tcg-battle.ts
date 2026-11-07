@@ -285,6 +285,7 @@ export type TcgBattleEnergyGainRule = {
   amountPerHead?: number
   amountPerUnit?: number
   maxAmount?: number
+  requiresEnergyType?: TcgBattleEnergyType
   source?: TcgBattleCountSource
   condition?: TcgBattleCoinCondition
   requiresDamageDealt?: boolean
@@ -1449,6 +1450,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'rsv10pt5') {
     const whiteFlareEffect = inferWhiteFlareTcgBattleAttackEffect(attack, baseDamage)
     if (whiteFlareEffect) return applyAttackTextModifiers(whiteFlareEffect)
+  }
+  if (setId === 'zsv10pt5') {
+    const blackBoltEffect = inferBlackBoltTcgBattleAttackEffect(attack, baseDamage)
+    if (blackBoltEffect) return applyAttackTextModifiers(blackBoltEffect)
   }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
@@ -23039,6 +23044,146 @@ function inferWhiteFlareTcgBattleAttackEffect(
   return null
 }
 
+function inferBlackBoltTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'collect') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'hide') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAllEffects', condition: 'heads' }],
+    }
+  }
+  if (name === 'lively needles') {
+    return { damage: { kind: 'healedThisTurnBonus', baseDamage, bonusDamage: 100 } }
+  }
+  if (name === 'dangerous reaction') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 120,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+    }
+  }
+  if (name === 'ancient seaweed') {
+    // Item cards are not present in the Pokémon-only deck.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (name === 'continuous headbutt') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 50, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'drag off') {
+    return {
+      damage: { kind: 'fixed', amount: 20 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', beforeDamage: true }],
+    }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, basicOnly: true, destination: 'bench' }],
+    }
+  }
+  if (name === 'charge') {
+    return {
+      ...zero(),
+      energyGain: [{ target: 'self', amount: 1, requiresEnergyType: 'Lightning' }],
+    }
+  }
+  if (name === 'voltage burst') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      selfDamage: [{ kind: 'fixed', amount: 30 }],
+    }
+  }
+  if (name === 'evo-lariat') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 40,
+        source: { kind: 'pokemonEvolvedInPlay', side: 'own' },
+      },
+    }
+  }
+  if (name === 'psychic' && attack.damage?.includes('+')) {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 30,
+        source: { kind: 'energyOnTarget' },
+      },
+    }
+  }
+  if (name === 'shoulder throw') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: 30,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+  if (name === 'abundant harvest') {
+    return {
+      ...zero(),
+      energyGain: [{ target: 'self', amount: 1, requiresEnergyType: 'Fighting' }],
+    }
+  }
+  if (name === 'venoshock') {
+    const bonusDamage = baseDamage === 30 ? 60 : 90
+    return { damage: { kind: 'statusBonus', baseDamage, bonusDamage, statuses: ['poisoned'] } }
+  }
+  if (name === 'cursed slug') {
+    return {
+      damage: {
+        kind: 'countAtMostBonus',
+        baseDamage,
+        bonusDamage: 120,
+        source: { kind: 'handSize', side: 'opponent' },
+        maximumUnits: 3,
+      },
+    }
+  }
+  if (name === 'finishing blow') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'metal arms') {
+    // Pokémon Tools are not included in the battle format; retain base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'cross-cut') {
+    return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 80 } }
+  }
+  if (name === 'axe blast') {
+    return { damage: { kind: 'targetSubtypeKnockOut', subtype: 'Basic' } }
+  }
+  if (name === 'scout') {
+    return { ...zero(), special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+  if (name === 'add on') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 4 }] }
+  }
+
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -24970,6 +25115,7 @@ export function resolveTcgBattleAttack(params: {
     energyGains: effect.energyGain
       ?.filter((gain) =>
         doesTcgBattleConditionPass(gain.condition, coinFlips) &&
+        (!gain.requiresEnergyType || state[sideKey].selectedEnergy === gain.requiresEnergyType) &&
         (!gain.requiresDamageDealt || targetDamage > 0) &&
         (!gain.requiresOwnBench || state[sideKey].back.some((card) => card.currentHp > 0)),
       )
