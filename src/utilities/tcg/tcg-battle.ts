@@ -109,6 +109,7 @@ export type TcgBattleDamageRule =
   | { kind: 'headsTable'; damages: number[]; coinFlipCount: number }
   | { kind: 'headsBonusEachIfEnergyAvailable'; baseDamage: number; bonusDamage: number; coinFlipCount: number }
   | { kind: 'lastHitBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'lastTurnKnockoutBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'statusBonus'; baseDamage: number; bonusDamage: number; statuses: TcgBattleStatusCondition[]; statusTarget?: 'attacker' | 'target' }
   | { kind: 'statusCountBonus'; baseDamage: number; bonusDamagePerStatus: number; statuses: TcgBattleStatusCondition[]; statusTarget?: 'attacker' | 'target' }
   | { kind: 'damageCounterThresholdBonus'; baseDamage: number; bonusDamage: number; minimumCounters: number }
@@ -476,6 +477,7 @@ export interface TcgBattleState {
   opponent: TcgBattleSideState
   pendingPromotion?: TcgBattleSide
   consecutivePasses: number
+  lastOpponentAttackKnockout?: Partial<Record<TcgBattleSide, { turnNumber: number; knockedOut: boolean }>>
   winner?: TcgBattleSide | 'tie'
   lastDamageEvent?: {
     id: string
@@ -605,6 +607,12 @@ export function toTcgPvpPerspectiveState(
   const flipSide = (side: TcgBattleSide) =>
     shouldFlip ? flipTcgBattleSide(side) : side
   const { participantIds: _participantIds, ...publicState } = shared
+  const lastOpponentAttackKnockout = shouldFlip
+    ? {
+        player: shared.lastOpponentAttackKnockout?.opponent,
+        opponent: shared.lastOpponentAttackKnockout?.player,
+      }
+    : shared.lastOpponentAttackKnockout
 
   return {
     ...publicState,
@@ -619,6 +627,7 @@ export function toTcgPvpPerspectiveState(
     resumeSideAfterPromotion: shared.resumeSideAfterPromotion
       ? flipSide(shared.resumeSideAfterPromotion)
       : undefined,
+    lastOpponentAttackKnockout,
     winner:
       shared.winner === 'tie' || !shared.winner
         ? shared.winner
@@ -1057,6 +1066,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'col1') {
     const callOfLegendsEffect = inferCallOfLegendsTcgBattleAttackEffect(attack, text, baseDamage)
     if (callOfLegendsEffect) return applyAttackTextModifiers(callOfLegendsEffect)
+  }
+  if (setId === 'bw1') {
+    const blackWhiteEffect = inferBlackWhiteTcgBattleAttackEffect(attack, baseDamage)
+    if (blackWhiteEffect) return applyAttackTextModifiers(blackWhiteEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -7676,6 +7689,126 @@ function inferCallOfLegendsTcgBattleAttackEffect(
   return null
 }
 
+function inferBlackWhiteTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'constant rattle') {
+    return {
+      damage: { kind: 'headsTable', damages: [0, 10, 30, 60], coinFlipCount: 3 },
+      coinFlipCount: 3,
+    }
+  }
+  if (name === 'nature power') {
+    // The format shares Energy across each side and does not track attached types.
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'both' } },
+    }
+  }
+  if (name === 'flame charge') {
+    // Searching the deck for a typed Energy is represented by one shared-Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'outrage') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'aqua tail') {
+    // Attached Water Energy is approximated with the side's shared Energy pool.
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 10, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'hydro pump') {
+    // Attached Water Energy is approximated with the side's shared Energy pool.
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } },
+    }
+  }
+  if (name === 'feather dance') {
+    return {
+      ...zero(),
+      special: [{ kind: 'buffAttack', target: 'self', attackName: '*', damageBonus: 40 }],
+    }
+  }
+  if (name === 'attract') {
+    return { ...zero(), special: [{ kind: 'attackFailsOnTails' }] }
+  }
+  if (name === 'cell culture') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, basicOnly: true, includeNames: ['Solosis'] }],
+    }
+  }
+  if (name === 'psywave') {
+    // Attached Energy on the target is approximated with the opponent's shared Energy pool.
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'opponent' } },
+    }
+  }
+  if (name === 'krookoroll') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 40 } }
+  }
+  if (name === 'taunt') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'sucker punch') {
+    // Darkness attachment is not tracked separately from shared Energy.
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 30,
+        source: { kind: 'energy', side: 'own' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'foul play') {
+    return {
+      ...zero(),
+      choiceRequirement: 'copyAttack',
+      special: [{ kind: 'copyAttack', preserveExtraCosts: false }],
+    }
+  }
+  if (name === 'blindside') {
+    return {
+      damage: { kind: 'fixed', amount: 50 },
+      targetScope: 'any',
+      targetMustBeDamaged: true,
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'punishment') {
+    return { damage: { kind: 'stage2TargetBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'revenge') {
+    return { damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage: 70 } }
+  }
+  if (name === 'energize') {
+    // Recovering typed Energy from a discard pile becomes one shared-Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+
+  // Draw/card-to-hand effects do not fit the current battle flow.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -12413,6 +12546,16 @@ function calculateTcgBattleRawDamage(
     }
     case 'lastHitBonus':
       return rule.baseDamage + (context.attacker.temporaryEffects?.lastIncomingAttackDamage ? rule.bonusDamage : 0)
+    case 'lastTurnKnockoutBonus': {
+      const knockout = context.sideKey
+        ? context.state?.lastOpponentAttackKnockout?.[context.sideKey]
+        : undefined
+      return rule.baseDamage + (
+        knockout?.knockedOut && knockout.turnNumber === context.state?.turnNumber
+          ? rule.bonusDamage
+          : 0
+      )
+    }
     case 'statusBonus':
       return rule.baseDamage + (
         (rule.statusTarget === 'attacker' ? context.attacker : context.target)

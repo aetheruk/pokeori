@@ -1305,6 +1305,18 @@ function applyAttack(
   })
   if (choiceError) throw new Error(choiceError)
 
+  const defendingSide = sideKey === 'player' ? 'opponent' : 'player'
+  const defendingSideTurnNumber = getNextTcgBattleTurnNumber(
+    state.turnNumber,
+    sideKey,
+    defendingSide,
+  )
+  const damageEventStartIndex = state.lastDamageEvents?.length || 0
+  state.lastOpponentAttackKnockout = {
+    ...state.lastOpponentAttackKnockout,
+    [defendingSide]: { turnNumber: defendingSideTurnNumber, knockedOut: false },
+  }
+
   const statusCheck = resolveTcgBattleStatusAttackCheck(
     attacker,
     Math.random,
@@ -1609,6 +1621,18 @@ function applyAttack(
     resolution,
     blockTargetEffects,
   })
+  const defendingCards = [...state[defendingSide].front, ...state[defendingSide].back]
+  const knockedOutByAttack = (state.lastDamageEvents || [])
+    .slice(damageEventStartIndex)
+    .some((event) =>
+      event.targetSide === defendingSide &&
+      event.reason === 'attack' &&
+      defendingCards.some((card) => card.instanceId === event.targetId && card.currentHp <= 0),
+    )
+  state.lastOpponentAttackKnockout = {
+    ...state.lastOpponentAttackKnockout,
+    [defendingSide]: { turnNumber: defendingSideTurnNumber, knockedOut: knockedOutByAttack },
+  }
   clearSourceLinkedControlsForInactiveSources(state)
 
   if (
