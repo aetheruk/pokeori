@@ -979,6 +979,7 @@ function applyTcgBattleSpecialEffects(params: {
 
     if (rule.kind === 'discardRandomHandCard') {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      if (rule.requiresDiscardChoice && !(choice?.kind === 'discardHandCards' && choice.cardIds.length > 0)) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
       const discardCount = typeof rule.untilHandSize === 'number'
@@ -1177,7 +1178,11 @@ function applyTcgBattleSpecialEffects(params: {
       const ownCards = rule.sourceZone === 'bench'
         ? state[sideKey].back
         : [...state[sideKey].front, ...state[sideKey].back]
-      const source = ownCards.find((card) => card.instanceId === choice.sourceCardId && card.currentHp > 0)
+      const source = ownCards.find((card) =>
+        card.instanceId === choice.sourceCardId &&
+        card.currentHp > 0 &&
+        (!rule.sourceNameContains || card.name.toLowerCase().includes(rule.sourceNameContains.toLowerCase())),
+      )
       const defendingCard = [...state[opponentKey].front, ...state[opponentKey].back]
         .find((card) => card.instanceId === target.instanceId && card.currentHp > 0)
       if (!source || !defendingCard) continue
@@ -1837,7 +1842,7 @@ function applyAttack(
   const damageEventStartIndex = state.lastDamageEvents?.length || 0
   state.lastOpponentAttackKnockout = {
     ...state.lastOpponentAttackKnockout,
-    [defendingSide]: { turnNumber: defendingSideTurnNumber, knockedOut: false },
+    [defendingSide]: { turnNumber: defendingSideTurnNumber, knockedOut: false, knockedOutNames: [] },
   }
 
   const statusCheck = resolveTcgBattleStatusAttackCheck(
@@ -2179,9 +2184,21 @@ function applyAttack(
       resolution.specialEffects?.some((rule) => rule.kind === 'knockOutTarget') === true &&
       defendingCards.some((card) => card.instanceId === target.instanceId && card.currentHp <= 0)
     )
+  const knockedOutByAttackIds = new Set(
+    (state.lastDamageEvents || [])
+      .slice(damageEventStartIndex)
+      .filter((event) => event.targetSide === defendingSide && event.reason === 'attack')
+      .map((event) => event.targetId),
+  )
+  if (resolution.specialEffects?.some((rule) => rule.kind === 'knockOutTarget') && target.currentHp <= 0) {
+    knockedOutByAttackIds.add(target.instanceId)
+  }
+  const knockedOutNames = defendingCards
+    .filter((card) => knockedOutByAttackIds.has(card.instanceId) && card.currentHp <= 0)
+    .map((card) => card.name)
   state.lastOpponentAttackKnockout = {
     ...state.lastOpponentAttackKnockout,
-    [defendingSide]: { turnNumber: defendingSideTurnNumber, knockedOut: knockedOutByAttack },
+    [defendingSide]: { turnNumber: defendingSideTurnNumber, knockedOut: knockedOutByAttack, knockedOutNames },
   }
   clearSourceLinkedControlsForInactiveSources(state)
 

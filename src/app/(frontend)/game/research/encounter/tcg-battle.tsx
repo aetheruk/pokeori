@@ -2722,8 +2722,16 @@ function AttackChoiceDrawer({
   const damageCounterSourceCards = transferDamageCountersRule?.kind === 'transferDamageCounters' && transferDamageCountersRule.sourceZone === 'bench'
     ? state.player.back
     : [...state.player.front, ...state.player.back]
+  const transferDamageSourceNameContains = transferDamageCountersRule?.kind === 'transferDamageCounters'
+    ? transferDamageCountersRule.sourceNameContains
+    : undefined
   const damageCounterSourceChoices = damageCounterSourceCards
-    .filter((card) => card.currentHp > 0 && card.currentHp < card.hp)
+    .filter((card) =>
+      card.currentHp > 0 &&
+      card.currentHp < card.hp &&
+      (!transferDamageSourceNameContains ||
+        card.name.toLowerCase().includes(transferDamageSourceNameContains.toLowerCase())),
+    )
   const handPokemonChoices = state.player.hand
   const ownPokemonChoices = [...state.player.front, ...state.player.back]
     .filter((card) => card.currentHp > 0)
