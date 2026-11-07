@@ -1350,6 +1350,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const lostOriginEffect = inferLostOriginTcgBattleAttackEffect(attack, baseDamage)
     if (lostOriginEffect) return applyAttackTextModifiers(lostOriginEffect)
   }
+  if (setId === 'swsh12') {
+    const silverTempestEffect = inferSilverTempestTcgBattleAttackEffect(attack, baseDamage)
+    if (silverTempestEffect) return applyAttackTextModifiers(silverTempestEffect)
+  }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
     if (dragonMajestyEffect) return applyAttackTextModifiers(dragonMajestyEffect)
@@ -18914,6 +18918,174 @@ function inferLostOriginTcgBattleAttackEffect(
         statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
       },
     }
+  }
+
+  return null
+}
+
+function inferSilverTempestTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: {
+      basicOnly?: boolean
+      includeNames?: string[]
+      includeSubtypes?: string[]
+      includeTypes?: string[]
+      destination?: 'bench' | 'hand'
+    } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'noble light') {
+    const amount = Number(text.match(/heal (\d+) damage/)?.[1] || 30)
+    return { ...zero(), healing: [{ amount, side: 'both', zone: 'play' }] }
+  }
+  if (name === 'swelling scent') return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  if (name === 'four as one') return null
+  if (name === 'fighting tackle') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 100)
+    return { damage: { kind: 'pokemonVTargetBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'sparkling wing') return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  if (name === 'energy crush') {
+    const perEnergy = Number(text.match(/does (\d+) damage for each energy/)?.[1] || 50)
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perEnergy, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'quick dive' || name === 'water arrow' || name === 'gear throw') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 50)
+    return anyTargetDamage(amount)
+  }
+  if (name === 'merciless strike') return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 80 } }
+  if (name === 'white drop') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 50)
+    return { damage: { kind: 'pokemonVTargetBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'phione sea feast') {
+    return searchPokemon(3, { basicOnly: true, includeTypes: ['Water'], destination: 'bench' })
+  }
+  if (name === 'rotom overhaul') {
+    const drawCount = Number(text.match(/draw (\d+) cards/)?.[1] || 6)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: drawCount, shuffleHandIntoDeck: true }] }
+  }
+  if (name === 'collect') return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  if (name === 'battle claw') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 30)
+    return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'mind ruler') {
+    const perCard = Number(text.match(/does (\d+) damage for each card in your opponent/)?.[1] || 20)
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perCard, source: { kind: 'handSize', side: 'opponent' } } }
+  }
+  if (name === 'psy call') return searchPokemon(2, { includeSubtypes: ['Stage 1'], destination: 'bench' })
+  if (name === 'eerie voice') {
+    const amount = Number(text.match(/put (\d+) damage counters on each/)?.[1] || 2) * 10
+    return { ...zero(), counterDamage: [{ amount, side: 'opponent', zone: 'play' }] }
+  }
+  if (name === 'vigorous kick') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 90)
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage,
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'opponent', subtypes: ['VMAX'], zone: 'play' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'rock bullet') {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each fighting energy/)?.[1] || 30)
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: perEnergy, source: { kind: 'energyOfType', side: 'own', type: 'Fighting' } } }
+  }
+  if (name === 'find a friend' || name === 'call sign') {
+    return searchPokemon(1, { destination: 'hand' })
+  }
+  if (name === 'reaping claw') {
+    const maximumHp = Number(text.match(/(\d+) hp or less remaining/)?.[1] || 100)
+    return { damage: { kind: 'knockOutAtRemainingHpAtMost', maximumHp } }
+  }
+  if (name === 'allure') {
+    const amount = Number(text.match(/draw (\d+) cards/)?.[1] || 2)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount }] }
+  }
+  if (name === 'sandpot trap') {
+    const amount = Number(text.match(/does (\d+) damage to each/)?.[1] || 30)
+    return {
+      ...zero(),
+      benchDamage: [{ amount, side: 'opponent', zone: 'play', ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'peat shoulder') {
+    const decreasePerCounter = Number(text.match(/does (\d+) less damage for each damage counter/)?.[1] || 10)
+    return { damage: { kind: 'subtractCount', baseDamage, perUnitDamage: decreasePerCounter, source: { kind: 'damageCounters', target: 'attacker' } } }
+  }
+  if (name === 'critical bite') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 30)
+    return anyTargetDamage(amount)
+  }
+  if (name === 'flock') return searchPokemon(2, { includeNames: ['Murkrow'], destination: 'bench' })
+  if (name === 'triple draw') {
+    const amount = Number(text.match(/draw (\d+) cards/)?.[1] || 3)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount }] }
+  }
+  if (name === 'venoshock') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 120)
+    return { damage: { kind: 'statusBonus', baseDamage, bonusDamage, statuses: ['poisoned'] } }
+  }
+  if (name === 'astral misfortune') {
+    return {
+      ...zero(),
+      coinFlipCount: 2,
+      damage: { kind: 'knockOutOnCoinCondition', condition: { result: 'heads', minimum: 2, exactly: 2 } },
+    }
+  }
+  if (name === 'radiant hunt') {
+    return {
+      damage: { kind: 'targetSubtypeKnockOut', subtype: 'Radiant' },
+      targetScope: 'any',
+      targetMustHaveSubtype: 'Radiant',
+    }
+  }
+  if (name === 'read the wind') {
+    const drawCount = Number(text.match(/draw (\d+) cards/)?.[1] || 3)
+    return {
+      ...zero(),
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardCount: 1,
+      special: [
+        { kind: 'discardSelectedHandPokemon' },
+        { kind: 'drawCards', target: 'self', amount: drawCount, requiresDiscardChoice: true },
+      ],
+    }
+  }
+  if (name === 'continuous spin') {
+    const damagePerHead = Number(text.match(/does (\d+) damage for each heads/)?.[1] || 20)
+    return { damage: { kind: 'headsMultiplier', damagePerHeads: damagePerHead, coinFlipCount: 0 }, flipUntilTails: true }
+  }
+  if (name === 'magical echo') {
+    return {
+      ...zero(),
+      choiceRequirement: 'damageCounterTransfer',
+      special: [{ kind: 'transferDamageCounters', maxCounters: 99, sourceZone: 'bench' }],
+    }
+  }
+  if (name === 'eerie cry') {
+    const amount = Number(text.match(/put (\d+) damage counters on each/)?.[1] || 3) * 10
+    return { ...zero(), counterDamage: [{ amount, side: 'opponent', zone: 'play', onlyDamaged: true }] }
   }
 
   return null
