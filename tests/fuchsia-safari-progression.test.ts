@@ -497,7 +497,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     ).toHaveLength(2)
   })
 
-  test('Safari uses one long four-area expedition with canonical encounter pools', () => {
+  test('Safari expedition pools track all four habitats and gated species', () => {
     const safariLocations = locations.filter((entry) =>
       ['central', 'east', 'west', 'north'].some(
         (area) => entry.id === `safari-${area}-catch`,
@@ -560,6 +560,11 @@ describe('Fuchsia Gym and Safari progression', () => {
         [29, 30, 32, 33, 46, 49, 102, 104, 111, 113, 115, 123, 127, 128, 128],
       ],
     ])
+    const canonicalCatchSpecies = new Map(canonicalSpecies)
+    canonicalCatchSpecies.set('central', [
+      ...canonicalSpecies.get('central')!,
+      143,
+    ])
     for (const [area, speciesIds] of canonicalSpecies) {
       const location = locations.find(
         (entry) => entry.id === `safari-${area}-catch`,
@@ -572,7 +577,7 @@ describe('Fuchsia Gym and Safari progression', () => {
           .map((encounter) => encounter.speciesId)
           .sort((a, b) => a - b),
         area,
-      ).toEqual(speciesIds)
+      ).toEqual(canonicalCatchSpecies.get(area))
       expect(
         study?.settings.pokemonPool
           .map((pokemon) => pokemon.speciesId)
@@ -585,7 +590,16 @@ describe('Fuchsia Gym and Safari progression', () => {
           0,
         ),
         area,
-      ).toBe(100)
+      ).toBe(area === 'central' ? 101 : 100)
+      if (area === 'central') {
+        expect(
+          location?.encounters.find((encounter) => encounter.speciesId === 143)
+            ?.requirements,
+        ).toContainEqual({
+          type: 'task_completed',
+          targetId: 'safari-wardens-permit',
+        })
+      }
       expect(
         study?.settings.pokemonPool.reduce(
           (total, pokemon) => total + pokemon.weight,

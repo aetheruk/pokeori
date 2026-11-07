@@ -1329,7 +1329,7 @@ describe('TCG battle utilities', () => {
     expect(getValidTcgBattleTargets(state, 'player', attacker, lure)).toEqual([target])
     expect(validateTcgBattleAttackChoice({ state, sideKey: 'player', attacker, attack: lure, target, paidAttackCost: 1 })).toBe('Choose how that attack should resolve.')
     expect(validateTcgBattleAttackChoice({ state, sideKey: 'player', attacker, attack: lure, target, choice: { kind: 'benchSwitch', cardId: bench.instanceId }, paidAttackCost: 1 })).toBeNull()
-    expect(validateTcgBattleAttackChoice({ state, sideKey: 'player', attacker, attack: paint, target, choice: { kind: 'typeChange', type: 'Colorless' }, paidAttackCost: 1 })).toBe('Choose a non-Colorless type.')
+    expect(validateTcgBattleAttackChoice({ state, sideKey: 'player', attacker, attack: paint, target, choice: { kind: 'typeChange', type: 'Colorless' }, paidAttackCost: 1 })).toBe('Choose an allowed type.')
   })
 
   test('copies only supported attacks and carries their required choice', () => {
