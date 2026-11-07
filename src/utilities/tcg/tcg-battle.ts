@@ -1169,6 +1169,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const xyPrimalClashEffect = inferXyPrimalClashTcgBattleAttackEffect(attack, baseDamage)
     if (xyPrimalClashEffect) return applyAttackTextModifiers(xyPrimalClashEffect)
   }
+  if (setId === 'xy6') {
+    const xyRoaringSkiesEffect = inferXyRoaringSkiesTcgBattleAttackEffect(attack, baseDamage)
+    if (xyRoaringSkiesEffect) return applyAttackTextModifiers(xyRoaringSkiesEffect)
+  }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
     if (platinumEffect) return applyAttackTextModifiers(platinumEffect)
@@ -10934,6 +10938,166 @@ function inferXyPrimalClashTcgBattleAttackEffect(
 
   // Stadium/Tool/Item cards, Prize effects, evolution, Energy in hand, and
   // unsupported discard-pile-to-hand/deck operations remain filtered.
+  return null
+}
+
+function inferXyRoaringSkiesTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'loathe') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self', condition: 'heads' }],
+    }
+  }
+  if (name === 'shake it off') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'pokemonOfTypesInPlay', side: 'opponent', types: ['Colorless'], zone: 'play' },
+      },
+    }
+  }
+  if (name === 'flock') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeNames: ['Wurmple'] }],
+    }
+  }
+  if (name === 'cursed rain') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownBench',
+      counterDamage: [{ amount: 10, side: 'opponent', zone: 'play' }],
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'me first' || name === "feelin' fine") {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'grand loop') {
+    return {
+      ...zero(),
+      choiceRequirement: 'optionalOwnBench',
+      special: [
+        { kind: 'drawCards', target: 'self', amount: 3 },
+        { kind: 'switch', target: 'self', optional: true },
+      ],
+    }
+  }
+  if (name === 'find ice') {
+    // Water Energy cards searched into hand are approximated as shared Energy.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 3 }] }
+  }
+  if (name === 'tail whip') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [{ kind: 'cannotAttack', target: 'opponent', condition: 'heads' }],
+    }
+  }
+  if (name === 'continuous tumble') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 20, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'random spark') {
+    return {
+      damage: { kind: 'fixed', amount: 30 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'psywave') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energyOnTarget' } } }
+  }
+  if (name === 'close encounter') {
+    // The opening-turn permission is not tracked; its two-card draw is modeled.
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 2 }] }
+  }
+  if (name === 'rip off') {
+    return { ...zero(), special: [{ kind: 'shuffleRandomHandCardIntoDeck', target: 'opponent' }] }
+  }
+  if (name === 'powerful slap') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 50, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'song of echoes') {
+    return {
+      ...zero(),
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amount: 0,
+        amountPerUnit: 1,
+        source: { kind: 'bench', side: 'both' },
+        shuffleHandIntoDeck: true,
+      }],
+    }
+  }
+  if (name === 'continuous headbutt') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 30, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'power howl') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'handSize', side: 'opponent' } },
+    }
+  }
+  if (name === 'sonic ace') {
+    return {
+      damage: { kind: 'fixed', amount: 120 },
+      targetScope: 'any',
+      energyDiscard: [{ target: 'self', amount: 2 }],
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'burrow') {
+    return { ...zero(), special: [{ kind: 'millCards', target: 'opponent', amount: 1 }] }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, basicOnly: true }],
+    }
+  }
+  if (name === 'bind wound') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownPokemon',
+      healing: [{ target: 'selectedOwnPokemon', amount: 20 }],
+    }
+  }
+  if (name === 'intensifying burn') {
+    return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 50 } }
+  }
+  if (name === 'feather dance') {
+    return {
+      ...zero(),
+      special: [{ kind: 'buffAttack', target: 'self', damageBonus: 80 }],
+    }
+  }
+  if (name === 'sand attack') {
+    return { ...zero(), special: [{ kind: 'attackFailsOnTails' }] }
+  }
+
+  // Prize, deck-top, Trainer, delayed-knockout, and attached-card effects are
+  // filtered where their state is not represented by this battle mode.
   return null
 }
 
