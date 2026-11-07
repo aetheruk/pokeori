@@ -928,18 +928,23 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'discardRandomHandCard') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
-      if (destination.hand.length === 0) continue
-      const index = Math.floor(Math.random() * destination.hand.length)
-      const [discardedCard] = destination.hand.splice(index, 1)
-      destination.discard.push(discardedCard)
-      recordEffectEvent(state, {
-        kind: 'control',
-        sourceId: attacker.instanceId,
-        targetId: discardedCard.instanceId,
-        label: `${discardedCard.name} was discarded from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand`,
-      })
+      const discardCount = rule.amountPerTail
+        ? rule.amountPerTail * (resolution.coinFlips?.tails || 0)
+        : 1
+      for (let count = 0; count < discardCount && destination.hand.length > 0; count += 1) {
+        const index = Math.floor(Math.random() * destination.hand.length)
+        const [discardedCard] = destination.hand.splice(index, 1)
+        destination.discard.push(discardedCard)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: discardedCard.instanceId,
+          label: `${discardedCard.name} was discarded from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand`,
+        })
+      }
       continue
     }
 
@@ -1044,7 +1049,13 @@ function applyTcgBattleSpecialEffects(params: {
         [...destination.hand, ...destination.front, ...destination.back, ...destination.discard].map((card) => card.id),
       )
       const available = destination.deck.filter((card) => !inUseIds.has(card.id))
-      const amount = Math.min(available.length, rule.amount + (rule.amountPerOwnEnergy || 0) * state[sideKey].energy)
+      const sourceUnits = rule.source
+        ? getTcgBattleCount(rule.source, { state, sideKey, attacker, target, paidAttackCost, coinMode: 'actual' })
+        : 0
+      const amount = Math.min(
+        available.length,
+        rule.amount + (rule.amountPerOwnEnergy || 0) * state[sideKey].energy + (rule.amountPerUnit || 0) * sourceUnits,
+      )
       const milled = drawTcgBattleCards(available, amount)
       destination.discard.push(...milled)
       if (milled.length > 0) {

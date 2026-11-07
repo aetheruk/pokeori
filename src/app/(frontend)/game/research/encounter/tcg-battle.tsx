@@ -2614,6 +2614,12 @@ function AttackChoiceDrawer({
     ? getTcgBattleAttackEffect(copiedAttack)
     : null
   const activeEffect = requirement === 'copyAttack' ? copiedEffect : effect
+  const constrainedStatusChoices = activeEffect?.status
+    ?.filter((rule) => rule.useChosenStatus)
+    .flatMap((rule) => rule.statuses)
+  const statusChoices = constrainedStatusChoices?.length
+    ? [...new Set(constrainedStatusChoices)]
+    : TCG_CHOICE_STATUSES
   const recoveryPokemonRule = activeEffect?.special?.find(
     (rule) => rule.kind === 'recoverPokemonFromDiscardToHand',
   )
@@ -2877,7 +2883,7 @@ function AttackChoiceDrawer({
         : activeRequirement === 'discardPokemon'
           ? Boolean(selectedDiscardPokemon)
         : activeRequirement === 'statusCondition'
-          ? TCG_CHOICE_STATUSES.includes(selectedStatus)
+          ? statusChoices.includes(selectedStatus)
         : activeRequirement === 'statusPair'
           ? ['burned', 'poisoned'].includes(selectedFirstPairStatus) &&
             ['asleep', 'confused'].includes(selectedSecondPairStatus)
@@ -3273,7 +3279,7 @@ function AttackChoiceDrawer({
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">Special Condition</h3>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {TCG_CHOICE_STATUSES.map((status) => (
+                {statusChoices.map((status) => (
                   <button
                     type="button"
                     key={status}
