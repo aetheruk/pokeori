@@ -1528,6 +1528,7 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
     if (rule.kind === 'disableSelfAttack') {
+      if (rule.requiresOptionalChoice && !(choice?.kind === 'optionalBonus' && choice.enabled)) continue
       const attackIndex = attacker.attacks.findIndex(
         (candidate) => candidate.name.toLowerCase() === rule.attackName.toLowerCase(),
       )

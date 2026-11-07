@@ -368,7 +368,7 @@ export type TcgBattleSpecialRule =
   | { kind: 'buffDefendingPokemon'; damageBonus: number }
   | { kind: 'blockTargeting'; condition?: TcgBattleCoinCondition; targetMaxHpAtMost?: number }
   | { kind: 'cannotAttack'; target?: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
-  | { kind: 'disableSelfAttack'; attackName: string; condition?: TcgBattleCoinCondition }
+  | { kind: 'disableSelfAttack'; attackName: string; condition?: TcgBattleCoinCondition; requiresOptionalChoice?: boolean }
   | { kind: 'preventRetreat'; target?: 'self' | 'opponent'; condition?: TcgBattleCoinCondition; untilSourceLeaves?: boolean; untilTargetLeaves?: boolean; sourceLeavesClears?: boolean }
   | { kind: 'preventSwitch'; condition?: TcgBattleCoinCondition; sourceLeavesClears?: boolean }
   | { kind: 'clearStatus'; target: 'self' | 'opponent'; statuses: TcgBattleStatusCondition[] }
@@ -1416,6 +1416,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'sv6') {
     const twilightMasqueradeEffect = inferTwilightMasqueradeTcgBattleAttackEffect(attack, baseDamage)
     if (twilightMasqueradeEffect) return applyAttackTextModifiers(twilightMasqueradeEffect)
+  }
+  if (setId === 'sv6pt5') {
+    const shroudedFableEffect = inferShroudedFableTcgBattleAttackEffect(attack, baseDamage)
+    if (shroudedFableEffect) return applyAttackTextModifiers(shroudedFableEffect)
   }
   if (setId === 'sv7') {
     const stellarCrownEffect = inferStellarCrownTcgBattleAttackEffect(attack, baseDamage)
@@ -21338,6 +21342,171 @@ function inferTwilightMasqueradeTcgBattleAttackEffect(
         kind: 'pokemonExOrVTargetBonus',
         baseDamage,
         bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 90),
+      },
+    }
+  }
+
+  return null
+}
+
+function inferShroudedFableTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: { destination?: 'bench' | 'hand' } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+
+  if (name === 'shocking web') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 80),
+        source: { kind: 'energyOfType', side: 'own', type: 'Lightning' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'add on') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'united wings') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(text.match(/does (\d+) damage for each/)?.[1] || 20),
+        source: { kind: 'pokemonWithAttackInDiscard', side: 'own', attackName: 'United Wings' },
+      },
+    }
+  }
+  if (name === 'stock up on feathers') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', untilHandSize: 7 }] }
+  }
+  if (name === 'call for backup') return searchPokemon(3, { destination: 'hand' })
+  if (name === 'hydro pump') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(text.match(/does (\d+) more damage for each water energy/)?.[1] || 50),
+        source: { kind: 'energyOfType', side: 'own', type: 'Water' },
+      },
+    }
+  }
+  if (name === 'healing pirouette') {
+    return { ...zero(), healing: [{ amount: 20, side: 'own', zone: 'play' }] }
+  }
+  if (name === 'mystical return') {
+    return {
+      ...zero(),
+      targetScope: 'bench',
+      coinFlipCount: 1,
+      special: [{ kind: 'shuffleTargetIntoDeck', targetZone: 'bench', condition: 'heads' }],
+    }
+  }
+  if (name === 'clean hit') {
+    return {
+      damage: {
+        kind: 'evolvedTargetBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 90),
+      },
+    }
+  }
+  if (name === 'iron smasher') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 120),
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'opponent', subtypes: ['Future'], zone: 'play' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'darkfall') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 50),
+        source: { kind: 'energyOfType', side: 'own', type: 'Darkness' },
+        minimumUnits: 3,
+      },
+    }
+  }
+  if (name === 'illusory hijacking') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(text.match(/does (\d+) damage for each/)?.[1] || 60),
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'opponent', subtypes: ['ex', 'V'], zone: 'play' },
+      },
+    }
+  }
+  if (name === 'corrosive winds') {
+    return {
+      ...zero(),
+      counterDamage: [{ amount: 20, side: 'opponent', zone: 'play', onlyDamaged: true }],
+    }
+  }
+  if (name === 'poisonous musculature') {
+    return {
+      ...zero(),
+      energyGain: [{ target: 'self', amount: 2 }],
+      special: [{ kind: 'setStatus', target: 'self', statuses: ['poisoned'] }],
+    }
+  }
+  if (name === 'chain-crazed') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 130),
+        statuses: ['poisoned'],
+        statusTarget: 'attacker',
+      },
+    }
+  }
+  if (name === 'cruel arrow') {
+    return {
+      damage: { kind: 'fixed', amount: Number(text.match(/does (\d+) damage to 1/)?.[1] || 100) },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'nasal lariat') {
+    return {
+      damage: {
+        kind: 'optionalChoiceBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/do (\d+) more damage/)?.[1] || 100),
+      },
+      choiceRequirement: 'optionalBonus',
+      special: [{ kind: 'disableSelfAttack', attackName: 'Nasal Lariat', requiresOptionalChoice: true }],
+    }
+  }
+  if (name === 'rigidify') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 30 }] }
+  }
+  if (name === 'energy feather') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(text.match(/does (\d+) damage for each energy/)?.[1] || 30),
+        source: { kind: 'energy', side: 'own' },
       },
     }
   }
