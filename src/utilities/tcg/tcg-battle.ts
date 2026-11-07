@@ -1329,6 +1329,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const evolvingSkiesEffect = inferEvolvingSkiesTcgBattleAttackEffect(attack, baseDamage)
     if (evolvingSkiesEffect) return applyAttackTextModifiers(evolvingSkiesEffect)
   }
+  if (setId === 'swsh8') {
+    const fusionStrikeEffect = inferFusionStrikeTcgBattleAttackEffect(attack, baseDamage)
+    if (fusionStrikeEffect) return applyAttackTextModifiers(fusionStrikeEffect)
+  }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
     if (dragonMajestyEffect) return applyAttackTextModifiers(dragonMajestyEffect)
@@ -17916,6 +17920,166 @@ function inferEvolvingSkiesTcgBattleAttackEffect(
       targetMustHaveRemainingHpAtMost: maximumHp,
     }
   }
+  return null
+}
+
+function inferFusionStrikeTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: {
+      basicOnly?: boolean
+      includeNames?: string[]
+      includeSubtypes?: string[]
+      destination?: 'bench' | 'hand'
+    } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'flock') return searchPokemon(1, { includeNames: ['Caterpie'], destination: 'bench' })
+  if (name === 'counter') return { damage: { kind: 'lastIncomingDamageBonus', baseDamage } }
+  if (name === 'healing circle') return null
+  if (name === 'ditch and shake') return null
+  if (name === 'bail out') {
+    return {
+      ...zero(),
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 2, upTo: true }],
+    }
+  }
+  if (name === 'energize' || name === 'warm up' || name === 'fiery cheering' || name === 'soak in water') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === "queen's orders") return null
+  if (name === 'fling fire') return null
+  if (name === 'poltergeist' || name === 'max poltergeist' || name === 'circus soaking') return null
+  if (name === 'glistening droplets') {
+    return {
+      ...zero(),
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: 5,
+      counterDamage: [{ amountPerCounter: 10, target: 'distributed' }],
+    }
+  }
+  if (name === 'multishot star') return null
+  if (name === 'dive and rescue') {
+    return {
+      ...zero(),
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 3, upTo: true }],
+    }
+  }
+  if (name === 'collect' || name === 'double draw') {
+    const drawCount = Number(text.match(/draw (\d+) cards?/)?.[1] || 1)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: drawCount }] }
+  }
+  if (name === 'trigger avalanche') {
+    const amount = Number(text.match(/discard the top (\d+) cards of your opponent/)?.[1] || 2)
+    return { ...zero(), special: [{ kind: 'millCards', target: 'opponent', amount }] }
+  }
+  if (name === 'find ice') return null
+  if (name === 'call for family') {
+    const maxCount = Number(text.match(/up to (\d+) basic pokemon/)?.[1] || 1)
+    return searchPokemon(maxCount, { basicOnly: true, destination: 'bench' })
+  }
+  if (name === 'surprise short') return null
+  if (name === 'electro blaster') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 200)
+    const discardCount = Number(text.match(/discard (\d+) lightning energy/)?.[1] || 2)
+    return {
+      ...anyTargetDamage(amount),
+      energyDiscard: [{ target: 'self', amount: discardCount, requiresEnergyType: 'Lightning' }],
+      minimumExtraEnergyDiscard: discardCount,
+    }
+  }
+  if (name === 'bolt storm') {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each lightning energy/)?.[1] || 30)
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: perEnergy, source: { kind: 'energyOfType', side: 'own', type: 'Lightning' } } }
+  }
+  if (name === 'targeted spark') return anyTargetDamage(30)
+  if (name === 'find treasure' || name === 'go and collect' || name === 'rapid hunt' || name === 'sketching trash' || name === 'willful busybody') return null
+  if (name === 'energy mix') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'cross fusion strike') return null
+  if (name === 'force regeneration') return null
+  if (name === 'photon boost' || name === 'melodious echo') return null
+  if (name === 'psychic' && text.includes("energy attached to your opponent's active pokemon")) {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each energy/)?.[1] || 30)
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: perEnergy, source: { kind: 'energyOnTarget' } } }
+  }
+  if (name === 'max mindstorm') {
+    const perEnergy = Number(text.match(/does (\d+) damage for each energy/)?.[1] || 60)
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perEnergy, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'oppressing sandstorm') return { damage: { kind: 'targetSubtypeKnockOut', subtype: 'Basic' } }
+  if (name === 'fusion strike assault') {
+    const perPokemon = Number(text.match(/does (\d+) damage for each of your fusion strike pokemon/)?.[1] || 30)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: perPokemon,
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'own', subtypes: ['Fusion Strike'], zone: 'play' },
+      },
+    }
+  }
+  if (name === 'dig it up') return null
+  if (name === 'gut punch') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 60)
+    return { damage: { kind: 'pokemonVTargetBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'ancient imprint') {
+    const remainingHp = Number(text.match(/until its remaining hp is (\d+)/)?.[1] || 60)
+    return { damage: { kind: 'targetToRemainingHp', remainingHp } }
+  }
+  if (name === 'raised bad' || name === 'call to muster') {
+    const amount = Number(text.match(/up to (\d+) basic energy/)?.[1] || (name === 'raised bad' ? 2 : 2))
+    return { ...zero(), energyGain: [{ target: 'self', amount }] }
+  }
+  if (name === 'cliff edge formation') return null
+  if (name === 'fear and panic') {
+    const perPokemon = Number(text.match(/does (\d+) damage for each of your opponent/)?.[1] || 60)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: perPokemon,
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'opponent', subtypes: ['V', 'VMAX', 'VSTAR', 'GX'], zone: 'play' },
+      },
+    }
+  }
+  if (name === 'merciless strike') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 90)
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'drag off') return null
+  if (name === 'rear attack') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 140)
+    return { damage: { kind: 'countAtMostBonus', baseDamage, bonusDamage, source: { kind: 'bench', side: 'own' }, maximumUnits: 2 } }
+  }
+  if (name === 'continuous steps') {
+    const damagePerHeads = Number(text.match(/does (\d+) damage for each heads/)?.[1] || 30)
+    return { damage: { kind: 'headsMultiplier', damagePerHeads, coinFlipCount: 0 }, flipUntilTails: true }
+  }
+  if (name === 'wild dive') {
+    const perEnergy = Number(text.match(/does (\d+) damage for each energy/)?.[1] || 30)
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perEnergy, source: { kind: 'energyOnTarget' } } }
+  }
+  if (name === 'find a friend') return searchPokemon(1, { destination: 'hand' })
+  if (name === 'leaflet dance') return null
+
   return null
 }
 
