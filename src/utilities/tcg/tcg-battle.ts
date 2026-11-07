@@ -126,6 +126,7 @@ export type TcgBattleDamageRule =
   | { kind: 'attackerHpExactBonus'; baseDamage: number; bonusDamage: number; remainingHp: number }
   | { kind: 'attackerFullHpBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'targetSubtypeKnockOut'; subtype: string }
+  | { kind: 'knockOutAtRemainingHpAtMost'; maximumHp: number }
   | { kind: 'optionalChoiceBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'healthyTarget'; healthyDamage: number; damagedDamage: number }
   | { kind: 'headsTable'; damages: number[]; coinFlipCount: number }
@@ -434,6 +435,8 @@ export interface TcgBattleAttackEffect {
   targetMustBeUndamaged?: boolean
   targetMustBeLowestRemainingHp?: boolean
   targetMustHaveSubtype?: string
+  targetMustHaveAnySubtype?: string[]
+  targetMustHaveRemainingHpAtMost?: number
   targetMustNotHaveSubtype?: string
   attackerMustBeDamaged?: boolean
   targetMustHaveDeltaMark?: boolean
@@ -1321,6 +1324,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'swsh6') {
     const chillingReignEffect = inferChillingReignTcgBattleAttackEffect(attack, baseDamage)
     if (chillingReignEffect) return applyAttackTextModifiers(chillingReignEffect)
+  }
+  if (setId === 'swsh7') {
+    const evolvingSkiesEffect = inferEvolvingSkiesTcgBattleAttackEffect(attack, baseDamage)
+    if (evolvingSkiesEffect) return applyAttackTextModifiers(evolvingSkiesEffect)
   }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
@@ -17675,6 +17682,243 @@ function inferChillingReignTcgBattleAttackEffect(
   return null
 }
 
+function inferEvolvingSkiesTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: {
+      basicOnly?: boolean
+      includeSubtypes?: string[]
+      includeTypes?: string[]
+      destination?: 'bench' | 'hand'
+    } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'continuous spin') {
+    const damagePerHeads = Number(text.match(/does (\d+) damage for each heads/)?.[1] || 20)
+    return { damage: { kind: 'headsMultiplier', damagePerHeads, coinFlipCount: 0 }, flipUntilTails: true }
+  }
+  if (name === 'rally back') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 90)
+    return { damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'grass knot') {
+    const perRetreat = Number(text.match(/does (\d+) damage for each colorless/)?.[1] || 60)
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perRetreat, source: { kind: 'retreatCost', target: 'target' } } }
+  }
+  if (name === 'max detonate' || name === 'missing in the forest' || name === 'go and collect' || name === 'rapid hunt' || name === 'lead') {
+    // These attacks depend on Trainer cards or ordered deck reveals, neither of which is modeled.
+    return null
+  }
+  if (name === 'angry fang') {
+    // The shared damage-counter count cannot isolate injured Single Strike Pokémon on the Bench.
+    return null
+  }
+  if (name === 'max torrent' || name === 'fierce dragon') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 100)
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'blizzard rondo') {
+    const perPokemon = Number(text.match(/does (\d+) more damage for each benched pokemon/)?.[1] || 20)
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: perPokemon, source: { kind: 'bench', side: 'both' } } }
+  }
+  if (name === 'call for family') {
+    const maxCount = Number(text.match(/up to (\d+) basic pokemon/)?.[1] || 1)
+    return searchPokemon(maxCount, { basicOnly: true, destination: 'bench' })
+  }
+  if (name === 'taunt') {
+    return { ...zero(), choiceRequirement: 'opponentBench', special: [{ kind: 'switch', target: 'opponent' }] }
+  }
+  if (name === 'synchrodraw') {
+    return {
+      ...zero(),
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'handSize', side: 'opponent' },
+        shuffleHandIntoDeck: true,
+      }],
+    }
+  }
+  if (name === 'schooling shot') {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each basic energy/)?.[1] || 30)
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: perEnergy, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'energize') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'big sparking') {
+    const amount = Number(text.match(/does (\d+) damage to each pokemon/)?.[1] || 50)
+    return {
+      ...zero(),
+      benchDamage: [{
+        amount,
+        side: 'both',
+        zone: 'play',
+        ignoreWeaknessResistanceOnBench: true,
+        subtypeFilter: { include: ['V', 'VMAX', 'VSTAR', 'GX'] },
+      }],
+    }
+  }
+  if (name === 'electron crush') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 120)
+    const discardCount = Number(text.match(/discard (\d+) lightning energy/)?.[1] || 3)
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage },
+      choiceRequirement: 'optionalBonus',
+      minimumExtraEnergyDiscard: discardCount,
+      energyDiscard: [{ target: 'self', amount: discardCount, requiresEnergyType: 'Lightning', optional: true }],
+    }
+  }
+  if (name === 'wake-up slap') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 90)
+    return {
+      damage: {
+        kind: 'statusCountBonus',
+        baseDamage,
+        bonusDamagePerStatus: bonusDamage,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+      special: [{ kind: 'clearStatus', target: 'opponent', statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'] }],
+    }
+  }
+  if (name === 'mirror pain') return null
+  if (name === 'collect') return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  if (name === 'synchro woofer' || name === 'synchro loud') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || (name === 'synchro woofer' ? 80 : 120))
+    return { damage: { kind: 'handSizeComparisonBonus', baseDamage, bonusDamage, comparison: 'equal' } }
+  }
+  if (name === 'max harmony') {
+    const perType = Number(text.match(/does (\d+) more damage for each different type/)?.[1] || 30)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: perType,
+        source: { kind: 'distinctTypesInPlay', side: 'own', zone: 'bench' },
+      },
+    }
+  }
+  if (name === 'clean hit' || name === 'valiant talons') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || (name === 'clean hit' ? 50 : 60))
+    return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'protect') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAll', condition: 'heads' }],
+    }
+  }
+  if (name === 'moonlight blade') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 80)
+    return { damage: { kind: 'damageCounterThresholdBonus', baseDamage, bonusDamage, minimumCounters: 1 } }
+  }
+  if (name === 'shiftadieu') return null
+  if (name === 'berserk') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 90)
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage,
+        source: { kind: 'injuredPokemon', side: 'own', zone: 'bench' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'fighting tackle') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 80)
+    return { damage: { kind: 'pokemonVTargetBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'dragon energy') {
+    const perCounter = Number(text.match(/does (\d+) less damage for each damage counter/)?.[1] || 20)
+    return { damage: { kind: 'subtractCount', baseDamage, perUnitDamage: perCounter, source: { kind: 'damageCounters', target: 'attacker' } } }
+  }
+  if (name === 'vee-search') return searchPokemon(3, { includeSubtypes: ['V'], destination: 'hand' })
+  if (name === 'tailwind draw') {
+    return {
+      ...zero(),
+      special: [{ kind: 'drawCards', target: 'self', amount: 1 }],
+    }
+  }
+  if (name === 'nitro dive') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 80)
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage,
+        source: { kind: 'energyOfType', side: 'own', type: 'Fire' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'crescent glow') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'photon laser') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 90)
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage,
+        source: { kind: 'energy', side: 'own' },
+        minimumUnits: 5,
+      },
+    }
+  }
+  if (name === 'triple draw') {
+    const drawCount = Number(text.match(/draw (\d+) cards/)?.[1] || 3)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: drawCount }] }
+  }
+  if (name === 'thunder spear') return anyTargetDamage(20)
+  if (name === 'boomburst') {
+    const amount = Number(text.match(/does (\d+) damage to each of your opponent/)?.[1] || 20)
+    return {
+      ...zero(),
+      benchDamage: [{ amount, side: 'opponent', zone: 'play', ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'max mindstorm') {
+    const perEnergy = Number(text.match(/does (\d+) damage for each energy/)?.[1] || 60)
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perEnergy, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'fiery wrath' || name === 'dragon counter' || name === 'judgment surge') return null
+  if (name === 'psylaser') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 120)
+    return {
+      ...anyTargetDamage(amount),
+      energyDiscard: [{ target: 'self', amount: 'all', requiresEnergyType: 'Psychic' }],
+    }
+  }
+  if (name === 'zen shot') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 60)
+    return { ...anyTargetDamage(amount), targetMustHaveAnySubtype: ['V', 'VMAX', 'VSTAR'] }
+  }
+  if (name === 'hunting claw') {
+    const maximumHp = Number(text.match(/has (\d+) hp or less remaining/)?.[1] || 60)
+    return {
+      damage: { kind: 'knockOutAtRemainingHpAtMost', maximumHp },
+      targetScope: 'any',
+      targetMustHaveRemainingHpAtMost: maximumHp,
+    }
+  }
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -21903,6 +22147,8 @@ export function getValidTcgBattleTargets(
     if (effect.targetMustBeDamaged && card.currentHp >= card.hp) return false
     if (effect.targetMustBeUndamaged && card.currentHp < card.hp) return false
     if (effect.targetMustHaveSubtype && !card.subtypes.some((subtype) => subtype.toLowerCase() === effect.targetMustHaveSubtype?.toLowerCase())) return false
+    if (effect.targetMustHaveAnySubtype && !card.subtypes.some((subtype) => effect.targetMustHaveAnySubtype?.some((requiredSubtype) => subtype.toLowerCase() === requiredSubtype.toLowerCase()))) return false
+    if (effect.targetMustHaveRemainingHpAtMost !== undefined && card.currentHp > effect.targetMustHaveRemainingHpAtMost) return false
     if (effect.targetMustNotHaveSubtype && card.subtypes.some((subtype) => subtype.toLowerCase() === effect.targetMustNotHaveSubtype?.toLowerCase())) return false
     if (lowestRemainingHp !== undefined && card.currentHp !== lowestRemainingHp) return false
     if (effect.targetMustHaveDeltaMark && !card.name.includes('δ')) return false
@@ -22777,6 +23023,8 @@ function calculateTcgBattleRawDamage(
       return context.target.subtypes.some((subtype) => subtype.toLowerCase() === rule.subtype.toLowerCase())
         ? context.target.currentHp
         : 0
+    case 'knockOutAtRemainingHpAtMost':
+      return context.target.currentHp <= rule.maximumHp ? context.target.currentHp : 0
     case 'optionalChoiceBonus':
       return rule.baseDamage + (context.choice?.kind === 'optionalBonus' && context.choice.enabled ? rule.bonusDamage : 0)
     case 'energyComparisonBonus': {
