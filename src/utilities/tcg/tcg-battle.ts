@@ -310,14 +310,16 @@ export type TcgBattleSpecialRule =
   | { kind: 'shuffleRandomHandCardIntoDeck'; target: 'self' | 'opponent'; amountPerHead?: number; condition?: TcgBattleCoinCondition }
   | { kind: 'discardRandomHandCard'; target: 'self' | 'opponent'; amountPerHead?: number; amountPerTail?: number; untilHandSize?: number; condition?: TcgBattleCoinCondition }
   | { kind: 'discardSelectedHandPokemon' }
+  | { kind: 'recoverRandomPokemonFromDiscardToHand'; amountPerHead: number }
   | { kind: 'recoverPokemonFromDiscardToHand'; includeSubtypes?: string[]; includeNames?: string[]; maxCount?: number; upTo?: boolean; condition?: TcgBattleCoinCondition }
   | { kind: 'returnOwnBenchToHand' }
   | { kind: 'returnOwnPokemonToDeck' }
   | { kind: 'returnTargetToHand'; condition?: TcgBattleCoinCondition }
-  | { kind: 'knockOutTarget' }
+  | { kind: 'knockOutTarget'; requiresAnyTargetStatus?: boolean }
   | { kind: 'transferDamageCounters'; maxCounters: number; sourceZone?: 'bench' | 'play' }
   | { kind: 'transferDamageCountersFromOwnSide'; maxCountersPerPokemon: number }
-  | { kind: 'shuffleTargetIntoDeck' }
+  | { kind: 'shuffleTargetIntoDeck'; requiresOpponentBench?: boolean }
+  | { kind: 'shuffleDiscardPokemonIntoDeck'; maxCount: number }
   | { kind: 'revealHand'; target: 'self' | 'opponent' }
   | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerHead?: number; amountPerOwnEnergy?: number; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition }
   | {
@@ -1231,6 +1233,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'sm2') {
     const guardiansRisingEffect = inferSunMoonGuardiansRisingTcgBattleAttackEffect(attack, baseDamage)
     if (guardiansRisingEffect) return applyAttackTextModifiers(guardiansRisingEffect)
+  }
+  if (setId === 'sm3') {
+    const burningShadowsEffect = inferSunMoonBurningShadowsTcgBattleAttackEffect(attack, baseDamage)
+    if (burningShadowsEffect) return applyAttackTextModifiers(burningShadowsEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -13097,6 +13103,219 @@ function inferSunMoonGuardiansRisingTcgBattleAttackEffect(
   if (name === 'weather teller') return zero()
 
   // Prize, Tool, delayed-KO, deck-order and multi-target choice effects remain filtered.
+  return null
+}
+
+function inferSunMoonBurningShadowsTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTarget = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'bye-bye heal') {
+    return {
+      ...zero(),
+      healing: [{ amount: 'all', side: 'own', zone: 'play' }],
+      special: [{ kind: 'returnOwnPokemonToDeck' }],
+    }
+  }
+  if (name === 'first impression' || name === 'solar heat' || name === 'enhanced fang') {
+    // Ignore switch-history and unmodeled Tool/Stadium bonuses; keep printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'raging out-gx') {
+    return { ...zero(), special: [{ kind: 'millCards', target: 'opponent', amount: 10 }] }
+  }
+  if (name === 'odor sleuth') {
+    return {
+      ...zero(),
+      coinFlipCount: 2,
+      special: [{ kind: 'recoverRandomPokemonFromDiscardToHand', amountPerHead: 1 }],
+    }
+  }
+  if (name === 'sacred fire') return anyTarget(50)
+  if (name === 'water arrow') return anyTarget(baseDamage)
+  if (name === 'brine') {
+    return {
+      ...anyTarget(90),
+      targetMustBeDamaged: true,
+    }
+  }
+  if (name === 'venting anger') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 50,
+        source: { kind: 'namedPokemonInDiscard', side: 'own', names: ['Magikarp'] },
+      },
+    }
+  }
+  if (name === 'hydro shot') {
+    return {
+      ...anyTarget(120),
+      minimumExtraEnergyDiscard: 2,
+      energyDiscard: [{ target: 'self', amount: 2, requiresEnergyType: 'Water' }],
+    }
+  }
+  if (name === 'tapu storm-gx') {
+    return { ...zero(), special: [{ kind: 'shuffleTargetIntoDeck', requiresOpponentBench: true }] }
+  }
+  if (name === 'aqua shock') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 30,
+        source: { kind: 'energyOfType', side: 'opponent', type: 'Water' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'vacuum bolt') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 80 },
+      choiceRequirement: 'optionalBonus',
+      selfDamage: [{ kind: 'optionalChoice', amount: 80 }],
+    }
+  }
+  if (name === 'drift ashore') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand' }],
+    }
+  }
+  if (name === 'shadowy knot') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 50, source: { kind: 'retreatCost', target: 'target' } } }
+  }
+  if (name === 'dark guidance') {
+    return { ...zero(), choiceRequirement: 'discardPokemon', special: [{ kind: 'reviveDiscardPokemon', side: 'self' }] }
+  }
+  if (name === 'night roam') {
+    return { ...zero(), counterDamage: [{ amount: 10, side: 'both', zone: 'play' }] }
+  }
+  if (name === 'poison boost') {
+    return {
+      damage: { kind: 'statusBonus', baseDamage, bonusDamage: 80, statuses: ['poisoned'], statusTarget: 'attacker' },
+      special: [{ kind: 'clearStatus', target: 'self', statuses: ['poisoned'] }],
+    }
+  }
+  if (name === 'venoshock') {
+    return { damage: { kind: 'statusBonus', baseDamage, bonusDamage: 40, statuses: ['poisoned'] } }
+  }
+  if (name === 'perplexing eyes') {
+    return { ...zero(), choiceRequirement: 'typeChange', special: [{ kind: 'changeWeakness' }] }
+  }
+  if (name === 'allure') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 3 }] }
+  }
+  if (name === 'hand kinesis') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'handSize', side: 'own' } } }
+  }
+  if (name === 'prismatic burst') {
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 60, source: { kind: 'energyOfType', side: 'own', type: 'Psychic' } },
+      energyDiscard: [{ target: 'self', amount: 'all', requiresEnergyType: 'Psychic' }],
+    }
+  }
+  if (name === 'black ray-gx') {
+    return {
+      ...zero(),
+      benchDamage: [{
+        amount: 100,
+        side: 'opponent',
+        zone: 'play',
+        ignoreWeaknessResistance: true,
+        subtypeFilter: { include: ['GX', 'EX'] },
+      }],
+    }
+  }
+  if (name === 'cross-cut') {
+    return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'double draw') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 2 }] }
+  }
+  if (name === 'dangerous claws') {
+    return { damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage: 30, subtype: 'Basic' } }
+  }
+  if (name === 'peerless hundred blows-gx') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 50, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'focus energy') {
+    return { ...zero(), special: [{ kind: 'buffAttack', target: 'self', attackName: 'Bite', baseDamage: 60 }] }
+  }
+  if (name === 'division') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeNames: ['Alolan Grimer'] }],
+    }
+  }
+  if (name === 'chemical breath') {
+    return {
+      damage: {
+        kind: 'statusCountBonus',
+        baseDamage,
+        bonusDamagePerStatus: 70,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+    }
+  }
+  if (name === 'hone claws') {
+    return { ...zero(), special: [{ kind: 'buffAttack', target: 'self', attackName: 'Slash', baseDamage: 80 }] }
+  }
+  if (name === 'dark raid') {
+    // Whether the opponent has used a GX attack is not tracked; preserve base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'dead end-gx') {
+    return { ...zero(), special: [{ kind: 'knockOutTarget', requiresAnyTargetStatus: true }] }
+  }
+  if (name === 'infinite force') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 30, source: { kind: 'energy', side: 'both' } } }
+  }
+  if (name === 'twilight-gx') {
+    return { ...zero(), special: [{ kind: 'shuffleDiscardPokemonIntoDeck', maxCount: 10 }] }
+  }
+  if (name === 'boomburst-gx') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 50, side: 'opponent', zone: 'play', ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'screech') {
+    return { ...zero(), special: [{ kind: 'buffDefendingPokemon', damageBonus: 60 }] }
+  }
+  if (name === 'see through') {
+    return { ...zero(), special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+  if (name === 'baby-doll eyes') {
+    return { ...zero(), special: [{ kind: 'preventRetreat' }] }
+  }
+  if (name === 'mix-up') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [{ kind: 'millCards', target: 'opponent', amount: 3, condition: 'heads' }],
+    }
+  }
+  if (name === 'nature\'s judgment') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 60 },
+      choiceRequirement: 'optionalBonus',
+      energyDiscard: [{ target: 'self', amount: 'all', optional: true }],
+    }
+  }
+
+  // Prior-turn history, Prize cards, deck ordering, multi-target picks and delayed knockouts remain filtered.
   return null
 }
 

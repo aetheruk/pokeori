@@ -1011,6 +1011,26 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
 
+    if (rule.kind === 'recoverRandomPokemonFromDiscardToHand') {
+      const discard = state[sideKey].discard
+      const recoverCount = Math.min(rule.amountPerHead * (resolution.coinFlips?.heads || 0), discard.length)
+      const recovered: TcgBattleCardState[] = []
+      for (let index = 0; index < recoverCount; index += 1) {
+        const cardIndex = Math.floor(Math.random() * discard.length)
+        recovered.push(...discard.splice(cardIndex, 1))
+      }
+      if (recovered.length > 0) {
+        state[sideKey].hand.push(...recovered)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: recovered[0].instanceId,
+          label: `${recovered.map((card) => card.name).join(', ')} returned from the discard pile to your hand`,
+        })
+      }
+      continue
+    }
+
     if (rule.kind === 'recoverPokemonFromDiscardToHand' && choice?.kind === 'discardPokemonToHand') {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const discard = state[sideKey].discard
@@ -1093,7 +1113,11 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
 
-    if (rule.kind === 'knockOutTarget' && target.currentHp > 0) {
+    if (
+      rule.kind === 'knockOutTarget' &&
+      target.currentHp > 0 &&
+      (!rule.requiresAnyTargetStatus || Boolean(target.statusConditions?.length))
+    ) {
       target.currentHp = 0
       recordEffectEvent(state, {
         kind: 'control',
@@ -1167,16 +1191,39 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'shuffleTargetIntoDeck') {
+      if (rule.requiresOpponentBench && state[opponentKey].back.every((card) => card.currentHp <= 0)) continue
       const defendingSide = state[opponentKey]
       const targetIndex = defendingSide.front.findIndex((card) => card.instanceId === target.instanceId)
       if (targetIndex < 0) continue
-      defendingSide.front.splice(targetIndex, 1)
+      const [card] = defendingSide.front.splice(targetIndex, 1)
+      defendingSide.deck.push(toTcgBattleCardSummary(card))
+      shuffleTcgBattleDeck(defendingSide)
       recordEffectEvent(state, {
         kind: 'control',
         sourceId: attacker.instanceId,
         targetId: target.instanceId,
         label: `${target.name} was shuffled into the opposing deck`,
       })
+      continue
+    }
+
+    if (rule.kind === 'shuffleDiscardPokemonIntoDeck') {
+      const discard = state[sideKey].discard
+      const count = Math.min(rule.maxCount, discard.length)
+      for (let index = 0; index < count; index += 1) {
+        const cardIndex = Math.floor(Math.random() * discard.length)
+        const [card] = discard.splice(cardIndex, 1)
+        state[sideKey].deck.push(toTcgBattleCardSummary(card))
+      }
+      if (count > 0) {
+        shuffleTcgBattleDeck(state[sideKey])
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: attacker.instanceId,
+          label: `${count} Pokémon returned from your discard pile to your deck`,
+        })
+      }
       continue
     }
 
