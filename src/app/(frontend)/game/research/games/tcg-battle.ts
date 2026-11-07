@@ -562,6 +562,15 @@ function advanceTurn(state: TcgBattleState, nextSide: TcgBattleSide) {
       if (Object.keys(history).length === 0) delete card.temporaryEffects?.lastNightEyesAttackBySide
     }
   }
+  for (const sideKey of ['player', 'opponent'] as const) {
+    for (const card of [...state[sideKey].front, ...state[sideKey].back]) {
+      const history = card.temporaryEffects?.lastAttackHitBySide
+      if (!history?.[state.activeSide]) continue
+      history[state.activeSide] = (history[state.activeSide] || 0) - 1
+      if ((history[state.activeSide] || 0) <= 0) delete history[state.activeSide]
+      if (Object.keys(history).length === 0) delete card.temporaryEffects?.lastAttackHitBySide
+    }
+  }
   for (const card of [...state[state.activeSide].front, ...state[state.activeSide].back]) {
     delete card.temporaryEffects?.lastIncomingAttackDamage
   }
@@ -688,6 +697,12 @@ function getTemporaryEffects(card: TcgBattleCardState) {
   return card.temporaryEffects
 }
 
+function recordTcgBattleAttackHit(card: TcgBattleCardState, sideKey: TcgBattleSide) {
+  const history = getTemporaryEffects(card).lastAttackHitBySide || {}
+  history[sideKey] = 2
+  getTemporaryEffects(card).lastAttackHitBySide = history
+}
+
 function clearSourceLinkedControlsForInactiveSources(state: TcgBattleState) {
   for (const sideKey of ['player', 'opponent'] as const) {
     const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
@@ -779,12 +794,12 @@ function applyTcgBattleSpecialEffects(params: {
         'changeWeakness',
         'changeType',
         'placeMarker',
-        'preventRetreat',
         'attackFailsOnTails',
         'preventSwitch',
         'buffDefendingPokemon',
       ].includes(rule.kind) ||
       (rule.kind === 'switch' && rule.target === 'opponent') ||
+      (rule.kind === 'preventRetreat' && (rule.target || 'opponent') === 'opponent') ||
       (rule.kind === 'cannotAttack' && rule.target !== 'self') ||
       (rule.kind === 'buffAttack' && rule.target === 'opponent') ||
       (rule.kind === 'clearStatus' && rule.target === 'opponent') ||
@@ -975,7 +990,8 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
     if (rule.kind === 'preventRetreat') {
-      getTemporaryEffects(target).cannotRetreat = rule.untilSourceLeaves
+      const retreatTarget = rule.target === 'self' ? attacker : target
+      getTemporaryEffects(retreatTarget).cannotRetreat = rule.untilSourceLeaves
         ? { remainingTurns: 99, sourceId: attacker.instanceId, untilSourceLeaves: true }
         : rule.untilTargetLeaves
           ? { remainingTurns: 99, untilTargetLeaves: true }
@@ -1434,6 +1450,9 @@ function applyAttack(
     history[sideKey] = 2
     getTemporaryEffects(target).lastNightEyesAttackBySide = history
   }
+  if (resolution.targetDamage > 0 || attack.name.toLowerCase() === 'midnight eyes') {
+    recordTcgBattleAttackHit(target, sideKey)
+  }
   if (resolution.targetDamage > 0) {
     recordDamageEvent(state, {
       sourceId: attacker.instanceId,
@@ -1450,6 +1469,7 @@ function applyAttack(
       )
       if (!benchCard) continue
       applyAttackDamageToCard(state, sideKey, attacker.instanceId, benchHit.targetSide, benchCard, benchHit.damage)
+      if (benchHit.damage > 0) recordTcgBattleAttackHit(benchCard, sideKey)
     }
   }
   if (resolution.counterDamage && resolution.counterDamage.length > 0) {
@@ -1461,6 +1481,7 @@ function applyAttack(
       )
       if (!hitCard) continue
       applyAttackDamageToCard(state, sideKey, attacker.instanceId, counterHit.targetSide, hitCard, counterHit.damage)
+      if (counterHit.damage > 0) recordTcgBattleAttackHit(hitCard, sideKey)
     }
   }
   if (resolution.healing && resolution.healing.length > 0) {
