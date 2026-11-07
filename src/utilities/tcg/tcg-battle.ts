@@ -1156,6 +1156,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const xyFlashfireEffect = inferXyFlashfireTcgBattleAttackEffect(attack, baseDamage)
     if (xyFlashfireEffect) return applyAttackTextModifiers(xyFlashfireEffect)
   }
+  if (setId === 'xy3') {
+    const xyFuriousFistsEffect = inferXyFuriousFistsTcgBattleAttackEffect(attack, baseDamage)
+    if (xyFuriousFistsEffect) return applyAttackTextModifiers(xyFuriousFistsEffect)
+  }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
     if (platinumEffect) return applyAttackTextModifiers(platinumEffect)
@@ -10258,6 +10262,167 @@ function inferXyFlashfireTcgBattleAttackEffect(
   }
   // Cross-turn coin changes, draw prevention, Prize counts, multi-Pokémon
   // counter redistribution, Energy in hand, and deck ordering are not modeled.
+  return null
+}
+
+function inferXyFuriousFistsTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'knock off') {
+    return { ...zero(), special: [{ kind: 'discardRandomHandCard', target: 'opponent' }] }
+  }
+  if (name === 'giga power') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 40 },
+      selfDamage: [{ kind: 'optionalChoice', amount: 20 }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'big bang horn') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage: 180,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'twin bursts') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 80,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: ['Electivire'] },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'burning shot') {
+    return {
+      damage: { kind: 'fixed', amount: 150 },
+      targetScope: 'any',
+      energyDiscard: [{ target: 'self', amount: 2 }],
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'finishing blow') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 50 } }
+  }
+  if (name === 'igloo hold') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+  if (name === 'splash cannon') {
+    // Water Energy attached to Clawitzer is approximated with shared Energy.
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } },
+    }
+  }
+  if (name === 'tag team spark') {
+    // Magmortar's individual Energy is not tracked; shared Energy is used when it is Benched.
+    return {
+      damage: {
+        kind: 'gatedCount',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+        gateSource: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: ['Magmortar'] },
+        minimumGateUnits: 1,
+      },
+    }
+  }
+  if (name === 'entrainment') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, basicOnly: true }],
+    }
+  }
+  if (name === 'energy short') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'energyOnTarget' } },
+    }
+  }
+  if (name === 'quick draw') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'mountain munch') {
+    return { ...zero(), special: [{ kind: 'millCards', target: 'opponent', amount: 1 }] }
+  }
+  if (name === 'venoshock') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 40,
+        statuses: ['poisoned'],
+      },
+    }
+  }
+  if (name === 'follow me') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'jet sonic') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 40,
+        source: { kind: 'unusedEnergy' },
+        maxUnits: 1,
+        optional: true,
+      },
+      energyDiscard: [{ target: 'self', amount: 1, optional: true }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'charge energy') {
+    // Basic Energy cards searched into hand are approximated as shared Energy.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'boomburst') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 30, side: 'opponent', zone: 'play' }],
+    }
+  }
+  if (name === 'lickichop') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 30, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'big yawn') {
+    return {
+      ...zero(),
+      status: [
+        { target: 'self', statuses: ['asleep'] },
+        { target: 'opponent', statuses: ['asleep'] },
+      ],
+    }
+  }
+  if (name === 'twister throw') {
+    return { damage: { kind: 'handSizeComparisonBonus', baseDamage, bonusDamage: 60, comparison: 'equal' } }
+  }
+
+  // Stadium/Tool/Item cards, Prize cards, cross-turn coin changes, in-battle
+  // evolution, hand Energy, and deck order are not represented by this mode.
   return null
 }
 
