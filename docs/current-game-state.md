@@ -4,6 +4,8 @@ Unreleased: The Dailies view shows each voyage that is currently underway in an 
 
 Unreleased: Prof's Scrip Shop no longer offers the League Ticket exchange. Missed starter Pokémon icons cost 350 Professor Scrip and titles cost 200. One Rocket Grunt icon purchase grants both male and female icons; Red and Blue each have one 1,500-Scrip purchase granting both game-version icon variants.
 
+Unreleased: Once the free starter-area version is unlocked, Charmander joins Route 24's Field Observation and wild battle pools, Squirtle joins Route 6's pools, and Bulbasaur joins Viridian Forest's pools.
+
 Unreleased: The repeatable Lavender Tower Ghost Trial's Alpha Gengar battle is categorized as Kanto so its Alpha capture attempt records Kanto as the Pokémon's obtained region.
 
 Unreleased: Trainer notification settings replace a device subscription when its VAPID key no longer matches the server, clearing the stale server record before creating a fresh subscription.
@@ -895,6 +897,7 @@ Main beats:
 - `viridian-exit` requires `binder-base2` and is the gate into Pewter City.
 - `bulbasaur-2` is a late side quest unlocked from Cerulean's `bulbasaur-1`; it requires a companion and specific research levels for Kanto starter/related forms.
 - Secret Garden unlocks after `bulbasaur-2` and is initially time-gated to 05:00-09:00 Kanto time. After 3 successful Secret Garden catches, `secret-garden-trust` swaps in `viridian-secret-garden-open`, an ungated version with a 12% Regular Seed recipe drop.
+- After `secret-garden-trust`, Bulbasaur also joins Viridian Forest's Field Observation and wild battle pools.
 - `tm-vine-whip`, `tm-leafage`, `tm-absorb`, and `tm-razor-leaf` are no longer Secret Garden drops; they are developed through level 1 Pokemon Research rewards for matching Grass first partner Pokemon.
 
 Current role in flow: Viridian Forest gates Pewter via `viridian-exit` and carries side objectives that become relevant later.

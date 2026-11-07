@@ -63,6 +63,17 @@ export const vermilionCityBattles: BattleConfig[] = [
           max: 16,
         },
       },
+      {
+        speciesId: 7,
+        formId: '7',
+        level: {
+          min: 13,
+          max: 16,
+        },
+        requirements: [
+          { type: 'task_completed', targetId: 'squirtle-cove-regular' },
+        ],
+      },
     ],
     rewards: [],
     maxPokemon: 1,

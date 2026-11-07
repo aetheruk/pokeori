@@ -29,6 +29,14 @@ export const viridianForestFieldObservationEntries: FieldObservationConfig[] = [
         { speciesId: 14, formId: '14', weight: 5 },
         { speciesId: 25, formId: '25', weight: 10 },
         {
+          speciesId: 1,
+          formId: '1',
+          weight: 5,
+          requirements: [
+            { type: 'task_completed', targetId: 'secret-garden-trust' },
+          ],
+        },
+        {
           speciesId: 12,
           formId: '12',
           weight: 5,

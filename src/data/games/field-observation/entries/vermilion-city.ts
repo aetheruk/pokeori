@@ -26,6 +26,14 @@ export const vermilionCityFieldObservationEntries: FieldObservationConfig[] = [
         { speciesId: 52, formId: '52', weight: 20 },
         { speciesId: 56, formId: '56', weight: 20 },
         { speciesId: 69, formId: '69', weight: 15 },
+        {
+          speciesId: 7,
+          formId: '7',
+          weight: 5,
+          requirements: [
+            { type: 'task_completed', targetId: 'squirtle-cove-regular' },
+          ],
+        },
       ],
       levelRange: {
         min: 13,

@@ -837,6 +837,14 @@ export const ceruleanCityBattles: BattleConfig[] = [
         level: 14,
         formId: '69',
       },
+      {
+        speciesId: 4,
+        level: 12,
+        formId: '4',
+        requirements: [
+          { type: 'task_completed', targetId: 'growlithe-knows-the-way' },
+        ],
+      },
     ],
     rewards: [
       {
