@@ -382,11 +382,6 @@ function AbilityDexListItem({
         >
           {isKnown ? entry.ability.name : 'Unknown ability'}
         </h2>
-        <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-game-muted sm:text-sm">
-          {isKnown
-            ? entry.ability.description
-            : 'Register this ability to reveal its field note.'}
-        </p>
       </div>
     </button>
   )
