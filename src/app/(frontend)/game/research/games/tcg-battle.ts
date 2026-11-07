@@ -926,6 +926,8 @@ function applyTcgBattleSpecialEffects(params: {
         : 0
       const amount = typeof rule.untilHandSize === 'number'
         ? Math.max(0, rule.untilHandSize - destination.hand.length)
+        : rule.untilHandSizeMatches === 'opponent'
+          ? Math.max(0, state[destinationSideKey === 'player' ? 'opponent' : 'player'].hand.length - destination.hand.length)
         : Math.max(
             0,
             (rule.amount || 0) +
