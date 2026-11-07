@@ -458,6 +458,7 @@ export interface TcgBattleAttackEffect {
   targetMustHaveSubtype?: string
   targetMustHaveAnySubtype?: string[]
   targetMustHaveRemainingHpAtMost?: number
+  targetMustHaveDamageCounters?: { minimum: number; maximum?: number }
   targetMustNotHaveSubtype?: string
   attackerMustBeDamaged?: boolean
   targetMustHaveDeltaMark?: boolean
@@ -1430,6 +1431,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'sv8') {
     const surgingSparksEffect = inferSurgingSparksTcgBattleAttackEffect(attack, baseDamage)
     if (surgingSparksEffect) return applyAttackTextModifiers(surgingSparksEffect)
+  }
+  if (setId === 'sv8pt5') {
+    const prismaticEvolutionsEffect = inferPrismaticEvolutionsTcgBattleAttackEffect(attack, baseDamage)
+    if (prismaticEvolutionsEffect) return applyAttackTextModifiers(prismaticEvolutionsEffect)
   }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
@@ -22088,6 +22093,225 @@ function inferSurgingSparksTcgBattleAttackEffect(
   return null
 }
 
+function inferPrismaticEvolutionsTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTarget = (amount: number, ignoresEffects = false): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+    ignoreWeaknessResistance: ignoresEffects,
+    ignoreTargetDamageModifiers: ignoresEffects,
+  })
+
+  if (name === 'leaflet blessings') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownBench',
+      energyGain: [{ target: 'self', amount: 1, requiresOwnBench: true }],
+      healing: [{ target: 'selectedOwnBench', amount: 'all' }],
+    }
+  }
+  if (name === 'verdant storm') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 60,
+        source: { kind: 'energy', side: 'opponent' },
+      },
+    }
+  }
+  if (name === 'syrup storm') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(text.match(/does (\d+) more damage for each grass energy/)?.[1] || 30),
+        source: { kind: 'energyOfType', side: 'own', type: 'Grass' },
+      },
+    }
+  }
+  if (name === 'myriad leaf shower') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 30,
+        source: { kind: 'energy', side: 'both' },
+      },
+    }
+  }
+  if (name === 'fighting blaze' || name === 'fighting whirlpool') {
+    return {
+      damage: {
+        kind: 'pokemonExOrVTargetBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 90),
+      },
+    }
+  }
+  if (name === 'dynamic blaze') {
+    return {
+      damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 140 },
+      energyDiscard: [{ target: 'self', amount: 'all', targetEvolved: true }],
+    }
+  }
+  if (name === 'severe squall') {
+    return {
+      ...zero(),
+      benchDamage: [{
+        amount: 60,
+        side: 'opponent',
+        zone: 'play',
+        ignoreWeaknessResistance: true,
+        subtypeFilter: { include: ['ex'] },
+      }],
+    }
+  }
+  if (name === 'euclase') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      targetMustHaveDamageCounters: { minimum: 6, maximum: 6 },
+      damage: { kind: 'knockOutAtDamageCounters', minimumCounters: 6, maximumCounters: 6 },
+    }
+  }
+  if (name === 'linear attack') return anyTarget(30)
+  if (name === 'fighting lightning') {
+    return {
+      damage: {
+        kind: 'pokemonExOrVTargetBonus',
+        baseDamage,
+        bonusDamage: 90,
+      },
+    }
+  }
+  if (name === 'flashing spear') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 90,
+        source: { kind: 'chosenEnergy' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+      choiceEnergyMax: 2,
+    }
+  }
+  if (name === 'roaring scream') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'energy feather') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 30,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'swelling power') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'magma purge') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 60,
+        source: { kind: 'chosenEnergy' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+      choiceEnergyMax: 4,
+    }
+  }
+  if (name === 'feint attack') return anyTarget(50, true)
+  if (name === 'call to muster') return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  if (name === 'grind') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 50,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'vengeance fletching') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(text.match(/does (\d+) more damage for each ancient/)?.[1] || 10),
+        source: { kind: 'pokemonInDiscard', side: 'own', includeSubtypes: ['Ancient'] },
+      },
+    }
+  }
+  if (name === 'jewel breaker') {
+    return { damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage: 230, subtype: 'Tera' } }
+  }
+  if (name === 'rising tackle') {
+    return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 50 } }
+  }
+  if (name === 'calamity storm') {
+    // Stadium cards are not represented; keep the printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'land collapse') {
+    // The Ancient Supporter turn check is unavailable; retain its ordinary one-card mill.
+    return { ...zero(), special: [{ kind: 'millCards', target: 'opponent', amount: 1 }] }
+  }
+  if (name === 'burst roar') {
+    return {
+      ...zero(),
+      special: [
+        { kind: 'discardAllHandCards' },
+        { kind: 'drawCards', target: 'self', amount: 6 },
+      ],
+    }
+  }
+  if (name === 'bellowing thunder') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 70,
+        source: { kind: 'chosenEnergy' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+    }
+  }
+  if (name === 'catharsis roar') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 120,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+        statusTarget: 'target',
+      },
+    }
+  }
+
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -26348,6 +26572,11 @@ export function getValidTcgBattleTargets(
     if (effect.targetMustHaveSubtype && !card.subtypes.some((subtype) => subtype.toLowerCase() === effect.targetMustHaveSubtype?.toLowerCase())) return false
     if (effect.targetMustHaveAnySubtype && !card.subtypes.some((subtype) => effect.targetMustHaveAnySubtype?.some((requiredSubtype) => subtype.toLowerCase() === requiredSubtype.toLowerCase()))) return false
     if (effect.targetMustHaveRemainingHpAtMost !== undefined && card.currentHp > effect.targetMustHaveRemainingHpAtMost) return false
+    if (effect.targetMustHaveDamageCounters) {
+      const counters = Math.floor((card.hp - card.currentHp) / 10)
+      if (counters < effect.targetMustHaveDamageCounters.minimum) return false
+      if (effect.targetMustHaveDamageCounters.maximum !== undefined && counters > effect.targetMustHaveDamageCounters.maximum) return false
+    }
     if (effect.targetMustNotHaveSubtype && card.subtypes.some((subtype) => subtype.toLowerCase() === effect.targetMustNotHaveSubtype?.toLowerCase())) return false
     if (lowestRemainingHp !== undefined && card.currentHp !== lowestRemainingHp) return false
     if (effect.targetMustHaveDeltaMark && !card.name.includes('δ')) return false
