@@ -823,6 +823,9 @@ function applyTcgBattleSpecialEffects(params: {
         if (!cardSummary) continue
         const newPokemon = createTcgBattleCardState(cardSummary, destination.back.length + index)
         if (rule.treatAsBasic) newPokemon.subtypes = ['Basic']
+        if (rule.damageCountersOnSearch) {
+          newPokemon.currentHp = Math.max(0, newPokemon.currentHp - rule.damageCountersOnSearch * 10)
+        }
         destination.back.push(newPokemon)
         recordEffectEvent(state, {
           kind: 'control',

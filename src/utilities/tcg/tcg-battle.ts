@@ -42,6 +42,7 @@ export type TcgBattleCountSource =
   | { kind: 'pokemonEvolvedOnBench'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'pokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[] }
   | { kind: 'distinctTypesOfNamedPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; nameContains: string }
+  | { kind: 'handSize'; side: 'own' | 'opponent'; max?: number }
   | { kind: 'unusedEnergy' }
   | { kind: 'chosenEnergy' }
   | { kind: 'energy'; side: 'own' | 'opponent' | 'both'; max?: number }
@@ -147,6 +148,7 @@ export type TcgBattleStatusRule = {
   requiresTargetStatusAbsent?: TcgBattleStatusCondition
   requiresEnergy?: { side: 'own' | 'opponent'; minimum: number; maximum?: number }
   requiresAttackerStatus?: TcgBattleStatusCondition
+  requiresAttackerDamaged?: boolean
   requiresHandSizeComparison?: 'equal'
   useChosenStatus?: boolean
   useChosenStatusPair?: boolean
@@ -259,7 +261,7 @@ export type TcgBattleChoiceRequirement =
   | 'textureMagic'
 
 export type TcgBattleSpecialRule =
-  | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; treatAsBasic?: boolean }
+  | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; treatAsBasic?: boolean; damageCountersOnSearch?: number }
   | {
       kind: 'switch'
       target: 'self' | 'opponent'
@@ -354,6 +356,7 @@ export interface TcgBattleAttackEffect {
   targetMustBeDamaged?: boolean
   targetMustBeUndamaged?: boolean
   targetMustBeLowestRemainingHp?: boolean
+  targetMustHaveSubtype?: string
   attackerMustBeDamaged?: boolean
   targetMustHaveDeltaMark?: boolean
   minimumExtraEnergyDiscard?: number
@@ -1017,6 +1020,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'dp7') {
     const dp7Effect = inferDp7TcgBattleAttackEffect(attack, text, baseDamage)
     if (dp7Effect) return applyAttackTextModifiers(dp7Effect)
+  }
+  if (setId === 'pl2') {
+    const risingRivalsEffect = inferRisingRivalsTcgBattleAttackEffect(attack, text, baseDamage)
+    if (risingRivalsEffect) return applyAttackTextModifiers(risingRivalsEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -6192,6 +6199,334 @@ function inferDp7TcgBattleAttackEffect(
   return null
 }
 
+function inferRisingRivalsTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTarget = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'burn out') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 30 },
+      choiceRequirement: 'optionalBonus',
+      status: [{ target: 'self', statuses: ['burned'], requiresOptionalChoice: true }],
+    }
+  }
+  if (name === 'power swing') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonEvolvedOnBench', side: 'own' },
+      },
+    }
+  }
+  if (name === 'wake-up slap') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 20,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+      special: [{ kind: 'clearStatus', target: 'opponent', statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'] }],
+    }
+  }
+  if (name === 'combo throw' || name === 'psywave') {
+    // Per-Pokemon attached Energy is approximated by the opponent's shared Energy pool.
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'energy', side: 'opponent' },
+      },
+    }
+  }
+  if (name === 'trample') {
+    return {
+      ...zero(),
+      coinFlipSource: { kind: 'bench', side: 'both' },
+      benchDamage: [{ amount: 30, side: 'both', zone: 'bench', perTargetCoinFlip: true, ignoreWeaknessResistance: true }],
+    }
+  }
+  if (name === 'rend') return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 20 } }
+  if (name === 'return blow') return { damage: { kind: 'lastIncomingDamage' }, ignoreWeaknessResistance: true }
+  if (name === 'evolving flare') return { damage: { kind: 'fixed', amount: baseDamage } }
+  if (name === 'calling wave') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, includeNameContains: ['Gastrodon'], treatAsBasic: true, damageCountersOnSearch: 2 }],
+    }
+  }
+  if (name === 'muddy bomb') {
+    return {
+      ...anyTarget(30),
+      benchDamage: [{ amount: 10, side: 'opponent', zone: 'play', excludeTarget: true }],
+    }
+  }
+  if (name === 'raging sea') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'injuredPokemon', side: 'own', zone: 'bench' },
+      },
+    }
+  }
+  if (name === 'focus energy' && text.includes("megahorn attack's base damage is 100")) {
+    return { ...zero(), special: [{ kind: 'buffAttack', attackName: 'Megahorn', baseDamage: 100 }] }
+  }
+  if (name === 'save sand') {
+    // Energy attached to Hippowdon is represented by its side's shared Energy pool.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'quick attack' || name === 'needling sting') {
+    const bonusDamage = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage }, coinFlipCount: 1 }
+  }
+  if (name === 'magic heal') {
+    return {
+      ...zero(),
+      coinFlipCount: 3,
+      healing: [{ side: 'own', zone: 'play', maxTargets: 1, amount: 0, amountPerHead: 10 }],
+    }
+  }
+  if (name === 'ruthless tail') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'bench', side: 'opponent' },
+      },
+    }
+  }
+  if (name === 'thunder throw') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 10, side: 'opponent', zone: 'bench', maxTargets: 2, ignoreWeaknessResistance: true }],
+    }
+  }
+  if (name === 'repeat lightning') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'injuredPokemon', side: 'opponent', zone: 'bench' },
+      },
+    }
+  }
+  if (name === 'evolving aqua') {
+    return { ...anyTarget(baseDamage), targetMustBeDamaged: true }
+  }
+  if (name === 'leaf needle') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'skill dive') return anyTarget(baseDamage)
+  if (name === 'reckless bomb') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 20, side: 'opponent', zone: 'play' }],
+      selfDamage: [{ kind: 'fixed', amount: 100 }],
+    }
+  }
+  if (name === 'attack and hide') {
+    return { ...zero(), targetScope: 'any', counterDamage: [{ amount: 30, target: 'opponent' }] }
+  }
+  if (name === 'split bomb') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 20, side: 'opponent', zone: 'play', maxTargets: 2, ignoreWeaknessResistance: true }],
+    }
+  }
+  if (name === 'ice blade') return anyTarget(baseDamage)
+  if (name === 'bite and crush') {
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage: 10 }, coinFlipCount: 2 }
+  }
+  if (name === 'heavy metal') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'cross-cut') return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 20 } }
+  if (name === 'pickup power') {
+    // Discard-pile Energy recovery is represented as shared Energy gained per heads.
+    return { ...zero(), coinFlipCount: 3, energyGain: [{ target: 'self', amountPerHead: 1 }] }
+  }
+  if (name === 'mend') {
+    // Searching for a Metal Energy is not modeled, so its attachment/healing pair uses shared Energy.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }], healing: [{ target: 'self', amount: 10 }] }
+  }
+  if (name === 'blessed fruit') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownBench',
+      healing: [{ target: 'selectedOwnBench', amount: 'all', sameTypeAsAttacker: true }],
+    }
+  }
+  if (name === 'iron head') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 10, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'scary face') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [
+        { kind: 'cannotAttack', target: 'opponent', condition: 'heads' },
+        { kind: 'preventRetreat', target: 'opponent', condition: 'heads' },
+      ],
+    }
+  }
+  if (name === 'shell scatter') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 10, side: 'opponent', zone: 'play' }],
+      special: [{ kind: 'disableSelfAttack', attackName: 'Shell Scatter' }],
+    }
+  }
+  if (name === 'stoke') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'endeavor') {
+    return { damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 2 }, coinFlipCount: 2 }
+  }
+  if (name === 'triple smash') {
+    return { damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 3 }, coinFlipCount: 3 }
+  }
+  if (name === 'rest') {
+    return {
+      ...zero(),
+      allowWhileAsleep: true,
+      healing: [{ target: 'self', amount: 60 }],
+      special: [
+        { kind: 'clearStatus', target: 'self', statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'] },
+        { kind: 'setStatus', target: 'self', statuses: ['asleep'] },
+      ],
+    }
+  }
+  if (name === 'stress poison') {
+    return {
+      damage: { kind: 'damageCounterThresholdBonus', baseDamage, bonusDamage: 20, minimumCounters: 1 },
+      status: [{ target: 'opponent', statuses: ['poisoned'], requiresAttackerDamaged: true }],
+    }
+  }
+  if (name === 'frustration') return { ...anyTarget(baseDamage), targetMustBeUndamaged: true }
+  if (name === 'feint attack') {
+    return {
+      ...anyTarget(baseDamage),
+      ignoreWeaknessResistance: true,
+      ignoreTargetDamageModifiers: true,
+    }
+  }
+  if (name === 'find ice') return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  if (name === 'ripple') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      counterDamage: [{ amount: 10, side: 'opponent', zone: 'play', condition: 'heads' }],
+    }
+  }
+  if (name === 'brine') return { ...anyTarget(baseDamage), targetMustBeDamaged: true }
+  if (name === 'toss and turn') {
+    return {
+      damage: { kind: 'statusBonus', baseDamage, bonusDamage: 30, statuses: ['asleep'], statusTarget: 'attacker' },
+      allowWhileAsleep: true,
+    }
+  }
+  if (name === 'heavy press') {
+    return {
+      damage: { kind: 'headsBonus', baseDamage, bonusDamage: 40 },
+      coinFlipCount: 1,
+      status: [{ target: 'self', statuses: ['asleep'], condition: 'tails' }],
+    }
+  }
+  if (name === 'grind') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'energy cyclone') {
+    // Chosen shared Energy stands in for Energy cards selected from the hand and returned to the deck.
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'chosenEnergy' } },
+      choiceRequirement: 'energyAmount',
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+    }
+  }
+  if (name === 'extreme attack') {
+    return { ...anyTarget(150), targetMustHaveSubtype: 'Level-Up' }
+  }
+  if (name === 'aimed cut') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'target' },
+      },
+    }
+  }
+  if (name === 'darkness magic') {
+    return {
+      ...zero(),
+      counterDamage: [{ amountPerUnit: 10, source: { kind: 'handSize', side: 'own', max: 8 }, target: 'opponent' }],
+    }
+  }
+  if (name === 'grudge') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonInDiscard', side: 'own' },
+      },
+    }
+  }
+  if (name === 'spin storm') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      choiceRequirement: 'optionalOpponentBench',
+      special: [{ kind: 'switch', target: 'opponent', condition: 'heads', optional: true }],
+    }
+  }
+  if (name === 'hail') {
+    return { ...zero(), benchDamage: [{ amount: 10, side: 'opponent', zone: 'play' }] }
+  }
+  if (name === 'crushing ice') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+  if (name === 'warm up') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'cleanse away') {
+    return { ...zero(), healing: [{ amount: 30, side: 'own', zone: 'bench' }] }
+  }
+
+  // Prize, hand/deck, discard-pile card movement, and in-turn evolution checks remain filtered.
+  return null
+}
+
 function inferPlatinumTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -10021,6 +10356,7 @@ export function getValidTcgBattleTargets(
     if (scope === 'all' && card.instanceId === attacker.instanceId) return false
     if (effect.targetMustBeDamaged && card.currentHp >= card.hp) return false
     if (effect.targetMustBeUndamaged && card.currentHp < card.hp) return false
+    if (effect.targetMustHaveSubtype && !card.subtypes.some((subtype) => subtype.toLowerCase() === effect.targetMustHaveSubtype?.toLowerCase())) return false
     if (lowestRemainingHp !== undefined && card.currentHp !== lowestRemainingHp) return false
     if (effect.targetMustHaveDeltaMark && !card.name.includes('δ')) return false
     if (attacker.temporaryEffects?.cannotTarget?.targetId === card.instanceId) return false
@@ -10839,6 +11175,11 @@ function getTcgBattleCount(
     return countFor(own) + countFor(opponent)
   }
 
+  if (source.kind === 'handSize') {
+    const amount = (source.side === 'own' ? own : opponent).hand.length
+    return Math.min(amount, source.max ?? Number.POSITIVE_INFINITY)
+  }
+
   if (source.kind === 'pokemonWithSubtypesInPlay') {
     const wanted = new Set(source.subtypes.map((subtype) => subtype.toLowerCase()))
     const cardsFor = (side: TcgBattleSideState) =>
@@ -10994,6 +11335,7 @@ function calculateTcgBattleStatusConditions(
       if (rule.targetSubtype === 'stage2' && !affectedCard?.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2')) return []
       if (rule.requiresTargetStatusAbsent && affectedCard?.statusConditions?.includes(rule.requiresTargetStatusAbsent)) return []
       if (rule.requiresAttackerStatus && !attacker?.statusConditions?.includes(rule.requiresAttackerStatus)) return []
+      if (rule.requiresAttackerDamaged && (!attacker || attacker.currentHp >= attacker.hp)) return []
       if (rule.requiresNamedPokemon) {
         if (!state || !sideKey) return []
         const requiredSide = rule.requiresNamedPokemon.side === 'own'
