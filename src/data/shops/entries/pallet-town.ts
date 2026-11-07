@@ -198,11 +198,11 @@ const starterShopTitles = [
   { id: 'starter-water', name: 'Bubble Blower' },
 ] as const
 
-const profScripStarterCost = (): ShopItem['cost'] => [
+const profScripCost = (amount: number): ShopItem['cost'] => [
   {
     type: 'currency',
     id: 'prof-scrip',
-    amount: 500,
+    amount,
   },
 ]
 
@@ -235,7 +235,7 @@ const starterExclusiveShopItems: ShopItem[] = [
       type: 'pokemon' as const,
       id: starter.pokemonId,
     },
-    cost: profScripStarterCost(),
+    cost: profScripCost(350),
     stock: 1,
     requirements: starterChoiceExclusion(starter.taskId),
     rewards: [
@@ -255,7 +255,7 @@ const starterExclusiveShopItems: ShopItem[] = [
       type: 'local' as const,
       id: '/sprites/items/certificate.avif',
     },
-    cost: profScripStarterCost(),
+    cost: profScripCost(200),
     stock: 1,
     requirements: starterTitleRequirement(title.id),
     rewards: [
@@ -290,9 +290,9 @@ export const palletTownShops: ShopConfig[] = [
     items: [
       ...starterExclusiveShopItems,
       {
-        id: 'trainer-gb-red',
-        name: 'Red (Red)',
-        description: 'Classic GB RED trainer sprite.',
+        id: 'trainer-gb-red-versions',
+        name: 'Red',
+        description: 'Unlock both Red trainer icons from the Red and Blue versions.',
         icon: {
           type: 'trainer',
           id: 'gb-red',
@@ -301,7 +301,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 1000,
+            amount: 1500,
           },
         ],
         stock: 1,
@@ -312,12 +312,18 @@ export const palletTownShops: ShopConfig[] = [
             quantity: 1,
             dropChance: 100,
           },
+          {
+            type: 'icon',
+            targetId: 'trainer-gb-red-2',
+            quantity: 1,
+            dropChance: 100,
+          },
         ],
       },
       {
-        id: 'trainer-gb-blue',
-        name: 'Blue (Red)',
-        description: 'Classic GB BLUE trainer sprite.',
+        id: 'trainer-gb-blue-versions',
+        name: 'Blue',
+        description: 'Unlock both Blue trainer icons from the Red and Blue versions.',
         icon: {
           type: 'trainer',
           id: 'gb-blue',
@@ -326,7 +332,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 1000,
+            amount: 1500,
           },
         ],
         stock: 1,
@@ -337,50 +343,6 @@ export const palletTownShops: ShopConfig[] = [
             quantity: 1,
             dropChance: 100,
           },
-        ],
-      },
-      {
-        id: 'trainer-gb-red-2',
-        name: 'Red (Blue)',
-        description: 'Alternative Pokemon Red Version trainer sprite.',
-        icon: {
-          type: 'trainer',
-          id: 'gb-red-2',
-        },
-        cost: [
-          {
-            type: 'currency',
-            id: 'prof-scrip',
-            amount: 1000,
-          },
-        ],
-        stock: 1,
-        rewards: [
-          {
-            type: 'icon',
-            targetId: 'trainer-gb-red-2',
-            quantity: 1,
-            dropChance: 100,
-          },
-        ],
-      },
-      {
-        id: 'trainer-gb-blue-2',
-        name: 'Blue (Blue)',
-        description: 'Alternative Pokemon Blue Version trainer sprite.',
-        icon: {
-          type: 'trainer',
-          id: 'gb-blue-2',
-        },
-        cost: [
-          {
-            type: 'currency',
-            id: 'prof-scrip',
-            amount: 1000,
-          },
-        ],
-        stock: 1,
-        rewards: [
           {
             type: 'icon',
             targetId: 'trainer-gb-blue-2',
@@ -401,7 +363,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 500,
+            amount: 200,
           },
         ],
         stock: 1,
@@ -462,7 +424,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 500,
+            amount: 200,
           },
         ],
         stock: 1,
@@ -481,9 +443,9 @@ export const palletTownShops: ShopConfig[] = [
         ],
       },
       {
-        id: 'icon-rocket-m',
-        name: 'Icon: Rocket Grunt (M)',
-        description: 'Unlock the male Team Rocket Grunt trainer icon.',
+        id: 'icon-rocket-grunts',
+        name: 'Icon: Rocket Grunt',
+        description: 'Unlock both the male and female Team Rocket Grunt trainer icons.',
         icon: {
           type: 'trainer',
           id: 'rocket-grunt-m',
@@ -509,31 +471,6 @@ export const palletTownShops: ShopConfig[] = [
             quantity: 1,
             dropChance: 100,
           },
-        ],
-      },
-      {
-        id: 'icon-rocket-f',
-        name: 'Icon: Rocket Grunt (F)',
-        description: 'Unlock the female Team Rocket Grunt trainer icon.',
-        icon: {
-          type: 'trainer',
-          id: 'rocket-grunt-f',
-        },
-        cost: [
-          {
-            type: 'currency',
-            id: 'prof-scrip',
-            amount: 500,
-          },
-        ],
-        stock: 1,
-        requirements: [
-          {
-            type: 'task_completed',
-            targetId: 'nugget-bridge-refuse',
-          },
-        ],
-        rewards: [
           {
             type: 'icon',
             targetId: 'rocket-f',
