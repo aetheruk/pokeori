@@ -225,6 +225,7 @@ export type TcgBattleBenchDamageRule = {
   selectedEnergyType?: boolean
   typeFilter?: { include?: string[]; exclude?: string[] }
   subtypeFilter?: { include?: string[]; exclude?: string[] }
+  nameContains?: string[]
 }
 
 export type TcgBattleCounterDamageRule =
@@ -332,7 +333,7 @@ export type TcgBattleChoiceRequirement =
   | 'textureMagic'
 
 export type TcgBattleSpecialRule =
-  | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; includeResistanceTypes?: string[]; destination?: 'bench' | 'hand'; random?: boolean; condition?: TcgBattleCoinCondition; treatAsBasic?: boolean; damageCountersOnSearch?: number; oneOfEachName?: boolean; oneOfEachType?: boolean }
+  | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; includeResistanceTypes?: string[]; includeSelectedEnergyType?: boolean; destination?: 'bench' | 'hand'; random?: boolean; condition?: TcgBattleCoinCondition; treatAsBasic?: boolean; damageCountersOnSearch?: number; oneOfEachName?: boolean; oneOfEachType?: boolean }
   | { kind: 'revealTopDeckPokemon'; amount: number; includeSubtypes: string[] }
   | { kind: 'drawCards'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; amountPerUnit?: number; untilHandSize?: number; untilHandSizeMatches?: 'opponent'; source?: TcgBattleCountSource; shuffleHandIntoDeck?: boolean; condition?: TcgBattleCoinCondition; requiresDiscardChoice?: boolean }
   | { kind: 'shuffleRandomHandCardIntoDeck'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; condition?: TcgBattleCoinCondition; revealSelected?: boolean }
@@ -1415,6 +1416,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'sv6') {
     const twilightMasqueradeEffect = inferTwilightMasqueradeTcgBattleAttackEffect(attack, baseDamage)
     if (twilightMasqueradeEffect) return applyAttackTextModifiers(twilightMasqueradeEffect)
+  }
+  if (setId === 'sv7') {
+    const stellarCrownEffect = inferStellarCrownTcgBattleAttackEffect(attack, baseDamage)
+    if (stellarCrownEffect) return applyAttackTextModifiers(stellarCrownEffect)
   }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
@@ -21340,6 +21345,241 @@ function inferTwilightMasqueradeTcgBattleAttackEffect(
   return null
 }
 
+function inferStellarCrownTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: { basicOnly?: boolean; includeNames?: string[]; includeSelectedEnergyType?: boolean; destination?: 'bench' | 'hand' } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+
+  if (name === 'collect' || name === 'allure') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'miasma wind') {
+    return {
+      damage: {
+        kind: 'statusCountBonus',
+        baseDamage: 0,
+        bonusDamagePerStatus: Number(text.match(/does (\d+) damage for each special condition/)?.[1] || 100),
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+        statusTarget: 'target',
+      },
+    }
+  }
+  if (name === 'loom over') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: Number(text.match(/does (\d+) less damage/)?.[1] || 10),
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'breezy gift') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [
+        { kind: 'returnOwnPokemonToDeck' },
+        { kind: 'searchDeckPokemon', maxCount: 3, destination: 'hand' },
+      ],
+    }
+  }
+  if (name === 'syrup storm') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(text.match(/does (\d+) more damage for each grass energy/)?.[1] || 30),
+        source: { kind: 'energyOfType', side: 'own', type: 'Grass' },
+      },
+    }
+  }
+  if (name === 'call for family') return searchPokemon(1, { basicOnly: true, destination: 'bench' })
+  if (name === 'garnet volley') {
+    return {
+      damage: { kind: 'fixed', amount: Number(text.match(/does (\d+) damage to 1/)?.[1] || 180) },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'twin cannons') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 140, source: { kind: 'chosenEnergy' } },
+      energyDiscard: [{ target: 'self', amount: 'choice', requiresEnergyType: 'Water' }],
+      choiceRequirement: 'energyAmount',
+      choiceEnergyMax: 2,
+      choiceEnergyType: 'Water',
+    }
+  }
+  if (name === 'power splash') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(text.match(/does (\d+) damage for each energy/)?.[1] || 40),
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'hard crunch') return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 80 } }
+  if (name === 'charged web') {
+    return {
+      damage: {
+        kind: 'pokemonExOrVTargetBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 110),
+      },
+    }
+  }
+  if (name === 'parallel placement') return searchPokemon(3, { includeNames: ['Charjabug'], destination: 'bench' })
+  if (name === 'targeted spark') {
+    return {
+      damage: { kind: 'fixed', amount: Number(text.match(/does (\d+) damage to 1/)?.[1] || 20) },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'dangle tail') {
+    return {
+      ...zero(),
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 1 }],
+    }
+  }
+  if (name === 'everyone explode now') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(text.match(/does (\d+) damage for each of your drifloon/)?.[1] || 50),
+        source: { kind: 'namedPokemonContains', side: 'own', zone: 'play', values: ['Drifloon', 'Drifblim'] },
+      },
+      benchDamage: [{
+        amount: 30,
+        side: 'own',
+        zone: 'play',
+        nameContains: ['Drifloon', 'Drifblim'],
+        ignoreWeaknessResistanceOnBench: true,
+      }],
+    }
+  }
+  if (name === 'ominous eyes') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      counterDamage: [{ amount: 30, target: 'opponent' }],
+    }
+  }
+  if (name === 'flower shower') {
+    return {
+      ...zero(),
+      special: [
+        { kind: 'drawCards', target: 'self', amount: 3 },
+        { kind: 'drawCards', target: 'opponent', amount: 3 },
+      ],
+    }
+  }
+  if (name === 'colorful confection') {
+    return searchPokemon(5, { includeSelectedEnergyType: true, destination: 'hand' })
+  }
+  if (name === 'pleasant aroma' || name === 'form ranks') {
+    return searchPokemon(name === 'form ranks' ? 2 : 1, { basicOnly: true, destination: 'bench' })
+  }
+  if (name === 'bone vengeance') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 120,
+        source: { kind: 'damageCountersOnNamedPokemon', side: 'own', zone: 'bench', names: ['Cubone'] },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'chi-atsu') {
+    return { ...zero(), counterDamage: [{ target: 'opponent', amountToLeaveHp: 50 }] }
+  }
+  if (name === 'gale roundhouse') {
+    return {
+      damage: {
+        kind: 'countAtMostBonus',
+        baseDamage,
+        bonusDamage: 60,
+        source: { kind: 'handSize', side: 'opponent' },
+        maximumUnits: 5,
+      },
+    }
+  }
+  if (name === 'resolute fang') {
+    return {
+      damage: {
+        kind: 'pokemonExTargetBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 70),
+      },
+    }
+  }
+  if (name === 'devouring mouth') {
+    return {
+      damage: {
+        kind: 'energyComparisonBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 160),
+      },
+    }
+  }
+  if (name === 'pull') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', beforeDamage: true }],
+    }
+  }
+  if (name === 'aero chase') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(text.match(/does (\d+) more damage/)?.[1] || 110),
+        source: { kind: 'retreatCost', target: 'target' },
+        minimumUnits: 2,
+      },
+    }
+  }
+  if (name === 'withdraw') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAll', condition: 'heads', persistent: true }],
+    }
+  }
+  if (name === 'thunderburst storm') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(text.match(/does (\d+) damage to 1/)?.[1] || 30),
+        source: { kind: 'energy', side: 'own' },
+      },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -23592,6 +23832,7 @@ export function getAvailableTcgBattleDeckPokemon(
   const eligibleTypes = rule.includeTypes?.map((type) => type.toLowerCase())
   const eligibleSubtypes = rule.includeSubtypes?.map((subtype) => subtype.toLowerCase())
   const eligibleResistanceTypes = rule.includeResistanceTypes?.map((type) => type.toLowerCase())
+  const selectedEnergyType = rule.includeSelectedEnergyType ? side.selectedEnergy?.toLowerCase() : undefined
 
   return side.deck.filter((card) => {
     if (unavailableIds.has(card.id)) return false
@@ -23600,12 +23841,13 @@ export function getAvailableTcgBattleDeckPokemon(
     const isNamed = Boolean(eligibleNames?.includes(normalizedName))
     const nameContains = Boolean(eligibleNameParts?.some((value) => normalizedName.includes(value)))
     const typeMatches = Boolean(card.types.some((type) => eligibleTypes?.includes(type.toLowerCase())))
+    const selectedEnergyTypeMatches = Boolean(selectedEnergyType && card.types.some((type) => type.toLowerCase() === selectedEnergyType))
     const subtypeMatches = Boolean(card.subtypes.some((subtype) => eligibleSubtypes?.includes(subtype.toLowerCase())))
     const resistanceMatches = Boolean(card.resistances.some((resistance) => eligibleResistanceTypes?.includes(resistance.type.toLowerCase())))
     if (rule.basicOnly && !isBasic) return false
     if (
-      (eligibleNames?.length || eligibleNameParts?.length || eligibleTypes?.length || eligibleSubtypes?.length || eligibleResistanceTypes?.length || rule.includeBasic) &&
-      !(isNamed || nameContains || typeMatches || subtypeMatches || resistanceMatches || (rule.includeBasic && isBasic))
+      (eligibleNames?.length || eligibleNameParts?.length || eligibleTypes?.length || eligibleSubtypes?.length || eligibleResistanceTypes?.length || rule.includeSelectedEnergyType || rule.includeBasic) &&
+      !(isNamed || nameContains || typeMatches || selectedEnergyTypeMatches || subtypeMatches || resistanceMatches || (rule.includeBasic && isBasic))
     ) return false
     return true
   })
@@ -24784,6 +25026,7 @@ function calculateTcgBattleBenchDamage(
       const cardSubtypes = card.subtypes.map((subtype) => subtype.toLowerCase())
       if (rule.subtypeFilter?.include?.length && !rule.subtypeFilter.include.some((subtype) => cardSubtypes.includes(subtype.toLowerCase()))) return false
       if (rule.subtypeFilter?.exclude?.some((subtype) => cardSubtypes.includes(subtype.toLowerCase()))) return false
+      if (rule.nameContains?.length && !rule.nameContains.some((name) => normalizeTcgBattleCardName(card.name).includes(normalizeTcgBattleCardName(name)))) return false
       return true
     })
     const maxTargets = rule.maxTargetsFrom
