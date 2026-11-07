@@ -800,6 +800,7 @@ function applyTcgBattleSpecialEffects(params: {
         'preventSwitch',
         'buffDefendingPokemon',
         'transferDamageCounters',
+        'transferDamageCountersFromOwnSide',
         'transferAllDamageCounters',
         'shuffleTargetIntoDeck',
       ].includes(rule.kind) ||
@@ -1029,6 +1030,36 @@ function applyTcgBattleSpecialEffects(params: {
         targetId: source.instanceId,
         label: `Moved ${movedCounters} damage counter${movedCounters === 1 ? '' : 's'} from ${source.name} to ${defendingCard.name}`,
       })
+      continue
+    }
+
+    if (rule.kind === 'transferDamageCountersFromOwnSide') {
+      const defendingCard = [...state[opponentKey].front, ...state[opponentKey].back]
+        .find((card) => card.instanceId === target.instanceId && card.currentHp > 0)
+      if (!defendingCard) continue
+      for (const source of [...state[sideKey].front, ...state[sideKey].back]) {
+        if (source.currentHp <= 0) continue
+        const availableCounters = Math.max(0, Math.floor((source.hp - source.currentHp) / 10))
+        const movedCounters = Math.min(rule.maxCountersPerPokemon, availableCounters)
+        if (movedCounters <= 0) continue
+        const damage = movedCounters * 10
+        source.currentHp = Math.min(source.hp, source.currentHp + damage)
+        defendingCard.currentHp = Math.max(0, defendingCard.currentHp - damage)
+        recordDamageEvent(state, {
+          sourceId: attacker.instanceId,
+          targetId: defendingCard.instanceId,
+          targetSide: opponentKey,
+          damage,
+          reason: 'attack',
+        })
+        recordTcgBattleAttackHit(defendingCard, sideKey)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: source.instanceId,
+          label: `Moved ${movedCounters} damage counter${movedCounters === 1 ? '' : 's'} from ${source.name} to ${defendingCard.name}`,
+        })
+      }
       continue
     }
 

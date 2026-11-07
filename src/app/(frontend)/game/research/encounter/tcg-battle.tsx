@@ -2605,7 +2605,10 @@ function AttackChoiceDrawer({
   const requirement = effect?.choiceRequirement
   const attackCost = attack ? getAttackCost(attack, state) : 0
   const availableEnergy = Math.max(0, state.player.energy - attackCost)
-  const availableChoiceEnergy = Math.min(availableEnergy, effect?.choiceEnergyMax ?? Number.POSITIVE_INFINITY)
+  const energyTypeAllowed = !effect?.choiceEnergyType || state.player.selectedEnergy === effect.choiceEnergyType
+  const availableChoiceEnergy = energyTypeAllowed
+    ? Math.min(availableEnergy, effect?.choiceEnergyMax ?? Number.POSITIVE_INFINITY)
+    : 0
   const copiedAttack =
     requirement === 'copyAttack' && target && selectedAttackIndex !== null
       ? target.attacks[selectedAttackIndex]
@@ -3446,7 +3449,7 @@ function AttackChoiceDrawer({
           {activeRequirement === 'energyAmount' && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
-                Extra Energy
+                {effect.choiceEnergyType ? `Extra ${effect.choiceEnergyType} Energy` : 'Extra Energy'}
               </h3>
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
                 {Array.from({ length: availableChoiceEnergy + 1 }, (_, amount) => (
