@@ -1054,6 +1054,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const triumphantEffect = inferTriumphantTcgBattleAttackEffect(attack, text, baseDamage)
     if (triumphantEffect) return applyAttackTextModifiers(triumphantEffect)
   }
+  if (setId === 'col1') {
+    const callOfLegendsEffect = inferCallOfLegendsTcgBattleAttackEffect(attack, text, baseDamage)
+    if (callOfLegendsEffect) return applyAttackTextModifiers(callOfLegendsEffect)
+  }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
     if (platinumEffect) return applyAttackTextModifiers(platinumEffect)
@@ -7411,6 +7415,264 @@ function inferTriumphantTcgBattleAttackEffect(
   }
 
   // Stadium/hand/deck/Prize/Lost Zone and damage-counter movement effects without a faithful target choice remain filtered.
+  return null
+}
+
+function inferCallOfLegendsTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  // Several Call of Legends cards reprint attacks already mapped in the HGSS sets.
+  if (
+    name === 'cross chop' ||
+    name === 'detect' ||
+    name === 'dual splash' ||
+    name === 'everyone explode now' ||
+    name === 'fire counterattack' ||
+    name === 'focus energy' ||
+    name === 'jump on' ||
+    name === 'miasma wind' ||
+    name === 'minimize' ||
+    name === 'quick attack' ||
+    name === 'quick blow' ||
+    name === 'roar' ||
+    name === 'steel coat'
+  ) {
+    const reprintedEffect =
+      inferUndauntedTcgBattleAttackEffect(attack, text, baseDamage) ??
+      inferUnleashedTcgBattleAttackEffect(attack, text, baseDamage) ??
+      inferTriumphantTcgBattleAttackEffect(attack, text, baseDamage) ??
+      inferHeartGoldSoulSilverTcgBattleAttackEffect(attack, text, baseDamage)
+    if (reprintedEffect) return reprintedEffect
+  }
+
+  if (name === 'cell storm') {
+    // The two Psychic Energy discard and self-healing use the shared Energy/HP pools.
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      energyDiscard: [{ target: 'self', amount: 2 }],
+      minimumExtraEnergyDiscard: 2,
+      healing: [{ target: 'self', amount: 60 }],
+    }
+  }
+  if (name === 'mirror shot') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      special: [{ kind: 'attackFailsOnTails' }],
+    }
+  }
+  if (name === 'close combat') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      special: [{ kind: 'buffDefendingPokemon', damageBonus: 20 }],
+    }
+  }
+  if (name === 'destructive tsunami') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      benchDamage: [
+        { amount: 40, side: 'opponent', zone: 'play', condition: 'heads' },
+        { amount: 40, side: 'own', zone: 'play', condition: 'tails' },
+      ],
+    }
+  }
+  if (name === 'linear attack') {
+    const amount = Number.parseInt(text.match(/does (\d+) damage to that pokemon/)?.[1] || '0', 10)
+    return amount > 0 ? anyTargetDamage(amount) : null
+  }
+  if (name === 'spinning tail' || name === 'tsunami') {
+    return { ...zero(), benchDamage: [{ amount: 20, side: 'opponent', zone: 'play' }] }
+  }
+  if (name === 'chomp') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'acceleration bolt') {
+    // Searching for two Basic Energy cards is represented as two shared-Energy gains.
+    return { damage: { kind: 'fixed', amount: baseDamage }, energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'eeeeeeek') {
+    // Hand shuffle/draw is unavailable; retain Cleffa's printed self-Asleep effect.
+    return { ...zero(), special: [{ kind: 'setStatus', target: 'self', statuses: ['asleep'] }] }
+  }
+  if (name === 'layabout') {
+    return {
+      ...zero(),
+      healing: [{ target: 'self', amount: 'all' }],
+      special: [{ kind: 'disableSelfAttack', attackName: 'Layabout' }],
+    }
+  }
+  if (name === 'grind') {
+    // Energy attached to Tangrowth is approximated by the shared Energy pool.
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'thunder spear') return anyTargetDamage(20)
+  if (name === 'sleepy lost') {
+    // The Lost Zone action is unavailable; retain Mime Jr.'s printed self-Asleep effect.
+    return { ...zero(), special: [{ kind: 'setStatus', target: 'self', statuses: ['asleep'] }] }
+  }
+  if (name === 'poison buildup') {
+    return { ...zero(), special: [{ kind: 'setStatus', target: 'self', statuses: ['poisoned'] }] }
+  }
+  if (name === 'poison effect') {
+    return {
+      damage: { kind: 'statusBonus', baseDamage, bonusDamage: 60, statuses: ['poisoned'], statusTarget: 'attacker' },
+      special: [{ kind: 'clearStatus', target: 'self', statuses: ['poisoned'] }],
+    }
+  }
+  if (name === 'nap') return { ...zero(), healing: [{ target: 'self', amount: 10 }] }
+  if (name === 'rock smash') {
+    const bonusDamage = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage }, coinFlipCount: 1 }
+  }
+  if (name === 'nutritional support') {
+    // A Basic Grass Energy attachment to any friendly Pokémon is represented by shared Energy.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'fake tears') {
+    // The Trainer lock is unavailable; keep the coin-gated 30 damage reduction.
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'reduce', amount: 30, condition: 'heads' }],
+    }
+  }
+  if (name === 'aqua tail') {
+    // Water Energy attached to Totodile is approximated by its side's shared Energy pool.
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'timid tackle') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      selfDamage: [{ kind: 'fixed', amount: 20 }],
+      choiceRequirement: 'optionalOwnBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'wormhole') {
+    // The player's mandatory switch is supported; this choice model cannot also select the opponent's switch.
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      choiceRequirement: 'optionalOwnBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'big bite') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      special: [{ kind: 'preventRetreat', target: 'opponent' }],
+    }
+  }
+  if (name === 'agility') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAllEffects', condition: 'heads' }],
+    }
+  }
+  if (name === 'play with fire') {
+    return {
+      ...zero(),
+      status: [{ target: 'opponent', statuses: ['burned'] }],
+      special: [{ kind: 'setStatus', target: 'self', statuses: ['asleep'] }],
+    }
+  }
+  if (name === 'mischievous punch') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      ignoreWeaknessResistance: true,
+      special: [{ kind: 'setStatus', target: 'self', statuses: ['asleep'] }],
+    }
+  }
+  if (name === 'granite head') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      protection: [{ target: 'self', kind: 'reduce', amount: 30 }],
+    }
+  }
+  if (name === 'tumble over') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      special: [{ kind: 'cannotAttack', target: 'self' }],
+    }
+  }
+  if (name === 'shocking bolt') {
+    // The Lost Zone is unavailable; all Energy attached to Pachirisu is approximated by shared Energy.
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+    }
+  }
+  if (name === 'inferno spear') {
+    // Fire and Lightning attachment types are not tracked separately from shared Energy.
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      energyDiscard: [{ target: 'self', amount: 2 }],
+      minimumExtraEnergyDiscard: 2,
+    }
+  }
+  if (name === 'swords dance') {
+    return {
+      ...zero(),
+      special: [{ kind: 'buffAttack', target: 'self', attackName: 'Lost Claw', baseDamage: 80 }],
+    }
+  }
+  if (name === 'twister') {
+    return {
+      damage: { kind: 'conditionalBonus', baseDamage: 0, bonusDamage: baseDamage, condition: { result: 'heads', minimum: 1 } },
+      coinFlipCount: 2,
+      energyDiscard: [{ target: 'opponent', amount: 'heads' }],
+    }
+  }
+  if (name === 'plow over') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      coinFlipCount: 1,
+      status: [{ target: 'opponent', statuses: ['paralyzed'], condition: 'heads' }],
+      energyDiscard: [{ target: 'opponent', amount: 1, condition: 'tails' }],
+    }
+  }
+  if (name === 'raging thunder') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      counterDamage: [{ amount: 20, side: 'own', zone: 'play', maxTargets: 1 }],
+    }
+  }
+  if (name === 'clomp clomp clobber') {
+    // Lost Zone movement is approximated by spending one shared Energy.
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      energyDiscard: [{ target: 'self', amount: 1 }],
+      minimumExtraEnergyDiscard: 1,
+    }
+  }
+  if (name === 'mantle bazooka') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      energyDiscard: [{ target: 'self', amount: 2 }],
+      minimumExtraEnergyDiscard: 2,
+    }
+  }
+
   return null
 }
 
