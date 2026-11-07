@@ -793,6 +793,8 @@ function applyTcgBattleSpecialEffects(params: {
         'disableAttack',
         'blockTargeting',
         'swapDamageCounters',
+        'returnTargetToHand',
+        'knockOutTarget',
         'changeWeakness',
         'changeType',
         'placeMarker',
@@ -985,18 +987,77 @@ function applyTcgBattleSpecialEffects(params: {
     if (rule.kind === 'recoverPokemonFromDiscardToHand' && choice?.kind === 'discardPokemonToHand') {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const discard = state[sideKey].discard
-      const card = discard.find((entry) => entry.instanceId === choice.cardId)
-      const eligible = card &&
-        (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
-        (!rule.includeNames?.length || rule.includeNames.includes(card.name))
-      if (!card || !eligible) continue
-      discard.splice(discard.indexOf(card), 1)
+      const selectedIds = choice.cardIds || (choice.cardId ? [choice.cardId] : [])
+      const maxCount = rule.maxCount ?? 1
+      const recovered: TcgBattleCardState[] = []
+      for (const cardId of selectedIds.slice(0, maxCount)) {
+        const card = discard.find((entry) => entry.instanceId === cardId)
+        const eligible = card &&
+          (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
+          (!rule.includeNames?.length || rule.includeNames.includes(card.name))
+        if (!card || !eligible) continue
+        discard.splice(discard.indexOf(card), 1)
+        recovered.push(card)
+      }
+      if (recovered.length > 0) {
+        state[sideKey].hand.push(...recovered)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: recovered[0].instanceId,
+          label: `${recovered.map((card) => card.name).join(', ')} returned from the discard pile to the attacker's hand`,
+        })
+      }
+      continue
+    }
+
+    if (rule.kind === 'returnOwnBenchToHand' && choice?.kind === 'benchSwitch') {
+      const cardIndex = state[sideKey].back.findIndex(
+        (card) => card.instanceId === choice.cardId && card.currentHp > 0,
+      )
+      if (cardIndex < 0) continue
+      const [card] = state[sideKey].back.splice(cardIndex, 1)
+      clearTcgBattleTemporaryEffects(card)
+      clearTcgBattleStatuses(card)
+      card.currentHp = card.hp
+      card.markers = undefined
       state[sideKey].hand.push(card)
       recordEffectEvent(state, {
         kind: 'control',
         sourceId: attacker.instanceId,
         targetId: card.instanceId,
-        label: `${card.name} returned from the discard pile to the attacker's hand`,
+        label: `${card.name} returned from the Bench to your hand`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'returnTargetToHand') {
+      const cardIndex = state[opponentKey].front.findIndex(
+        (card) => card.instanceId === target.instanceId && card.currentHp > 0,
+      )
+      if (cardIndex < 0) continue
+      const [card] = state[opponentKey].front.splice(cardIndex, 1)
+      clearTcgBattleTemporaryEffects(card)
+      clearTcgBattleStatuses(card)
+      card.currentHp = card.hp
+      card.markers = undefined
+      state[opponentKey].hand.push(card)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: card.instanceId,
+        label: `${card.name} returned to the opponent's hand`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'knockOutTarget' && target.currentHp > 0) {
+      target.currentHp = 0
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${target.name} was Knocked Out`,
       })
       continue
     }
@@ -1977,6 +2038,9 @@ function applyAttack(
       event.targetSide === defendingSide &&
       event.reason === 'attack' &&
       defendingCards.some((card) => card.instanceId === event.targetId && card.currentHp <= 0),
+    ) || (
+      resolution.specialEffects?.some((rule) => rule.kind === 'knockOutTarget') === true &&
+      defendingCards.some((card) => card.instanceId === target.instanceId && card.currentHp <= 0)
     )
   state.lastOpponentAttackKnockout = {
     ...state.lastOpponentAttackKnockout,

@@ -2581,7 +2581,7 @@ function AttackChoiceDrawer({
   const [selectedCounterAssignments, setSelectedCounterAssignments] = useState<Record<string, number>>({})
   const [selectedDiscardHandPokemonIds, setSelectedDiscardHandPokemonIds] = useState<string[]>([])
   const [selectedOwnPokemonId, setSelectedOwnPokemonId] = useState('')
-  const [selectedRecoveryPokemonId, setSelectedRecoveryPokemonId] = useState('')
+  const [selectedRecoveryPokemonIds, setSelectedRecoveryPokemonIds] = useState<string[]>([])
   const [selectedAttackIndex, setSelectedAttackIndex] = useState<number | null>(
     null,
   )
@@ -2632,6 +2632,9 @@ function AttackChoiceDrawer({
         (!recoveryPokemonRule.includeNames?.length || recoveryPokemonRule.includeNames.includes(card.name)),
       )
     : []
+  const maxRecoverySelection = recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand'
+    ? recoveryPokemonRule.maxCount ?? 1
+    : 1
   const deckPokemonRule = activeEffect?.special?.find(
     (rule) => rule.kind === 'searchDeckPokemon',
   )
@@ -2770,10 +2773,20 @@ function AttackChoiceDrawer({
   }, [ownPokemonChoices, selectedOwnPokemonId])
 
   useEffect(() => {
-    if (!recoverablePokemonChoices.some((card) => card.instanceId === selectedRecoveryPokemonId)) {
-      setSelectedRecoveryPokemonId(recoverablePokemonChoices[0]?.instanceId || '')
+    const eligibleIds = new Set(recoverablePokemonChoices.map((card) => card.instanceId))
+    const selected = selectedRecoveryPokemonIds
+      .filter((cardId) => eligibleIds.has(cardId))
+      .slice(0, maxRecoverySelection)
+    if (recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo) {
+      if (selected.length !== selectedRecoveryPokemonIds.length) setSelectedRecoveryPokemonIds(selected)
+      return
     }
-  }, [recoverablePokemonChoices, selectedRecoveryPokemonId])
+    if (selected.length > 0 || recoverablePokemonChoices.length === 0) {
+      if (selected.length !== selectedRecoveryPokemonIds.length) setSelectedRecoveryPokemonIds(selected)
+      return
+    }
+    setSelectedRecoveryPokemonIds(recoverablePokemonChoices.slice(0, maxRecoverySelection).map((card) => card.instanceId))
+  }, [recoverablePokemonChoices, selectedRecoveryPokemonIds, maxRecoverySelection, recoveryPokemonRule])
 
   if (!attack || !effect) return null
 
@@ -2810,8 +2823,11 @@ function AttackChoiceDrawer({
           .map(([cardId, counters]) => ({ cardId, counters })),
       }
     }
-    if (required === 'discardPokemonToHand' && selectedRecoveryPokemonId) {
-      return { kind: 'discardPokemonToHand', cardId: selectedRecoveryPokemonId }
+    if (
+      required === 'discardPokemonToHand' &&
+      (selectedRecoveryPokemonIds.length > 0 || recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo)
+    ) {
+      return { kind: 'discardPokemonToHand', cardIds: selectedRecoveryPokemonIds.slice(0, maxRecoverySelection) }
     }
     if (
       required === 'opponentBench' ||
@@ -2892,7 +2908,9 @@ function AttackChoiceDrawer({
         : activeRequirement === 'counterDistribution'
           ? assignedCounterCount === counterDistributionCount
         : activeRequirement === 'discardPokemonToHand'
-          ? recoverablePokemonChoices.length === 0 || Boolean(selectedRecoveryPokemonId)
+          ? recoverablePokemonChoices.length === 0 || (recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo
+              ? selectedRecoveryPokemonIds.length <= Math.min(maxRecoverySelection, recoverablePokemonChoices.length)
+              : selectedRecoveryPokemonIds.length === Math.min(maxRecoverySelection, recoverablePokemonChoices.length))
         : activeRequirement === 'discardPokemon'
           ? Boolean(selectedDiscardPokemon)
         : activeRequirement === 'statusCondition'
@@ -3104,17 +3122,23 @@ function AttackChoiceDrawer({
           )}
           {activeRequirement === 'discardPokemonToHand' && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-ink">Pokémon to recover</h3>
+              <h3 className="text-sm font-semibold text-game-ink">
+                {maxRecoverySelection > 1 ? `Pokémon to recover (${selectedRecoveryPokemonIds.length} selected)` : 'Pokémon to recover'}
+              </h3>
               {recoverablePokemonChoices.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {recoverablePokemonChoices.map((card) => {
-                    const selected = selectedRecoveryPokemonId === card.instanceId
+                    const selected = selectedRecoveryPokemonIds.includes(card.instanceId)
                     return (
                       <button
                         type="button"
                         key={card.instanceId}
                         aria-pressed={selected}
-                        onClick={() => setSelectedRecoveryPokemonId(card.instanceId)}
+                        onClick={() => setSelectedRecoveryPokemonIds((current) =>
+                          selected
+                            ? current.filter((cardId) => cardId !== card.instanceId)
+                            : current.length < maxRecoverySelection ? [...current, card.instanceId] : current,
+                        )}
                         className={cn(
                           'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left text-sm font-semibold transition-colors',
                           selected
@@ -3227,7 +3251,10 @@ function AttackChoiceDrawer({
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {availableDeckPokemon.map((card) => {
                     const selected = selectedDeckPokemonIds.includes(card.id)
-                    const disabled = !selected && selectedDeckPokemonIds.length >= maxDeckPokemonSelection
+                    const duplicateNameSelected = Boolean(deckPokemonRule.oneOfEachName && !selected && selectedDeckPokemonIds.some((cardId) =>
+                      availableDeckPokemon.find((candidate) => candidate.id === cardId)?.name.toLowerCase() === card.name.toLowerCase(),
+                    ))
+                    const disabled = !selected && (selectedDeckPokemonIds.length >= maxDeckPokemonSelection || duplicateNameSelected)
                     return (
                       <button
                         type="button"
