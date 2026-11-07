@@ -348,6 +348,7 @@ export type TcgBattleSpecialRule =
   | { kind: 'changeType'; condition?: TcgBattleCoinCondition }
   | { kind: 'textureMagic' }
   | { kind: 'destinyBond' }
+  | { kind: 'discardEnergyOnKnockout' }
   | { kind: 'mirrorLastDamage' }
   | { kind: 'reflectDamage'; damageMultiplier?: number; reflectFixedDamage?: number; preventIncomingOnHeads?: boolean; coinGate?: TcgBattleCoinCondition }
   | { kind: 'placeMarker'; marker: 'lightningRod' | 'shockWave' }
@@ -387,6 +388,8 @@ export interface TcgBattleTemporaryEffects {
   battleType?: TcgBattleEnergyType
   destinyBond?: { remainingTurns: number }
   reflectDamage?: { remainingTurns: number; damageMultiplier?: number; reflectFixedDamage?: number; preventIncomingOnHeads?: boolean; coinGate?: TcgBattleCoinCondition }
+  weaknessValue?: string | null
+  discardEnergyOnKnockout?: { remainingTurns: number }
   lastIncomingAttackDamage?: number
   lastNightEyesAttackBySide?: Partial<Record<TcgBattleSide, number>>
   lastAttackHitBySide?: Partial<Record<TcgBattleSide, number>>
@@ -1209,6 +1212,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'xy11') {
     const xySteamSiegeEffect = inferXySteamSiegeTcgBattleAttackEffect(attack, baseDamage)
     if (xySteamSiegeEffect) return applyAttackTextModifiers(xySteamSiegeEffect)
+  }
+  if (setId === 'xy12') {
+    const xyEvolutionsEffect = inferXyEvolutionsTcgBattleAttackEffect(attack, baseDamage)
+    if (xyEvolutionsEffect) return applyAttackTextModifiers(xyEvolutionsEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -12398,6 +12405,92 @@ function inferXySteamSiegeTcgBattleAttackEffect(
   return null
 }
 
+function inferXyEvolutionsTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'stiffen') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 40 }] }
+  }
+  if (name === 'swarming sting') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 40,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: ['Beedrill'] },
+      },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'explosive fireball') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 60,
+        source: { kind: 'energyOfType', side: 'own', type: 'Fire' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'all', requiresEnergyType: 'Fire' }],
+    }
+  }
+  if (name === 'dashing punch') {
+    // Switching history is not tracked, so keep its printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'break star') {
+    return {
+      ...zero(),
+      benchDamage: [{
+        amount: 100,
+        side: 'opponent',
+        zone: 'play',
+        subtypeFilter: { include: ['BREAK'] },
+        ignoreWeaknessResistanceOnBench: true,
+      }],
+    }
+  }
+  if (name === 'energize') {
+    // Attaching a named Energy card is approximated with shared Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'spark bolt') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 70 },
+      energyDiscard: [{ target: 'self', amount: 'all', optional: true }],
+      minimumExtraEnergyDiscard: 1,
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'continuous tumble') {
+    return { damage: { kind: 'headsMultiplier', damagePerHeads: 10, coinFlipCount: 0 }, flipUntilTails: true }
+  }
+  if (name === 'little grudge') {
+    return { ...zero(), special: [{ kind: 'discardEnergyOnKnockout' }] }
+  }
+  if (name === 'psychic') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energyOnTarget' },
+      },
+    }
+  }
+  if (name === 'conversion 3') {
+    return { ...zero(), choiceRequirement: 'typeChange', special: [{ kind: 'changeWeakness' }] }
+  }
+
+  // Special Energy discard-pile checks remain filtered because that card zone
+  // is not represented by the Pokémon-only battle deck and discard.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -14480,7 +14573,7 @@ export function tickTcgBattleIncomingAttackModifiers(state: TcgBattleState, side
 
     const effects = card.temporaryEffects
     if (!effects) continue
-    for (const key of ['disabledAttack', 'cannotAttack', 'cannotRetreat', 'cannotSwitch', 'endure', 'preventStatusConditions', 'cannotTarget', 'nextAttackBuff', 'destinyBond', 'reflectDamage'] as const) {
+    for (const key of ['disabledAttack', 'cannotAttack', 'cannotRetreat', 'cannotSwitch', 'endure', 'preventStatusConditions', 'cannotTarget', 'nextAttackBuff', 'destinyBond', 'discardEnergyOnKnockout', 'reflectDamage'] as const) {
       const effect = effects[key]
       if (!effect) continue
       if (key === 'cannotRetreat' && (effects.cannotRetreat?.untilSourceLeaves || effects.cannotRetreat?.untilTargetLeaves)) continue
@@ -18056,7 +18149,9 @@ function applyTcgWeaknessAndResistance(
     const weaknessType = target.temporaryEffects?.weaknessType
     const weakness = weaknessType
       ? weaknessType === attackType
-        ? { type: weaknessType, value: '×2' }
+        ? target.temporaryEffects?.weaknessValue === null
+          ? undefined
+          : { type: weaknessType, value: target.temporaryEffects?.weaknessValue || '×2' }
         : undefined
       : target.weaknesses.find((entry) => entry.type === attackType)
     if (weakness) {

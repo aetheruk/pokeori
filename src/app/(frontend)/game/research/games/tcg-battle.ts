@@ -1452,7 +1452,12 @@ function applyTcgBattleSpecialEffects(params: {
     ) {
       const affected = rule.kind === 'changeResistance' ? attacker : target
       const effects = getTemporaryEffects(affected)
-      if (rule.kind === 'changeWeakness') effects.weaknessType = choice.type
+      if (rule.kind === 'changeWeakness') {
+        effects.weaknessValue = effects.weaknessType
+          ? effects.weaknessValue ?? '×2'
+          : affected.weaknesses[0]?.value ?? null
+        effects.weaknessType = choice.type
+      }
       if (rule.kind === 'changeResistance') effects.resistanceType = choice.type
       if (rule.kind === 'changeType') effects.battleType = choice.type
       recordEffectEvent(state, {
@@ -1483,6 +1488,16 @@ function applyTcgBattleSpecialEffects(params: {
         sourceId: attacker.instanceId,
         targetId: attacker.instanceId,
         label: 'Destiny Bond',
+      })
+      continue
+    }
+    if (rule.kind === 'discardEnergyOnKnockout') {
+      getTemporaryEffects(attacker).discardEnergyOnKnockout = { remainingTurns: 1 }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: 'Little Grudge',
       })
       continue
     }
@@ -1937,6 +1952,24 @@ function applyAttack(
     resolution,
     blockTargetEffects,
   })
+  const attackDamageEvents = (state.lastDamageEvents || []).slice(damageEventStartIndex)
+  const grudgeKnockoutIds = new Set(
+    attackDamageEvents
+      .filter((event) => event.targetSide === defendingSide && event.reason === 'attack')
+      .map((event) => event.targetId),
+  )
+  for (const grudgeCard of [...state[defendingSide].front, ...state[defendingSide].back]) {
+    if (
+      !grudgeKnockoutIds.has(grudgeCard.instanceId) ||
+      grudgeCard.currentHp > 0 ||
+      !grudgeCard.temporaryEffects?.discardEnergyOnKnockout
+    ) continue
+    delete grudgeCard.temporaryEffects.discardEnergyOnKnockout
+    if (side.energy > 0) {
+      side.energy -= 1
+      state.log.unshift(`${grudgeCard.name}'s Little Grudge discarded 1 Energy from the attacking side.`)
+    }
+  }
   const defendingCards = [...state[defendingSide].front, ...state[defendingSide].back]
   const knockedOutByAttack = (state.lastDamageEvents || [])
     .slice(damageEventStartIndex)
