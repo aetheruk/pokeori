@@ -1243,7 +1243,13 @@ function applyTcgBattleSpecialEffects(params: {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       if (rule.requiresOpponentBench && state[opponentKey].back.every((card) => card.currentHp <= 0)) continue
       const defendingSide = state[opponentKey]
-      const targetZone = rule.targetZone === 'bench' ? defendingSide.back : defendingSide.front
+      const targetZone = rule.targetZone === 'selected'
+        ? defendingSide.back.some((card) => card.instanceId === target.instanceId)
+          ? defendingSide.back
+          : defendingSide.front
+        : rule.targetZone === 'bench'
+          ? defendingSide.back
+          : defendingSide.front
       const targetIndex = targetZone.findIndex((card) => card.instanceId === target.instanceId)
       if (targetIndex < 0) continue
       const [card] = targetZone.splice(targetIndex, 1)
