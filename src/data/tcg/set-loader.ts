@@ -158,6 +158,10 @@ export async function getTcgSetByIdLazy(setId: string): Promise<TcgSet | null> {
       return (await import('./sets/me4')).default
     case 'me5':
       return (await import('./sets/me5')).default
+    case 'me55':
+      return (await import('./sets/me55')).default
+    case 'me55c':
+      return (await import('./sets/me55c')).default
     case 'neo1':
       return (await import('./sets/neo1')).default
     case 'neo2':
