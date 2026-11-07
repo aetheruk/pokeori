@@ -411,6 +411,8 @@ Black Bolt (`zsv10pt5`) covers 161 Pokémon cards and 245 attacks: 236 are suppo
 
 Mega Evolution (`me1`) covers 152 Pokémon cards and 226 attacks: 222 are supported and four remain filtered. Mappings add Energy-scaled damage/gains, searches/draws, counter damage and transfers, target knockouts, status checks, temporary attack reduction, and optional Energy discards. Attached Energy remains shared by side; Prize, Stadium, Trainer and Energy-card zones are not represented. Supporter-copy effects, basic Energy cards in the discard/top-deck, and deck-top choices remain filtered.
 
+Phantasmal Flames (`me2`) covers 110 Pokémon cards and 152 attacks: 149 are supported and three remain filtered. Mappings add incoming-damage/healing history, type and shared-Energy formulas, typed Energy discards/gains, Pokémon search/draw, selected damage/healing, Special Condition checks, knockouts, counter placement, and switching. Energizing Sketch approximates discard Energy recovery as shared Energy per heads. Basic Energy and Supporter card-zone searches remain filtered.
+
 ## Reserved Future Content
 
 The following are defined in data or engine support but not yet naturally obtainable through authored progression:

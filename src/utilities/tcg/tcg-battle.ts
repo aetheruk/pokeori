@@ -1,5 +1,6 @@
 import type { TcgCardAttack, TcgCardDetail } from '@/data/tcg/types'
 import { getTcgCardDetailById } from '@/data/tcg/details'
+import { inferPhantasmalFlamesTcgBattleAttackEffect } from '@/utilities/tcg/tcg-battle-phantasmal-flames'
 
 export type TcgBattleDeckFormat = 'baby' | 'champions' | 'masters'
 export type TcgBattleSide = 'player' | 'opponent'
@@ -30,6 +31,7 @@ export type TcgBattleCountSource =
   | { kind: 'pokemonInPlay'; side: 'own' | 'opponent' | 'both'; excludeAttacker?: boolean }
   | { kind: 'injuredPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play' }
   | { kind: 'injuredPokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[]; zone: 'bench' | 'play' }
+  | { kind: 'injuredPokemonNameContains'; side: 'own' | 'opponent' | 'both'; nameContains: string; zone: 'bench' | 'play' }
   | { kind: 'deckSize'; side: 'own' | 'opponent' }
   | { kind: 'damageCounters'; target: 'attacker' | 'target' }
   | { kind: 'damageCountersOnSide'; side: 'own' | 'opponent' | 'both'; zone: 'front' | 'bench' | 'play' }
@@ -48,6 +50,7 @@ export type TcgBattleCountSource =
   | { kind: 'pokemonEvolvedFromInPlay'; side: 'own' | 'opponent' | 'both'; evolvesFrom: string }
   | { kind: 'pokemonEvolvedOnBench'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'pokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[]; zone?: 'bench' | 'play' }
+  | { kind: 'pokemonOfTypesWithSubtypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[]; subtypes: string[]; zone: 'bench' | 'play' }
   | { kind: 'distinctTypesInPlay'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play' }
   | { kind: 'retreatCostOnNamedPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; names: string[] }
   | { kind: 'pokemonWithAttack'; side: 'own' | 'opponent' | 'both'; attackName: string; zone: 'bench' | 'play' }
@@ -110,6 +113,7 @@ export type TcgBattleDamageRule =
   | { kind: 'knockOutLowestRemainingHp' }
   | { kind: 'knockOutAtDamageCounters'; minimumCounters: number; maximumCounters?: number }
   | { kind: 'handSizeComparisonBonus'; baseDamage: number; bonusDamage: number; comparison: 'equal' | 'more' }
+  | { kind: 'attackerDamagedBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'emptyHandBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'namedPokemonSetBonus'; baseDamage: number; bonusDamage: number; side: 'own' | 'opponent'; names: string[]; zone?: 'bench' | 'play' }
   | { kind: 'namedPokemonBenchBonus'; baseDamage: number; bonusDamage: number; injuredBonusDamage: number; nameContains: string }
@@ -1458,6 +1462,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'me1') {
     const megaEvolutionEffect = inferMegaEvolutionTcgBattleAttackEffect(attack, baseDamage)
     if (megaEvolutionEffect) return applyAttackTextModifiers(megaEvolutionEffect)
+  }
+  if (setId === 'me2') {
+    const phantasmalFlamesEffect = inferPhantasmalFlamesTcgBattleAttackEffect(attack, baseDamage)
+    if (phantasmalFlamesEffect) return applyAttackTextModifiers(phantasmalFlamesEffect)
   }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
@@ -28672,6 +28680,8 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (context.attacker.currentHp === rule.remainingHp ? rule.bonusDamage : 0)
     case 'attackerFullHpBonus':
       return rule.baseDamage + (context.attacker.currentHp === context.attacker.hp ? rule.bonusDamage : 0)
+    case 'attackerDamagedBonus':
+      return rule.baseDamage + (context.attacker.currentHp < context.attacker.hp ? rule.bonusDamage : 0)
     case 'targetSubtypeKnockOut':
       return context.target.subtypes.some((subtype) => subtype.toLowerCase() === rule.subtype.toLowerCase())
         ? context.target.currentHp
@@ -28905,6 +28915,20 @@ export function getTcgBattleCount(
     return countFor(own) + countFor(opponent)
   }
 
+  if (source.kind === 'pokemonOfTypesWithSubtypesInPlay') {
+    const types = new Set(source.types.map((type) => type.toLowerCase()))
+    const subtypes = new Set(source.subtypes.map((subtype) => subtype.toLowerCase()))
+    const countFor = (side: TcgBattleSideState) =>
+      (source.zone === 'bench' ? side.back : [...side.front, ...side.back]).filter((card) =>
+        card.currentHp > 0 &&
+        card.types.some((type) => types.has(type.toLowerCase())) &&
+        card.subtypes.some((subtype) => subtypes.has(subtype.toLowerCase())),
+      ).length
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
   if (source.kind === 'distinctTypesInPlay') {
     const countFor = (side: TcgBattleSideState) => {
       const cards = source.zone === 'bench' ? side.back : [...side.front, ...side.back]
@@ -29038,6 +29062,17 @@ export function getTcgBattleCount(
         card.types.some((type) => types.has(type.toLowerCase())),
       ).length
     }
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
+  if (source.kind === 'injuredPokemonNameContains') {
+    const name = normalizeTcgBattleCardName(source.nameContains)
+    const countFor = (side: TcgBattleSideState) =>
+      (source.zone === 'bench' ? side.back : [...side.front, ...side.back]).filter((card) =>
+        card.currentHp > 0 && card.currentHp < card.hp && normalizeTcgBattleCardName(card.name).includes(name),
+      ).length
     if (source.side === 'own') return countFor(own)
     if (source.side === 'opponent') return countFor(opponent)
     return countFor(own) + countFor(opponent)
