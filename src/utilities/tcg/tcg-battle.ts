@@ -101,7 +101,7 @@ export type TcgBattleDamageRule =
   | { kind: 'evolvedFromBonus'; baseDamage: number; bonusDamage: number; evolvesFrom: string }
   | { kind: 'retreatCostZeroBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'knockOutLowestRemainingHp' }
-  | { kind: 'knockOutAtDamageCounters'; minimumCounters: number }
+  | { kind: 'knockOutAtDamageCounters'; minimumCounters: number; maximumCounters?: number }
   | { kind: 'handSizeComparisonBonus'; baseDamage: number; bonusDamage: number; comparison: 'equal' | 'more' }
   | { kind: 'emptyHandBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'namedPokemonSetBonus'; baseDamage: number; bonusDamage: number; side: 'own' | 'opponent'; names: string[] }
@@ -323,7 +323,7 @@ export type TcgBattleSpecialRule =
   | { kind: 'shuffleTargetIntoDeck'; requiresOpponentBench?: boolean; targetZone?: 'front' | 'bench' }
   | { kind: 'shuffleDiscardPokemonIntoDeck'; maxCount: number }
   | { kind: 'revealHand'; target: 'self' | 'opponent' }
-  | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerHead?: number; amountPerOwnEnergy?: number; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition }
+  | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerHead?: number; amountPerOwnEnergy?: number; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition; requiresOptionalChoice?: boolean }
   | {
       kind: 'switch'
       target: 'self' | 'opponent'
@@ -439,6 +439,7 @@ export interface TcgBattleAttackEffect {
   choiceCounterCount?: number
   choiceCounterCountFrom?: TcgBattleCountSource
   choiceHandCardCount?: number
+  optionalBonusPrompt?: string
   allowWhileAsleep?: boolean
   ignoreWeaknessResistanceOnBench?: boolean
   special?: TcgBattleSpecialRule[]
@@ -1251,6 +1252,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'sm5') {
     const ultraPrismEffect = inferSunMoonUltraPrismTcgBattleAttackEffect(attack, baseDamage)
     if (ultraPrismEffect) return applyAttackTextModifiers(ultraPrismEffect)
+  }
+  if (setId === 'sm6') {
+    const forbiddenLightEffect = inferSunMoonForbiddenLightTcgBattleAttackEffect(attack, baseDamage)
+    if (forbiddenLightEffect) return applyAttackTextModifiers(forbiddenLightEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -13979,6 +13984,252 @@ function inferSunMoonUltraPrismTcgBattleAttackEffect(
   return null
 }
 
+function inferSunMoonForbiddenLightTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'multiply') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeNames: ['Exeggcute'] }],
+    }
+  }
+  if (name === 'tropical shake') {
+    // Basic Energy cards in the discard pile are not represented; keep base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'ice shard') {
+    return { damage: { kind: 'targetTypeBonus', baseDamage, bonusDamage: 40, targetType: 'Fighting' } }
+  }
+  if (name === 'growth') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'limbo limbo') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'dominating fangs') {
+    // Lysandre Labs is a Stadium card and is not represented in the battle deck.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'spatial control' || name === 'energy teaser') {
+    // Energy is tracked per side, so moving it between that side's Pokémon is a no-op.
+    return zero()
+  }
+  if (name === 'hydro pressure') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energyOfType', side: 'own', type: 'Water' },
+      },
+    }
+  }
+  if (name === 'standing by') {
+    return {
+      ...zero(),
+      special: [{ kind: 'buffAttack', target: 'self', attackName: 'Sharpshooting', baseDamage: 120 }],
+    }
+  }
+  if (name === 'sharpshooting') {
+    return {
+      damage: { kind: 'fixed', amount: 40 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'spider web') {
+    return { ...zero(), special: [{ kind: 'preventRetreat', target: 'opponent' }] }
+  }
+  if (name === 'bubble trap') {
+    // Previous-turn attack names are not recorded; keep printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'mind splash') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 50,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: ['Uxie'] },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'psychic') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 30,
+        source: { kind: 'energy', side: 'opponent' },
+      },
+    }
+  }
+  if (name === 'beast raid') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'own', subtypes: ['Ultra Beast'], zone: 'play' },
+      },
+    }
+  }
+  if (name === 'quick dive') {
+    return {
+      damage: { kind: 'fixed', amount: 50 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'royal blades') {
+    // The model does not track whether Cynthia was played on the previous turn.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'exact revenge') {
+    // Knockout history is tracked, but the knocked-out Pokémon's type is not.
+    return { damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage: 70 } }
+  }
+  if (name === 'act tough') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 30,
+        source: { kind: 'energyOfType', side: 'own', type: 'Darkness' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'sky drop') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+  if (name === 'peace maker') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 30,
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'opponent', subtypes: ['Ultra Beast'], zone: 'play' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'calm strike' || name === 'aura strike') {
+    // GX-attack and same-turn evolution history are not tracked.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'untamed punch') {
+    return {
+      damage: { kind: 'damageCounterThresholdBonus', baseDamage, bonusDamage: 50, minimumCounters: 1 },
+      status: [
+        { target: 'self', statuses: ['confused'], requiresAttackerDamaged: true },
+        { target: 'opponent', statuses: ['confused'], requiresAttackerDamaged: true },
+      ],
+    }
+  }
+  if (name === 'doom count-gx') {
+    return {
+      damage: { kind: 'knockOutAtDamageCounters', minimumCounters: 4, maximumCounters: 4 },
+    }
+  }
+  if (name === 'total command') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'bench', side: 'both' },
+      },
+    }
+  }
+  if (name === 'overclock') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', untilHandSize: 6 }] }
+  }
+  if (name === 'find a friend') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand' }],
+    }
+  }
+  if (name === 'electrichain') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 30,
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: ['Lightning'], zone: 'bench' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'sanctuary-gx') {
+    return { ...zero(), special: [{ kind: 'transferDamageCountersFromOwnSide', maxCountersPerPokemon: 99 }] }
+  }
+  if (name === 'soaking horn') {
+    return { damage: { kind: 'healedThisTurnBonus', baseDamage, bonusDamage: 80 } }
+  }
+  if (name === 'photon geyser') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 80,
+        source: { kind: 'energyOfType', side: 'own', type: 'Psychic' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'all', requiresEnergyType: 'Psychic' }],
+    }
+  }
+  if (name === 'collect') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'mountaintop mining') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 40 },
+      choiceRequirement: 'optionalBonus',
+      optionalBonusPrompt: 'Take 40 more damage and discard the top 2 cards of your deck?',
+      special: [{ kind: 'millCards', target: 'self', amount: 2, requiresOptionalChoice: true }],
+    }
+  }
+  if (name === 'rock cannon') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: Number.parseInt(attack.damage, 10) || baseDamage, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'destructive sound') {
+    // Item cards are absent from the battle hand; preserve the hand-reveal effect.
+    return { ...zero(), special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+  if (name === 'resonance') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 70,
+        statuses: ['confused'],
+      },
+    }
+  }
+
+  // Prize and Energy-card zones, in-battle evolution, Ability checks, delayed
+  // knockouts, counter redistribution, and card-specific effects remain filtered.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -18924,10 +19175,12 @@ function calculateTcgBattleRawDamage(
       const lowestHp = Math.min(...cards.map((card) => card.currentHp))
       return context.target.currentHp === lowestHp ? context.target.currentHp : 0
     }
-    case 'knockOutAtDamageCounters':
-      return Math.floor((context.target.hp - context.target.currentHp) / 10) >= rule.minimumCounters
+    case 'knockOutAtDamageCounters': {
+      const counters = Math.floor((context.target.hp - context.target.currentHp) / 10)
+      return counters >= rule.minimumCounters && (rule.maximumCounters === undefined || counters <= rule.maximumCounters)
         ? context.target.currentHp
         : 0
+    }
     case 'handSizeComparisonBonus': {
       if (!context.state || !context.sideKey) return rule.baseDamage
       const opponentSideKey = context.sideKey === 'player' ? 'opponent' : 'player'

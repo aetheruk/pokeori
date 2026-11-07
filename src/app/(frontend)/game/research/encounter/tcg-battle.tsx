@@ -3312,13 +3312,13 @@ function AttackChoiceDrawer({
               <section className="space-y-2">
                 <h3 className="text-sm font-semibold text-game-ink">Optional attack bonus</h3>
                 <p className="text-sm text-game-muted">
-                  {activeEffect.damage.kind === 'optionalCoinDamage'
+                  {activeEffect.optionalBonusPrompt || (activeEffect.damage.kind === 'optionalCoinDamage'
                     ? `Flip for ${activeEffect.damage.successDamage} damage? Tails does ${activeEffect.damage.failureDamage} damage.`
                     : optionalBonusEnergyDiscardAmount > 0
                       ? `Discard ${optionalBonusEnergyDiscardAmount} Energy to take +${activeEffect.damage.bonusDamage} damage?`
                       : activeEffect.selfDamage?.some((rule) => rule.kind === 'optionalChoice')
                         ? `Take +${activeEffect.damage.bonusDamage} damage and accept the recoil?`
-                        : `Take +${activeEffect.damage.bonusDamage} damage?`}
+                        : `Take +${activeEffect.damage.bonusDamage} damage?`)}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <button

@@ -1251,6 +1251,7 @@ function applyTcgBattleSpecialEffects(params: {
 
     if (rule.kind === 'millCards') {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      if (rule.requiresOptionalChoice && !(choice?.kind === 'optionalBonus' && choice.enabled)) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
       const inUseIds = new Set(
