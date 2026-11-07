@@ -804,6 +804,7 @@ function applyTcgBattleSpecialEffects(params: {
       (rule.kind === 'buffAttack' && rule.target === 'opponent') ||
       (rule.kind === 'drawCards' && rule.target === 'opponent') ||
       (rule.kind === 'shuffleRandomHandCardIntoDeck' && rule.target === 'opponent') ||
+      (rule.kind === 'discardRandomHandCard' && rule.target === 'opponent') ||
       (rule.kind === 'revealHand' && rule.target === 'opponent') ||
       (rule.kind === 'millCards' && rule.target === 'opponent') ||
       (rule.kind === 'clearStatus' && rule.target === 'opponent') ||
@@ -878,6 +879,22 @@ function applyTcgBattleSpecialEffects(params: {
         sourceId: attacker.instanceId,
         targetId: shuffledCard.instanceId,
         label: `${shuffledCard.name} was shuffled from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand into their deck`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'discardRandomHandCard') {
+      const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
+      const destination = state[destinationSideKey]
+      if (destination.hand.length === 0) continue
+      const index = Math.floor(Math.random() * destination.hand.length)
+      const [discardedCard] = destination.hand.splice(index, 1)
+      destination.discard.push(discardedCard)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: discardedCard.instanceId,
+        label: `${discardedCard.name} was discarded from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand`,
       })
       continue
     }

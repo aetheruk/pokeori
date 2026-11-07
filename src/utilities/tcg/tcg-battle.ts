@@ -274,7 +274,8 @@ export type TcgBattleChoiceRequirement =
 export type TcgBattleSpecialRule =
   | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; includeResistanceTypes?: string[]; destination?: 'bench' | 'hand'; random?: boolean; condition?: TcgBattleCoinCondition; treatAsBasic?: boolean; damageCountersOnSearch?: number }
   | { kind: 'drawCards'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; shuffleHandIntoDeck?: boolean; condition?: TcgBattleCoinCondition }
-  | { kind: 'shuffleRandomHandCardIntoDeck'; target: 'self' | 'opponent' }
+  | { kind: 'shuffleRandomHandCardIntoDeck'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
+  | { kind: 'discardRandomHandCard'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
   | { kind: 'revealHand'; target: 'self' | 'opponent' }
   | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerOwnEnergy?: number }
   | {
@@ -1103,6 +1104,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'bw7') {
     const boundariesCrossedEffect = inferBoundariesCrossedTcgBattleAttackEffect(attack, baseDamage)
     if (boundariesCrossedEffect) return applyAttackTextModifiers(boundariesCrossedEffect)
+  }
+  if (setId === 'bw8') {
+    const plasmaStormEffect = inferPlasmaStormTcgBattleAttackEffect(attack, baseDamage)
+    if (plasmaStormEffect) return applyAttackTextModifiers(plasmaStormEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -8779,6 +8784,264 @@ function inferBoundariesCrossedTcgBattleAttackEffect(
   }
 
   // In-battle copying from your own Bench, Tool/Trainer interactions, and deck ordering remain filtered.
+  return null
+}
+
+function inferPlasmaStormTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'rumble stomp' || name === 'incessant peck') {
+    return {
+      damage: {
+        kind: 'headsBonusEach',
+        baseDamage,
+        bonusDamage: 20,
+        coinFlipCount: 0,
+      },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'gather order') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 3, includeNames: ['Combee'] }],
+    }
+  }
+  if (name === 'damage beat') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'damageCounters', target: 'target' },
+      },
+    }
+  }
+  if (name === 'swaddle guard') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 40 }] }
+  }
+  if (name === 'astonish') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [{ kind: 'shuffleRandomHandCardIntoDeck', target: 'opponent', condition: 'heads' }],
+    }
+  }
+  if (name === 'loud howl') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'turbo energize') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'intensifying burn') {
+    return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 50 } }
+  }
+  if (name === 'flame blast') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'continuous headbutt') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: baseDamage, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'seafaring') {
+    return {
+      ...zero(),
+      coinFlipCount: 3,
+      energyGain: [{ target: 'self', amountPerHead: 1, maxAmount: 3 }],
+    }
+  }
+  if (name === 'hail') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      benchDamage: [{ amount: 10, side: 'opponent', zone: 'play', condition: 'heads' }],
+    }
+  }
+  if (name === 'discharge') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 30,
+        source: { kind: 'energy', side: 'own' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+    }
+  }
+  if (name === 'smogbank') {
+    return { ...zero(), benchDamage: [{ amount: 20, side: 'opponent', zone: 'play' }] }
+  }
+  if (name === 'powerful storm') {
+    // Individually attached Energy is represented by the shared side pool.
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'hex') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 50,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+    }
+  }
+  if (name === 'facade') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 60,
+        statuses: ['burned', 'poisoned'],
+        statusTarget: 'attacker',
+      },
+    }
+  }
+  if (name === 'ensnarl') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+  if (name === 'wreck') {
+    // Stadium cards are absent, so Wreck keeps its printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'reflect' || name === 'rigidify') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 20 }] }
+  }
+  if (name === 'hard crunch') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 30 } }
+  }
+  if (name === 'call for backup') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand' }],
+    }
+  }
+  if (name === 'white inferno') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'teampact') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 30,
+        source: {
+          kind: 'pokemonWithSubtypesInPlay',
+          side: 'own',
+          subtypes: ['Team Plasma'],
+          zone: 'play',
+        },
+      },
+    }
+  }
+  if (name === 'shout') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [{ kind: 'discardRandomHandCard', target: 'opponent', condition: 'heads' }],
+    }
+  }
+  if (name === 'destructive sound') {
+    // Item cards are not distinguished in the Pokémon-only hand.
+    return null
+  }
+  if (name === 'round') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 50,
+        source: { kind: 'pokemonWithAttack', side: 'own', attackName: 'Round', zone: 'play' },
+      },
+    }
+  }
+  if (name === 'collect') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'fast swipe') {
+    return { ...zero(), special: [{ kind: 'discardRandomHandCard', target: 'opponent' }] }
+  }
+  if (name === 'scout') {
+    return { ...zero(), special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+  if (name === 'second bite') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'target' },
+      },
+    }
+  }
+  if (name === 'wild edge') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 20 },
+      choiceRequirement: 'optionalBonus',
+      selfDamage: [{ kind: 'optionalChoice', amount: 20 }],
+    }
+  }
+  if (name === 'split bomb') {
+    return {
+      damage: { kind: 'fixed', amount: 40 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+      benchDamage: [{ amount: 40, side: 'opponent', zone: 'play', maxTargets: 1, excludeTarget: true }],
+    }
+  }
+  if (name === 'hydro pump') {
+    // Water Energy attached to the attacker is approximated by shared Energy.
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+
+  // Plasma Energy, Pokémon Tools, Trainer cards, attached Energy, Prize cards,
+  // and damage-counter movement between different Pokémon are not modeled.
   return null
 }
 
