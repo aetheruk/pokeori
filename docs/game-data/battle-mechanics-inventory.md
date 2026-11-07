@@ -419,6 +419,8 @@ Perfect Order (`me3`) covers 92 Pokémon cards and 136 attacks: 132 are supporte
 
 Chaos Rising (`me4`) covers 97 Pokémon cards and 139 attacks: 137 are supported and two remain filtered. Mappings add named-Pokémon and Energy-scaled damage, Pokémon-only searches and hand effects, counter transfers, board healing, switching, coin attacks, and targeted effects. Energy remains side-wide, and individual Energy discards/recovery use shared-pool approximations. The remaining attacks revive multiple Pokémon from discard or search for Transformation Tome Item cards, mechanics the battle deck does not support.
 
+Pitch Black (`me5`) covers 95 Pokémon cards and 139 attacks: 131 are supported and eight remain filtered across seven distinct attacks. Mappings add healed-turn and hand-size checks, deck searches, discard/mill effects, typed Energy scaling, hand discards/draws, board healing, counter placement, and coin damage. Energy remains side-wide. The filtered effects require fixed top/bottom-deck selection, counting Ability-bearing Pokémon in discard, delayed knockout timing, or a hand-conditioned attack copy.
+
 ## Reserved Future Content
 
 The following are defined in data or engine support but not yet naturally obtainable through authored progression:

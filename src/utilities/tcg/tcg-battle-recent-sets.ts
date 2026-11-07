@@ -4,6 +4,7 @@ import { inferPhantasmalFlamesTcgBattleAttackEffect } from './tcg-battle-phantas
 import { inferAscendedHeroesTcgBattleAttackEffect } from './tcg-battle-ascended-heroes'
 import { inferPerfectOrderTcgBattleAttackEffect } from './tcg-battle-perfect-order'
 import { inferChaosRisingTcgBattleAttackEffect } from './tcg-battle-chaos-rising'
+import { inferPitchBlackTcgBattleAttackEffect } from './tcg-battle-pitch-black'
 
 export function inferRecentTcgBattleAttackEffect(
   attack: TcgCardAttack,
@@ -14,5 +15,6 @@ export function inferRecentTcgBattleAttackEffect(
   if (setId === 'me2pt5') return inferAscendedHeroesTcgBattleAttackEffect(attack, baseDamage)
   if (setId === 'me3') return inferPerfectOrderTcgBattleAttackEffect(attack, baseDamage)
   if (setId === 'me4') return inferChaosRisingTcgBattleAttackEffect(attack, baseDamage)
+  if (setId === 'me5') return inferPitchBlackTcgBattleAttackEffect(attack, baseDamage)
   return null
 }
