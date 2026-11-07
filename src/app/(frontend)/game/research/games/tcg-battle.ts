@@ -887,12 +887,14 @@ function applyTcgBattleSpecialEffects(params: {
               : 0
           )
         : 0
-      const amount = Math.max(
-        0,
-        (rule.amount || 0) +
-          (rule.amountPerHead || 0) * (resolution.coinFlips?.heads || 0) +
-          (rule.amountPerUnit || 0) * units,
-      )
+      const amount = typeof rule.untilHandSize === 'number'
+        ? Math.max(0, rule.untilHandSize - destination.hand.length)
+        : Math.max(
+            0,
+            (rule.amount || 0) +
+              (rule.amountPerHead || 0) * (resolution.coinFlips?.heads || 0) +
+              (rule.amountPerUnit || 0) * units,
+          )
       const inUseIds = new Set(
         [...destination.hand, ...destination.front, ...destination.back, ...destination.discard].map((card) => card.id),
       )
@@ -915,15 +917,19 @@ function applyTcgBattleSpecialEffects(params: {
     if (rule.kind === 'shuffleRandomHandCardIntoDeck') {
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
-      if (destination.hand.length === 0) continue
-      const index = Math.floor(Math.random() * destination.hand.length)
-      const [shuffledCard] = destination.hand.splice(index, 1)
-      recordEffectEvent(state, {
-        kind: 'control',
-        sourceId: attacker.instanceId,
-        targetId: shuffledCard.instanceId,
-        label: `${shuffledCard.name} was shuffled from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand into their deck`,
-      })
+      const count = rule.amountPerHead === undefined
+        ? 1
+        : rule.amountPerHead * (resolution.coinFlips?.heads || 0)
+      for (let discarded = 0; discarded < count && destination.hand.length > 0; discarded += 1) {
+        const index = Math.floor(Math.random() * destination.hand.length)
+        const [shuffledCard] = destination.hand.splice(index, 1)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: shuffledCard.instanceId,
+          label: `${shuffledCard.name} was shuffled from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand into their deck`,
+        })
+      }
       continue
     }
 
@@ -933,9 +939,11 @@ function applyTcgBattleSpecialEffects(params: {
       const destination = state[destinationSideKey]
       const discardCount = typeof rule.untilHandSize === 'number'
         ? Math.max(0, destination.hand.length - rule.untilHandSize)
-        : rule.amountPerTail
-          ? rule.amountPerTail * (resolution.coinFlips?.tails || 0)
-          : 1
+        : rule.amountPerHead !== undefined
+          ? rule.amountPerHead * (resolution.coinFlips?.heads || 0)
+          : rule.amountPerTail
+            ? rule.amountPerTail * (resolution.coinFlips?.tails || 0)
+            : 1
       for (let count = 0; count < discardCount && destination.hand.length > 0; count += 1) {
         const index = Math.floor(Math.random() * destination.hand.length)
         const [discardedCard] = destination.hand.splice(index, 1)
@@ -986,7 +994,9 @@ function applyTcgBattleSpecialEffects(params: {
 
     if (rule.kind === 'transferDamageCounters') {
       if (choice?.kind !== 'damageCounterTransfer' || !choice.sourceCardId) continue
-      const ownCards = [...state[sideKey].front, ...state[sideKey].back]
+      const ownCards = rule.sourceZone === 'bench'
+        ? state[sideKey].back
+        : [...state[sideKey].front, ...state[sideKey].back]
       const source = ownCards.find((card) => card.instanceId === choice.sourceCardId && card.currentHp > 0)
       const defendingCard = [...state[opponentKey].front, ...state[opponentKey].back]
         .find((card) => card.instanceId === target.instanceId && card.currentHp > 0)

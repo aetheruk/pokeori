@@ -2685,7 +2685,11 @@ function AttackChoiceDrawer({
           .map((card) => ({ side, card }))
       : [],
   )
-  const damageCounterSourceChoices = [...state.player.front, ...state.player.back]
+  const transferDamageCountersRule = activeEffect?.special?.find((rule) => rule.kind === 'transferDamageCounters')
+  const damageCounterSourceCards = transferDamageCountersRule?.kind === 'transferDamageCounters' && transferDamageCountersRule.sourceZone === 'bench'
+    ? state.player.back
+    : [...state.player.front, ...state.player.back]
+  const damageCounterSourceChoices = damageCounterSourceCards
     .filter((card) => card.currentHp > 0 && card.currentHp < card.hp)
   const handPokemonChoices = state.player.hand
   const ownPokemonChoices = [...state.player.front, ...state.player.back]
