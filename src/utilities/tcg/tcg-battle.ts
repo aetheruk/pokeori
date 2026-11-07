@@ -70,6 +70,7 @@ export type TcgBattleCountSource =
       excludeAttacker?: boolean
     }
   | { kind: 'pokemonWithSubtypesInPlay'; side: 'own' | 'opponent' | 'both'; subtypes: string[]; zone: 'bench' | 'play' }
+  | { kind: 'pokemonWithRetreatCost'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; retreatCost: number }
 
 export type TcgBattleDamageRule =
   | { kind: 'fixed'; amount: number }
@@ -154,6 +155,7 @@ export type TcgBattleEnergyDiscardRule = {
   condition?: TcgBattleCoinCondition
   optional?: boolean
   requiresEnergyType?: TcgBattleEnergyType
+  requiresTargetSubtype?: string
   targetSubtype?: 'ex' | 'stage2'
   targetEvolved?: boolean
 }
@@ -1274,6 +1276,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'sm10') {
     const unbrokenBondsEffect = inferSunMoonUnbrokenBondsTcgBattleAttackEffect(attack, baseDamage)
     if (unbrokenBondsEffect) return applyAttackTextModifiers(unbrokenBondsEffect)
+  }
+  if (setId === 'sm11') {
+    const unifiedMindsEffect = inferSunMoonUnifiedMindsTcgBattleAttackEffect(attack, baseDamage)
+    if (unifiedMindsEffect) return applyAttackTextModifiers(unifiedMindsEffect)
   }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
@@ -15436,6 +15442,334 @@ function inferSunMoonUnbrokenBondsTcgBattleAttackEffect(
   return null
 }
 
+function inferSunMoonUnifiedMindsTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: {
+      basicOnly?: boolean
+      includeNames?: string[]
+      includeTypes?: string[]
+      destination?: 'bench' | 'hand'
+    } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+
+  if (name === 'fury cutter') {
+    return {
+      damage: { kind: 'headsTable', damages: [50, 90, 130, 200], coinFlipCount: 3 },
+      coinFlipCount: 3,
+    }
+  }
+  if (name === 'venoshock') {
+    return { damage: { kind: 'statusBonus', baseDamage, bonusDamage: 70, statuses: ['poisoned'] } }
+  }
+  if (name === 'sweet scent') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownPokemon',
+      healing: [{ target: 'selectedOwnPokemon', amount: 30 }],
+    }
+  }
+  if (name === 'petal blizzard') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 10, side: 'opponent', zone: 'play', ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'sol slice') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 50,
+        source: { kind: 'energyOfType', side: 'own', type: 'Fire' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'multiply') {
+    return searchPokemon(2, { includeNames: ['Sewaddle'], destination: 'bench' })
+  }
+  if (name === 'sea creeper net') return searchPokemon(1, { basicOnly: true, destination: 'bench' })
+  if (name === 'hot burn-gx') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 50, source: { kind: 'energyOfType', side: 'own', type: 'Fire' } } }
+  }
+  if (name === 'victory sign') {
+    // Different basic Energy types and their card-zone movement collapse into the shared Energy pool.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'find a friend') return searchPokemon(1, { includeTypes: ['Fire'], destination: 'hand' })
+  if (name === 'ditch and splash') {
+    // The battle deck contains Pokémon only, so there are no Supporter cards to discard for damage.
+    return zero()
+  }
+  if (name === 'swarming bites') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: ['Basculin'] } },
+      targetScope: 'bench',
+    }
+  }
+  if (name === 'aqua impact') {
+    const damagePerRetreat = Number(text.match(/does (\d+) more damage for each colorless/)?.[1] || 0)
+    return damagePerRetreat
+      ? { damage: { kind: 'count', baseDamage, perUnitDamage: damagePerRetreat, source: { kind: 'retreatCost', target: 'target' } } }
+      : null
+  }
+  if (name === 'tangle drag') {
+    return { ...zero(), choiceRequirement: 'opponentBench', special: [{ kind: 'switch', target: 'opponent' }] }
+  }
+  if (name === 'nature dive') {
+    return {
+      damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage: 100, subtype: 'Ultra Beast' },
+      energyDiscard: [{ target: 'self', amount: 2, requiresTargetSubtype: 'Ultra Beast' }],
+    }
+  }
+  if (name === 'first impression' || name === 'tandem shock') {
+    // The battle state does not record whether the attacker switched from the Bench this turn.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'lightning ride-gx') {
+    const lightningCost = attack.cost.filter((type) => type === 'Lightning').length
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 100,
+        source: { kind: 'energyOfType', side: 'own', type: 'Lightning' },
+        minimumUnits: lightningCost + 2,
+      },
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'meal time') {
+    return {
+      ...zero(),
+      flipUntilTails: true,
+      special: [{ kind: 'drawCards', target: 'self', amountPerHead: 1 }],
+    }
+  }
+  if (name === 'wild river') {
+    return { ...zero(), choiceRequirement: 'ownBench', special: [{ kind: 'switch', target: 'self' }] }
+  }
+  if (name === 'generate electricity') {
+    // The searched Lightning Energy attachment is represented by the side-wide Energy pool.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'overspark') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 30, source: { kind: 'unusedEnergy' } },
+      energyDiscard: [{ target: 'self', amount: 'all', requiresEnergyType: 'Lightning' }],
+    }
+  }
+  if (name === 'trap bolt') {
+    return { damage: { kind: 'attackerRemainingHpLessBonus', baseDamage, bonusDamage: 30 } }
+  }
+  if (name === 'thunderous gale') {
+    return {
+      damage: {
+        kind: 'namedPokemonBenchBonus',
+        baseDamage,
+        bonusDamage: 50,
+        injuredBonusDamage: 50,
+        nameContains: 'Tornadus',
+      },
+    }
+  }
+  if (name === 'psychic club') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 30,
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: ['Psychic'], zone: 'bench' },
+      },
+    }
+  }
+  if (name === 'first contact') return searchPokemon(3, { basicOnly: true, destination: 'bench' })
+  if (name === 'call for family') return searchPokemon(1, { basicOnly: true, destination: 'bench' })
+  if (name === 'collect' || name === 'dust gathering') {
+    const drawCount = Number(text.match(/draw (\d+) cards?/)?.[1] || 1)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: drawCount }] }
+  }
+  if (name === 'rest well') {
+    return {
+      ...zero(),
+      status: [
+        { target: 'self', statuses: ['asleep'] },
+        { target: 'opponent', statuses: ['asleep'] },
+      ],
+      special: [{ kind: 'buffAttack', target: 'self', damageBonus: 100 }],
+    }
+  }
+  if (name === 'star search') {
+    // The deck search and targeted attachment use the battle's shared Energy pool.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'knock off') {
+    return { ...zero(), special: [{ kind: 'discardRandomHandCard', target: 'opponent' }] }
+  }
+  if (name === 'astonish') {
+    return { ...zero(), special: [{ kind: 'shuffleRandomHandCardIntoDeck', target: 'opponent', revealSelected: true }] }
+  }
+  if (name === 'psypower') {
+    return {
+      ...zero(),
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: 3,
+      counterDamage: [{ amountPerCounter: 10, target: 'distributed' }],
+    }
+  }
+  if (name === 'live wire') {
+    return { damage: { kind: 'fixed', amount: 50 }, targetScope: 'any' }
+  }
+  if (name === 'shooting star pirouette') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 30, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'trash slash') {
+    // The modeled discard pile contains Pokémon only, so it has no Item cards to count.
+    return zero()
+  }
+  if (name === 'wild dive-gx') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 50, source: { kind: 'energyOnTarget' } },
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (name === 'pre-dawn strike') {
+    return { damage: { kind: 'statusBonus', baseDamage, bonusDamage: 90, statuses: ['asleep'] } }
+  }
+  if (name === 'pure power') {
+    return {
+      ...zero(),
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: 4,
+      counterDamage: [{ amountPerCounter: 10, target: 'distributed' }],
+    }
+  }
+  if (name === 'over slice') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 40 },
+      choiceRequirement: 'optionalBonus',
+      minimumExtraEnergyDiscard: 1,
+      energyDiscard: [{ target: 'self', amount: 1, optional: true }],
+    }
+  }
+  if (name === 'rototiller') {
+    return { ...zero(), special: [{ kind: 'shuffleDiscardPokemonIntoDeck', maxCount: 4 }] }
+  }
+  if (name === 'nocturnal maneuvers-gx') {
+    return searchPokemon(99, { basicOnly: true, destination: 'bench' })
+  }
+  if (name === 'blow through') {
+    // Stadium cards are not represented in this Pokémon-only battle mode.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'big eater-gx') {
+    // Revealing is supported, but the Pokémon-only hand cannot contain Supporter cards to discard.
+    return { ...zero(), special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+  if (name === 'linear attack') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 40)
+    return { damage: { kind: 'fixed', amount }, targetScope: 'any', ignoreWeaknessResistanceOnBench: true }
+  }
+  if (name === 'sharpshooting') {
+    return { damage: { kind: 'fixed', amount: 30 }, targetScope: 'any', ignoreWeaknessResistanceOnBench: true }
+  }
+  if (name === 'calamitous slash') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 80 } }
+  }
+  if (name === 'mach delivery-gx') {
+    return {
+      ...zero(),
+      special: [
+        { kind: 'discardRandomHandCard', target: 'self', untilHandSize: 9 },
+        { kind: 'drawCards', target: 'self', untilHandSize: 10 },
+      ],
+    }
+  }
+  if (name === 'energy arrow') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'energyOnTarget' } },
+      targetScope: 'any',
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (name === 'powerful axe') {
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 40, source: { kind: 'energy', side: 'own' } },
+    }
+  }
+  if (name === 'drag off') {
+    return {
+      damage: { kind: 'fixed', amount: 30 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', beforeDamage: true }],
+    }
+  }
+  if (name === 'boomburst') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 20, side: 'opponent', zone: 'play', ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'venom shot') {
+    return {
+      damage: { kind: 'fixed', amount: 170 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+      energyDiscard: [{ target: 'self', amount: 2 }],
+    }
+  }
+  if (name === 'heavy draw') {
+    return {
+      ...zero(),
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'pokemonWithRetreatCost', side: 'own', zone: 'play', retreatCost: 4 },
+      }],
+    }
+  }
+  if (name === 'double draw') return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 2 }] }
+  if (name === 'tag impact') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 50,
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'own', subtypes: ['TAG TEAM'], zone: 'play' },
+      },
+    }
+  }
+  if (name === 'blindside') {
+    return {
+      damage: { kind: 'fixed', amount: 60 },
+      targetScope: 'any',
+      targetMustBeDamaged: true,
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'roar') {
+    return { ...zero(), choiceRequirement: 'opponentBench', special: [{ kind: 'switch', target: 'opponent' }] }
+  }
+
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -20893,6 +21227,17 @@ export function getTcgBattleCount(
     return countFor(own) + countFor(opponent)
   }
 
+  if (source.kind === 'pokemonWithRetreatCost') {
+    const cardsFor = (side: TcgBattleSideState) =>
+      source.zone === 'bench' ? side.back : [...side.front, ...side.back]
+    const countFor = (side: TcgBattleSideState) => cardsFor(side).filter((card) =>
+      card.currentHp > 0 && card.convertedRetreatCost === source.retreatCost,
+    ).length
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
   if (source.kind === 'deltaPokemonInPlay') {
     const countFor = (side: TcgBattleSideState) =>
       getLivingTcgBattleCards(side).filter((card) => card.name.includes('δ')).length
@@ -20989,6 +21334,10 @@ function calculateTcgBattleEnergyDiscards(
         : context.sideKey === 'player' ? 'opponent' : 'player'
       if (context.state[energySideKey].selectedEnergy !== rule.requiresEnergyType) continue
     }
+    if (
+      rule.requiresTargetSubtype &&
+      !context.target.subtypes.some((subtype) => subtype.toLowerCase() === rule.requiresTargetSubtype?.toLowerCase())
+    ) continue
     if (rule.targetSubtype === 'ex' && !context.target.subtypes.some((subtype) => subtype.toLowerCase() === 'ex')) continue
     if (rule.targetSubtype === 'stage2' && !context.target.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2')) continue
     if (rule.targetEvolved && !context.target.subtypes.some((subtype) => /^stage [12]$/i.test(subtype))) continue
