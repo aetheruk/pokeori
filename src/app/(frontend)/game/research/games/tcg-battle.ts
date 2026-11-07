@@ -975,6 +975,7 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'recoverPokemonFromDiscardToHand' && choice?.kind === 'discardPokemonToHand') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const discard = state[sideKey].discard
       const card = discard.find((entry) => entry.instanceId === choice.cardId)
       const eligible = card &&
@@ -1779,10 +1780,15 @@ function applyAttack(
         (card) => card.instanceId === heal.targetId && card.currentHp > 0,
       )
       if (!healCard) continue
+      const previousHp = healCard.currentHp
       healCard.currentHp = Math.min(
         healCard.hp,
         healCard.currentHp + heal.amount,
       )
+      if (healCard.currentHp > previousHp) {
+        getTemporaryEffects(healCard).healedTurnNumber = state.turnNumber
+        getTemporaryEffects(healCard).healedBySide = sideKey
+      }
     }
   }
 
