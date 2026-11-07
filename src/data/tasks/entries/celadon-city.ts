@@ -1335,6 +1335,18 @@ export const celadonCityTasks: Task[] = [
         "type": "currency",
         "targetId": "pokedollars",
         "quantity": 1500
+      },
+      {
+        "type": "icon",
+        "targetId": "pokemon-133",
+        "dropChance": 100,
+        "requirements": [
+          {
+            "type": "task_completed",
+            "targetId": "celadon-socialite-eevee-trade",
+            "count": 24
+          }
+        ]
       }
     ],
     "enterModal": [

@@ -4975,7 +4975,21 @@ describe('static data references', () => {
           pokemonCriteria: { speciesId: 133 },
         },
       ],
-      rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 1500 }],
+      rewards: expect.arrayContaining([
+        { type: 'currency', targetId: 'pokedollars', quantity: 1500 },
+        {
+          type: 'icon',
+          targetId: 'pokemon-133',
+          dropChance: 100,
+          requirements: [
+            {
+              type: 'task_completed',
+              targetId: 'celadon-socialite-eevee-trade',
+              count: 24,
+            },
+          ],
+        },
+      ]),
     })
   })
 
