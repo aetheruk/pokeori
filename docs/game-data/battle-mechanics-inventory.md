@@ -415,6 +415,8 @@ Phantasmal Flames (`me2`) covers 110 Pokémon cards and 152 attacks: 149 are sup
 
 Ascended Heroes (`me2pt5`) covers 243 Pokémon cards and 340 attacks: 324 are supported and 16 remain filtered across twelve distinct attacks. Mappings add named-team and Energy-scaled damage, Pokémon searches and Pokémon-only hand effects, until-tails attacks, shared-Energy costs/gains, multi-target damage, protection, healing, and knockouts. The battle hand is empty after setup; attacks can draw Pokémon cards into it, which remain unplayable. Multi-target damage uses automatic target selection. Energy stays side-wide. The filtered attacks need turn-history checks, in-battle evolution, doubling existing counters, or Trainer, Tool, Prize, and Basic Energy card zones.
 
+Perfect Order (`me3`) covers 92 Pokémon cards and 136 attacks: 132 are supported and four remain filtered across two distinct attacks. Mappings add Pokémon searches and Pokémon-only hand effects, typed Energy damage, shared-Energy recovery/transfer approximations, selected healing and switching, coin-based damage to the opponent's board, protection, counter placement, and target bonuses. Energy remains side-wide. The two unsupported effects require knocking out multiple Pokémon at once or revealing only matching named Pokémon from hand.
+
 ## Reserved Future Content
 
 The following are defined in data or engine support but not yet naturally obtainable through authored progression:

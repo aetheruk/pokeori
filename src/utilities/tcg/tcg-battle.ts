@@ -2,6 +2,7 @@ import type { TcgCardAttack, TcgCardDetail } from '@/data/tcg/types'
 import { getTcgCardDetailById } from '@/data/tcg/details'
 import { inferPhantasmalFlamesTcgBattleAttackEffect } from '@/utilities/tcg/tcg-battle-phantasmal-flames'
 import { inferAscendedHeroesTcgBattleAttackEffect } from '@/utilities/tcg/tcg-battle-ascended-heroes'
+import { inferPerfectOrderTcgBattleAttackEffect } from '@/utilities/tcg/tcg-battle-perfect-order'
 
 export type TcgBattleDeckFormat = 'baby' | 'champions' | 'masters'
 export type TcgBattleSide = 'player' | 'opponent'
@@ -1471,6 +1472,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'me2pt5') {
     const ascendedHeroesEffect = inferAscendedHeroesTcgBattleAttackEffect(attack, baseDamage)
     if (ascendedHeroesEffect) return applyAttackTextModifiers(ascendedHeroesEffect)
+  }
+  if (setId === 'me3') {
+    const perfectOrderEffect = inferPerfectOrderTcgBattleAttackEffect(attack, baseDamage)
+    if (perfectOrderEffect) return applyAttackTextModifiers(perfectOrderEffect)
   }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
