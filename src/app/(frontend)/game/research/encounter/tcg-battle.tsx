@@ -51,9 +51,14 @@ import type {
 import {
   calculateTcgBattleDamage,
   chooseTcgBattleAttackChoice,
+  doesTcgBattleSubtypeFilterMatch,
+  getAvailableTcgBattleDeckPokemon,
+  getTcgBattleDeckSearchMaxCount,
   getEffectiveTcgBattleAttackCost,
+  getOpenTcgBattleBenchSlots,
   getTcgBattleAttackEffect,
   getTcgBattleCardUnlockTurnForCard,
+  getTcgBattleCount,
   getValidTcgBattleTargets,
   isTcgBattleAttackDisabled,
   TCG_BATTLE_FORMATS,
@@ -2530,6 +2535,14 @@ const TCG_CHOICE_TYPES: TcgBattleEnergyType[] = [
   'Dragon',
 ]
 
+const TCG_CHOICE_STATUSES: TcgBattleStatusCondition[] = [
+  'asleep',
+  'burned',
+  'confused',
+  'paralyzed',
+  'poisoned',
+]
+
 function AttackChoiceDrawer({
   open,
   state,
@@ -2563,6 +2576,14 @@ function AttackChoiceDrawer({
     : validTargets[0]?.instanceId || ''
   const [selectedTargetId, setSelectedTargetId] = useState(initialTarget)
   const [selectedCardId, setSelectedCardId] = useState('')
+  const [selectedDiscardPokemon, setSelectedDiscardPokemon] = useState<
+    { side: 'player' | 'opponent'; cardId: string } | null
+  >(null)
+  const [selectedDamageCounterSourceId, setSelectedDamageCounterSourceId] = useState('')
+  const [selectedCounterAssignments, setSelectedCounterAssignments] = useState<Record<string, number>>({})
+  const [selectedDiscardHandPokemonIds, setSelectedDiscardHandPokemonIds] = useState<string[]>([])
+  const [selectedOwnPokemonId, setSelectedOwnPokemonId] = useState('')
+  const [selectedRecoveryPokemonIds, setSelectedRecoveryPokemonIds] = useState<string[]>([])
   const [selectedAttackIndex, setSelectedAttackIndex] = useState<number | null>(
     null,
   )
@@ -2570,6 +2591,12 @@ function AttackChoiceDrawer({
     null,
   )
   const [energyAmount, setEnergyAmount] = useState(0)
+  const [selectedStatus, setSelectedStatus] = useState<TcgBattleStatusCondition>('asleep')
+  const [selectedFirstPairStatus, setSelectedFirstPairStatus] = useState<'burned' | 'poisoned'>('poisoned')
+  const [selectedSecondPairStatus, setSelectedSecondPairStatus] = useState<'asleep' | 'confused'>('asleep')
+  const [selectedDeckPokemonIds, setSelectedDeckPokemonIds] = useState<string[]>([])
+  const [useOptionalBonus, setUseOptionalBonus] = useState(false)
+  const [skipOptionalBenchSwitch, setSkipOptionalBenchSwitch] = useState(false)
   const [selectedType, setSelectedType] = useState<TcgBattleEnergyType>('Grass')
   const [resistanceType, setResistanceType] =
     useState<TcgBattleEnergyType>('Grass')
@@ -2577,9 +2604,17 @@ function AttackChoiceDrawer({
   const target = validTargets.find(
     (card) => card.instanceId === selectedTargetId,
   )
-  const requirement = effect?.choiceRequirement
+  const requirement = effect?.choiceRequirement === 'optionalBonus' &&
+    effect.damage.kind === 'handDiscardBonus' &&
+    state.player.hand.length === 0
+    ? undefined
+    : effect?.choiceRequirement
   const attackCost = attack ? getAttackCost(attack, state) : 0
   const availableEnergy = Math.max(0, state.player.energy - attackCost)
+  const energyTypeAllowed = !effect?.choiceEnergyType || state.player.selectedEnergy === effect.choiceEnergyType
+  const availableChoiceEnergy = energyTypeAllowed
+    ? Math.min(availableEnergy, effect?.choiceEnergyMax ?? Number.POSITIVE_INFINITY)
+    : 0
   const copiedAttack =
     requirement === 'copyAttack' && target && selectedAttackIndex !== null
       ? target.attacks[selectedAttackIndex]
@@ -2587,6 +2622,50 @@ function AttackChoiceDrawer({
   const copiedEffect = copiedAttack
     ? getTcgBattleAttackEffect(copiedAttack)
     : null
+  const activeEffect = requirement === 'copyAttack' ? copiedEffect : effect
+  const optionalBonusEnergyDiscardAmount = (activeEffect?.energyDiscard || []).reduce(
+    (total, rule) => total + (rule.optional && rule.target === 'self' && typeof rule.amount === 'number' ? rule.amount : 0),
+    0,
+  )
+  const optionalBonusHasEnoughEnergy = state.player.energy - (requirement === 'copyAttack' ? 0 : attackCost) >= optionalBonusEnergyDiscardAmount
+  const constrainedStatusChoices = activeEffect?.status
+    ?.filter((rule) => rule.useChosenStatus)
+    .flatMap((rule) => rule.statuses)
+  const statusChoices = constrainedStatusChoices?.length
+    ? [...new Set(constrainedStatusChoices)]
+    : TCG_CHOICE_STATUSES
+  const recoveryPokemonRule = activeEffect?.special?.find(
+    (rule) => rule.kind === 'recoverPokemonFromDiscardToHand',
+  )
+  const recoverablePokemonChoices = recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand'
+    ? state.player.discard.filter((card) =>
+        (!recoveryPokemonRule.includeSubtypes?.length || recoveryPokemonRule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
+        (!recoveryPokemonRule.includeNames?.length || recoveryPokemonRule.includeNames.includes(card.name)) &&
+        (!recoveryPokemonRule.includeTypes?.length || recoveryPokemonRule.includeTypes.some((type) => card.types.includes(type))),
+      )
+    : []
+  const maxRecoverySelection = recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand'
+    ? recoveryPokemonRule.maxCount ?? 1
+    : 1
+  const deckPokemonRule = activeEffect?.special?.find(
+    (rule) => rule.kind === 'searchDeckPokemon',
+  )
+  const availableDeckPokemon = deckPokemonRule?.kind === 'searchDeckPokemon'
+    ? getAvailableTcgBattleDeckPokemon(state.player, deckPokemonRule)
+    : []
+  const maxDeckPokemonSelection = deckPokemonRule?.kind === 'searchDeckPokemon'
+    ? Math.min(
+        getTcgBattleDeckSearchMaxCount({
+          state,
+          sideKey: 'player',
+          attacker,
+          target: target || attacker,
+          rule: deckPokemonRule,
+        }),
+        deckPokemonRule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(state.player),
+        availableDeckPokemon.length,
+      )
+    : 0
   const activeRequirement:
     | Exclude<TcgBattleChoiceRequirement, 'copyAttack'>
     | undefined =
@@ -2595,14 +2674,83 @@ function AttackChoiceDrawer({
         ? undefined
         : copiedEffect?.choiceRequirement
       : requirement
+  const optionalSwitchTarget =
+    activeRequirement === 'optionalOwnBench'
+      ? 'self'
+      : activeRequirement === 'optionalOpponentBench'
+        ? 'opponent'
+        : null
+  const canSkipBenchSwitch = Boolean(
+    optionalSwitchTarget &&
+      activeEffect?.special?.some(
+        (rule) => rule.kind === 'switch' && rule.target === optionalSwitchTarget && rule.optional,
+      ),
+  )
+  const ownBenchHealingRule = activeRequirement === 'ownBench'
+    ? activeEffect?.healing?.find(
+        (rule) => 'target' in rule && rule.target === 'selectedOwnBench',
+      )
+    : undefined
   const benchChoices =
     activeRequirement === 'ownBench'
-      ? state.player.back
-      : activeRequirement === 'opponentBench'
+      ? state.player.back.filter((card) =>
+          !ownBenchHealingRule ||
+          doesTcgBattleSubtypeFilterMatch(
+            card.subtypes,
+            'subtypeFilter' in ownBenchHealingRule
+              ? ownBenchHealingRule.subtypeFilter
+              : undefined,
+          ),
+        )
+      : activeRequirement === 'optionalOwnBench'
+        ? state.player.back
+      : activeRequirement === 'opponentBench' || activeRequirement === 'optionalOpponentBench'
         ? state.opponent.back
         : []
+  const discardPokemonRule = activeEffect?.special?.find((rule) => rule.kind === 'reviveDiscardPokemon')
+  const discardPokemonSides = discardPokemonRule?.kind === 'reviveDiscardPokemon' && discardPokemonRule.side
+    ? [discardPokemonRule.side === 'self' ? 'player' : 'opponent'] as const
+    : ['player', 'opponent'] as const
+  const discardChoices = discardPokemonSides.flatMap((side) =>
+    state[side].back.length < 3 && state[side].front.length + state[side].back.length < 6
+      ? state[side].discard
+          .filter((card) => card.subtypes.includes('Basic'))
+          .map((card) => ({ side, card }))
+      : [],
+  )
+  const transferDamageCountersRule = activeEffect?.special?.find((rule) => rule.kind === 'transferDamageCounters')
+  const damageCounterSourceCards = transferDamageCountersRule?.kind === 'transferDamageCounters' && transferDamageCountersRule.sourceZone === 'bench'
+    ? state.player.back
+    : [...state.player.front, ...state.player.back]
+  const transferDamageSourceNameContains = transferDamageCountersRule?.kind === 'transferDamageCounters'
+    ? transferDamageCountersRule.sourceNameContains
+    : undefined
+  const damageCounterSourceChoices = damageCounterSourceCards
+    .filter((card) =>
+      card.currentHp > 0 &&
+      card.currentHp < card.hp &&
+      (!transferDamageSourceNameContains ||
+        card.name.toLowerCase().includes(transferDamageSourceNameContains.toLowerCase())),
+    )
+  const handPokemonChoices = state.player.hand
+  const ownPokemonChoices = [...state.player.front, ...state.player.back]
+    .filter((card) => card.currentHp > 0)
+  const counterDistributionChoices = [...state.opponent.front, ...state.opponent.back]
+    .filter((card) => card.currentHp > 0)
+  const counterDistributionCardIds = counterDistributionChoices.map((card) => card.instanceId).join('|')
+  const counterDistributionCount = activeEffect?.choiceCounterCountFrom
+    ? getTcgBattleCount(activeEffect.choiceCounterCountFrom, {
+        state,
+        sideKey: 'player',
+        attacker,
+        target: target || attacker,
+        coinMode: 'actual',
+      })
+    : activeEffect?.choiceCounterCount || 0
+  const assignedCounterCount = Object.values(selectedCounterAssignments).reduce((sum, count) => sum + count, 0)
 
   useEffect(() => {
+    if (canSkipBenchSwitch && skipOptionalBenchSwitch) return
     if (
       !benchChoices.some(
         (card) => card.instanceId === selectedCardId && card.currentHp > 0,
@@ -2612,11 +2760,76 @@ function AttackChoiceDrawer({
         benchChoices.find((card) => card.currentHp > 0)?.instanceId || '',
       )
     }
-  }, [benchChoices, selectedCardId])
+  }, [benchChoices, selectedCardId, canSkipBenchSwitch, skipOptionalBenchSwitch])
 
   useEffect(() => {
-    if (activeRequirement === 'energyAmount') setEnergyAmount(availableEnergy)
-  }, [activeRequirement, availableEnergy])
+    setSkipOptionalBenchSwitch(false)
+  }, [attacker.instanceId, attackIndex, activeRequirement, selectedAttackIndex, followUpAttackIndex])
+
+  useEffect(() => {
+    setSelectedCounterAssignments({})
+  }, [attacker.instanceId, attackIndex, activeRequirement, selectedAttackIndex, followUpAttackIndex])
+
+  useEffect(() => {
+    const eligibleIds = new Set(counterDistributionChoices.map((card) => card.instanceId))
+    setSelectedCounterAssignments((current) => Object.fromEntries(
+      Object.entries(current).filter(([cardId, counters]) => eligibleIds.has(cardId) && counters > 0),
+    ))
+  }, [counterDistributionCardIds])
+
+  useEffect(() => {
+    if (activeRequirement === 'energyAmount') setEnergyAmount(availableChoiceEnergy)
+  }, [activeRequirement, availableChoiceEnergy])
+
+  useEffect(() => {
+    if (
+      !discardChoices.some(
+        ({ side, card }) => side === selectedDiscardPokemon?.side && card.instanceId === selectedDiscardPokemon.cardId,
+      )
+    ) {
+      const first = discardChoices[0]
+      setSelectedDiscardPokemon(first ? { side: first.side, cardId: first.card.instanceId } : null)
+    }
+  }, [discardChoices, selectedDiscardPokemon])
+
+  useEffect(() => {
+    if (!damageCounterSourceChoices.some((card) => card.instanceId === selectedDamageCounterSourceId)) {
+      setSelectedDamageCounterSourceId(damageCounterSourceChoices[0]?.instanceId || '')
+    }
+  }, [damageCounterSourceChoices, selectedDamageCounterSourceId])
+
+  useEffect(() => {
+    const handIds = new Set(handPokemonChoices.map((card) => card.instanceId))
+    setSelectedDiscardHandPokemonIds((selected) => selected.filter((cardId) => handIds.has(cardId)))
+  }, [handPokemonChoices])
+
+  useEffect(() => {
+    setSelectedDiscardHandPokemonIds([])
+  }, [attacker.instanceId, attackIndex])
+
+  useEffect(() => {
+    if (!ownPokemonChoices.some((card) => card.instanceId === selectedOwnPokemonId)) {
+      const mostInjured = [...ownPokemonChoices]
+        .sort((a, b) => (b.hp - b.currentHp) - (a.hp - a.currentHp))[0]
+      setSelectedOwnPokemonId(mostInjured?.instanceId || '')
+    }
+  }, [ownPokemonChoices, selectedOwnPokemonId])
+
+  useEffect(() => {
+    const eligibleIds = new Set(recoverablePokemonChoices.map((card) => card.instanceId))
+    const selected = selectedRecoveryPokemonIds
+      .filter((cardId) => eligibleIds.has(cardId))
+      .slice(0, maxRecoverySelection)
+    if (recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo) {
+      if (selected.length !== selectedRecoveryPokemonIds.length) setSelectedRecoveryPokemonIds(selected)
+      return
+    }
+    if (selected.length > 0 || recoverablePokemonChoices.length === 0) {
+      if (selected.length !== selectedRecoveryPokemonIds.length) setSelectedRecoveryPokemonIds(selected)
+      return
+    }
+    setSelectedRecoveryPokemonIds(recoverablePokemonChoices.slice(0, maxRecoverySelection).map((card) => card.instanceId))
+  }, [recoverablePokemonChoices, selectedRecoveryPokemonIds, maxRecoverySelection, recoveryPokemonRule])
 
   if (!attack || !effect) return null
 
@@ -2629,11 +2842,66 @@ function AttackChoiceDrawer({
     if (required === 'disableAttack' && attackChoiceIndex !== null) {
       return { kind: 'disabledAttack', attackIndex: attackChoiceIndex }
     }
+    if (required === 'damageCounterTransfer') {
+      return {
+        kind: 'damageCounterTransfer',
+        sourceCardId: selectedDamageCounterSourceId || undefined,
+      }
+    }
+    if (required === 'discardHandCards') {
+      const handIds = new Set(handPokemonChoices.map((card) => card.instanceId))
+      return {
+        kind: 'discardHandCards',
+        cardIds: selectedDiscardHandPokemonIds.filter((cardId) => handIds.has(cardId)),
+      }
+    }
+    if (required === 'ownPokemon' && selectedOwnPokemonId) {
+      return { kind: 'ownPokemon', cardId: selectedOwnPokemonId }
+    }
+    if (required === 'counterDistribution') {
+      return {
+        kind: 'counterDistribution',
+        assignments: Object.entries(selectedCounterAssignments)
+          .filter(([, counters]) => counters > 0)
+          .map(([cardId, counters]) => ({ cardId, counters })),
+      }
+    }
     if (
-      (required === 'opponentBench' || required === 'ownBench') &&
-      selectedCardId
+      required === 'discardPokemonToHand' &&
+      (selectedRecoveryPokemonIds.length > 0 || recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo)
     ) {
+      return { kind: 'discardPokemonToHand', cardIds: selectedRecoveryPokemonIds.slice(0, maxRecoverySelection) }
+    }
+    if (
+      required === 'opponentBench' ||
+        required === 'ownBench' ||
+        required === 'optionalOpponentBench' ||
+        required === 'optionalOwnBench'
+    ) {
+      if (canSkipBenchSwitch && skipOptionalBenchSwitch) return { kind: 'skipBenchSwitch' }
+      if (!selectedCardId) return undefined
       return { kind: 'benchSwitch', cardId: selectedCardId }
+    }
+    if (required === 'discardPokemon' && selectedDiscardPokemon) {
+      return { kind: 'discardPokemon', ...selectedDiscardPokemon }
+    }
+    if (required === 'deckPokemon') {
+      const availableIds = new Set(availableDeckPokemon.map((card) => card.id))
+      return {
+        kind: 'deckPokemon',
+        cardIds: selectedDeckPokemonIds
+          .filter((cardId) => availableIds.has(cardId))
+          .slice(0, maxDeckPokemonSelection),
+      }
+    }
+    if (required === 'optionalBonus') {
+      return { kind: 'optionalBonus', enabled: useOptionalBonus }
+    }
+    if (required === 'statusCondition') {
+      return { kind: 'statusCondition', status: selectedStatus }
+    }
+    if (required === 'statusPair') {
+      return { kind: 'statusPair', first: selectedFirstPairStatus, second: selectedSecondPairStatus }
     }
     if (required === 'energyAmount') {
       return { kind: 'energyAmount', amount: energyAmount }
@@ -2664,9 +2932,35 @@ function AttackChoiceDrawer({
       ? (requirement === 'copyAttack'
           ? followUpAttackIndex
           : selectedAttackIndex) !== null
-      : activeRequirement === 'opponentBench' ||
-          activeRequirement === 'ownBench'
+      : activeRequirement === 'opponentBench'
         ? Boolean(selectedCardId)
+        : activeRequirement === 'ownBench'
+          ? benchChoices.every((card) => card.currentHp <= 0) || Boolean(selectedCardId)
+        : activeRequirement === 'optionalOpponentBench' || activeRequirement === 'optionalOwnBench'
+          ? benchChoices.every((card) => card.currentHp <= 0) ||
+            Boolean(selectedCardId) ||
+            (canSkipBenchSwitch && skipOptionalBenchSwitch)
+        : activeRequirement === 'damageCounterTransfer'
+          ? damageCounterSourceChoices.length === 0 || Boolean(selectedDamageCounterSourceId)
+        : activeRequirement === 'discardHandCards'
+          ? effect.choiceHandCardCount === undefined ||
+            handPokemonChoices.length === 0 ||
+            selectedDiscardHandPokemonIds.length === Math.min(effect.choiceHandCardCount, handPokemonChoices.length)
+        : activeRequirement === 'ownPokemon'
+          ? Boolean(selectedOwnPokemonId)
+        : activeRequirement === 'counterDistribution'
+          ? assignedCounterCount === counterDistributionCount
+        : activeRequirement === 'discardPokemonToHand'
+          ? recoverablePokemonChoices.length === 0 || (recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo
+              ? selectedRecoveryPokemonIds.length <= Math.min(maxRecoverySelection, recoverablePokemonChoices.length)
+              : selectedRecoveryPokemonIds.length === Math.min(maxRecoverySelection, recoverablePokemonChoices.length))
+        : activeRequirement === 'discardPokemon'
+          ? Boolean(selectedDiscardPokemon)
+        : activeRequirement === 'statusCondition'
+          ? statusChoices.includes(selectedStatus)
+        : activeRequirement === 'statusPair'
+          ? ['burned', 'poisoned'].includes(selectedFirstPairStatus) &&
+            ['asleep', 'confused'].includes(selectedSecondPairStatus)
         : true)
   const choiceReady =
     !requirement ||
@@ -2708,9 +3002,10 @@ function AttackChoiceDrawer({
   const renderTypeChoices = (
     value: TcgBattleEnergyType,
     onChange: (value: TcgBattleEnergyType) => void,
+    allowedTypes: TcgBattleEnergyType[] = TCG_CHOICE_TYPES,
   ) => (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-      {TCG_CHOICE_TYPES.map((type) => (
+      {allowedTypes.map((type) => (
         <button
           type="button"
           key={type}
@@ -2753,18 +3048,403 @@ function AttackChoiceDrawer({
             </section>
           )}
           {(activeRequirement === 'opponentBench' ||
-            activeRequirement === 'ownBench') && (
+            activeRequirement === 'ownBench' ||
+            activeRequirement === 'optionalOpponentBench' ||
+            activeRequirement === 'optionalOwnBench') && benchChoices.some((card) => card.currentHp > 0) && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
-                {activeRequirement === 'ownBench'
+                {activeRequirement === 'ownBench' || activeRequirement === 'optionalOwnBench'
                   ? 'Switch with'
                   : 'Bring forward'}
               </h3>
               {renderCardChoices(
                 benchChoices,
                 selectedCardId,
-                setSelectedCardId,
+                (cardId) => {
+                  setSelectedCardId(cardId)
+                  setSkipOptionalBenchSwitch(false)
+                },
               )}
+              {canSkipBenchSwitch && (
+                <button
+                  type="button"
+                  aria-pressed={skipOptionalBenchSwitch}
+                  onClick={() => {
+                    setSelectedCardId('')
+                    setSkipOptionalBenchSwitch(true)
+                  }}
+                  className={cn(
+                    'game-focus-ring min-h-11 w-full rounded-md border px-3 py-2 text-sm font-semibold transition-colors',
+                    skipOptionalBenchSwitch
+                      ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                      : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                  )}
+                >
+                  {optionalSwitchTarget === 'self' ? 'Keep this Pokémon Active' : 'Leave the opponent Active'}
+                </button>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'damageCounterTransfer' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">
+                Move damage counters from
+              </h3>
+              {damageCounterSourceChoices.length > 0 ? (
+                renderCardChoices(
+                  damageCounterSourceChoices,
+                  selectedDamageCounterSourceId,
+                  setSelectedDamageCounterSourceId,
+                )
+              ) : (
+                <p className="text-sm text-game-muted">Your Pokémon have no damage counters to move.</p>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'counterDistribution' && (
+            <section className="space-y-2">
+              <div>
+                <h3 className="text-sm font-semibold text-game-ink">Place damage counters</h3>
+                <p className="text-xs text-game-muted">
+                  Assign all {counterDistributionCount} counters. {assignedCounterCount}/{counterDistributionCount} assigned.
+                </p>
+              </div>
+              <div className="space-y-2">
+                {counterDistributionChoices.map((card) => {
+                  const counters = selectedCounterAssignments[card.instanceId] || 0
+                  const canAddCounter = assignedCounterCount < counterDistributionCount
+                  return (
+                    <div key={card.instanceId} className="flex items-center justify-between gap-3 rounded-md border border-game-border/60 bg-game-surface-raised px-3 py-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-game-ink">{card.name}</p>
+                        <p className="text-xs text-game-muted">{card.currentHp}/{card.hp} HP</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          aria-label={`Remove a damage counter from ${card.name}`}
+                          disabled={counters === 0}
+                          onClick={() => setSelectedCounterAssignments((current) => {
+                            const nextCount = (current[card.instanceId] || 0) - 1
+                            if (nextCount <= 0) {
+                              const remaining = { ...current }
+                              delete remaining[card.instanceId]
+                              return remaining
+                            }
+                            return { ...current, [card.instanceId]: nextCount }
+                          })}
+                          className="game-focus-ring h-9 w-9 rounded-md border border-game-border/60 text-lg font-semibold text-game-ink disabled:opacity-40"
+                        >
+                          −
+                        </button>
+                        <span className="w-5 text-center font-mono text-sm font-semibold text-game-ink">{counters}</span>
+                        <button
+                          type="button"
+                          aria-label={`Add a damage counter to ${card.name}`}
+                          disabled={!canAddCounter}
+                          onClick={() => setSelectedCounterAssignments((current) => {
+                            const total = Object.values(current).reduce((sum, count) => sum + count, 0)
+                            if (total >= counterDistributionCount) return current
+                            return { ...current, [card.instanceId]: (current[card.instanceId] || 0) + 1 }
+                          })}
+                          className="game-focus-ring h-9 w-9 rounded-md border border-game-border/60 text-lg font-semibold text-game-ink disabled:opacity-40"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+          {activeRequirement === 'ownPokemon' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Choose a Pokémon to heal</h3>
+              {renderCardChoices(ownPokemonChoices, selectedOwnPokemonId, setSelectedOwnPokemonId)}
+            </section>
+          )}
+          {activeRequirement === 'discardPokemonToHand' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">
+                {maxRecoverySelection > 1 ? `Pokémon to recover (${selectedRecoveryPokemonIds.length} selected)` : 'Pokémon to recover'}
+              </h3>
+              {recoverablePokemonChoices.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {recoverablePokemonChoices.map((card) => {
+                    const selected = selectedRecoveryPokemonIds.includes(card.instanceId)
+                    return (
+                      <button
+                        type="button"
+                        key={card.instanceId}
+                        aria-pressed={selected}
+                        onClick={() => setSelectedRecoveryPokemonIds((current) =>
+                          selected
+                            ? current.filter((cardId) => cardId !== card.instanceId)
+                            : current.length < maxRecoverySelection ? [...current, card.instanceId] : current,
+                        )}
+                        className={cn(
+                          'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left text-sm font-semibold transition-colors',
+                          selected
+                            ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                            : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                        )}
+                      >
+                        {card.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-game-muted">No eligible Pokémon are in your discard pile.</p>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'discardHandCards' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">
+                Pokémon to discard ({selectedDiscardHandPokemonIds.length})
+              </h3>
+              <p className="text-xs text-game-muted">
+                {effect.choiceHandCardCount === undefined
+                  ? 'Choose any number. Each Pokémon adds 30 damage.'
+                  : `Choose ${effect.choiceHandCardCount} Pokémon to discard.`}
+              </p>
+              {handPokemonChoices.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {handPokemonChoices.map((card) => {
+                    const selected = selectedDiscardHandPokemonIds.includes(card.instanceId)
+                    const atSelectionLimit =
+                      effect.choiceHandCardCount !== undefined &&
+                      selectedDiscardHandPokemonIds.length >= effect.choiceHandCardCount
+                    return (
+                      <button
+                        type="button"
+                        key={card.instanceId}
+                        aria-pressed={selected}
+                        disabled={!selected && atSelectionLimit}
+                        onClick={() => setSelectedDiscardHandPokemonIds((current) =>
+                          selected
+                            ? current.filter((cardId) => cardId !== card.instanceId)
+                            : [...current, card.instanceId],
+                        )}
+                        className={cn(
+                          'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left text-sm font-semibold transition-colors',
+                          selected
+                            ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                            : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                        )}
+                      >
+                        {card.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-game-muted">Your hand is empty.</p>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'discardPokemon' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">
+                Basic Pokémon to revive
+              </h3>
+              {discardChoices.length === 0 ? (
+                <p className="text-sm text-game-muted">Neither side has a Basic Pokémon that can be revived.</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {discardChoices.map(({ side, card }) => {
+                    const selected = selectedDiscardPokemon?.side === side && selectedDiscardPokemon.cardId === card.instanceId
+                    const damageCounters = Math.floor(card.hp / 20)
+                    const remainingHp = Math.max(1, card.hp - damageCounters * 10)
+                    return (
+                      <button
+                        type="button"
+                        key={`${side}-${card.instanceId}`}
+                        onClick={() => setSelectedDiscardPokemon({ side, cardId: card.instanceId })}
+                        className={cn(
+                          'game-focus-ring min-h-11 rounded-md border bg-game-surface-raised px-3 py-2 text-left text-game-ink transition-colors',
+                          selected ? 'border-game-moss bg-game-moss/25' : 'border-game-border/60 hover:border-game-moss/60',
+                        )}
+                      >
+                        <span className="block truncate text-sm font-semibold">{card.name}</span>
+                        <span className="text-xs text-game-muted">{side === 'player' ? 'Your' : "Opponent’s"} discard · returns at {remainingHp}/{card.hp} HP</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'deckPokemon' && deckPokemonRule?.kind === 'searchDeckPokemon' && (
+            <section className="space-y-2">
+              <div>
+                <h3 className="text-sm font-semibold text-game-ink">Choose Pokémon from your deck</h3>
+                <p className="text-xs text-game-muted">
+                  {deckPokemonRule.oneOfEachType
+                    ? `Select up to ${maxDeckPokemonSelection} Pokémon, each with a different type.`
+                    : deckPokemonRule.destination === 'hand'
+                    ? `Select up to ${maxDeckPokemonSelection} Pokémon to add to your hand.`
+                    : `Select up to ${maxDeckPokemonSelection}. You may leave some or all Bench spaces open.`}
+                </p>
+              </div>
+              {availableDeckPokemon.length === 0 ? (
+                <p className="text-sm text-game-muted">No eligible Pokémon remain in your deck.</p>
+              ) : maxDeckPokemonSelection === 0 && deckPokemonRule.destination !== 'hand' ? (
+                <p className="text-sm text-game-muted">Your Bench is full.</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {availableDeckPokemon.map((card) => {
+                    const selected = selectedDeckPokemonIds.includes(card.id)
+                    const duplicateNameSelected = Boolean(deckPokemonRule.oneOfEachName && !selected && selectedDeckPokemonIds.some((cardId) =>
+                      availableDeckPokemon.find((candidate) => candidate.id === cardId)?.name.toLowerCase() === card.name.toLowerCase(),
+                    ))
+                    const cardType = card.types[0]?.toLowerCase() || 'colorless'
+                    const duplicateTypeSelected = Boolean(deckPokemonRule.oneOfEachType && !selected && selectedDeckPokemonIds.some((cardId) =>
+                      (availableDeckPokemon.find((candidate) => candidate.id === cardId)?.types[0]?.toLowerCase() || 'colorless') === cardType,
+                    ))
+                    const disabled = !selected && (selectedDeckPokemonIds.length >= maxDeckPokemonSelection || duplicateNameSelected || duplicateTypeSelected)
+                    return (
+                      <button
+                        type="button"
+                        key={card.id}
+                        disabled={disabled}
+                        onClick={() => setSelectedDeckPokemonIds((current) =>
+                          current.includes(card.id)
+                            ? current.filter((id) => id !== card.id)
+                            : current.length < maxDeckPokemonSelection
+                              ? [...current, card.id]
+                              : current,
+                        )}
+                        className={cn(
+                          'game-focus-ring min-h-11 rounded-md border bg-game-surface-raised px-3 py-2 text-left text-game-ink transition-colors',
+                          selected
+                            ? 'border-game-moss bg-game-moss/25'
+                            : 'border-game-border/60 hover:border-game-moss/60',
+                          disabled && 'cursor-not-allowed opacity-40',
+                        )}
+                      >
+                        <span className="block truncate text-sm font-semibold">{card.name}</span>
+                        <span className="text-xs text-game-muted">{card.types.join(' / ')} · {card.hp} HP</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'optionalBonus' &&
+            activeEffect &&
+            (activeEffect.damage.kind === 'optionalChoiceBonus' ||
+              activeEffect.damage.kind === 'optionalCoinDamage' ||
+              activeEffect.damage.kind === 'handDiscardBonus') && (
+              <section className="space-y-2">
+                <h3 className="text-sm font-semibold text-game-ink">Optional attack bonus</h3>
+                <p className="text-sm text-game-muted">
+                  {activeEffect.optionalBonusPrompt || (activeEffect.damage.kind === 'optionalCoinDamage'
+                    ? `Flip for ${activeEffect.damage.successDamage} damage? Tails does ${activeEffect.damage.failureDamage} damage.`
+                    : optionalBonusEnergyDiscardAmount > 0
+                      ? `Discard ${optionalBonusEnergyDiscardAmount} Energy to take +${activeEffect.damage.bonusDamage} damage?`
+                      : activeEffect.selfDamage?.some((rule) => rule.kind === 'optionalChoice')
+                        ? `Take +${activeEffect.damage.bonusDamage} damage and accept the recoil?`
+                        : `Take +${activeEffect.damage.bonusDamage} damage?`)}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setUseOptionalBonus(false)}
+                    className={cn(
+                      'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
+                      !useOptionalBonus
+                        ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                        : 'border-game-border/60 bg-game-surface-raised text-game-muted',
+                    )}
+                  >
+                    {activeEffect.damage.kind === 'optionalCoinDamage' ? 'Do not flip' : 'No bonus'}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!optionalBonusHasEnoughEnergy}
+                    onClick={() => setUseOptionalBonus(true)}
+                    className={cn(
+                      'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
+                      !optionalBonusHasEnoughEnergy
+                        ? 'cursor-not-allowed border-game-border/60 bg-game-surface-raised text-game-muted/50'
+                        : useOptionalBonus
+                        ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                        : 'border-game-border/60 bg-game-surface-raised text-game-muted',
+                    )}
+                  >
+                    {activeEffect.damage.kind === 'optionalCoinDamage' ? 'Flip a coin' : 'Take bonus'}
+                  </button>
+                </div>
+              </section>
+            )}
+          {activeRequirement === 'statusCondition' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Special Condition</h3>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {statusChoices.map((status) => (
+                  <button
+                    type="button"
+                    key={status}
+                    onClick={() => setSelectedStatus(status)}
+                    className={cn(
+                      'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold capitalize transition-colors',
+                      selectedStatus === status
+                        ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                        : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                    )}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+          {activeRequirement === 'statusPair' && (
+            <section className="space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold text-game-ink">First Special Condition</h3>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {(['burned', 'poisoned'] as const).map((status) => (
+                    <button
+                      type="button"
+                      key={status}
+                      onClick={() => setSelectedFirstPairStatus(status)}
+                      className={cn(
+                        'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold capitalize transition-colors',
+                        selectedFirstPairStatus === status
+                          ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                          : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                      )}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-game-ink">Second Special Condition</h3>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {(['asleep', 'confused'] as const).map((status) => (
+                    <button
+                      type="button"
+                      key={status}
+                      onClick={() => setSelectedSecondPairStatus(status)}
+                      className={cn(
+                        'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold capitalize transition-colors',
+                        selectedSecondPairStatus === status
+                          ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                          : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                      )}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </section>
           )}
           {requirement === 'copyAttack' && target && (
@@ -2854,10 +3534,10 @@ function AttackChoiceDrawer({
           {activeRequirement === 'energyAmount' && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
-                Extra Energy
+                {effect.choiceEnergyType ? `Extra ${effect.choiceEnergyType} Energy` : 'Extra Energy'}
               </h3>
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-                {Array.from({ length: availableEnergy + 1 }, (_, amount) => (
+                {Array.from({ length: availableChoiceEnergy + 1 }, (_, amount) => (
                   <button
                     type="button"
                     key={amount}
@@ -2876,7 +3556,7 @@ function AttackChoiceDrawer({
             </section>
           )}
           {activeRequirement === 'typeChange' &&
-            renderTypeChoices(selectedType, setSelectedType)}
+            renderTypeChoices(selectedType, setSelectedType, activeEffect?.choiceAllowedTypes)}
           {activeRequirement === 'textureMagic' && (
             <>
               <section className="space-y-2">
@@ -3886,7 +4566,9 @@ function BenchSheet({
   const description = isPromotion
     ? 'Fill the open front slot.'
     : isRetreat
-      ? `${attacker?.name || 'Selected card'} retreat cost ${attacker?.convertedRetreatCost ?? 0}.`
+      ? attacker?.temporaryEffects?.cannotRetreat
+        ? `${attacker.name} cannot retreat this turn.`
+        : `${attacker?.name || 'Selected card'} retreat cost ${attacker?.convertedRetreatCost ?? 0}.`
       : `${state.player.back.length} ready / ${state.player.discard.length} discarded.`
   const icon = isPromotion ? (
     <span className="text-xs font-bold uppercase tracking-wide">Promote</span>
@@ -3924,7 +4606,7 @@ function BenchSheet({
               <CardImageButton
                 key={card.instanceId}
                 card={card}
-                disabled={isPending || (isRetreat && !attacker)}
+                disabled={isPending || (isRetreat && (!attacker || Boolean(attacker.temporaryEffects?.cannotRetreat)))}
                 onClick={() => {
                   if (isPromotion) onPromote(card.instanceId)
                   else if (isRetreat) onRetreat(card.instanceId)
@@ -4139,15 +4821,19 @@ function CardImageButton({
           ))}
         </div>
       )}
-      {card.markers?.includes('lightningRod') && (
+      {card.markers?.some((marker) => marker === 'lightningRod' || marker === 'shockWave') && (
         <div
           className={cn(
-            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-md border border-game-ochre/50 bg-game-surface-raised px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-game-ink shadow-sm',
+            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-md border border-game-ochre/50 bg-game-surface-raised px-1.5 py-1 text-[8px] font-bold uppercase tracking-wide text-game-ink shadow-sm',
             side === 'opponent' && 'rotate-180',
           )}
-          title="Lightning Rod marker"
+          title={`${card.markers
+            .filter((marker) => marker === 'lightningRod' || marker === 'shockWave')
+            .map((marker) => marker === 'lightningRod' ? 'Lightning Rod' : 'Shock-wave')
+            .join(', ')} marker`}
         >
-          Rod
+          {card.markers.includes('lightningRod') && <span>Rod</span>}
+          {card.markers.includes('shockWave') && <span>Shock</span>}
         </div>
       )}
     </button>
