@@ -1354,6 +1354,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const silverTempestEffect = inferSilverTempestTcgBattleAttackEffect(attack, baseDamage)
     if (silverTempestEffect) return applyAttackTextModifiers(silverTempestEffect)
   }
+  if (setId === 'swsh12pt5') {
+    const crownZenithEffect = inferCrownZenithTcgBattleAttackEffect(attack, baseDamage)
+    if (crownZenithEffect) return applyAttackTextModifiers(crownZenithEffect)
+  }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
     if (dragonMajestyEffect) return applyAttackTextModifiers(dragonMajestyEffect)
@@ -19091,6 +19095,227 @@ function inferSilverTempestTcgBattleAttackEffect(
   return null
 }
 
+function inferCrownZenithTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: {
+      basicOnly?: boolean
+      includeNames?: string[]
+      destination?: 'bench' | 'hand'
+    } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'swoop across') {
+    const amount = Number(text.match(/does (\d+) damage to each/)?.[1] || 10)
+    return {
+      ...zero(),
+      benchDamage: [{ amount, side: 'opponent', zone: 'play', ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'energize' || name === 'psypump' || name === 'wave summoning') {
+    const amount = Number(text.match(/attach up to (\d+)/)?.[1] || 1)
+    return { ...zero(), energyGain: [{ target: 'self', amount }] }
+  }
+  if (name === 'drag off') {
+    const amount = Number(text.match(/does (\d+) damage to the new active/)?.[1] || 20)
+    return {
+      damage: { kind: 'fixed', amount },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', beforeDamage: true }],
+    }
+  }
+  if (name === 'explosive fire') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 100)
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage,
+        source: { kind: 'damageCounters', target: 'attacker' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'flare juggling') {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each energy/)?.[1] || 30)
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: perEnergy, source: { kind: 'energyOnTarget' } } }
+  }
+  if (name === 'hydro burn') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 80)
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage,
+        source: { kind: 'energyOfType', side: 'own', type: 'Water' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'call for family') {
+    const maxCount = Number(text.match(/up to (\d+) basic pokemon/)?.[1] || 1)
+    return searchPokemon(maxCount, { basicOnly: true, destination: 'bench' })
+  }
+  if (name === 'emotional draw') {
+    const amount = Number(text.match(/draw (\d+) cards/)?.[1] || 5)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount, shuffleHandIntoDeck: true }] }
+  }
+  if (name === 'fireball fever') {
+    const maxCards = Number(text.match(/discard up to (\d+) cards from the top/)?.[1] || 5)
+    const damagePerCard = Number(text.match(/does (\d+) more damage for each card/)?.[1] || 40)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: damagePerCard,
+        source: { kind: 'deckSize', side: 'own' },
+        maxUnits: maxCards,
+        optional: true,
+      },
+      choiceRequirement: 'optionalBonus',
+      optionalBonusPrompt: `Discard up to ${maxCards} cards from the top of your deck for ${damagePerCard} more damage per card?`,
+      special: [{ kind: 'millCards', target: 'self', amount: maxCards, requiresOptionalChoice: true }],
+    }
+  }
+  if (name === 'dynamic wave') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 180)
+    const energyCount = Number(text.match(/put (\d+) energy attached/)?.[1] || 3)
+    return {
+      damage: { kind: 'fixed', amount },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+      energyDiscard: [{ target: 'self', amount: energyCount }],
+    }
+  }
+  if (name === 'jumping kick' || name === 'linear attack') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 30)
+    return anyTargetDamage(amount)
+  }
+  if (name === 'electrostep') {
+    const amount = Number(text.match(/does (\d+) damage/)?.[1] || 40)
+    return {
+      damage: { kind: 'fixed', amount },
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'scar strikes') return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 100 } }
+  if (name === 'continuous tumble' || name === 'rolling rollout' || name === 'rolling dash') {
+    const damagePerHead = Number(text.match(/does (\d+) (?:more )?damage for each heads/)?.[1] || 30)
+    const addsToBase = text.includes('more damage for each heads')
+    return {
+      damage: addsToBase
+        ? { kind: 'headsBonusEach', baseDamage, bonusDamage: damagePerHead, coinFlipCount: 0 }
+        : { kind: 'headsMultiplier', damagePerHeads: damagePerHead, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'powerful storm') {
+    const perEnergy = Number(text.match(/does (\d+) damage for each energy/)?.[1] || 20)
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perEnergy, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'energy mix') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'double draw') {
+    const amount = Number(text.match(/draw (\d+) cards/)?.[1] || 2)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount }] }
+  }
+  if (name === 'cycle draw') {
+    const drawCount = Number(text.match(/draw (\d+) cards/)?.[1] || 3)
+    return {
+      ...zero(),
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardCount: 1,
+      special: [
+        { kind: 'discardSelectedHandPokemon' },
+        { kind: 'drawCards', target: 'self', amount: drawCount, requiresDiscardChoice: true },
+      ],
+    }
+  }
+  if (name === 'moon kinesis') {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each psychic energy/)?.[1] || 30)
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: perEnergy, source: { kind: 'energyOfType', side: 'own', type: 'Psychic' } } }
+  }
+  if (name === 'loving sympathy') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 70)
+    return { damage: { kind: 'handSizeComparisonBonus', baseDamage, bonusDamage, comparison: 'equal' } }
+  }
+  if (name === 'spiral burst' || name === 'max burst') {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each card/)?.[1] || 80)
+    const maximumEnergy = name === 'spiral burst' ? 2 : undefined
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: perEnergy,
+        source: { kind: 'chosenEnergy' },
+        maxUnits: maximumEnergy,
+      },
+      choiceRequirement: 'energyAmount',
+      choiceEnergyMax: maximumEnergy,
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+    }
+  }
+  if (name === 'energy burst') {
+    const perEnergy = Number(text.match(/does (\d+) damage for each energy/)?.[1] || 20)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: perEnergy,
+        source: { kind: 'energy', side: 'both' },
+      },
+    }
+  }
+  if (name === 'invite out') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      choiceRequirement: 'optionalOpponentBench',
+      special: [{ kind: 'switch', target: 'opponent', condition: 'heads' }],
+    }
+  }
+  if (name === 'midnight fang') {
+    const reduction = Number(text.match(/does (\d+) less damage for each energy/)?.[1] || 80)
+    return { damage: { kind: 'subtractCount', baseDamage, perUnitDamage: reduction, source: { kind: 'energyOnTarget' } } }
+  }
+  if (name === 'dredge up') {
+    const amount = Number(text.match(/discard the top (\d+) cards/)?.[1] || 3)
+    return { ...zero(), special: [{ kind: 'millCards', target: 'opponent', amount }] }
+  }
+  if (name === 'dangerous claws') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 80)
+    return { damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage, subtype: 'Basic' } }
+  }
+  if (name === 'behemoth blade') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 160)
+    return { damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage, subtype: 'VMAX' } }
+  }
+  if (name === 'retaliate') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 120)
+    return { damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'vee brave') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 80)
+    return { damage: { kind: 'pokemonVTargetBonus', baseDamage, bonusDamage } }
+  }
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -23718,6 +23943,19 @@ export function chooseTcgBattleAttackChoice(params: {
   }
   if (required === 'optionalBonus') {
     const damageRule = effect?.damage
+    const optionalCountBonus = damageRule?.kind === 'count' && damageRule.optional
+      ? damageRule.perUnitDamage * Math.min(
+          getTcgBattleCount(damageRule.source, {
+            state,
+            sideKey,
+            attacker,
+            target,
+            paidAttackCost,
+            coinMode: 'max',
+          }),
+          damageRule.maxUnits ?? Number.POSITIVE_INFINITY,
+        )
+      : undefined
     const recoil = effect?.selfDamage?.find((rule) => rule.kind === 'optionalChoice')
     const optionalEnergyCost = (effect?.energyDiscard || []).reduce(
       (total, rule) => total + (rule.optional && rule.target === 'self' && typeof rule.amount === 'number' ? rule.amount : 0),
@@ -23729,7 +23967,10 @@ export function chooseTcgBattleAttackChoice(params: {
       : damageRule?.kind === 'optionalChoiceBonus' &&
         attacker.currentHp > (recoil?.kind === 'optionalChoice' ? recoil.amount : 0) &&
         target.currentHp > damageRule.baseDamage &&
-        target.currentHp <= damageRule.baseDamage + damageRule.bonusDamage)
+        target.currentHp <= damageRule.baseDamage + damageRule.bonusDamage ||
+        optionalCountBonus !== undefined && damageRule?.kind === 'count' &&
+          target.currentHp > damageRule.baseDamage &&
+          target.currentHp <= damageRule.baseDamage + optionalCountBonus)
     return { kind: 'optionalBonus', enabled }
   }
   if (required === 'statusCondition') return { kind: 'statusCondition', status: 'paralyzed' }
