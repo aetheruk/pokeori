@@ -1037,6 +1037,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const arceusEffect = inferArceusTcgBattleAttackEffect(attack, text, baseDamage)
     if (arceusEffect) return applyAttackTextModifiers(arceusEffect)
   }
+  if (setId === 'hgss1') {
+    const heartGoldSoulSilverEffect = inferHeartGoldSoulSilverTcgBattleAttackEffect(attack, text, baseDamage)
+    if (heartGoldSoulSilverEffect) return applyAttackTextModifiers(heartGoldSoulSilverEffect)
+  }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
     if (platinumEffect) return applyAttackTextModifiers(platinumEffect)
@@ -6672,6 +6676,178 @@ function inferArceusTcgBattleAttackEffect(
 
   // Effects that depend on card identity in hand/deck/discard, typed attached Energy,
   // Stadium/Tool presence, Prize cards, or evolution cards stay filtered.
+  return null
+}
+
+function inferHeartGoldSoulSilverTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+  const boardDamage = (amount: number): TcgBattleBenchDamageRule[] => [
+    { amount, side: 'opponent', zone: 'front' },
+    { amount, side: 'opponent', zone: 'bench', ignoreWeaknessResistance: true },
+  ]
+
+  if (name === 'mass attack') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonInPlay', side: 'both' },
+      },
+    }
+  }
+  if (name === 'extrasensory') {
+    return { damage: { kind: 'handSizeComparisonBonus', baseDamage, bonusDamage: 40, comparison: 'equal' } }
+  }
+  if (name === 'iron tail' || name === 'continuous eggsplosion') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: name === 'iron tail' ? 30 : 10, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'double return') {
+    return {
+      damage: {
+        kind: 'conditionalCount',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'damageCounters', target: 'attacker' },
+        condition: 'heads',
+      },
+      coinFlipCount: 1,
+    }
+  }
+  if (name === 'cure powder') {
+    return { ...zero(), healing: [{ amount: 30, side: 'own', zone: 'play' }] }
+  }
+  if (name === 'spinning tail') {
+    return { ...zero(), benchDamage: boardDamage(20) }
+  }
+  if (name === 'quick blow' || name === 'knock away' || name === 'water splash' || name === 'quick attack') {
+    const bonusDamage = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage }, coinFlipCount: 1 }
+  }
+  if (name === 'chomp') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'ice blade' || name === 'thunder spear') {
+    return anyTargetDamage(name === 'ice blade' ? 30 : 20)
+  }
+  if (name === 'sneaky attack') {
+    // Darkness Energy attached to Persian is approximated by any shared Energy on the side.
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 30,
+        source: { kind: 'energy', side: 'own' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'hyper cannon') {
+    return {
+      damage: {
+        kind: 'conditionalBonus',
+        baseDamage,
+        bonusDamage: 50,
+        condition: { result: 'heads', minimum: 2, exactly: 2 },
+      },
+      coinFlipCount: 2,
+    }
+  }
+  if (name === 'hail') {
+    return { ...zero(), benchDamage: boardDamage(10) }
+  }
+  if (name === 'double headbutt') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 20, coinFlipCount: 2 },
+      coinFlipCount: 2,
+    }
+  }
+  if (name === 'madkinesis') {
+    // Psychic Energy attached to Slowbro is approximated by the shared Energy pool.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'cosmic cyclone') {
+    // Returned Water Energy is represented by spending the chosen amount of shared Energy.
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'chosenEnergy' } },
+      choiceRequirement: 'energyAmount',
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+    }
+  }
+  if (name === 'minimize') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 20 }] }
+  }
+  if (name === 'static electricity') {
+    // Deck Energy attachment is approximated by shared Energy gain, one per Mareep in play.
+    return {
+      ...zero(),
+      energyGain: [{
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'namedPokemon', side: 'both', zone: 'play', names: ['Mareep'] },
+      }],
+    }
+  }
+  if (name === 'cure kernels') {
+    // The engine randomly chooses one injured friendly Pokemon because the healing UI cannot select any own target.
+    return { ...zero(), healing: [{ amount: 20, side: 'own', zone: 'play', maxTargets: 1 }] }
+  }
+  if (name === 'roar') {
+    return {
+      ...zero(),
+      choiceRequirement: 'optionalOpponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'spider web') {
+    return { damage: { kind: 'fixed', amount: baseDamage }, special: [{ kind: 'preventRetreat', target: 'opponent' }] }
+  }
+  if (name === 'tail whip') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [{ kind: 'cannotAttack', target: 'opponent', condition: 'heads' }],
+    }
+  }
+  if (name === 'hydro crunch') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'target' },
+      },
+    }
+  }
+  if (name === 'thrash') {
+    return {
+      damage: { kind: 'headsBonus', baseDamage, bonusDamage: 20 },
+      coinFlipCount: 1,
+      selfDamage: [{ kind: 'fixed', amount: 20, condition: 'tails' }],
+    }
+  }
+
+  // Deck/hand actions, card return, and Energy movement between opposing Pokemon remain filtered.
   return null
 }
 
