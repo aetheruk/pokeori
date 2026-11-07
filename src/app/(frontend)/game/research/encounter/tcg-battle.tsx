@@ -2630,7 +2630,8 @@ function AttackChoiceDrawer({
   const recoverablePokemonChoices = recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand'
     ? state.player.discard.filter((card) =>
         (!recoveryPokemonRule.includeSubtypes?.length || recoveryPokemonRule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
-        (!recoveryPokemonRule.includeNames?.length || recoveryPokemonRule.includeNames.includes(card.name)),
+        (!recoveryPokemonRule.includeNames?.length || recoveryPokemonRule.includeNames.includes(card.name)) &&
+        (!recoveryPokemonRule.includeTypes?.length || recoveryPokemonRule.includeTypes.some((type) => card.types.includes(type))),
       )
     : []
   const maxRecoverySelection = recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand'

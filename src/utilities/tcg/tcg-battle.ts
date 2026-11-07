@@ -307,18 +307,18 @@ export type TcgBattleSpecialRule =
   | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; includeResistanceTypes?: string[]; destination?: 'bench' | 'hand'; random?: boolean; condition?: TcgBattleCoinCondition; treatAsBasic?: boolean; damageCountersOnSearch?: number; oneOfEachName?: boolean }
   | { kind: 'revealTopDeckPokemon'; amount: number; includeSubtypes: string[] }
   | { kind: 'drawCards'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; amountPerUnit?: number; untilHandSize?: number; source?: TcgBattleCountSource; shuffleHandIntoDeck?: boolean; condition?: TcgBattleCoinCondition; requiresDiscardChoice?: boolean }
-  | { kind: 'shuffleRandomHandCardIntoDeck'; target: 'self' | 'opponent'; amountPerHead?: number; condition?: TcgBattleCoinCondition }
+  | { kind: 'shuffleRandomHandCardIntoDeck'; target: 'self' | 'opponent'; amountPerHead?: number; condition?: TcgBattleCoinCondition; revealSelected?: boolean }
   | { kind: 'discardRandomHandCard'; target: 'self' | 'opponent'; amountPerHead?: number; amountPerTail?: number; untilHandSize?: number; condition?: TcgBattleCoinCondition }
   | { kind: 'discardSelectedHandPokemon' }
   | { kind: 'recoverRandomPokemonFromDiscardToHand'; amountPerHead: number }
-  | { kind: 'recoverPokemonFromDiscardToHand'; includeSubtypes?: string[]; includeNames?: string[]; maxCount?: number; upTo?: boolean; condition?: TcgBattleCoinCondition }
+  | { kind: 'recoverPokemonFromDiscardToHand'; includeSubtypes?: string[]; includeNames?: string[]; includeTypes?: string[]; maxCount?: number; upTo?: boolean; condition?: TcgBattleCoinCondition }
   | { kind: 'returnOwnBenchToHand' }
   | { kind: 'returnOwnPokemonToDeck' }
   | { kind: 'returnTargetToHand'; condition?: TcgBattleCoinCondition }
   | { kind: 'knockOutTarget'; requiresAnyTargetStatus?: boolean }
   | { kind: 'transferDamageCounters'; maxCounters: number; sourceZone?: 'bench' | 'play' }
   | { kind: 'transferDamageCountersFromOwnSide'; maxCountersPerPokemon: number }
-  | { kind: 'shuffleTargetIntoDeck'; requiresOpponentBench?: boolean }
+  | { kind: 'shuffleTargetIntoDeck'; requiresOpponentBench?: boolean; targetZone?: 'front' | 'bench' }
   | { kind: 'shuffleDiscardPokemonIntoDeck'; maxCount: number }
   | { kind: 'revealHand'; target: 'self' | 'opponent' }
   | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerHead?: number; amountPerOwnEnergy?: number; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition }
@@ -1237,6 +1237,14 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'sm3') {
     const burningShadowsEffect = inferSunMoonBurningShadowsTcgBattleAttackEffect(attack, baseDamage)
     if (burningShadowsEffect) return applyAttackTextModifiers(burningShadowsEffect)
+  }
+  if (setId === 'sm35') {
+    const shiningLegendsEffect = inferSunMoonShiningLegendsTcgBattleAttackEffect(attack, baseDamage)
+    if (shiningLegendsEffect) return applyAttackTextModifiers(shiningLegendsEffect)
+  }
+  if (setId === 'sm4') {
+    const crimsonInvasionEffect = inferSunMoonCrimsonInvasionTcgBattleAttackEffect(attack, baseDamage)
+    if (crimsonInvasionEffect) return applyAttackTextModifiers(crimsonInvasionEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -13319,6 +13327,351 @@ function inferSunMoonBurningShadowsTcgBattleAttackEffect(
   return null
 }
 
+function inferSunMoonShiningLegendsTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'flippity flap') {
+    return {
+      ...zero(),
+      special: [{ kind: 'drawCards', target: 'self', amount: 6, shuffleHandIntoDeck: true }],
+    }
+  }
+  if (name === 'rally back') {
+    return { damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage: 90 } }
+  }
+  if (name === 'gaia blaster') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energyOfType', side: 'own', type: 'Grass' },
+      },
+    }
+  }
+  if (name === 'profane punch') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 80,
+        source: { kind: 'injuredPokemon', side: 'own', zone: 'bench' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'shocking sting') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 50,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+    }
+  }
+  if (name === 'bail out') {
+    return {
+      ...zero(),
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', includeTypes: ['Water'] }],
+    }
+  }
+  if (name === 'iron tail') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 20, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'powerful spark') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energyOfType', side: 'own', type: 'Lightning' },
+      },
+    }
+  }
+  if (name === 'tag team boost') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 50,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: ['Minun'] },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'collect') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'whiny voice') {
+    return {
+      ...zero(),
+      special: [{ kind: 'shuffleRandomHandCardIntoDeck', target: 'opponent', revealSelected: true }],
+    }
+  }
+  if (name === 'full burst') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 30,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'cursed drop') {
+    return {
+      ...zero(),
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: 3,
+      counterDamage: [{ target: 'distributed', amountPerCounter: 10 }],
+    }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, basicOnly: true }],
+    }
+  }
+  if (name === 'dangerous head') {
+    return { damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage: 50, subtype: 'Basic' } }
+  }
+  if (name === 'trickster-gx') {
+    return {
+      ...zero(),
+      choiceRequirement: 'copyAttack',
+      special: [{ kind: 'copyAttack', preserveExtraCosts: false }],
+    }
+  }
+  if (name === 'ultimate arrow') {
+    return {
+      ...zero(),
+      benchDamage: [{
+        amount: 30,
+        side: 'opponent',
+        zone: 'play',
+        ignoreWeaknessResistanceOnBench: true,
+      }],
+    }
+  }
+
+  // Dual Pump needs two independently chosen defending targets. Legendary Guidance
+  // searches for Energy cards, which are not represented in the Pokémon-only deck.
+  return null
+}
+
+function inferSunMoonCrimsonInvasionTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'multiply') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 3, includeNames: ['Kakuna'] }],
+    }
+  }
+  if (name === 'sucker punch') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 30,
+        source: { kind: 'energyOfType', side: 'own', type: 'Darkness' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'spike rend') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'hunt') {
+    return {
+      ...zero(),
+      damage: { kind: 'fixed', amount: 40 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', beforeDamage: true }],
+    }
+  }
+  if (name === 'continuous headbutt') {
+    const damagePerHeads = attack.name.toLowerCase() === 'continuous headbutt'
+      ? Number.parseInt(attack.damage, 10) || (baseDamage === 30 ? 30 : 80)
+      : 0
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'draconic disaster') {
+    // Stadium cards are not in the battle deck; preserve printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'forceful tackle') {
+    // The optional self-placed counters are not represented as an attack choice.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'ink spit') {
+    return { ...zero(), special: [{ kind: 'attackFailsOnTails' }] }
+  }
+  if (name === 'special artillery') {
+    // Special Energy is not tracked; preserve the printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'tlc') {
+    return {
+      ...zero(),
+      targetScope: 'bench',
+      targetMustBeDamaged: true,
+      special: [{ kind: 'shuffleTargetIntoDeck', targetZone: 'bench' }],
+    }
+  }
+  if (name === 'pika draw') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'psychic') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'opponent' },
+      },
+    }
+  }
+  if (name === 'ominous eyes') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      counterDamage: [{ amount: 10, target: 'target' }],
+    }
+  }
+  if (name === 'pain amplifier') {
+    return {
+      ...zero(),
+      counterDamage: [{ amount: 20, side: 'opponent', zone: 'play', onlyDamaged: true }],
+    }
+  }
+  if (name === 'dark arts') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'handSize', side: 'opponent' },
+      },
+    }
+  }
+  if (name === 'astonish') {
+    return {
+      ...zero(),
+      special: [{ kind: 'shuffleRandomHandCardIntoDeck', target: 'opponent', revealSelected: true }],
+    }
+  }
+  if (name === 'pumpkin bomb') {
+    // Pokémon Tools are not modeled; preserve printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'nasty plot') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, destination: 'hand' }],
+    }
+  }
+  if (name === 'cross-cut') {
+    return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'eat sloppily') {
+    // The top five Pokémon are milled; Energy cards and attachment are unmodeled.
+    return { ...zero(), special: [{ kind: 'millCards', target: 'self', amount: 5 }] }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, basicOnly: true }],
+    }
+  }
+  if (name === 'revenge cannon') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCountersOnSide', side: 'own', zone: 'bench' },
+      },
+    }
+  }
+  if (name === 'punishing slap') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 60,
+        source: { kind: 'energyOfType', side: 'opponent', type: 'Darkness' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'tropical head') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+      },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'noble roar') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'war cry') {
+    return {
+      damage: {
+        kind: 'countComparisonBonus',
+        baseDamage,
+        bonusDamage: 90,
+        addSource: { kind: 'pokemonInPlay', side: 'opponent' },
+        subtractSource: { kind: 'pokemonInPlay', side: 'own' },
+      },
+    }
+  }
+  if (name === 'draco melody') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeTypes: ['Dragon'], condition: 'heads' }],
+    }
+  }
+  if (name === 'bug search') {
+    return { ...zero(), special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+
+  // Energy-card actions, Evolution, Prize cards, unmodeled Trainer/Tool/Stadium
+  // effects, and Amazing Plea's opponent-controlled choice remain filtered.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -17596,7 +17949,8 @@ export function validateTcgBattleAttackChoice(params: {
       if (rule?.kind === 'recoverPokemonFromDiscardToHand' &&
         !own.discard.some((card) =>
           (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
-          (!rule.includeNames?.length || rule.includeNames.includes(card.name)),
+          (!rule.includeNames?.length || rule.includeNames.includes(card.name)) &&
+          (!rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.includes(type))),
         )) return null
     }
     if (required === 'discardPokemon') {
@@ -17682,7 +18036,8 @@ export function validateTcgBattleAttackChoice(params: {
     const selectedIds = choice.cardIds || (choice.cardId ? [choice.cardId] : [])
     const eligible = own.discard.filter((card) =>
       (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
-      (!rule.includeNames?.length || rule.includeNames.includes(card.name)),
+      (!rule.includeNames?.length || rule.includeNames.includes(card.name)) &&
+      (!rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.includes(type))),
     )
     const eligibleIds = new Set(eligible.map((card) => card.instanceId))
     const maxCount = Math.min(rule.maxCount ?? 1, eligible.length)
@@ -17886,7 +18241,8 @@ export function chooseTcgBattleAttackChoice(params: {
     const eligible = state[sideKey].discard
       .filter((card) =>
         (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
-        (!rule.includeNames?.length || rule.includeNames.includes(card.name)),
+        (!rule.includeNames?.length || rule.includeNames.includes(card.name)) &&
+        (!rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.includes(type))),
       )
       .sort((a, b) => b.hp - a.hp)
       .slice(0, rule.maxCount ?? 1)

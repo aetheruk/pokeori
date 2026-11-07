@@ -960,11 +960,16 @@ function applyTcgBattleSpecialEffects(params: {
       for (let discarded = 0; discarded < count && destination.hand.length > 0; discarded += 1) {
         const index = Math.floor(Math.random() * destination.hand.length)
         const [shuffledCard] = destination.hand.splice(index, 1)
+        destination.deck.push(toTcgBattleCardSummary(shuffledCard))
+        shuffleTcgBattleDeck(destination)
+        const handOwner = destinationSideKey === sideKey ? 'your' : "your opponent's"
         recordEffectEvent(state, {
           kind: 'control',
           sourceId: attacker.instanceId,
           targetId: shuffledCard.instanceId,
-          label: `${shuffledCard.name} was shuffled from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand into their deck`,
+          label: rule.revealSelected
+            ? `${shuffledCard.name} was revealed from ${handOwner} hand and shuffled into their deck`
+            : `A Pokémon was shuffled from ${handOwner} hand into their deck`,
         })
       }
       continue
@@ -1041,7 +1046,8 @@ function applyTcgBattleSpecialEffects(params: {
         const card = discard.find((entry) => entry.instanceId === cardId)
         const eligible = card &&
           (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
-          (!rule.includeNames?.length || rule.includeNames.includes(card.name))
+          (!rule.includeNames?.length || rule.includeNames.includes(card.name)) &&
+          (!rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.includes(type)))
         if (!card || !eligible) continue
         discard.splice(discard.indexOf(card), 1)
         recovered.push(card)
@@ -1193,9 +1199,10 @@ function applyTcgBattleSpecialEffects(params: {
     if (rule.kind === 'shuffleTargetIntoDeck') {
       if (rule.requiresOpponentBench && state[opponentKey].back.every((card) => card.currentHp <= 0)) continue
       const defendingSide = state[opponentKey]
-      const targetIndex = defendingSide.front.findIndex((card) => card.instanceId === target.instanceId)
+      const targetZone = rule.targetZone === 'bench' ? defendingSide.back : defendingSide.front
+      const targetIndex = targetZone.findIndex((card) => card.instanceId === target.instanceId)
       if (targetIndex < 0) continue
-      const [card] = defendingSide.front.splice(targetIndex, 1)
+      const [card] = targetZone.splice(targetIndex, 1)
       defendingSide.deck.push(toTcgBattleCardSummary(card))
       shuffleTcgBattleDeck(defendingSide)
       recordEffectEvent(state, {
