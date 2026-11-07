@@ -2027,7 +2027,7 @@ describe('static data references', () => {
     ])
   })
 
-  test('League Tickets are awarded and exchanged through authored Kanto progression', () => {
+  test('League Tickets are awarded through authored Kanto progression and not sold in Prof\'s Scrip Shop', () => {
     const hasLeagueTicketReward = (
       rewards:
         | Array<{ type?: string; targetId?: unknown; quantity?: unknown }>
@@ -2045,9 +2045,6 @@ describe('static data references', () => {
     const profScripShop = shops.find(
       (shop) => shop.id === 'retro-trainer-cards',
     )
-    const exchange = profScripShop?.items.find(
-      (item) => item.id === 'league-ticket-exchange',
-    )
     const gymBattleIds = ['pewter-gym-brock', 'cerulean-gym-misty']
     const gymDailyIds = ['brock-daily-stones', 'misty-daily-scales']
     const surgeGym = expeditions.find(
@@ -2058,10 +2055,9 @@ describe('static data references', () => {
     )
 
     expect(hasLeagueTicketReward(starterTask?.rewards, 10)).toBe(true)
-    expect(exchange?.cost).toEqual([
-      { type: 'currency', id: 'prof-scrip', amount: 5 },
-    ])
-    expect(hasLeagueTicketReward(exchange?.rewards, 1)).toBe(true)
+    expect(
+      profScripShop?.items.some((item) => item.id === 'league-ticket-exchange'),
+    ).toBe(false)
     expect(
       gymBattleIds.every((id) =>
         hasLeagueTicketReward(

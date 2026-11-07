@@ -2,6 +2,8 @@
 
 Unreleased: The Dailies view shows each voyage that is currently underway in an Active Voyages section, making those journeys easy to reopen while they run.
 
+Unreleased: Prof's Scrip Shop no longer offers the League Ticket exchange.
+
 Unreleased: The repeatable Lavender Tower Ghost Trial's Alpha Gengar battle is categorized as Kanto so its Alpha capture attempt records Kanto as the Pokémon's obtained region.
 
 Unreleased: Trainer notification settings replace a device subscription when its VAPID key no longer matches the server, clearing the stale server record before creating a fresh subscription.
@@ -149,7 +151,7 @@ Release `0.51.46` fixes timed rhythm games, including Razz Berry Crushing (20 se
 - Unreleased: Evolution rules now include owned-game adaptations for Meltan, Galarian Farfetch'd/Yamask, Milcery, Stantler, Basculin, the Let's Go walking evolutions, Tandemaus, Bisharp, Gimmighoul, and Annihilape. Nincada can also grant a Shedinja when it evolves with an open party slot and a Poké Ball; Mantyke checks for Remoraid in the party. These rules are preserved in the evolution generator and enforced by the server.
 - Unreleased: Route 9's Cerulean-side pass preparation tasks now use the revised comic Hiker dialogue and player descriptions, from the failed first crossing through collecting boots, making trail clothes, finding gloves, and assembling the outfit.
 - Unreleased: After the Route 9 Hiker explains how to make Trail Clothes, the passive `The Hike of Fashion` reminder repeats the Artisan recipe description until the player owns the clothes, and stays hidden after assembling the outfit consumes them.
-- Unreleased (`0.43.86`): Prof's Scrip Shop charges 5 Professor Scrip for one League Ticket, up from 2.
+- Historical (`0.43.86`): Prof's Scrip Shop charged 5 Professor Scrip for one League Ticket, up from 2; that exchange has since been removed.
 - Unreleased (`0.43.83`): Underground Society members earn 100 Guild XP for the Pewter School quiz Promo Meowth, 100 for the first Lost-and-Found tutorial battle victory, and 250 for each first victory against the Fire, Water, and Grass decks.
 - Unreleased (`0.43.82`): Underground Society membership is awarded only when the player hands over 500 Crystals with the Card Redistribution Box. Membership reward previews and rank-up summaries use the Society's authored trainer icon.
 - Release (`0.43.81`): Basic Training progression introduced the 500-Crystal contribution and Underground Society Rank 1 membership, including a fallback for players who had already completed training.

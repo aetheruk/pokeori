@@ -288,30 +288,6 @@ export const palletTownShops: ShopConfig[] = [
       },
     ],
     items: [
-      {
-        id: 'league-ticket-exchange',
-        name: 'League Ticket',
-        description: 'A ticket for Chansey prize wheels.',
-        icon: {
-          type: 'item',
-          id: 'league-ticket',
-        },
-        cost: [
-          {
-            type: 'currency',
-            id: 'prof-scrip',
-            amount: 5,
-          },
-        ],
-        rewards: [
-          {
-            type: 'currency',
-            targetId: 'league-ticket',
-            quantity: 1,
-            dropChance: 100,
-          },
-        ],
-      },
       ...starterExclusiveShopItems,
       {
         id: 'trainer-gb-red',
