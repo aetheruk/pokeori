@@ -42,7 +42,8 @@ export type TcgBattleCountSource =
   | { kind: 'pokemonEvolvedInPlay'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'pokemonEvolvedFromInPlay'; side: 'own' | 'opponent' | 'both'; evolvesFrom: string }
   | { kind: 'pokemonEvolvedOnBench'; side: 'own' | 'opponent' | 'both' }
-  | { kind: 'pokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[] }
+  | { kind: 'pokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[]; zone?: 'bench' | 'play' }
+  | { kind: 'pokemonWithAttack'; side: 'own' | 'opponent' | 'both'; attackName: string; zone: 'bench' | 'play' }
   | { kind: 'distinctTypesOfNamedPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; nameContains: string }
   | { kind: 'distinctTypesOfPokemonWithSubtypesInPlay'; side: 'own' | 'opponent' | 'both'; subtypes: string[]; zone: 'bench' | 'play' }
   | { kind: 'handSize'; side: 'own' | 'opponent'; max?: number }
@@ -88,6 +89,7 @@ export type TcgBattleDamageRule =
   | { kind: 'countComparisonBonus'; baseDamage: number; bonusDamage: number; addSource: TcgBattleCountSource; subtractSource: TcgBattleCountSource }
   | { kind: 'evolvedTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'targetSubtypeBonus'; baseDamage: number; bonusDamage: number; subtype: string }
+  | { kind: 'targetTypeBonus'; baseDamage: number; bonusDamage: number; targetType: string }
   | { kind: 'evolvedFromBonus'; baseDamage: number; bonusDamage: number; evolvesFrom: string }
   | { kind: 'retreatCostZeroBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'knockOutLowestRemainingHp' }
@@ -1075,6 +1077,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'bw2') {
     const emergingPowersEffect = inferEmergingPowersTcgBattleAttackEffect(attack, baseDamage)
     if (emergingPowersEffect) return applyAttackTextModifiers(emergingPowersEffect)
+  }
+  if (setId === 'bw3') {
+    const nobleVictoriesEffect = inferNobleVictoriesTcgBattleAttackEffect(attack, baseDamage)
+    if (nobleVictoriesEffect) return applyAttackTextModifiers(nobleVictoriesEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -7937,6 +7943,129 @@ function inferEmergingPowersTcgBattleAttackEffect(
   return null
 }
 
+function inferNobleVictoriesTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'aromax') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownBench',
+      healing: [{ target: 'selectedOwnBench', amount: 'all' }],
+    }
+  }
+  if (name === 'round') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: baseDamage,
+        source: { kind: 'pokemonWithAttack', side: 'own', attackName: 'Round', zone: 'play' },
+      },
+    }
+  }
+  if (name === 'hydro pump') {
+    // Energy attached to this Pokémon is approximated by the side's shared Energy pool.
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } },
+    }
+  }
+  if (name === 'ice shard') {
+    return { damage: { kind: 'targetTypeBonus', baseDamage, bonusDamage: 40, targetType: 'Fighting' } }
+  }
+  if (name === 'ice chain' || name === 'luring light') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'outrage') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'glaciate') {
+    return { ...zero(), benchDamage: [{ amount: 30, side: 'opponent', zone: 'play' }] }
+  }
+  if (name === 'electrichain') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 20,
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: ['Lightning'], zone: 'bench' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'net force') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 40,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: ['Reuniclus'] },
+      },
+    }
+  }
+  if (name === 'first contact') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, basicOnly: true }],
+    }
+  }
+  if (name === 'core cannon') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+      },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'retaliate') {
+    return { damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'abundant harvest') {
+    // Recovering Basic Energy becomes one shared Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'iron head') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 10, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'finishing blow') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 50 } }
+  }
+  if (name === 'metal scissors') {
+    // Metal Energy attached to this Pokémon is approximated by shared Energy.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'energy press') {
+    // Energy attached to the Defending Pokémon is approximated by its side's shared pool.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energyOnTarget' } } }
+  }
+
+  // In-battle evolution, card draw/deck order, discard recovery, deck discard, and
+  // transferring counters from a selected Bench card are outside the battle model.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -12401,12 +12530,17 @@ export function chooseTcgBattleAttackChoice(params: {
     const bench = required === 'ownBench' || required === 'optionalOwnBench'
       ? state[sideKey].back
       : state[sideKey === 'player' ? 'opponent' : 'player'].back
+    const selectedOwnBenchHealing = required === 'ownBench' && effect?.healing?.some((rule) =>
+      'target' in rule && rule.target === 'selectedOwnBench',
+    )
     const sameTypeHealing = required === 'ownBench' && effect?.healing?.some((rule) =>
       'target' in rule && rule.target === 'selectedOwnBench' && rule.sameTypeAsAttacker,
     )
     const picked = [...bench]
       .filter((card) => card.currentHp > 0 && (!sameTypeHealing || card.types.some((type) => attacker.types.includes(type))))
-      .sort((a, b) => b.currentHp - a.currentHp)[0]
+      .sort((a, b) => selectedOwnBenchHealing
+        ? (b.hp - b.currentHp) - (a.hp - a.currentHp)
+        : b.currentHp - a.currentHp)[0]
     return picked ? { kind: 'benchSwitch', cardId: picked.instanceId } : undefined
   }
   if (required === 'energyAmount') {
@@ -12581,6 +12715,8 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (context.target.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)) ? rule.bonusDamage : 0)
     case 'targetSubtypeBonus':
       return rule.baseDamage + (context.target.subtypes.some((subtype) => subtype.toLowerCase() === rule.subtype.toLowerCase()) ? rule.bonusDamage : 0)
+    case 'targetTypeBonus':
+      return rule.baseDamage + (context.target.types.some((type) => type.toLowerCase() === rule.targetType.toLowerCase()) ? rule.bonusDamage : 0)
     case 'evolvedFromBonus': {
       const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
       return rule.baseDamage + (
@@ -12878,10 +13014,27 @@ function getTcgBattleCount(
 
   if (source.kind === 'pokemonOfTypesInPlay') {
     const types = new Set(source.types.map((type) => type.toLowerCase()))
-    const countFor = (side: TcgBattleSideState) =>
-      getLivingTcgBattleCards(side).filter((card) =>
+    const countFor = (side: TcgBattleSideState) => {
+      const cards = source.zone === 'bench' ? side.back : [...side.front, ...side.back]
+      return cards.filter((card) =>
+        card.currentHp > 0 &&
         card.types.some((type) => types.has(type.toLowerCase())),
       ).length
+    }
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
+  if (source.kind === 'pokemonWithAttack') {
+    const wantedAttackName = normalizeTcgBattleCardName(source.attackName)
+    const countFor = (side: TcgBattleSideState) => {
+      const cards = source.zone === 'bench' ? side.back : [...side.front, ...side.back]
+      return cards.filter((card) =>
+        card.currentHp > 0 &&
+        card.attacks.some((attack) => normalizeTcgBattleCardName(attack.name) === wantedAttackName),
+      ).length
+    }
     if (source.side === 'own') return countFor(own)
     if (source.side === 'opponent') return countFor(opponent)
     return countFor(own) + countFor(opponent)
