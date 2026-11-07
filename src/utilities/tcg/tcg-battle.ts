@@ -1308,6 +1308,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     const vividVoltageEffect = inferVividVoltageTcgBattleAttackEffect(attack, baseDamage)
     if (vividVoltageEffect) return applyAttackTextModifiers(vividVoltageEffect)
   }
+  if (setId === 'swsh45') {
+    const shiningFatesEffect = inferShiningFatesTcgBattleAttackEffect(attack, baseDamage)
+    if (shiningFatesEffect) return applyAttackTextModifiers(shiningFatesEffect)
+  }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
     if (dragonMajestyEffect) return applyAttackTextModifiers(dragonMajestyEffect)
@@ -17120,6 +17124,112 @@ function inferVividVoltageTcgBattleAttackEffect(
   if (name === 'mind ruler') {
     const perCard = Number(text.match(/does (\d+) damage for each card/)?.[1] || 30)
     return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perCard, source: { kind: 'handSize', side: 'opponent' } } }
+  }
+
+  return null
+}
+
+function inferShiningFatesTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: {
+      basicOnly?: boolean
+      includeNames?: string[]
+      includeNameContains?: string[]
+      destination?: 'bench' | 'hand'
+    } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+
+  if (name === 'attach leaves') return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  if (name === 'anchor anger' || name === 'under pressure' || name === 'raid' || name === "land's pulse") {
+    // Last-turn knockout/evolution, Prize-card, and Stadium checks are unavailable; retain base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'swinging chain') {
+    const perEnergy = Number(text.match(/does (\d+) damage .*for each grass energy/)?.[1] || 30)
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: perEnergy, source: { kind: 'energyOfType', side: 'own', type: 'Grass' } },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'enriching seeds') {
+    return {
+      ...zero(),
+      choiceRequirement: 'ownBench',
+      healing: [{ target: 'selectedOwnBench', amount: 'all' }],
+    }
+  }
+  if (name === 'counter') return { damage: { kind: 'lastIncomingDamageBonus', baseDamage } }
+  if (name === 'amazing surge') {
+    const amount = Number(text.match(/does (\d+) damage to each/)?.[1] || 80)
+    return {
+      ...zero(),
+      benchDamage: [{ amount, side: 'opponent', zone: 'play', ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'call for family') return searchPokemon(1, { basicOnly: true, destination: 'bench' })
+  if (name === 'famished') return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  if (name === 'psychic') {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each energy/)?.[1] || 20)
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: perEnergy, source: { kind: 'energy', side: 'opponent' } } }
+  }
+  if (name === 'amazing destruction') {
+    return { ...zero(), special: [{ kind: 'knockOutTarget' }] }
+  }
+  if (name === 'call for goons') {
+    const maxCount = Number(text.match(/up to (\d+) basic pokemon/)?.[1] || 3)
+    return searchPokemon(maxCount, { basicOnly: true, destination: 'bench' })
+  }
+  if (name === 'stick on' || name === 'helping hand') return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  if (name === 'max transform') {
+    return { ...zero(), choiceRequirement: 'copyAttack', special: [{ kind: 'copyAttack', preserveExtraCosts: false }] }
+  }
+  if (name === 'signs of evolution') {
+    return searchPokemon(1, {
+      includeNames: ['Vaporeon', 'Jolteon', 'Flareon', 'Sylveon', 'Espeon', 'Umbreon', 'Leafeon', 'Glaceon'],
+      destination: 'hand',
+    })
+  }
+  if (name === 'beak catch') return searchPokemon(2, { destination: 'hand' })
+  if (name === 'spit shot') {
+    const amount = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || 160)
+    return {
+      damage: { kind: 'fixed', amount },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+    }
+  }
+  if (name === 'max jet') {
+    const damagePerHeads = Number(text.match(/does (\d+) damage for each heads/)?.[1] || 80)
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'adornment') {
+    return {
+      ...zero(),
+      energyGain: [{ target: 'self', amount: 0, amountPerUnit: 1, source: { kind: 'bench', side: 'own' } }],
+    }
+  }
+  if (name === 'g-max whisk') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 60, source: { kind: 'chosenEnergy' } },
+      choiceRequirement: 'energyAmount',
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+    }
   }
 
   return null
