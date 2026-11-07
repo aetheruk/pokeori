@@ -802,6 +802,7 @@ function applyTcgBattleSpecialEffects(params: {
       (rule.kind === 'preventRetreat' && (rule.target || 'opponent') === 'opponent') ||
       (rule.kind === 'cannotAttack' && rule.target !== 'self') ||
       (rule.kind === 'buffAttack' && rule.target === 'opponent') ||
+      (rule.kind === 'drawCards' && rule.target === 'opponent') ||
       (rule.kind === 'clearStatus' && rule.target === 'opponent') ||
       (rule.kind === 'clearStatusOnSide' && rule.side === 'opponent') ||
       (rule.kind === 'setStatus' && rule.target === 'opponent') ||
@@ -815,23 +816,48 @@ function applyTcgBattleSpecialEffects(params: {
       )
       const maxCount = Math.min(
         getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }),
-        getOpenTcgBattleBenchSlots(destination),
+        rule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(destination),
       )
       const selectedIds = choice.cardIds.slice(0, maxCount)
       for (const [index, cardId] of selectedIds.entries()) {
         const cardSummary = availableById.get(cardId)
         if (!cardSummary) continue
-        const newPokemon = createTcgBattleCardState(cardSummary, destination.back.length + index)
+        const newPokemon = createTcgBattleCardState(cardSummary, destination.back.length + destination.hand.length + index)
         if (rule.treatAsBasic) newPokemon.subtypes = ['Basic']
         if (rule.damageCountersOnSearch) {
           newPokemon.currentHp = Math.max(0, newPokemon.currentHp - rule.damageCountersOnSearch * 10)
         }
-        destination.back.push(newPokemon)
+        if (rule.destination === 'hand') destination.hand.push(newPokemon)
+        else destination.back.push(newPokemon)
         recordEffectEvent(state, {
           kind: 'control',
           sourceId: attacker.instanceId,
           targetId: newPokemon.instanceId,
-          label: `${newPokemon.name} joined the Bench`,
+          label: rule.destination === 'hand' ? `${newPokemon.name} joined your hand` : `${newPokemon.name} joined the Bench`,
+        })
+      }
+      continue
+    }
+
+    if (rule.kind === 'drawCards') {
+      const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
+      const destination = state[destinationSideKey]
+      if (rule.shuffleHandIntoDeck) destination.hand = []
+      const amount = Math.max(0, (rule.amount || 0) + (rule.amountPerHead || 0) * (resolution.coinFlips?.heads || 0))
+      const inUseIds = new Set(
+        [...destination.hand, ...destination.front, ...destination.back, ...destination.discard].map((card) => card.id),
+      )
+      const available = destination.deck.filter((card) => !inUseIds.has(card.id))
+      const drawn = drawTcgBattleCards(available, amount)
+      destination.hand.push(...drawn)
+      if (drawn.length > 0 || rule.shuffleHandIntoDeck) {
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: attacker.instanceId,
+          label: rule.shuffleHandIntoDeck
+            ? `${destination === state[sideKey] ? 'Your' : "Opponent's"} hand was shuffled and ${drawn.length} Pokémon drawn`
+            : `${destination === state[sideKey] ? 'You' : 'Opponent'} drew ${drawn.length} Pokémon`,
         })
       }
       continue

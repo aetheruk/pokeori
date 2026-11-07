@@ -2624,7 +2624,7 @@ function AttackChoiceDrawer({
           target: target || attacker,
           rule: deckPokemonRule,
         }),
-        getOpenTcgBattleBenchSlots(state.player),
+        deckPokemonRule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(state.player),
         availableDeckPokemon.length,
       )
     : 0
@@ -2939,12 +2939,14 @@ function AttackChoiceDrawer({
               <div>
                 <h3 className="text-sm font-semibold text-game-ink">Choose Pokémon from your deck</h3>
                 <p className="text-xs text-game-muted">
-                  Select up to {maxDeckPokemonSelection}. You may leave some or all Bench spaces open.
+                  {deckPokemonRule.destination === 'hand'
+                    ? `Select up to ${maxDeckPokemonSelection} Pokémon to add to your hand.`
+                    : `Select up to ${maxDeckPokemonSelection}. You may leave some or all Bench spaces open.`}
                 </p>
               </div>
               {availableDeckPokemon.length === 0 ? (
                 <p className="text-sm text-game-muted">No eligible Pokémon remain in your deck.</p>
-              ) : maxDeckPokemonSelection === 0 ? (
+              ) : maxDeckPokemonSelection === 0 && deckPokemonRule.destination !== 'hand' ? (
                 <p className="text-sm text-game-muted">Your Bench is full.</p>
               ) : (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
