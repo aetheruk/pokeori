@@ -38,6 +38,7 @@ export type TcgBattleCountSource =
   | { kind: 'energyOnTarget' }
   | { kind: 'retreatCost'; target: 'attacker' | 'target' }
   | { kind: 'pokemonInDiscard'; side: 'own' | 'opponent'; max?: number; includeSubtypes?: string[]; all?: boolean }
+  | { kind: 'pokemonOfTypesInDiscard'; side: 'own' | 'opponent'; types: string[]; max?: number }
   | { kind: 'pokemonWithAttackInDiscard'; side: 'own' | 'opponent'; attackName: string }
   | { kind: 'namedPokemonInDiscard'; side: 'own' | 'opponent'; names: string[]; max?: number }
   | { kind: 'deltaPokemonInPlay'; side: 'own' | 'opponent' | 'both' }
@@ -1298,6 +1299,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'swsh3') {
     const darknessAblazeEffect = inferDarknessAblazeTcgBattleAttackEffect(attack, baseDamage)
     if (darknessAblazeEffect) return applyAttackTextModifiers(darknessAblazeEffect)
+  }
+  if (setId === 'swsh35') {
+    const championsPathEffect = inferChampionsPathTcgBattleAttackEffect(attack, baseDamage)
+    if (championsPathEffect) return applyAttackTextModifiers(championsPathEffect)
   }
   if (setId === 'sm75') {
     const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
@@ -16799,6 +16804,88 @@ function inferDarknessAblazeTcgBattleAttackEffect(
   return null
 }
 
+function inferChampionsPathTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const searchPokemon = (
+    maxCount: number,
+    options: { basicOnly?: boolean; destination?: 'bench' | 'hand' } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, ...options }],
+  })
+
+  if (name === 'call for family') return searchPokemon(1, { basicOnly: true, destination: 'bench' })
+  if (name === 'quick draw' || name === 'collect' || name === 'filch') {
+    const amount = Number(text.match(/draw (\d+) cards?/)?.[1] || 1)
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount }] }
+  }
+  if (name === 'draw up') return { ...zero(), energyGain: [{ target: 'self', amount: 3 }] }
+  if (name === 'swelling pulse') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 80)
+    return { damage: { kind: 'healedThisTurnBonus', baseDamage, bonusDamage } }
+  }
+  if (name === 'adornment') {
+    return {
+      ...zero(),
+      energyGain: [{ target: 'self', amount: 0, amountPerUnit: 1, source: { kind: 'bench', side: 'own' } }],
+    }
+  }
+  if (name === 'g-max whisk') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 60,
+        source: { kind: 'chosenEnergy' },
+      },
+      choiceRequirement: 'energyAmount',
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+    }
+  }
+  if (name === 'macho revenge') {
+    const perPokemon = Number(text.match(/does (\d+) damage for each fighting pokemon/)?.[1] || 20)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: perPokemon,
+        source: { kind: 'pokemonOfTypesInDiscard', side: 'own', types: ['Fighting'] },
+      },
+    }
+  }
+  if (name === 'bad brawl') {
+    // The Supporter-played-this-turn check is not tracked; retain printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'venoshock') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 50)
+    return { damage: { kind: 'statusBonus', baseDamage, bonusDamage, statuses: ['poisoned'] } }
+  }
+  if (name === 'attack from behind') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 50)
+    return { damage: { kind: 'statusBonus', baseDamage, bonusDamage, statuses: ['confused'] } }
+  }
+  if (name === 'gatling slug') {
+    const perEnergy = Number(text.match(/does (\d+) more damage for each metal energy/)?.[1] || 40)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: perEnergy,
+        source: { kind: 'energyOfType', side: 'own', type: 'Metal' },
+      },
+    }
+  }
+
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -22032,6 +22119,15 @@ export function getTcgBattleCount(
       includedSubtypes?.length
         ? card.subtypes.some((subtype) => includedSubtypes.includes(subtype.toLowerCase()))
         : card.subtypes.some((subtype) => subtype === 'Basic' || /^Stage [12]$/i.test(subtype)),
+    ).length
+    return Math.min(amount, source.max ?? Number.POSITIVE_INFINITY)
+  }
+
+  if (source.kind === 'pokemonOfTypesInDiscard') {
+    const side = source.side === 'own' ? own : opponent
+    const types = new Set(source.types.map((type) => type.toLowerCase()))
+    const amount = side.discard.filter((card) =>
+      card.types.some((type) => types.has(type.toLowerCase())),
     ).length
     return Math.min(amount, source.max ?? Number.POSITIVE_INFINITY)
   }
