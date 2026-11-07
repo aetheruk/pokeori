@@ -877,6 +877,13 @@ function applyTcgBattleSpecialEffects(params: {
 
     if (rule.kind === 'drawCards') {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      if (
+        rule.requiresDiscardChoice &&
+        !(
+          choice?.kind === 'discardHandCards' &&
+          choice.cardIds.some((cardId) => state[sideKey].discard.some((card) => card.instanceId === cardId))
+        )
+      ) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
       if (rule.shuffleHandIntoDeck) destination.hand = []

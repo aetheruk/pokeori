@@ -2881,7 +2881,9 @@ function AttackChoiceDrawer({
         : activeRequirement === 'damageCounterTransfer'
           ? damageCounterSourceChoices.length === 0 || Boolean(selectedDamageCounterSourceId)
         : activeRequirement === 'discardHandCards'
-          ? true
+          ? effect.choiceHandCardCount === undefined ||
+            handPokemonChoices.length === 0 ||
+            selectedDiscardHandPokemonIds.length === Math.min(effect.choiceHandCardCount, handPokemonChoices.length)
         : activeRequirement === 'ownPokemon'
           ? Boolean(selectedOwnPokemonId)
         : activeRequirement === 'counterDistribution'
@@ -3132,16 +3134,24 @@ function AttackChoiceDrawer({
               <h3 className="text-sm font-semibold text-game-ink">
                 Pokémon to discard ({selectedDiscardHandPokemonIds.length})
               </h3>
-              <p className="text-xs text-game-muted">Choose any number. Each Pokémon adds 30 damage.</p>
+              <p className="text-xs text-game-muted">
+                {effect.choiceHandCardCount === undefined
+                  ? 'Choose any number. Each Pokémon adds 30 damage.'
+                  : `Choose ${effect.choiceHandCardCount} Pokémon to discard.`}
+              </p>
               {handPokemonChoices.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {handPokemonChoices.map((card) => {
                     const selected = selectedDiscardHandPokemonIds.includes(card.instanceId)
+                    const atSelectionLimit =
+                      effect.choiceHandCardCount !== undefined &&
+                      selectedDiscardHandPokemonIds.length >= effect.choiceHandCardCount
                     return (
                       <button
                         type="button"
                         key={card.instanceId}
                         aria-pressed={selected}
+                        disabled={!selected && atSelectionLimit}
                         onClick={() => setSelectedDiscardHandPokemonIds((current) =>
                           selected
                             ? current.filter((cardId) => cardId !== card.instanceId)
