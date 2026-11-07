@@ -1104,6 +1104,7 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'returnOwnPokemonToDeck') {
+      if (rule.requiresOptionalChoice && !(choice?.kind === 'optionalBonus' && choice.enabled)) continue
       const cardIndex = state[sideKey].front.findIndex((card) => card.instanceId === attacker.instanceId)
       if (cardIndex < 0) continue
       const [card] = state[sideKey].front.splice(cardIndex, 1)
@@ -1113,6 +1114,22 @@ function applyTcgBattleSpecialEffects(params: {
         kind: 'control',
         sourceId: attacker.instanceId,
         targetId: attacker.instanceId,
+        label: `${card.name} was shuffled into your deck`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'returnOwnBenchToDeck') {
+      if (choice?.kind !== 'benchSwitch') continue
+      const cardIndex = state[sideKey].back.findIndex((card) => card.instanceId === choice.cardId)
+      if (cardIndex < 0) continue
+      const [card] = state[sideKey].back.splice(cardIndex, 1)
+      state[sideKey].deck.push(toTcgBattleCardSummary(card))
+      shuffleTcgBattleDeck(state[sideKey])
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: card.instanceId,
         label: `${card.name} was shuffled into your deck`,
       })
       continue
