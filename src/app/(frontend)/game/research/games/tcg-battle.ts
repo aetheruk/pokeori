@@ -954,9 +954,9 @@ function applyTcgBattleSpecialEffects(params: {
     if (rule.kind === 'shuffleRandomHandCardIntoDeck') {
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
-      const count = rule.amountPerHead === undefined
+      const count = rule.amount ?? (rule.amountPerHead === undefined
         ? 1
-        : rule.amountPerHead * (resolution.coinFlips?.heads || 0)
+        : rule.amountPerHead * (resolution.coinFlips?.heads || 0))
       for (let discarded = 0; discarded < count && destination.hand.length > 0; discarded += 1) {
         const index = Math.floor(Math.random() * destination.hand.length)
         const [shuffledCard] = destination.hand.splice(index, 1)
