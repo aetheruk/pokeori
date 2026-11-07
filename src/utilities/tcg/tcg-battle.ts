@@ -303,7 +303,7 @@ export type TcgBattleSpecialRule =
   | { kind: 'transferDamageCounters'; maxCounters: number }
   | { kind: 'shuffleTargetIntoDeck' }
   | { kind: 'revealHand'; target: 'self' | 'opponent' }
-  | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerOwnEnergy?: number; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition }
+  | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerHead?: number; amountPerOwnEnergy?: number; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition }
   | {
       kind: 'switch'
       target: 'self' | 'opponent'
@@ -1164,6 +1164,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'xy4') {
     const xyPhantomForcesEffect = inferXyPhantomForcesTcgBattleAttackEffect(attack, text, baseDamage)
     if (xyPhantomForcesEffect) return applyAttackTextModifiers(xyPhantomForcesEffect)
+  }
+  if (setId === 'xy5') {
+    const xyPrimalClashEffect = inferXyPrimalClashTcgBattleAttackEffect(attack, baseDamage)
+    if (xyPrimalClashEffect) return applyAttackTextModifiers(xyPrimalClashEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -10673,6 +10677,263 @@ function inferXyPhantomForcesTcgBattleAttackEffect(
 
   // Tool/Item/Stadium cards, Prize effects, future-turn coin rules, evolution,
   // hand Energy, and discard-to-deck movement are not represented in this mode.
+  return null
+}
+
+function inferXyPrimalClashTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = normalizeTcgAttackText(attack.text || '')
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'multiply') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeNames: ['Weedle'] }],
+    }
+  }
+  if (name === 'grass knot') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+  if (name === 'pester') {
+    return {
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: 30,
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+      },
+    }
+  }
+  if (name === 'helping hand') {
+    // Basic Energy attachment to a Benched Pokémon is approximated as shared Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'wood blast') {
+    // Grass Energy attached to Trevenant is approximated with shared Energy.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'roar' || name === 'captivate') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'indomitable blaze') {
+    return { damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'spreading flames') {
+    // Energy recovered from the discard is represented in the shared pool.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 3 }] }
+  }
+  if (name === 'explosive jet') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 50, source: { kind: 'chosenEnergy' } },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+    }
+  }
+  if (name === 'knockout needle') {
+    return {
+      damage: {
+        kind: 'conditionalBonus',
+        baseDamage,
+        bonusDamage: 40,
+        condition: { result: 'heads', minimum: 2, exactly: 2 },
+      },
+      coinFlipCount: 2,
+    }
+  }
+  if (name === 'water arrow') {
+    return {
+      damage: { kind: 'fixed', amount: 60 },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'hydro pump') {
+    // Water Energy attached to Swampert is approximated with shared Energy.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 30, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'knock off') {
+    return { ...zero(), special: [{ kind: 'discardRandomHandCard', target: 'opponent' }] }
+  }
+  if (name === 'ball roll' || name === 'spring tides') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 30, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'frozen splash') {
+    return { damage: { kind: 'targetTypeBonus', baseDamage, bonusDamage: 70, targetType: 'Fighting' } }
+  }
+  if (name === 'shell protection') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'preventAtMost', amount: 50 }] }
+  }
+  if (name === 'powerful storm') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'psychic') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energyOnTarget' } } }
+  }
+  if (name === 'deep sea swirl') {
+    return {
+      ...zero(),
+      special: [{ kind: 'drawCards', target: 'self', amount: 6, shuffleHandIntoDeck: true }],
+    }
+  }
+  if (name === 'charge') {
+    // Lightning Energy attachment is represented in the shared Energy pool.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'electricannon') {
+    // Lightning Energy and its discard are approximated with the shared Energy pool.
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 50,
+        source: { kind: 'unusedEnergy' },
+        maxUnits: 1,
+        optional: true,
+      },
+      energyDiscard: [{ target: 'self', amount: 'all', optional: true }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'synchro star') {
+    return { damage: { kind: 'energyEqualityBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'rock shower') {
+    return {
+      ...zero(),
+      coinFlipCount: 3,
+      benchDamage: [{ amount: 0, amountPerHead: 20, side: 'opponent', zone: 'play' }],
+    }
+  }
+  if (name === 'stiffen') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 40 }] }
+  }
+  if (name === 'pure power') {
+    const counters = Number.parseInt(text.match(/put (\d+) damage counters/)?.[1] || '', 10)
+    if (!Number.isFinite(counters) || counters <= 0) return null
+    return {
+      ...zero(),
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: counters,
+      counterDamage: [{ target: 'distributed', amountPerCounter: 10 }],
+    }
+  }
+  if (name === 'ear dig') {
+    return {
+      ...zero(),
+      flipUntilTails: true,
+      special: [{ kind: 'millCards', target: 'opponent', amount: 0, amountPerHead: 1 }],
+    }
+  }
+  if (name === 'hunt') {
+    return {
+      damage: { kind: 'fixed', amount: 30 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', beforeDamage: true }],
+    }
+  }
+  if (name === 'straight claw') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 30,
+        source: { kind: 'unusedEnergy' },
+        maxUnits: 1,
+        optional: true,
+      },
+      energyDiscard: [{ target: 'self', amount: 1, optional: true }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'dredge') {
+    // Energy searched and attached from the deck is represented by shared Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'false swipe') {
+    return {
+      damage: { kind: 'targetToRemainingHp', remainingHp: 10, condition: 'heads' },
+      coinFlipCount: 1,
+    }
+  }
+  if (name === 'superpower') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 30 },
+      selfDamage: [{ kind: 'optionalChoice', amount: 30 }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'dwindling wave') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage: 100,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'brilliant arrow') {
+    // Fairy Energy attached across the team is approximated with shared Energy.
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 30, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'gather strength') {
+    // Basic Energy cards searched into hand are approximated as shared Energy.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 4 }] }
+  }
+  if (name === 'sand attack') {
+    return { ...zero(), special: [{ kind: 'attackFailsOnTails' }] }
+  }
+  if (name === 'charm') {
+    return { ...zero(), special: [{ kind: 'buffAttack', target: 'opponent', damageBonus: -20 }] }
+  }
+  if (name === 'replace') {
+    // Energy movement has no observable effect with the shared Energy pool.
+    return zero()
+  }
+  if (name === 'drench') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'continuous headbutt') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 80, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'burrow') {
+    return { ...zero(), special: [{ kind: 'millCards', target: 'opponent', amount: 1 }] }
+  }
+  if (name === 'uproar') {
+    return { ...zero(), benchDamage: [{ amount: 10, side: 'opponent', zone: 'play' }] }
+  }
+
+  // Stadium/Tool/Item cards, Prize effects, evolution, Energy in hand, and
+  // unsupported discard-pile-to-hand/deck operations remain filtered.
   return null
 }
 

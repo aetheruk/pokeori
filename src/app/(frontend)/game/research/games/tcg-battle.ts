@@ -1056,7 +1056,10 @@ function applyTcgBattleSpecialEffects(params: {
         : 0
       const amount = Math.min(
         available.length,
-        rule.amount + (rule.amountPerOwnEnergy || 0) * state[sideKey].energy + (rule.amountPerUnit || 0) * sourceUnits,
+        rule.amount +
+          (rule.amountPerHead || 0) * (resolution.coinFlips?.heads || 0) +
+          (rule.amountPerOwnEnergy || 0) * state[sideKey].energy +
+          (rule.amountPerUnit || 0) * sourceUnits,
       )
       const milled = drawTcgBattleCards(available, amount)
       destination.discard.push(...milled)
