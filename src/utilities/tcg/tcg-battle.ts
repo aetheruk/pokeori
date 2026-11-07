@@ -117,6 +117,7 @@ export type TcgBattleDamageRule =
   | { kind: 'damagedTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'remainingHpComparisonBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'attackerRemainingHpLessBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'attackerRemainingHpAtMostBonus'; baseDamage: number; bonusDamage: number; maximumHp: number }
   | { kind: 'selectedEnergyTypeMatchBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'attackerHpExactBonus'; baseDamage: number; bonusDamage: number; remainingHp: number }
   | { kind: 'attackerFullHpBonus'; baseDamage: number; bonusDamage: number }
@@ -1256,6 +1257,14 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'sm6') {
     const forbiddenLightEffect = inferSunMoonForbiddenLightTcgBattleAttackEffect(attack, baseDamage)
     if (forbiddenLightEffect) return applyAttackTextModifiers(forbiddenLightEffect)
+  }
+  if (setId === 'sm7') {
+    const celestialStormEffect = inferSunMoonCelestialStormTcgBattleAttackEffect(attack, baseDamage)
+    if (celestialStormEffect) return applyAttackTextModifiers(celestialStormEffect)
+  }
+  if (setId === 'sm75') {
+    const dragonMajestyEffect = inferSunMoonDragonMajestyTcgBattleAttackEffect(attack, baseDamage)
+    if (dragonMajestyEffect) return applyAttackTextModifiers(dragonMajestyEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -14230,6 +14239,375 @@ function inferSunMoonForbiddenLightTcgBattleAttackEffect(
   return null
 }
 
+function inferSunMoonDragonMajestyTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = attack.text.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTarget = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'damage rush') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 30, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'call for family') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, basicOnly: true }],
+    }
+  }
+  if (name === 'splatter') return anyTarget(baseDamage)
+  if (name === 'hydro pump' || name === 'bubble shoot') {
+    const perEnergyDamage = Number(text.match(/does (\d+) more damage times? the amount of water energy/)?.[1] || 0)
+    const targetDamagePerEnergy = perEnergyDamage || Number(text.match(/does (\d+) damage times? the amount of water energy/)?.[1] || 0)
+    if (!targetDamagePerEnergy) return null
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: name === 'bubble shoot' ? 0 : baseDamage,
+        perUnitDamage: targetDamagePerEnergy,
+        source: { kind: 'energyOfType', side: 'own', type: 'Water' },
+      },
+      ...(name === 'bubble shoot'
+        ? { targetScope: 'any' as const, ignoreWeaknessResistanceOnBench: true }
+        : {}),
+    }
+  }
+  if (name === 'maelstrom-gx') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 40, side: 'opponent', zone: 'play' }],
+    }
+  }
+  if (name === 'raging blade') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 0)
+    if (!bonusDamage) return null
+    return {
+      damage: { kind: 'damageCounterThresholdBonus', baseDamage, bonusDamage, minimumCounters: 1 },
+    }
+  }
+  if (name === 'flame jet-gx') return anyTarget(baseDamage)
+  if (name === 'rigidify') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 20 }] }
+  }
+  if (name === 'raging uppercut') {
+    const threshold = Number(text.match(/has (\d+) or more damage counters/)?.[1] || 0)
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 0)
+    if (!threshold || !bonusDamage) return null
+    return {
+      damage: {
+        kind: 'damageCounterThresholdBonus',
+        baseDamage,
+        bonusDamage,
+        minimumCounters: threshold,
+      },
+    }
+  }
+  if (name === 'fetch' || name === 'collect') {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
+  }
+  if (name === 'photon geyser') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 80,
+        source: { kind: 'energyOfType', side: 'own', type: 'Psychic' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'all', requiresEnergyType: 'Psychic' }],
+    }
+  }
+
+  return null
+}
+
+function inferSunMoonCelestialStormTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const text = attack.text.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTarget = (amount: number, ignoreAllModifiers = false): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistance: ignoreAllModifiers,
+    ignoreTargetDamageModifiers: ignoreAllModifiers,
+    ignoreWeaknessResistanceOnBench: true,
+  })
+  const searchPokemon = (
+    maxCount: number,
+    options: { includeNames?: string[]; destination?: 'bench' | 'hand'; maxCountFrom?: TcgBattleCountSource } = {},
+  ): TcgBattleAttackEffect => ({
+    ...zero(),
+    choiceRequirement: 'deckPokemon',
+    special: [{ kind: 'searchDeckPokemon', maxCount, basicOnly: true, ...options }],
+  })
+
+  if (name === 'twin play') return searchPokemon(2, { includeNames: ['Scyther'] })
+  if (name === 'reactive poison') {
+    return {
+      damage: {
+        kind: 'statusCountBonus',
+        baseDamage,
+        bonusDamagePerStatus: 50,
+        statuses: ['asleep', 'burned', 'confused', 'paralyzed', 'poisoned'],
+      },
+    }
+  }
+  if (name === 'powerful storm') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'extrasensory') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 0)
+    return bonusDamage
+      ? { damage: { kind: 'handSizeComparisonBonus', baseDamage, bonusDamage, comparison: 'equal' } }
+      : null
+  }
+  if (name === 'den of iniquity-gx') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      special: [{ kind: 'shuffleTargetIntoDeck' }],
+    }
+  }
+  if (name === 'feint attack') return anyTarget(baseDamage, true)
+  if (name === 'find a friend') return searchPokemon(2, { destination: 'hand' })
+  if (name === 'hydro pump') {
+    const perEnergyDamage = Number(text.match(/does (\d+) more damage times? the amount of water energy/)?.[1] || 0)
+    return perEnergyDamage
+      ? {
+          damage: {
+            kind: 'count',
+            baseDamage,
+            perUnitDamage: perEnergyDamage,
+            source: { kind: 'energyOfType', side: 'own', type: 'Water' },
+          },
+        }
+      : null
+  }
+  if (name === 'circular steps') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'pokemonInPlay', side: 'both', excludeAttacker: true },
+      },
+    }
+  }
+  if (name === 'dwindling wave') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: 40,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'dangerous bite') {
+    return { damage: { kind: 'targetSubtypeBonus', baseDamage, bonusDamage: 80, subtype: 'Basic' } }
+  }
+  if (name === 'even game') {
+    return searchPokemon(99, {
+      destination: 'bench',
+      maxCountFrom: { kind: 'bench', side: 'opponent' },
+    })
+  }
+  if (name === 'crush and burn-gx') {
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 50, source: { kind: 'chosenEnergy' } },
+      choiceRequirement: 'energyAmount',
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+    }
+  }
+  if (name === 'lightning strike') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 70 },
+      choiceRequirement: 'optionalBonus',
+      energyDiscard: [{ target: 'self', amount: 'all', optional: true, requiresEnergyType: 'Lightning' }],
+    }
+  }
+  if (name === 'draw for everybody') {
+    return {
+      ...zero(),
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'bench', side: 'both' },
+        shuffleHandIntoDeck: true,
+      }],
+    }
+  }
+  if (name === 'ditch and draw') {
+    return {
+      ...zero(),
+      choiceRequirement: 'discardHandCards',
+      special: [
+        { kind: 'discardSelectedHandPokemon' },
+        { kind: 'drawCards', target: 'self', untilHandSize: 5 },
+      ],
+    }
+  }
+  if (name === 'zappy pom-poms') {
+    return {
+      ...zero(),
+      benchDamage: [{
+        amount: 30,
+        side: 'both',
+        zone: 'play',
+        subtypeFilter: { include: ['GX', 'EX'] },
+        ignoreWeaknessResistanceOnBench: true,
+      }],
+    }
+  }
+  if (name === 'breakdown') {
+    return {
+      ...zero(),
+      counterDamage: [{ amountPerUnit: 10, source: { kind: 'handSize', side: 'opponent' }, target: 'opponent' }],
+    }
+  }
+  if (name === 'life trick-gx') {
+    return { ...zero(), healing: [{ target: 'self', amount: 'all' }] }
+  }
+  if (name === 'swallow up') {
+    return { damage: { kind: 'remainingHpComparisonBonus', baseDamage, bonusDamage: 80 } }
+  }
+  if (name === 'bounce') {
+    return { ...zero(), choiceRequirement: 'ownBench', special: [{ kind: 'switch', target: 'self' }] }
+  }
+  if (name === 'enemy show') {
+    return {
+      ...zero(),
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCountFrom: { kind: 'pokemonInPlay', side: 'opponent' },
+      counterDamage: [{ amountPerCounter: 10, target: 'distributed' }],
+    }
+  }
+  if (name === 'psychic') {
+    const perEnergyDamage = Number(text.match(/does (\d+) more damage times? the amount of energy/)?.[1] || 0)
+    return perEnergyDamage
+      ? {
+          damage: {
+            kind: 'count',
+            baseDamage,
+            perUnitDamage: perEnergyDamage,
+            source: { kind: 'energyOnTarget' },
+          },
+        }
+      : null
+  }
+  if (name === 'full moon ray') {
+    const perEnergyDamage = Number(text.match(/does (\d+) more damage times? the amount of energy/)?.[1] || 0)
+    return perEnergyDamage
+      ? {
+          damage: {
+            kind: 'count',
+            baseDamage,
+            perUnitDamage: perEnergyDamage,
+            source: { kind: 'energyOnTarget' },
+          },
+        }
+      : null
+  }
+  if (name === 'reflect') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 40 }] }
+  }
+  if (name === 'spear dive') {
+    const damage = Number(text.match(/does (\d+) damage to 1 of your opponent/)?.[1] || baseDamage)
+    return anyTarget(damage, true)
+  }
+  if (name === 'screech') {
+    return { ...zero(), special: [{ kind: 'buffDefendingPokemon', damageBonus: 20 }] }
+  }
+  if (name === 'endure' || name === 'bide') {
+    return { ...zero(), coinFlipCount: 1, special: [{ kind: 'endure', condition: 'heads' }] }
+  }
+  if (name === 'dust devil') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 20, side: 'both', zone: 'play', typeFilter: { exclude: ['Fighting'] }, ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'strike of enlightenment') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 0)
+    return bonusDamage
+      ? { damage: { kind: 'attackerRemainingHpAtMostBonus', baseDamage, bonusDamage, maximumHp: 30 } }
+      : null
+  }
+  if (name === 'wreck') {
+    // Stadium cards are not represented in the Pokémon-only battle model.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'call for the boss') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', includeNames: ['Alolan Raticate', 'Alolan Raticate-GX'] }],
+    }
+  }
+  if (name === 'beat up') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 30, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'pokemonInPlay', side: 'own' },
+    }
+  }
+  if (name === 'raging blade') {
+    const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 0)
+    return bonusDamage
+      ? { damage: { kind: 'damageCounterThresholdBonus', baseDamage, bonusDamage, minimumCounters: 1 } }
+      : null
+  }
+  if (name === 'cross-cut-gx') {
+    return { damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: 100 } }
+  }
+  if (name === 'bite off') {
+    return { damage: { kind: 'pokemonExOrGxTargetBonus', baseDamage, bonusDamage: 30 } }
+  }
+  if (name === 'dragon break') {
+    return {
+      damage: {
+        kind: 'weightedCount',
+        baseDamage: 0,
+        sources: [
+          { source: { kind: 'energyOfType', side: 'own', type: 'Grass' }, perUnitDamage: 30 },
+          { source: { kind: 'energyOfType', side: 'own', type: 'Lightning' }, perUnitDamage: 30 },
+        ],
+      },
+    }
+  }
+  if (name === 'strike and run') {
+    return searchPokemon(3, { destination: 'bench' })
+  }
+  if (name === 'slack off') {
+    return {
+      ...zero(),
+      healing: [{ target: 'self', amount: 'all' }],
+      special: [{ kind: 'cannotAttack', target: 'self' }],
+    }
+  }
+
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -19310,6 +19688,8 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (context.target.currentHp < context.attacker.currentHp ? rule.bonusDamage : 0)
     case 'attackerRemainingHpLessBonus':
       return rule.baseDamage + (context.attacker.currentHp < context.target.currentHp ? rule.bonusDamage : 0)
+    case 'attackerRemainingHpAtMostBonus':
+      return rule.baseDamage + (context.attacker.currentHp <= rule.maximumHp ? rule.bonusDamage : 0)
     case 'attackerHpExactBonus':
       return rule.baseDamage + (context.attacker.currentHp === rule.remainingHp ? rule.bonusDamage : 0)
     case 'attackerFullHpBonus':
