@@ -24,6 +24,7 @@ import {
   getAllowedTcgBattleAttackCost,
   getEffectiveTcgBattleAttackCost,
   getTcgBattleAttackEffect,
+  getTcgBattleCount,
   getValidTcgBattleTargets,
   getTcgBattleCardUnlockTurnForCard,
   getAvailableTcgBattleDeckPokemon,
@@ -764,11 +765,12 @@ function applyTcgBattleSpecialEffects(params: {
   sideKey: TcgBattleSide
   attacker: TcgBattleCardState
   target: TcgBattleCardState
+  paidAttackCost: number
   choice?: TcgBattleAttackChoice
   resolution: ReturnType<typeof resolveTcgBattleAttack>
   blockTargetEffects: boolean
 }) {
-  const { state, sideKey, attacker, target, resolution, blockTargetEffects } =
+  const { state, sideKey, attacker, target, paidAttackCost, resolution, blockTargetEffects } =
     params
   const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
   const choice =
@@ -798,6 +800,7 @@ function applyTcgBattleSpecialEffects(params: {
         'preventSwitch',
         'buffDefendingPokemon',
         'transferDamageCounters',
+        'transferAllDamageCounters',
         'shuffleTargetIntoDeck',
       ].includes(rule.kind) ||
       (rule.kind === 'switch' && rule.target === 'opponent') ||
@@ -873,10 +876,23 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'drawCards') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
       if (rule.shuffleHandIntoDeck) destination.hand = []
-      const amount = Math.max(0, (rule.amount || 0) + (rule.amountPerHead || 0) * (resolution.coinFlips?.heads || 0))
+      const units = rule.source
+        ? getTcgBattleCount(rule.source, { state, sideKey, attacker, target, paidAttackCost, coinMode: 'actual' }) + (
+            rule.source.kind === 'energy' && (rule.source.side === 'own' || rule.source.side === 'both')
+              ? paidAttackCost
+              : 0
+          )
+        : 0
+      const amount = Math.max(
+        0,
+        (rule.amount || 0) +
+          (rule.amountPerHead || 0) * (resolution.coinFlips?.heads || 0) +
+          (rule.amountPerUnit || 0) * units,
+      )
       const inUseIds = new Set(
         [...destination.hand, ...destination.front, ...destination.back, ...destination.discard].map((card) => card.id),
       )
@@ -1021,6 +1037,7 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'millCards') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
       const inUseIds = new Set(
@@ -1316,6 +1333,26 @@ function applyTcgBattleSpecialEffects(params: {
         sourceId: attacker.instanceId,
         targetId: target.instanceId,
         label: 'Damage counters swapped',
+      })
+      continue
+    }
+    if (rule.kind === 'transferAllDamageCounters') {
+      const transferredDamage = Math.max(0, Math.floor((attacker.hp - attacker.currentHp) / 10) * 10)
+      if (transferredDamage <= 0) continue
+      attacker.currentHp = Math.min(attacker.hp, attacker.currentHp + transferredDamage)
+      target.currentHp = Math.max(0, target.currentHp - transferredDamage)
+      recordDamageEvent(state, {
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        targetSide: opponentKey,
+        damage: transferredDamage,
+        reason: 'attack',
+      })
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${transferredDamage / 10} damage counters moved to ${target.name}`,
       })
       continue
     }
@@ -1825,6 +1862,7 @@ function applyAttack(
     sideKey,
     attacker,
     target,
+    paidAttackCost: energyCost,
     choice,
     resolution,
     blockTargetEffects,
