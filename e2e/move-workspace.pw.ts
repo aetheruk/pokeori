@@ -7,7 +7,7 @@ for (const width of [390, 1280]) {
     await page.getByRole('button', { name: 'Test Pokemon inspector', exact: true }).click()
     await page.getByRole('button', { name: 'Open fixture inspector', exact: true }).click()
     const inspector = page.getByRole('dialog', { name: 'Inspector fixture', exact: true })
-    await expect(page.getByText(/Evolution move: Rollout/)).toBeVisible()
+    await expect(page.getByText(/Evolution move: Rollout/)).toHaveCount(0)
     await page.getByRole('button', { name: 'Manage moves', exact: true }).click()
     const workspace = page.getByRole('dialog', { name: "Inspector fixture's moves", exact: true })
     await expect(workspace).toBeVisible()

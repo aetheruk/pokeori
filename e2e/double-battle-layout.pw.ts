@@ -38,7 +38,7 @@ for (const width of [320, 390, 1280]) {
       await page.getByRole('button', { name: 'Back' }).click()
     }
     await expect(page.getByText('Item · Potion')).toHaveCount(0)
-    await expect(page.getByTestId('battle-log-panel')).toHaveCSS('background-color', 'rgb(255, 248, 232)')
+    await expect(page.getByTestId('battle-log-panel')).toHaveCSS('background-color', 'rgb(252, 252, 252)')
     await expect(page.getByTestId('selected-doubles-target-arrow')).toHaveCount(1)
     await expect(page.getByRole('button', { name: 'Target Plusle' })).toHaveAttribute('aria-pressed', 'true')
 
