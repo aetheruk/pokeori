@@ -45,6 +45,7 @@ import {
   toTcgPvpPerspectiveState,
   type TcgBattleAttackChoice,
   type TcgBattleCardState,
+  type TcgBattleCardSummary,
   type TcgBattleDeckFormat,
   type TcgBattleEnergyDiscardResolution,
   type TcgBattleEnergyType,
@@ -521,6 +522,28 @@ function findCard(cards: TcgBattleCardState[], instanceId: string) {
   )
 }
 
+function toTcgBattleCardSummary(card: TcgBattleCardState): TcgBattleCardSummary {
+  const {
+    instanceId: _instanceId,
+    currentHp: _currentHp,
+    statusConditions: _statusConditions,
+    incomingAttackModifier: _incomingAttackModifier,
+    temporaryEffects: _temporaryEffects,
+    markers: _markers,
+    ...summary
+  } = card
+  return summary
+}
+
+function shuffleTcgBattleDeck(side: TcgBattleState['player']) {
+  for (let index = side.deck.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1))
+    const card = side.deck[index]
+    side.deck[index] = side.deck[swapIndex]
+    side.deck[swapIndex] = card
+  }
+}
+
 function promoteOpponentIfNeeded(state: TcgBattleState) {
   compactTcgBattleBoard(state.opponent)
   while (state.opponent.front.length < 3 && state.opponent.back.length > 0) {
@@ -889,7 +912,11 @@ function applyTcgBattleSpecialEffects(params: {
       ) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
-      if (rule.shuffleHandIntoDeck) destination.hand = []
+      if (rule.shuffleHandIntoDeck) {
+        destination.deck.push(...destination.hand.map(toTcgBattleCardSummary))
+        destination.hand = []
+        shuffleTcgBattleDeck(destination)
+      }
       const units = rule.source
         ? getTcgBattleCount(rule.source, { state, sideKey, attacker, target, paidAttackCost, coinMode: 'actual' }) + (
             rule.source.kind === 'energy' && (rule.source.side === 'own' || rule.source.side === 'both')
@@ -1027,6 +1054,21 @@ function applyTcgBattleSpecialEffects(params: {
         sourceId: attacker.instanceId,
         targetId: card.instanceId,
         label: `${card.name} returned from the Bench to your hand`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'returnOwnPokemonToDeck') {
+      const cardIndex = state[sideKey].front.findIndex((card) => card.instanceId === attacker.instanceId)
+      if (cardIndex < 0) continue
+      const [card] = state[sideKey].front.splice(cardIndex, 1)
+      state[sideKey].deck.push(toTcgBattleCardSummary(card))
+      shuffleTcgBattleDeck(state[sideKey])
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `${card.name} was shuffled into your deck`,
       })
       continue
     }

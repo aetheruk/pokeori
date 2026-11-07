@@ -57,6 +57,7 @@ import {
   getOpenTcgBattleBenchSlots,
   getTcgBattleAttackEffect,
   getTcgBattleCardUnlockTurnForCard,
+  getTcgBattleCount,
   getValidTcgBattleTargets,
   isTcgBattleAttackDisabled,
   TCG_BATTLE_FORMATS,
@@ -2703,7 +2704,15 @@ function AttackChoiceDrawer({
   const counterDistributionChoices = [...state.opponent.front, ...state.opponent.back]
     .filter((card) => card.currentHp > 0)
   const counterDistributionCardIds = counterDistributionChoices.map((card) => card.instanceId).join('|')
-  const counterDistributionCount = activeEffect?.choiceCounterCount || 0
+  const counterDistributionCount = activeEffect?.choiceCounterCountFrom
+    ? getTcgBattleCount(activeEffect.choiceCounterCountFrom, {
+        state,
+        sideKey: 'player',
+        attacker,
+        target: target || attacker,
+        coinMode: 'actual',
+      })
+    : activeEffect?.choiceCounterCount || 0
   const assignedCounterCount = Object.values(selectedCounterAssignments).reduce((sum, count) => sum + count, 0)
 
   useEffect(() => {
