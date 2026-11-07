@@ -803,22 +803,26 @@ function applyTcgBattleSpecialEffects(params: {
       (rule.kind === 'cannotAttack' && rule.target !== 'self') ||
       (rule.kind === 'buffAttack' && rule.target === 'opponent') ||
       (rule.kind === 'drawCards' && rule.target === 'opponent') ||
+      (rule.kind === 'shuffleRandomHandCardIntoDeck' && rule.target === 'opponent') ||
+      (rule.kind === 'revealHand' && rule.target === 'opponent') ||
+      (rule.kind === 'millCards' && rule.target === 'opponent') ||
       (rule.kind === 'clearStatus' && rule.target === 'opponent') ||
       (rule.kind === 'clearStatusOnSide' && rule.side === 'opponent') ||
       (rule.kind === 'setStatus' && rule.target === 'opponent') ||
       (rule.kind === 'preventStatus' && rule.target === 'opponent')
     if (blockTargetEffects && targetsOpponent) continue
 
-    if (rule.kind === 'searchDeckPokemon' && choice?.kind === 'deckPokemon') {
+    if (rule.kind === 'searchDeckPokemon' && (choice?.kind === 'deckPokemon' || rule.random)) {
       const destination = state[sideKey]
-      const availableById = new Map(
-        getAvailableTcgBattleDeckPokemon(destination, rule).map((card) => [card.id, card]),
-      )
+      const availableCards = getAvailableTcgBattleDeckPokemon(destination, rule)
+      const availableById = new Map(availableCards.map((card) => [card.id, card]))
       const maxCount = Math.min(
         getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }),
         rule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(destination),
       )
-      const selectedIds = choice.cardIds.slice(0, maxCount)
+      const selectedIds = choice?.kind === 'deckPokemon'
+        ? choice.cardIds.slice(0, maxCount)
+        : drawTcgBattleCards(availableCards, maxCount).map((card) => card.id)
       for (const [index, cardId] of selectedIds.entries()) {
         const cardSummary = availableById.get(cardId)
         if (!cardSummary) continue
@@ -858,6 +862,57 @@ function applyTcgBattleSpecialEffects(params: {
           label: rule.shuffleHandIntoDeck
             ? `${destination === state[sideKey] ? 'Your' : "Opponent's"} hand was shuffled and ${drawn.length} Pokémon drawn`
             : `${destination === state[sideKey] ? 'You' : 'Opponent'} drew ${drawn.length} Pokémon`,
+        })
+      }
+      continue
+    }
+
+    if (rule.kind === 'shuffleRandomHandCardIntoDeck') {
+      const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
+      const destination = state[destinationSideKey]
+      if (destination.hand.length === 0) continue
+      const index = Math.floor(Math.random() * destination.hand.length)
+      const [shuffledCard] = destination.hand.splice(index, 1)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: shuffledCard.instanceId,
+        label: `${shuffledCard.name} was shuffled from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand into their deck`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'revealHand') {
+      const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
+      const destination = state[destinationSideKey]
+      const cardNames = destination.hand.map((card) => card.name)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: cardNames.length > 0
+          ? `${destinationSideKey === sideKey ? 'Attacker' : 'Opponent'} revealed: ${cardNames.join(', ')}`
+          : `${destinationSideKey === sideKey ? 'Attacker' : 'Opponent'} has no cards in hand to reveal`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'millCards') {
+      const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
+      const destination = state[destinationSideKey]
+      const inUseIds = new Set(
+        [...destination.hand, ...destination.front, ...destination.back, ...destination.discard].map((card) => card.id),
+      )
+      const available = destination.deck.filter((card) => !inUseIds.has(card.id))
+      const amount = Math.min(available.length, rule.amount + (rule.amountPerOwnEnergy || 0) * state[sideKey].energy)
+      const milled = drawTcgBattleCards(available, amount)
+      destination.discard.push(...milled)
+      if (milled.length > 0) {
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: attacker.instanceId,
+          label: `${milled.length} Pokémon discarded from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s deck`,
         })
       }
       continue
@@ -914,7 +969,11 @@ function applyTcgBattleSpecialEffects(params: {
     }
     if (rule.kind === 'buffAttack') {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
-      const affected = rule.target === 'opponent' ? target : attacker
+      const affected = rule.target === 'opponent'
+        ? target
+        : rule.target === 'switchedOwn' && choice?.kind === 'benchSwitch'
+          ? state[sideKey].front.find((card) => card.instanceId === choice.cardId) || attacker
+          : attacker
       getTemporaryEffects(affected).nextAttackBuff = {
         attackName: rule.attackNames?.length ? (rule.attackName || '') : (rule.attackName || '*'),
         attackNames: rule.attackNames,
