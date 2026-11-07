@@ -197,6 +197,8 @@ export type TcgBattleBenchDamageRule = {
   side: 'own' | 'opponent' | 'both'
   zone?: 'bench' | 'front' | 'play'
   ignoreWeaknessResistance?: boolean
+  applyWeaknessResistanceOnBench?: boolean
+  ignoreWeaknessResistanceOnBench?: boolean
   perTargetCoinFlip?: boolean
   requiresEnergy?: { side: 'own' | 'opponent'; minimum: number }
   maxTargets?: number
@@ -1203,6 +1205,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'xy10') {
     const xyFatesCollideEffect = inferXyFatesCollideTcgBattleAttackEffect(attack, baseDamage)
     if (xyFatesCollideEffect) return applyAttackTextModifiers(xyFatesCollideEffect)
+  }
+  if (setId === 'xy11') {
+    const xySteamSiegeEffect = inferXySteamSiegeTcgBattleAttackEffect(attack, baseDamage)
+    if (xySteamSiegeEffect) return applyAttackTextModifiers(xySteamSiegeEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -12185,6 +12191,213 @@ function inferXyFatesCollideTcgBattleAttackEffect(
   return null
 }
 
+function inferXySteamSiegeTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (name === 'fluffy transport' || name === 'roar') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+  if (name === 'scout') {
+    return { ...zero(), special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+  if (name === 'assault boom' || name === 'past friends') {
+    // Tool and Supporter-discard riders are not represented; keep base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'bide') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [{ kind: 'endure', condition: 'heads' }],
+    }
+  }
+  if (name === 'extrasensory') {
+    return { damage: { kind: 'handSizeComparisonBonus', baseDamage, bonusDamage: 60, comparison: 'equal' } }
+  }
+  if (name === 'returning flames') {
+    // Fire Energy recovered to hand is approximated with shared Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'dwindling wave') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  if (name === 'lock-on') {
+    return {
+      ...zero(),
+      special: [
+        { kind: 'preventRetreat', target: 'opponent' },
+        { kind: 'buffDefendingPokemon', damageBonus: 120 },
+      ],
+    }
+  }
+  if (name === 'double thread') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 30, side: 'opponent', zone: 'play', maxTargets: 2, applyWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'come along') {
+    return {
+      ...zero(),
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeNames: ['Nidoran ♀'] }],
+    }
+  }
+  if (name === 'nido press') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 40,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: ['Nidorina'] },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'power lariat') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 30,
+        source: { kind: 'pokemonEvolvedOnBench', side: 'own' },
+      },
+    }
+  }
+  if (name === 'transfer pain') {
+    return {
+      ...zero(),
+      targetScope: 'any',
+      choiceRequirement: 'damageCounterTransfer',
+      special: [{ kind: 'transferDamageCounters', maxCounters: 1, sourceZone: 'play' }],
+    }
+  }
+  if (name === 'burst curse') {
+    return {
+      ...zero(),
+      minimumExtraEnergyDiscard: 2,
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: 8,
+      energyDiscard: [{ target: 'self', amount: 2 }],
+      counterDamage: [{ amountPerCounter: 10, target: 'distributed' }],
+    }
+  }
+  if (name === 'hyperspace punch') {
+    return {
+      ...zero(),
+      benchDamage: [{ amount: 20, side: 'opponent', zone: 'play', maxTargets: 2, ignoreWeaknessResistanceOnBench: true }],
+    }
+  }
+  if (name === 'focus energy') {
+    return { ...zero(), special: [{ kind: 'buffAttack', target: 'self', attackName: 'Flop', baseDamage: 50 }] }
+  }
+  if (name === 'spirited throw') {
+    return { damage: { kind: 'attackerRemainingHpLessBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'charge order') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 10,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: ['Pawniard'] },
+      },
+    }
+  }
+  if (name === 'retaliate') {
+    return { damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage: 60 } }
+  }
+  if (name === 'wild edge') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 50 },
+      selfDamage: [{ kind: 'optionalChoice', amount: 20 }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'iron tail') {
+    return { damage: { kind: 'headsMultiplier', damagePerHeads: 100, coinFlipCount: 0 }, flipUntilTails: true }
+  }
+  if (name === 'counter head') {
+    return { ...zero(), special: [{ kind: 'reflectDamage', damageMultiplier: 1 }] }
+  }
+  if (name === 'link blast') {
+    return { damage: { kind: 'energyEqualityBonus', baseDamage, bonusDamage: 70 } }
+  }
+  if (name === 'geomancy') {
+    // Two Fairy Energy attachments are approximated as shared Energy gain.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+  if (name === 'life stream') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+      },
+    }
+  }
+  if (name === 'proud fang') {
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 60,
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'opponent', subtypes: ['BREAK'], zone: 'play' },
+        minimumUnits: 1,
+      },
+    }
+  }
+  if (name === 'revenge blast' || name === 'despair ray' || name === 'raid') {
+    // Prize, Bench-discard, and evolution-history bonuses are unavailable;
+    // retain the printed base damage where the attack has one.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'dark burn') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 50, source: { kind: 'chosenEnergy' } },
+      choiceRequirement: 'energyAmount',
+      choiceEnergyType: 'Darkness',
+      energyDiscard: [{ target: 'self', amount: 'choice', requiresEnergyType: 'Darkness' }],
+    }
+  }
+  if (name === 'furry chance') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      special: [{ kind: 'millCards', target: 'opponent', amount: 1 }],
+    }
+  }
+  if (name === 'sky drop') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+
+  // Effects requiring Prize, Ability, Trainer/Tool, deck-order, delayed, or
+  // in-battle evolution state remain filtered when they have no safe fallback.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -15651,7 +15864,10 @@ function calculateTcgBattleBenchDamage(
               coinMode: 'actual',
             })
           : 0)
-      const damage = targetSide !== sideKey && isFront && !rule.ignoreWeaknessResistance
+      const appliesWeaknessResistance = isFront
+        ? !rule.ignoreWeaknessResistance
+        : Boolean(rule.applyWeaknessResistanceOnBench) && !rule.ignoreWeaknessResistanceOnBench
+      const damage = targetSide !== sideKey && appliesWeaknessResistance
         ? applyTcgWeaknessAndResistance(attacker, card, amount)
         : amount
       if (rule.perTargetCoinFlip) {
