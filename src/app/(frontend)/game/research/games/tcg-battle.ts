@@ -890,7 +890,8 @@ function applyTcgBattleSpecialEffects(params: {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const affected = rule.target === 'opponent' ? target : attacker
       getTemporaryEffects(affected).nextAttackBuff = {
-        attackName: rule.attackName || '*',
+        attackName: rule.attackNames?.length ? (rule.attackName || '') : (rule.attackName || '*'),
+        attackNames: rule.attackNames,
         baseDamage: rule.baseDamage,
         damageBonus: rule.damageBonus,
         damageMultiplier: rule.damageMultiplier,
@@ -901,7 +902,7 @@ function applyTcgBattleSpecialEffects(params: {
         kind: 'control',
         sourceId: attacker.instanceId,
         targetId: affected.instanceId,
-        label: `${rule.attackName || 'Next attack'} empowered`,
+        label: `${rule.attackName || rule.attackNames?.join(' or ') || 'Next attack'} empowered`,
       })
       continue
     }
@@ -1612,7 +1613,8 @@ function applyAttack(
 
   if (
     attacker.temporaryEffects?.nextAttackBuff?.attackName === '*' ||
-    attacker.temporaryEffects?.nextAttackBuff?.attackName.toLowerCase() === attack.name.toLowerCase()
+    attacker.temporaryEffects?.nextAttackBuff?.attackName.toLowerCase() === attack.name.toLowerCase() ||
+    attacker.temporaryEffects?.nextAttackBuff?.attackNames?.some((name) => name.toLowerCase() === attack.name.toLowerCase())
   ) {
     delete attacker.temporaryEffects.nextAttackBuff
   }
