@@ -413,6 +413,8 @@ Mega Evolution (`me1`) covers 152 Pokémon cards and 226 attacks: 222 are suppor
 
 Phantasmal Flames (`me2`) covers 110 Pokémon cards and 152 attacks: 149 are supported and three remain filtered. Mappings add incoming-damage/healing history, type and shared-Energy formulas, typed Energy discards/gains, Pokémon search/draw, selected damage/healing, Special Condition checks, knockouts, counter placement, and switching. Energizing Sketch approximates discard Energy recovery as shared Energy per heads. Basic Energy and Supporter card-zone searches remain filtered.
 
+Ascended Heroes (`me2pt5`) covers 243 Pokémon cards and 340 attacks: 324 are supported and 16 remain filtered across twelve distinct attacks. Mappings add named-team and Energy-scaled damage, Pokémon searches and Pokémon-only hand effects, until-tails attacks, shared-Energy costs/gains, multi-target damage, protection, healing, and knockouts. The battle hand is empty after setup; attacks can draw Pokémon cards into it, which remain unplayable. Multi-target damage uses automatic target selection. Energy stays side-wide. The filtered attacks need turn-history checks, in-battle evolution, doubling existing counters, or Trainer, Tool, Prize, and Basic Energy card zones.
+
 ## Reserved Future Content
 
 The following are defined in data or engine support but not yet naturally obtainable through authored progression:
