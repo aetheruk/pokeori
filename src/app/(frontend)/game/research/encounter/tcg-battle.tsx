@@ -2618,6 +2618,11 @@ function AttackChoiceDrawer({
     ? getTcgBattleAttackEffect(copiedAttack)
     : null
   const activeEffect = requirement === 'copyAttack' ? copiedEffect : effect
+  const optionalBonusEnergyDiscardAmount = (activeEffect?.energyDiscard || []).reduce(
+    (total, rule) => total + (rule.optional && rule.target === 'self' && typeof rule.amount === 'number' ? rule.amount : 0),
+    0,
+  )
+  const optionalBonusHasEnoughEnergy = state.player.energy - (requirement === 'copyAttack' ? 0 : attackCost) >= optionalBonusEnergyDiscardAmount
   const constrainedStatusChoices = activeEffect?.status
     ?.filter((rule) => rule.useChosenStatus)
     .flatMap((rule) => rule.statuses)
@@ -3248,7 +3253,9 @@ function AttackChoiceDrawer({
               <div>
                 <h3 className="text-sm font-semibold text-game-ink">Choose Pokémon from your deck</h3>
                 <p className="text-xs text-game-muted">
-                  {deckPokemonRule.destination === 'hand'
+                  {deckPokemonRule.oneOfEachType
+                    ? `Select up to ${maxDeckPokemonSelection} Pokémon, each with a different type.`
+                    : deckPokemonRule.destination === 'hand'
                     ? `Select up to ${maxDeckPokemonSelection} Pokémon to add to your hand.`
                     : `Select up to ${maxDeckPokemonSelection}. You may leave some or all Bench spaces open.`}
                 </p>
@@ -3264,7 +3271,11 @@ function AttackChoiceDrawer({
                     const duplicateNameSelected = Boolean(deckPokemonRule.oneOfEachName && !selected && selectedDeckPokemonIds.some((cardId) =>
                       availableDeckPokemon.find((candidate) => candidate.id === cardId)?.name.toLowerCase() === card.name.toLowerCase(),
                     ))
-                    const disabled = !selected && (selectedDeckPokemonIds.length >= maxDeckPokemonSelection || duplicateNameSelected)
+                    const cardType = card.types[0]?.toLowerCase() || 'colorless'
+                    const duplicateTypeSelected = Boolean(deckPokemonRule.oneOfEachType && !selected && selectedDeckPokemonIds.some((cardId) =>
+                      (availableDeckPokemon.find((candidate) => candidate.id === cardId)?.types[0]?.toLowerCase() || 'colorless') === cardType,
+                    ))
+                    const disabled = !selected && (selectedDeckPokemonIds.length >= maxDeckPokemonSelection || duplicateNameSelected || duplicateTypeSelected)
                     return (
                       <button
                         type="button"
@@ -3303,7 +3314,11 @@ function AttackChoiceDrawer({
                 <p className="text-sm text-game-muted">
                   {activeEffect.damage.kind === 'optionalCoinDamage'
                     ? `Flip for ${activeEffect.damage.successDamage} damage? Tails does ${activeEffect.damage.failureDamage} damage.`
-                    : `Take +${activeEffect.damage.bonusDamage} damage and accept the recoil?`}
+                    : optionalBonusEnergyDiscardAmount > 0
+                      ? `Discard ${optionalBonusEnergyDiscardAmount} Energy to take +${activeEffect.damage.bonusDamage} damage?`
+                      : activeEffect.selfDamage?.some((rule) => rule.kind === 'optionalChoice')
+                        ? `Take +${activeEffect.damage.bonusDamage} damage and accept the recoil?`
+                        : `Take +${activeEffect.damage.bonusDamage} damage?`}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -3320,10 +3335,13 @@ function AttackChoiceDrawer({
                   </button>
                   <button
                     type="button"
+                    disabled={!optionalBonusHasEnoughEnergy}
                     onClick={() => setUseOptionalBonus(true)}
                     className={cn(
                       'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-sm font-semibold',
-                      useOptionalBonus
+                      !optionalBonusHasEnoughEnergy
+                        ? 'cursor-not-allowed border-game-border/60 bg-game-surface-raised text-game-muted/50'
+                        : useOptionalBonus
                         ? 'border-game-moss bg-game-moss/25 text-game-ink'
                         : 'border-game-border/60 bg-game-surface-raised text-game-muted',
                     )}
