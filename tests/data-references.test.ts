@@ -1779,17 +1779,14 @@ describe('static data references', () => {
         ?.filter((item) => !starterIconItemIds.includes(item.id))
         .map((item) => [item.id, item.name, item.stock, item.daily || false]),
     ).toEqual([
-      ['trainer-gb-red', 'Red (Red)', 1, false],
-      ['trainer-gb-blue', 'Blue (Red)', 1, false],
-      ['trainer-gb-red-2', 'Red (Blue)', 1, false],
-      ['trainer-gb-blue-2', 'Blue (Blue)', 1, false],
+      ['trainer-gb-red-versions', 'Red', 1, false],
+      ['trainer-gb-blue-versions', 'Blue', 1, false],
       ['icon-nugget', 'Icon: Nugget', 1, false],
-      ['icon-rocket-m', 'Icon: Rocket Grunt (M)', 1, false],
-      ['icon-rocket-f', 'Icon: Rocket Grunt (F)', 1, false],
+      ['icon-rocket-grunts', 'Icon: Rocket Grunt', 1, false],
     ])
   })
 
-  test("Prof's Scrip Shop starter cosmetics use one-time 500-scrip purchases", () => {
+  test("Prof's Scrip Shop starter icons cost 350 Scrip and starter titles cost 200", () => {
     const scripShop = shops.find((shop) => shop.id === 'retro-trainer-cards')
     const starterTasks = tasks.filter((task) => task.id.startsWith('starter-'))
     const starterIconItems = scripShop?.items.filter(
@@ -1826,7 +1823,7 @@ describe('static data references', () => {
       )
 
       expect(item?.cost).toEqual([
-        { type: 'currency', id: 'prof-scrip', amount: 500 },
+        { type: 'currency', id: 'prof-scrip', amount: 350 },
       ])
       expect(item?.stock).toBe(1)
       expect(item?.daily || false).toBe(false)
@@ -1849,7 +1846,7 @@ describe('static data references', () => {
       )
 
       expect(item?.cost).toEqual([
-        { type: 'currency', id: 'prof-scrip', amount: 500 },
+        { type: 'currency', id: 'prof-scrip', amount: 200 },
       ])
       expect(item?.stock).toBe(1)
       expect(item?.daily || false).toBe(false)
@@ -1862,21 +1859,43 @@ describe('static data references', () => {
   test("Prof's Scrip Shop prices and missed Nugget Bridge choice items are configured correctly", () => {
     const scripShop = shops.find((shop) => shop.id === 'retro-trainer-cards')
 
-    // GB icons are 1000 Prof Scrips each
-    const gbIcons = ['trainer-gb-red', 'trainer-gb-blue', 'trainer-gb-red-2', 'trainer-gb-blue-2']
+    // Each Red/Blue offer grants both game-version icons for 1500 Prof Scrips.
+    const gbIcons = ['trainer-gb-red-versions', 'trainer-gb-blue-versions']
     for (const id of gbIcons) {
       const item = scripShop?.items.find((i) => i.id === id)
-      expect(item?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 1000 }])
+      expect(item?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 1500 }])
     }
 
-    // Missed choice items are 500 Prof Scrips each with mutually exclusive requirements
+    expect(
+      scripShop?.items.find((item) => item.id === 'trainer-gb-red-versions')?.rewards,
+    ).toEqual([
+      { type: 'icon', targetId: 'trainer-gb-red', quantity: 1, dropChance: 100 },
+      { type: 'icon', targetId: 'trainer-gb-red-2', quantity: 1, dropChance: 100 },
+    ])
+    expect(
+      scripShop?.items.find((item) => item.id === 'trainer-gb-blue-versions')?.rewards,
+    ).toEqual([
+      { type: 'icon', targetId: 'trainer-gb-blue', quantity: 1, dropChance: 100 },
+      { type: 'icon', targetId: 'trainer-gb-blue-2', quantity: 1, dropChance: 100 },
+    ])
+    expect(
+      scripShop?.items.some((item) =>
+        [
+          'trainer-gb-red',
+          'trainer-gb-blue',
+          'trainer-gb-red-2',
+          'trainer-gb-blue-2',
+        ].includes(item.id),
+      ),
+    ).toBe(false)
+
+    // Missed Nugget Bridge rewards keep their branch requirements; title prices are 200 Scrip.
     const goldenChildTitle = scripShop?.items.find((i) => i.id === 'title-golden-child')
     const nuggetIcon = scripShop?.items.find((i) => i.id === 'icon-nugget')
     const rocketTitle = scripShop?.items.find((i) => i.id === 'title-team-rocket-grunt')
-    const rocketMIcon = scripShop?.items.find((i) => i.id === 'icon-rocket-m')
-    const rocketFIcon = scripShop?.items.find((i) => i.id === 'icon-rocket-f')
+    const rocketIcons = scripShop?.items.find((i) => i.id === 'icon-rocket-grunts')
 
-    expect(goldenChildTitle?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
+    expect(goldenChildTitle?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 200 }])
     expect(goldenChildTitle?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-join' }])
     expect(goldenChildTitle?.rewards).toEqual([{ type: 'title', targetId: 'golden-child', dropChance: 100 }])
 
@@ -1884,17 +1903,16 @@ describe('static data references', () => {
     expect(nuggetIcon?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-join' }])
     expect(nuggetIcon?.rewards).toEqual([{ type: 'icon', targetId: 'nugget', quantity: 1, dropChance: 100 }])
 
-    expect(rocketTitle?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
+    expect(rocketTitle?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 200 }])
     expect(rocketTitle?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-refuse' }])
     expect(rocketTitle?.rewards).toEqual([{ type: 'title', targetId: 'team-rocket-grunt', dropChance: 100 }])
 
-    expect(rocketMIcon?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
-    expect(rocketMIcon?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-refuse' }])
-    expect(rocketMIcon?.rewards).toEqual([{ type: 'icon', targetId: 'rocket-m', quantity: 1, dropChance: 100 }])
-
-    expect(rocketFIcon?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
-    expect(rocketFIcon?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-refuse' }])
-    expect(rocketFIcon?.rewards).toEqual([{ type: 'icon', targetId: 'rocket-f', quantity: 1, dropChance: 100 }])
+    expect(rocketIcons?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
+    expect(rocketIcons?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-refuse' }])
+    expect(rocketIcons?.rewards).toEqual([
+      { type: 'icon', targetId: 'rocket-m', quantity: 1, dropChance: 100 },
+      { type: 'icon', targetId: 'rocket-f', quantity: 1, dropChance: 100 },
+    ])
   })
 
   test("Captain's Credit profile rewards use award sprites without changing icon unlocks", () => {
@@ -2027,7 +2045,7 @@ describe('static data references', () => {
     ])
   })
 
-  test('League Tickets are awarded and exchanged through authored Kanto progression', () => {
+  test('League Tickets are awarded through authored Kanto progression and not sold in Prof\'s Scrip Shop', () => {
     const hasLeagueTicketReward = (
       rewards:
         | Array<{ type?: string; targetId?: unknown; quantity?: unknown }>
@@ -2045,9 +2063,6 @@ describe('static data references', () => {
     const profScripShop = shops.find(
       (shop) => shop.id === 'retro-trainer-cards',
     )
-    const exchange = profScripShop?.items.find(
-      (item) => item.id === 'league-ticket-exchange',
-    )
     const gymBattleIds = ['pewter-gym-brock', 'cerulean-gym-misty']
     const gymDailyIds = ['brock-daily-stones', 'misty-daily-scales']
     const surgeGym = expeditions.find(
@@ -2058,10 +2073,9 @@ describe('static data references', () => {
     )
 
     expect(hasLeagueTicketReward(starterTask?.rewards, 10)).toBe(true)
-    expect(exchange?.cost).toEqual([
-      { type: 'currency', id: 'prof-scrip', amount: 5 },
-    ])
-    expect(hasLeagueTicketReward(exchange?.rewards, 1)).toBe(true)
+    expect(
+      profScripShop?.items.some((item) => item.id === 'league-ticket-exchange'),
+    ).toBe(false)
     expect(
       gymBattleIds.every((id) =>
         hasLeagueTicketReward(
@@ -4961,7 +4975,21 @@ describe('static data references', () => {
           pokemonCriteria: { speciesId: 133 },
         },
       ],
-      rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 1500 }],
+      rewards: expect.arrayContaining([
+        { type: 'currency', targetId: 'pokedollars', quantity: 1500 },
+        {
+          type: 'icon',
+          targetId: 'pokemon-133',
+          dropChance: 100,
+          requirements: [
+            {
+              type: 'task_completed',
+              targetId: 'celadon-socialite-eevee-trade',
+              count: 24,
+            },
+          ],
+        },
+      ]),
     })
   })
 

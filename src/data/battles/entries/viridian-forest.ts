@@ -450,6 +450,14 @@ export const viridianForestBattles: BattleConfig[] = [
       { speciesId: 14, level: { min: 3, max: 6 } }, // Kakuna
       { speciesId: 25, level: { min: 3, max: 6 } }, // Pikachu
       {
+        speciesId: 1,
+        level: { min: 3, max: 6 },
+        formId: '1',
+        requirements: [
+          { type: 'task_completed', targetId: 'secret-garden-trust' },
+        ],
+      }, // Bulbasaur
+      {
         speciesId: 127,
         level: { min: 3, max: 6 },
         formId: '127',

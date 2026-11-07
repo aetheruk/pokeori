@@ -688,26 +688,26 @@ function MoveDexListItem({
           : 'border-dashed border-game-border-strong bg-game-surface/55 hover:bg-game-surface',
       )}
     >
-      <div
-        className={cn(
-          'game-icon-orb game-icon-orb-art relative flex size-12 shrink-0 items-center justify-center',
-          isSketchbook
-            ? 'border-game-ochre/45 text-game-ochre-strong'
-            : 'text-game-charcoal-strong',
-        )}
-      >
-        {isKnown ? (
-          <ItemSprite
-            itemId={getMoveTypeSpriteItemId(entry.move)}
-            alt=""
-            width={38}
-            height={38}
-            className="size-9 object-contain"
-          />
-        ) : (
+      {isKnown ? (
+        <ItemSprite
+          itemId={getMoveTypeSpriteItemId(entry.move)}
+          alt=""
+          width={38}
+          height={38}
+          className="size-9 shrink-0 object-contain"
+        />
+      ) : (
+        <div
+          className={cn(
+            'game-icon-orb game-icon-orb-art relative flex size-12 shrink-0 items-center justify-center',
+            isSketchbook
+              ? 'border-game-ochre/45 text-game-ochre-strong'
+              : 'text-game-charcoal-strong',
+          )}
+        >
           <CircleHelp className="size-6 text-game-ochre" aria-hidden="true" />
-        )}
-      </div>
+        </div>
+      )}
       <div className="min-w-0 flex-1">
         {isKnown ? (
           <>

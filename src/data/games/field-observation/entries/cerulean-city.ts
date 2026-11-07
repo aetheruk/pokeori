@@ -171,6 +171,14 @@ export const ceruleanCityFieldObservationEntries: FieldObservationConfig[] = [
         { speciesId: 43, formId: '43', weight: 16 },
         { speciesId: 63, formId: '63', weight: 10 },
         { speciesId: 69, formId: '69', weight: 16 },
+        {
+          speciesId: 4,
+          formId: '4',
+          weight: 5,
+          requirements: [
+            { type: 'task_completed', targetId: 'growlithe-knows-the-way' },
+          ],
+        },
       ],
       levelRange: {
         min: 9,
