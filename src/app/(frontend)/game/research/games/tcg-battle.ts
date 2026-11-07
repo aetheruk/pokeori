@@ -1197,6 +1197,7 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'shuffleTargetIntoDeck') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       if (rule.requiresOpponentBench && state[opponentKey].back.every((card) => card.currentHp <= 0)) continue
       const defendingSide = state[opponentKey]
       const targetZone = rule.targetZone === 'bench' ? defendingSide.back : defendingSide.front
