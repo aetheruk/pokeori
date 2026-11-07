@@ -245,11 +245,22 @@ function generatePokemonModule() {
       return speciesData
     }
 
+    const defaultPokemon = speciesPokemon.find((poke) => poke.is_default === '1')
+    const femalePokemon = speciesPokemon.find(
+      (poke) =>
+        poke.is_default !== '1' &&
+        poke.identifier === `${speciesIdentifier}-female`,
+    )
+
     const speciesPokemonIdentifiers = new Set(speciesPokemon.map((p) => p.identifier))
 
     speciesPokemon.forEach((poke) => {
       const pokemonId = parseInt(poke.id)
       const formId = pokemonId.toString()
+      // PokeAPI stores a few full gender variants as separate Pokemon rows.
+      // Keep these under the species' single base form and attach their data
+      // below instead of exposing a second Pokédex form.
+      if (poke === femalePokemon) return
       if (excludedFormIds.has(formId)) {
         return
       }
@@ -341,6 +352,25 @@ function generatePokemonModule() {
         })
       })
     })
+
+    if (defaultPokemon && femalePokemon) {
+      const defaultForm = speciesData.forms.find(
+        (form) => form.id === String(defaultPokemon.id),
+      )
+      if (defaultForm) {
+        const femaleStats = getStatsForPokemon(parseInt(femalePokemon.id))
+        const femaleEvYield = getEffortYieldForPokemon(parseInt(femalePokemon.id))
+        if (
+          JSON.stringify(femaleStats) !== JSON.stringify(defaultForm.stats) ||
+          JSON.stringify(femaleEvYield) !== JSON.stringify(defaultForm.evYield)
+        ) {
+          defaultForm.genderVariants = {
+            ...defaultForm.genderVariants,
+            female: { stats: femaleStats, evYield: femaleEvYield },
+          }
+        }
+      }
+    }
 
     return speciesData
   })
@@ -512,6 +542,14 @@ export interface PokemonEVYield {
   speed: number;
 }
 
+export type PokemonGender = 'male' | 'female' | 'genderless';
+export type PokemonSex = Exclude<PokemonGender, 'genderless'>;
+
+export interface PokemonGenderVariant {
+  stats: PokemonStats;
+  evYield: PokemonEVYield;
+}
+
 export interface PokemonForm {
   id: string;
   height: number;
@@ -522,6 +560,7 @@ export interface PokemonForm {
   types: string[];
   stats: PokemonStats;
   evYield: PokemonEVYield;
+  genderVariants?: Partial<Record<PokemonSex, PokemonGenderVariant>>;
 }
 
 export type PokemonGrowthRate =

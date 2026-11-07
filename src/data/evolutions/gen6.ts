@@ -254,7 +254,17 @@ export const gen6Evolutions: Record<number, Evolution[]> = {
       "name": "meowstic",
       "trigger": "level-up",
       "conditions": {
-        "minLevel": 25
+        "minLevel": 25,
+        "gender": 2
+      }
+    },
+    {
+      "speciesId": 678,
+      "name": "meowstic",
+      "trigger": "level-up",
+      "conditions": {
+        "minLevel": 25,
+        "gender": 1
       }
     }
   ],

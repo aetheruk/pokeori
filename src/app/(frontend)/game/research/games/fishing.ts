@@ -510,9 +510,11 @@ export async function castFishingLine(rodType: RodType) {
         const activeAbilityId = researchState.activeAbilityId
         const activeAbilitySourceFormId =
           researchState.activeAbilitySourceFormId
+        const targetGender = rollPokemonGender(pokemonEntry.speciesId)
         const effectiveAbilityId = resolveStartAbilityId(
           activeAbilityId,
           formId,
+          targetGender,
         )
         const effectiveAbility = effectiveAbilityId
           ? ABILITIES[effectiveAbilityId]
@@ -1361,6 +1363,7 @@ export async function startFishingCatch(options?: {
             researchLevel,
             getResearcherAbilityRolls(researcherLevel),
             getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+            encounterState.gender,
           ),
           background: encounter.background,
         }

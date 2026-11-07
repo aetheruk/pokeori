@@ -76,6 +76,8 @@ import me2pt5 from './sets/me2pt5'
 import me3 from './sets/me3'
 import me4 from './sets/me4'
 import me5 from './sets/me5'
+import me55 from './sets/me55'
+import me55c from './sets/me55c'
 import neo1 from './sets/neo1'
 import neo2 from './sets/neo2'
 import neo3 from './sets/neo3'
@@ -254,6 +256,8 @@ export const tcgSets: TcgSet[] = [
   me3,
   me4,
   me5,
+  me55,
+  me55c,
   neo1,
   neo2,
   neo3,

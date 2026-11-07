@@ -268,6 +268,14 @@ export const gen8Evolutions: Record<number, Evolution[]> = {
       "conditions": {
         "itemId": "cracked-pot"
       }
+    },
+    {
+      "speciesId": 855,
+      "name": "polteageist",
+      "trigger": "use-item",
+      "conditions": {
+        "itemId": "chipped-pot"
+      }
     }
   ],
   "856": [

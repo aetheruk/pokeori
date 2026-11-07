@@ -15,6 +15,10 @@ Turn-based Pokemon battle system with advanced mechanics.
 - Data: `src/data/battles/`, `src/data/powers.ts`
 
 ## Mechanics
+### Gender-specific Pokémon data
+
+Indeedee, Basculegion, and Oinkologne use the female source record's base stats and EV yield when the owned Pokémon is female; Meowstic's base stats are the same for both genders. Meowstic, Indeedee, and Oinkologne also resolve their gender-specific natural abilities during capture, reward generation, battle fallback, and evolution ability transfer. Older saved Pokémon with an incompatible natural ability use the matching gender-specific ability from the same slot in battles and the details view, and retain that slot when they evolve. Ability patches respect gender-restricted assignments. The Pokédex keeps each species as one form and shows the selected gender's stats and existing gendered sprite.
+
 ### Alpha wild encounters
 
 Ordinary wild battles roll Alpha independently from rarity at 1-in-55. Alpha Pokémon have the natural level roll plus five, 252 HP EVs, one guaranteed IV fixed at 31, and five otherwise random IVs. Their nature and size are generated once. The normal maximum height and weight (+20% of species base) each receive an independent extra 0–10%; size is XXXL only when both extra rolls exceed 8%, otherwise XXL. The resolved player team limit is two, applied after lead selection; ordinary wild encounters retain their authored limit. In Alpha battles, the player's effective level cap is five levels above the highest enemy level, compared with ten levels for ordinary wild battles.

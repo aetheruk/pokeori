@@ -1,7 +1,11 @@
 import type { Pokemon } from '@/payload-types'
 import { NATURES, NatureName } from '@/data/natures'
 import pokemonData from '@/data/pokemon-data'
-import type { PokemonData, PokemonStats as BasePokemonStats } from '@/data/pokemon-data'
+import type {
+  PokemonData,
+  PokemonGender,
+  PokemonStats as BasePokemonStats,
+} from '@/data/pokemon-data'
 import type { Payload } from 'payload'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { getTotalPokemonExperienceForLevel } from '@/utilities/pokemon/experience'
@@ -40,13 +44,23 @@ export interface GeneratedPokemonStats {
 type StatName = 'hp' | 'attack' | 'defense' | 'specialAttack' | 'specialDefense' | 'speed'
 
 // Helper to get base stats from pokemon-data
-function getBaseData(speciesId: number, formId: string) {
+function getBaseData(
+  speciesId: number,
+  formId: string,
+  gender?: PokemonGender | null,
+) {
   const data = pokemonData as PokemonData
   const species = data.find((s) => s.id === speciesId)
   if (!species) throw new Error(`Species ${speciesId} not found`)
 
   const form = species.forms.find((f) => f.id === formId) || species.forms[0]
   if (!form) throw new Error(`Form ${formId} not found`)
+
+  const genderVariant =
+    gender && gender !== 'genderless' ? form.genderVariants?.[gender] : undefined
+  if (genderVariant) {
+    return { ...form, stats: genderVariant.stats, evYield: genderVariant.evYield }
+  }
 
   return form
 }
@@ -260,7 +274,7 @@ export function computeStats(
 }
 
 export function calculateStats(pokemon: Pokemon): Pokemon {
-  const baseData = getBaseData(pokemon.speciesId, pokemon.formId)
+  const baseData = getBaseData(pokemon.speciesId, pokemon.formId, pokemon.gender)
   const baseStats = baseData.stats
   const level = pokemon.level || 1
   const nature = pokemon.nature || 'Hardy'
@@ -315,7 +329,7 @@ export async function identifyPokemon(
   const level = Math.floor(Math.random() * (maxLevel - minLevel + 1)) + minLevel
 
   // 3. Determine Nature, Height, Weight, Size, and IVs
-  const baseData = getBaseData(pokemon.speciesId, pokemon.formId)
+  const baseData = getBaseData(pokemon.speciesId, pokemon.formId, pokemon.gender)
   const { ivs, nature, height, weight, size } = generatePokemonAttributes(
     baseData.height,
     baseData.weight,

@@ -1,5 +1,9 @@
 # Current Game State
 
+Unreleased: Refreshed Pokémon data records gender-specific Meowstic and Oinkologne evolutions and adds the Chipped Pot route for Sinistea. Chipped Pot is now registered as an evolution item with its own sprite.
+
+Unreleased: Gender variants that PokeAPI stores as separate records remain one Pokédex form, while gender-specific base stats and EV yields now apply to Indeedee, Basculegion, and Oinkologne. Natural abilities resolve by gender for Meowstic, Indeedee, and Oinkologne; Meowstic's hidden ability is Prankster for males and Competitive for females. Capture and reward rolls, evolution ability transfer, battle stats, EV rewards, Pokédex stats, and ability-patch compatibility use the owned Pokémon's gender. Older saved Pokémon with a gender-incompatible natural ability display and battle with the matching ability from the same slot, and evolution preserves that slot. Gendered sprites continue to use the existing male/female sprite selection.
+
 Unreleased: The Dailies view shows each voyage that is currently underway in an Active Voyages section, making those journeys easy to reopen while they run.
 
 Unreleased: The repeatable Lavender Tower Ghost Trial's Alpha Gengar battle is categorized as Kanto so its Alpha capture attempt records Kanto as the Pokémon's obtained region.

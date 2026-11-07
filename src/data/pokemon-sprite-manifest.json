@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T06:15:57.346Z",
+  "generatedAt": "2026-11-06T18:35:06.383Z",
   "source": "https://github.com/PokeAPI/sprites",
   "fallbackFormId": "201",
   "sprites": {
@@ -717,7 +717,9 @@
         },
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/42.avif",
-          "shiny": "/sprites/pokemon/gen-v/back/shiny/42.avif"
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/42.avif",
+          "female": "/sprites/pokemon/gen-v/back/female/42.avif",
+          "shinyFemale": "/sprites/pokemon/gen-v/back/shiny-female/42.avif"
         }
       }
     },
@@ -3431,7 +3433,9 @@
         },
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/202.avif",
-          "shiny": "/sprites/pokemon/gen-v/back/shiny/202.avif"
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/202.avif",
+          "female": "/sprites/pokemon/gen-v/back/female/202.avif",
+          "shinyFemale": "/sprites/pokemon/gen-v/back/shiny-female/202.avif"
         }
       }
     },
@@ -5671,7 +5675,9 @@
         },
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/332.avif",
-          "shiny": "/sprites/pokemon/gen-v/back/shiny/332.avif"
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/332.avif",
+          "female": "/sprites/pokemon/gen-v/back/female/332.avif",
+          "shinyFemale": "/sprites/pokemon/gen-v/back/shiny-female/332.avif"
         }
       }
     },
@@ -6755,7 +6761,9 @@
         },
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/398.avif",
-          "shiny": "/sprites/pokemon/gen-v/back/shiny/398.avif"
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/398.avif",
+          "female": "/sprites/pokemon/gen-v/back/female/398.avif",
+          "shinyFemale": "/sprites/pokemon/gen-v/back/shiny-female/398.avif"
         }
       }
     },
@@ -6797,7 +6805,9 @@
         },
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/400.avif",
-          "shiny": "/sprites/pokemon/gen-v/back/shiny/400.avif"
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/400.avif",
+          "female": "/sprites/pokemon/gen-v/back/female/400.avif",
+          "shinyFemale": "/sprites/pokemon/gen-v/back/shiny-female/400.avif"
         }
       }
     },
@@ -7077,7 +7087,9 @@
         },
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/415.avif",
-          "shiny": "/sprites/pokemon/gen-v/back/shiny/415.avif"
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/415.avif",
+          "female": "/sprites/pokemon/gen-v/back/female/415.avif",
+          "shinyFemale": "/sprites/pokemon/gen-v/back/shiny-female/415.avif"
         }
       }
     },
@@ -7113,7 +7125,9 @@
         },
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/417.avif",
-          "shiny": "/sprites/pokemon/gen-v/back/shiny/417.avif"
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/417.avif",
+          "female": "/sprites/pokemon/gen-v/back/female/417.avif",
+          "shinyFemale": "/sprites/pokemon/gen-v/back/shiny-female/417.avif"
         }
       }
     },
@@ -7883,7 +7897,9 @@
         },
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/460.avif",
-          "shiny": "/sprites/pokemon/gen-v/back/shiny/460.avif"
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/460.avif",
+          "female": "/sprites/pokemon/gen-v/back/female/460.avif",
+          "shinyFemale": "/sprites/pokemon/gen-v/back/shiny-female/460.avif"
         }
       }
     },
@@ -21461,6 +21477,22 @@
         "back": {
           "normal": "/sprites/pokemon/gen-v/back/normal/10325.avif",
           "shiny": "/sprites/pokemon/gen-v/back/shiny/10325.avif"
+        }
+      }
+    },
+    "10326": {
+      "home": {
+        "normal": "/sprites/pokemon/home/normal/10326.avif",
+        "shiny": "/sprites/pokemon/home/shiny/10326.avif"
+      },
+      "genV": {
+        "front": {
+          "normal": "/sprites/pokemon/gen-v/front/normal/10326.avif",
+          "shiny": "/sprites/pokemon/gen-v/front/shiny/10326.avif"
+        },
+        "back": {
+          "normal": "/sprites/pokemon/gen-v/back/normal/10326.avif",
+          "shiny": "/sprites/pokemon/gen-v/back/shiny/10326.avif"
         }
       }
     },

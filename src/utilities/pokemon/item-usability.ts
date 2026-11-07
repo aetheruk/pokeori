@@ -1,5 +1,5 @@
 import type { Item } from '@/data/items/types'
-import { ABILITIES } from '@/data/abilities'
+import { ABILITIES, isGenderCompatibleFormAbility } from '@/data/abilities'
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import {
   getPokemonEvTotal,
@@ -70,6 +70,7 @@ export const POKEMON_ITEM_PICKER_GROUP_LABELS: Record<
 export type PokemonItemUseTarget = {
   speciesId?: number | null
   formId?: string | null
+  gender?: 'male' | 'female' | 'genderless' | null
   level?: number | null
   experience?: number | null
   evs?: Partial<
@@ -377,6 +378,13 @@ export function getPokemonItemUnavailableReason(
       !effects.usableByForms.includes(formId)
     ) {
       return 'This item cannot be used on this Pokemon.'
+    }
+
+    if (
+      effects.teachAbility &&
+      !isGenderCompatibleFormAbility(formId, effects.teachAbility, pokemon.gender)
+    ) {
+      return 'This ability is not compatible with this Pokémon’s gender.'
     }
 
     if (effects.usableByTypes?.length) {

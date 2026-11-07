@@ -70,7 +70,17 @@ export const gen9Evolutions: Record<number, Evolution[]> = {
       "name": "oinkologne",
       "trigger": "level-up",
       "conditions": {
-        "minLevel": 18
+        "minLevel": 18,
+        "gender": 2
+      }
+    },
+    {
+      "speciesId": 916,
+      "name": "oinkologne",
+      "trigger": "level-up",
+      "conditions": {
+        "minLevel": 18,
+        "gender": 1
       }
     }
   ],

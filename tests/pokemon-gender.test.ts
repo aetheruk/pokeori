@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { getPokemonSpecies } from '@/utilities/pokemon/pokedex'
+import { isGenderCompatibleFormAbility, isNaturalFormAbilityForForm } from '@/data/abilities'
+import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import {
   formatPokemonGenderLabel,
   getDefaultPokemonGender,
@@ -34,5 +35,44 @@ describe('Pokemon gender data', () => {
     expect(formatPokemonGenderLabel('male')).toBe('Male')
     expect(formatPokemonGenderLabel('female')).toBe('Female')
     expect(formatPokemonGenderLabel('genderless')).toBe('Genderless')
+  })
+
+  test('supports Meowstic gender-specific abilities while retaining shared base stats', () => {
+    expect(isNaturalFormAbilityForForm('678', 'prankster', 'male')).toBe(true)
+    expect(isNaturalFormAbilityForForm('678', 'prankster', 'female')).toBe(false)
+    expect(isNaturalFormAbilityForForm('678', 'competitive', 'female')).toBe(true)
+    expect(isNaturalFormAbilityForForm('678', 'competitive', 'male')).toBe(false)
+
+    expect(isGenderCompatibleFormAbility('678', 'prankster', 'male')).toBe(true)
+    expect(isGenderCompatibleFormAbility('678', 'prankster', 'female')).toBe(false)
+    expect(isGenderCompatibleFormAbility('678', 'competitive', 'female')).toBe(true)
+    expect(isGenderCompatibleFormAbility('678', 'competitive', 'male')).toBe(false)
+
+    const male = getPokemonForm('678', 'male')
+    const female = getPokemonForm('678', 'female')
+    expect(male?.stats).toEqual(female?.stats)
+    expect(male?.stats).toEqual({
+      hp: 74,
+      attack: 48,
+      defense: 76,
+      'special-attack': 83,
+      'special-defense': 81,
+      speed: 104,
+    })
+  })
+
+  test('applies source gender-specific stats to forms that differ', () => {
+    const maleIndeedee = getPokemonForm('876', 'male')
+    const femaleIndeedee = getPokemonForm('876', 'female')
+
+    expect(maleIndeedee?.stats).not.toEqual(femaleIndeedee?.stats)
+    expect(femaleIndeedee?.stats).toEqual({
+      hp: 70,
+      attack: 55,
+      defense: 65,
+      'special-attack': 95,
+      'special-defense': 105,
+      speed: 85,
+    })
   })
 })

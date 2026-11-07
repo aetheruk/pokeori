@@ -23,8 +23,8 @@ const steps = [
     passSkipFetch: true,
   },
   {
-    name: 'Generate Pokemon modules',
-    command: ['bun', 'scripts/generate-pokemon-modules.mjs'],
+    name: 'Generate Pokemon modules and icon catalog',
+    command: ['bun', 'run', 'generate:pokemon'],
   },
   {
     name: 'Sync bundled Pokemon sprites',

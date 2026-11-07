@@ -1,11 +1,12 @@
 import pokemonData, {
   type PokemonData,
   type PokemonForm,
+  type PokemonGender as PokemonGenderType,
   type PokemonGrowthRate,
 } from '@/data/pokemon-data'
 import { getBundledPokemonSpriteUrl } from './local-sprites'
 
-export type PokemonGender = 'male' | 'female' | 'genderless'
+export type PokemonGender = PokemonGenderType
 
 export type { PokemonData, PokemonForm, PokemonGrowthRate } from '@/data/pokemon-data'
 
@@ -15,7 +16,7 @@ export function getPokemonImageUrl(
   formId: string | number,
   type: PokemonImageType = 'home',
   shiny = false,
-  genderOrFemale?: PokemonGender | boolean | null,
+  genderOrFemale?: PokemonGenderType | boolean | null,
 ): string {
   return getBundledPokemonSpriteUrl({
     formId,
@@ -46,7 +47,11 @@ export interface FlattenedPokemon extends PokemonForm {
  * If no form name is supplied, returns the base form
  * Returns flattened data structure with species properties moved to top level
  */
-export function getPokemonSpecies(id: string | number, formName?: string): FlattenedPokemon | null {
+export function getPokemonSpecies(
+  id: string | number,
+  formName?: string,
+  gender?: PokemonGenderType | null,
+): FlattenedPokemon | null {
   const speciesId = id.toString()
   // Search for the species first
   const species = (pokemonData as PokemonData).find((s) => s.id.toString() === speciesId)
@@ -61,6 +66,7 @@ export function getPokemonSpecies(id: string | number, formName?: string): Flatt
     }
 
     if (form) {
+      const genderVariant = gender ? form.genderVariants?.[gender as 'male' | 'female'] : undefined
       // Flatten the structure by moving species-level properties to top level
       return {
         id: form.id,
@@ -71,8 +77,9 @@ export function getPokemonSpecies(id: string | number, formName?: string): Flatt
         name: form.name,
         form: form.form,
         types: form.types,
-        stats: form.stats,
-        evYield: form.evYield,
+        stats: genderVariant?.stats || form.stats,
+        evYield: genderVariant?.evYield || form.evYield,
+        genderVariants: form.genderVariants,
         capture_rate: species.capture_rate,
         gender_rate: species.gender_rate,
         has_gender_differences: species.has_gender_differences,
@@ -93,13 +100,17 @@ export function getPokemonSpecies(id: string | number, formName?: string): Flatt
  * Get a Pokemon form by form ID
  * Returns flattened data structure with species properties moved to top level
  */
-export function getPokemonForm(id: string | number): FlattenedPokemon | null {
+export function getPokemonForm(
+  id: string | number,
+  gender?: PokemonGenderType | null,
+): FlattenedPokemon | null {
   const targetId = id.toString()
   // Search through all species to find the matching form
   for (const species of pokemonData as PokemonData) {
     const form = species.forms.find((f) => f.id === targetId)
 
     if (form) {
+      const genderVariant = gender ? form.genderVariants?.[gender as 'male' | 'female'] : undefined
       // Flatten the structure by moving species-level properties to top level
       return {
         id: form.id,
@@ -110,8 +121,9 @@ export function getPokemonForm(id: string | number): FlattenedPokemon | null {
         name: form.name,
         form: form.form,
         types: form.types,
-        stats: form.stats,
-        evYield: form.evYield,
+        stats: genderVariant?.stats || form.stats,
+        evYield: genderVariant?.evYield || form.evYield,
+        genderVariants: form.genderVariants,
         capture_rate: species.capture_rate,
         gender_rate: species.gender_rate,
         has_gender_differences: species.has_gender_differences,

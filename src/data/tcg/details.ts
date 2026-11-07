@@ -158,6 +158,10 @@ export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail
       return (await import('./details/me4')).default
     case 'me5':
       return (await import('./details/me5')).default
+    case 'me55':
+      return (await import('./details/me55')).default
+    case 'me55c':
+      return (await import('./details/me55c')).default
     case 'neo1':
       return (await import('./details/neo1')).default
     case 'neo2':

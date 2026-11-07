@@ -225,6 +225,7 @@ export async function chooseSurfPokemon(
             researchLevel,
             getResearcherAbilityRolls(researcherLevel),
             getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+            gender,
           ),
           background: stateForCapture.background,
         }

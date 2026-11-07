@@ -357,7 +357,8 @@ export async function attemptCapture(
 
     // Calculate Capture
     const species =
-      getPokemonForm(state.formId) || getPokemonSpecies(state.pokemonId)
+      getPokemonForm(state.formId, state.gender) ||
+      getPokemonSpecies(state.pokemonId, undefined, state.gender)
 
     // Ability Catch Modifier
     const activePoke = isChronicle
@@ -705,7 +706,8 @@ export async function attemptCapture(
     }
 
     const formData =
-      getPokemonForm(state.formId) || getPokemonSpecies(state.pokemonId)
+      getPokemonForm(state.formId, state.gender) ||
+      getPokemonSpecies(state.pokemonId, undefined, state.gender)
 
     // If NOT caught, return failure
     if (!caught) {
@@ -870,6 +872,7 @@ export async function attemptCapture(
           catchResearchLvl,
           getResearcherAbilityRolls(researcherLevel),
           getResearcherHiddenAbilitiesUnlocked(researcherLevel),
+          state.gender,
         )
 
     const rarity = targetRarity

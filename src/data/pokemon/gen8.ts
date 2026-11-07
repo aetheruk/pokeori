@@ -3298,6 +3298,26 @@ const gen8Data: PokemonData = [
           "specialAttack": 2,
           "specialDefense": 0,
           "speed": 0
+        },
+        "genderVariants": {
+          "female": {
+            "stats": {
+              "hp": 70,
+              "attack": 55,
+              "defense": 65,
+              "special-attack": 95,
+              "special-defense": 105,
+              "speed": 85
+            },
+            "evYield": {
+              "hp": 0,
+              "attack": 0,
+              "defense": 0,
+              "specialAttack": 0,
+              "specialDefense": 2,
+              "speed": 0
+            }
+          }
         }
       }
     ]
@@ -4716,6 +4736,26 @@ const gen8Data: PokemonData = [
           "specialAttack": 0,
           "specialDefense": 0,
           "speed": 0
+        },
+        "genderVariants": {
+          "female": {
+            "stats": {
+              "hp": 120,
+              "attack": 92,
+              "defense": 65,
+              "special-attack": 100,
+              "special-defense": 75,
+              "speed": 78
+            },
+            "evYield": {
+              "hp": 3,
+              "attack": 0,
+              "defense": 0,
+              "specialAttack": 0,
+              "specialDefense": 0,
+              "speed": 0
+            }
+          }
         }
       }
     ]

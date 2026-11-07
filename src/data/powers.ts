@@ -125,6 +125,7 @@ export const MEGA_EVOLUTIONS: MegaEvolutionEntry[] = [
   { baseFormId: '668', megaFormId: '10295', megaStoneId: 'pyroarite', megaStoneName: 'Pyroarite' },
   { baseFormId: '670', megaFormId: '10296', megaStoneId: 'floettite', megaStoneName: 'Floettite' },
   { baseFormId: '678', megaFormId: '10314', megaStoneId: 'meowsticite', megaStoneName: 'Meowsticite' },
+  { baseFormId: '678', megaFormId: '10326', megaStoneId: 'meowsticite', megaStoneName: 'Meowsticite' },
   { baseFormId: '687', megaFormId: '10297', megaStoneId: 'malamarite', megaStoneName: 'Malamarite' },
   { baseFormId: '689', megaFormId: '10298', megaStoneId: 'barbaraclite', megaStoneName: 'Barbaraclite' },
   { baseFormId: '691', megaFormId: '10299', megaStoneId: 'dragalgite', megaStoneName: 'Dragalgite' },

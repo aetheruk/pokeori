@@ -7,5 +7,4 @@ These referenced item sprites do not exist in `public/sprites/items`.
 
 | Item ID | Name | Category | Sprite ID | Expected Path |
 | --- | --- | --- | --- | --- |
-| `binder-me5` | TCG Binder (Pitch Black) | `Binder` | `binder-me5` | `/sprites/items/tcg/binder-me5.avif` |
-| `pack-me5` | Pitch Black Booster Pack | `booster-pack` | `pack-me5` | `/sprites/items/tcg/pack-me5.avif` |
+| None | None | None | None | None |
