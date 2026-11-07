@@ -797,6 +797,8 @@ function applyTcgBattleSpecialEffects(params: {
         'attackFailsOnTails',
         'preventSwitch',
         'buffDefendingPokemon',
+        'transferDamageCounters',
+        'shuffleTargetIntoDeck',
       ].includes(rule.kind) ||
       (rule.kind === 'switch' && rule.target === 'opponent') ||
       (rule.kind === 'preventRetreat' && (rule.target || 'opponent') === 'opponent') ||
@@ -895,6 +897,84 @@ function applyTcgBattleSpecialEffects(params: {
         sourceId: attacker.instanceId,
         targetId: discardedCard.instanceId,
         label: `${discardedCard.name} was discarded from the ${destinationSideKey === sideKey ? 'attacker' : 'opponent'}'s hand`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'discardSelectedHandPokemon' && choice?.kind === 'discardHandCards') {
+      const selectedIds = new Set(choice.cardIds)
+      const discarded = state[sideKey].hand.filter((card) => selectedIds.has(card.instanceId))
+      state[sideKey].hand = state[sideKey].hand.filter((card) => !selectedIds.has(card.instanceId))
+      state[sideKey].discard.push(...discarded)
+      if (discarded.length > 0) {
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: attacker.instanceId,
+          label: `${discarded.map((card) => card.name).join(', ')} discarded from the attacker's hand`,
+        })
+      }
+      continue
+    }
+
+    if (rule.kind === 'recoverPokemonFromDiscardToHand' && choice?.kind === 'discardPokemonToHand') {
+      const discard = state[sideKey].discard
+      const card = discard.find((entry) => entry.instanceId === choice.cardId)
+      const eligible = card &&
+        (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
+        (!rule.includeNames?.length || rule.includeNames.includes(card.name))
+      if (!card || !eligible) continue
+      discard.splice(discard.indexOf(card), 1)
+      state[sideKey].hand.push(card)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: card.instanceId,
+        label: `${card.name} returned from the discard pile to the attacker's hand`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'transferDamageCounters') {
+      if (choice?.kind !== 'damageCounterTransfer' || !choice.sourceCardId) continue
+      const ownCards = [...state[sideKey].front, ...state[sideKey].back]
+      const source = ownCards.find((card) => card.instanceId === choice.sourceCardId && card.currentHp > 0)
+      const defendingCard = [...state[opponentKey].front, ...state[opponentKey].back]
+        .find((card) => card.instanceId === target.instanceId && card.currentHp > 0)
+      if (!source || !defendingCard) continue
+      const availableCounters = Math.max(0, Math.floor((source.hp - source.currentHp) / 10))
+      const movedCounters = Math.min(rule.maxCounters, availableCounters)
+      if (movedCounters <= 0) continue
+      const damage = movedCounters * 10
+      source.currentHp = Math.min(source.hp, source.currentHp + damage)
+      defendingCard.currentHp = Math.max(0, defendingCard.currentHp - damage)
+      recordDamageEvent(state, {
+        sourceId: attacker.instanceId,
+        targetId: defendingCard.instanceId,
+        targetSide: opponentKey,
+        damage,
+        reason: 'attack',
+      })
+      recordTcgBattleAttackHit(defendingCard, sideKey)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: source.instanceId,
+        label: `Moved ${movedCounters} damage counter${movedCounters === 1 ? '' : 's'} from ${source.name} to ${defendingCard.name}`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'shuffleTargetIntoDeck') {
+      const defendingSide = state[opponentKey]
+      const targetIndex = defendingSide.front.findIndex((card) => card.instanceId === target.instanceId)
+      if (targetIndex < 0) continue
+      defendingSide.front.splice(targetIndex, 1)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${target.name} was shuffled into the opposing deck`,
       })
       continue
     }

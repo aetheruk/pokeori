@@ -2577,6 +2577,10 @@ function AttackChoiceDrawer({
   const [selectedDiscardPokemon, setSelectedDiscardPokemon] = useState<
     { side: 'player' | 'opponent'; cardId: string } | null
   >(null)
+  const [selectedDamageCounterSourceId, setSelectedDamageCounterSourceId] = useState('')
+  const [selectedDiscardHandPokemonIds, setSelectedDiscardHandPokemonIds] = useState<string[]>([])
+  const [selectedOwnPokemonId, setSelectedOwnPokemonId] = useState('')
+  const [selectedRecoveryPokemonId, setSelectedRecoveryPokemonId] = useState('')
   const [selectedAttackIndex, setSelectedAttackIndex] = useState<number | null>(
     null,
   )
@@ -2609,6 +2613,15 @@ function AttackChoiceDrawer({
     ? getTcgBattleAttackEffect(copiedAttack)
     : null
   const activeEffect = requirement === 'copyAttack' ? copiedEffect : effect
+  const recoveryPokemonRule = activeEffect?.special?.find(
+    (rule) => rule.kind === 'recoverPokemonFromDiscardToHand',
+  )
+  const recoverablePokemonChoices = recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand'
+    ? state.player.discard.filter((card) =>
+        (!recoveryPokemonRule.includeSubtypes?.length || recoveryPokemonRule.includeSubtypes.some((subtype) => card.subtypes.includes(subtype))) &&
+        (!recoveryPokemonRule.includeNames?.length || recoveryPokemonRule.includeNames.includes(card.name)),
+      )
+    : []
   const deckPokemonRule = activeEffect?.special?.find(
     (rule) => rule.kind === 'searchDeckPokemon',
   )
@@ -2661,6 +2674,11 @@ function AttackChoiceDrawer({
           .map((card) => ({ side, card }))
       : [],
   )
+  const damageCounterSourceChoices = [...state.player.front, ...state.player.back]
+    .filter((card) => card.currentHp > 0 && card.currentHp < card.hp)
+  const handPokemonChoices = state.player.hand
+  const ownPokemonChoices = [...state.player.front, ...state.player.back]
+    .filter((card) => card.currentHp > 0)
 
   useEffect(() => {
     if (canSkipBenchSwitch && skipOptionalBenchSwitch) return
@@ -2694,6 +2712,35 @@ function AttackChoiceDrawer({
     }
   }, [discardChoices, selectedDiscardPokemon])
 
+  useEffect(() => {
+    if (!damageCounterSourceChoices.some((card) => card.instanceId === selectedDamageCounterSourceId)) {
+      setSelectedDamageCounterSourceId(damageCounterSourceChoices[0]?.instanceId || '')
+    }
+  }, [damageCounterSourceChoices, selectedDamageCounterSourceId])
+
+  useEffect(() => {
+    const handIds = new Set(handPokemonChoices.map((card) => card.instanceId))
+    setSelectedDiscardHandPokemonIds((selected) => selected.filter((cardId) => handIds.has(cardId)))
+  }, [handPokemonChoices])
+
+  useEffect(() => {
+    setSelectedDiscardHandPokemonIds([])
+  }, [attacker.instanceId, attackIndex])
+
+  useEffect(() => {
+    if (!ownPokemonChoices.some((card) => card.instanceId === selectedOwnPokemonId)) {
+      const mostInjured = [...ownPokemonChoices]
+        .sort((a, b) => (b.hp - b.currentHp) - (a.hp - a.currentHp))[0]
+      setSelectedOwnPokemonId(mostInjured?.instanceId || '')
+    }
+  }, [ownPokemonChoices, selectedOwnPokemonId])
+
+  useEffect(() => {
+    if (!recoverablePokemonChoices.some((card) => card.instanceId === selectedRecoveryPokemonId)) {
+      setSelectedRecoveryPokemonId(recoverablePokemonChoices[0]?.instanceId || '')
+    }
+  }, [recoverablePokemonChoices, selectedRecoveryPokemonId])
+
   if (!attack || !effect) return null
 
   const buildChoiceFor = (
@@ -2704,6 +2751,25 @@ function AttackChoiceDrawer({
   ): TcgBattleAttackChoice | undefined => {
     if (required === 'disableAttack' && attackChoiceIndex !== null) {
       return { kind: 'disabledAttack', attackIndex: attackChoiceIndex }
+    }
+    if (required === 'damageCounterTransfer') {
+      return {
+        kind: 'damageCounterTransfer',
+        sourceCardId: selectedDamageCounterSourceId || undefined,
+      }
+    }
+    if (required === 'discardHandCards') {
+      const handIds = new Set(handPokemonChoices.map((card) => card.instanceId))
+      return {
+        kind: 'discardHandCards',
+        cardIds: selectedDiscardHandPokemonIds.filter((cardId) => handIds.has(cardId)),
+      }
+    }
+    if (required === 'ownPokemon' && selectedOwnPokemonId) {
+      return { kind: 'ownPokemon', cardId: selectedOwnPokemonId }
+    }
+    if (required === 'discardPokemonToHand' && selectedRecoveryPokemonId) {
+      return { kind: 'discardPokemonToHand', cardId: selectedRecoveryPokemonId }
     }
     if (
       required === 'opponentBench' ||
@@ -2772,6 +2838,14 @@ function AttackChoiceDrawer({
           ? benchChoices.every((card) => card.currentHp <= 0) ||
             Boolean(selectedCardId) ||
             (canSkipBenchSwitch && skipOptionalBenchSwitch)
+        : activeRequirement === 'damageCounterTransfer'
+          ? damageCounterSourceChoices.length === 0 || Boolean(selectedDamageCounterSourceId)
+        : activeRequirement === 'discardHandCards'
+          ? true
+        : activeRequirement === 'ownPokemon'
+          ? Boolean(selectedOwnPokemonId)
+        : activeRequirement === 'discardPokemonToHand'
+          ? recoverablePokemonChoices.length === 0 || Boolean(selectedRecoveryPokemonId)
         : activeRequirement === 'discardPokemon'
           ? Boolean(selectedDiscardPokemon)
         : activeRequirement === 'statusCondition'
@@ -2899,6 +2973,95 @@ function AttackChoiceDrawer({
                 >
                   {optionalSwitchTarget === 'self' ? 'Keep this Pokémon Active' : 'Leave the opponent Active'}
                 </button>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'damageCounterTransfer' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">
+                Move damage counters from
+              </h3>
+              {damageCounterSourceChoices.length > 0 ? (
+                renderCardChoices(
+                  damageCounterSourceChoices,
+                  selectedDamageCounterSourceId,
+                  setSelectedDamageCounterSourceId,
+                )
+              ) : (
+                <p className="text-sm text-game-muted">Your Pokémon have no damage counters to move.</p>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'ownPokemon' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Choose a Pokémon to heal</h3>
+              {renderCardChoices(ownPokemonChoices, selectedOwnPokemonId, setSelectedOwnPokemonId)}
+            </section>
+          )}
+          {activeRequirement === 'discardPokemonToHand' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Pokémon to recover</h3>
+              {recoverablePokemonChoices.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {recoverablePokemonChoices.map((card) => {
+                    const selected = selectedRecoveryPokemonId === card.instanceId
+                    return (
+                      <button
+                        type="button"
+                        key={card.instanceId}
+                        aria-pressed={selected}
+                        onClick={() => setSelectedRecoveryPokemonId(card.instanceId)}
+                        className={cn(
+                          'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left text-sm font-semibold transition-colors',
+                          selected
+                            ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                            : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                        )}
+                      >
+                        {card.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-game-muted">No eligible Pokémon are in your discard pile.</p>
+              )}
+            </section>
+          )}
+          {activeRequirement === 'discardHandCards' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">
+                Pokémon to discard ({selectedDiscardHandPokemonIds.length})
+              </h3>
+              <p className="text-xs text-game-muted">Choose any number. Each Pokémon adds 30 damage.</p>
+              {handPokemonChoices.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {handPokemonChoices.map((card) => {
+                    const selected = selectedDiscardHandPokemonIds.includes(card.instanceId)
+                    return (
+                      <button
+                        type="button"
+                        key={card.instanceId}
+                        aria-pressed={selected}
+                        onClick={() => setSelectedDiscardHandPokemonIds((current) =>
+                          selected
+                            ? current.filter((cardId) => cardId !== card.instanceId)
+                            : [...current, card.instanceId],
+                        )}
+                        className={cn(
+                          'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left text-sm font-semibold transition-colors',
+                          selected
+                            ? 'border-game-moss bg-game-moss/25 text-game-ink'
+                            : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60',
+                        )}
+                      >
+                        {card.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-game-muted">Your hand is empty.</p>
               )}
             </section>
           )}
