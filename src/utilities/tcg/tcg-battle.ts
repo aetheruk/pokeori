@@ -211,6 +211,7 @@ export type TcgBattleCounterDamageRule =
   | { amountPerHead: number; side: 'own' | 'opponent' | 'both'; zone?: 'bench' | 'play'; condition?: TcgBattleCoinCondition; excludeAttacker?: boolean; excludeTarget?: boolean }
   | { amountPerUnit: number; source: TcgBattleCountSource; target: 'self' | 'opponent' | 'target'; condition?: TcgBattleCoinCondition; maxUnits?: number; requiresTargetStatus?: TcgBattleStatusCondition }
   | { target: 'opponent'; amountToLeaveHp: number }
+  | { target: 'opponent'; amountToLeaveHpOfAttacker: true }
 
 export type TcgBattleHealingRule =
   | { amount: number | 'all'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition; amountPerHead?: number; amountPerUnit?: number; source?: TcgBattleCountSource; requiresOwnBench?: boolean; requiresTargetStatus?: TcgBattleStatusCondition }
@@ -1031,6 +1032,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'pl3') {
     const supremeVictorsEffect = inferSupremeVictorsTcgBattleAttackEffect(attack, text, baseDamage)
     if (supremeVictorsEffect) return applyAttackTextModifiers(supremeVictorsEffect)
+  }
+  if (setId === 'pl4') {
+    const arceusEffect = inferArceusTcgBattleAttackEffect(attack, text, baseDamage)
+    if (arceusEffect) return applyAttackTextModifiers(arceusEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -6490,6 +6495,186 @@ function inferSupremeVictorsTcgBattleAttackEffect(
   return null
 }
 
+function inferArceusTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTargetDamage = (
+    damage: TcgBattleDamageRule,
+    ignoreWeaknessResistanceOnBench = true,
+  ): TcgBattleAttackEffect => ({
+    damage,
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench,
+  })
+
+  if (name === 'tumbling attack' || name === 'ambush' || name === 'rising lunge' || name === 'quick attack' || name === 'knock away' || name === 'tail crush') {
+    const bonusDamage = Number.parseInt(text.match(/plus (\d+) more damage/)?.[1] || '0', 10)
+    return { damage: { kind: 'headsBonus', baseDamage, bonusDamage }, coinFlipCount: 1 }
+  }
+  if (name === 'damage roller') {
+    return { ...zero(), counterDamage: [{ target: 'opponent', amountToLeaveHpOfAttacker: true }] }
+  }
+  if (name === 'entangle tackle') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 30 },
+      // The single-active battle board applies this recoil to Swalot rather than choosing another friendly Pokémon.
+      selfDamage: [{ kind: 'optionalChoice', amount: 30 }],
+    }
+  }
+  if (name === 'oracle arrow') {
+    return {
+      ...anyTargetDamage({ kind: 'fixed', amount: 40 }),
+      targetMustBeDamaged: true,
+    }
+  }
+  if (name === 'sharpshooting' || name === 'tongue spring') {
+    return anyTargetDamage({ kind: 'fixed', amount: name === 'sharpshooting' ? 40 : 20 })
+  }
+  if (name === 'wreck' || name === 'extend fang') {
+    // Stadium and Pokémon Tool checks are not represented in this battle mode, so use printed base damage.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (name === 'tumble down') {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 30, source: { kind: 'chosenEnergy' } },
+      choiceRequirement: 'energyAmount',
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+    }
+  }
+  if (name === 'second bite') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'target' },
+      },
+    }
+  }
+  if (name === 'leaf blast') {
+    // Attached Grass Energy is approximated with the shared Energy pool.
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'wide laser') {
+    return {
+      ...zero(),
+      benchDamage: [
+        { amount: 10, side: 'opponent', zone: 'front' },
+        { amount: 10, side: 'opponent', zone: 'bench', ignoreWeaknessResistance: true },
+      ],
+    }
+  }
+  if (name === 'extrasensory') {
+    return { damage: { kind: 'handSizeComparisonBonus', baseDamage, bonusDamage: 30, comparison: 'equal' } }
+  }
+  if (name === 'detect') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAllEffects', condition: 'heads' }],
+    }
+  }
+  if (name === 'endure') {
+    return { ...zero(), coinFlipCount: 1, special: [{ kind: 'endure', condition: 'heads' }] }
+  }
+  if (name === 'discharge') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 40, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+    }
+  }
+  if (name === 'water ball') {
+    // Attached Water Energy is approximated with the shared Energy pool.
+    return { damage: { kind: 'count', baseDamage: 20, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'dragon bump') {
+    // The separate Fire and Water attachment requirement is approximated by two shared Energy.
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: 20,
+        source: { kind: 'energy', side: 'own' },
+        minimumUnits: 2,
+      },
+    }
+  }
+  if (name === 'cloak headbutt') {
+    return {
+      damage: { kind: 'namedPokemonSetBonus', baseDamage, bonusDamage: 30, side: 'own', names: ['Wormadam Trash Cloak'] },
+    }
+  }
+  if (name === 'cloak shard') {
+    return anyTargetDamage({
+      kind: 'namedPokemonSetBonus',
+      baseDamage: 10,
+      bonusDamage: 30,
+      side: 'own',
+      names: ['Wormadam Plant Cloak'],
+    })
+  }
+  if (name === 'bunny hop') {
+    return { ...anyTargetDamage({ kind: 'fixed', amount: 20 }), targetMustBeUndamaged: true }
+  }
+  if (name === 'compound pain') {
+    return {
+      ...zero(),
+      counterDamage: [{ amount: 30, side: 'opponent', zone: 'play', onlyDamaged: true }],
+    }
+  }
+  if (name === 'sky spear') {
+    return {
+      ...anyTargetDamage({ kind: 'fixed', amount: 80 }),
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+    }
+  }
+  if (name === 'leaf refresh') {
+    return { ...zero(), healing: [{ amount: 30, side: 'own', zone: 'bench' }] }
+  }
+  if (name === 'break ground') {
+    return { ...zero(), benchDamage: [{ amount: 10, side: 'own', zone: 'bench', ignoreWeaknessResistance: true }] }
+  }
+  if (name === 'lightning turn') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    }
+  }
+  if (name === 'bright flame') {
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      coinFlipCount: 1,
+      energyDiscard: [{ target: 'self', amount: 2, condition: 'tails' }],
+    }
+  }
+  if (name === 'harden') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'preventAtMost', amount: 30 }] }
+  }
+  if (name === 'scrunch') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAll', condition: 'heads' }],
+    }
+  }
+  if (name === 'sand attack') {
+    return { ...zero(), special: [{ kind: 'attackFailsOnTails' }] }
+  }
+  if (name === 'swallow up') {
+    return { damage: { kind: 'remainingHpComparisonBonus', baseDamage, bonusDamage: 70 } }
+  }
+
+  // Effects that depend on card identity in hand/deck/discard, typed attached Energy,
+  // Stadium/Tool presence, Prize cards, or evolution cards stay filtered.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -10002,6 +10187,8 @@ function calculateTcgBattleCounterDamage(
       const targetCard = rule.target === 'self' ? attacker : target
       const amount = ('amountToLeaveHp' in rule
         ? Math.max(0, targetCard.currentHp - rule.amountToLeaveHp)
+        : 'amountToLeaveHpOfAttacker' in rule
+          ? Math.max(0, targetCard.currentHp - attacker.currentHp)
         : 'amountPerUnit' in rule
           ? rule.amountPerUnit * Math.min(rule.maxUnits ?? Number.POSITIVE_INFINITY, getTcgBattleCount(rule.source, {
             state,
