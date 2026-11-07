@@ -931,9 +931,11 @@ function applyTcgBattleSpecialEffects(params: {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
-      const discardCount = rule.amountPerTail
-        ? rule.amountPerTail * (resolution.coinFlips?.tails || 0)
-        : 1
+      const discardCount = typeof rule.untilHandSize === 'number'
+        ? Math.max(0, destination.hand.length - rule.untilHandSize)
+        : rule.amountPerTail
+          ? rule.amountPerTail * (resolution.coinFlips?.tails || 0)
+          : 1
       for (let count = 0; count < discardCount && destination.hand.length > 0; count += 1) {
         const index = Math.floor(Math.random() * destination.hand.length)
         const [discardedCard] = destination.hand.splice(index, 1)

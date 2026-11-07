@@ -2674,7 +2674,11 @@ function AttackChoiceDrawer({
       : activeRequirement === 'opponentBench' || activeRequirement === 'optionalOpponentBench'
         ? state.opponent.back
         : []
-  const discardChoices = (['player', 'opponent'] as const).flatMap((side) =>
+  const discardPokemonRule = activeEffect?.special?.find((rule) => rule.kind === 'reviveDiscardPokemon')
+  const discardPokemonSides = discardPokemonRule?.kind === 'reviveDiscardPokemon' && discardPokemonRule.side
+    ? [discardPokemonRule.side === 'self' ? 'player' : 'opponent'] as const
+    : ['player', 'opponent'] as const
+  const discardChoices = discardPokemonSides.flatMap((side) =>
     state[side].back.length < 3 && state[side].front.length + state[side].back.length < 6
       ? state[side].discard
           .filter((card) => card.subtypes.includes('Basic'))
