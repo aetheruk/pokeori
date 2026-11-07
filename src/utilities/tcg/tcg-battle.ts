@@ -172,6 +172,7 @@ export type TcgBattleProtectionRule = {
 
 export type TcgBattleBenchDamageRule = {
   amount: number
+  amountPerHead?: number
   amountPerUnit?: number
   source?: TcgBattleCountSource
   side: 'own' | 'opponent' | 'both'
@@ -1070,6 +1071,10 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   if (setId === 'bw1') {
     const blackWhiteEffect = inferBlackWhiteTcgBattleAttackEffect(attack, baseDamage)
     if (blackWhiteEffect) return applyAttackTextModifiers(blackWhiteEffect)
+  }
+  if (setId === 'bw2') {
+    const emergingPowersEffect = inferEmergingPowersTcgBattleAttackEffect(attack, baseDamage)
+    if (emergingPowersEffect) return applyAttackTextModifiers(emergingPowersEffect)
   }
   if (setId === 'pl1') {
     const platinumEffect = inferPlatinumTcgBattleAttackEffect(attack, text, baseDamage)
@@ -7809,6 +7814,129 @@ function inferBlackWhiteTcgBattleAttackEffect(
   return null
 }
 
+function inferEmergingPowersTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+  const anyTargetDamage = (amount: number): TcgBattleAttackEffect => ({
+    damage: { kind: 'fixed', amount },
+    targetScope: 'any',
+    ignoreWeaknessResistanceOnBench: true,
+  })
+
+  if (name === 'helping hand' || name === 'charge' || name === 'tailwind') {
+    // Typed Energy searched, recovered, or attached to a specific Pokémon becomes shared Energy.
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'splatter') return anyTargetDamage(30)
+  if (name === 'superpower') {
+    return {
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: 20 },
+      selfDamage: [{ kind: 'optionalChoice', amount: 20 }],
+      choiceRequirement: 'optionalBonus',
+    }
+  }
+  if (name === 'phat sound') {
+    return {
+      ...zero(),
+      coinFlipCount: 3,
+      benchDamage: [{ amount: 0, amountPerHead: 10, side: 'opponent', zone: 'play' }],
+    }
+  }
+  if (name === 'venoshock') {
+    return { damage: { kind: 'statusBonus', baseDamage, bonusDamage: 60, statuses: ['poisoned'] } }
+  }
+  if (name === 'reflect') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 40 }] }
+  }
+  if (name === 'psychic assault') {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 10,
+        source: { kind: 'damageCounters', target: 'target' },
+      },
+    }
+  }
+  if (name === 'madkinesis') {
+    // Attached Psychic Energy is approximated by the player's shared Energy pool.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'smack down') {
+    return { damage: { kind: 'resistanceTypeBonus', baseDamage, bonusDamage: 60, resistanceType: 'Fighting' } }
+  }
+  if (name === 'rock bullet') {
+    // Attached Fighting Energy is approximated by the player's shared Energy pool.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'hone claws') {
+    return { ...zero(), special: [{ kind: 'buffAttack', target: 'self', attackName: '*', damageBonus: 30 }] }
+  }
+  if (name === 'feint attack') {
+    return {
+      ...anyTargetDamage(30),
+      ignoreWeaknessResistance: true,
+      ignoreTargetDamageModifiers: true,
+    }
+  }
+  if (name === 'claw rend') {
+    return { damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: 30 } }
+  }
+  if (name === 'rear guard') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'reduce', amount: 30 }] }
+  }
+  if (name === 'bone rush') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 30, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'dark pulse') {
+    // Darkness Energy across the team is approximated by the player's shared Energy pool.
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } } }
+  }
+  if (name === 'iron defense') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      protection: [{ target: 'self', kind: 'preventAllEffects', condition: 'heads' }],
+    }
+  }
+  if (name === 'power whip') {
+    // Attached Energy on Ferrothorn is approximated by the player's shared Energy pool.
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'energy', side: 'own' } },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    }
+  }
+  if (name === 'powerful slap') {
+    // Per-Pokémon Energy is approximated by the player's shared Energy pool.
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 40, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+    }
+  }
+  if (name === 'heal pulse') {
+    // The engine cannot select any friendly target, so it heals one injured teammate at random.
+    return { ...zero(), healing: [{ amount: 50, side: 'own', zone: 'play', maxTargets: 1 }] }
+  }
+  if (name === 'captivate') {
+    return {
+      ...zero(),
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    }
+  }
+
+  // Drawing/searching into hand, evolving during battle, deck-order control, and moving
+  // Energy between individual Pokémon have no matching state transition in this format.
+  return null
+}
+
 function inferRisingRivalsTcgBattleAttackEffect(
   attack: TcgCardAttack,
   text: string,
@@ -11255,15 +11383,18 @@ function calculateTcgBattleBenchDamage(
       : candidates
     for (const card of selected) {
       const isFront = state[targetSide].front.some((frontCard) => frontCard.instanceId === card.instanceId)
-      const amount = rule.source && typeof rule.amountPerUnit === 'number'
-        ? rule.amount + rule.amountPerUnit * getTcgBattleCount(rule.source, {
-            state,
-            sideKey,
-            attacker,
-            target,
-            coinMode: 'actual',
-          })
-        : rule.amount
+      const amount =
+        rule.amount +
+        (rule.amountPerHead || 0) * (coinFlips?.heads || 0) +
+        (rule.source && typeof rule.amountPerUnit === 'number'
+          ? rule.amountPerUnit * getTcgBattleCount(rule.source, {
+              state,
+              sideKey,
+              attacker,
+              target,
+              coinMode: 'actual',
+            })
+          : 0)
       const damage = targetSide !== sideKey && isFront && !rule.ignoreWeaknessResistance
         ? applyTcgWeaknessAndResistance(attacker, card, amount)
         : amount
