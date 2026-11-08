@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
+import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { SecretPokemonIcon } from '@/components/game/shared/SecretPokemonIcon'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Badge } from '@/components/ui/badge'
@@ -41,6 +42,7 @@ export interface DisplayableReward {
   requirements?: Array<{ type: string; [key: string]: unknown }>
   // Additional properties used in specific reward types
   pokemonData?: { shiny?: boolean; [key: string]: unknown }
+  eggData?: { rarity?: string; [key: string]: unknown }
   skill?: string
   currencyType?: string
 }
@@ -120,6 +122,19 @@ export function mapRewardToDisplayItem(
   const quantityStr = formatQuantity(reward.quantity)
 
   switch (reward.type) {
+    case 'egg': {
+      label = reward.label || 'Pokemon Egg'
+      if (quantityStr) label += ` ${quantityStr}`
+      icon = (
+        <PokemonRarityEggSprite
+          rarity={reward.eggData?.rarity}
+          alt={typeof label === 'string' ? label : 'Pokemon Egg'}
+          className="h-8 w-8"
+          sizes="32px"
+        />
+      )
+      break
+    }
     case 'item': {
       const itemDef = items.find((i) => i.id === reward.targetId)
 
