@@ -241,6 +241,7 @@ export function PrizeWheelGame({
         ((claimRes.summary.items && claimRes.summary.items.length > 0) ||
           (claimRes.summary.currency && claimRes.summary.currency.length > 0) ||
           (claimRes.summary.pokemon && claimRes.summary.pokemon.length > 0) ||
+          (claimRes.summary.eggs && claimRes.summary.eggs.length > 0) ||
           (claimRes.summary.cards && claimRes.summary.cards.length > 0))
 
       if (hasRewards) {
