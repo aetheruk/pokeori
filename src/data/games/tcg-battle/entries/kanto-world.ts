@@ -108,8 +108,8 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     cards: bugCatcherBarryDeck,
     additionalRewards: [
       { type: 'item', targetId: 'pack-base2', quantity: 3, dropChance: 100 },
-      promoReward('basep-45', 20),
-      promoReward('basep-27', 5),
+      promoReward('basep-45', 35),
+      promoReward('basep-27', 20),
     ],
   }),
   worldBattle({
@@ -127,8 +127,8 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     ],
     additionalRewards: [
       { type: 'item', targetId: 'spirit-wisp-t1', quantity: 5, dropChance: 100 },
-      promoReward('basep-42', 20),
-      promoReward('basep-39', 5),
+      promoReward('basep-42', 35),
+      promoReward('basep-39', 20),
     ],
   }),
   worldBattle({
@@ -143,8 +143,8 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     cards: billDeck,
     additionalRewards: [
       { type: 'item', targetId: 'pack-base1', quantity: 3, dropChance: 100 },
-      promoReward('basep-11', 20),
-      promoReward('basep-16', 5),
+      promoReward('basep-11', 35),
+      promoReward('basep-16', 20),
     ],
   }),
   worldBattle({
@@ -162,8 +162,8 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     ],
     additionalRewards: [
       { type: 'item', targetId: 'pack-base5', quantity: 3, dropChance: 100 },
-      promoReward('basep-17', 20),
-      promoReward('basep-18', 5),
+      promoReward('basep-17', 35),
+      promoReward('basep-18', 20),
     ],
   }),
   worldBattle({
@@ -190,10 +190,10 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
           sourceLocation: 'Cerulean City',
         },
       },
-      promoReward('basep-30', 20),
-      promoReward('basep-31', 5),
-      promoReward('basep-36', 5),
-      promoReward('basep-35', 1),
+      promoReward('basep-30', 35),
+      promoReward('basep-31', 20),
+      promoReward('basep-36', 20),
+      promoReward('basep-35', 10),
     ],
   }),
 ]

@@ -30,6 +30,7 @@ export function TrainerGuilds() {
             <button
               key={guild.id}
               type="button"
+              data-haptic-disabled="true"
               className="game-focus-ring flex min-h-16 w-full items-center gap-3 rounded-md border border-game-card-border bg-game-surface p-3 text-left transition-colors hover:border-game-charcoal/35 hover:bg-game-surface-raised"
               onClick={() => setSelectedGuildId(guild.id)}
               aria-label={`View ${guild.name} details`}
