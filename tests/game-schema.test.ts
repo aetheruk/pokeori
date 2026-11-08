@@ -1355,7 +1355,7 @@ describe('generated game data schemas', () => {
     )
   })
 
-  test('the Pokemon Center Wheel is the only Chansey wheel and keeps its rare prize', () => {
+  test('the Pokemon Center Wheel is the only Chansey wheel and has the new prize rules', () => {
     const chanseyWheels = allGames.filter(
       (entry) => entry.gameType === 'prize-wheel' && entry.id.startsWith('chansey-wheel-'),
     ) as PrizeWheelGameConfig[]
@@ -1380,10 +1380,35 @@ describe('generated game data schemas', () => {
         (reward) => reward.type === 'item' && reward.targetId === 'leaf-stone',
       ),
     )
-    expect(leafStone?.percentage).toBe(1)
+    expect(leafStone).toMatchObject({ percentage: 0.5, fixedPercentage: 0.5 })
+    expect(leafStone?.requirements).toContainEqual({
+      type: 'item_owned',
+      targetId: 'badge-kanto-rainbow',
+    })
     expect(
-      wheel.settings.slots.reduce((total, slot) => total + slot.percentage, 0),
-    ).toBe(100)
+      wheel.settings.slots.filter((slot) => slot.id.startsWith('materials-')),
+    ).toHaveLength(4)
+    expect(
+      wheel.settings.slots.find((slot) => slot.id === 'materials-base')?.rewards,
+    ).toHaveLength(18)
+    expect(
+      wheel.settings.slots.find((slot) => slot.id === 'materials-viridian')?.rewards,
+    ).toHaveLength(18)
+    expect(
+      wheel.settings.slots.find((slot) => slot.id === 'materials-viridian')?.rewards[0],
+    ).toMatchObject({ quantity: 6 })
+    expect(wheel.settings.slots.filter((slot) => slot.id.startsWith('nuts-'))).toHaveLength(6)
+    expect(
+      wheel.settings.slots.filter((slot) => slot.id.startsWith('premium-')),
+    ).toHaveLength(8)
+    expect(wheel.settings.slots.find((slot) => slot.id === 'egg')).toMatchObject({
+      percentage: 2,
+      fixedPercentage: 2,
+    })
+    expect(wheel.settings.slots.find((slot) => slot.id === 'shiny-egg')).toMatchObject({
+      percentage: 0.05,
+      fixedPercentage: 0.05,
+    })
   })
 
   test('Chansey wheels use icon-only faces without changing Rocket wheels', () => {

@@ -6,7 +6,11 @@ export interface PrizeWheelSlot {
   label: string
   color: string // Hex or Tailwind class
   icon?: TaskIcon | string
-  percentage: number // 0-100, should sum to 100
+  percentage: number // Raw weight, or resolved percent in an active wheel session.
+  /** Preserve this exact chance while other slots share the remaining odds. */
+  fixedPercentage?: number
+  /** Split one category's weight across the eligible slots in this group. */
+  weightGroup?: { id: string; weight: number }
   requirements?: TaskCondition[]
   rewards: Reward[]
 }
