@@ -564,6 +564,7 @@ export function TrainerLeveling({
                 <button
                   type="button"
                   key={skill.id}
+                  data-haptic-disabled="true"
                   aria-label={`View ${skill.name} skill details`}
                   {...scrollClickGuard}
                   onClick={() => {
