@@ -1355,183 +1355,35 @@ describe('generated game data schemas', () => {
     )
   })
 
-  test('Pewter, Cerulean, and Lavender Chansey wheels keep their local prize mixes', () => {
-    const expectedSlots = {
-      'chansey-wheel-pewter': {
-        'battle-potion': 35,
-        'broken-ball-t1': 25,
-        'rock-gem': 20,
-        'small-stone-t1': 19,
-        'moon-stone': 1,
-      },
-      'chansey-wheel-cerulean': {
-        'battle-potion': 35,
-        'broken-ball-t1': 25,
-        'water-gem': 20,
-        'aqua-solvent-t1': 19,
-        'water-stone': 1,
-      },
-      'chansey-wheel-lavender': {
-        'psychic-gem': 23,
-        'ghost-gem': 24,
-        'mind-thread-t1': 24,
-        'spirit-wisp-t1': 24,
-        nugget: 5,
-      },
-    }
+  test('the Pokemon Center Wheel is the only Chansey wheel and keeps its rare prize', () => {
+    const chanseyWheels = allGames.filter(
+      (entry) => entry.gameType === 'prize-wheel' && entry.id.startsWith('chansey-wheel-'),
+    ) as PrizeWheelGameConfig[]
+    expect(chanseyWheels).toHaveLength(1)
 
-    for (const [gameId, expected] of Object.entries(expectedSlots)) {
-      const game = allGames.find((entry) => entry.id === gameId) as
-        | PrizeWheelGameConfig
-        | undefined
-      expect(game).toBeDefined()
-
-      const actual = Object.fromEntries(
-        game!.settings.slots.map((slot) => {
-          const reward = slot.rewards[0]
-          if (reward?.type !== 'item' && reward?.type !== 'task_complete') {
-            throw new Error(
-              `${gameId}:${slot.id} must reward an item or task completion`,
-            )
-          }
-
-          return [reward.targetId, slot.percentage]
-        }),
-      )
-
-      expect(actual).toEqual(expected)
-      expect(
-        game!.settings.slots.reduce(
-          (total, slot) => total + slot.percentage,
-          0,
-        ),
-      ).toBe(100)
-
-      if (gameId === 'chansey-wheel-lavender') {
-        const materialQuantities = Object.fromEntries(
-          game!.settings.slots.flatMap((slot) =>
-            slot.rewards
-              .filter((reward) => reward.type === 'item')
-              .map((reward) => [reward.targetId, reward.quantity]),
-          ),
-        )
-        const slotPercentages = game!.settings.slots.reduce<
-          Record<string, number>
-        >((totals, slot) => {
-          for (const reward of slot.rewards) {
-            if (reward.type !== 'item') continue
-            const targetId = reward.targetId
-            if (!targetId) continue
-            totals[targetId] = (totals[targetId] || 0) + slot.percentage
-          }
-          return totals
-        }, {})
-        expect(materialQuantities).toEqual({
-          'psychic-gem': 6,
-          'ghost-gem': 6,
-          'mind-thread-t1': 6,
-          'spirit-wisp-t1': 6,
-          nugget: 1,
-        })
-        expect(slotPercentages).toEqual({
-          'psychic-gem': 23,
-          'ghost-gem': 24,
-          'mind-thread-t1': 24,
-          'spirit-wisp-t1': 24,
-          nugget: 5,
-        })
-        expect(
-          game!.settings.slots.some((slot) =>
-            slot.rewards.some(
-              (reward) => reward.targetId === 'spell-tag-recipe',
-            ),
-          ),
-        ).toBe(false)
-      }
-    }
-  })
-
-  test('Chansey wheels have their intended rare prizes and odds', () => {
-    const rarePrizes = [
-      ['chansey-wheel-viridian', 'leaf-stone', 1],
-      ['chansey-wheel-pewter', 'moon-stone', 1],
-      ['chansey-wheel-cerulean', 'water-stone', 1],
-      ['chansey-wheel-vermilion', 'thunder-stone', 1],
-      ['chansey-wheel-lavender', 'nugget', 5],
-      ['chansey-wheel-fuchsia', 'big-mushroom', 1],
-      ['chansey-wheel-celadon', 'link-cable', 1],
-    ] as const
-
-    for (const [gameId, itemId, percentage] of rarePrizes) {
-      const wheel = allGames.find((entry) => entry.id === gameId) as
-        | PrizeWheelGameConfig
-        | undefined
-      expect(wheel).toBeDefined()
-
-      const prizeSlot = wheel!.settings.slots.find((slot) =>
-        slot.rewards.some(
-          (reward) => reward.type === 'item' && reward.targetId === itemId,
-        ),
-      )
-      expect(prizeSlot?.percentage).toBe(percentage)
-      expect(
-        wheel!.settings.slots.reduce((total, slot) => total + slot.percentage, 0),
-      ).toBe(100)
-    }
-  })
-
-  test('Celadon Chansey Wheel gives three of each status-healing item', () => {
-    const wheel = allGames.find((entry) => entry.id === 'chansey-wheel-celadon') as
-      | PrizeWheelGameConfig
-      | undefined
-
-    expect(wheel).toBeDefined()
+    const wheel = chanseyWheels[0]!
+    expect(wheel.id).toBe('chansey-wheel-viridian')
+    expect(wheel.name).toBe('Pokemon Center Wheel')
+    expect(wheel.daily).toBe(true)
+    expect(wheel.settings.cost).toEqual({
+      amount: 2,
+      currencyType: 'league-ticket',
+    })
     expect(
-      wheel!.settings.slots.slice(0, 6).map((slot) => ({
-        itemId: slot.rewards[0]?.targetId,
-        quantity: slot.rewards[0]?.quantity,
-        percentage: slot.percentage,
-      })),
-    ).toEqual([
-      { itemId: 'antidote', quantity: 3, percentage: 16.5 },
-      { itemId: 'paralyze-heal', quantity: 3, percentage: 16.5 },
-      { itemId: 'awakening', quantity: 3, percentage: 16.5 },
-      { itemId: 'burn-heal', quantity: 3, percentage: 16.5 },
-      { itemId: 'ice-heal', quantity: 3, percentage: 16.5 },
-      { itemId: 'full-heal', quantity: 3, percentage: 16.5 },
-    ])
-  })
+      wheel.requirements.find(
+        (requirement) => requirement.type === 'daily_not_completed',
+      )?.count,
+    ).toBe(5)
 
-  test('Chansey wheels are daily and all cost two League Tickets', () => {
-    const expectedCosts = {
-      'chansey-wheel-viridian': 2,
-      'chansey-wheel-pewter': 2,
-      'chansey-wheel-cerulean': 2,
-      'chansey-wheel-vermilion': 2,
-      'chansey-wheel-lavender': 2,
-      'chansey-wheel-fuchsia': 2,
-      'chansey-wheel-celadon': 2,
-    }
-
-    for (const [gameId, amount] of Object.entries(expectedCosts)) {
-      const game = allGames.find((entry) => entry.id === gameId) as
-        | PrizeWheelGameConfig
-        | undefined
-
-      expect(game).toBeDefined()
-      expect(game!.settings.cost).toEqual({
-        amount,
-        currencyType: 'league-ticket',
-      })
-      expect(game!.daily).toBe(true)
-      expect(
-        game!.requirements.some(
-          (requirement) =>
-            requirement.type === 'daily_not_completed' &&
-            requirement.targetId === gameId,
-        ),
-      ).toBe(true)
-    }
+    const leafStone = wheel.settings.slots.find((slot) =>
+      slot.rewards.some(
+        (reward) => reward.type === 'item' && reward.targetId === 'leaf-stone',
+      ),
+    )
+    expect(leafStone?.percentage).toBe(1)
+    expect(
+      wheel.settings.slots.reduce((total, slot) => total + slot.percentage, 0),
+    ).toBe(100)
   })
 
   test('Chansey wheels use icon-only faces without changing Rocket wheels', () => {
@@ -1540,7 +1392,7 @@ describe('generated game data schemas', () => {
         entry.gameType === 'prize-wheel' &&
         entry.id.startsWith('chansey-wheel-'),
     )
-    expect(chanseyWheels).toHaveLength(7)
+    expect(chanseyWheels).toHaveLength(1)
     expect(
       chanseyWheels.every((entry) => entry.settings.showSlotLabels === false),
     ).toBe(true)

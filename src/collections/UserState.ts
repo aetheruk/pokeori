@@ -231,6 +231,16 @@ export const UserTaskProgress: CollectionConfig = {
       name: 'lastCompletedAt',
       type: 'date',
     },
+    {
+      name: 'dailyAttemptCount',
+      type: 'number',
+      min: 0,
+      defaultValue: 0,
+    },
+    {
+      name: 'dailyAttemptDate',
+      type: 'text',
+    },
   ],
 }
 

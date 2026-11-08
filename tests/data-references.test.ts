@@ -2712,47 +2712,6 @@ describe('static data references', () => {
     })
   })
 
-  test('Fuchsia Chansey Wheel awards X items and a rare Big Mushroom', () => {
-    const wheel = allGames.find((game) => game.id === 'chansey-wheel-fuchsia')
-    const slots =
-      wheel?.gameType === 'prize-wheel'
-        ? (wheel.settings as PrizeWheelGameConfig['settings']).slots
-        : []
-    const xItemIds = ['x-attack', 'x-defense', 'x-sp-atk', 'x-sp-def', 'x-speed', 'dire-hit']
-    const mushroomSlot = slots.find((slot) => slot.id === 'big-mushroom')
-
-    expect(wheel?.requirements).toContainEqual({
-      type: 'task_completed',
-      targetId: 'explore-fuchsia-city',
-    })
-    expect(slots.map((slot) => slot.id)).toEqual([...xItemIds, 'big-mushroom'])
-    expect(
-      wheel?.gameType === 'prize-wheel'
-        ? wheel.settings.showSlotLabels
-        : undefined,
-    ).toBe(false)
-    expect(slots.map((slot) => slot.color)).toEqual([
-      '#F1AEC6',
-      '#E8F3E2',
-      '#F1AEC6',
-      '#E8F3E2',
-      '#F1AEC6',
-      '#E8F3E2',
-      '#f7cf05',
-    ])
-    expect(mushroomSlot?.percentage).toBe(1)
-    expect(mushroomSlot?.requirements).toBeUndefined()
-    expect(mushroomSlot?.rewards).toEqual([
-      {
-        type: 'item',
-        targetId: 'big-mushroom',
-        quantity: 1,
-        dropChance: 100,
-      },
-    ])
-    expect(slots.reduce((total, slot) => total + slot.percentage, 0)).toBe(100)
-  })
-
   test("Diglett's Cave unlocks from the sailor warning", () => {
     const sailorWarning = tasks.find(
       (entry) => entry.id === 'vermilion-rumours',
@@ -5327,10 +5286,13 @@ describe('static data references', () => {
 
     expect(regularDailyItems.length).toBeGreaterThan(0)
     for (const item of regularDailyItems) {
-      expect((item as any).requirements).toContainEqual({
-        type: 'daily_not_completed',
-        targetId: item.id,
-      })
+      expect(
+        (item as any).requirements.some(
+          (requirement: { type: string; targetId?: string }) =>
+            requirement.type === 'daily_not_completed' &&
+            requirement.targetId === item.id,
+        ),
+      ).toBe(true)
     }
   })
 

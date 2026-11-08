@@ -39,6 +39,10 @@ Tasks use requirement system in `src/utilities/requirements/`:
 - Group alternative conditions with `any_of` when a gate should pass if at least one nested
   requirement is still true, such as keeping catch-up content visible until every authored goal
   in a combined set is complete.
+- Authored repeatable daily activities can set `count` on a `daily_not_completed` requirement to
+  allow that many settled attempts per UTC day. An omitted count preserves the existing
+  successful-completion gate; an explicit count counts wins, losses, or task completions toward
+  the daily limit. Generated Daily Challenges remain one claim per challenge.
 
 Explore modals render requirement copy through `src/components/game/shared/criteria-mapping.tsx`.
 The display text is context-aware: catch-location results are shown as catches, wild battle

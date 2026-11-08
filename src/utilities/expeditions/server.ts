@@ -19,6 +19,7 @@ import {
   getUserActivityStatsMap,
   getUserCompletedTasksMap,
   getUserInventoryMap,
+  incrementActivityDailyAttemptMetadata,
   setUserActivityStatsMap,
   setUserInventoryMap,
 } from '@/utilities/user-state'
@@ -169,6 +170,11 @@ async function updateExpeditionStats(
     losses: (current.losses || 0) + (completed ? 0 : 1),
     updatedAt: now,
     lastPlayed: now,
+    metadata: incrementActivityDailyAttemptMetadata(
+      current.metadata,
+      current.lastPlayed || current.updatedAt,
+      new Date(now),
+    ),
   }
 
   await setUserActivityStatsMap(
