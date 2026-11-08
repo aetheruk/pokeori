@@ -12,6 +12,9 @@ function promoReward(cardId: string, dropChance: number) {
     type: 'card' as const,
     quantity: 1,
     dropChance,
+    requirements: [
+      { type: 'card_collected_specific' as const, targetId: cardId, inverse: true },
+    ],
     cardDrawParams: { allowedCardIds: [cardId], guaranteed: true },
   }
 }
