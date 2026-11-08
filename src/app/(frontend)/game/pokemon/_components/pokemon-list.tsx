@@ -36,7 +36,6 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { useHaptics } from '@haptics/react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -158,7 +157,6 @@ export function PokemonList({
   initialBoxState: InitialPokemonBoxState
 }) {
   const { user, gameData, refreshUser } = useUser()
-  const { trigger: triggerHaptic } = useHaptics()
   const router = useRouter()
   const searchParams = useSearchParams()
   const selectForItem = searchParams.get('selectFor')
@@ -944,7 +942,7 @@ export function PokemonList({
     const cardContent = (
       <Card
         title={name}
-        data-haptic-manual="true"
+        data-haptic-disabled="true"
         role={isCardInteractive ? 'button' : undefined}
         tabIndex={isCardInteractive ? 0 : undefined}
         aria-label={isCardInteractive ? name : undefined}
@@ -982,8 +980,6 @@ export function PokemonList({
             longPressTriggeredRef.current = false
             return
           }
-
-          if (isCardInteractive) triggerHaptic('selection')
 
           if (rosterSelection) {
             event.preventDefault()
@@ -1036,7 +1032,6 @@ export function PokemonList({
         }
         onPointerMove={handleLongPressPointerMove}
         onPointerUp={() => {
-          if (longPressTriggeredRef.current) triggerHaptic('selection')
           cancelLongPress()
         }}
         onPointerCancel={cancelLongPress}
@@ -1118,10 +1113,9 @@ export function PokemonList({
           <div className="absolute bottom-0 z-20 flex w-full justify-center bg-game-ink/70 p-1">
             <Button
               size="sm"
-              data-haptic-manual="true"
+              data-haptic-disabled="true"
               className="h-10 w-full max-w-[90%] bg-game-ochre text-[10px] font-bold !text-game-cream hover:bg-game-ochre/90"
               onClick={(e) => {
-                triggerHaptic('selection')
                 e.preventDefault()
                 e.stopPropagation()
                 handleIdentify(pokemon.id)

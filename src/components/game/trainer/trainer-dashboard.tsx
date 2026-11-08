@@ -313,24 +313,6 @@ export function TrainerDashboard({
 
       <SecondaryControlBar className="lg:hidden">
         <div className="space-y-3">
-          <ScenicChoiceCard
-            background={trainerBanner}
-            title={user?.trainerName || 'Trainer'}
-            appearance="explore"
-            icon={
-              <TaskIconDisplay
-                icon={trainerIcon}
-                normalizeVisibleBounds
-                outlineVisiblePixels
-                className="h-10 w-10"
-              />
-            }
-            iconPosition="left"
-            selectionIcon={trainerAppearanceIcon}
-            onClick={() => setSectionDrawerOpen(true)}
-            className="min-h-20"
-          />
-
           {activeTab === 'decks' && (
             <PremiumSelect
               label="Deck generation"
@@ -362,6 +344,24 @@ export function TrainerDashboard({
               ))}
             </div>
           )}
+
+          <ScenicChoiceCard
+            background={trainerBanner}
+            title={user?.trainerName || 'Trainer'}
+            appearance="explore"
+            icon={
+              <TaskIconDisplay
+                icon={trainerIcon}
+                normalizeVisibleBounds
+                outlineVisiblePixels
+                className="h-10 w-10"
+              />
+            }
+            iconPosition="left"
+            selectionIcon={trainerAppearanceIcon}
+            onClick={() => setSectionDrawerOpen(true)}
+            className="min-h-20"
+          />
         </div>
       </SecondaryControlBar>
 

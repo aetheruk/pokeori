@@ -12,6 +12,8 @@ export type TcgBattleGameSettings =
       battleMode?: 'pve'
       opponentDeckCardIds: string[]
       opponentEnergyType?: TcgBattleEnergyType
+      opponentTrainerIcon?: string
+      cost?: { amount: number; currencyType: 'crystals' }
     })
   | (BaseTcgBattleGameSettings & {
       battleMode: 'pvp'

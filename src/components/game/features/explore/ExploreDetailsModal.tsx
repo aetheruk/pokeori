@@ -274,7 +274,8 @@ export function ExploreDetailsModal({
       }) || []
 
     const cost =
-      item.originalData?.gameType === 'prize-wheel'
+      item.originalData?.gameType === 'prize-wheel' ||
+      item.originalData?.gameType === 'tcg-battle'
         ? item.originalData.settings?.cost
         : undefined
     if (cost) {
@@ -306,7 +307,10 @@ export function ExploreDetailsModal({
           />
         ),
         label: `${currency?.name || cost.currencyType} x${cost.amount}`,
-        subLabel: 'Spin Cost',
+        subLabel:
+          item.originalData?.gameType === 'tcg-battle'
+            ? 'Battle Entry Fee'
+            : 'Spin Cost',
         completed: balance >= cost.amount,
         progress:
           cost.amount > 1

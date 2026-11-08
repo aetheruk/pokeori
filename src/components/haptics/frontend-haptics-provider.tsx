@@ -21,6 +21,33 @@ const HAPTIC_CONTROL_SELECTOR = [
   '[role="treeitem"]',
 ].join(',')
 
+const SCROLLABLE_SELECTION_SELECTOR = [
+  '[aria-pressed]',
+  '[aria-selected]',
+  '[role="option"]',
+  '[role="radio"]',
+  '[role="checkbox"]',
+  '[role="gridcell"]',
+].join(',')
+
+function isInsideScrollableArea(control: HTMLElement, root: HTMLElement) {
+  let ancestor = control.parentElement
+
+  while (ancestor) {
+    const { overflowX, overflowY } = window.getComputedStyle(ancestor)
+    if (
+      ['auto', 'scroll', 'overlay'].includes(overflowX) ||
+      ['auto', 'scroll', 'overlay'].includes(overflowY)
+    ) {
+      return true
+    }
+    if (ancestor === root) break
+    ancestor = ancestor.parentElement
+  }
+
+  return false
+}
+
 function markHapticControls(root: HTMLElement) {
   const controls = [
     ...(root.matches(HAPTIC_CONTROL_SELECTOR) ? [root] : []),
@@ -29,10 +56,16 @@ function markHapticControls(root: HTMLElement) {
   let markedControl = false
 
   for (const control of controls) {
-    // Scrollable collection cards trigger haptics from their click handlers so
-    // an iOS switch overlay cannot intercept a vertical pan across the card.
+    // Selection results in scrollable collections need to remain swipeable.
+    if (control.hasAttribute('data-haptic-disabled')) continue
     if (control.hasAttribute('data-haptic-manual')) continue
     if (control.hasAttribute('data-haptic')) continue
+    if (
+      control.matches(SCROLLABLE_SELECTION_SELECTOR) &&
+      isInsideScrollableArea(control, root)
+    ) {
+      continue
+    }
 
     // A full-size iOS switch overlay on a compound control could cover its
     // nested buttons. Those child controls get their own overlays instead.

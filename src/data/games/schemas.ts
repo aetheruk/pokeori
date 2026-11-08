@@ -179,6 +179,7 @@ export const rewardSchema = z
       'pokemon_experience',
       'guild_membership',
       'guild_xp',
+      'egg',
     ]),
     targetId: z.union([z.string(), z.number()]).optional(),
     skill: z.string().optional(),
@@ -192,6 +193,16 @@ export const rewardSchema = z
     label: z.string().optional(),
     icon: taskIconSchema.optional(),
     pokemonData: z.record(z.string(), z.unknown()).optional(),
+    eggData: z
+      .object({
+        rarity: z.string().refine(isPokemonRarityId, 'Invalid Pokemon rarity').optional(),
+        sourceResearchId: z.string().optional(),
+        sourceBackground: z.string().optional(),
+        sourceRegion: z.string().optional(),
+        sourceLocation: z.string().optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
 
@@ -1366,9 +1377,21 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
       opponentDeckCardIds: z.array(z.string().min(1)).length(15).optional(),
       opponentEnergyType: z.string().min(1).optional(),
       themeColour: z.string().min(1).optional(),
+      opponentTrainerIcon: z.string().min(1).optional(),
+      cost: z
+        .object({ amount: z.number().positive(), currencyType: z.literal('crystals') })
+        .strict()
+        .optional(),
     })
     .superRefine((settings, context) => {
       if (settings.battleMode === 'pvp') {
+        if (settings.cost !== undefined) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['cost'],
+            message: 'PVP TCG battles cannot charge an entry fee.',
+          })
+        }
         if (!settings.matchmakingModes?.length) {
           context.addIssue({
             code: z.ZodIssueCode.custom,

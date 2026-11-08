@@ -1477,6 +1477,7 @@ const TcgCardItem = memo(function TcgCardItem({
   return (
     <button
       type="button"
+      data-haptic-disabled="true"
       onClick={isOwned ? onClick : undefined}
       disabled={!isOwned}
       aria-label={getTcgCardAccessibleLabel({

@@ -76,6 +76,11 @@ import {
   incrementUserActivityResult,
 } from '@/utilities/user-state'
 import { KID_MODE_ACCESS_ERROR } from '@/utilities/kid-mode'
+import {
+  createEconomyRequestId,
+  getEconomyActionErrorMessage,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 
 type TcgBattleActionResult =
   | {
@@ -512,7 +517,10 @@ function getTcgBattleTrainerCards(
     },
     enemyTrainer: {
       name: encounter.name,
-      icon: 'ditto',
+      icon:
+        'opponentTrainerIcon' in encounter.settings
+          ? encounter.settings.opponentTrainerIcon || 'ditto'
+          : 'ditto',
       banner: '/backgrounds/tcg.avif',
       title: `${formatLabel} TCG Battle`,
     },
@@ -2979,13 +2987,19 @@ export async function startTcgBattle(
 
     return await withTcgBattleLock(user.id, async () => {
       const encounter = await getActiveTcgBattleEncounter(user.id, encounterId)
+      const activityState = (await redis.get(
+        `game:${user.id}`,
+      )) as GameActivityState | null
+      if (!activityState || activityState.encounterId !== encounter.id) {
+        return { success: false, error: 'No active research encounter.' }
+      }
       const existing = (await redis.get(
         battleKey(user.id),
       )) as TcgBattleState | null
       if (
         existing &&
         existing.encounterId === encounter.id &&
-        existing.phase !== 'finished'
+        existing.activityStartTime === activityState.startTime
       ) {
         const trainers = getTcgBattleTrainerCards(user, encounter)
         existing.playerTrainer =
@@ -3058,6 +3072,59 @@ export async function startTcgBattle(
       }
       const opponentDeck = opponentDeckValidation.cards
 
+      if (encounter.settings.cost) {
+        const { amount, currencyType } = encounter.settings.cost
+        let chargeResult: { success: true } | { success: false; error: string }
+        try {
+          chargeResult = await runEconomyAction(
+            {
+              userId: user.id,
+              action: 'tcg-battle-entry',
+              requestId: createEconomyRequestId(
+                `${encounter.id}:${activityState.startTime}`,
+              ),
+              payload: payload as any,
+            },
+            async ({ req }) => {
+              const freshUser = await payload.findByID({
+                collection: 'users',
+                id: user.id,
+                req,
+              })
+              const balance = freshUser.currency?.[currencyType] || 0
+              if (balance < amount) {
+                return {
+                  success: false as const,
+                  error: `You need ${amount} Crystals to start this battle.`,
+                }
+              }
+
+              await payload.update({
+                collection: 'users',
+                id: user.id,
+                data: {
+                  currency: {
+                    ...freshUser.currency,
+                    [currencyType]: balance - amount,
+                  },
+                },
+                req,
+              })
+              return { success: true as const }
+            },
+          )
+        } catch (error) {
+          return {
+            success: false,
+            error: getEconomyActionErrorMessage(error),
+          }
+        }
+
+        if (!chargeResult.success) {
+          return rejectTcgBattleStart(user.id, chargeResult.error)
+        }
+      }
+
       const playerHand = drawTcgBattleOpeningCards(playerDeck.cards, 6)
       const opponentHand = drawTcgBattleOpeningCards(opponentDeck, 6)
       const opponentBoard = arrangeOpponentTcgBattleCards(opponentHand)
@@ -3067,6 +3134,7 @@ export async function startTcgBattle(
       const state: TcgBattleState = {
         userId: user.id,
         encounterId: encounter.id,
+        activityStartTime: activityState.startTime,
         format,
         phase: 'arranging',
         turnNumber: 1,

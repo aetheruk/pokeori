@@ -20,7 +20,6 @@ import {
 import Image from 'next/image'
 import { useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
-import { useHaptics } from '@haptics/react'
 import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
 import { SecretPokemonIcon } from '@/components/game/shared/SecretPokemonIcon'
 import type { TaskProgressData } from '@/components/game/shared/GameInfoModal'
@@ -109,7 +108,6 @@ function EncounterItemIcon({
 }) {
   const suppressClick = useRef(false)
   const pointerStart = useRef<{ x: number; y: number } | null>(null)
-  const { trigger: triggerHaptic } = useHaptics()
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
     suppressClick.current = false
@@ -129,7 +127,7 @@ function EncounterItemIcon({
       type="button"
       aria-label={`${item.name}, ${item.quantity} available${selected ? ', selected' : ''}`}
       aria-pressed={selected}
-      data-haptic-manual="true"
+      data-haptic-disabled="true"
       className={cn(
         'relative flex h-11 w-11 shrink-0 touch-pan-x items-center justify-center rounded-md border bg-game-surface-raised p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-charcoal',
         selected
@@ -154,7 +152,6 @@ function EncounterItemIcon({
           suppressClick.current = false
           return
         }
-        triggerHaptic('selection')
         onSelect()
       }}
     >
@@ -1366,6 +1363,20 @@ export function ActionButton({
       }),
     )
 
+  const tcgBattleCost =
+    item.type === 'game' && item.originalData.gameType === 'tcg-battle'
+      ? item.originalData.settings?.cost
+      : undefined
+  const tcgBattleBalance = tcgBattleCost
+    ? ((userData.currency as Record<string, number | null | undefined> | undefined)?.[
+        tcgBattleCost.currencyType
+      ] ??
+      (userData.user as any).currency?.[tcgBattleCost.currencyType] ??
+      0)
+    : 0
+  const canAffordTcgBattle =
+    !tcgBattleCost || tcgBattleBalance >= tcgBattleCost.amount
+
   if (item.type === 'voyage') {
     if (selectedActiveVoyage) {
       if (isSelectedVoyageFinished) {
@@ -1520,7 +1531,10 @@ export function ActionButton({
     item.type === 'game' ||
     item.type === 'field-research'
   const isDisabled =
-    loadingId === item.id || !criteriaMet || (isBoxFull && isEncounterType)
+    loadingId === item.id ||
+    !criteriaMet ||
+    !canAffordTcgBattle ||
+    (isBoxFull && isEncounterType)
 
   const consumePokemonCriteria = item.originalData.criteria?.filter(
     (c: any) => c.type === 'pokemon_owned' && c.consume,

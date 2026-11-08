@@ -582,6 +582,8 @@ export type TcgBattleLastAction = {
 export interface TcgBattleState {
   userId: string
   encounterId: string
+  /** Parent research-session identity prevents a finished paid battle from being replayed for free. */
+  activityStartTime?: number
   battleMode?: TcgBattleMode
   matchId?: string
   format: TcgBattleDeckFormat
