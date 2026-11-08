@@ -136,6 +136,7 @@ export interface DailyTaskMetadata {
 export interface TaskCondition {
   type: TaskRequirementType
   targetId?: string | number | string[]
+  /** Progress target; for `daily_not_completed`, this is the maximum attempts allowed per UTC day (defaults to one). */
   count?: number
   progress?: number // Used for explicit progress tracking (like dailies)
   consume?: boolean

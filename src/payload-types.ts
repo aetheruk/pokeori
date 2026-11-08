@@ -913,6 +913,8 @@ export interface UserTaskProgress {
   count: number;
   completedAt?: string | null;
   lastCompletedAt?: string | null;
+  dailyAttemptCount?: number | null;
+  dailyAttemptDate?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1575,6 +1577,8 @@ export interface UserTaskProgressSelect<T extends boolean = true> {
   count?: T;
   completedAt?: T;
   lastCompletedAt?: T;
+  dailyAttemptCount?: T;
+  dailyAttemptDate?: T;
   updatedAt?: T;
   createdAt?: T;
 }

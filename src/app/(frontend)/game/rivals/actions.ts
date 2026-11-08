@@ -12,6 +12,11 @@ import { tasks } from '@/data/tasks'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
 import { getGameUserData } from '@/utilities/game-data'
 import {
+  getDailyCountForToday,
+  getUtcDateKey,
+  incrementDailyCount,
+} from '@/utilities/date-utils'
+import {
   checkTaskCriteria,
   checkTaskRequirements,
 } from '@/utilities/tasks/task-logic'
@@ -103,10 +108,22 @@ export async function selectRivalTrainer(
       return { success: false, error: 'Rival selection is already complete.' }
     }
 
+    const dailyAttempts = incrementDailyCount(
+      getDailyCountForToday(
+        existingCompletion?.dailyAttemptCount,
+        existingCompletion?.dailyAttemptDate,
+        existingCompletion?.updatedAt || existingCompletion?.completedAt,
+        now,
+      ),
+      getUtcDateKey(now),
+      now,
+    )
     completedTasks[taskId] = {
       count: (existingCompletion?.count || 0) + 1,
       completedAt: existingCompletion?.completedAt || now,
       updatedAt: now,
+      dailyAttemptCount: dailyAttempts.count,
+      dailyAttemptDate: dailyAttempts.date,
     }
     completedTasksToSave = completedTasks
   }

@@ -5,6 +5,20 @@
 
 import type { User, Pokemon } from '@/payload-types'
 import type { BattleStance } from '@/utilities/battle/types'
+import { getDailyCountForToday } from '@/utilities/date-utils'
+
+function getDailyAttemptFields(
+  count: unknown,
+  countDate: unknown,
+  lastOccurredAt?: string | Date | null,
+) {
+  const attemptsToday = getDailyCountForToday(
+    count,
+    countDate,
+    lastOccurredAt,
+  )
+  return attemptsToday > 0 ? { attemptsToday } : {}
+}
 
 /**
  * Pokedex entry for a specific Pokemon form
@@ -40,6 +54,10 @@ export interface CompletedTaskEntry {
   taskId: string
   completedAt: string
   count: number
+  updatedAt?: string
+  attemptsToday?: number
+  dailyAttemptCount?: number
+  dailyAttemptDate?: string
 }
 
 /**
@@ -55,6 +73,8 @@ export interface BattleStats {
   wins?: number
   losses?: number
   lastPlayed?: string
+  updatedAt?: string
+  metadata?: Record<string, unknown>
 }
 
 /**
@@ -64,6 +84,8 @@ export interface LocationStats {
   wins?: number
   losses?: number
   lastPlayed?: string
+  updatedAt?: string
+  metadata?: Record<string, unknown>
 }
 
 /**
@@ -73,6 +95,8 @@ export interface GameActivityStats {
   wins?: number
   losses?: number
   lastPlayed?: string
+  updatedAt?: string
+  metadata?: Record<string, unknown>
 }
 
 /**
@@ -281,6 +305,7 @@ export interface BattleResultEntry {
   wins: number
   losses: number
   lastPlayed?: string
+  attemptsToday?: number
 }
 
 /**
@@ -291,6 +316,7 @@ export interface LocationResultEntry {
   wins: number
   losses: number
   lastPlayed?: string
+  attemptsToday?: number
 }
 
 /**
@@ -301,6 +327,7 @@ export interface GameResultEntry {
   wins: number
   losses: number
   lastPlayed?: string
+  attemptsToday?: number
 }
 
 /**
@@ -311,6 +338,7 @@ export interface FieldResearchResultEntry {
   wins: number
   losses: number
   lastPlayed?: string
+  attemptsToday?: number
 }
 
 /**
@@ -366,7 +394,17 @@ export namespace UserDataConverters {
             // BUT wait, if the array has holes, maybe the "taskId" is the *key*, but Array.entries() won't work in filter(Boolean).
             // If `t` is an object, ensure it has a taskId
             const obj = t as any
-            if (obj.taskId) return obj as CompletedTaskEntry
+            if (obj.taskId) {
+              const attemptsToday = obj.attemptsToday ?? getDailyCountForToday(
+                obj.dailyAttemptCount,
+                obj.dailyAttemptDate,
+                obj.updatedAt || obj.completedAt,
+              )
+              return {
+                ...obj,
+                ...(attemptsToday > 0 ? { attemptsToday } : {}),
+              } as CompletedTaskEntry
+            }
           }
           return t
         })
@@ -376,10 +414,19 @@ export namespace UserDataConverters {
     }
     return Object.entries(completedTasks || {})
       .filter(([_, data]) => data)
-      .map(([taskId, data]) => ({
-        taskId,
-        ...(data as any),
-      })) as CompletedTaskEntry[]
+      .map(([taskId, data]) => {
+        const entry = data as any
+        const attemptsToday = entry.attemptsToday ?? getDailyCountForToday(
+          entry.dailyAttemptCount,
+          entry.dailyAttemptDate,
+          entry.updatedAt || entry.completedAt,
+        )
+        return {
+          taskId,
+          ...entry,
+          ...(attemptsToday > 0 ? { attemptsToday } : {}),
+        }
+      }) as CompletedTaskEntry[]
   }
 
   export function battleStatsToArray(
@@ -390,6 +437,11 @@ export namespace UserDataConverters {
       wins: stats.wins || 0,
       losses: stats.losses || 0,
       lastPlayed: stats.lastPlayed,
+      ...getDailyAttemptFields(
+        stats.metadata?.dailyAttemptCount,
+        stats.metadata?.dailyAttemptDate,
+        stats.lastPlayed || stats.updatedAt,
+      ),
     }))
   }
 
@@ -401,6 +453,11 @@ export namespace UserDataConverters {
       wins: stats.wins || 0,
       losses: stats.losses || 0,
       lastPlayed: stats.lastPlayed,
+      ...getDailyAttemptFields(
+        stats.metadata?.dailyAttemptCount,
+        stats.metadata?.dailyAttemptDate,
+        stats.lastPlayed || stats.updatedAt,
+      ),
     }))
   }
 
@@ -412,6 +469,11 @@ export namespace UserDataConverters {
       wins: stats.wins || 0,
       losses: stats.losses || 0,
       lastPlayed: stats.lastPlayed,
+      ...getDailyAttemptFields(
+        stats.metadata?.dailyAttemptCount,
+        stats.metadata?.dailyAttemptDate,
+        stats.lastPlayed || stats.updatedAt,
+      ),
     }))
   }
 
@@ -423,6 +485,11 @@ export namespace UserDataConverters {
       wins: stats.wins || 0,
       losses: stats.losses || 0,
       lastPlayed: stats.lastPlayed,
+      ...getDailyAttemptFields(
+        stats.metadata?.dailyAttemptCount,
+        stats.metadata?.dailyAttemptDate,
+        stats.lastPlayed || stats.updatedAt,
+      ),
     }))
   }
 }

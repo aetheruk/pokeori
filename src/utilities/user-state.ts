@@ -8,6 +8,7 @@ import type { RequirementData } from '@/utilities/requirements'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 import { fieldResearchGames } from '@/data/games'
 import type { PayloadRequest } from 'payload'
+import { getDailyCountForToday, getUtcDateKey, incrementDailyCount } from '@/utilities/date-utils'
 
 export const USER_STATE_COLLECTIONS = {
   inventory: 'user-inventory-items',
@@ -84,6 +85,8 @@ export type CompletedTasksMap = Record<
     completedAt?: string
     count?: number
     updatedAt?: string
+    dailyAttemptCount?: number
+    dailyAttemptDate?: string
   }
 >
 export type PokedexMapEntry = Omit<PokedexEntry, 'speciesId' | 'formId'>
@@ -98,6 +101,30 @@ export type ActivityStatEntry = {
   lastPlayed?: string
   updatedAt?: string
   metadata?: Record<string, unknown>
+}
+
+export function incrementActivityDailyAttemptMetadata(
+  metadata: Record<string, unknown> | undefined,
+  lastOccurredAt?: string | Date | null,
+  now: Date = new Date(),
+): Record<string, unknown> {
+  const current = metadata || {}
+  const dailyCount = incrementDailyCount(
+    getDailyCountForToday(
+      current.dailyAttemptCount,
+      current.dailyAttemptDate,
+      lastOccurredAt,
+      now,
+    ),
+    getUtcDateKey(now),
+    now,
+  )
+
+  return {
+    ...current,
+    dailyAttemptCount: dailyCount.count,
+    dailyAttemptDate: dailyCount.date,
+  }
 }
 export type ActivityStatsMap = {
   battles?: Record<string, ActivityStatEntry>
@@ -524,14 +551,29 @@ function pokedexMapToRows(
 }
 
 export function taskRowsToArray(rows: any[]): CompletedTaskEntry[] {
-  return rows.map((row) => ({
-    taskId: String(row.taskId),
-    completedAt: String(
-      row.completedAt || row.lastCompletedAt || row.updatedAt || '',
-    ),
-    count: toNumber(row.count),
-    updatedAt: row.lastCompletedAt || row.updatedAt,
-  }))
+  const today = getUtcDateKey(new Date())
+  return rows.map((row) => {
+    const updatedAt = row.lastCompletedAt || row.updatedAt
+    const attemptsToday = getDailyCountForToday(
+      row.dailyAttemptCount,
+      row.dailyAttemptDate,
+      updatedAt,
+      today,
+    )
+    return {
+      taskId: String(row.taskId),
+      completedAt: String(
+        row.completedAt || row.lastCompletedAt || row.updatedAt || '',
+      ),
+      count: toNumber(row.count),
+      updatedAt,
+      ...(row.dailyAttemptCount !== undefined
+        ? { dailyAttemptCount: toOptionalNumber(row.dailyAttemptCount) }
+        : {}),
+      ...(row.dailyAttemptDate ? { dailyAttemptDate: row.dailyAttemptDate } : {}),
+      ...(attemptsToday > 0 ? { attemptsToday } : {}),
+    }
+  })
 }
 
 export function completedTasksArrayToMap(
@@ -542,7 +584,16 @@ export function completedTasksArrayToMap(
   return Object.fromEntries(
     completedTasks
       .filter((entry) => entry.taskId)
-      .map(({ taskId, ...completion }) => [taskId, completion]),
+      .map((entry) => [
+        entry.taskId,
+        {
+          completedAt: entry.completedAt,
+          count: entry.count,
+          updatedAt: entry.updatedAt,
+          dailyAttemptCount: entry.dailyAttemptCount,
+          dailyAttemptDate: entry.dailyAttemptDate,
+        },
+      ]),
   )
 }
 
@@ -560,6 +611,8 @@ function completedTasksMapToRows(
         count: toNumber(entry.count),
         completedAt: entry.completedAt || null,
         lastCompletedAt: entry.updatedAt || entry.completedAt || null,
+        dailyAttemptCount: entry.dailyAttemptCount ?? 0,
+        dailyAttemptDate: entry.dailyAttemptDate || null,
       },
     }))
 }
@@ -671,15 +724,25 @@ export function activityRowsToArrays(rows: any[]): ActivityBuckets {
     return [...canonicalRows, ...legacyRows]
   }
 
+  const today = getUtcDateKey(new Date())
   const mapRows = (sourceRows: any[], idKey: string): any[] =>
     sourceRows.map((row) => {
+      const lastPlayed = row.lastPlayed || row.updatedAt
+      const metadata = isObjectRecord(row.metadata) ? row.metadata : {}
+      const attemptsToday = getDailyCountForToday(
+        metadata.dailyAttemptCount,
+        metadata.dailyAttemptDate,
+        lastPlayed,
+        today,
+      )
       return {
         [idKey]: String(row.activityId),
         wins: toNumber(row.wins),
         losses: toNumber(row.losses),
         highScore: toOptionalNumber(row.highScore),
-        lastPlayed: row.lastPlayed || row.updatedAt,
+        lastPlayed,
         updatedAt: row.updatedAt,
+        ...(attemptsToday > 0 ? { attemptsToday } : {}),
       }
     })
 
@@ -1145,16 +1208,21 @@ export async function incrementUserActivityResult(
     result.highScore === undefined
       ? existingHighScore
       : Math.max(existingHighScore ?? 0, result.highScore)
+  const metadata = {
+    ...(isObjectRecord(existing?.metadata) ? existing.metadata : {}),
+    ...(result.metadata || {}),
+  }
   const entry: ActivityStatEntry = {
     wins: toNumber(existing?.wins) + toNumber(result.wins),
     losses: toNumber(existing?.losses) + toNumber(result.losses),
     highScore: nextHighScore,
     lastPlayed: now,
     updatedAt: now,
-    metadata: {
-      ...(isObjectRecord(existing?.metadata) ? existing.metadata : {}),
-      ...(result.metadata || {}),
-    },
+    metadata: incrementActivityDailyAttemptMetadata(
+      metadata,
+      existing?.lastPlayed || existing?.updatedAt,
+      new Date(now),
+    ),
   }
   const data = {
     user: userId,
@@ -1269,6 +1337,8 @@ export async function getUserStateData(
           completedAt: true,
           lastCompletedAt: true,
           updatedAt: true,
+          dailyAttemptCount: true,
+          dailyAttemptDate: true,
         }, options.req)
       : Promise.resolve([]),
     shouldFetchActivityStats

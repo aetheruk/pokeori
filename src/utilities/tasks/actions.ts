@@ -35,7 +35,12 @@ import {
   setUserCompletedTasksMap,
   setUserInventoryMap,
 } from '@/utilities/user-state'
-import { isToday } from '@/utilities/date-utils'
+import {
+  getDailyCountForToday,
+  getUtcDateKey,
+  incrementDailyCount,
+  isToday,
+} from '@/utilities/date-utils'
 import { acquireActionLock, checkActionRateLimit, releaseActionLock } from '@/utilities/game-integrity'
 import {
   getEconomyActionErrorMessage,
@@ -420,17 +425,32 @@ export async function completeTask(
     const completedTasks = await getUserCompletedTasksMap(payload, user.id, { req })
     const storageId = taskId
     const existing = completedTasks[storageId]
+    const completedAt = new Date().toISOString()
+    const dailyAttempts = incrementDailyCount(
+      getDailyCountForToday(
+        existing?.dailyAttemptCount,
+        existing?.dailyAttemptDate,
+        existing?.updatedAt || existing?.completedAt,
+        completedAt,
+      ),
+      getUtcDateKey(completedAt),
+      completedAt,
+    )
 
     if (existing) {
       existing.count = (existing.count || 0) + 1
-      existing.updatedAt = new Date().toISOString()
+      existing.updatedAt = completedAt
       if (!existing.completedAt) existing.completedAt = existing.updatedAt
+      existing.dailyAttemptCount = dailyAttempts.count
+      existing.dailyAttemptDate = dailyAttempts.date
       completedTasks[storageId] = existing
     } else {
       completedTasks[storageId] = {
         count: 1,
-        completedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        completedAt,
+        updatedAt: completedAt,
+        dailyAttemptCount: dailyAttempts.count,
+        dailyAttemptDate: dailyAttempts.date,
       }
     }
     await setUserCompletedTasksMap(payload, user.id, completedTasks, { req })
@@ -438,9 +458,16 @@ export async function completeTask(
     // Also update activeDailyTasks if it's a static daily task
     let activeDailyTasks = (userRefetched as any).activeDailyTasks as any[]
     if (task.daily && activeDailyTasks) {
+      const dailyGate = task.requirements.find(
+        (requirement) =>
+          requirement.type === 'daily_not_completed' &&
+          String(requirement.targetId) === taskId,
+      )
+      const dailyAttemptLimit = Math.max(1, Math.floor(dailyGate?.count || 1))
+      const completedForToday = dailyAttempts.count >= dailyAttemptLimit
       activeDailyTasks = activeDailyTasks.map((t) => {
         if (t.id === taskId) {
-          return { ...t, completed: true }
+          return { ...t, completed: completedForToday }
         }
         return t
       })

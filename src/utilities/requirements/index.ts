@@ -30,6 +30,7 @@ export interface BattleResult {
   losses: number
   createdAt: string
   updatedAt: string
+  attemptsToday?: number
 }
 
 export interface LocationEncounterResult {
@@ -40,6 +41,7 @@ export interface LocationEncounterResult {
   losses: number
   createdAt: string
   updatedAt: string
+  attemptsToday?: number
 }
 
 export interface GameResult {
@@ -50,6 +52,7 @@ export interface GameResult {
   losses: number
   createdAt: string
   updatedAt: string
+  attemptsToday?: number
 }
 
 export interface FieldResearchResult {
@@ -60,6 +63,7 @@ export interface FieldResearchResult {
   losses: number
   createdAt: string
   updatedAt: string
+  attemptsToday?: number
 }
 
 export interface ExpeditionResult {
@@ -68,6 +72,7 @@ export interface ExpeditionResult {
   losses: number
   lastPlayed?: string
   updatedAt?: string
+  attemptsToday?: number
 }
 
 export interface RequirementData {
@@ -105,18 +110,23 @@ export interface RequirementData {
     completedAt: string
     count: number
     updatedAt?: string
+    attemptsToday?: number
+    dailyAttemptCount?: number
+    dailyAttemptDate?: string
   }[]
   battleResults: {
     battleId: string
     wins: number
     losses: number
     lastPlayed?: string
+    attemptsToday?: number
   }[]
   locationEncounterResults: {
     locationId: string
     wins: number
     losses: number
     lastPlayed?: string
+    attemptsToday?: number
   }[]
   gameResults: {
     gameId: string
@@ -124,6 +134,7 @@ export interface RequirementData {
     losses: number
     highScore?: number
     lastPlayed?: string
+    attemptsToday?: number
   }[]
   fieldResearchResults: {
     fieldResearchId: string
@@ -131,6 +142,7 @@ export interface RequirementData {
     losses: number
     highScore?: number
     lastPlayed?: string
+    attemptsToday?: number
   }[]
   expeditionResults?: ExpeditionResult[]
   currency?: User['currency']
@@ -788,6 +800,31 @@ export function getRequirementProgress(
     case 'daily_not_completed': {
       const activityId = condition.targetId as string
       target = 1
+      const attemptLimit =
+        typeof condition.count === 'number' && Number.isFinite(condition.count)
+          ? Math.max(1, Math.floor(condition.count))
+          : undefined
+
+      const reachedDailyLimit = (result?: {
+        wins?: number
+        losses?: number
+        attemptsToday?: number
+        lastPlayed?: string
+        updatedAt?: string
+      }, countLossesByDefault = false) => {
+        if (!result) return false
+        const lastDate = result.updatedAt || result.lastPlayed
+        if (!isToday(lastDate)) return false
+
+        if (attemptLimit !== undefined) {
+          return (result.attemptsToday ?? 1) >= attemptLimit
+        }
+
+        // Preserve the existing per-domain behavior when no count is set.
+        return countLossesByDefault
+          ? (result.wins || 0) + (result.losses || 0) > 0
+          : (result.wins || 0) > 0
+      }
 
       let playedToday = false
 
@@ -795,22 +832,14 @@ export function getRequirementProgress(
       const battleResult = data.battleResults.find(
         (r) => r.battleId === activityId,
       )
-      if (battleResult && battleResult.wins > 0) {
-        const lastDate =
-          (battleResult as any).updatedAt || battleResult.lastPlayed
-        playedToday = isToday(lastDate)
-      }
+      playedToday = reachedDailyLimit(battleResult)
 
       // Check location encounter results
       if (!playedToday) {
         const locationResult = data.locationEncounterResults.find(
           (r) => r.locationId === activityId,
         )
-        if (locationResult && locationResult.wins > 0) {
-          const lastDate =
-            (locationResult as any).updatedAt || locationResult.lastPlayed
-          playedToday = isToday(lastDate)
-        }
+        playedToday = reachedDailyLimit(locationResult)
       }
 
       // Check mini-game and Field Research results
@@ -820,11 +849,7 @@ export function getRequirementProgress(
           data.fieldResearchResults.find(
             (r) => r.fieldResearchId === activityId,
           )
-        if (activityResult && activityResult.wins > 0) {
-          const lastDate =
-            (activityResult as any).updatedAt || activityResult.lastPlayed
-          playedToday = isToday(lastDate)
-        }
+        playedToday = reachedDailyLimit(activityResult)
       }
 
       // Check expedition results
@@ -832,14 +857,7 @@ export function getRequirementProgress(
         const expeditionResult = (data.expeditionResults || []).find(
           (r) => r.expeditionId === activityId,
         )
-        if (
-          expeditionResult &&
-          (expeditionResult.wins || 0) + (expeditionResult.losses || 0) > 0
-        ) {
-          const lastDate =
-            expeditionResult.updatedAt || expeditionResult.lastPlayed
-          playedToday = isToday(lastDate)
-        }
+        playedToday = reachedDailyLimit(expeditionResult, true)
       }
 
       // Check completed tasks
@@ -847,7 +865,10 @@ export function getRequirementProgress(
         const taskResult = completedTasks.find((t) => t.taskId === activityId)
         if (taskResult) {
           const lastDate = taskResult.updatedAt || taskResult.completedAt
-          playedToday = isToday(lastDate)
+          playedToday = isToday(lastDate) && (
+            attemptLimit === undefined ||
+            (taskResult.attemptsToday ?? 1) >= attemptLimit
+          )
         }
       }
 

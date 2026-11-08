@@ -3,7 +3,7 @@ import { PrizeWheelGameConfig } from '../types'
 export const viridianCitychanseyEntries: PrizeWheelGameConfig[] = [
   {
     id: 'chansey-wheel-viridian',
-    name: 'Viridian Chansey Wheel',
+    name: 'Pokemon Center Wheel',
     gameType: 'prize-wheel',
     description:
       'Visit Chansey in the Viridian City Pokemon Center for daily prizes and a rare chance to win a Leaf Stone!',
@@ -20,6 +20,7 @@ export const viridianCitychanseyEntries: PrizeWheelGameConfig[] = [
       {
         type: 'daily_not_completed',
         targetId: 'chansey-wheel-viridian',
+        count: 5,
       },
     ],
     criteria: [],

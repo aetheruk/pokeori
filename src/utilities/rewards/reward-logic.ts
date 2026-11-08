@@ -35,7 +35,7 @@ import { allGames } from '@/data/games'
 import { locations } from '@/data/locations'
 import { voyages } from '@/data/voyages'
 import { expeditions } from '@/data/expeditions'
-import { isToday } from '@/utilities/date-utils'
+import { getDailyCountForToday, isToday } from '@/utilities/date-utils'
 import {
   checkTaskRequirements,
   checkTaskCriteria,
@@ -392,13 +392,21 @@ export async function grantRewards(
       stats.fieldResearch || {},
     ),
     expeditionResults: Object.entries((stats as any).expeditions || {}).map(
-      ([expeditionId, expeditionStats]: [string, any]) => ({
-        expeditionId,
-        wins: expeditionStats.wins || 0,
-        losses: expeditionStats.losses || 0,
-        lastPlayed: expeditionStats.lastPlayed,
-        updatedAt: expeditionStats.updatedAt,
-      }),
+      ([expeditionId, expeditionStats]: [string, any]) => {
+        const attemptsToday = getDailyCountForToday(
+          expeditionStats.metadata?.dailyAttemptCount,
+          expeditionStats.metadata?.dailyAttemptDate,
+          expeditionStats.lastPlayed || expeditionStats.updatedAt,
+        )
+        return {
+          expeditionId,
+          wins: expeditionStats.wins || 0,
+          losses: expeditionStats.losses || 0,
+          lastPlayed: expeditionStats.lastPlayed,
+          updatedAt: expeditionStats.updatedAt,
+          ...(attemptsToday > 0 ? { attemptsToday } : {}),
+        }
+      },
     ),
     lastRoll: newRoll,
     weatherSlot: weatherState.slot,
