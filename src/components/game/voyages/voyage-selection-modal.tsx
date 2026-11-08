@@ -396,6 +396,7 @@ export function VoyageSelectionModal({
                       <button
                         type="button"
                         key={p.id}
+                        data-haptic-disabled="true"
                         aria-pressed={isSelected}
                         aria-label={`${isSelected ? 'Remove' : 'Select'} ${p.name || 'Pokémon'}, level ${p.level}`}
                         className={cn(

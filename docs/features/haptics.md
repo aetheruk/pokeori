@@ -10,21 +10,21 @@ The provider uses the library's platform-specific behavior: direct switch
 overlays for iOS, the Vibration API where supported, and no sound fallback on
 desktop. Reduced-motion preferences suppress haptic output.
 
-On iOS, haptic overlays allow native horizontal and vertical panning and pinch
-gestures, so scrollable lists remain usable across Explore, inventory, Artisan,
-crafting, and other app surfaces. Explore activity cards, region and area
-selectors, and scenic choice cards set their targets explicitly. Inventory item
-cards and Artisan recipe cards trigger selection haptics from their click
-handlers so a drag across a card remains a scroll gesture; their nested action
-buttons trigger haptics manually as well. Continuous pointer surfaces
+Automatic haptic overlays are omitted from selected controls inside horizontally
+or vertically scrollable areas. Individual result cards can opt out explicitly
+with `data-haptic-disabled`. This keeps
+swipes over collection grids, search results, and selector lists available on
+touch screens. Explore activity cards, region and area selectors, and scenic
+choice cards keep their explicit targets. Inventory item cards and Artisan
+recipe cards trigger selection haptics from their click handlers; their nested
+action buttons trigger haptics manually as well. Continuous pointer surfaces
 such as drawing canvases, steering stages, and swipe gestures keep their existing
-pointer behavior instead of receiving a full-size overlay. Flap's outside-
-playfield tap target remains explicitly haptic-enabled.
+pointer behavior. Flap's outside-playfield tap target remains explicitly
+haptic-enabled.
 
-Pokémon roster tiles, Pokédex/MoveDex/AbilityDex records, and Trainer collection
-cards call the shared selection haptic from their click handlers. This lets a
-drag across a large tile or virtualized record grid remain a scroll gesture
-without placing an iOS switch overlay over the scroll target.
+Pokémon roster tiles and Carddex, Pokédex, MoveDex, and AbilityDex result cards
+do not trigger haptics, leaving their grids free to scroll. Trainer collection
+summary cards keep their own selection feedback.
 
 The TCG battle opening hand uses the same manual selection haptic on each card
 and leaves the horizontal card rail free of iOS switch overlays, so selecting a

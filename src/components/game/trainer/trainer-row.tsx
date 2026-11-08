@@ -70,6 +70,7 @@ export function TrainerRow({
   return (
     <button
       type="button"
+      data-haptic-disabled="true"
       aria-haspopup="dialog"
       aria-label={`View ${trainer.trainerName}'s trainer profile`}
       onClick={onSelect}

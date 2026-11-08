@@ -617,6 +617,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         router.replace('/game/explore')
         return
       }
+      if ('cost' in encounter.settings && encounter.settings.cost) {
+        void refreshUser()
+      }
       setState(response.state)
       setFrontIds(
         response.state.phase === 'arranging' && !response.state.ready?.player

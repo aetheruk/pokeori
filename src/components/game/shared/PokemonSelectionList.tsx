@@ -27,6 +27,7 @@ export function PokemonSelectionList({
         return (
           <button
             type="button"
+            data-haptic-disabled="true"
             aria-pressed={isSelected}
             aria-label={`${isSelected ? 'Remove' : 'Select'} ${p.name || 'Pokémon'}, level ${p.level}`}
             key={p.id}

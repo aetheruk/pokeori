@@ -160,6 +160,7 @@ export function RivalSelectionDialog({
                 <button
                   key={trainer.id}
                   type="button"
+                  data-haptic-disabled="true"
                   onClick={() => handleSelect(trainer.id)}
                   disabled={!!selectingId}
                   className="flex w-full items-center gap-3 rounded-md border border-game-border bg-game-surface-raised p-3 text-left transition-colors hover:border-game-moss/50 hover:bg-game-moss/10 disabled:opacity-60"

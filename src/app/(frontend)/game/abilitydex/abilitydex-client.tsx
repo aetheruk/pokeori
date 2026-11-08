@@ -1,7 +1,6 @@
 'use client'
 
 import { CircleHelp, Search, Sparkles, X } from 'lucide-react'
-import { useHaptics } from '@haptics/react'
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
 import { useMemo, useState } from 'react'
@@ -312,7 +311,6 @@ function AbilityDexListItem({
   entriesByForm: PokedexProgressByForm
   onSelect: () => void
 }) {
-  const { trigger: triggerHaptic } = useHaptics()
   const representative = getAbilityDexRepresentativeLearner(
     entry,
     entriesByForm,
@@ -327,17 +325,14 @@ function AbilityDexListItem({
   return (
     <button
       type="button"
-      data-haptic-manual="true"
+      data-haptic-disabled="true"
       aria-label={
         isKnown
           ? `View ${entry.ability.name}`
           : `Unknown ability record ${recordNumber}`
       }
       aria-pressed={isSelected}
-      onClick={() => {
-        triggerHaptic('selection')
-        onSelect()
-      }}
+      onClick={onSelect}
       className={cn(
         'game-focus-ring group relative flex h-full min-h-20 w-full items-center gap-3 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition-colors sm:px-4',
         isSelected

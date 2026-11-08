@@ -9,7 +9,6 @@ import {
 } from '@/app/(frontend)/game/tcg/actions'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { Button } from '@/components/ui/button'
-import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard } from '@/data/tcg/types'
@@ -230,9 +229,6 @@ export function TcgDecksPanel({
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <div className="game-paper-background space-y-4 rounded-xl border border-game-border bg-game-surface p-4 shadow-sm">
-        <SectionDivider className="mb-1" variant="chip">
-          TCG Generation Decks
-        </SectionDivider>
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-game-border bg-game-surface-raised px-3 py-2">
           <span className="text-sm font-semibold text-game-ink">
             {activeFormat?.label} Deck
@@ -269,12 +265,6 @@ export function TcgDecksPanel({
           }
           options={energyOptions}
         />
-        <p className="rounded-md border border-game-moss/20 bg-game-moss/5 px-3 py-2 text-xs leading-relaxed text-game-muted">
-          Battle decks need 6 Basic Pokémon to guarantee your opening line-up.
-          Stage 1 and Stage 2 cards need their previous stage in the same deck.
-          Auto Fill keeps available evolution lines together.
-        </p>
-
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-8">
           {activeDeck.length === 0 ? (
             <span className="col-span-full rounded-md border border-dashed border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-muted">
@@ -288,6 +278,7 @@ export function TcgDecksPanel({
                 <button
                   type="button"
                   key={cardId}
+                  data-haptic-disabled="true"
                   aria-label={`Remove ${card?.name || cardId} from deck`}
                   className="game-focus-ring group min-w-0 text-left"
                   onClick={() => removeCardFromDeck(cardId)}
