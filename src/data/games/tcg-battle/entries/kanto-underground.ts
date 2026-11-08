@@ -88,18 +88,18 @@ const tutorialCards = [
 
 const fireCards = [
   'base1-46', 'base1-28', 'base1-68', 'base1-60', 'base1-36',
-  'base3-39', 'base4-42', 'base4-51', 'base4-69', 'base1-24',
-  'base1-12', 'base1-23', 'base2-3', 'base2-19', 'base1-4',
+  'base3-39', 'base4-42', 'base2-51', 'base4-69', 'base1-24',
+  'base1-12', 'base1-23', 'base2-3', 'base4-51', 'base1-4',
 ]
 const waterCards = [
   'base1-63', 'base1-65', 'base1-41', 'base1-35', 'base3-49',
-  'base3-51', 'base3-53', 'base3-54', 'base3-56', 'base1-42',
+  'base2-53', 'base3-53', 'base3-54', 'base3-56', 'base1-42',
   'base1-64', 'base2-46', 'base3-35', 'base1-25', 'base3-10',
 ]
 const grassCards = [
   'base1-44', 'base1-45', 'base1-69', 'base1-66', 'base1-51',
   'base1-55', 'base1-37', 'base1-30', 'base1-33', 'base1-54',
-  'base2-9', 'base2-10', 'base2-13', 'base3-46', 'base3-48',
+  'base2-63', 'base2-10', 'base2-13', 'base3-46', 'base3-48',
 ]
 
 export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [

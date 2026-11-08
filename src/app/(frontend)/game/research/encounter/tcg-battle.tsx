@@ -45,6 +45,7 @@ import type {
   TcgBattleCardState,
   TcgBattleChoiceRequirement,
   TcgBattleEnergyType,
+  TcgBattleEvolutionOption,
   TcgBattleState,
   TcgBattleStatusCondition,
 } from '@/utilities/tcg/tcg-battle'
@@ -58,6 +59,7 @@ import {
   getOpenTcgBattleBenchSlots,
   getTcgBattleAttackEffect,
   getTcgBattleCardUnlockTurnForCard,
+  getTcgBattleEvolutionOptions,
   getTcgBattleCount,
   getValidTcgBattleTargets,
   isTcgBattleAttackDisabled,
@@ -72,6 +74,7 @@ import {
   surrenderTcgPvp,
   tcgBattleAttack,
   tcgBattleCharge,
+  tcgBattleEvolve,
   tcgBattlePromote,
   tcgBattleRetreat,
 } from '../games/tcg-battle'
@@ -124,6 +127,7 @@ type ActionMeta = (
       attackIndex: number
     }
   | { kind: 'retreat'; frontId: string; backId: string }
+  | { kind: 'evolve'; targetId: string; evolutionCardId: string }
   | { kind: 'charge' }
   | { kind: 'promote'; cardId: string }
   | { kind: 'arrange' }
@@ -301,9 +305,17 @@ function findSideCard(
 function cloneTcgBattleCard(card: TcgBattleCardState): TcgBattleCardState {
   return {
     ...card,
+    evolutionStack: card.evolutionStack?.map((summary) => ({ ...summary })),
     statusConditions: card.statusConditions
       ? [...card.statusConditions]
       : undefined,
+    incomingAttackModifier: card.incomingAttackModifier
+      ? { ...card.incomingAttackModifier }
+      : undefined,
+    temporaryEffects: card.temporaryEffects
+      ? structuredClone(card.temporaryEffects)
+      : undefined,
+    markers: card.markers ? [...card.markers] : undefined,
   }
 }
 
@@ -397,7 +409,16 @@ function compactVisualBattleBoard(
     ...side.back.filter((card) => card.currentHp <= 0),
   ]
   if (fainted.length === 0) return []
-  side.discard = [...side.discard, ...fainted]
+  const discarded = fainted.flatMap((card) => {
+    const stack = (card.evolutionStack || []).map((summary, index) => ({
+      ...summary,
+      instanceId: `${summary.id}:discard:${card.instanceId}:${index}`,
+      currentHp: 0,
+    }))
+    const { evolutionStack: _evolutionStack, ...faintedCard } = card
+    return [...stack, faintedCard]
+  })
+  side.discard = [...side.discard, ...discarded]
   side.front = side.front.filter((card) => card.currentHp > 0)
   side.back = side.back.filter((card) => card.currentHp > 0)
   return fainted
@@ -542,6 +563,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const [attackerId, setAttackerId] = useState('')
   const [targetId, setTargetId] = useState('')
   const [benchMode, setBenchMode] = useState<BenchMode | null>(null)
+  const [showEvolutionSheet, setShowEvolutionSheet] = useState(false)
   const [choiceAttackIndex, setChoiceAttackIndex] = useState<number | null>(
     null,
   )
@@ -638,6 +660,13 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     () => state?.opponent.front.find((card) => card.instanceId === targetId),
     [state, targetId],
   )
+  const evolutionOptions = useMemo(
+    () =>
+      state
+        ? getTcgBattleEvolutionOptions(state.player, state.turnNumber)
+        : [],
+    [state?.player, state?.turnNumber],
+  )
   const attackCap = state ? getAllowedAttackCost(state.turnNumber) : 1
   const formatConfig = state ? TCG_BATTLE_FORMATS[state.format] : null
   const deadlineSeconds = state?.deadlineAt
@@ -731,6 +760,23 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       if (meta.kind === 'claim' || meta.kind === 'promote') {
         if (meta.kind === 'promote') playSfx('select')
         commitActionResult(nextState, completion)
+        return
+      }
+
+      if (meta.kind === 'evolve') {
+        const previous = findSideCard(previousState.player, meta.targetId)
+        const evolved = findSideCard(nextState.player, meta.targetId)
+        setResolution({
+          id: makeResolutionId('evolved'),
+          tone: 'player',
+          title: 'Evolution',
+          detail: `${previous?.name || 'Your Pokémon'} became ${evolved?.name || 'its next stage'}.`,
+        })
+        playSfx('good')
+        scheduleResolutionStep(
+          () => commitActionResult(nextState, completion),
+          RESOLUTION_TIMING.actionIntro + RESOLUTION_TIMING.finalSettle,
+        )
         return
       }
 
@@ -1481,6 +1527,14 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       const detail =
         action.kind === 'retreat'
           ? 'The opposing collector rotates their front line.'
+          : action.kind === 'evolve'
+            ? (() => {
+                const before = findSideCard(previousState.opponent, action.frontId || '')
+                const after = findSideCard(nextState.opponent, action.frontId || '')
+                return before && after
+                  ? `${before.name} becomes ${after.name}.`
+                  : 'The opposing collector evolves a Pokémon.'
+              })()
           : action.kind === 'promote'
             ? 'The opposing collector promotes a bench card.'
             : nextState.opponent.energy > previousState.opponent.energy
@@ -1492,6 +1546,8 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         title:
           action.kind === 'retreat'
             ? 'Opponent Retreat'
+            : action.kind === 'evolve'
+              ? 'Opponent Evolution'
             : action.kind === 'promote'
               ? 'Opponent Promotion'
               : 'Opponent Charge',
@@ -1597,6 +1653,20 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       playSfx('select')
       return
     }
+    if (meta.kind === 'evolve') {
+      const target = findSideCard(previousState.player, meta.targetId)
+      const evolution = previousState.player.deck.find(
+        (card) => card.id === meta.evolutionCardId,
+      )
+      setResolution({
+        id: makeResolutionId('evolve-queued'),
+        tone: 'player',
+        title: 'Evolution Ready',
+        detail: `${target?.name || 'Your Pokémon'} prepares to evolve${evolution ? ` into ${evolution.name}` : ''}.`,
+      })
+      playSfx('select')
+      return
+    }
     setResolution({
       id: makeResolutionId('charge-queued'),
       tone: 'system',
@@ -1636,6 +1706,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           return
         }
         setBenchMode(null)
+        if (meta.kind === 'evolve') setShowEvolutionSheet(false)
         if (!previousState) {
           commitActionResult(response.state, response.completion)
           return
@@ -2049,6 +2120,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           claimError={claimError}
           resultShown={Boolean(resultOverlay)}
           resolution={resolution}
+          canEvolve={evolutionOptions.length > 0}
           onCharge={() =>
             callAction(() => tcgBattleCharge(state.revision), {
               kind: 'charge',
@@ -2059,6 +2131,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           }
           onPromote={() => setBenchMode('promote')}
           onRetreat={() => setBenchMode('retreat')}
+          onOpenEvolution={() => setShowEvolutionSheet(true)}
         />
       </main>
 
@@ -2091,6 +2164,21 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               },
             )
           }}
+        />
+      )}
+
+      {showEvolutionSheet && (
+        <EvolutionSheet
+          options={evolutionOptions}
+          isPending={isBusy}
+          onClose={() => setShowEvolutionSheet(false)}
+          onEvolve={(targetId, evolutionCardId) =>
+            callAction(
+              () =>
+                tcgBattleEvolve(targetId, evolutionCardId, state.revision),
+              { kind: 'evolve', targetId, evolutionCardId },
+            )
+          }
         />
       )}
 
@@ -3707,10 +3795,12 @@ function BattleCommandControls({
   claimError,
   resultShown,
   resolution,
+  canEvolve,
   onCharge,
   onClaim,
   onPromote,
   onRetreat,
+  onOpenEvolution,
 }: {
   state: TcgBattleState
   selectedAttacker?: TcgBattleCardState
@@ -3718,10 +3808,12 @@ function BattleCommandControls({
   claimError: string | null
   resultShown: boolean
   resolution?: BattleResolution | null
+  canEvolve: boolean
   onCharge: () => void
   onClaim: () => void
   onPromote: () => void
   onRetreat: () => void
+  onOpenEvolution: () => void
 }) {
   const hasAutoClaimedResultRef = useRef(false)
 
@@ -3800,7 +3892,12 @@ function BattleCommandControls({
 
   return (
     <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1.25rem)] z-30 flex justify-center">
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex items-center justify-center gap-2 sm:gap-3">
+        <LabeledCommandButton
+          label="Evolve"
+          disabled={!canAct || !canEvolve || isPending || forceAttack}
+          onClick={onOpenEvolution}
+        />
         <LabeledCommandButton
           label="Switch"
           disabled={!canAct || !selectedAttacker || isPending || forceAttack}
@@ -4614,6 +4711,81 @@ function BenchSheet({
               />
             ))
           )}
+        </div>
+      </div>
+    </ResponsivePanel>
+  )
+}
+
+function EvolutionSheet({
+  options,
+  isPending,
+  onClose,
+  onEvolve,
+}: {
+  options: TcgBattleEvolutionOption[]
+  isPending: boolean
+  onClose: () => void
+  onEvolve: (targetId: string, evolutionCardId: string) => void
+}) {
+  return (
+    <ResponsivePanel
+      open
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose()
+      }}
+      title="Evolve Pokémon"
+      description="Choose a Pokémon and a matching Stage card from your deck. Evolution uses your turn and costs no Energy."
+      icon={<span className="text-xs font-bold uppercase tracking-wide">Evolve</span>}
+      background="/backgrounds/tcg.avif"
+      heroLabel="Card battle"
+      className="bg-game-surface-raised text-game-ink"
+    >
+      <div className="min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="mx-auto flex max-w-2xl flex-col gap-2">
+          {options.length === 0 ? (
+            <div
+              className="flex min-h-28 items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised px-4 text-center text-sm font-bold text-game-muted"
+              role="status"
+            >
+              No Pokémon can evolve right now.
+            </div>
+          ) : (
+            options.map((option) => (
+              <div
+                key={`${option.targetId}:${option.card.id}`}
+                className="flex items-center gap-3 rounded-md border border-game-border bg-game-canvas p-2.5"
+              >
+                <Image
+                  src={option.card.image}
+                  alt={option.card.name}
+                  width={44}
+                  height={60}
+                  className="h-[60px] w-11 rounded-sm object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-black uppercase text-game-ink">
+                    {option.targetName} → {option.card.name}
+                  </p>
+                  <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-game-muted">
+                    {option.card.subtypes.join(' · ')}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isPending}
+                  onClick={() => onEvolve(option.targetId, option.card.id)}
+                  className="game-focus-ring min-h-10 shrink-0 rounded-md border border-game-moss/50 bg-game-surface-raised px-3 text-[10px] font-black uppercase tracking-wide text-game-ink hover:bg-game-moss/10"
+                >
+                  Evolve
+                </Button>
+              </div>
+            ))
+          )}
+          <p className="px-1 pt-2 text-[11px] leading-relaxed text-game-muted">
+            Damage counters stay on the Pokémon. Poison, sleep, and temporary effects clear when it evolves.
+          </p>
         </div>
       </div>
     </ResponsivePanel>

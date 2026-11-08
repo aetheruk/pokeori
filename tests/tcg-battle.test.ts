@@ -8,6 +8,7 @@ import base5Details from '@/data/tcg/details/base5'
 import basePromoDetails from '@/data/tcg/details/basep'
 import {
   applyTcgBattleEnergyDiscards,
+  applyTcgBattleEvolution,
   applyTcgBattleStatusConditions,
   autoBuildTcgBattleDeck,
   buildTcgBattleCardSummary,
@@ -16,11 +17,15 @@ import {
   calculateTcgBattleCardCost,
   calculateTcgBattleDamage,
   chooseTcgBattleAttackChoice,
+  compactTcgBattleBoard,
+  drawTcgBattleOpeningCards,
+  getTcgBattleDeckLineErrors,
   getEffectiveTcgBattleAttackCost,
   getAllowedTcgBattleAttackCost,
   getNextTcgBattleTurnNumber,
   getTcgBattleCardUnlockTurn,
   getTcgBattleCardUnlockTurnForCard,
+  getTcgBattleEvolutionOptions,
   isTcgBattleCardUnlocked,
   getSupportedTcgBattleAttacks,
   getValidTcgBattleTargets,
@@ -116,7 +121,7 @@ function makeBattleState(overrides: Partial<TcgBattleState> = {}): TcgBattleStat
 }
 
 describe('TCG battle utilities', () => {
-  test('auto-fill uses each format cost cap while building fifteen cards', async () => {
+  test('auto-fill builds valid, evolvable decks within each format cost cap', async () => {
     const collection = Object.fromEntries(
       getAllTcgCards().map((card) => [card.id, 1]),
     )
@@ -132,11 +137,143 @@ describe('TCG battle utilities', () => {
     expect(baby.cards).toHaveLength(15)
     expect(champions.cards).toHaveLength(15)
     expect(masters.cards).toHaveLength(15)
-    expect(baby.totalCost).toBe(TCG_BATTLE_FORMATS.baby.deckCostLimit)
-    expect(champions.totalCost).toBe(
-      TCG_BATTLE_FORMATS.champions.deckCostLimit,
+    for (const [format, result] of [
+      ['baby', baby],
+      ['champions', champions],
+      ['masters', masters],
+    ] as const) {
+      expect(result.totalCost).toBeLessThanOrEqual(
+        TCG_BATTLE_FORMATS[format].deckCostLimit,
+      )
+      expect(getTcgBattleDeckLineErrors(result.cards)).toEqual([])
+      expect(result.cards.some((card) => card.subtypes.includes('Stage 1') || card.subtypes.includes('Stage 2'))).toBe(true)
+    }
+  })
+
+  test('requires six Basics and enough matching cards for every evolution', () => {
+    const basics = Array.from({ length: 6 }, (_, index) => ({
+      ...makeBattleCard(`basic-${index}`, 1),
+      name: `Basic ${index}`,
+      subtypes: ['Basic'],
+    }))
+    const pikachu = {
+      ...makeBattleCard('base1-58', 1),
+      name: 'Pikachu',
+      subtypes: ['Basic'],
+      evolvesTo: ['Raichu'],
+    }
+    const raichu = {
+      ...makeBattleCard('base1-14', 1),
+      name: 'Raichu',
+      subtypes: ['Stage 1'],
+      evolvesFrom: 'Pikachu',
+    }
+    const legalDeck = [...basics.slice(0, 5), pikachu, raichu, ...basics.slice(5)]
+
+    expect(getTcgBattleDeckLineErrors(legalDeck)).toEqual([])
+    expect(
+      getTcgBattleDeckLineErrors([
+        ...basics.slice(0, 4),
+        pikachu,
+        raichu,
+      ]),
+    ).toContain(
+      'Deck must include at least 6 Basic Pokémon for the opening line-up.',
     )
-    expect(masters.totalCost).toBe(TCG_BATTLE_FORMATS.masters.deckCostLimit)
+    expect(
+      getTcgBattleDeckLineErrors([
+        ...basics,
+        pikachu,
+        raichu,
+        { ...raichu, id: 'base2-67' },
+      ]),
+    ).toContain('Pikachu needs enough matching Basic Pokémon cards in the deck for every evolution.')
+  })
+
+  test('opens with Basics and evolves through a damage-preserving stack', () => {
+    const pikachu = {
+      ...makeBattleCard('base1-58', 1),
+      name: 'Pikachu',
+      hp: 60,
+      currentHp: 40,
+      subtypes: ['Basic'],
+      evolvesTo: ['Raichu'],
+      statusConditions: ['poisoned'] as TcgBattleCardState['statusConditions'],
+    }
+    const raichu = {
+      ...makeBattleCard('base1-14', 1),
+      name: 'Raichu',
+      hp: 100,
+      subtypes: ['Stage 1'],
+      evolvesFrom: 'Pikachu',
+      evolvesTo: ['Raichu Prime'],
+    }
+    const raichuPrime = {
+      ...makeBattleCard('base4-27', 1),
+      name: 'Raichu Prime',
+      hp: 150,
+      subtypes: ['Stage 2'],
+      evolvesFrom: 'Raichu',
+    }
+    const basics = Array.from({ length: 5 }, (_, index) => ({
+      ...makeBattleCard(`opening-basic-${index}`, 1),
+      subtypes: ['Basic'],
+    }))
+    const openingHand = drawTcgBattleOpeningCards(
+      [pikachu, raichu, raichuPrime, ...basics],
+      6,
+    )
+    expect(openingHand).toHaveLength(6)
+    expect(openingHand.every((card) => card.subtypes.includes('Basic'))).toBe(true)
+
+    const activePikachu = { ...pikachu, instanceId: 'pikachu-active' }
+    const stage1Side: TcgBattleSideState = {
+      deck: [raichu, raichuPrime],
+      hand: [],
+      front: [activePikachu],
+      back: [],
+      discard: [],
+      energy: 5,
+    }
+    expect(getTcgBattleEvolutionOptions(stage1Side, 2)).toHaveLength(0)
+    expect(getTcgBattleEvolutionOptions(stage1Side, 3)).toHaveLength(1)
+
+    const firstEvolution = applyTcgBattleEvolution(
+      stage1Side,
+      activePikachu.instanceId,
+      raichu.id,
+      3,
+    )
+    expect(firstEvolution?.target).toMatchObject({
+      instanceId: 'pikachu-active',
+      name: 'Raichu',
+      hp: 100,
+      currentHp: 80,
+      statusConditions: undefined,
+    })
+    expect(firstEvolution?.target.evolutionStack?.map((card) => card.name)).toEqual(['Pikachu'])
+    expect(stage1Side.deck.map((card) => card.id)).toEqual([raichuPrime.id])
+    expect(getTcgBattleEvolutionOptions(stage1Side, 4)).toHaveLength(0)
+    expect(getTcgBattleEvolutionOptions(stage1Side, 5)).toHaveLength(1)
+
+    const secondEvolution = applyTcgBattleEvolution(
+      stage1Side,
+      activePikachu.instanceId,
+      raichuPrime.id,
+      5,
+    )
+    expect(secondEvolution?.target.currentHp).toBe(130)
+    expect(secondEvolution?.target.evolutionStack?.map((card) => card.name)).toEqual([
+      'Pikachu',
+      'Raichu',
+    ])
+    secondEvolution!.target.currentHp = 0
+    compactTcgBattleBoard(stage1Side)
+    expect(stage1Side.discard.map((card) => card.name)).toEqual([
+      'Pikachu',
+      'Raichu',
+      'Raichu Prime',
+    ])
   })
 
   test('parses leading attack damage values', () => {
@@ -945,6 +1082,24 @@ describe('TCG battle utilities', () => {
         opponentDeckCardIds.map((cardId) => buildTcgBattleCardSummary(cardId)),
       )
       expect(cards.every(Boolean)).toBe(true)
+    }
+  })
+
+  test('keeps every authored TCG opponent deck legal with its evolution lines', async () => {
+    const authoredBattles = allGames.filter(
+      (game): game is TcgBattleGameConfig =>
+        game.gameType === 'tcg-battle' &&
+        Boolean(game.settings.opponentDeckCardIds?.length),
+    )
+
+    for (const game of authoredBattles) {
+      const cardIds = game.settings.opponentDeckCardIds!
+      const validation = await validateTcgBattleDeck(
+        cardIds,
+        Object.fromEntries(cardIds.map((cardId) => [cardId, 1])),
+        game.settings.deckFormat,
+      )
+      expect(validation.valid, `${game.id}: ${validation.errors.join(' ')}`).toBe(true)
     }
   })
 

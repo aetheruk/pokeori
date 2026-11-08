@@ -269,6 +269,11 @@ export function TcgDecksPanel({
           }
           options={energyOptions}
         />
+        <p className="rounded-md border border-game-moss/20 bg-game-moss/5 px-3 py-2 text-xs leading-relaxed text-game-muted">
+          Battle decks need 6 Basic Pokémon to guarantee your opening line-up.
+          Stage 1 and Stage 2 cards need their previous stage in the same deck.
+          Auto Fill keeps available evolution lines together.
+        </p>
 
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-8">
           {activeDeck.length === 0 ? (

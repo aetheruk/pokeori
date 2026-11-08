@@ -526,6 +526,7 @@ export interface TcgBattleCardSummary {
 export interface TcgBattleCardState extends TcgBattleCardSummary {
   instanceId: string
   currentHp: number
+  evolutionStack?: TcgBattleCardSummary[]
   statusConditions?: TcgBattleStatusCondition[]
   incomingAttackModifier?: TcgBattleIncomingAttackModifier
   temporaryEffects?: TcgBattleTemporaryEffects
@@ -563,6 +564,7 @@ export type TcgBattleLastAction = {
   kind:
     | 'arrange'
     | 'attack'
+    | 'evolve'
     | 'retreat'
     | 'charge'
     | 'promote'
@@ -574,6 +576,7 @@ export type TcgBattleLastAction = {
   frontId?: string
   backId?: string
   cardId?: string
+  evolutionCardId?: string
 }
 
 export interface TcgBattleState {
@@ -671,13 +674,25 @@ export function flipTcgBattleSide(side: TcgBattleSide): TcgBattleSide {
 function cloneTcgBattlePerspectiveSide(
   side: TcgBattleSideState,
 ): TcgBattleSideState {
+  const cloneCard = (card: TcgBattleCardState): TcgBattleCardState => ({
+    ...card,
+    evolutionStack: card.evolutionStack?.map((summary) => ({ ...summary })),
+    statusConditions: card.statusConditions ? [...card.statusConditions] : undefined,
+    incomingAttackModifier: card.incomingAttackModifier
+      ? { ...card.incomingAttackModifier }
+      : undefined,
+    temporaryEffects: card.temporaryEffects
+      ? structuredClone(card.temporaryEffects)
+      : undefined,
+    markers: card.markers ? [...card.markers] : undefined,
+  })
   return {
     ...side,
     deck: [...side.deck],
-    hand: [...side.hand],
-    front: [...side.front],
-    back: [...side.back],
-    discard: [...side.discard],
+    hand: side.hand.map(cloneCard),
+    front: side.front.map(cloneCard),
+    back: side.back.map(cloneCard),
+    discard: side.discard.map(cloneCard),
   }
 }
 
@@ -908,6 +923,58 @@ export function calculateTcgBattleCardCost(
   return 5
 }
 
+function normalizeTcgBattlePokemonName(name: string | null | undefined): string {
+  return (name || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+}
+
+function getTcgBattleEvolutionStage(card: Pick<TcgBattleCardSummary, 'subtypes'>): 0 | 1 | 2 {
+  const subtypes = card.subtypes.map((subtype) => subtype.toLowerCase())
+  if (subtypes.includes('stage 2')) return 2
+  if (subtypes.includes('stage 1')) return 1
+  return 0
+}
+
+function isTcgBattleBasic(card: Pick<TcgBattleCardSummary, 'subtypes'>): boolean {
+  return card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')
+}
+
+export function getTcgBattleDeckLineErrors(cards: TcgBattleCardSummary[]): string[] {
+  const errors: string[] = []
+  const basics = cards.filter(isTcgBattleBasic)
+  if (basics.length < 6) {
+    errors.push('Deck must include at least 6 Basic Pokémon for the opening line-up.')
+  }
+  const countMatching = (name: string, stage: 0 | 1) => cards.filter((candidate) =>
+    normalizeTcgBattlePokemonName(candidate.name) === name &&
+    getTcgBattleEvolutionStage(candidate) === stage &&
+    (stage !== 0 || isTcgBattleBasic(candidate)),
+  ).length
+  const checkStageLines = (stage: 1 | 2, label: string, predecessorStage: 0 | 1) => {
+    const counts = new Map<string, { name: string; count: number }>()
+    for (const card of cards) {
+      if (getTcgBattleEvolutionStage(card) !== stage) continue
+      const predecessorName = normalizeTcgBattlePokemonName(card.evolvesFrom)
+      if (!predecessorName) {
+        errors.push(`${card.name} needs its ${label} predecessor in the deck.`)
+        continue
+      }
+      const group = counts.get(predecessorName) || { name: card.evolvesFrom || 'predecessor', count: 0 }
+      group.count += 1
+      counts.set(predecessorName, group)
+    }
+    for (const [normalizedName, group] of counts) {
+      if (group.count > countMatching(normalizedName, predecessorStage)) {
+        errors.push(`${group.name} needs enough matching ${label} cards in the deck for every evolution.`)
+      }
+    }
+  }
+
+  checkStageLines(1, 'Basic Pokémon', 0)
+  checkStageLines(2, 'Stage 1 Pokémon', 1)
+
+  return errors
+}
+
 export async function validateTcgBattleDeck(
   cardIds: string[],
   collection: Record<string, number>,
@@ -938,6 +1005,7 @@ export async function validateTcgBattleDeck(
   if (totalCost > limit) {
     errors.push(`Deck cost ${totalCost} exceeds the ${limit} ${TCG_BATTLE_FORMATS[format].label} limit.`)
   }
+  errors.push(...getTcgBattleDeckLineErrors(cards))
 
   return { valid: errors.length === 0, errors, cards, totalCost }
 }
@@ -961,53 +1029,151 @@ export async function autoBuildTcgBattleDeck(
     candidatesByCost.set(card.cost, cardsAtCost)
   }
 
-  // Only the best fifteen cards at each cost can contribute to a fifteen-card
-  // deck. Keeping that bounded pool makes the format-aware selection cheap
+  // Only the best twenty-five cards at each cost are useful for line-aware
+  // choices in a fifteen-card deck. Keeping that bounded pool makes selection cheap
   // even when a trainer owns the full catalog.
   const candidatePool = Array.from(candidatesByCost.values()).flatMap((cards) =>
     [...cards]
       .sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a))
-      .slice(0, 15),
+      .slice(0, 25),
   )
-  type DeckState = { score: number; cards: TcgBattleCardSummary[] }
-  const states: Array<Array<DeckState | undefined>> = Array.from(
-    { length: 16 },
-    () => Array.from({ length: limit + 1 }),
+  const selected: TcgBattleCardSummary[] = []
+  const selectedIds = new Set<string>()
+  let totalCost = 0
+  const hasMatchingDescendant = (card: TcgBattleCardSummary, stage: 1 | 2) =>
+    candidatePool.some((candidate) =>
+      getTcgBattleEvolutionStage(candidate) === stage &&
+      normalizeTcgBattlePokemonName(candidate.evolvesFrom) === normalizeTcgBattlePokemonName(card.name),
+    )
+  const evolutionRootIds = new Set(
+    candidatePool
+      .filter(isTcgBattleBasic)
+      .filter((basic) => candidatePool.some((stage1) =>
+        getTcgBattleEvolutionStage(stage1) === 1 &&
+        normalizeTcgBattlePokemonName(stage1.evolvesFrom) === normalizeTcgBattlePokemonName(basic.name) &&
+        basic.cost + stage1.cost <= limit,
+      ))
+      .map((card) => card.id),
   )
-  states[0][0] = { score: 0, cards: [] }
+  const lineBonus = (card: TcgBattleCardSummary) => {
+    const stage = getTcgBattleEvolutionStage(card)
+    if (stage === 2) return 90
+    if (stage === 1) return 100
+    return isTcgBattleBasic(card) && hasMatchingDescendant(card, 1) ? 60 : 0
+  }
 
-  for (const card of candidatePool) {
-    for (let count = 14; count >= 0; count -= 1) {
-      for (let currentCost = 0; currentCost + card.cost <= limit; currentCost += 1) {
-        const state = states[count][currentCost]
-        if (!state) continue
-        const nextCost = currentCost + card.cost
-        const nextScore = state.score + getCardBattleScore(card)
-        const existing = states[count + 1][nextCost]
-        if (!existing || nextScore > existing.score) {
-          states[count + 1][nextCost] = {
-            score: nextScore,
-            cards: [...state.cards, card],
-          }
+  const canCompleteDeck = (trialCards: TcgBattleCardSummary[], trialCost: number) => {
+    const trialIds = new Set(trialCards.map((card) => card.id))
+    const reachable = new Set<string>()
+    let changed = true
+    while (changed) {
+      changed = false
+      for (const card of candidatePool) {
+        if (trialIds.has(card.id) || reachable.has(card.id)) continue
+        const stage = getTcgBattleEvolutionStage(card)
+        const predecessorName = normalizeTcgBattlePokemonName(card.evolvesFrom)
+        const canReach = stage === 0
+          ? isTcgBattleBasic(card) || !/^stage [12]$/i.test(card.subtypes.join(' '))
+          : [...trialCards, ...candidatePool.filter((candidate) => reachable.has(candidate.id))].some((candidate) =>
+              normalizeTcgBattlePokemonName(candidate.name) === predecessorName &&
+              getTcgBattleEvolutionStage(candidate) === stage - 1 &&
+              (stage !== 1 || isTcgBattleBasic(candidate)),
+            )
+        if (canReach) {
+          reachable.add(card.id)
+          changed = true
         }
       }
     }
+    const needed = 15 - trialCards.length
+    const cheapest = candidatePool
+      .filter((card) => reachable.has(card.id))
+      .map((card) => card.cost)
+      .sort((a, b) => a - b)
+      .slice(0, needed)
+    return cheapest.length >= needed && trialCost + cheapest.reduce((sum, cost) => sum + cost, 0) <= limit
   }
 
-  let selected: TcgBattleCardSummary[] = []
-  let totalCost = 0
-  let bestScore = -Infinity
-  for (let cost = 0; cost <= limit; cost += 1) {
-    const state = states[15][cost]
-    if (!state) continue
-    if (state.score > bestScore || (state.score === bestScore && cost > totalCost)) {
-      selected = state.cards
-      totalCost = cost
-      bestScore = state.score
+  while (selected.length < 15) {
+    const basicCount = selected.filter(isTcgBattleBasic).length
+    const eligible = candidatePool.filter((card) => {
+      if (selectedIds.has(card.id) || totalCost + card.cost > limit) return false
+      if (selected.length === 0 && evolutionRootIds.size > 0 && !evolutionRootIds.has(card.id)) return false
+      if (basicCount < 6 && !isTcgBattleBasic(card)) return false
+      const stage = getTcgBattleEvolutionStage(card)
+      if (stage > 0) {
+        const predecessorName = normalizeTcgBattlePokemonName(card.evolvesFrom)
+        const predecessorStage = (stage - 1) as 0 | 1
+        const predecessorCount = selected.filter((candidate) =>
+          normalizeTcgBattlePokemonName(candidate.name) === predecessorName &&
+          getTcgBattleEvolutionStage(candidate) === predecessorStage &&
+          (predecessorStage !== 0 || isTcgBattleBasic(candidate)),
+        ).length
+        const alreadyPairedCount = selected.filter((candidate) =>
+          getTcgBattleEvolutionStage(candidate) === stage &&
+          normalizeTcgBattlePokemonName(candidate.evolvesFrom) === predecessorName,
+        ).length
+        if (predecessorCount <= alreadyPairedCount) return false
+      }
+      return canCompleteDeck([...selected, card], totalCost + card.cost)
+    })
+    const shouldStartAnEvolutionLine =
+      basicCount >= 6 && !selected.some((card) => getTcgBattleEvolutionStage(card) === 1)
+    const lineCards = shouldStartAnEvolutionLine
+      ? eligible.filter((card) => getTcgBattleEvolutionStage(card) === 1)
+      : []
+    if (lineCards.length > 0) {
+      eligible.splice(0, eligible.length, ...lineCards)
+    }
+    if (eligible.length === 0) break
+
+    eligible.sort((a, b) => {
+      const scoreDifference = (getCardBattleScore(b) + lineBonus(b)) - (getCardBattleScore(a) + lineBonus(a))
+      return scoreDifference || b.cost - a.cost || a.name.localeCompare(b.name)
+    })
+    const card = eligible[0]
+    selected.push(card)
+    selectedIds.add(card.id)
+    totalCost += card.cost
+  }
+
+  // Spend any remaining format budget through a one-card upgrade, keeping all
+  // evolution prerequisites and the six-Basic opening rule intact.
+  let improved = true
+  while (selected.length === 15 && totalCost < limit && improved) {
+    improved = false
+    let replacement: { index: number; card: TcgBattleCardSummary } | undefined
+    let replacementScore = -Infinity
+    for (const card of candidatePool) {
+      if (selectedIds.has(card.id)) continue
+      for (const [index, current] of selected.entries()) {
+        const nextCost = totalCost - current.cost + card.cost
+        if (nextCost <= totalCost || nextCost > limit) continue
+        const trial = [...selected]
+        trial[index] = card
+        if (getTcgBattleDeckLineErrors(trial).length > 0) continue
+        const score = getCardBattleScore(card) + lineBonus(card) - getCardBattleScore(current) - lineBonus(current)
+        if (score > replacementScore) {
+          replacement = { index, card }
+          replacementScore = score
+        }
+      }
+    }
+    if (replacement) {
+      const previous = selected[replacement.index]
+      selectedIds.delete(previous.id)
+      selected[replacement.index] = replacement.card
+      selectedIds.add(replacement.card.id)
+      totalCost += replacement.card.cost - previous.cost
+      improved = true
     }
   }
 
-  const errors = selected.length === 15 ? [] : ['Not enough legal owned cards to build this format.']
+  const errors = selected.length === 15
+    ? getTcgBattleDeckLineErrors(selected)
+    : candidatePool.filter(isTcgBattleBasic).length < 6
+      ? ['Auto Fill needs at least 6 legal Basic Pokémon in this generation.']
+      : ['Not enough legal owned cards to build this format.']
   return { valid: errors.length === 0, errors, cards: selected, totalCost }
 }
 
@@ -1028,6 +1194,11 @@ export function drawTcgBattleCards(cards: TcgBattleCardSummary[], count: number)
     drawn.push(createTcgBattleCardState(card, drawn.length))
   }
   return drawn
+}
+
+export function drawTcgBattleOpeningCards(cards: TcgBattleCardSummary[], count = 6): TcgBattleCardState[] {
+  const basics = cards.filter(isTcgBattleBasic)
+  return drawTcgBattleCards(basics, count)
 }
 
 export function arrangeOpponentTcgBattleCards(cards: TcgBattleCardState[]) {
@@ -25650,6 +25821,88 @@ export function getOpenTcgBattleBenchSlots(side: TcgBattleSideState): number {
   return Math.max(0, Math.min(3 - livingBench, 6 - livingPokemon))
 }
 
+export interface TcgBattleEvolutionOption {
+  targetId: string
+  targetName: string
+  card: TcgBattleCardSummary
+}
+
+function getTcgBattleUsedDeckCardIds(side: TcgBattleSideState): Set<string> {
+  const cardsInBattle = [
+    ...side.hand,
+    ...side.front,
+    ...side.back,
+    ...side.discard,
+  ]
+  const usedIds = new Set(cardsInBattle.map((card) => card.id))
+  for (const card of [...side.front, ...side.back, ...side.discard]) {
+    for (const stackedCard of card.evolutionStack || []) usedIds.add(stackedCard.id)
+  }
+  return usedIds
+}
+
+export function getTcgBattleEvolutionOptions(
+  side: TcgBattleSideState,
+  turnNumber: number,
+): TcgBattleEvolutionOption[] {
+  const usedIds = getTcgBattleUsedDeckCardIds(side)
+  const options: TcgBattleEvolutionOption[] = []
+  for (const target of [...side.front, ...side.back]) {
+    if (target.currentHp <= 0) continue
+    const targetStage = getTcgBattleEvolutionStage(target)
+    if (!isTcgBattleBasic(target) && targetStage !== 1) continue
+    const nextStage = targetStage + 1
+    for (const card of side.deck) {
+      if (usedIds.has(card.id) || getTcgBattleEvolutionStage(card) !== nextStage) continue
+      if (normalizeTcgBattlePokemonName(card.evolvesFrom) !== normalizeTcgBattlePokemonName(target.name)) continue
+      if (turnNumber < getTcgBattleCardUnlockTurnForCard(card)) continue
+      options.push({ targetId: target.instanceId, targetName: target.name, card })
+    }
+  }
+  return options
+}
+
+export function applyTcgBattleEvolution(
+  side: TcgBattleSideState,
+  targetId: string,
+  evolutionCardId: string,
+  turnNumber: number,
+): { target: TcgBattleCardState; evolution: TcgBattleCardSummary; previousName: string } | null {
+  const option = getTcgBattleEvolutionOptions(side, turnNumber).find(
+    (candidate) => candidate.targetId === targetId && candidate.card.id === evolutionCardId,
+  )
+  if (!option) return null
+  const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId)
+  if (!target) return null
+  const evolutionDeckIndex = side.deck.findIndex((card) => card.id === option.card.id)
+  if (evolutionDeckIndex < 0) return null
+  side.deck.splice(evolutionDeckIndex, 1)
+
+  const damageCounters = Math.max(0, target.hp - target.currentHp)
+  const previousName = target.name
+  const {
+    instanceId,
+    currentHp: _currentHp,
+    evolutionStack,
+    statusConditions: _statusConditions,
+    incomingAttackModifier: _incomingAttackModifier,
+    temporaryEffects: _temporaryEffects,
+    markers: _markers,
+    ...previousSummary
+  } = target
+  const stack = [...(evolutionStack || []).map((card) => ({ ...card })), previousSummary]
+  Object.assign(target, option.card, {
+    instanceId,
+    currentHp: Math.max(0, option.card.hp - damageCounters),
+    evolutionStack: stack,
+    statusConditions: undefined,
+    incomingAttackModifier: undefined,
+    temporaryEffects: undefined,
+    markers: undefined,
+  })
+  return { target, evolution: option.card, previousName }
+}
+
 export function getTcgBattleDeckSearchMaxCount(params: {
   state: TcgBattleState
   sideKey: TcgBattleSide
@@ -25673,13 +25926,7 @@ export function getAvailableTcgBattleDeckPokemon(
   side: TcgBattleSideState,
   rule: Extract<TcgBattleSpecialRule, { kind: 'searchDeckPokemon' }>,
 ): TcgBattleCardSummary[] {
-  const cardsInBattle = [
-    ...side.hand,
-    ...side.front,
-    ...side.back,
-    ...side.discard,
-  ]
-  const unavailableIds = new Set(cardsInBattle.map((card) => card.id))
+  const unavailableIds = getTcgBattleUsedDeckCardIds(side)
   const normalizeName = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '')
   const eligibleNames = rule.includeNames?.map(normalizeName)
   const eligibleNameParts = rule.includeNameContains?.map(normalizeName)
@@ -25710,7 +25957,17 @@ export function getAvailableTcgBattleDeckPokemon(
 export function compactTcgBattleBoard(side: TcgBattleSideState): void {
   const faintedFront = side.front.filter((card) => card.currentHp <= 0)
   const faintedBack = side.back.filter((card) => card.currentHp <= 0)
-  side.discard.push(...faintedFront, ...faintedBack)
+  for (const card of [...faintedFront, ...faintedBack]) {
+    for (const [index, summary] of (card.evolutionStack || []).entries()) {
+      side.discard.push({
+        ...summary,
+        instanceId: `${summary.id}:discard:${card.instanceId}:${index}`,
+        currentHp: 0,
+      })
+    }
+    const { evolutionStack: _evolutionStack, ...faintedCard } = card
+    side.discard.push(faintedCard)
+  }
   side.front = side.front.filter((card) => card.currentHp > 0)
   side.back = side.back.filter((card) => card.currentHp > 0)
 }
