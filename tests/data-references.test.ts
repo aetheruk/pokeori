@@ -2740,7 +2740,7 @@ describe('static data references', () => {
       '#E8F3E2',
       '#f7cf05',
     ])
-    expect(mushroomSlot?.percentage).toBe(5)
+    expect(mushroomSlot?.percentage).toBe(1)
     expect(mushroomSlot?.requirements).toBeUndefined()
     expect(mushroomSlot?.rewards).toEqual([
       {

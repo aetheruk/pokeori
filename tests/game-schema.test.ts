@@ -1355,7 +1355,7 @@ describe('generated game data schemas', () => {
     )
   })
 
-  test('Pewter, Cerulean, and Lavender Chansey wheels keep their local material reward mixes', () => {
+  test('Pewter, Cerulean, and Lavender Chansey wheels keep their local prize mixes', () => {
     const expectedSlots = {
       'chansey-wheel-pewter': {
         'battle-potion': 35,
@@ -1369,13 +1369,14 @@ describe('generated game data schemas', () => {
         'broken-ball-t1': 25,
         'water-gem': 20,
         'aqua-solvent-t1': 19,
-        nugget: 1,
+        'water-stone': 1,
       },
       'chansey-wheel-lavender': {
         'psychic-gem': 23,
-        'ghost-gem': 5,
+        'ghost-gem': 24,
         'mind-thread-t1': 24,
         'spirit-wisp-t1': 24,
+        nugget: 5,
       },
     }
 
@@ -1430,12 +1431,14 @@ describe('generated game data schemas', () => {
           'ghost-gem': 6,
           'mind-thread-t1': 6,
           'spirit-wisp-t1': 6,
+          nugget: 1,
         })
         expect(slotPercentages).toEqual({
           'psychic-gem': 23,
-          'ghost-gem': 29,
+          'ghost-gem': 24,
           'mind-thread-t1': 24,
           'spirit-wisp-t1': 24,
+          nugget: 5,
         })
         expect(
           game!.settings.slots.some((slot) =>
@@ -1448,14 +1451,66 @@ describe('generated game data schemas', () => {
     }
   })
 
-  test('Chansey wheels are daily and spend League Tickets at authored progression costs', () => {
+  test('Chansey wheels have their intended rare prizes and odds', () => {
+    const rarePrizes = [
+      ['chansey-wheel-viridian', 'leaf-stone', 1],
+      ['chansey-wheel-pewter', 'moon-stone', 1],
+      ['chansey-wheel-cerulean', 'water-stone', 1],
+      ['chansey-wheel-vermilion', 'thunder-stone', 1],
+      ['chansey-wheel-lavender', 'nugget', 5],
+      ['chansey-wheel-fuchsia', 'big-mushroom', 1],
+      ['chansey-wheel-celadon', 'link-cable', 1],
+    ] as const
+
+    for (const [gameId, itemId, percentage] of rarePrizes) {
+      const wheel = allGames.find((entry) => entry.id === gameId) as
+        | PrizeWheelGameConfig
+        | undefined
+      expect(wheel).toBeDefined()
+
+      const prizeSlot = wheel!.settings.slots.find((slot) =>
+        slot.rewards.some(
+          (reward) => reward.type === 'item' && reward.targetId === itemId,
+        ),
+      )
+      expect(prizeSlot?.percentage).toBe(percentage)
+      expect(
+        wheel!.settings.slots.reduce((total, slot) => total + slot.percentage, 0),
+      ).toBe(100)
+    }
+  })
+
+  test('Celadon Chansey Wheel gives three of each status-healing item', () => {
+    const wheel = allGames.find((entry) => entry.id === 'chansey-wheel-celadon') as
+      | PrizeWheelGameConfig
+      | undefined
+
+    expect(wheel).toBeDefined()
+    expect(
+      wheel!.settings.slots.slice(0, 6).map((slot) => ({
+        itemId: slot.rewards[0]?.targetId,
+        quantity: slot.rewards[0]?.quantity,
+        percentage: slot.percentage,
+      })),
+    ).toEqual([
+      { itemId: 'antidote', quantity: 3, percentage: 16.5 },
+      { itemId: 'paralyze-heal', quantity: 3, percentage: 16.5 },
+      { itemId: 'awakening', quantity: 3, percentage: 16.5 },
+      { itemId: 'burn-heal', quantity: 3, percentage: 16.5 },
+      { itemId: 'ice-heal', quantity: 3, percentage: 16.5 },
+      { itemId: 'full-heal', quantity: 3, percentage: 16.5 },
+    ])
+  })
+
+  test('Chansey wheels are daily and all cost two League Tickets', () => {
     const expectedCosts = {
       'chansey-wheel-viridian': 2,
       'chansey-wheel-pewter': 2,
       'chansey-wheel-cerulean': 2,
-      'chansey-wheel-vermilion': 5,
+      'chansey-wheel-vermilion': 2,
       'chansey-wheel-lavender': 2,
       'chansey-wheel-fuchsia': 2,
+      'chansey-wheel-celadon': 2,
     }
 
     for (const [gameId, amount] of Object.entries(expectedCosts)) {
@@ -1485,7 +1540,7 @@ describe('generated game data schemas', () => {
         entry.gameType === 'prize-wheel' &&
         entry.id.startsWith('chansey-wheel-'),
     )
-    expect(chanseyWheels).toHaveLength(6)
+    expect(chanseyWheels).toHaveLength(7)
     expect(
       chanseyWheels.every((entry) => entry.settings.showSlotLabels === false),
     ).toBe(true)

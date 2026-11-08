@@ -1,3 +1,87 @@
 import { PrizeWheelGameConfig } from '../types'
 
-export const celadonCitychanseyEntries: PrizeWheelGameConfig[] = []
+export const celadonCitychanseyEntries: PrizeWheelGameConfig[] = [
+  {
+    id: 'chansey-wheel-celadon',
+    name: 'Celadon Chansey Wheel',
+    gameType: 'prize-wheel',
+    description:
+      'Visit Chansey in the Celadon City Pokemon Center for daily status-healing items and a rare chance to win a Link Cable!',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    background: '/backgrounds/chansey.avif',
+    icon: { type: 'pokemon', id: '113' },
+    daily: true,
+    requirements: [
+      { type: 'task_completed', targetId: 'explore-celadon-city' },
+      { type: 'daily_not_completed', targetId: 'chansey-wheel-celadon' },
+    ],
+    criteria: [],
+    rewards: [],
+    settings: {
+      spinTime: { min: 5, max: 10 },
+      background: '/scratchcard/chansey.avif',
+      themeColour: '#FAC0CC',
+      showSlotLabels: false,
+      cost: { amount: 2, currencyType: 'league-ticket' },
+      slots: [
+        {
+          id: '1',
+          label: '3x Antidote',
+          color: '#F1AEC6',
+          percentage: 16.5,
+          icon: { type: 'item', id: 'antidote' },
+          rewards: [{ type: 'item', targetId: 'antidote', quantity: 3, dropChance: 100 }],
+        },
+        {
+          id: '2',
+          label: '3x Paralyze Heal',
+          color: '#E8F3E2',
+          percentage: 16.5,
+          icon: { type: 'item', id: 'paralyze-heal' },
+          rewards: [{ type: 'item', targetId: 'paralyze-heal', quantity: 3, dropChance: 100 }],
+        },
+        {
+          id: '3',
+          label: '3x Awakening',
+          color: '#F1AEC6',
+          percentage: 16.5,
+          icon: { type: 'item', id: 'awakening' },
+          rewards: [{ type: 'item', targetId: 'awakening', quantity: 3, dropChance: 100 }],
+        },
+        {
+          id: '4',
+          label: '3x Burn Heal',
+          color: '#E8F3E2',
+          percentage: 16.5,
+          icon: { type: 'item', id: 'burn-heal' },
+          rewards: [{ type: 'item', targetId: 'burn-heal', quantity: 3, dropChance: 100 }],
+        },
+        {
+          id: '5',
+          label: '3x Ice Heal',
+          color: '#F1AEC6',
+          percentage: 16.5,
+          icon: { type: 'item', id: 'ice-heal' },
+          rewards: [{ type: 'item', targetId: 'ice-heal', quantity: 3, dropChance: 100 }],
+        },
+        {
+          id: '6',
+          label: '3x Full Heal',
+          color: '#E8F3E2',
+          percentage: 16.5,
+          icon: { type: 'item', id: 'full-heal' },
+          rewards: [{ type: 'item', targetId: 'full-heal', quantity: 3, dropChance: 100 }],
+        },
+        {
+          id: '7',
+          label: 'Link Cable',
+          color: '#f7cf05',
+          percentage: 1,
+          icon: { type: 'item', id: 'link-cable' },
+          rewards: [{ type: 'item', targetId: 'link-cable', quantity: 1, dropChance: 100 }],
+        },
+      ],
+    },
+  },
+]
