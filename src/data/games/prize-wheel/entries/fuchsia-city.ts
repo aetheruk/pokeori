@@ -1,12 +1,12 @@
 import { PrizeWheelGameConfig } from '../types'
 
 const xItemSlots = [
-  { id: 'x-attack', label: 'X Attack', percentage: 16 },
-  { id: 'x-defense', label: 'X Defense', percentage: 16 },
-  { id: 'x-sp-atk', label: 'X Sp. Atk', percentage: 16 },
-  { id: 'x-sp-def', label: 'X Sp. Def', percentage: 16 },
-  { id: 'x-speed', label: 'X Speed', percentage: 15 },
-  { id: 'dire-hit', label: 'Dire Hit', percentage: 16 },
+  { id: 'x-attack', label: 'X Attack', percentage: 16.5 },
+  { id: 'x-defense', label: 'X Defense', percentage: 16.5 },
+  { id: 'x-sp-atk', label: 'X Sp. Atk', percentage: 16.5 },
+  { id: 'x-sp-def', label: 'X Sp. Def', percentage: 16.5 },
+  { id: 'x-speed', label: 'X Speed', percentage: 16.5 },
+  { id: 'dire-hit', label: 'Dire Hit', percentage: 16.5 },
 ] as const
 
 export const fuchsiaCitychanseyEntries: PrizeWheelGameConfig[] = [
@@ -46,7 +46,7 @@ export const fuchsiaCitychanseyEntries: PrizeWheelGameConfig[] = [
           id: 'big-mushroom',
           label: 'Big Mushroom',
           color: '#f7cf05',
-          percentage: 5,
+          percentage: 1,
           icon: { type: 'item' as const, id: 'big-mushroom' },
           rewards: [
             {

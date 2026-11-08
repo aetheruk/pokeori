@@ -55,7 +55,7 @@ describe('requirements and criteria semantics', () => {
 
   test('each Chansey wheel blocks a second daily spin and reopens on the next UTC day', () => {
     const wheels = allGames.filter((game) => game.id.startsWith('chansey-wheel-'))
-    expect(wheels).toHaveLength(6)
+    expect(wheels).toHaveLength(7)
     const today = new Date().toISOString()
     const yesterday = new Date(Date.now() - 86_400_000).toISOString()
 

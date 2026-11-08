@@ -6,7 +6,7 @@ export const lavenderTownchanseyEntries: PrizeWheelGameConfig[] = [
     name: 'Lavender Chansey Wheel',
     gameType: 'prize-wheel',
     description:
-      'Visit Chansey in the Lavender Town Pokemon Center and spin the wheel for a chance to win spectral and psychic crafting prizes each day!',
+      'Visit Chansey in the Lavender Town Pokemon Center for spectral and psychic crafting prizes, plus a rare Nugget!',
     category: 'Kanto',
     subCategory: 'Lavender Town',
     background: '/backgrounds/chansey.avif',
@@ -65,11 +65,11 @@ export const lavenderTownchanseyEntries: PrizeWheelGameConfig[] = [
         },
         {
           id: '5',
-          label: '6x Ghost Gems',
+          label: 'Nugget',
           color: '#f7cf05',
           percentage: 5,
-          icon: { type: 'item', id: 'ghost-gem' },
-          rewards: [{ type: 'item', targetId: 'ghost-gem', quantity: 6, dropChance: 100 }],
+          icon: { type: 'item', id: 'nugget' },
+          rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 100 }],
         },
       ],
     },
