@@ -9,6 +9,7 @@ import {
   canSideChargeEnergy,
   arrangeOpponentTcgBattleCards,
   applyTcgBattleEnergyDiscards,
+  applyTcgBattleEvolution,
   applyTcgBattleStatusConditions,
   canSideTakeTcgBattleAction,
   canTcgBattleEndByPassStall,
@@ -20,6 +21,7 @@ import {
   compactTcgBattleBoard,
   createTcgBattleCardState,
   drawTcgBattleCards,
+  drawTcgBattleOpeningCards,
   doesTcgBattleConditionPass,
   getAllowedTcgBattleAttackCost,
   getEffectiveTcgBattleAttackCost,
@@ -27,6 +29,7 @@ import {
   getTcgBattleCount,
   getValidTcgBattleTargets,
   getTcgBattleCardUnlockTurnForCard,
+  getTcgBattleEvolutionOptions,
   getAvailableTcgBattleDeckPokemon,
   getTcgBattleDeckSearchMaxCount,
   getOpenTcgBattleBenchSlots,
@@ -434,7 +437,7 @@ async function initializeTcgPvpMatch(
     activeSide: 'player',
     player: {
       deck: canonicalPlayerDeck.cards,
-      hand: drawTcgBattleCards(canonicalPlayerDeck.cards, 6),
+      hand: drawTcgBattleOpeningCards(canonicalPlayerDeck.cards, 6),
       front: [],
       back: [],
       discard: [],
@@ -443,7 +446,7 @@ async function initializeTcgPvpMatch(
     },
     opponent: {
       deck: canonicalOpponentDeck.cards,
-      hand: drawTcgBattleCards(canonicalOpponentDeck.cards, 6),
+      hand: drawTcgBattleOpeningCards(canonicalOpponentDeck.cards, 6),
       front: [],
       back: [],
       discard: [],
@@ -530,6 +533,7 @@ function toTcgBattleCardSummary(card: TcgBattleCardState): TcgBattleCardSummary 
     incomingAttackModifier: _incomingAttackModifier,
     temporaryEffects: _temporaryEffects,
     markers: _markers,
+    evolutionStack: _evolutionStack,
     ...summary
   } = card
   return summary
@@ -2259,6 +2263,39 @@ function runOpponentTurn(state: TcgBattleState) {
   const choice = chooseOpponentTcgBattleAttack(state)
 
   if (!choice) {
+    if (!canSideChargeEnergy(state, 'opponent')) {
+      const evolutionOption = getTcgBattleEvolutionOptions(
+        state.opponent,
+        state.turnNumber,
+      ).sort(
+        (a, b) =>
+          b.card.cost - a.card.cost ||
+          a.card.name.localeCompare(b.card.name),
+      )[0]
+      if (evolutionOption) {
+        const evolved = applyTcgBattleEvolution(
+          state.opponent,
+          evolutionOption.targetId,
+          evolutionOption.card.id,
+          state.turnNumber,
+        )
+        if (evolved) {
+          state.consecutivePasses = 0
+          state.log.unshift(
+            `Opponent evolved ${evolved.previousName} into ${evolved.evolution.name}.`,
+          )
+          state.lastAction = {
+            id: randomUUID(),
+            side: 'opponent',
+            kind: 'evolve',
+            frontId: evolved.target.instanceId,
+            evolutionCardId: evolved.evolution.id,
+          }
+          finishOpponentTurn(state)
+          return
+        }
+      }
+    }
     if (canSideChargeEnergy(state, 'opponent')) {
       const gain = TCG_BATTLE_FORMATS[state.format].chargeGain
       const cap = TCG_BATTLE_FORMATS[state.format].energyCap
@@ -3021,8 +3058,8 @@ export async function startTcgBattle(
       }
       const opponentDeck = opponentDeckValidation.cards
 
-      const playerHand = drawTcgBattleCards(playerDeck.cards, 6)
-      const opponentHand = drawTcgBattleCards(opponentDeck, 6)
+      const playerHand = drawTcgBattleOpeningCards(playerDeck.cards, 6)
+      const opponentHand = drawTcgBattleOpeningCards(opponentDeck, 6)
       const opponentBoard = arrangeOpponentTcgBattleCards(opponentHand)
       const energy = TCG_BATTLE_FORMATS[format].startingEnergy
       const trainers = getTcgBattleTrainerCards(user, encounter)
@@ -3457,6 +3494,104 @@ export async function tcgBattlePromote(
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unable to promote card.',
+    }
+  }
+}
+
+export async function tcgBattleEvolve(
+  targetId: string,
+  evolutionCardId: string,
+  expectedRevision?: number,
+): Promise<TcgBattleActionResult> {
+  try {
+    const user = await getUser()
+    if (!user) return { success: false, error: 'Not authenticated' }
+
+    const encounter = await getActiveTcgBattleEncounter(user.id)
+    if (isTcgPvpEncounter(encounter)) {
+      return runTcgPvpMutation(
+        user.id,
+        expectedRevision,
+        (state, viewerSide) => {
+          if (state.phase !== 'battle' || state.activeSide !== viewerSide) {
+            return 'It is not your turn.'
+          }
+          if (
+            state[viewerSide].energy >=
+              TCG_BATTLE_FORMATS[state.format].energyCap &&
+            canSideTakeTcgBattleAction(state, viewerSide)
+          ) {
+            return 'You must attack while at full energy.'
+          }
+          const evolved = applyTcgBattleEvolution(
+            state[viewerSide],
+            targetId,
+            evolutionCardId,
+            state.turnNumber,
+          )
+          if (!evolved) {
+            return 'That Pokémon cannot evolve with the selected card yet.'
+          }
+
+          clearDamageEvents(state)
+          state.consecutivePasses = 0
+          state.log.unshift(
+            `${getTcgPvpSideName(state, viewerSide)} evolved ${evolved.previousName} into ${evolved.evolution.name}.`,
+          )
+          state.lastAction = {
+            id: randomUUID(),
+            side: viewerSide,
+            kind: 'evolve',
+            frontId: evolved.target.instanceId,
+            evolutionCardId: evolved.evolution.id,
+          }
+          settleTcgPvpAction(state, viewerSide)
+        },
+      )
+    }
+
+    return await withTcgBattleLock(user.id, async () => {
+      const state = await loadState(user.id)
+      await getActiveTcgBattleEncounter(user.id, state.encounterId)
+      if (state.phase !== 'battle' || state.activeSide !== 'player') {
+        return { success: false, error: 'It is not your turn.' }
+      }
+      if (
+        state.player.energy >= TCG_BATTLE_FORMATS[state.format].energyCap &&
+        canSideTakeTcgBattleAction(state, 'player')
+      ) {
+        return {
+          success: false,
+          error: 'You must attack while at full energy.',
+        }
+      }
+      const evolved = applyTcgBattleEvolution(
+        state.player,
+        targetId,
+        evolutionCardId,
+        state.turnNumber,
+      )
+      if (!evolved) {
+        return {
+          success: false,
+          error: 'That Pokémon cannot evolve with the selected card yet.',
+        }
+      }
+
+      clearDamageEvents(state)
+      state.consecutivePasses = 0
+      state.log.unshift(
+        `You evolved ${evolved.previousName} into ${evolved.evolution.name}.`,
+      )
+      afterPlayerAction(state)
+      finishByStallIfNeeded(state)
+      await saveState(state)
+      return { success: true, state }
+    })
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unable to evolve.',
     }
   }
 }
