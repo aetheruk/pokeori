@@ -16,8 +16,8 @@ import {
   clearTcgBattleControlStatus,
   clearTcgBattleStatuses,
   clearTcgBattleTemporaryEffects,
+  chooseOpponentTcgBattleAction,
   chooseTcgBattleAttackChoice,
-  chooseOpponentTcgBattleAttack,
   compactTcgBattleBoard,
   createTcgBattleCardState,
   drawTcgBattleCards,
@@ -29,7 +29,6 @@ import {
   getTcgBattleCount,
   getValidTcgBattleTargets,
   getTcgBattleCardUnlockTurnForCard,
-  getTcgBattleEvolutionOptions,
   getAvailableTcgBattleDeckPokemon,
   getTcgBattleDeckSearchMaxCount,
   getOpenTcgBattleBenchSlots,
@@ -2268,66 +2267,51 @@ function applyAttack(
 
 function runOpponentTurn(state: TcgBattleState) {
   if (state.phase !== 'battle' || state.activeSide !== 'opponent') return
-  const choice = chooseOpponentTcgBattleAttack(state)
+  const decision = chooseOpponentTcgBattleAction(state)
 
-  if (!choice) {
-    if (!canSideChargeEnergy(state, 'opponent')) {
-      const evolutionOption = getTcgBattleEvolutionOptions(
-        state.opponent,
-        state.turnNumber,
-      ).sort(
-        (a, b) =>
-          b.card.cost - a.card.cost ||
-          a.card.name.localeCompare(b.card.name),
-      )[0]
-      if (evolutionOption) {
-        const evolved = applyTcgBattleEvolution(
-          state.opponent,
-          evolutionOption.targetId,
-          evolutionOption.card.id,
-          state.turnNumber,
-        )
-        if (evolved) {
-          state.consecutivePasses = 0
-          state.log.unshift(
-            `Opponent evolved ${evolved.previousName} into ${evolved.evolution.name}.`,
-          )
-          state.lastAction = {
-            id: randomUUID(),
-            side: 'opponent',
-            kind: 'evolve',
-            frontId: evolved.target.instanceId,
-            evolutionCardId: evolved.evolution.id,
-          }
-          finishOpponentTurn(state)
-          return
-        }
-      }
-    }
-    if (canSideChargeEnergy(state, 'opponent')) {
-      const gain = TCG_BATTLE_FORMATS[state.format].chargeGain
-      const cap = TCG_BATTLE_FORMATS[state.format].energyCap
-      const before = state.opponent.energy
-      state.opponent.energy = Math.min(cap, state.opponent.energy + gain)
-      state.log.unshift(
-        `Opponent charged ${state.opponent.energy - before} energy.`,
-      )
-    } else {
-      state.log.unshift('Opponent ended turn.')
-    }
-    state.consecutivePasses += 1
+  if (decision.kind === 'attack') {
+    const { attacker, attackIndex, target, choice } = decision.option
+    applyAttack(state, 'opponent', attacker, attackIndex, target, choice)
     finishOpponentTurn(state)
     return
   }
 
-  applyAttack(
-    state,
-    'opponent',
-    choice.attacker,
-    choice.attackIndex,
-    choice.target,
-    choice.choice,
-  )
+  if (decision.kind === 'evolve') {
+    const evolved = applyTcgBattleEvolution(
+      state.opponent,
+      decision.option.targetId,
+      decision.option.card.id,
+      state.turnNumber,
+    )
+    if (evolved) {
+      state.consecutivePasses = 0
+      state.log.unshift(
+        `Opponent evolved ${evolved.previousName} into ${evolved.evolution.name}.`,
+      )
+      state.lastAction = {
+        id: randomUUID(),
+        side: 'opponent',
+        kind: 'evolve',
+        frontId: evolved.target.instanceId,
+        evolutionCardId: evolved.evolution.id,
+      }
+      finishOpponentTurn(state)
+      return
+    }
+  }
+
+  if (decision.kind === 'charge' || canSideChargeEnergy(state, 'opponent')) {
+    const gain = TCG_BATTLE_FORMATS[state.format].chargeGain
+    const cap = TCG_BATTLE_FORMATS[state.format].energyCap
+    const before = state.opponent.energy
+    state.opponent.energy = Math.min(cap, state.opponent.energy + gain)
+    state.log.unshift(
+      `Opponent charged ${state.opponent.energy - before} energy.`,
+    )
+  } else {
+    state.log.unshift('Opponent ended turn.')
+  }
+  state.consecutivePasses += 1
   finishOpponentTurn(state)
 }
 

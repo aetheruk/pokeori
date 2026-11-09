@@ -1204,8 +1204,29 @@ export function drawTcgBattleOpeningCards(cards: TcgBattleCardSummary[], count =
 }
 
 export function arrangeOpponentTcgBattleCards(cards: TcgBattleCardState[]) {
-  const sorted = [...cards].sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a))
+  const sorted = [...cards].sort((a, b) => getOpponentOpeningScore(b) - getOpponentOpeningScore(a) || a.name.localeCompare(b.name))
   return { front: sorted.slice(0, 3), back: sorted.slice(3, 6) }
+}
+
+function getOpponentOpeningScore(card: TcgBattleCardState): number {
+  const cardState = { ...card, currentHp: card.hp }
+  const openingAttack = Math.max(
+    0,
+    ...card.attacks
+      .filter((attack) => (attack.convertedEnergyCost ?? attack.cost?.length ?? 0) <= 1)
+      .map((attack) => {
+        const effect = getTcgBattleAttackEffect(attack)
+        return effect
+          ? calculateTcgBattleRawDamage(effect.damage, {
+              attacker: cardState,
+              target: cardState,
+              paidAttackCost: 1,
+              coinMode: 'max',
+            })
+          : 0
+      }),
+  )
+  return card.hp * 0.8 + openingAttack * 2.2 - card.convertedRetreatCost * 2
 }
 
 export function getAllowedTcgBattleAttackCost(turnNumber: number): number {
@@ -25974,19 +25995,283 @@ export function compactTcgBattleBoard(side: TcgBattleSideState): void {
   side.back = side.back.filter((card) => card.currentHp > 0)
 }
 
-export function chooseOpponentTcgBattleAttack(state: TcgBattleState) {
-  const maxCost = getAllowedTcgBattleAttackCost(state.turnNumber)
-  let best:
-    | {
-        attacker: TcgBattleCardState
-        target: TcgBattleCardState
-        attackIndex: number
-        damage: number
-        choice?: TcgBattleAttackChoice
+type OpponentTcgBattleAttackOption = {
+  attacker: TcgBattleCardState
+  target: TcgBattleCardState
+  attackIndex: number
+  damage: number
+  choice?: TcgBattleAttackChoice
+  score: number
+  knockoutChance: number
+  expectedDamage: number
+  energyCost: number
+}
+
+export type OpponentTcgBattleAction =
+  | { kind: 'attack'; option: OpponentTcgBattleAttackOption }
+  | { kind: 'evolve'; option: TcgBattleEvolutionOption }
+  | { kind: 'charge' }
+  | { kind: 'end' }
+
+const OPPONENT_ATTACK_SCORE_SAMPLES = 16
+
+function createOpponentDecisionRandom(seed: string): () => number {
+  let value = 2166136261
+  for (let index = 0; index < seed.length; index += 1) {
+    value ^= seed.charCodeAt(index)
+    value = Math.imul(value, 16777619)
+  }
+  return () => {
+    value = (value + 0x6d2b79f5) | 0
+    let next = value
+    next = Math.imul(next ^ (next >>> 15), next | 1)
+    next ^= next + Math.imul(next ^ (next >>> 7), next | 61)
+    return ((next ^ (next >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+function getOpponentStatusValue(status: TcgBattleStatusCondition): number {
+  if (status === 'asleep' || status === 'paralyzed') return 11
+  if (status === 'confused') return 9
+  return 4.5
+}
+
+function getOpponentProtectionValue(modifier: TcgBattleIncomingAttackModifier): number {
+  const turns = 'remainingOpponentTurns' in modifier
+    ? Math.min(2, Math.max(1, modifier.remainingOpponentTurns))
+    : 1
+  const baseValue = modifier.kind === 'preventAll' || modifier.kind === 'preventAllEffects'
+    ? 15
+    : modifier.kind === 'halve'
+      ? 9
+      : modifier.kind === 'coinPreventDamage'
+        ? 7 + (modifier.reflectDamage || 0) * 0.25
+        : Math.min(10, modifier.amount * 0.5)
+  return baseValue * turns
+}
+
+function getOpponentSpecialEffectValue(
+  rule: TcgBattleSpecialRule,
+  state: TcgBattleState,
+  attacker: TcgBattleCardState,
+  target: TcgBattleCardState,
+): number {
+  const own = state.opponent
+  const enemy = state.player
+  const targetsEnemy = [...enemy.front, ...enemy.back].some((card) => card.instanceId === target.instanceId)
+  switch (rule.kind) {
+    case 'knockOutTarget':
+      return !targetsEnemy
+        ? -30
+        : rule.requiresTargetStatus && !target.statusConditions?.includes(rule.requiresTargetStatus)
+        ? 0
+        : rule.requiresAnyTargetStatus && !(target.statusConditions?.length)
+          ? 0
+          : 30
+    case 'returnTargetToHand':
+    case 'shuffleTargetIntoDeck':
+      return targetsEnemy
+        ? enemy.front.some((card) => card.instanceId === target.instanceId) ? 19 : 11
+        : -19
+    case 'cannotAttack':
+      return (rule.target || 'opponent') === 'opponent'
+        ? 12
+        : own.front.some((card) => card.instanceId === target.instanceId)
+          ? -12
+          : 0
+    case 'disableAttack':
+      return 8
+    case 'switch':
+      return rule.target === 'opponent' ? 5 : attacker.currentHp < attacker.hp * 0.4 ? 7 : 1
+    case 'searchDeckPokemon':
+      return rule.destination === 'bench' && own.back.length < 3 ? 5 : 2
+    case 'drawCards':
+      return Math.min(5, (rule.amount || rule.amountPerHead || 1) * 1.5)
+    case 'buffAttack':
+    case 'buffDefendingPokemon':
+      return 6
+    case 'endure':
+      return attacker.currentHp <= Math.max(20, attacker.hp * 0.4) ? 12 : 6
+    case 'clearStatus': {
+      if (rule.target !== 'self') return -1
+      const cards = own.front.some((card) => card.instanceId === target.instanceId) || own.back.some((card) => card.instanceId === target.instanceId)
+        ? [target]
+        : [attacker]
+      return cards.reduce((total, card) => total + (card.statusConditions || []).reduce((sum, status) =>
+        sum + (rule.statuses.includes(status) ? getOpponentStatusValue(status) * 0.5 : 0), 0), 0)
+    }
+    case 'preventRetreat':
+      return rule.target === 'opponent' ? 4 : 0
+    default:
+      return 0
+  }
+}
+
+function scoreOpponentAttackResolution(
+  state: TcgBattleState,
+  attacker: TcgBattleCardState,
+  target: TcgBattleCardState,
+  resolution: TcgBattleAttackResolution,
+): { score: number; damage: number; frontKnockOut: boolean } {
+  const damageByCard = new Map<string, number>()
+  const addDamage = (cardId: string, amount: number) => {
+    if (amount > 0) damageByCard.set(cardId, (damageByCard.get(cardId) || 0) + amount)
+  }
+  addDamage(target.instanceId, resolution.targetDamage)
+  addDamage(attacker.instanceId, resolution.incomingReflectedDamage || 0)
+  for (const hit of resolution.benchDamage || []) addDamage(hit.targetId, hit.damage)
+  for (const hit of resolution.counterDamage || []) addDamage(hit.targetId, hit.damage)
+
+  let score = 0
+  let damage = 0
+  let frontKnockOut = false
+  for (const [cardId, amount] of damageByCard) {
+    const sideKey: TcgBattleSide | undefined = [...state.player.front, ...state.player.back].some((card) => card.instanceId === cardId)
+      ? 'player'
+      : [...state.opponent.front, ...state.opponent.back].some((card) => card.instanceId === cardId)
+        ? 'opponent'
+        : undefined
+    if (!sideKey) continue
+    const side = state[sideKey]
+    const card = [...side.front, ...side.back].find((entry) => entry.instanceId === cardId)
+    if (!card) continue
+    const effectiveDamage = Math.min(card.currentHp, amount)
+    const isFront = side.front.some((entry) => entry.instanceId === cardId)
+    const isEnemy = sideKey === 'player'
+    const weight = isEnemy ? (isFront ? 1 : 0.78) : (isFront ? -1.2 : -0.9)
+    score += effectiveDamage * weight
+    damage += isEnemy ? effectiveDamage : 0
+    if (amount >= card.currentHp) {
+      score += isEnemy ? (isFront ? 25 : 14) : -30
+      if (isEnemy && isFront) frontKnockOut = true
+      if (isEnemy && getLivingTcgBattleCards(side).length === 1) score += 35
+    }
+  }
+  if (resolution.selfKnockOut) score -= 42
+  score -= Math.min(attacker.currentHp, resolution.selfDamage) * 1.15
+
+  for (const status of resolution.statusConditions || []) {
+    const statusTarget = status.target === 'opponent'
+      ? target
+      : attacker
+    const already = new Set(statusTarget.statusConditions || [])
+    for (const condition of status.statuses) {
+      if (!already.has(condition)) score += (status.target === 'opponent' ? 1 : -1) * getOpponentStatusValue(condition)
+      already.add(condition)
+    }
+  }
+
+  for (const heal of resolution.healing || []) {
+    score += (heal.targetSide === 'opponent' ? 1 : -1) * heal.amount * 0.85
+  }
+  for (const protection of resolution.protection || []) {
+    score += (protection.targetSide === 'opponent' ? 1 : -1) * getOpponentProtectionValue(protection.modifier)
+  }
+  for (const discard of resolution.energyDiscards || []) {
+    score += (discard.target === 'opponent' ? 1 : -1) * discard.amount * 2.5
+  }
+  for (const gain of resolution.energyGains || []) {
+    score += (gain.target === 'self' ? 1 : -1) * gain.amount * 2
+  }
+  for (const special of resolution.specialEffects || []) {
+    score += getOpponentSpecialEffectValue(special, state, attacker, target)
+  }
+  const specialKnockOut = resolution.specialEffects?.some((special) =>
+    special.kind === 'knockOutTarget' &&
+    (!special.requiresTargetStatus || target.statusConditions?.includes(special.requiresTargetStatus)) &&
+    (!special.requiresAnyTargetStatus || Boolean(target.statusConditions?.length)),
+  )
+  if (specialKnockOut && state.player.front.some((card) => card.instanceId === target.instanceId)) {
+    score += 35
+    frontKnockOut = true
+  }
+
+  return { score, damage, frontKnockOut }
+}
+
+function getOpponentAttackSuccessChance(attacker: TcgBattleCardState, attack: TcgBattleAttack): number {
+  const effect = getTcgBattleAttackEffect(attack)
+  const statuses = attacker.statusConditions || []
+  const statusBlocks = statuses.includes('paralyzed') ||
+    (!effect?.allowWhileAsleep && statuses.includes('asleep')) ||
+    statuses.includes('confused')
+  const statusChance = statusBlocks ? 0.5 : 1
+  const tailChance = attacker.temporaryEffects?.attackFailsOnTails ? 0.5 : 1
+  return statusChance * tailChance
+}
+
+function scoreOpponentAttackOption(
+  state: TcgBattleState,
+  attacker: TcgBattleCardState,
+  target: TcgBattleCardState,
+  attackIndex: number,
+  choice?: TcgBattleAttackChoice,
+): OpponentTcgBattleAttackOption {
+  const attack = attacker.attacks[attackIndex]
+  const energyCost = getEffectiveTcgBattleAttackCost(state, attack)
+  const sampleScores: number[] = []
+  let knockoutSamples = 0
+  let expectedDamage = 0
+  for (let sample = 0; sample < OPPONENT_ATTACK_SCORE_SAMPLES; sample += 1) {
+    const seededRandom = createOpponentDecisionRandom(
+      `${state.turnNumber}:${attacker.instanceId}:${target.instanceId}:${attackIndex}:${sample}`,
+    )
+    let firstRoll = true
+    const random = () => {
+      if (firstRoll) {
+        firstRoll = false
+        return (sample + 0.5) / OPPONENT_ATTACK_SCORE_SAMPLES
       }
-    | null = null
+      return seededRandom()
+    }
+    const resolution = resolveTcgBattleAttack({
+      state,
+      sideKey: 'opponent',
+      attacker,
+      attack,
+      target,
+      paidAttackCost: energyCost,
+      choice,
+      random,
+    })
+    const outcome = scoreOpponentAttackResolution(state, attacker, target, resolution)
+    sampleScores.push(outcome.score)
+    expectedDamage += outcome.damage
+    if (outcome.frontKnockOut) knockoutSamples += 1
+  }
+  const successChance = getOpponentAttackSuccessChance(attacker, attack)
+  const averageOutcome = sampleScores.reduce((sum, value) => sum + value, 0) / sampleScores.length
+  const statusConditions = attacker.statusConditions || []
+  const blockingStatus = statusConditions.includes('paralyzed')
+    ? 'paralyzed'
+    : !getTcgBattleAttackEffect(attack)?.allowWhileAsleep && statusConditions.includes('asleep')
+      ? 'asleep'
+      : statusConditions.includes('confused')
+        ? 'confused'
+        : undefined
+  const confusionFailurePenalty = blockingStatus === 'confused' ? 5.75 : 0
+  const score = averageOutcome * successChance - energyCost * 2.25 * successChance -
+    confusionFailurePenalty * (1 - successChance) - (1 - successChance) * 3
+  const expected = expectedDamage / sampleScores.length * successChance
+  return {
+    attacker,
+    target,
+    attackIndex,
+    damage: expected,
+    choice,
+    score,
+    knockoutChance: knockoutSamples / sampleScores.length * successChance,
+    expectedDamage: expected,
+    energyCost,
+  }
+}
+
+function getOpponentAttackOptions(state: TcgBattleState, attackerFilter?: string): OpponentTcgBattleAttackOption[] {
+  const maxCost = getAllowedTcgBattleAttackCost(state.turnNumber)
+  const options: OpponentTcgBattleAttackOption[] = []
 
   for (const attacker of state.opponent.front.filter((card) => card.currentHp > 0)) {
+    if (attackerFilter && attacker.instanceId !== attackerFilter) continue
     if (!isTcgBattleSummaryUnlocked(attacker, state.turnNumber)) continue
     for (const [attackIndex, attack] of attacker.attacks.entries()) {
       if (isTcgBattleAttackDisabled(attacker, attackIndex)) continue
@@ -26003,15 +26288,144 @@ export function chooseOpponentTcgBattleAttack(state: TcgBattleState) {
         })
         const requirement = getTcgBattleAttackEffect(attack)?.choiceRequirement
         if (requirement && !choice && !isOptionalBenchChoiceSatisfied(requirement, state, 'opponent')) continue
-        const damage = calculateTcgBattleDamage(attacker, attack, target, state, 'opponent')
-        if (!best || damage > best.damage || target.currentHp < best.target.currentHp) {
-          best = { attacker, target, attackIndex, damage, choice }
-        }
+        options.push(scoreOpponentAttackOption(state, attacker, target, attackIndex, choice))
       }
     }
   }
 
-  return best
+  return options
+}
+
+function compareOpponentAttackOptions(a: OpponentTcgBattleAttackOption, b: OpponentTcgBattleAttackOption): number {
+  return b.score - a.score ||
+    b.knockoutChance - a.knockoutChance ||
+    b.expectedDamage - a.expectedDamage ||
+    a.energyCost - b.energyCost ||
+    a.attacker.name.localeCompare(b.attacker.name) ||
+    a.attackIndex - b.attackIndex ||
+    a.target.name.localeCompare(b.target.name)
+}
+
+export function chooseOpponentTcgBattleAttack(state: TcgBattleState) {
+  return getOpponentAttackOptions(state).sort(compareOpponentAttackOptions)[0] || null
+}
+
+function getProjectedOpponentAttackerScore(
+  state: TcgBattleState,
+  attackerId: string,
+  turnNumber: number,
+  energy: number,
+): number {
+  const front = state.opponent.front.map((card) => ({ ...card }))
+  const back = state.opponent.back.map((card) => ({ ...card }))
+  let activeIndex = front.findIndex((card) => card.instanceId === attackerId)
+  if (activeIndex < 0) {
+    const benchIndex = back.findIndex((card) => card.instanceId === attackerId)
+    if (benchIndex < 0 || front.length === 0) return 0
+    const promoted = back[benchIndex]
+    back[benchIndex] = front[0]
+    front[0] = promoted
+    activeIndex = 0
+  }
+  const projected: TcgBattleState = {
+    ...state,
+    turnNumber,
+    opponent: { ...state.opponent, energy, front, back },
+  }
+  return getOpponentAttackOptions(projected, projected.opponent.front[activeIndex]?.instanceId)
+    .sort(compareOpponentAttackOptions)[0]?.score || 0
+}
+
+function getOpponentEvolutionValue(
+  state: TcgBattleState,
+  evolution: TcgBattleEvolutionOption,
+): number {
+  const current = [...state.opponent.front, ...state.opponent.back]
+    .find((card) => card.instanceId === evolution.targetId)
+  if (!current) return Number.NEGATIVE_INFINITY
+  const isFront = state.opponent.front.some((card) => card.instanceId === current.instanceId)
+  const nextTurn = getNextTcgBattleTurnNumber(state.turnNumber, 'opponent', 'player')
+  const currentPotential = getProjectedOpponentAttackerScore(state, current.instanceId, nextTurn, state.opponent.energy)
+  const projection: TcgBattleState = {
+    ...state,
+    opponent: {
+      ...state.opponent,
+      deck: [...state.opponent.deck],
+      front: state.opponent.front.map((card) => ({ ...card })),
+      back: state.opponent.back.map((card) => ({ ...card })),
+    },
+  }
+  const projectedTarget = [...projection.opponent.front, ...projection.opponent.back]
+    .find((card) => card.instanceId === evolution.targetId)
+  if (!projectedTarget) return Number.NEGATIVE_INFINITY
+  const hpBeforeEvolution = projectedTarget.currentHp
+  const evolved = applyTcgBattleEvolution(
+    projection.opponent,
+    evolution.targetId,
+    evolution.card.id,
+    state.turnNumber,
+  )
+  if (!evolved) return Number.NEGATIVE_INFINITY
+  const evolvedPotential = getProjectedOpponentAttackerScore(
+    projection,
+    evolution.targetId,
+    nextTurn,
+    state.opponent.energy,
+  )
+  const extraHp = Math.max(0, evolved.target.currentHp - hpBeforeEvolution)
+  const clearedStatusValue = (current.statusConditions || [])
+    .reduce((sum, status) => sum + getOpponentStatusValue(status) * (status === 'poisoned' || status === 'burned' ? 0.75 : 0.55), 0)
+  const defensiveEffectLoss = current.incomingAttackModifier ? 5 : 0
+  const futureValue = (evolvedPotential - currentPotential) * (isFront ? 0.85 : 0.45)
+  return futureValue + extraHp * (isFront ? 0.7 : 0.45) + clearedStatusValue - defensiveEffectLoss
+}
+
+function getBestOpponentEvolution(state: TcgBattleState): { option: TcgBattleEvolutionOption; value: number } | null {
+  return getTcgBattleEvolutionOptions(state.opponent, state.turnNumber)
+    .map((option) => ({ option, value: getOpponentEvolutionValue(state, option) }))
+    .sort((a, b) => b.value - a.value || b.option.card.cost - a.option.card.cost || a.option.card.name.localeCompare(b.option.card.name))[0] || null
+}
+
+function getOpponentChargeValue(state: TcgBattleState): number {
+  if (!canSideChargeEnergy(state, 'opponent')) return 0
+  const gain = TCG_BATTLE_FORMATS[state.format].chargeGain
+  const chargedEnergy = Math.min(TCG_BATTLE_FORMATS[state.format].energyCap, state.opponent.energy + gain)
+  const nextTurn = getNextTcgBattleTurnNumber(state.turnNumber, 'opponent', 'player')
+  const currentBest = chooseOpponentTcgBattleAttack(state)?.score || 0
+  const chargedBest = getProjectedOpponentAttackerScore(state, state.opponent.front[0]?.instanceId || '', nextTurn, chargedEnergy)
+  const chargedFrontBest = Math.max(
+    chargedBest,
+    ...state.opponent.front.slice(1).map((card) => getProjectedOpponentAttackerScore(state, card.instanceId, nextTurn, chargedEnergy)),
+  )
+  return Math.max(0, chargedFrontBest - currentBest)
+}
+
+export function chooseOpponentTcgBattleAction(state: TcgBattleState): OpponentTcgBattleAction {
+  const attack = chooseOpponentTcgBattleAttack(state)
+  const atEnergyCap = state.opponent.energy >= TCG_BATTLE_FORMATS[state.format].energyCap
+  if (attack && (atEnergyCap || attack.knockoutChance >= 0.5)) return { kind: 'attack', option: attack }
+
+  const evolution = getBestOpponentEvolution(state)
+  const chargeValue = getOpponentChargeValue(state)
+  const attackScore = attack?.score || 0
+  const evolutionThreshold = attack ? Math.max(14, attackScore * 0.85) : 12
+  const chargeThreshold = attack ? Math.max(14, attackScore * 0.45) : 0
+
+  if (evolution && evolution.value > evolutionThreshold && evolution.value >= chargeValue) {
+    return { kind: 'evolve', option: evolution.option }
+  }
+  if (attack && attack.score <= 0 && canSideChargeEnergy(state, 'opponent') && chargeValue <= 0) {
+    return { kind: 'charge' }
+  }
+  if (canSideChargeEnergy(state, 'opponent') && chargeValue > chargeThreshold && chargeValue > (evolution?.value || 0)) {
+    return { kind: 'charge' }
+  }
+  if (attack) return { kind: 'attack', option: attack }
+  if (evolution && evolution.value > 12 && (!canSideChargeEnergy(state, 'opponent') || evolution.value >= chargeValue)) {
+    return { kind: 'evolve', option: evolution.option }
+  }
+  if (canSideChargeEnergy(state, 'opponent')) return { kind: 'charge' }
+  return { kind: 'end' }
 }
 
 export function canSideTakeTcgBattleAction(state: TcgBattleState, sideKey: TcgBattleSide): boolean {
