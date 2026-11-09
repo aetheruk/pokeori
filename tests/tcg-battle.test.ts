@@ -16,8 +16,11 @@ import {
   canSideChargeEnergy,
   calculateTcgBattleCardCost,
   calculateTcgBattleDamage,
+  chooseOpponentTcgBattleAction,
+  chooseOpponentTcgBattleAttack,
   chooseTcgBattleAttackChoice,
   compactTcgBattleBoard,
+  arrangeOpponentTcgBattleCards,
   drawTcgBattleOpeningCards,
   getTcgBattleDeckLineErrors,
   getEffectiveTcgBattleAttackCost,
@@ -121,6 +124,167 @@ function makeBattleState(overrides: Partial<TcgBattleState> = {}): TcgBattleStat
 }
 
 describe('TCG battle utilities', () => {
+  test('opponent opening line-up puts a legal early attacker in front', () => {
+    const slow = makeBattleCard('slow-heavy', 3)
+    slow.hp = 50
+    slow.currentHp = 50
+    slow.attacks[0].damage = '60'
+    const quick = makeBattleCard('quick-attacker', 1)
+    quick.hp = 40
+    quick.currentHp = 40
+    quick.attacks[0].damage = '10'
+    const quickAlternates = ['quick-attacker-b', 'quick-attacker-c'].map((id) => {
+      const card = makeBattleCard(id, 1)
+      card.hp = 40
+      card.currentHp = 40
+      card.attacks[0].damage = '10'
+      return card
+    })
+    const fillers = ['filler-a', 'filler-b'].map((id) => {
+      const card = makeBattleCard(id, 1)
+      card.hp = 20
+      card.currentHp = 20
+      card.attacks = []
+      return card
+    })
+
+    const lineUp = arrangeOpponentTcgBattleCards([slow, ...fillers, quick, ...quickAlternates])
+
+    expect(lineUp.front[0]?.instanceId).toBe(quick.instanceId)
+    expect(lineUp.back.some((card) => card.instanceId === slow.instanceId)).toBe(true)
+  })
+
+  test('opponent attack chooser avoids a protected low-HP target', () => {
+    const attacker = makeBattleCard('opponent-attacker', 1)
+    const openTarget = makeBattleCard('open-target', 1)
+    const protectedTarget = makeBattleCard('protected-target', 1)
+    openTarget.currentHp = 50
+    protectedTarget.currentHp = 40
+    protectedTarget.incomingAttackModifier = {
+      kind: 'preventAll',
+      remainingOpponentTurns: 2,
+    }
+    const state = makeBattleState({
+      turnNumber: 1,
+      player: makeBattleSide(openTarget, 0, { front: [openTarget, protectedTarget] }),
+      opponent: makeBattleSide(attacker, 5),
+    })
+
+    const choice = chooseOpponentTcgBattleAttack(state)
+
+    expect(choice?.target.instanceId).toBe(openTarget.instanceId)
+    expect(chooseOpponentTcgBattleAttack(state)?.target.instanceId).toBe(openTarget.instanceId)
+  })
+
+  test('opponent attack chooser values useful control effects alongside damage', () => {
+    const attacker = makeBattleCard('opponent-attacker', 1)
+    attacker.attacks = [
+      makeAttack({ name: 'Plain Hit', damage: '10' }),
+      makeAttack({
+        name: 'Paralyzing Glare',
+        damage: '',
+        battleEffect: {
+          damage: { kind: 'fixed', amount: 0 },
+          status: [{ target: 'opponent', statuses: ['paralyzed'] }],
+        },
+      }),
+    ]
+    const target = makeBattleCard('player-target', 1)
+    const state = makeBattleState({
+      turnNumber: 1,
+      player: makeBattleSide(target, 0),
+      opponent: makeBattleSide(attacker, 5),
+    })
+
+    const choice = chooseOpponentTcgBattleAttack(state)
+
+    expect(choice?.attackIndex).toBe(1)
+  })
+
+  test('opponent takes an available special-effect knockout before evolving', () => {
+    const attacker = makeBattleCard('opponent-attacker', 1)
+    attacker.attacks = [makeAttack({
+      name: 'Final Judgment',
+      damage: '',
+      battleEffect: {
+        damage: { kind: 'fixed', amount: 0 },
+        special: [{ kind: 'knockOutTarget' }],
+      },
+    })]
+    const evolution = makeBattleCard('opponent-stage-one', 1)
+    evolution.name = 'Opponent Stage One'
+    evolution.subtypes = ['Stage 1']
+    evolution.evolvesFrom = attacker.name
+    evolution.attacks = [makeAttack({ name: 'Heavy Strike', damage: '60' })]
+    const target = makeBattleCard('player-target', 1)
+    const state = makeBattleState({
+      turnNumber: 10,
+      player: makeBattleSide(target, 5),
+      opponent: makeBattleSide(attacker, 5, { deck: [evolution] }),
+    })
+
+    const action = chooseOpponentTcgBattleAction(state)
+
+    expect(action.kind).toBe('attack')
+    if (action.kind === 'attack') expect(action.option.knockoutChance).toBe(1)
+  })
+
+  test('opponent evolves for a strong next-turn upgrade but takes an available knockout first', () => {
+    const basic = makeBattleCard('opponent-basic', 1)
+    basic.attacks[0].damage = '10'
+    const evolution = makeBattleCard('opponent-stage-one', 1)
+    evolution.name = 'Opponent Stage One'
+    evolution.subtypes = ['Stage 1']
+    evolution.evolvesFrom = basic.name
+    evolution.hp = 80
+    evolution.currentHp = 80
+    evolution.cost = 2
+    evolution.attacks = [makeAttack({ name: 'Powerful Strike', damage: '50' })]
+    const player = makeBattleCard('player-target', 1)
+    const state = makeBattleState({
+      turnNumber: 10,
+      player: makeBattleSide(player, 5),
+      opponent: makeBattleSide(basic, 5, { deck: [evolution] }),
+    })
+
+    expect(chooseOpponentTcgBattleAction(state).kind).toBe('evolve')
+
+    state.opponent.energy = TCG_BATTLE_FORMATS.baby.energyCap
+    player.currentHp = 50
+    expect(chooseOpponentTcgBattleAction(state).kind).toBe('attack')
+
+    state.opponent.energy = 5
+    player.currentHp = 10
+    expect(chooseOpponentTcgBattleAction(state).kind).toBe('attack')
+  })
+
+  test('opponent charges when it has no affordable attack', () => {
+    const attacker = makeBattleCard('opponent-attacker', 3)
+    const target = makeBattleCard('player-target', 1)
+    const state = makeBattleState({
+      turnNumber: 1,
+      player: makeBattleSide(target, 0),
+      opponent: makeBattleSide(attacker, 0),
+    })
+
+    expect(chooseOpponentTcgBattleAction(state).kind).toBe('charge')
+  })
+
+  test('opponent decision scoring does not mutate the battle state', () => {
+    const attacker = makeBattleCard('opponent-attacker', 1)
+    const target = makeBattleCard('player-target', 1)
+    const state = makeBattleState({
+      turnNumber: 1,
+      player: makeBattleSide(target, 0),
+      opponent: makeBattleSide(attacker, 5),
+    })
+    const before = JSON.stringify(state)
+
+    chooseOpponentTcgBattleAction(state)
+
+    expect(JSON.stringify(state)).toBe(before)
+  })
+
   test('auto-fill builds valid, evolvable decks within each format cost cap', async () => {
     const collection = Object.fromEntries(
       getAllTcgCards().map((card) => [card.id, 1]),
