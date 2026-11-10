@@ -20,23 +20,35 @@ function promoReward(cardId: string, dropChance: number) {
   }
 }
 
-function missingSetCardReward(setId: string) {
+function incompleteSetRequirement(setId: string) {
   const setSummary = tcgSetSummaries.find((set) => set.id === setId)
   if (!setSummary) throw new Error(`Missing TCG set summary for ${setId}`)
 
   return {
+    type: 'card_collected_set' as const,
+    targetId: setId,
+    count: setSummary.total,
+    unique: true,
+    inverse: true,
+  }
+}
+
+function packReward(itemId: string, setId: string) {
+  return {
+    type: 'item' as const,
+    targetId: itemId,
+    quantity: 1,
+    dropChance: 100,
+    requirements: [incompleteSetRequirement(setId)],
+  }
+}
+
+function missingSetCardReward(setId: string) {
+  return {
     type: 'card' as const,
     quantity: 1,
     dropChance: 80,
-    requirements: [
-      {
-        type: 'card_collected_set' as const,
-        targetId: setId,
-        count: setSummary.total,
-        unique: true,
-        inverse: true,
-      },
-    ],
+    requirements: [incompleteSetRequirement(setId)],
     cardDrawParams: {
       allowedSetIds: [setId],
       missingOnly: true,
@@ -142,7 +154,7 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     colour: '#65814d',
     cards: bugCatcherBarryDeck,
     additionalRewards: [
-      { type: 'item', targetId: 'pack-base2', quantity: 3, dropChance: 100 },
+      packReward('pack-base2', 'base2'),
       missingSetCardReward('base2'),
       promoReward('basep-45', 35),
       promoReward('basep-27', 20),
@@ -178,7 +190,7 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     colour: '#527e91',
     cards: billDeck,
     additionalRewards: [
-      { type: 'item', targetId: 'pack-base1', quantity: 3, dropChance: 100 },
+      packReward('pack-base1', 'base1'),
       missingSetCardReward('base1'),
       promoReward('basep-11', 35),
       promoReward('basep-16', 20),
@@ -198,7 +210,7 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
       { type: 'task_completed', targetId: 'explore-celadon-city' },
     ],
     additionalRewards: [
-      { type: 'item', targetId: 'pack-base5', quantity: 3, dropChance: 100 },
+      packReward('pack-base5', 'base5'),
       missingSetCardReward('base5'),
       promoReward('basep-17', 35),
       promoReward('basep-18', 20),
@@ -245,7 +257,7 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     colour: '#8b7355',
     cards: hikerMarcosDeck,
     additionalRewards: [
-      { type: 'item', targetId: 'pack-base3', quantity: 3, dropChance: 100 },
+      packReward('pack-base3', 'base3'),
       missingSetCardReward('base3'),
       promoReward('basep-7', 35),
     ],
