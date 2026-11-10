@@ -147,6 +147,7 @@ webhook queues an image pull.
 - Exposed container port: `3000`; route the domain through Coolify's proxy. Leave build/start command overrides empty.
 - Run one application replica. Allow 30 seconds for graceful shutdown.
 - Health check: GET `/api/health` on port 3000, interval 30 seconds, timeout 10 seconds, start period 60 seconds, 3 retries. Apply these values in Coolify if its health check overrides the Dockerfile.
+- Persistent storage: attach a named Docker volume named `next-image-cache` at `/app/.next/cache/images`. The Dockerfile creates this path as writable by `pokeori` (UID 1001) so a new empty volume can be initialized correctly. Keep the same volume attached across deployments; it contains regenerable optimized images and does not need backup. Next limits this cache to 1 GiB. This runtime volume is separate from the BuildKit `.next/cache` mount, which only accelerates image builds.
 
 Dockerfile syntax tracks stable `docker/dockerfile:1` and reads the build key through a BuildKit secret file mount. See [Docker's secret mount reference](https://docs.docker.com/reference/dockerfile/#run---mounttypesecret).
 
