@@ -163,6 +163,7 @@ export function RewardResultOverlay({
   const { playSfx } = useAudio()
   const gridActivityReturn = useGridActivityReturn()
   const lastPlayedResultRef = useRef<GenericResult | null>(null)
+  const dismissedResultRef = useRef<GenericResult | null>(null)
 
   // State for sequential flow
   const [currentStep, setCurrentStep] = useState<RewardResultStep>(() =>
@@ -182,13 +183,16 @@ export function RewardResultOverlay({
   // initialization effect updates currentStep.
   const visibleStep = result
     ? currentStep === 'idle'
-      ? getRewardResultFirstStep(result)
+      ? dismissedResultRef.current === result
+        ? 'idle'
+        : getRewardResultFirstStep(result)
       : currentStep
     : 'idle'
 
   useEffect(() => {
     if (!result) {
       lastPlayedResultRef.current = null
+      dismissedResultRef.current = null
       return
     }
     if (lastPlayedResultRef.current === result) return
@@ -313,6 +317,9 @@ export function RewardResultOverlay({
     const expeditionProgress =
       result?.expeditionProgress || (rewardSummary as any)?.expeditionProgress
     markExpeditionReturn(expeditionProgress?.expeditionId)
+    // Keep idle from falling back to the first reward step while the parent
+    // clears this result.
+    dismissedResultRef.current = result
     setCurrentStep('idle')
     setExitModalData(null)
     setExitModalQueue([])

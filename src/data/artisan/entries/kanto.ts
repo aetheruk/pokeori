@@ -1573,8 +1573,18 @@ const QUEST_RECIPES: ArtisanRecipeDraft[] = [
   },
 ]
 
-const baseSet2TotalCards = tcgSetSummaries.find((set) => set.id === 'base4')?.total
-if (!baseSet2TotalCards) throw new Error('Missing Base Set 2 summary for artisan recipe requirements')
+function setCollectionRequirement(setId: string, inverse = false) {
+  const setSummary = tcgSetSummaries.find((set) => set.id === setId)
+  if (!setSummary) throw new Error(`Missing TCG set summary for ${setId}`)
+
+  return {
+    type: 'card_collected_set' as const,
+    targetId: setId,
+    count: setSummary.total,
+    unique: true,
+    inverse,
+  }
+}
 
 const TCG_RECIPES: ArtisanRecipeDraft[] = [
   {
@@ -1608,7 +1618,10 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     minimumQuality: 'good',
     materialFailQualities: ['bad'],
     iconItemId: 'pack-base1',
-    requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
+    requirements: [
+      { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
+      setCollectionRequirement('base1'),
+    ],
   },
   {
     id: 'craft-tcg-base2-pack',
@@ -1626,7 +1639,10 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     minimumQuality: 'good',
     materialFailQualities: ['bad'],
     iconItemId: 'pack-base2',
-    requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
+    requirements: [
+      { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
+      setCollectionRequirement('base2'),
+    ],
   },
   {
     id: 'craft-tcg-base3-pack',
@@ -1644,7 +1660,10 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     minimumQuality: 'good',
     materialFailQualities: ['bad'],
     iconItemId: 'pack-base3',
-    requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
+    requirements: [
+      { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
+      setCollectionRequirement('base3'),
+    ],
   },
   {
     id: 'craft-tcg-base4-pack',
@@ -1699,13 +1718,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     iconItemId: 'binder-base4',
     requirements: [
       { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
-      {
-        type: 'card_collected_set',
-        targetId: 'base4',
-        count: baseSet2TotalCards,
-        unique: true,
-        inverse: true,
-      },
+      setCollectionRequirement('base4', true),
     ],
   },
   {
@@ -1727,6 +1740,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     requirements: [
       { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
       { type: 'item_owned', targetId: 'binder-base5' },
+      setCollectionRequirement('base5'),
     ],
   },
   {
@@ -1747,7 +1761,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     iconItemId: 'pack-gym1',
     requirements: [
       { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
-      { type: 'card_collected_set', targetId: 'gym1', count: 132, unique: true },
+      setCollectionRequirement('gym1'),
     ],
   },
 ]
