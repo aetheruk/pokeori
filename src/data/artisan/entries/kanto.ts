@@ -1,6 +1,7 @@
 import type { ArtisanRecipe, ArtisanRecipeCategory } from '../types'
 import { candyItems } from '@/data/items/entries/candies'
 import { LEVEL_EVOLUTION_CATALYSTS } from '@/data/evolution-catalysts'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
 
 type ArtisanRecipeDraft = Omit<ArtisanRecipe, 'category' | 'craftType' | 'outputQuantity'> & {
   outputQuantity?: ArtisanRecipe['outputQuantity']
@@ -1572,6 +1573,9 @@ const QUEST_RECIPES: ArtisanRecipeDraft[] = [
   },
 ]
 
+const baseSet2TotalCards = tcgSetSummaries.find((set) => set.id === 'base4')?.total
+if (!baseSet2TotalCards) throw new Error('Missing Base Set 2 summary for artisan recipe requirements')
+
 const TCG_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-tcg-foil-pack',
@@ -1659,6 +1663,50 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     materialFailQualities: ['bad'],
     iconItemId: 'pack-base4',
     requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
+  },
+  {
+    id: 'craft-tcg-base4-card',
+    name: 'New Card Base Set 2',
+    description: 'Blend the dried pigments with Grass-type fibers to print a new Base Set 2 card.',
+    artisanLevel: 22,
+    costs: [
+      { id: 'dried-red', amount: 3 },
+      { id: 'dried-blue', amount: 3 },
+      { id: 'dried-yellow', amount: 3 },
+      { id: 'dried-green', amount: 3 },
+      { id: 'dried-purple', amount: 3 },
+      { id: 'wood-scraps-t1', amount: 1 },
+    ],
+    rewards: [
+      {
+        type: 'card',
+        quantity: 1,
+        dropChance: 100,
+        cardDrawParams: {
+          allowedSetIds: ['base4'],
+          missingOnly: true,
+          rarityModifier: 1,
+          bonusThreshold: 0,
+          guaranteed: true,
+        },
+      },
+    ],
+    craftType: 'balance',
+    outputQuantity: { min: 0, max: 1 },
+    qualityOutputQuantity: { bad: 0, good: 0, perfect: 1 },
+    minimumQuality: 'perfect',
+    materialFailQualities: [],
+    iconItemId: 'binder-base4',
+    requirements: [
+      { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
+      {
+        type: 'card_collected_set',
+        targetId: 'base4',
+        count: baseSet2TotalCards,
+        unique: true,
+        inverse: true,
+      },
+    ],
   },
   {
     id: 'craft-tcg-base5-pack',

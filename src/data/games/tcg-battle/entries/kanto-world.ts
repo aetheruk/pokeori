@@ -1,5 +1,6 @@
 import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
 import { UNDERGROUND_SOCIETY_GUILD_ID } from '@/data/guilds/underground-society'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgBattleGameConfig } from '../types'
 
 const tutorialRequirement = {
@@ -20,10 +21,22 @@ function promoReward(cardId: string, dropChance: number) {
 }
 
 function missingSetCardReward(setId: string) {
+  const setSummary = tcgSetSummaries.find((set) => set.id === setId)
+  if (!setSummary) throw new Error(`Missing TCG set summary for ${setId}`)
+
   return {
     type: 'card' as const,
     quantity: 1,
     dropChance: 80,
+    requirements: [
+      {
+        type: 'card_collected_set' as const,
+        targetId: setId,
+        count: setSummary.total,
+        unique: true,
+        inverse: true,
+      },
+    ],
     cardDrawParams: {
       allowedSetIds: [setId],
       missingOnly: true,
