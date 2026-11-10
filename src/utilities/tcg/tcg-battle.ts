@@ -27401,7 +27401,7 @@ function inferVariableTcgBattleDamage(
   }
 
   const headsMultiplier = text.match(
-    /flip (\d+) coins\. this attack does (\d+) damage (?:for each heads|times the number of heads)\b/,
+    /flip (\d+) coins\. this attack does (\d+) damage (?:for each heads|times (?:the )?number of heads)\b/,
   )
   if (headsMultiplier && damage.endsWith('x')) {
     return {
@@ -28189,7 +28189,7 @@ function inferTcgBattleProtection(text: string): TcgBattleProtectionRule[] {
     }
 
     const reduceSelf = sentence.match(
-      /all damage done by attacks to (?:this pokemon|[a-z0-9' .&-]+) during your opponent's next turn is reduced by (\d+)\b/,
+      /all damage done by attacks to (?:this pokemon|[a-z0-9' .&-]+) during your opponent's next turn is reduc(?:ed|e) by (\d+)\b/,
     )
     if (reduceSelf) {
       rules.push({

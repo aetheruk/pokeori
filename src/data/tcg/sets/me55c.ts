@@ -4,7 +4,7 @@ const setData: TcgSet = {
   "id": "me55c",
   "name": "30th Celebration: Classic Collection",
   "series": "Mega Evolution",
-  "total": 30,
+  "total": 37,
   "printedTotal": null,
   "releaseDate": "2026/09/16",
   "images": {
@@ -13,11 +13,11 @@ const setData: TcgSet = {
   },
   "cards": [
     {
-      "id": "me55c-4",
+      "id": "me55c-1",
       "name": "Charizard",
-      "number": "4",
+      "number": "1",
       "artist": "Mitsuhiro Arita",
-      "rarity": "Rare Holo",
+      "rarity": null,
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 2"
@@ -26,24 +26,99 @@ const setData: TcgSet = {
       "types": [
         "Fire"
       ],
-      "evolvesFrom": "Charmeleon",
+      "evolvesFrom": null,
       "evolvesTo": [],
       "convertedRetreatCost": 3,
       "nationalPokedexNumbers": [
         6
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-4/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-4/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/001/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/001/high.webp"
+      }
+    },
+    {
+      "id": "me55c-2",
+      "name": "Delcatty",
+      "number": "2",
+      "artist": "Atsuko Nishida",
+      "rarity": null,
+      "supertype": "Pokémon",
+      "subtypes": [
+        "Stage 1"
+      ],
+      "hp": "70",
+      "types": [
+        "Colorless"
+      ],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": 1,
+      "nationalPokedexNumbers": [
+        301
+      ],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/30th-c/002/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/002/high.webp"
+      }
+    },
+    {
+      "id": "me55c-3",
+      "name": "Metagross",
+      "number": "3",
+      "artist": "Masakazu Fukuda",
+      "rarity": null,
+      "supertype": "Pokémon",
+      "subtypes": [
+        "Stage 2"
+      ],
+      "hp": "100",
+      "types": [
+        "Lightning"
+      ],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": 3,
+      "nationalPokedexNumbers": [
+        376
+      ],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/30th-c/003/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/003/high.webp"
+      }
+    },
+    {
+      "id": "me55c-4",
+      "name": "Charizard",
+      "number": "4",
+      "artist": "Eske Yoshinob",
+      "rarity": "Rare Holo",
+      "supertype": "Pokémon",
+      "subtypes": [
+        "Stage 2"
+      ],
+      "hp": "170",
+      "types": [
+        "Grass"
+      ],
+      "evolvesFrom": "Charmeleon",
+      "evolvesTo": [],
+      "convertedRetreatCost": 1,
+      "nationalPokedexNumbers": [
+        649
+      ],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/30th-c/004/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/004/high.webp"
       }
     },
     {
       "id": "me55c-5",
       "name": "Delcatty",
       "number": "5",
-      "artist": "Atsuko Nishida",
+      "artist": "Ken Sugimori",
       "rarity": "Rare Holo",
-      "supertype": "Pokémon",
+      "supertype": "Trainer",
       "subtypes": [
         "Stage 1"
       ],
@@ -58,8 +133,58 @@ const setData: TcgSet = {
         301
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-5/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-5/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/005/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/005/high.webp"
+      }
+    },
+    {
+      "id": "me55c-6",
+      "name": "Dark Tyranitar",
+      "number": "6",
+      "artist": "Nakaoka",
+      "rarity": null,
+      "supertype": "Pokémon",
+      "subtypes": [
+        "Stage 2"
+      ],
+      "hp": "120",
+      "types": [
+        "Darkness"
+      ],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": 2,
+      "nationalPokedexNumbers": [
+        248
+      ],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/30th-c/006/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/006/high.webp"
+      }
+    },
+    {
+      "id": "me55c-7",
+      "name": "Sneasel",
+      "number": "7",
+      "artist": "Ken Sugimori",
+      "rarity": null,
+      "supertype": "Pokémon",
+      "subtypes": [
+        "Basic"
+      ],
+      "hp": "60",
+      "types": [
+        "Darkness"
+      ],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": 0,
+      "nationalPokedexNumbers": [
+        215
+      ],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/30th-c/007/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/007/high.webp"
       }
     },
     {
@@ -92,95 +217,154 @@ const setData: TcgSet = {
       "id": "me55c-11",
       "name": "Metagross",
       "number": "11",
-      "artist": "Masakazu Fukuda",
+      "artist": "Makoto Imai",
       "rarity": "Rare Holo",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 2"
       ],
-      "hp": "100",
+      "hp": "80",
       "types": [
-        "Lightning",
-        "Metal"
+        "Psychic"
       ],
       "evolvesFrom": "Metang",
       "evolvesTo": [],
-      "convertedRetreatCost": 3,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
-        376
+        169
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-11/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-11/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/011/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/011/high.webp"
       }
     },
     {
       "id": "me55c-18",
       "name": "Misty",
       "number": "18",
-      "artist": "Ken Sugimori",
+      "artist": "Takashi Yamaguchi",
       "rarity": "Rare Holo",
-      "supertype": "Trainer",
-      "subtypes": [],
-      "hp": null,
-      "types": [],
+      "supertype": "Pokémon",
+      "subtypes": [
+        "Stage 2"
+      ],
+      "hp": "130",
+      "types": [
+        "Psychic"
+      ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
-      "nationalPokedexNumbers": [],
+      "convertedRetreatCost": 0,
+      "nationalPokedexNumbers": [
+        94
+      ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-18/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-18/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/018/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/018/high.webp"
       }
     },
     {
       "id": "me55c-19",
       "name": "Dark Tyranitar",
       "number": "19",
-      "artist": "Nakaoka",
+      "artist": "Shinji Higuchi + Noriko Takaya",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 2"
       ],
-      "hp": "120",
+      "hp": "150",
       "types": [
-        "Darkness"
+        "Darkness",
+        "Psychic"
       ],
       "evolvesFrom": "Dark Pupitar",
       "evolvesTo": [],
-      "convertedRetreatCost": 2,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
-        248
+        491,
+        488
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-19/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-19/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/019/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/019/high.webp"
+      }
+    },
+    {
+      "id": "me55c-20",
+      "name": "Darkrai & Cresselia LEGEND",
+      "number": "20",
+      "artist": "Shinji Higuchi + Noriko Takaya",
+      "rarity": null,
+      "supertype": "Pokémon",
+      "subtypes": [
+        "Basic"
+      ],
+      "hp": "150",
+      "types": [
+        "Darkness",
+        "Psychic"
+      ],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": 2,
+      "nationalPokedexNumbers": [
+        491,
+        488
+      ],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/30th-c/020/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/020/high.webp"
+      }
+    },
+    {
+      "id": "me55c-22",
+      "name": "Palkia",
+      "number": "22",
+      "artist": "Ryo Ueda",
+      "rarity": null,
+      "supertype": "Pokémon",
+      "subtypes": [
+        "Basic"
+      ],
+      "hp": "120",
+      "types": [
+        "Water"
+      ],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": 3,
+      "nationalPokedexNumbers": [
+        484
+      ],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/30th-c/022/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/022/high.webp"
       }
     },
     {
       "id": "me55c-25",
       "name": "Sneasel",
       "number": "25",
-      "artist": "Ken Sugimori",
+      "artist": "Mitsuhiro Arita",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
       ],
-      "hp": "60",
+      "hp": "120",
       "types": [
-        "Darkness"
+        "Metal"
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 1,
       "nationalPokedexNumbers": [
-        215
+        212
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-25/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-25/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/025/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/025/high.webp"
       }
     },
     {
@@ -203,11 +387,12 @@ const setData: TcgSet = {
       "evolvesTo": [],
       "convertedRetreatCost": 3,
       "nationalPokedexNumbers": [
-        25
+        25,
+        644
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-33/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-33/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/008/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/008/high.webp"
       }
     },
     {
@@ -226,13 +411,13 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": "Greninja",
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         658
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-41/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-41/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/009/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/009/high.webp"
       }
     },
     {
@@ -256,8 +441,8 @@ const setData: TcgSet = {
         480
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-43/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-43/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/010/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/010/high.webp"
       }
     },
     {
@@ -306,8 +491,8 @@ const setData: TcgSet = {
         243
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-50/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-50/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/012/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/012/high.webp"
       }
     },
     {
@@ -332,8 +517,8 @@ const setData: TcgSet = {
         794
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-57/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-57/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/013/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/013/high.webp"
       }
     },
     {
@@ -357,8 +542,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-58/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-58/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/014/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/014/high.webp"
       }
     },
     {
@@ -367,7 +552,7 @@ const setData: TcgSet = {
       "number": "69",
       "artist": "Ken Sugimori",
       "rarity": "Common",
-      "supertype": "Trainer",
+      "supertype": "Pokémon",
       "subtypes": [
         "Basic"
       ],
@@ -378,10 +563,12 @@ const setData: TcgSet = {
       "evolvesFrom": null,
       "evolvesTo": [],
       "convertedRetreatCost": 1,
-      "nationalPokedexNumbers": [],
+      "nationalPokedexNumbers": [
+        39
+      ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-69/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-69/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/015/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/015/high.webp"
       }
     },
     {
@@ -406,8 +593,8 @@ const setData: TcgSet = {
         384
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-85/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-85/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/016/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/016/high.webp"
       }
     },
     {
@@ -432,8 +619,8 @@ const setData: TcgSet = {
         791
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-89/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-89/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/017/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/017/high.webp"
       }
     },
     {
@@ -530,8 +717,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-101/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-101/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/021/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/021/high.webp"
       }
     },
     {
@@ -556,8 +743,8 @@ const setData: TcgSet = {
         282
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-106m/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-106m/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/023/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/023/high.webp"
       }
     },
     {
@@ -606,8 +793,8 @@ const setData: TcgSet = {
         251
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-106/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-106/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/024/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/024/high.webp"
       }
     },
     {
@@ -652,13 +839,13 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": "Mew V",
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         151
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-114/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-114/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/026/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/026/high.webp"
       }
     },
     {
@@ -682,8 +869,8 @@ const setData: TcgSet = {
         493
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-123/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-123/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/027/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/027/high.webp"
       }
     },
     {
@@ -708,8 +895,8 @@ const setData: TcgSet = {
         888
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-138/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-138/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/028/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/028/high.webp"
       }
     },
     {
@@ -733,8 +920,8 @@ const setData: TcgSet = {
         249
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-149/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-149/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/029/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/029/high.webp"
       }
     },
     {
@@ -758,8 +945,8 @@ const setData: TcgSet = {
         129
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55c-203/small",
-        "large": "https://images.scrydex.com/pokemon/me55c-203/large"
+        "small": "https://assets.tcgdex.net/en/me/30th-c/030/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th-c/030/high.webp"
       }
     }
   ]

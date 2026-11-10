@@ -35,8 +35,8 @@ const setData: TcgSet = {
         147
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/1.png",
-        "large": "https://images.pokemontcg.io/dv1/1_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/1/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/1/high.webp"
       }
     },
     {
@@ -62,8 +62,8 @@ const setData: TcgSet = {
         147
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/2.png",
-        "large": "https://images.pokemontcg.io/dv1/2_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/2/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/2/high.webp"
       }
     },
     {
@@ -89,8 +89,8 @@ const setData: TcgSet = {
         148
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/3.png",
-        "large": "https://images.pokemontcg.io/dv1/3_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/3/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/3/high.webp"
       }
     },
     {
@@ -116,8 +116,8 @@ const setData: TcgSet = {
         148
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/4.png",
-        "large": "https://images.pokemontcg.io/dv1/4_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/4/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/4/high.webp"
       }
     },
     {
@@ -141,8 +141,8 @@ const setData: TcgSet = {
         149
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/5.png",
-        "large": "https://images.pokemontcg.io/dv1/5_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/5/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/5/high.webp"
       }
     },
     {
@@ -168,8 +168,8 @@ const setData: TcgSet = {
         371
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/6.png",
-        "large": "https://images.pokemontcg.io/dv1/6_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/6/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/6/high.webp"
       }
     },
     {
@@ -195,8 +195,8 @@ const setData: TcgSet = {
         372
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/7.png",
-        "large": "https://images.pokemontcg.io/dv1/7_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/7/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/7/high.webp"
       }
     },
     {
@@ -220,8 +220,8 @@ const setData: TcgSet = {
         373
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/8.png",
-        "large": "https://images.pokemontcg.io/dv1/8_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/8/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/8/high.webp"
       }
     },
     {
@@ -245,8 +245,8 @@ const setData: TcgSet = {
         380
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/9.png",
-        "large": "https://images.pokemontcg.io/dv1/9_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/9/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/9/high.webp"
       }
     },
     {
@@ -270,8 +270,8 @@ const setData: TcgSet = {
         381
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/10.png",
-        "large": "https://images.pokemontcg.io/dv1/10_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/10/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/10/high.webp"
       }
     },
     {
@@ -295,8 +295,8 @@ const setData: TcgSet = {
         384
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/11.png",
-        "large": "https://images.pokemontcg.io/dv1/11_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/11/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/11/high.webp"
       }
     },
     {
@@ -322,8 +322,8 @@ const setData: TcgSet = {
         610
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/12.png",
-        "large": "https://images.pokemontcg.io/dv1/12_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/12/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/12/high.webp"
       }
     },
     {
@@ -349,8 +349,8 @@ const setData: TcgSet = {
         610
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/13.png",
-        "large": "https://images.pokemontcg.io/dv1/13_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/13/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/13/high.webp"
       }
     },
     {
@@ -376,8 +376,8 @@ const setData: TcgSet = {
         611
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/14.png",
-        "large": "https://images.pokemontcg.io/dv1/14_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/14/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/14/high.webp"
       }
     },
     {
@@ -403,8 +403,8 @@ const setData: TcgSet = {
         611
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/15.png",
-        "large": "https://images.pokemontcg.io/dv1/15_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/15/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/15/high.webp"
       }
     },
     {
@@ -428,8 +428,8 @@ const setData: TcgSet = {
         612
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/16.png",
-        "large": "https://images.pokemontcg.io/dv1/16_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/16/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/16/high.webp"
       }
     },
     {
@@ -453,8 +453,8 @@ const setData: TcgSet = {
         621
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/17.png",
-        "large": "https://images.pokemontcg.io/dv1/17_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/17/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/17/high.webp"
       }
     },
     {
@@ -462,7 +462,7 @@ const setData: TcgSet = {
       "name": "Exp. Share",
       "number": "18",
       "artist": "Ryo Ueda",
-      "rarity": null,
+      "rarity": "Rare",
       "supertype": "Trainer",
       "subtypes": [
         "Pokémon Tool"
@@ -474,8 +474,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/18.png",
-        "large": "https://images.pokemontcg.io/dv1/18_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/18/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/18/high.webp"
       }
     },
     {
@@ -483,7 +483,7 @@ const setData: TcgSet = {
       "name": "First Ticket",
       "number": "19",
       "artist": "5ban Graphics",
-      "rarity": null,
+      "rarity": "Rare",
       "supertype": "Trainer",
       "subtypes": [
         "Item"
@@ -495,8 +495,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/19.png",
-        "large": "https://images.pokemontcg.io/dv1/19_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/19/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/19/high.webp"
       }
     },
     {
@@ -516,8 +516,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/20.png",
-        "large": "https://images.pokemontcg.io/dv1/20_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/20/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/20/high.webp"
       }
     },
     {
@@ -525,7 +525,7 @@ const setData: TcgSet = {
       "name": "Kyurem",
       "number": "21",
       "artist": "Ryo Ueda",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -541,8 +541,8 @@ const setData: TcgSet = {
         646
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/dv1/21.png",
-        "large": "https://images.pokemontcg.io/dv1/21_hires.png"
+        "small": "https://assets.tcgdex.net/en/bw/dv1/21/low.webp",
+        "large": "https://assets.tcgdex.net/en/bw/dv1/21/high.webp"
       }
     }
   ]

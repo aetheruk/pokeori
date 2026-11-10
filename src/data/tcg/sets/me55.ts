@@ -33,8 +33,8 @@ const setData: TcgSet = {
         102
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-1/small",
-        "large": "https://images.scrydex.com/pokemon/me55-1/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/001/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/001/high.webp"
       }
     },
     {
@@ -58,8 +58,8 @@ const setData: TcgSet = {
         103
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-2/small",
-        "large": "https://images.scrydex.com/pokemon/me55-2/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/002/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/002/high.webp"
       }
     },
     {
@@ -83,8 +83,8 @@ const setData: TcgSet = {
         313
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-3/small",
-        "large": "https://images.scrydex.com/pokemon/me55-3/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/003/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/003/high.webp"
       }
     },
     {
@@ -108,8 +108,8 @@ const setData: TcgSet = {
         314
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-4/small",
-        "large": "https://images.scrydex.com/pokemon/me55-4/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/004/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/004/high.webp"
       }
     },
     {
@@ -133,8 +133,8 @@ const setData: TcgSet = {
         357
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-5/small",
-        "large": "https://images.scrydex.com/pokemon/me55-5/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/005/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/005/high.webp"
       }
     },
     {
@@ -158,8 +158,8 @@ const setData: TcgSet = {
         420
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-6/small",
-        "large": "https://images.scrydex.com/pokemon/me55-6/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/006/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/006/high.webp"
       }
     },
     {
@@ -183,8 +183,8 @@ const setData: TcgSet = {
         421
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-7/small",
-        "large": "https://images.scrydex.com/pokemon/me55-7/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/007/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/007/high.webp"
       }
     },
     {
@@ -208,8 +208,8 @@ const setData: TcgSet = {
         666
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-8/small",
-        "large": "https://images.scrydex.com/pokemon/me55-8/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/008/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/008/high.webp"
       }
     },
     {
@@ -233,8 +233,8 @@ const setData: TcgSet = {
         37
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-9/small",
-        "large": "https://images.scrydex.com/pokemon/me55-9/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/009/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/009/high.webp"
       }
     },
     {
@@ -258,8 +258,8 @@ const setData: TcgSet = {
         38
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-10/small",
-        "large": "https://images.scrydex.com/pokemon/me55-10/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/010/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/010/high.webp"
       }
     },
     {
@@ -283,8 +283,8 @@ const setData: TcgSet = {
         146
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-11/small",
-        "large": "https://images.scrydex.com/pokemon/me55-11/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/011/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/011/high.webp"
       }
     },
     {
@@ -308,8 +308,8 @@ const setData: TcgSet = {
         250
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-12/small",
-        "large": "https://images.scrydex.com/pokemon/me55-12/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/012/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/012/high.webp"
       }
     },
     {
@@ -333,8 +333,8 @@ const setData: TcgSet = {
         494
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-13/small",
-        "large": "https://images.scrydex.com/pokemon/me55-13/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/013/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/013/high.webp"
       }
     },
     {
@@ -358,8 +358,8 @@ const setData: TcgSet = {
         643
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-14/small",
-        "large": "https://images.scrydex.com/pokemon/me55-14/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/014/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/014/high.webp"
       }
     },
     {
@@ -384,8 +384,8 @@ const setData: TcgSet = {
         909
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-15/small",
-        "large": "https://images.scrydex.com/pokemon/me55-15/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/015/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/015/high.webp"
       }
     },
     {
@@ -409,8 +409,8 @@ const setData: TcgSet = {
         79
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-16/small",
-        "large": "https://images.scrydex.com/pokemon/me55-16/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/016/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/016/high.webp"
       }
     },
     {
@@ -434,8 +434,8 @@ const setData: TcgSet = {
         131
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-17/small",
-        "large": "https://images.scrydex.com/pokemon/me55-17/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/017/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/017/high.webp"
       }
     },
     {
@@ -459,8 +459,8 @@ const setData: TcgSet = {
         144
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-18/small",
-        "large": "https://images.scrydex.com/pokemon/me55-18/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/018/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/018/high.webp"
       }
     },
     {
@@ -484,8 +484,8 @@ const setData: TcgSet = {
         382
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-19/small",
-        "large": "https://images.scrydex.com/pokemon/me55-19/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/019/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/019/high.webp"
       }
     },
     {
@@ -509,8 +509,8 @@ const setData: TcgSet = {
         484
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-20/small",
-        "large": "https://images.scrydex.com/pokemon/me55-20/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/020/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/020/high.webp"
       }
     },
     {
@@ -535,8 +535,8 @@ const setData: TcgSet = {
         658
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-21/small",
-        "large": "https://images.scrydex.com/pokemon/me55-21/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/021/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/021/high.webp"
       }
     },
     {
@@ -560,8 +560,8 @@ const setData: TcgSet = {
         746
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-22/small",
-        "large": "https://images.scrydex.com/pokemon/me55-22/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/022/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/022/high.webp"
       }
     },
     {
@@ -585,8 +585,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-23/small",
-        "large": "https://images.scrydex.com/pokemon/me55-23/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/023/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/023/high.webp"
       }
     },
     {
@@ -610,8 +610,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-24/small",
-        "large": "https://images.scrydex.com/pokemon/me55-24/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/024/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/024/high.webp"
       }
     },
     {
@@ -635,8 +635,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-25/small",
-        "large": "https://images.scrydex.com/pokemon/me55-25/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/025/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/025/high.webp"
       }
     },
     {
@@ -660,8 +660,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-26/small",
-        "large": "https://images.scrydex.com/pokemon/me55-26/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/026/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/026/high.webp"
       }
     },
     {
@@ -685,8 +685,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-27/small",
-        "large": "https://images.scrydex.com/pokemon/me55-27/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/027/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/027/high.webp"
       }
     },
     {
@@ -710,8 +710,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-28/small",
-        "large": "https://images.scrydex.com/pokemon/me55-28/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/028/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/028/high.webp"
       }
     },
     {
@@ -735,8 +735,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-29/small",
-        "large": "https://images.scrydex.com/pokemon/me55-29/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/029/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/029/high.webp"
       }
     },
     {
@@ -760,8 +760,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-30/small",
-        "large": "https://images.scrydex.com/pokemon/me55-30/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/030/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/030/high.webp"
       }
     },
     {
@@ -780,13 +780,13 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-31/small",
-        "large": "https://images.scrydex.com/pokemon/me55-31/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/031/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/031/high.webp"
       }
     },
     {
@@ -810,8 +810,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-32/small",
-        "large": "https://images.scrydex.com/pokemon/me55-32/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/032/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/032/high.webp"
       }
     },
     {
@@ -835,8 +835,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-33/small",
-        "large": "https://images.scrydex.com/pokemon/me55-33/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/033/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/033/high.webp"
       }
     },
     {
@@ -860,8 +860,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-34/small",
-        "large": "https://images.scrydex.com/pokemon/me55-34/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/034/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/034/high.webp"
       }
     },
     {
@@ -885,8 +885,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-35/small",
-        "large": "https://images.scrydex.com/pokemon/me55-35/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/035/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/035/high.webp"
       }
     },
     {
@@ -910,8 +910,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-36/small",
-        "large": "https://images.scrydex.com/pokemon/me55-36/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/036/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/036/high.webp"
       }
     },
     {
@@ -935,8 +935,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-37/small",
-        "large": "https://images.scrydex.com/pokemon/me55-37/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/037/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/037/high.webp"
       }
     },
     {
@@ -960,8 +960,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-38/small",
-        "large": "https://images.scrydex.com/pokemon/me55-38/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/038/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/038/high.webp"
       }
     },
     {
@@ -985,8 +985,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-39/small",
-        "large": "https://images.scrydex.com/pokemon/me55-39/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/039/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/039/high.webp"
       }
     },
     {
@@ -1010,8 +1010,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-40/small",
-        "large": "https://images.scrydex.com/pokemon/me55-40/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/040/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/040/high.webp"
       }
     },
     {
@@ -1035,8 +1035,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-41/small",
-        "large": "https://images.scrydex.com/pokemon/me55-41/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/041/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/041/high.webp"
       }
     },
     {
@@ -1060,8 +1060,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-42/small",
-        "large": "https://images.scrydex.com/pokemon/me55-42/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/042/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/042/high.webp"
       }
     },
     {
@@ -1085,8 +1085,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-43/small",
-        "large": "https://images.scrydex.com/pokemon/me55-43/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/043/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/043/high.webp"
       }
     },
     {
@@ -1110,8 +1110,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-44/small",
-        "large": "https://images.scrydex.com/pokemon/me55-44/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/044/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/044/high.webp"
       }
     },
     {
@@ -1135,8 +1135,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-45/small",
-        "large": "https://images.scrydex.com/pokemon/me55-45/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/045/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/045/high.webp"
       }
     },
     {
@@ -1160,8 +1160,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-46/small",
-        "large": "https://images.scrydex.com/pokemon/me55-46/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/046/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/046/high.webp"
       }
     },
     {
@@ -1185,8 +1185,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-47/small",
-        "large": "https://images.scrydex.com/pokemon/me55-47/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/047/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/047/high.webp"
       }
     },
     {
@@ -1210,8 +1210,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-48/small",
-        "large": "https://images.scrydex.com/pokemon/me55-48/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/048/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/048/high.webp"
       }
     },
     {
@@ -1235,8 +1235,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-49/small",
-        "large": "https://images.scrydex.com/pokemon/me55-49/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/049/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/049/high.webp"
       }
     },
     {
@@ -1260,8 +1260,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-50/small",
-        "large": "https://images.scrydex.com/pokemon/me55-50/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/050/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/050/high.webp"
       }
     },
     {
@@ -1285,8 +1285,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-51/small",
-        "large": "https://images.scrydex.com/pokemon/me55-51/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/051/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/051/high.webp"
       }
     },
     {
@@ -1310,8 +1310,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-52/small",
-        "large": "https://images.scrydex.com/pokemon/me55-52/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/052/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/052/high.webp"
       }
     },
     {
@@ -1336,8 +1336,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-53/small",
-        "large": "https://images.scrydex.com/pokemon/me55-53/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/053/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/053/high.webp"
       }
     },
     {
@@ -1362,8 +1362,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-54/small",
-        "large": "https://images.scrydex.com/pokemon/me55-54/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/054/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/054/high.webp"
       }
     },
     {
@@ -1387,8 +1387,8 @@ const setData: TcgSet = {
         145
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-55/small",
-        "large": "https://images.scrydex.com/pokemon/me55-55/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/055/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/055/high.webp"
       }
     },
     {
@@ -1412,8 +1412,8 @@ const setData: TcgSet = {
         644
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-56/small",
-        "large": "https://images.scrydex.com/pokemon/me55-56/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/056/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/056/high.webp"
       }
     },
     {
@@ -1437,8 +1437,8 @@ const setData: TcgSet = {
         807
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-57/small",
-        "large": "https://images.scrydex.com/pokemon/me55-57/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/057/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/057/high.webp"
       }
     },
     {
@@ -1462,8 +1462,8 @@ const setData: TcgSet = {
         848
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-58/small",
-        "large": "https://images.scrydex.com/pokemon/me55-58/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/058/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/058/high.webp"
       }
     },
     {
@@ -1487,8 +1487,8 @@ const setData: TcgSet = {
         849
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-59/small",
-        "large": "https://images.scrydex.com/pokemon/me55-59/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/059/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/059/high.webp"
       }
     },
     {
@@ -1512,8 +1512,8 @@ const setData: TcgSet = {
         849
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-60/small",
-        "large": "https://images.scrydex.com/pokemon/me55-60/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/060/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/060/high.webp"
       }
     },
     {
@@ -1537,8 +1537,8 @@ const setData: TcgSet = {
         877
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-61/small",
-        "large": "https://images.scrydex.com/pokemon/me55-61/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/061/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/061/high.webp"
       }
     },
     {
@@ -1562,8 +1562,8 @@ const setData: TcgSet = {
         1008
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-62/small",
-        "large": "https://images.scrydex.com/pokemon/me55-62/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/062/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/062/high.webp"
       }
     },
     {
@@ -1587,8 +1587,8 @@ const setData: TcgSet = {
         150
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-63/small",
-        "large": "https://images.scrydex.com/pokemon/me55-63/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/063/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/063/high.webp"
       }
     },
     {
@@ -1613,8 +1613,8 @@ const setData: TcgSet = {
         150
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-64/small",
-        "large": "https://images.scrydex.com/pokemon/me55-64/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/064/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/064/high.webp"
       }
     },
     {
@@ -1638,8 +1638,8 @@ const setData: TcgSet = {
         151
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-65/small",
-        "large": "https://images.scrydex.com/pokemon/me55-65/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/065/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/065/high.webp"
       }
     },
     {
@@ -1659,13 +1659,13 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         151
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-66/small",
-        "large": "https://images.scrydex.com/pokemon/me55-66/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/066/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/066/high.webp"
       }
     },
     {
@@ -1689,8 +1689,8 @@ const setData: TcgSet = {
         183
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-67/small",
-        "large": "https://images.scrydex.com/pokemon/me55-67/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/067/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/067/high.webp"
       }
     },
     {
@@ -1714,8 +1714,8 @@ const setData: TcgSet = {
         184
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-68/small",
-        "large": "https://images.scrydex.com/pokemon/me55-68/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/068/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/068/high.webp"
       }
     },
     {
@@ -1739,8 +1739,8 @@ const setData: TcgSet = {
         196
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-69/small",
-        "large": "https://images.scrydex.com/pokemon/me55-69/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/069/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/069/high.webp"
       }
     },
     {
@@ -1765,8 +1765,8 @@ const setData: TcgSet = {
         196
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-70/small",
-        "large": "https://images.scrydex.com/pokemon/me55-70/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/070/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/070/high.webp"
       }
     },
     {
@@ -1791,8 +1791,8 @@ const setData: TcgSet = {
         700
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-71/small",
-        "large": "https://images.scrydex.com/pokemon/me55-71/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/071/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/071/high.webp"
       }
     },
     {
@@ -1816,8 +1816,8 @@ const setData: TcgSet = {
         201
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-72/small",
-        "large": "https://images.scrydex.com/pokemon/me55-72/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/072/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/072/high.webp"
       }
     },
     {
@@ -1841,8 +1841,8 @@ const setData: TcgSet = {
         425
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-73/small",
-        "large": "https://images.scrydex.com/pokemon/me55-73/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/073/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/073/high.webp"
       }
     },
     {
@@ -1866,8 +1866,8 @@ const setData: TcgSet = {
         488
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-74/small",
-        "large": "https://images.scrydex.com/pokemon/me55-74/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/074/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/074/high.webp"
       }
     },
     {
@@ -1891,8 +1891,8 @@ const setData: TcgSet = {
         609
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-75/small",
-        "large": "https://images.scrydex.com/pokemon/me55-75/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/075/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/075/high.webp"
       }
     },
     {
@@ -1916,8 +1916,8 @@ const setData: TcgSet = {
         716
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-76/small",
-        "large": "https://images.scrydex.com/pokemon/me55-76/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/076/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/076/high.webp"
       }
     },
     {
@@ -1941,8 +1941,8 @@ const setData: TcgSet = {
         764
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-77/small",
-        "large": "https://images.scrydex.com/pokemon/me55-77/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/077/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/077/high.webp"
       }
     },
     {
@@ -1966,8 +1966,8 @@ const setData: TcgSet = {
         789
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-78/small",
-        "large": "https://images.scrydex.com/pokemon/me55-78/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/078/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/078/high.webp"
       }
     },
     {
@@ -1991,8 +1991,8 @@ const setData: TcgSet = {
         790
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-79/small",
-        "large": "https://images.scrydex.com/pokemon/me55-79/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/079/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/079/high.webp"
       }
     },
     {
@@ -2016,8 +2016,8 @@ const setData: TcgSet = {
         792
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-80/small",
-        "large": "https://images.scrydex.com/pokemon/me55-80/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/080/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/080/high.webp"
       }
     },
     {
@@ -2041,8 +2041,8 @@ const setData: TcgSet = {
         999
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-81/small",
-        "large": "https://images.scrydex.com/pokemon/me55-81/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/081/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/081/high.webp"
       }
     },
     {
@@ -2066,8 +2066,8 @@ const setData: TcgSet = {
         383
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-82/small",
-        "large": "https://images.scrydex.com/pokemon/me55-82/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/082/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/082/high.webp"
       }
     },
     {
@@ -2091,8 +2091,8 @@ const setData: TcgSet = {
         448
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-83/small",
-        "large": "https://images.scrydex.com/pokemon/me55-83/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/083/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/083/high.webp"
       }
     },
     {
@@ -2116,8 +2116,8 @@ const setData: TcgSet = {
         537
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-84/small",
-        "large": "https://images.scrydex.com/pokemon/me55-84/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/084/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/084/high.webp"
       }
     },
     {
@@ -2141,8 +2141,8 @@ const setData: TcgSet = {
         745
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-85/small",
-        "large": "https://images.scrydex.com/pokemon/me55-85/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/085/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/085/high.webp"
       }
     },
     {
@@ -2166,8 +2166,8 @@ const setData: TcgSet = {
         1007
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-86/small",
-        "large": "https://images.scrydex.com/pokemon/me55-86/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/086/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/086/high.webp"
       }
     },
     {
@@ -2191,8 +2191,8 @@ const setData: TcgSet = {
         29
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-87/small",
-        "large": "https://images.scrydex.com/pokemon/me55-87/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/087/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/087/high.webp"
       }
     },
     {
@@ -2216,8 +2216,8 @@ const setData: TcgSet = {
         30
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-88/small",
-        "large": "https://images.scrydex.com/pokemon/me55-88/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/088/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/088/high.webp"
       }
     },
     {
@@ -2241,8 +2241,8 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-89/small",
-        "large": "https://images.scrydex.com/pokemon/me55-89/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/089/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/089/high.webp"
       }
     },
     {
@@ -2267,8 +2267,8 @@ const setData: TcgSet = {
         94
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-90/small",
-        "large": "https://images.scrydex.com/pokemon/me55-90/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/090/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/090/high.webp"
       }
     },
     {
@@ -2292,8 +2292,8 @@ const setData: TcgSet = {
         197
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-91/small",
-        "large": "https://images.scrydex.com/pokemon/me55-91/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/091/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/091/high.webp"
       }
     },
     {
@@ -2318,8 +2318,8 @@ const setData: TcgSet = {
         197
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-92/small",
-        "large": "https://images.scrydex.com/pokemon/me55-92/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/092/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/092/high.webp"
       }
     },
     {
@@ -2343,8 +2343,8 @@ const setData: TcgSet = {
         198
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-93/small",
-        "large": "https://images.scrydex.com/pokemon/me55-93/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/093/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/093/high.webp"
       }
     },
     {
@@ -2368,8 +2368,8 @@ const setData: TcgSet = {
         559
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-94/small",
-        "large": "https://images.scrydex.com/pokemon/me55-94/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/094/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/094/high.webp"
       }
     },
     {
@@ -2393,8 +2393,8 @@ const setData: TcgSet = {
         570
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-95/small",
-        "large": "https://images.scrydex.com/pokemon/me55-95/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/095/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/095/high.webp"
       }
     },
     {
@@ -2418,8 +2418,8 @@ const setData: TcgSet = {
         571
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-96/small",
-        "large": "https://images.scrydex.com/pokemon/me55-96/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/096/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/096/high.webp"
       }
     },
     {
@@ -2443,8 +2443,8 @@ const setData: TcgSet = {
         633
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-97/small",
-        "large": "https://images.scrydex.com/pokemon/me55-97/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/097/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/097/high.webp"
       }
     },
     {
@@ -2468,8 +2468,8 @@ const setData: TcgSet = {
         634
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-98/small",
-        "large": "https://images.scrydex.com/pokemon/me55-98/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/098/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/098/high.webp"
       }
     },
     {
@@ -2493,8 +2493,8 @@ const setData: TcgSet = {
         635
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-99/small",
-        "large": "https://images.scrydex.com/pokemon/me55-99/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/099/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/099/high.webp"
       }
     },
     {
@@ -2518,8 +2518,8 @@ const setData: TcgSet = {
         717
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-100/small",
-        "large": "https://images.scrydex.com/pokemon/me55-100/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/100/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/100/high.webp"
       }
     },
     {
@@ -2543,8 +2543,8 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-101/small",
-        "large": "https://images.scrydex.com/pokemon/me55-101/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/101/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/101/high.webp"
       }
     },
     {
@@ -2569,8 +2569,8 @@ const setData: TcgSet = {
         385
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-102/small",
-        "large": "https://images.scrydex.com/pokemon/me55-102/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/102/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/102/high.webp"
       }
     },
     {
@@ -2594,8 +2594,8 @@ const setData: TcgSet = {
         483
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-103/small",
-        "large": "https://images.scrydex.com/pokemon/me55-103/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/103/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/103/high.webp"
       }
     },
     {
@@ -2619,8 +2619,8 @@ const setData: TcgSet = {
         598
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-104/small",
-        "large": "https://images.scrydex.com/pokemon/me55-104/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/104/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/104/high.webp"
       }
     },
     {
@@ -2644,8 +2644,8 @@ const setData: TcgSet = {
         791
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-105/small",
-        "large": "https://images.scrydex.com/pokemon/me55-105/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/105/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/105/high.webp"
       }
     },
     {
@@ -2669,8 +2669,8 @@ const setData: TcgSet = {
         888
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-106/small",
-        "large": "https://images.scrydex.com/pokemon/me55-106/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/106/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/106/high.webp"
       }
     },
     {
@@ -2694,8 +2694,8 @@ const setData: TcgSet = {
         889
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-107/small",
-        "large": "https://images.scrydex.com/pokemon/me55-107/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/107/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/107/high.webp"
       }
     },
     {
@@ -2719,8 +2719,8 @@ const setData: TcgSet = {
         1000
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-108/small",
-        "large": "https://images.scrydex.com/pokemon/me55-108/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/108/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/108/high.webp"
       }
     },
     {
@@ -2745,8 +2745,8 @@ const setData: TcgSet = {
         373
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-109/small",
-        "large": "https://images.scrydex.com/pokemon/me55-109/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/109/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/109/high.webp"
       }
     },
     {
@@ -2770,8 +2770,8 @@ const setData: TcgSet = {
         782
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-110/small",
-        "large": "https://images.scrydex.com/pokemon/me55-110/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/110/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/110/high.webp"
       }
     },
     {
@@ -2795,8 +2795,8 @@ const setData: TcgSet = {
         783
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-111/small",
-        "large": "https://images.scrydex.com/pokemon/me55-111/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/111/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/111/high.webp"
       }
     },
     {
@@ -2820,8 +2820,8 @@ const setData: TcgSet = {
         784
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-112/small",
-        "large": "https://images.scrydex.com/pokemon/me55-112/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/112/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/112/high.webp"
       }
     },
     {
@@ -2845,8 +2845,8 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-113/small",
-        "large": "https://images.scrydex.com/pokemon/me55-113/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/113/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/113/high.webp"
       }
     },
     {
@@ -2870,8 +2870,8 @@ const setData: TcgSet = {
         115
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-114/small",
-        "large": "https://images.scrydex.com/pokemon/me55-114/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/114/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/114/high.webp"
       }
     },
     {
@@ -2895,8 +2895,8 @@ const setData: TcgSet = {
         132
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-115/small",
-        "large": "https://images.scrydex.com/pokemon/me55-115/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/115/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/115/high.webp"
       }
     },
     {
@@ -2920,8 +2920,8 @@ const setData: TcgSet = {
         133
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-116/small",
-        "large": "https://images.scrydex.com/pokemon/me55-116/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/116/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/116/high.webp"
       }
     },
     {
@@ -2945,8 +2945,8 @@ const setData: TcgSet = {
         133
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-117/small",
-        "large": "https://images.scrydex.com/pokemon/me55-117/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/117/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/117/high.webp"
       }
     },
     {
@@ -2970,8 +2970,8 @@ const setData: TcgSet = {
         133
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-118/small",
-        "large": "https://images.scrydex.com/pokemon/me55-118/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/118/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/118/high.webp"
       }
     },
     {
@@ -2995,8 +2995,8 @@ const setData: TcgSet = {
         143
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-119/small",
-        "large": "https://images.scrydex.com/pokemon/me55-119/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/119/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/119/high.webp"
       }
     },
     {
@@ -3015,13 +3015,13 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         174
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-120/small",
-        "large": "https://images.scrydex.com/pokemon/me55-120/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/120/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/120/high.webp"
       }
     },
     {
@@ -3045,8 +3045,8 @@ const setData: TcgSet = {
         249
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-121/small",
-        "large": "https://images.scrydex.com/pokemon/me55-121/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/121/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/121/high.webp"
       }
     },
     {
@@ -3070,8 +3070,8 @@ const setData: TcgSet = {
         570
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-122/small",
-        "large": "https://images.scrydex.com/pokemon/me55-122/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/122/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/122/high.webp"
       }
     },
     {
@@ -3095,8 +3095,8 @@ const setData: TcgSet = {
         571
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-123/small",
-        "large": "https://images.scrydex.com/pokemon/me55-123/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/123/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/123/high.webp"
       }
     },
     {
@@ -3120,8 +3120,8 @@ const setData: TcgSet = {
         774
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-124/small",
-        "large": "https://images.scrydex.com/pokemon/me55-124/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/124/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/124/high.webp"
       }
     },
     {
@@ -3145,8 +3145,8 @@ const setData: TcgSet = {
         925
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-125/small",
-        "large": "https://images.scrydex.com/pokemon/me55-125/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/125/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/125/high.webp"
       }
     },
     {
@@ -3166,8 +3166,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-126/small",
-        "large": "https://images.scrydex.com/pokemon/me55-126/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/126/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/126/high.webp"
       }
     },
     {
@@ -3187,8 +3187,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-127/small",
-        "large": "https://images.scrydex.com/pokemon/me55-127/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/127/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/127/high.webp"
       }
     },
     {
@@ -3208,8 +3208,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-128/small",
-        "large": "https://images.scrydex.com/pokemon/me55-128/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/128/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/128/high.webp"
       }
     },
     {
@@ -3233,8 +3233,8 @@ const setData: TcgSet = {
         103
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-129/small",
-        "large": "https://images.scrydex.com/pokemon/me55-129/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/129/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/129/high.webp"
       }
     },
     {
@@ -3258,8 +3258,8 @@ const setData: TcgSet = {
         146
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-130/small",
-        "large": "https://images.scrydex.com/pokemon/me55-130/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/130/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/130/high.webp"
       }
     },
     {
@@ -3283,8 +3283,8 @@ const setData: TcgSet = {
         131
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-131/small",
-        "large": "https://images.scrydex.com/pokemon/me55-131/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/131/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/131/high.webp"
       }
     },
     {
@@ -3308,8 +3308,8 @@ const setData: TcgSet = {
         144
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-132/small",
-        "large": "https://images.scrydex.com/pokemon/me55-132/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/132/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/132/high.webp"
       }
     },
     {
@@ -3333,8 +3333,8 @@ const setData: TcgSet = {
         145
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-133/small",
-        "large": "https://images.scrydex.com/pokemon/me55-133/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/133/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/133/high.webp"
       }
     },
     {
@@ -3358,8 +3358,8 @@ const setData: TcgSet = {
         849
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-134/small",
-        "large": "https://images.scrydex.com/pokemon/me55-134/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/134/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/134/high.webp"
       }
     },
     {
@@ -3383,8 +3383,8 @@ const setData: TcgSet = {
         877
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-135/small",
-        "large": "https://images.scrydex.com/pokemon/me55-135/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/135/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/135/high.webp"
       }
     },
     {
@@ -3408,8 +3408,8 @@ const setData: TcgSet = {
         425
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-136/small",
-        "large": "https://images.scrydex.com/pokemon/me55-136/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/136/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/136/high.webp"
       }
     },
     {
@@ -3433,8 +3433,8 @@ const setData: TcgSet = {
         609
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-137/small",
-        "large": "https://images.scrydex.com/pokemon/me55-137/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/137/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/137/high.webp"
       }
     },
     {
@@ -3458,8 +3458,8 @@ const setData: TcgSet = {
         745
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-138/small",
-        "large": "https://images.scrydex.com/pokemon/me55-138/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/138/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/138/high.webp"
       }
     },
     {
@@ -3483,8 +3483,8 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-139/small",
-        "large": "https://images.scrydex.com/pokemon/me55-139/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/139/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/139/high.webp"
       }
     },
     {
@@ -3508,8 +3508,8 @@ const setData: TcgSet = {
         559
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-140/small",
-        "large": "https://images.scrydex.com/pokemon/me55-140/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/140/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/140/high.webp"
       }
     },
     {
@@ -3533,8 +3533,8 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-141/small",
-        "large": "https://images.scrydex.com/pokemon/me55-141/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/141/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/141/high.webp"
       }
     },
     {
@@ -3558,8 +3558,8 @@ const setData: TcgSet = {
         1000
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-142/small",
-        "large": "https://images.scrydex.com/pokemon/me55-142/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/142/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/142/high.webp"
       }
     },
     {
@@ -3583,8 +3583,8 @@ const setData: TcgSet = {
         784
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-143/small",
-        "large": "https://images.scrydex.com/pokemon/me55-143/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/143/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/143/high.webp"
       }
     },
     {
@@ -3608,8 +3608,8 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-144/small",
-        "large": "https://images.scrydex.com/pokemon/me55-144/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/144/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/144/high.webp"
       }
     },
     {
@@ -3633,8 +3633,8 @@ const setData: TcgSet = {
         570
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-145/small",
-        "large": "https://images.scrydex.com/pokemon/me55-145/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/145/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/145/high.webp"
       }
     },
     {
@@ -3658,8 +3658,8 @@ const setData: TcgSet = {
         925
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-146/small",
-        "large": "https://images.scrydex.com/pokemon/me55-146/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/146/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/146/high.webp"
       }
     },
     {
@@ -3684,8 +3684,8 @@ const setData: TcgSet = {
         909
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-147/small",
-        "large": "https://images.scrydex.com/pokemon/me55-147/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/147/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/147/high.webp"
       }
     },
     {
@@ -3710,8 +3710,8 @@ const setData: TcgSet = {
         658
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-148/small",
-        "large": "https://images.scrydex.com/pokemon/me55-148/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/148/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/148/high.webp"
       }
     },
     {
@@ -3736,8 +3736,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-149/small",
-        "large": "https://images.scrydex.com/pokemon/me55-149/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/149/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/149/high.webp"
       }
     },
     {
@@ -3762,8 +3762,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-150/small",
-        "large": "https://images.scrydex.com/pokemon/me55-150/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/150/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/150/high.webp"
       }
     },
     {
@@ -3788,8 +3788,8 @@ const setData: TcgSet = {
         150
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-151/small",
-        "large": "https://images.scrydex.com/pokemon/me55-151/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/151/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/151/high.webp"
       }
     },
     {
@@ -3809,13 +3809,13 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         151
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-152/small",
-        "large": "https://images.scrydex.com/pokemon/me55-152/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/152/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/152/high.webp"
       }
     },
     {
@@ -3840,8 +3840,8 @@ const setData: TcgSet = {
         700
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-153/small",
-        "large": "https://images.scrydex.com/pokemon/me55-153/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/153/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/153/high.webp"
       }
     },
     {
@@ -3866,8 +3866,8 @@ const setData: TcgSet = {
         94
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-154/small",
-        "large": "https://images.scrydex.com/pokemon/me55-154/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/154/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/154/high.webp"
       }
     },
     {
@@ -3892,8 +3892,8 @@ const setData: TcgSet = {
         385
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-155/small",
-        "large": "https://images.scrydex.com/pokemon/me55-155/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/155/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/155/high.webp"
       }
     },
     {
@@ -3918,8 +3918,8 @@ const setData: TcgSet = {
         373
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-156/small",
-        "large": "https://images.scrydex.com/pokemon/me55-156/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/156/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/156/high.webp"
       }
     },
     {
@@ -3944,8 +3944,8 @@ const setData: TcgSet = {
         150
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-157/small",
-        "large": "https://images.scrydex.com/pokemon/me55-157/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/157/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/157/high.webp"
       }
     },
     {
@@ -3965,13 +3965,13 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         151
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-158/small",
-        "large": "https://images.scrydex.com/pokemon/me55-158/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/158/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/158/high.webp"
       }
     },
     {
@@ -3995,8 +3995,8 @@ const setData: TcgSet = {
         151
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-B/small",
-        "large": "https://images.scrydex.com/pokemon/me55-B/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/B/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/B/high.webp"
       }
     },
     {
@@ -4020,8 +4020,8 @@ const setData: TcgSet = {
         151
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-G/small",
-        "large": "https://images.scrydex.com/pokemon/me55-G/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/G/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/G/high.webp"
       }
     },
     {
@@ -4045,8 +4045,8 @@ const setData: TcgSet = {
         151
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me55-R/small",
-        "large": "https://images.scrydex.com/pokemon/me55-R/large"
+        "small": "https://assets.tcgdex.net/en/me/30th/R/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/30th/R/high.webp"
       }
     }
   ]

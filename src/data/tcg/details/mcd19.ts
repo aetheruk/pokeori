@@ -24,10 +24,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Surprise Attack",
-        "cost": [
-          "Grass"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
         "text": "Flip a coin. If tails, this attack does nothing."
       }
@@ -53,8 +51,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/1.png",
-      "large": "https://images.pokemontcg.io/mcd19/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/1/high.webp"
     }
   },
   {
@@ -78,12 +76,10 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Tropical Shake",
-        "cost": [
-          "Grass"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20+",
-        "text": "This attack does 20 more damage for each type of basic Energy card in your discard pile. You can't add more than 100 damage in this way."
+        "text": "This attack does 20 more damage for each type of basic Energy card in your discard pile. You can’t add more than 100 damage in this way."
       }
     ],
     "weaknesses": [
@@ -109,8 +105,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/2.png",
-      "large": "https://images.pokemontcg.io/mcd19/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/2/high.webp"
     }
   },
   {
@@ -136,21 +132,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Controlled Burn",
-        "cost": [
-          "Fire"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
-        "text": "Discard the top card of your opponent's deck."
+        "text": "Discard the top card of your opponent’s deck."
       },
       {
         "name": "Flamethrower",
-        "cost": [
-          "Fire",
-          "Fire",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 3,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "80",
         "text": "Discard an Energy from this Pokémon."
       }
@@ -170,15 +160,15 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       126
     ],
-    "flavorText": "When angered, it spouts brilliant fire from all over its body. It doesn't calm down until its opponent has burned to ash.",
+    "flavorText": "When angered, it spouts brilliant fire from all over its body. It doesn’t calm down until its opponent has burned to ash.",
     "legalities": {
       "unlimited": "Legal",
       "expanded": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/3.png",
-      "large": "https://images.pokemontcg.io/mcd19/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/3/high.webp"
     }
   },
   {
@@ -206,21 +196,22 @@ const cardDetails: TcgCardDetail[] = [
         "name": "Fury Swipes",
         "cost": [],
         "convertedEnergyCost": 0,
-        "damage": "10",
+        "damage": "10×",
         "text": "Flip 3 coins. This attack does 10 damage for each heads."
       }
     ],
     "weaknesses": [
       {
-        "type": "Metal",
+        "type": "Water",
         "value": "×2"
       }
     ],
     "resistances": [],
     "retreatCost": [
+      "Colorless",
       "Colorless"
     ],
-    "convertedRetreatCost": 1,
+    "convertedRetreatCost": 2,
     "nationalPokedexNumbers": [
       27
     ],
@@ -231,8 +222,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/4.png",
-      "large": "https://images.pokemontcg.io/mcd19/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/4/high.webp"
     }
   },
   {
@@ -256,21 +247,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Aqua Bullet",
-        "cost": [
-          "Water"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
-        "text": "This attack does 20 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 20 damage to 1 of your opponent’s Benched Pokémon. (Don’t apply Weakness and Resistance for Benched Pokémon.)"
       },
       {
         "name": "Hydro Pump",
-        "cost": [
-          "Colorless",
-          "Colorless",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 3,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "70+",
         "text": "This attack does 10 more damage times the amount of Water Energy attached to this Pokémon."
       }
@@ -297,8 +282,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/5.png",
-      "large": "https://images.pokemontcg.io/mcd19/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/5/high.webp"
     }
   },
   {
@@ -324,11 +309,9 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Iron Tail",
-        "cost": [
-          "Lightning"
-        ],
-        "convertedEnergyCost": 1,
-        "damage": "20",
+        "cost": [],
+        "convertedEnergyCost": 0,
+        "damage": "20×",
         "text": "Flip a coin until you get tails. This attack does 20 damage for each heads."
       }
     ],
@@ -345,9 +328,10 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [
+      "Colorless",
       "Colorless"
     ],
-    "convertedRetreatCost": 1,
+    "convertedRetreatCost": 2,
     "nationalPokedexNumbers": [
       25
     ],
@@ -358,8 +342,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/6.png",
-      "large": "https://images.pokemontcg.io/mcd19/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/6/high.webp"
     }
   },
   {
@@ -385,12 +369,10 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Ominous Eyes",
-        "cost": [
-          "Psychic"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
-        "text": "Put 1 damage counter on 1 of your opponent's Pokémon."
+        "text": "Put 1 damage counter on 1 of your opponent’s Pokémon."
       }
     ],
     "weaknesses": [
@@ -419,8 +401,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/7.png",
-      "large": "https://images.pokemontcg.io/mcd19/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/7/high.webp"
     }
   },
   {
@@ -433,7 +415,7 @@ const cardDetails: TcgCardDetail[] = [
     "subtypes": [
       "Basic"
     ],
-    "hp": "60",
+    "hp": "50",
     "types": [
       "Fighting"
     ],
@@ -446,11 +428,9 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Three-Step Strike",
-        "cost": [
-          "Fighting"
-        ],
-        "convertedEnergyCost": 1,
-        "damage": "10",
+        "cost": [],
+        "convertedEnergyCost": 0,
+        "damage": "10×",
         "text": "Flip 3 coins. This attack does 10 damage for each heads."
       }
     ],
@@ -468,15 +448,15 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       56
     ],
-    "flavorText": "It can spontaneously become enraged. Everyone near it clears out as it rampages, and the resulting loneliness makes it angrier still.",
+    "flavorText": "It can spontaneously become enraged. Everyone near it clears out as it rampages and the resulting loneliness makes it angrier still.",
     "legalities": {
       "unlimited": "Legal",
       "expanded": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/8.png",
-      "large": "https://images.pokemontcg.io/mcd19/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/8/high.webp"
     }
   },
   {
@@ -502,20 +482,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Screech",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
         "text": "During your next turn, the Defending Pokémon takes 20 more damage from attacks (after applying Weakness and Resistance)."
       },
       {
         "name": "Rage",
-        "cost": [
-          "Fighting",
-          "Fighting"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10+",
         "text": "This attack does 10 more damage for each damage counter on this Pokémon."
       }
@@ -542,8 +517,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/9.png",
-      "large": "https://images.pokemontcg.io/mcd19/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/9/high.webp"
     }
   },
   {
@@ -601,8 +576,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/10.png",
-      "large": "https://images.pokemontcg.io/mcd19/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/10/high.webp"
     }
   },
   {
@@ -628,7 +603,7 @@ const cardDetails: TcgCardDetail[] = [
         "name": "Gold Rush",
         "cost": [],
         "convertedEnergyCost": 0,
-        "damage": "30",
+        "damage": "30×",
         "text": "Discard any number of Metal Energy cards from your hand. This attack does 30 damage for each card you discarded in this way."
       }
     ],
@@ -651,15 +626,15 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       51
     ],
-    "flavorText": "This Pokémon are cherished in the Alola region, where they are thought to be feminine deities of the land incarnate.",
+    "flavorText": "These Pokémon are cherished in the Alola region, where they are thought to be feminine deities of the land incarnate.",
     "legalities": {
       "unlimited": "Legal",
       "expanded": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/11.png",
-      "large": "https://images.pokemontcg.io/mcd19/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/11/high.webp"
     }
   },
   {
@@ -692,10 +667,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Gnaw",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
         "text": ""
       }
@@ -721,8 +694,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd19/12.png",
-      "large": "https://images.pokemontcg.io/mcd19/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2019sm/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2019sm/12/high.webp"
     }
   }
 ]

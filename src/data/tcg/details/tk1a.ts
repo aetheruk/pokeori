@@ -57,8 +57,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/1.png",
-      "large": "https://images.pokemontcg.io/tk1a/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/1/high.webp"
     }
   },
   {
@@ -106,7 +106,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -123,8 +123,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/2.png",
-      "large": "https://images.pokemontcg.io/tk1a/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/2/high.webp"
     }
   },
   {
@@ -165,13 +165,13 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "10×",
-        "text": "Does 10 damage times the number of basic Energy cards attached to all of the Active Pokémon (both yours and your opponent's)."
+        "text": "Does 10 damage times the number of basic Energy cards attached to all of the Active Pokémon (both yours and your opponent’s)."
       }
     ],
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -188,8 +188,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/3.png",
-      "large": "https://images.pokemontcg.io/tk1a/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/3/high.webp"
     }
   },
   {
@@ -218,7 +218,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "10",
-        "text": "Remove 1 damage counter from 1 of your Pokémon"
+        "text": "Remove 1 damage counter from 1 of your Pokémon."
       },
       {
         "name": "Heat Blast",
@@ -235,7 +235,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -252,8 +252,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/4.png",
-      "large": "https://images.pokemontcg.io/tk1a/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/4/high.webp"
     }
   },
   {
@@ -300,7 +300,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -317,8 +317,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/5.png",
-      "large": "https://images.pokemontcg.io/tk1a/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/5/high.webp"
     }
   },
   {
@@ -365,7 +365,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -382,8 +382,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/6.png",
-      "large": "https://images.pokemontcg.io/tk1a/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/6/high.webp"
     }
   },
   {
@@ -421,7 +421,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -438,8 +438,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/7.png",
-      "large": "https://images.pokemontcg.io/tk1a/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/7/high.webp"
     }
   },
   {
@@ -464,7 +464,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -474,8 +474,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/8.png",
-      "large": "https://images.pokemontcg.io/tk1a/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/8/high.webp"
     }
   },
   {
@@ -500,7 +500,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -510,8 +510,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/9.png",
-      "large": "https://images.pokemontcg.io/tk1a/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/9/high.webp"
     }
   },
   {
@@ -525,7 +525,9 @@ const cardDetails: TcgCardDetail[] = [
       "Basic"
     ],
     "hp": null,
-    "types": [],
+    "types": [
+      "Fire"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [],
@@ -534,7 +536,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -544,8 +546,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk1a/10.png",
-      "large": "https://images.pokemontcg.io/tk1a/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/10/high.webp"
     }
   }
 ]

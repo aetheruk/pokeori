@@ -53,8 +53,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/1.png",
-      "large": "https://images.pokemontcg.io/bw10/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/1/high.webp"
     }
   },
   {
@@ -116,8 +116,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/2.png",
-      "large": "https://images.pokemontcg.io/bw10/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/2/high.webp"
     }
   },
   {
@@ -187,8 +187,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/3.png",
-      "large": "https://images.pokemontcg.io/bw10/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/3/high.webp"
     }
   },
   {
@@ -258,8 +258,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/4.png",
-      "large": "https://images.pokemontcg.io/bw10/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/4/high.webp"
     }
   },
   {
@@ -297,7 +297,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20+",
+        "damage": "20",
         "text": "Does 20 more damage for each Energy attached to the Defending Pokémon."
       }
     ],
@@ -327,8 +327,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/5.png",
-      "large": "https://images.pokemontcg.io/bw10/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/5/high.webp"
     }
   },
   {
@@ -384,8 +384,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/6.png",
-      "large": "https://images.pokemontcg.io/bw10/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/6/high.webp"
     }
   },
   {
@@ -452,8 +452,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/7.png",
-      "large": "https://images.pokemontcg.io/bw10/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/7/high.webp"
     }
   },
   {
@@ -504,7 +504,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       617
     ],
@@ -515,8 +515,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/8.png",
-      "large": "https://images.pokemontcg.io/bw10/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/8/high.webp"
     }
   },
   {
@@ -542,7 +542,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Verdant Wind",
-        "text": "Each of your Pokémon that has any Grass Energy attached to it can't be affected by any Special Conditions. (Remove any Special Conditions affecting those Pokémon.)",
+        "text": "Each of your Pokémon that has any Grass Energy attached to it can’t be affected by any Special Conditions. (Remove any Special Conditions affecting those Pokémon.)",
         "type": "Ability"
       }
     ],
@@ -584,8 +584,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/9.png",
-      "large": "https://images.pokemontcg.io/bw10/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/9/high.webp"
     }
   },
   {
@@ -624,7 +624,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "80+",
+        "damage": "80",
         "text": "Flip a coin. If heads, this attack does 20 more damage."
       }
     ],
@@ -649,8 +649,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/10.png",
-      "large": "https://images.pokemontcg.io/bw10/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/10/high.webp"
     }
   },
   {
@@ -677,7 +677,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Red Signal",
-        "text": "When you attach a Plasma Energy from your hand to this Pokémon, you may switch 1 of your opponent's Benched Pokémon with his or her Active Pokémon.",
+        "text": "When you attach a Plasma Energy from your hand to this Pokémon, you may switch 1 of your opponent’s Benched Pokémon with his or her Active Pokémon.",
         "type": "Ability"
       }
     ],
@@ -691,7 +691,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "100",
-        "text": "Does 20 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness or Resistance for Benched Pokémon.)"
+        "text": "Does 20 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
@@ -715,8 +715,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/11.png",
-      "large": "https://images.pokemontcg.io/bw10/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/11/high.webp"
     }
   },
   {
@@ -783,8 +783,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/12.png",
-      "large": "https://images.pokemontcg.io/bw10/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/12/high.webp"
     }
   },
   {
@@ -849,8 +849,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/13.png",
-      "large": "https://images.pokemontcg.io/bw10/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/13/high.webp"
     }
   },
   {
@@ -915,8 +915,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/14.png",
-      "large": "https://images.pokemontcg.io/bw10/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/14/high.webp"
     }
   },
   {
@@ -957,7 +957,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "30×",
+        "damage": "30",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       }
     ],
@@ -983,8 +983,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/15.png",
-      "large": "https://images.pokemontcg.io/bw10/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/15/high.webp"
     }
   },
   {
@@ -1021,7 +1021,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "60+",
+        "damage": "60",
         "text": "Does 10 more damage for each Water Energy attached to this Pokémon."
       }
     ],
@@ -1049,8 +1049,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/16.png",
-      "large": "https://images.pokemontcg.io/bw10/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/16/high.webp"
     }
   },
   {
@@ -1117,8 +1117,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/17.png",
-      "large": "https://images.pokemontcg.io/bw10/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/17/high.webp"
     }
   },
   {
@@ -1174,8 +1174,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/18.png",
-      "large": "https://images.pokemontcg.io/bw10/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/18/high.webp"
     }
   },
   {
@@ -1239,8 +1239,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/19.png",
-      "large": "https://images.pokemontcg.io/bw10/19_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/19/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/19/high.webp"
     }
   },
   {
@@ -1302,8 +1302,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/20.png",
-      "large": "https://images.pokemontcg.io/bw10/20_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/20/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/20/high.webp"
     }
   },
   {
@@ -1370,8 +1370,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/21.png",
-      "large": "https://images.pokemontcg.io/bw10/21_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/21/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/21/high.webp"
     }
   },
   {
@@ -1438,8 +1438,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/22.png",
-      "large": "https://images.pokemontcg.io/bw10/22_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/22/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/22/high.webp"
     }
   },
   {
@@ -1463,7 +1463,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Cursed Glare",
-        "text": "As long as this Pokémon is your Active Pokémon, your opponent can't attach any Special Energy cards from his or her hand to his or her Pokémon.",
+        "text": "As long as this Pokémon is your Active Pokémon, your opponent can’t attach any Special Energy cards from his or her hand to his or her Pokémon.",
         "type": "Ability"
       }
     ],
@@ -1500,8 +1500,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/23.png",
-      "large": "https://images.pokemontcg.io/bw10/23_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/23/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/23/high.webp"
     }
   },
   {
@@ -1565,8 +1565,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/24.png",
-      "large": "https://images.pokemontcg.io/bw10/24_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/24/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/24/high.webp"
     }
   },
   {
@@ -1634,8 +1634,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/25.png",
-      "large": "https://images.pokemontcg.io/bw10/25_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/25/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/25/high.webp"
     }
   },
   {
@@ -1701,8 +1701,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/26.png",
-      "large": "https://images.pokemontcg.io/bw10/26_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/26/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/26/high.webp"
     }
   },
   {
@@ -1742,7 +1742,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "30×",
+        "damage": "30",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       }
     ],
@@ -1769,8 +1769,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/27.png",
-      "large": "https://images.pokemontcg.io/bw10/27_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/27/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/27/high.webp"
     }
   },
   {
@@ -1800,7 +1800,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "50+",
+        "damage": "50",
         "text": "You may discard an Item card that has Fossil in its name from your hand. If you do, this attack does 50 more damage."
       },
       {
@@ -1840,8 +1840,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/28.png",
-      "large": "https://images.pokemontcg.io/bw10/28_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/28/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/28/high.webp"
     }
   },
   {
@@ -1902,8 +1902,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/29.png",
-      "large": "https://images.pokemontcg.io/bw10/29_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/29/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/29/high.webp"
     }
   },
   {
@@ -1935,7 +1935,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30+",
+        "damage": "30",
         "text": "Does 10 more damage for each damage counter on this Pokémon."
       },
       {
@@ -1974,8 +1974,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/30.png",
-      "large": "https://images.pokemontcg.io/bw10/30_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/30/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/30/high.webp"
     }
   },
   {
@@ -2030,8 +2030,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/31.png",
-      "large": "https://images.pokemontcg.io/bw10/31_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/31/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/31/high.webp"
     }
   },
   {
@@ -2096,8 +2096,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/32.png",
-      "large": "https://images.pokemontcg.io/bw10/32_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/32/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/32/high.webp"
     }
   },
   {
@@ -2127,7 +2127,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30×",
+        "damage": "30",
         "text": "Discard as many Energy attached to your Pokémon as you like. This attack does 30 damage times the number of Energy cards you discarded."
       },
       {
@@ -2139,7 +2139,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "50×",
+        "damage": "50",
         "text": "Flip 4 coins. This attack does 50 damage times the number of heads."
       }
     ],
@@ -2166,8 +2166,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/33.png",
-      "large": "https://images.pokemontcg.io/bw10/33_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/33/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/33/high.webp"
     }
   },
   {
@@ -2234,8 +2234,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/34.png",
-      "large": "https://images.pokemontcg.io/bw10/34_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/34/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/34/high.webp"
     }
   },
   {
@@ -2258,7 +2258,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Drifting Balloon",
-        "text": "This Pokémon's attacks cost Colorless less for each of your opponent's Team Plasma Pokémon in play.",
+        "text": "This Pokémon’s attacks cost Colorless less for each of your opponent’s Team Plasma Pokémon in play.",
         "type": "Ability"
       }
     ],
@@ -2283,7 +2283,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       426
     ],
@@ -2294,8 +2294,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/35.png",
-      "large": "https://images.pokemontcg.io/bw10/35_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/35/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/35/high.webp"
     }
   },
   {
@@ -2348,8 +2348,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/36.png",
-      "large": "https://images.pokemontcg.io/bw10/36_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/36/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/36/high.webp"
     }
   },
   {
@@ -2410,8 +2410,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/37.png",
-      "large": "https://images.pokemontcg.io/bw10/37_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/37/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/37/high.webp"
     }
   },
   {
@@ -2475,8 +2475,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/38.png",
-      "large": "https://images.pokemontcg.io/bw10/38_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/38/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/38/high.webp"
     }
   },
   {
@@ -2516,7 +2516,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10+",
+        "damage": "10",
         "text": "Flip a coin. If heads, this attack does 20 more damage."
       }
     ],
@@ -2541,8 +2541,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/39.png",
-      "large": "https://images.pokemontcg.io/bw10/39_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/39/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/39/high.webp"
     }
   },
   {
@@ -2608,8 +2608,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/40.png",
-      "large": "https://images.pokemontcg.io/bw10/40_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/40/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/40/high.webp"
     }
   },
   {
@@ -2675,8 +2675,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/41.png",
-      "large": "https://images.pokemontcg.io/bw10/41_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/41/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/41/high.webp"
     }
   },
   {
@@ -2731,8 +2731,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/42.png",
-      "large": "https://images.pokemontcg.io/bw10/42_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/42/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/42/high.webp"
     }
   },
   {
@@ -2763,7 +2763,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20+",
+        "damage": "20",
         "text": "Flip a coin. If heads, this attack does 20 more damage."
       }
     ],
@@ -2788,8 +2788,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/43.png",
-      "large": "https://images.pokemontcg.io/bw10/43_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/43/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/43/high.webp"
     }
   },
   {
@@ -2854,8 +2854,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/44.png",
-      "large": "https://images.pokemontcg.io/bw10/44_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/44/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/44/high.webp"
     }
   },
   {
@@ -2923,8 +2923,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/45.png",
-      "large": "https://images.pokemontcg.io/bw10/45_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/45/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/45/high.webp"
     }
   },
   {
@@ -2993,8 +2993,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/46.png",
-      "large": "https://images.pokemontcg.io/bw10/46_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/46/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/46/high.webp"
     }
   },
   {
@@ -3052,8 +3052,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/47.png",
-      "large": "https://images.pokemontcg.io/bw10/47_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/47/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/47/high.webp"
     }
   },
   {
@@ -3083,7 +3083,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "20+",
+        "damage": "20",
         "text": "If this Pokémon's remaining HP is 10, this attack does 70 more damage."
       },
       {
@@ -3121,8 +3121,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/48.png",
-      "large": "https://images.pokemontcg.io/bw10/48_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/48/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/48/high.webp"
     }
   },
   {
@@ -3145,7 +3145,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Badge of Discipline",
-        "text": "The damage of each of your Fighting Pokémon's attacks isn't affected by Resistance.",
+        "text": "The damage of each of your Fighting Pokémon’s attacks isn’t affected by Resistance.",
         "type": "Ability"
       }
     ],
@@ -3186,8 +3186,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/49.png",
-      "large": "https://images.pokemontcg.io/bw10/49_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/49/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/49/high.webp"
     }
   },
   {
@@ -3229,7 +3229,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "80+",
+        "damage": "80",
         "text": "If this Pokémon has a Pokémon Tool card attached to it, this attack does 40 more damage."
       }
     ],
@@ -3256,8 +3256,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/50.png",
-      "large": "https://images.pokemontcg.io/bw10/50_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/50/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/50/high.webp"
     }
   },
   {
@@ -3286,7 +3286,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30×",
+        "damage": "30",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       },
       {
@@ -3297,7 +3297,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "80-",
+        "damage": "80",
         "text": "Does 80 damage minus 20 damage for each Colorless in the Defending Pokémon's Retreat Cost."
       }
     ],
@@ -3324,8 +3324,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/51.png",
-      "large": "https://images.pokemontcg.io/bw10/51_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/51/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/51/high.webp"
     }
   },
   {
@@ -3353,7 +3353,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10+",
+        "damage": "10",
         "text": "If the Defending Pokémon is a Team Plasma Pokémon, this attack does 40 more damage."
       },
       {
@@ -3389,8 +3389,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/52.png",
-      "large": "https://images.pokemontcg.io/bw10/52_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/52/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/52/high.webp"
     }
   },
   {
@@ -3454,8 +3454,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/53.png",
-      "large": "https://images.pokemontcg.io/bw10/53_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/53/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/53/high.webp"
     }
   },
   {
@@ -3483,7 +3483,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "20+",
+        "damage": "20",
         "text": "Flip 2 coins. This attack does 20 more damage for each heads."
       },
       {
@@ -3505,7 +3505,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       567
     ],
@@ -3516,8 +3516,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/54.png",
-      "large": "https://images.pokemontcg.io/bw10/54_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/54/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/54/high.webp"
     }
   },
   {
@@ -3557,7 +3557,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20+",
+        "damage": "20",
         "text": "Flip a coin. If heads, this attack does 10 more damage."
       }
     ],
@@ -3587,8 +3587,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/55.png",
-      "large": "https://images.pokemontcg.io/bw10/55_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/55/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/55/high.webp"
     }
   },
   {
@@ -3628,7 +3628,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "60+",
+        "damage": "60",
         "text": "If the Defending Pokémon is a Team Plasma Pokémon, this attack does 60 more damage, and the Defending Pokémon is now Burned."
       }
     ],
@@ -3658,8 +3658,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/56.png",
-      "large": "https://images.pokemontcg.io/bw10/56_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/56/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/56/high.webp"
     }
   },
   {
@@ -3689,7 +3689,7 @@ const cardDetails: TcgCardDetail[] = [
           "Metal"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10",
         "text": "Flip a coin until you get tails. This attack does 10 damage times the number of heads."
       },
       {
@@ -3731,8 +3731,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/57.png",
-      "large": "https://images.pokemontcg.io/bw10/57_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/57/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/57/high.webp"
     }
   },
   {
@@ -3773,7 +3773,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "50×",
+        "damage": "50",
         "text": "Flip a coin until you get tails. This attack does 50 damage times the number of heads."
       }
     ],
@@ -3806,8 +3806,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/58.png",
-      "large": "https://images.pokemontcg.io/bw10/58_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/58/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/58/high.webp"
     }
   },
   {
@@ -3881,8 +3881,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/59.png",
-      "large": "https://images.pokemontcg.io/bw10/59_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/59/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/59/high.webp"
     }
   },
   {
@@ -3951,8 +3951,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/60.png",
-      "large": "https://images.pokemontcg.io/bw10/60_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/60/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/60/high.webp"
     }
   },
   {
@@ -4025,8 +4025,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/61.png",
-      "large": "https://images.pokemontcg.io/bw10/61_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/61/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/61/high.webp"
     }
   },
   {
@@ -4091,8 +4091,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/62.png",
-      "large": "https://images.pokemontcg.io/bw10/62_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/62/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/62/high.webp"
     }
   },
   {
@@ -4122,7 +4122,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10+",
+        "damage": "10",
         "text": "Flip a coin. If heads, this attack does 20 more damage."
       },
       {
@@ -4160,8 +4160,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/63.png",
-      "large": "https://images.pokemontcg.io/bw10/63_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/63/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/63/high.webp"
     }
   },
   {
@@ -4184,7 +4184,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Breakwing",
-        "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon, you may discard all Pokémon Tool cards attached to each of your opponent's Pokémon.",
+        "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon, you may discard all Pokémon Tool cards attached to each of your opponent’s Pokémon.",
         "type": "Ability"
       }
     ],
@@ -4226,8 +4226,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/64.png",
-      "large": "https://images.pokemontcg.io/bw10/64_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/64/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/64/high.webp"
     }
   },
   {
@@ -4299,8 +4299,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/65.png",
-      "large": "https://images.pokemontcg.io/bw10/65_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/65/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/65/high.webp"
     }
   },
   {
@@ -4372,8 +4372,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/66.png",
-      "large": "https://images.pokemontcg.io/bw10/66_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/66/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/66/high.webp"
     }
   },
   {
@@ -4438,8 +4438,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/67.png",
-      "large": "https://images.pokemontcg.io/bw10/67_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/67/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/67/high.webp"
     }
   },
   {
@@ -4505,8 +4505,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/68.png",
-      "large": "https://images.pokemontcg.io/bw10/68_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/68/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/68/high.webp"
     }
   },
   {
@@ -4534,7 +4534,7 @@ const cardDetails: TcgCardDetail[] = [
           "Metal"
         ],
         "convertedEnergyCost": 1,
-        "damage": "40×",
+        "damage": "40",
         "text": "Does 40 damage times the amount of Metal Energy attached to this Pokémon."
       },
       {
@@ -4570,8 +4570,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/69.png",
-      "large": "https://images.pokemontcg.io/bw10/69_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/69/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/69/high.webp"
     }
   },
   {
@@ -4635,8 +4635,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/70.png",
-      "large": "https://images.pokemontcg.io/bw10/70_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/70/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/70/high.webp"
     }
   },
   {
@@ -4674,7 +4674,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20",
         "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
       }
     ],
@@ -4700,8 +4700,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/71.png",
-      "large": "https://images.pokemontcg.io/bw10/71_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/71/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/71/high.webp"
     }
   },
   {
@@ -4756,8 +4756,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/72.png",
-      "large": "https://images.pokemontcg.io/bw10/72_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/72/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/72/high.webp"
     }
   },
   {
@@ -4813,8 +4813,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/73.png",
-      "large": "https://images.pokemontcg.io/bw10/73_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/73/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/73/high.webp"
     }
   },
   {
@@ -4851,7 +4851,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "50×",
+        "damage": "50",
         "text": "Flip 3 coins. This attack does 50 damage times the number of heads."
       }
     ],
@@ -4876,8 +4876,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/74.png",
-      "large": "https://images.pokemontcg.io/bw10/74_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/74/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/74/high.webp"
     }
   },
   {
@@ -4908,7 +4908,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10×",
+        "damage": "10",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       }
     ],
@@ -4934,8 +4934,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/75.png",
-      "large": "https://images.pokemontcg.io/bw10/75_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/75/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/75/high.webp"
     }
   },
   {
@@ -5005,8 +5005,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/76.png",
-      "large": "https://images.pokemontcg.io/bw10/76_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/76/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/76/high.webp"
     }
   },
   {
@@ -5075,8 +5075,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/77.png",
-      "large": "https://images.pokemontcg.io/bw10/77_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/77/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/77/high.webp"
     }
   },
   {
@@ -5111,8 +5111,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/78.png",
-      "large": "https://images.pokemontcg.io/bw10/78_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/78/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/78/high.webp"
     }
   },
   {
@@ -5147,8 +5147,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/79.png",
-      "large": "https://images.pokemontcg.io/bw10/79_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/79/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/79/high.webp"
     }
   },
   {
@@ -5184,8 +5184,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/80.png",
-      "large": "https://images.pokemontcg.io/bw10/80_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/80/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/80/high.webp"
     }
   },
   {
@@ -5220,8 +5220,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/81.png",
-      "large": "https://images.pokemontcg.io/bw10/81_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/81/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/81/high.webp"
     }
   },
   {
@@ -5256,8 +5256,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/82.png",
-      "large": "https://images.pokemontcg.io/bw10/82_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/82/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/82/high.webp"
     }
   },
   {
@@ -5293,8 +5293,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/83.png",
-      "large": "https://images.pokemontcg.io/bw10/83_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/83/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/83/high.webp"
     }
   },
   {
@@ -5329,8 +5329,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/84.png",
-      "large": "https://images.pokemontcg.io/bw10/84_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/84/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/84/high.webp"
     }
   },
   {
@@ -5366,8 +5366,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/85.png",
-      "large": "https://images.pokemontcg.io/bw10/85_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/85/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/85/high.webp"
     }
   },
   {
@@ -5404,8 +5404,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/86.png",
-      "large": "https://images.pokemontcg.io/bw10/86_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/86/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/86/high.webp"
     }
   },
   {
@@ -5440,8 +5440,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/87.png",
-      "large": "https://images.pokemontcg.io/bw10/87_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/87/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/87/high.webp"
     }
   },
   {
@@ -5477,8 +5477,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/88.png",
-      "large": "https://images.pokemontcg.io/bw10/88_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/88/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/88/high.webp"
     }
   },
   {
@@ -5514,8 +5514,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/89.png",
-      "large": "https://images.pokemontcg.io/bw10/89_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/89/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/89/high.webp"
     }
   },
   {
@@ -5551,8 +5551,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/90.png",
-      "large": "https://images.pokemontcg.io/bw10/90_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/90/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/90/high.webp"
     }
   },
   {
@@ -5587,8 +5587,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/91.png",
-      "large": "https://images.pokemontcg.io/bw10/91_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/91/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/91/high.webp"
     }
   },
   {
@@ -5639,8 +5639,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/92.png",
-      "large": "https://images.pokemontcg.io/bw10/92_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/92/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/92/high.webp"
     }
   },
   {
@@ -5691,8 +5691,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/93.png",
-      "large": "https://images.pokemontcg.io/bw10/93_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/93/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/93/high.webp"
     }
   },
   {
@@ -5730,8 +5730,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/94.png",
-      "large": "https://images.pokemontcg.io/bw10/94_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/94/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/94/high.webp"
     }
   },
   {
@@ -5768,15 +5768,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/95.png",
-      "large": "https://images.pokemontcg.io/bw10/95_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/95/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/95/high.webp"
     }
   },
   {
     "id": "bw10-96",
     "name": "Virizion-EX",
     "number": "96",
-    "artist": "Ryo Ueda",
+    "artist": "5ban Graphics",
     "rarity": "Rare Ultra",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5795,7 +5795,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Verdant Wind",
-        "text": "Each of your Pokémon that has any Grass Energy attached to it can't be affected by any Special Conditions. (Remove any Special Conditions affecting those Pokémon.)",
+        "text": "Each of your Pokémon that has any Grass Energy attached to it can’t be affected by any Special Conditions. (Remove any Special Conditions affecting those Pokémon.)",
         "type": "Ability"
       }
     ],
@@ -5837,8 +5837,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/96.png",
-      "large": "https://images.pokemontcg.io/bw10/96_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/96/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/96/high.webp"
     }
   },
   {
@@ -5865,7 +5865,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Red Signal",
-        "text": "When you attach a Plasma Energy from your hand to this Pokémon, you may switch 1 of your opponent's Benched Pokémon with his or her Active Pokémon.",
+        "text": "When you attach a Plasma Energy from your hand to this Pokémon, you may switch 1 of your opponent’s Benched Pokémon with his or her Active Pokémon.",
         "type": "Ability"
       }
     ],
@@ -5879,7 +5879,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "100",
-        "text": "Does 20 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness or Resistance for Benched Pokémon.)"
+        "text": "Does 20 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
@@ -5903,8 +5903,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/97.png",
-      "large": "https://images.pokemontcg.io/bw10/97_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/97/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/97/high.webp"
     }
   },
   {
@@ -5973,8 +5973,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/98.png",
-      "large": "https://images.pokemontcg.io/bw10/98_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/98/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/98/high.webp"
     }
   },
   {
@@ -6046,8 +6046,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/99.png",
-      "large": "https://images.pokemontcg.io/bw10/99_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/99/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/99/high.webp"
     }
   },
   {
@@ -6119,8 +6119,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/100.png",
-      "large": "https://images.pokemontcg.io/bw10/100_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/100/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/100/high.webp"
     }
   },
   {
@@ -6155,8 +6155,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/101.png",
-      "large": "https://images.pokemontcg.io/bw10/101_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/101/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/101/high.webp"
     }
   },
   {
@@ -6223,8 +6223,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/102.png",
-      "large": "https://images.pokemontcg.io/bw10/102_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/102/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/102/high.webp"
     }
   },
   {
@@ -6263,7 +6263,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "40",
-        "text": "During your next turn, this Pokémon's Leaf Wallop does 40 more damage (before applying Weakness and Resistance)."
+        "text": "During your next turn, this Pokémon's Leaf Wallop attack does 40 more damage (before applying Weakness and Resistance)."
       }
     ],
     "weaknesses": [
@@ -6292,8 +6292,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/103.png",
-      "large": "https://images.pokemontcg.io/bw10/103_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/103/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/103/high.webp"
     }
   },
   {
@@ -6316,7 +6316,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Sinister Hand",
-        "text": "As often as you like during your turn (before your attack), you may move 1 damage counter from 1 of your opponent's Pokémon to another of your opponent's Pokémon.",
+        "text": "As often as you like during your turn (before your attack), you may move 1 damage counter from 1 of your opponent’s Pokémon to another of your opponent’s Pokémon.",
         "type": "Ability"
       }
     ],
@@ -6357,8 +6357,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/104.png",
-      "large": "https://images.pokemontcg.io/bw10/104_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/104/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/104/high.webp"
     }
   },
   {
@@ -6394,8 +6394,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bw10/105.png",
-      "large": "https://images.pokemontcg.io/bw10/105_hires.png"
+      "small": "https://assets.tcgdex.net/en/bw/bw10/105/low.webp",
+      "large": "https://assets.tcgdex.net/en/bw/bw10/105/high.webp"
     }
   }
 ]

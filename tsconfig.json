@@ -50,6 +50,7 @@
   "exclude": [
     "node_modules",
     "scripts",
-    "src/migrations"
+    "src/migrations",
+    "source_data/tcg/tcgdex"
   ]
 }

@@ -46,7 +46,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -64,8 +64,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/1.png",
-      "large": "https://images.pokemontcg.io/pop5/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/1/high.webp"
     }
   },
   {
@@ -112,7 +112,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -130,8 +130,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/2.png",
-      "large": "https://images.pokemontcg.io/pop5/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/2/high.webp"
     }
   },
   {
@@ -175,7 +175,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -192,8 +192,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/3.png",
-      "large": "https://images.pokemontcg.io/pop5/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/3/high.webp"
     }
   },
   {
@@ -226,8 +226,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/4.png",
-      "large": "https://images.pokemontcg.io/pop5/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/4/high.webp"
     }
   },
   {
@@ -276,7 +276,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -293,8 +293,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/5.png",
-      "large": "https://images.pokemontcg.io/pop5/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/5/high.webp"
     }
   },
   {
@@ -329,8 +329,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/6.png",
-      "large": "https://images.pokemontcg.io/pop5/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/6/high.webp"
     }
   },
   {
@@ -365,8 +365,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/7.png",
-      "large": "https://images.pokemontcg.io/pop5/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/7/high.webp"
     }
   },
   {
@@ -399,8 +399,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/8.png",
-      "large": "https://images.pokemontcg.io/pop5/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/8/high.webp"
     }
   },
   {
@@ -433,8 +433,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/9.png",
-      "large": "https://images.pokemontcg.io/pop5/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/9/high.webp"
     }
   },
   {
@@ -481,7 +481,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -498,8 +498,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/10.png",
-      "large": "https://images.pokemontcg.io/pop5/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/10/high.webp"
     }
   },
   {
@@ -536,7 +536,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -553,8 +553,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/11.png",
-      "large": "https://images.pokemontcg.io/pop5/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/11/high.webp"
     }
   },
   {
@@ -602,7 +602,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -619,8 +619,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/12.png",
-      "large": "https://images.pokemontcg.io/pop5/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/12/high.webp"
     }
   },
   {
@@ -667,7 +667,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -684,8 +684,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/13.png",
-      "large": "https://images.pokemontcg.io/pop5/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/13/high.webp"
     }
   },
   {
@@ -709,7 +709,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Mist",
         "text": "Any damage done to Pelipper by attacks from Stage 2 Evolved Pokémon (both yours and your opponent's) is reduced by 30 (after applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -728,7 +728,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -738,7 +738,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       279
     ],
@@ -748,8 +748,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/14.png",
-      "large": "https://images.pokemontcg.io/pop5/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/14/high.webp"
     }
   },
   {
@@ -795,7 +795,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -812,8 +812,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/15.png",
-      "large": "https://images.pokemontcg.io/pop5/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/15/high.webp"
     }
   },
   {
@@ -840,7 +840,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Purple Ray",
         "text": "Once during your turn, when you put Espeon Star from your hand onto your Bench, you may use this power. Each Active Pokémon (both yours and your opponent's) is now Confused.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -859,7 +859,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -876,8 +876,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/16.png",
-      "large": "https://images.pokemontcg.io/pop5/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/16/high.webp"
     }
   },
   {
@@ -904,7 +904,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Dark Ray",
         "text": "Once during your turn, when you put Umbreon Star from your hand onto your Bench, you may choose 1 card from your opponent's hand without looking and discard it.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -922,7 +922,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -944,8 +944,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop5/17.png",
-      "large": "https://images.pokemontcg.io/pop5/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop5/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop5/17/high.webp"
     }
   }
 ]

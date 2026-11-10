@@ -45,7 +45,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -63,8 +63,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/1.png",
-      "large": "https://images.pokemontcg.io/tk2b/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/1/high.webp"
     }
   },
   {
@@ -111,7 +111,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -128,8 +128,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/2.png",
-      "large": "https://images.pokemontcg.io/tk2b/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/2/high.webp"
     }
   },
   {
@@ -178,7 +178,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -195,8 +195,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/3.png",
-      "large": "https://images.pokemontcg.io/tk2b/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/3/high.webp"
     }
   },
   {
@@ -244,7 +244,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -262,8 +262,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/4.png",
-      "large": "https://images.pokemontcg.io/tk2b/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/4/high.webp"
     }
   },
   {
@@ -310,7 +310,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -327,8 +327,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/5.png",
-      "large": "https://images.pokemontcg.io/tk2b/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/5/high.webp"
     }
   },
   {
@@ -357,7 +357,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your deck for an Energy card, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+        "text": "Search your deck for an Energy card, show it to your opponent, and put into your hand. Shuffle your deck afterward."
       },
       {
         "name": "Front Spark",
@@ -367,13 +367,13 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "Does 10 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "Does 10 damage to 1 of your opponent’s Benched Pokémon. (Don’t apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [
@@ -395,8 +395,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/6.png",
-      "large": "https://images.pokemontcg.io/tk2b/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/6/high.webp"
     }
   },
   {
@@ -443,7 +443,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -460,8 +460,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/7.png",
-      "large": "https://images.pokemontcg.io/tk2b/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/7/high.webp"
     }
   },
   {
@@ -487,7 +487,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -495,8 +495,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/8.png",
-      "large": "https://images.pokemontcg.io/tk2b/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/8/high.webp"
     }
   },
   {
@@ -521,7 +521,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -531,8 +531,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/9.png",
-      "large": "https://images.pokemontcg.io/tk2b/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/9/high.webp"
     }
   },
   {
@@ -557,7 +557,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -567,8 +567,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/10.png",
-      "large": "https://images.pokemontcg.io/tk2b/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/10/high.webp"
     }
   },
   {
@@ -582,7 +582,9 @@ const cardDetails: TcgCardDetail[] = [
       "Basic"
     ],
     "hp": null,
-    "types": [],
+    "types": [
+      "Fire"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [],
@@ -591,7 +593,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -601,8 +603,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/11.png",
-      "large": "https://images.pokemontcg.io/tk2b/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/11/high.webp"
     }
   },
   {
@@ -625,7 +627,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -635,8 +637,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2b/12.png",
-      "large": "https://images.pokemontcg.io/tk2b/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-m/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-m/12/high.webp"
     }
   }
 ]

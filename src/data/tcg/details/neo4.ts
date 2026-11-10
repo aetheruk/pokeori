@@ -15,14 +15,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Lightning"
     ],
-    "evolvesFrom": "Dark Flaaffy",
+    "evolvesFrom": "Flaaffy",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Conductivity",
-        "text": "Whenever your opponent attaches an Energy card from his or her hand to a Pokémon, this power does 10 damage to that Pokémon. (Don't apply Weakness and Resistance.) This power stops working if you have more than 1 Dark Ampharos in play or while Dark Ampharos is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "text": "Whenever your opponent attaches an Energy card to a Pokémon from his or her hand, this Power does 10 damage to that Pokémon. (Don't apply Weakness and Resistance) This power stops working if you have more than 1 Dark Ampharos in play or while Dark Ampharos is Asleep, Confused or Paralysed.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -35,7 +35,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "50",
-        "text": "Discard all Lightning Energy cards attached to Dark Ampharos or this attack does nothing."
+        "text": "Discard all Energy cards attached to this Pokémon in order to use this attack."
       }
     ],
     "weaknesses": [
@@ -59,8 +59,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/1.png",
-      "large": "https://images.pokemontcg.io/neo4/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/1/high.webp"
     }
   },
   {
@@ -83,8 +83,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Surprise Bite",
-        "text": "When you play Dark Crobat from your hand, you may choose 1 of your opponent's Pokémon. This power does 20 damage to that Pokémon. (Don't apply Weakness and Resistance.)",
-        "type": "Pokémon Power"
+        "text": "When you play Dark Crobat from your hand, you may choose 1 of your opponent's Pokémon. This power does 20 damage do that Pokémon. (Don't apply Weakness and Resistance.)",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -122,8 +122,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/2.png",
-      "large": "https://images.pokemontcg.io/neo4/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/2/high.webp"
     }
   },
   {
@@ -194,8 +194,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/3.png",
-      "large": "https://images.pokemontcg.io/neo4/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/3/high.webp"
     }
   },
   {
@@ -256,8 +256,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/4.png",
-      "large": "https://images.pokemontcg.io/neo4/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/4/high.webp"
     }
   },
   {
@@ -274,14 +274,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Water"
     ],
-    "evolvesFrom": "Dark Croconaw",
+    "evolvesFrom": "Croconaw",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Scare",
         "text": "As long as Dark Feraligatr is your Active Pokémon, all of your opponent's Baby Pokémon Powers stop working and your opponent's Baby Pokémon can't attack. This power stops working while Dark Feraligatr is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -319,8 +319,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/5.png",
-      "large": "https://images.pokemontcg.io/neo4/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/5/high.webp"
     }
   },
   {
@@ -337,14 +337,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Psychic"
     ],
-    "evolvesFrom": "Dark Haunter",
+    "evolvesFrom": "Haunter",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Deep Sleep",
         "text": "As long as any Dark Gengar are in play, a player flips 2 coins for each of his or her Pokémon that is Asleep at the end of each turn. If either of them is tails, that Pokémon is still Asleep. This power stops working if Dark Gengar is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -381,8 +381,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/6.png",
-      "large": "https://images.pokemontcg.io/neo4/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/6/high.webp"
     }
   },
   {
@@ -421,7 +421,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "30+",
-        "text": "If there are any Darkness Energy cards attached to Dark Houndoom, discard 1 of them and this attack does 30 damage plus 20 more damage (plus 10 more damage for the Darkness Energy you discarded). If there aren't any, this attack does 30 damage."
+        "text": "If there are any Energy cards attached to Dark Houndoom, discard 1 of them and this attack does 30 damage plus 20 more damage (plus 10 more damage for the Energy you discarded). If there aren't any, this attack does 30 damage."
       }
     ],
     "weaknesses": [
@@ -444,8 +444,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/7.png",
-      "large": "https://images.pokemontcg.io/neo4/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/7/high.webp"
     }
   },
   {
@@ -471,7 +471,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Spatial Distortion",
         "text": "Once during your turn (before your attack), you may flip a coin. If heads, choose a Stadium card from your discard pile and put it into play. (If there's already a Stadium card in play, discard it.) This power can't be used if Dark Porygon2 is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -512,8 +512,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/8.png",
-      "large": "https://images.pokemontcg.io/neo4/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/8/high.webp"
     }
   },
   {
@@ -583,8 +583,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/9.png",
-      "large": "https://images.pokemontcg.io/neo4/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/9/high.webp"
     }
   },
   {
@@ -601,7 +601,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": "Dark Quilava",
+    "evolvesFrom": "Quilava",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -621,8 +621,8 @@ const cardDetails: TcgCardDetail[] = [
           "Fire"
         ],
         "convertedEnergyCost": 1,
-        "damage": "40×",
-        "text": "You may discard any number of Fire Energy cards attached to your Pokémon. Flip a coin for each Fire Energy card discarded in this way. This attack does 40 damage times the number of heads."
+        "damage": "40x",
+        "text": "You may discard any number of Energy cards attached to your Pokémon. Flip a coin for each Energy card discarded in this way. This attack does 40 damage times the number of heads."
       }
     ],
     "weaknesses": [
@@ -645,8 +645,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/10.png",
-      "large": "https://images.pokemontcg.io/neo4/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/10/high.webp"
     }
   },
   {
@@ -663,7 +663,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Dark Pupitar",
+    "evolvesFrom": "Pupitar",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -674,8 +674,8 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "20×",
-        "text": "Flip a number of coins equal to the number of Fighting Energy cards attached to Dark Tyranitar. This attack does 20 damage times the number of heads. Then, for each heads, discard the top card from your opponent's deck."
+        "damage": "20x",
+        "text": "Flip a number of coins equal to the number of Energy cards attached to Dark Tyranitar. This attack does 20 damage times the number of heads. Then, for each heads, discard the top card from your opponent's deck."
       },
       {
         "name": "Fling Away",
@@ -717,8 +717,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/11.png",
-      "large": "https://images.pokemontcg.io/neo4/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/11/high.webp"
     }
   },
   {
@@ -742,7 +742,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Drive Off",
         "text": "As long as Light Arcanine is your Active Pokémon, once during your turn (before your attack), if your opponent has any Benched Pokémon, he or she chooses 1 of them and switches it with the Defending Pokémon. This power can't be used while Light Arcanine is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -779,8 +779,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/12.png",
-      "large": "https://images.pokemontcg.io/neo4/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/12/high.webp"
     }
   },
   {
@@ -843,8 +843,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/13.png",
-      "large": "https://images.pokemontcg.io/neo4/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/13/high.webp"
     }
   },
   {
@@ -861,14 +861,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Colorless"
     ],
-    "evolvesFrom": "Light Dragonair",
+    "evolvesFrom": "Dragonair",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Miraculous Wind",
         "text": "As long as Light Dragonite is your Active Pokémon, each Special Energy card provides Colorless Energy instead of its usual type and its other effects stop working. This power stops working while Light Dragonite is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -881,7 +881,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "40",
-        "text": "Prevent all effects of attacks, other than damage, done to Light Dragonite during your opponent's next turn."
+        "text": "During your opponent's next turn, prevent all effects of attacks that are not damage done to this Pokémon."
       }
     ],
     "weaknesses": [],
@@ -905,8 +905,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/14.png",
-      "large": "https://images.pokemontcg.io/neo4/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/14/high.webp"
     }
   },
   {
@@ -932,7 +932,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Gift",
         "text": "When you play Light Togetic from your hand, your opponent may search his or her deck for a Pokémon Tool card, show that card to you, and put it into his or her hand. Either way, you may do the same, and then each player who searched shuffles his or her deck.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -965,8 +965,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/15.png",
-      "large": "https://images.pokemontcg.io/neo4/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/15/high.webp"
     }
   },
   {
@@ -999,8 +999,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/16.png",
-      "large": "https://images.pokemontcg.io/neo4/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/16/high.webp"
     }
   },
   {
@@ -1064,8 +1064,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/17.png",
-      "large": "https://images.pokemontcg.io/neo4/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/17/high.webp"
     }
   },
   {
@@ -1089,7 +1089,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Hot Plate",
         "text": "As long as Dark Magcargo is your Active Pokémon, whenever a player puts a Baby Pokémon or Basic Pokémon onto his or her Bench from his or her hand, this power does 10 damage to that Pokémon. (Don't apply Weakness and Resistance.) This power stops working if Dark Magcargo is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1101,7 +1101,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "You may discard a Fire Energy card attached to Dark Magcargo when you use this attack. If you do and if your opponent has any Benched Pokémon, choose 1 of them and this attack does 20 damage to it. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "You may discard a Energy card attached to Dark Magcargo when you use this attack. If you do and if your opponent has any Benched Pokémon, choose 1 of them and this attack does 20 damage to it. (Don't apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
@@ -1126,8 +1126,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/18.png",
-      "large": "https://images.pokemontcg.io/neo4/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/18/high.webp"
     }
   },
   {
@@ -1144,7 +1144,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Water"
     ],
-    "evolvesFrom": "Dark Omanyte",
+    "evolvesFrom": "Omanyte",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -1190,8 +1190,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/19.png",
-      "large": "https://images.pokemontcg.io/neo4/19_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/19/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/19/high.webp"
     }
   },
   {
@@ -1215,7 +1215,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Cunning",
         "text": "Once during your turn (before your attack), you may flip a coin. If heads, look at the top card of your opponent's deck. Then, you may have your opponent shuffle his or her deck. This power can't be used if Dark Slowking is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1251,8 +1251,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/20.png",
-      "large": "https://images.pokemontcg.io/neo4/20_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/20/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/20/high.webp"
     }
   },
   {
@@ -1320,8 +1320,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/21.png",
-      "large": "https://images.pokemontcg.io/neo4/21_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/21/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/21/high.webp"
     }
   },
   {
@@ -1388,8 +1388,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/22.png",
-      "large": "https://images.pokemontcg.io/neo4/22_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/22/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/22/high.webp"
     }
   },
   {
@@ -1452,8 +1452,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/23.png",
-      "large": "https://images.pokemontcg.io/neo4/23_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/23/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/23/high.webp"
     }
   },
   {
@@ -1492,7 +1492,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
       }
     ],
@@ -1519,8 +1519,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/24.png",
-      "large": "https://images.pokemontcg.io/neo4/24_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/24/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/24/high.webp"
     }
   },
   {
@@ -1537,14 +1537,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Light Machoke",
+    "evolvesFrom": "Machoke",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Tag Team",
-        "text": "When you play Light Machamp from your hand, if it is on your Bench, remove 3 damage counters from your Active Pokémon. If it has fewer damage counters than that, remove all of them. Then, switch Light Machamp with your Active Pokémon.",
-        "type": "Pokémon Power"
+        "text": "When you play Light Machamp from your hand, if is on your Bench, remove 3 damage counters than that, remove all of them. Then, switch Light Machamp with your Active Pokémon.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1557,7 +1557,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "50",
-        "text": "If the Defending Pokémon has Dark in its name or is a Darkness Pokémon, flip a coin. If heads, this attack does 100 damage instead of 50."
+        "text": "If the Defending Pokémon has Dark in its name or is a Pokémon, flip a coin. If heads, this attack does 100 damage instead of 50."
       }
     ],
     "weaknesses": [
@@ -1581,8 +1581,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/25.png",
-      "large": "https://images.pokemontcg.io/neo4/25_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/25/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/25/high.webp"
     }
   },
   {
@@ -1606,9 +1606,9 @@ const cardDetails: TcgCardDetail[] = [
     "rules": [],
     "abilities": [
       {
-        "name": "Fluffy Wool",
-        "text": "During your opponent's turn, if Light Piloswine is your Active Pokémon and is damaged by your opponent's attack (even if it's Knocked Out), flip a coin. If heads, the attacking Pokémon is now Asleep. This power stops working if Light Piloswine is already Asleep, Confused, or Paralyzed when your opponent attacks.",
-        "type": "Pokémon Power"
+        "name": "",
+        "text": "",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1651,8 +1651,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/26.png",
-      "large": "https://images.pokemontcg.io/neo4/26_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/26/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/26/high.webp"
     }
   },
   {
@@ -1677,8 +1677,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Give]",
-        "text": "Once during your turn (before your attack), if you have Unown [G], Unown [I], Unown [V], and Unown [E] on your Bench, you may flip a coin. If heads, search your deck for a basic Energy card and attach it to 1 of your Pokémon. Shuffle your deck afterward.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before your attack), if you have Unown G, Unown I, Unown V, and Unown E on your Bench, you may flip a coin. If heads, search your deck for a basic Energy card and attach it to 1 of your Pokémon. Shuffle your deck afterward.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1712,8 +1712,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/27.png",
-      "large": "https://images.pokemontcg.io/neo4/27_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/27/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/27/high.webp"
     }
   },
   {
@@ -1738,8 +1738,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Help]",
-        "text": "Once during your turn (before your attack), if you have Unown [H], Unown [E], Unown [L], and Unown [P] on your Bench, you may shuffle your hand into your deck, then draw a new hand of the same number of cards.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before your attack), if you have Unown H, Unown E, Unown L, and Unown P on your Bench, you may shuffle your hand into your deck, then draw a new hand of the same number of cards.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1773,8 +1773,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/28.png",
-      "large": "https://images.pokemontcg.io/neo4/28_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/28/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/28/high.webp"
     }
   },
   {
@@ -1799,8 +1799,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Want]",
-        "text": "Once during your turn (before your attack), if you have Unown [W], Unown [A], Unown [N], and Unown [T] on your Bench, you may flip a coin. If heads, put a Trainer card from your discard pile into your hand.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before your attack), if you have Unown W, Unown A, Unown N, and Unown T on your Bench, you may flip a coin. If heads, put a Trainer card from your discard pile into your hand.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1834,8 +1834,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/29.png",
-      "large": "https://images.pokemontcg.io/neo4/29_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/29/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/29/high.webp"
     }
   },
   {
@@ -1848,7 +1848,7 @@ const cardDetails: TcgCardDetail[] = [
     "subtypes": [
       "Basic"
     ],
-    "hp": "50",
+    "hp": "40",
     "types": [
       "Psychic"
     ],
@@ -1860,8 +1860,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[XXXXX]",
-        "text": "Whenever 1 of your Pokémon with Unown in its name uses its Hidden Power attack, flip a coin until you get tails. That attack does 10 more damage for each heads. If you have more than 1 Unown [X] in play, use only 1 [XXXXX] each turn.",
-        "type": "Pokémon Power"
+        "text": "Whenever 1 of your Pokémon with Unown in its name uses its Hidden Power attack, flip a coin until you get tails. That attack does 10 more damage for each heads. If you have more than 1 Unown X in play, use only 1 [XXXXX] per turn.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1895,8 +1895,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/30.png",
-      "large": "https://images.pokemontcg.io/neo4/30_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/30/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/30/high.webp"
     }
   },
   {
@@ -1921,13 +1921,13 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Doubleslap",
+        "name": "Double Slap",
         "cost": [
           "Colorless",
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 2 coins. This attack does 20 damage times the number of heads."
       },
       {
@@ -1968,8 +1968,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/31.png",
-      "large": "https://images.pokemontcg.io/neo4/31_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/31/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/31/high.webp"
     }
   },
   {
@@ -2025,8 +2025,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/32.png",
-      "large": "https://images.pokemontcg.io/neo4/32_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/32/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/32/high.webp"
     }
   },
   {
@@ -2054,7 +2054,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       },
       {
@@ -2064,7 +2064,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip a number of coins equal to the number of Energy cards attached to your opponent's Pokémon. This attack does 20 damage times the number of heads."
       }
     ],
@@ -2089,8 +2089,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/33.png",
-      "large": "https://images.pokemontcg.io/neo4/33_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/33/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/33/high.webp"
     }
   },
   {
@@ -2154,8 +2154,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/34.png",
-      "large": "https://images.pokemontcg.io/neo4/34_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/34/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/34/high.webp"
     }
   },
   {
@@ -2218,8 +2218,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/35.png",
-      "large": "https://images.pokemontcg.io/neo4/35_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/35/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/35/high.webp"
     }
   },
   {
@@ -2281,8 +2281,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/36.png",
-      "large": "https://images.pokemontcg.io/neo4/36_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/36/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/36/high.webp"
     }
   },
   {
@@ -2313,7 +2313,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Choose 1 of your opponent's Pokémon. This attack does 10 damage for each Water Energy card attached to Dark Omanyte. Don't apply Weakness and Resistance. You can't do more than 30 damage in this way."
+        "text": "Choose 1 of your opponent's Pokémon. This attack does 10 damage for each Energy card attached to Dark Omanyte. Don't apply Weakness and Resistance. You can't do more than 30 damage in this way."
       }
     ],
     "weaknesses": [
@@ -2336,8 +2336,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/37.png",
-      "large": "https://images.pokemontcg.io/neo4/37_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/37/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/37/high.webp"
     }
   },
   {
@@ -2408,8 +2408,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/38.png",
-      "large": "https://images.pokemontcg.io/neo4/38_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/38/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/38/high.webp"
     }
   },
   {
@@ -2449,8 +2449,8 @@ const cardDetails: TcgCardDetail[] = [
           "Fire"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
-        "text": "Discard the top 5 cards of your deck. (If there are fewer than 5 cards in your deck, discard all of them.) This attack does 20 damage for each Fire Energy card you discarded in this way."
+        "damage": "20x",
+        "text": "Discard the top 5 cards of your deck. (If there are fewer than 5 cards in your deck, discard all of them.) This attack does 20 damage for each Energy card you discarded in this way."
       }
     ],
     "weaknesses": [
@@ -2473,8 +2473,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/39.png",
-      "large": "https://images.pokemontcg.io/neo4/39_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/39/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/39/high.webp"
     }
   },
   {
@@ -2544,8 +2544,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/40.png",
-      "large": "https://images.pokemontcg.io/neo4/40_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/40/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/40/high.webp"
     }
   },
   {
@@ -2610,8 +2610,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/41.png",
-      "large": "https://images.pokemontcg.io/neo4/41_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/41/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/41/high.webp"
     }
   },
   {
@@ -2640,7 +2640,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 2 coins. This attack does 20 damage times the number of heads."
       },
       {
@@ -2675,8 +2675,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/42.png",
-      "large": "https://images.pokemontcg.io/neo4/42_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/42/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/42/high.webp"
     }
   },
   {
@@ -2740,8 +2740,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/43.png",
-      "large": "https://images.pokemontcg.io/neo4/43_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/43/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/43/high.webp"
     }
   },
   {
@@ -2801,8 +2801,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/44.png",
-      "large": "https://images.pokemontcg.io/neo4/44_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/44/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/44/high.webp"
     }
   },
   {
@@ -2867,8 +2867,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/45.png",
-      "large": "https://images.pokemontcg.io/neo4/45_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/45/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/45/high.webp"
     }
   },
   {
@@ -2897,7 +2897,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "If you have any benched Pokémon, search your deck for a Fire Energy card and attach it to 1 of them. Then shuffle your deck."
+        "text": "If you have any benched Pokémon, search your deck for a Energy card and attach it to 1 of them. Then shuffle your deck."
       },
       {
         "name": "Burning Flame",
@@ -2908,7 +2908,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "30+",
-        "text": "Flip 2 coins. For each heads, discard a Fire Energy card attached to Light Flareon or this attack does nothing. This attack does 30 damage plus 20 damage for each heads."
+        "text": "Flip 2 coins. For each heads, discard a Energy card attached to Light Flareon or this attack does nothing. This attack does 30 damage plus 20 damage for each heads."
       }
     ],
     "weaknesses": [
@@ -2931,8 +2931,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/46.png",
-      "large": "https://images.pokemontcg.io/neo4/46_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/46/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/46/high.webp"
     }
   },
   {
@@ -2995,8 +2995,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/47.png",
-      "large": "https://images.pokemontcg.io/neo4/47_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/47/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/47/high.webp"
     }
   },
   {
@@ -3035,7 +3035,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 3 coins. This attack does 20 damage times the number of heads. If you get 2 or more heads, the Defending Pokémon is now Paralyzed."
       }
     ],
@@ -3057,8 +3057,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/48.png",
-      "large": "https://images.pokemontcg.io/neo4/48_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/48/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/48/high.webp"
     }
   },
   {
@@ -3123,8 +3123,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/49.png",
-      "large": "https://images.pokemontcg.io/neo4/49_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/49/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/49/high.webp"
     }
   },
   {
@@ -3149,10 +3149,12 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Guiding Flame",
         "cost": [
+          "Fire",
+          "Fire",
           "Fire"
         ],
-        "convertedEnergyCost": 1,
-        "damage": "",
+        "convertedEnergyCost": 3,
+        "damage": "50",
         "text": "Put a Baby Pokémon or a Basic Pokémon card from your discard pile onto your Bench. (You can't use this attack if your Bench is full.)"
       },
       {
@@ -3164,7 +3166,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "50",
-        "text": "Discard a Fire Energy card attached to Light Ninetales in order to use this attack."
+        "text": "Discard a Energy card attached to Light Ninetales in order to use this attack."
       }
     ],
     "weaknesses": [
@@ -3187,8 +3189,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/50.png",
-      "large": "https://images.pokemontcg.io/neo4/50_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/50/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/50/high.webp"
     }
   },
   {
@@ -3220,14 +3222,14 @@ const cardDetails: TcgCardDetail[] = [
         "text": "Your opponent may choose up to 3 Baby Pokémon, Basic Pokémon, and/or Evolution cards from his or her discard pile and shuffle them into his or her deck. Either way, you may do the same."
       },
       {
-        "name": "Splash About",
+        "name": "Slash About",
         "cost": [
           "Water",
           "Colorless"
         ],
         "convertedEnergyCost": 2,
         "damage": "20+",
-        "text": "If there are more Energy attached to the Defending Pokémon than to Light Slowbro, this attack does 20 damage plus 20 more damage. If not, this attack does 20 damage."
+        "text": "If there are more Energy cards attached to the Defending Pokémon than to Light Slowbro, this attack does 20 damage plus 20 more damage. If not, this attack does 20 damage."
       }
     ],
     "weaknesses": [
@@ -3251,8 +3253,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/51.png",
-      "large": "https://images.pokemontcg.io/neo4/51_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/51/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/51/high.webp"
     }
   },
   {
@@ -3284,7 +3286,7 @@ const cardDetails: TcgCardDetail[] = [
         "text": "If you have any Benched Pokémon, flip a coin. If heads, remove all damage counters from 1 of your Benched Pokémon and discard all Energy cards attached to it."
       },
       {
-        "name": "Hypnoshower",
+        "name": "Hypno Shower",
         "cost": [
           "Water",
           "Water",
@@ -3315,8 +3317,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/52.png",
-      "large": "https://images.pokemontcg.io/neo4/52_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/52/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/52/high.webp"
     }
   },
   {
@@ -3381,8 +3383,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/53.png",
-      "large": "https://images.pokemontcg.io/neo4/53_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/53/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/53/high.webp"
     }
   },
   {
@@ -3450,8 +3452,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/54.png",
-      "large": "https://images.pokemontcg.io/neo4/54_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/54/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/54/high.webp"
     }
   },
   {
@@ -3522,8 +3524,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/55.png",
-      "large": "https://images.pokemontcg.io/neo4/55_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/55/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/55/high.webp"
     }
   },
   {
@@ -3587,8 +3589,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/56.png",
-      "large": "https://images.pokemontcg.io/neo4/56_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/56/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/56/high.webp"
     }
   },
   {
@@ -3613,8 +3615,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Chase]",
-        "text": "As long as Unown [C] is your Active Pokémon, whenever your opponent's Active Pokémon tries to retreat, flip a coin. If heads, put 1 damage counter on that Pokémon. Apply Weakness and Resistance.",
-        "type": "Pokémon Power"
+        "text": "As long as Unown C is your Active Pokémon, whenever your opponent's Active Pokémon tries to retreat, flip a coin. If heads, put 1 damage counter on that Pokémon. Apply Weakness and Resistance.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3648,8 +3650,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/57.png",
-      "large": "https://images.pokemontcg.io/neo4/57_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/57/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/57/high.webp"
     }
   },
   {
@@ -3673,9 +3675,9 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "abilities": [
       {
-        "name": "[Perform]",
-        "text": "If an attack damaged Unown [P] during your opponent's last turn and Unown [P] was your Active Pokémon, Unown [P]'s Hidden Power attack does that much more damage to the Defending Pokémon. This power can be used even if Unown [P] is Confused.",
-        "type": "Pokémon Power"
+        "name": "",
+        "text": "",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3709,8 +3711,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/58.png",
-      "large": "https://images.pokemontcg.io/neo4/58_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/58/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/58/high.webp"
     }
   },
   {
@@ -3735,8 +3737,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Quicken]",
-        "text": "Once during your turn (before your attack), you may flip a coin. If heads, prevent all effects of attacks, including damage, done to any of your Pokémon with Unown in its name during your opponent's next turn. If you have more than 1 Unown [Q] in play, use only 1 [Quicken] each turn. This power can be used even if Unown [Q] is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before your attack), you may flip a coin. If heads, prevent all effects of attacks, including damage, done to any of your Pokémon with Unown in its name during your opponent's next turn. If you have more than 1 Unown Q in play, use only 1 [Quicken] each turn. This power can be used even if Unown Q is Asleep, Confused, or Paralyzed.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3770,8 +3772,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/59.png",
-      "large": "https://images.pokemontcg.io/neo4/59_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/59/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/59/high.webp"
     }
   },
   {
@@ -3796,8 +3798,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Zoom]",
-        "text": "As long as Unown [Z] is Benched, you pay no Energy cost to retreat a Pokémon with Unown in its name.",
-        "type": "Pokémon Power"
+        "text": "As long as Unown Z is Benched, you pay no Energy cost to retreat a Pokémon with Unown in its name.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3831,8 +3833,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/60.png",
-      "large": "https://images.pokemontcg.io/neo4/60_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/60/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/60/high.webp"
     }
   },
   {
@@ -3886,8 +3888,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/61.png",
-      "large": "https://images.pokemontcg.io/neo4/61_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/61/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/61/high.webp"
     }
   },
   {
@@ -3926,7 +3928,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed. If tails, during your opponent's next turn, your opponent pays Colorless more to retreat the Defending Pokémon."
+        "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed. If tails, during your opponent's next turn, your opponent pays more to retreat the Defending Pokémon."
       }
     ],
     "weaknesses": [
@@ -3950,8 +3952,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/62.png",
-      "large": "https://images.pokemontcg.io/neo4/62_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/62/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/62/high.webp"
     }
   },
   {
@@ -3990,7 +3992,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 2 coins. This attack does 10 damage times the number of heads."
       }
     ],
@@ -4014,8 +4016,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/63.png",
-      "large": "https://images.pokemontcg.io/neo4/63_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/63/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/63/high.webp"
     }
   },
   {
@@ -4040,7 +4042,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Sleep Powder",
+        "name": "Sleep Power",
         "cost": [
           "Grass"
         ],
@@ -4078,8 +4080,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/64.png",
-      "large": "https://images.pokemontcg.io/neo4/64_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/64/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/64/high.webp"
     }
   },
   {
@@ -4131,8 +4133,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/65.png",
-      "large": "https://images.pokemontcg.io/neo4/65_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/65/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/65/high.webp"
     }
   },
   {
@@ -4190,8 +4192,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/66.png",
-      "large": "https://images.pokemontcg.io/neo4/66_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/66/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/66/high.webp"
     }
   },
   {
@@ -4249,8 +4251,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/67.png",
-      "large": "https://images.pokemontcg.io/neo4/67_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/67/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/67/high.webp"
     }
   },
   {
@@ -4305,8 +4307,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/68.png",
-      "large": "https://images.pokemontcg.io/neo4/68_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/68/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/68/high.webp"
     }
   },
   {
@@ -4369,8 +4371,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/69.png",
-      "large": "https://images.pokemontcg.io/neo4/69_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/69/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/69/high.webp"
     }
   },
   {
@@ -4439,8 +4441,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/70.png",
-      "large": "https://images.pokemontcg.io/neo4/70_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/70/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/70/high.webp"
     }
   },
   {
@@ -4498,8 +4500,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/71.png",
-      "large": "https://images.pokemontcg.io/neo4/71_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/71/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/71/high.webp"
     }
   },
   {
@@ -4529,7 +4531,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "Attach up to 2 Grass Energy cards from your hand to 1 of your Grass Pokémon."
+        "text": "Attach up to 2 Energy cards from your hand to 1 of your Pokémon."
       },
       {
         "name": "Solarbeam",
@@ -4563,8 +4565,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/72.png",
-      "large": "https://images.pokemontcg.io/neo4/72_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/72/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/72/high.webp"
     }
   },
   {
@@ -4628,8 +4630,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/73.png",
-      "large": "https://images.pokemontcg.io/neo4/73_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/73/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/73/high.webp"
     }
   },
   {
@@ -4688,8 +4690,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/74.png",
-      "large": "https://images.pokemontcg.io/neo4/74_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/74/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/74/high.webp"
     }
   },
   {
@@ -4743,8 +4745,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/75.png",
-      "large": "https://images.pokemontcg.io/neo4/75_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/75/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/75/high.webp"
     }
   },
   {
@@ -4803,8 +4805,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/76.png",
-      "large": "https://images.pokemontcg.io/neo4/76_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/76/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/76/high.webp"
     }
   },
   {
@@ -4860,8 +4862,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/77.png",
-      "large": "https://images.pokemontcg.io/neo4/77_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/77/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/77/high.webp"
     }
   },
   {
@@ -4921,8 +4923,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/78.png",
-      "large": "https://images.pokemontcg.io/neo4/78_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/78/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/78/high.webp"
     }
   },
   {
@@ -4986,8 +4988,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/79.png",
-      "large": "https://images.pokemontcg.io/neo4/79_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/79/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/79/high.webp"
     }
   },
   {
@@ -5017,7 +5019,7 @@ const cardDetails: TcgCardDetail[] = [
           "Water"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       }
     ],
@@ -5039,8 +5041,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/80.png",
-      "large": "https://images.pokemontcg.io/neo4/80_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/80/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/80/high.webp"
     }
   },
   {
@@ -5095,8 +5097,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/81.png",
-      "large": "https://images.pokemontcg.io/neo4/81_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/81/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/81/high.webp"
     }
   },
   {
@@ -5152,8 +5154,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/82.png",
-      "large": "https://images.pokemontcg.io/neo4/82_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/82/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/82/high.webp"
     }
   },
   {
@@ -5218,8 +5220,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/83.png",
-      "large": "https://images.pokemontcg.io/neo4/83_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/83/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/83/high.webp"
     }
   },
   {
@@ -5279,8 +5281,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/84.png",
-      "large": "https://images.pokemontcg.io/neo4/84_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/84/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/84/high.webp"
     }
   },
   {
@@ -5311,7 +5313,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "10+",
-        "text": "Does 10 damage plus 10 more damage for each Water Energy attached to Totodile but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
+        "text": "Does 10 damage plus 10 more damage for each Energy attached to Totodile but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
       }
     ],
     "weaknesses": [
@@ -5334,8 +5336,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/85.png",
-      "large": "https://images.pokemontcg.io/neo4/85_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/85/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/85/high.webp"
     }
   },
   {
@@ -5348,7 +5350,7 @@ const cardDetails: TcgCardDetail[] = [
     "subtypes": [
       "Basic"
     ],
-    "hp": "50",
+    "hp": "40",
     "types": [
       "Psychic"
     ],
@@ -5360,8 +5362,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Laugh]",
-        "text": "Once during your turn (before your attack), you may flip a coin. If heads, each player shuffles his or her deck. This power can be used even if Unown [L] is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before your attack), you may flip a coin. If heads, each player shuffles his or her deck. This power can be used even if Unown L is Asleep, Confused, or Paralyzed.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -5395,8 +5397,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/86.png",
-      "large": "https://images.pokemontcg.io/neo4/86_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/86/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/86/high.webp"
     }
   },
   {
@@ -5409,7 +5411,7 @@ const cardDetails: TcgCardDetail[] = [
     "subtypes": [
       "Basic"
     ],
-    "hp": "50",
+    "hp": "40",
     "types": [
       "Psychic"
     ],
@@ -5421,8 +5423,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Search]",
-        "text": "Once during your turn (before your attack), you may look at 1 of your Prize cards. Return that Prize card face down. This power can be used even if Unown [S] is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before your attack), you may look at 1 of your Prize cards. Return that Prize card face down. This power can be used even if Unown S is Asleep, Confused, or Paralyzed.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -5457,8 +5459,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/87.png",
-      "large": "https://images.pokemontcg.io/neo4/87_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/87/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/87/high.webp"
     }
   },
   {
@@ -5483,8 +5485,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Tell]",
-        "text": "Once during your turn (before your attack), you may flip a coin. If heads, look at your opponent's hand and show your hand to your opponent. This power can be used even if Unown [T] is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before your attack), you may flip a coin. If heads, look at your opponent's hand and show your hand to your opponent. This power can be used even if Unown T is Asleep, Confused, or Paralyzed.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -5519,8 +5521,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/88.png",
-      "large": "https://images.pokemontcg.io/neo4/88_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/88/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/88/high.webp"
     }
   },
   {
@@ -5545,8 +5547,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "[Vanish]",
-        "text": "When you play Unown [V] from your hand, you may flip a coin. If heads, return 1 of your Pokémon with Unown in its name (other than Unown [V]) to your hand. (Discard all cards attached to that card.)",
-        "type": "Pokémon Power"
+        "text": "When you play Unown V from your hand, you may flip a coin. If heads, return 1 of your Pokémon with Unown in its name (other than Unown V) to your hand. (Discard all cards attached to that card.)",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -5580,8 +5582,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/89.png",
-      "large": "https://images.pokemontcg.io/neo4/89_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/89/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/89/high.webp"
     }
   },
   {
@@ -5618,10 +5620,11 @@ const cardDetails: TcgCardDetail[] = [
         "name": "Poisonpowder",
         "cost": [
           "Grass",
+          "Colorless",
           "Colorless"
         ],
-        "convertedEnergyCost": 2,
-        "damage": "10",
+        "convertedEnergyCost": 3,
+        "damage": "40",
         "text": "The Defending Pokémon is now Poisoned."
       }
     ],
@@ -5645,8 +5648,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/90.png",
-      "large": "https://images.pokemontcg.io/neo4/90_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/90/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/90/high.webp"
     }
   },
   {
@@ -5678,7 +5681,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "30",
-        "text": "Discard 1 Fire Energy card attached to Vulpix in order to use this attack."
+        "text": "Discard 1 Energy card attached to this Pokémon in order to use this attack."
       }
     ],
     "weaknesses": [
@@ -5701,8 +5704,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/91.png",
-      "large": "https://images.pokemontcg.io/neo4/91_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/91/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/91/high.webp"
     }
   },
   {
@@ -5736,8 +5739,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/92.png",
-      "large": "https://images.pokemontcg.io/neo4/92_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/92/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/92/high.webp"
     }
   },
   {
@@ -5771,8 +5774,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/93.png",
-      "large": "https://images.pokemontcg.io/neo4/93_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/93/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/93/high.webp"
     }
   },
   {
@@ -5803,8 +5806,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/94.png",
-      "large": "https://images.pokemontcg.io/neo4/94_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/94/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/94/high.webp"
     }
   },
   {
@@ -5838,8 +5841,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/95.png",
-      "large": "https://images.pokemontcg.io/neo4/95_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/95/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/95/high.webp"
     }
   },
   {
@@ -5872,8 +5875,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/96.png",
-      "large": "https://images.pokemontcg.io/neo4/96_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/96/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/96/high.webp"
     }
   },
   {
@@ -5907,8 +5910,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/97.png",
-      "large": "https://images.pokemontcg.io/neo4/97_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/97/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/97/high.webp"
     }
   },
   {
@@ -5939,8 +5942,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/98.png",
-      "large": "https://images.pokemontcg.io/neo4/98_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/98/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/98/high.webp"
     }
   },
   {
@@ -5974,8 +5977,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/99.png",
-      "large": "https://images.pokemontcg.io/neo4/99_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/99/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/99/high.webp"
     }
   },
   {
@@ -6009,8 +6012,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/100.png",
-      "large": "https://images.pokemontcg.io/neo4/100_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/100/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/100/high.webp"
     }
   },
   {
@@ -6041,8 +6044,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/101.png",
-      "large": "https://images.pokemontcg.io/neo4/101_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/101/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/101/high.webp"
     }
   },
   {
@@ -6073,8 +6076,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/102.png",
-      "large": "https://images.pokemontcg.io/neo4/102_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/102/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/102/high.webp"
     }
   },
   {
@@ -6105,8 +6108,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/103.png",
-      "large": "https://images.pokemontcg.io/neo4/103_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/103/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/103/high.webp"
     }
   },
   {
@@ -6137,8 +6140,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/104.png",
-      "large": "https://images.pokemontcg.io/neo4/104_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/104/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/104/high.webp"
     }
   },
   {
@@ -6169,8 +6172,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/105.png",
-      "large": "https://images.pokemontcg.io/neo4/105_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/105/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/105/high.webp"
     }
   },
   {
@@ -6201,7 +6204,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Remove a number of damage counters from 1 of your Benched Pokémon equal to the number of Water Energy cards attached to Shining Celebi. If the Pokémon has fewer damage counters than that, remove all of them."
+        "text": "Remove a number of damage counters from 1 of your Benched Pokémon equal to the number of Energy cards attached to Shining Celebi. If the Pokémon has fewer damage counters than that, remove all of them."
       },
       {
         "name": "Miracle Leaf",
@@ -6234,8 +6237,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/106.png",
-      "large": "https://images.pokemontcg.io/neo4/106_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/106/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/106/high.webp"
     }
   },
   {
@@ -6260,7 +6263,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "White-hot Flame",
+        "name": "White-Hot Flame",
         "cost": [
           "Fire",
           "Fire",
@@ -6270,7 +6273,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 5,
         "damage": "100",
-        "text": "Discard 1 Fire Energy card and 1 Lightning Energy card attached to Shining Charizard or this attack does nothing. Flip a coin. If tails, Shining Charizard does 30 damage to itself."
+        "text": "Discard 1 Energy card and 1 Energy card attached to Shining Charizard or this attack does nothing. Flip a coin. If tails, Shining Charizard does 30 damage to itself."
       }
     ],
     "weaknesses": [
@@ -6300,8 +6303,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/107.png",
-      "large": "https://images.pokemontcg.io/neo4/107_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/107/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/107/high.webp"
     }
   },
   {
@@ -6346,7 +6349,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "50+",
-        "text": "Does 50 damage plus 10 more damage for each Water Energy attached to Shining Kabutops but not used to pay for this attack's Energy cost. Don't apply Resistance."
+        "text": "Does 50 damage plus 10 more damage for each Energy attached to Shining Kabutops but not used to pay for this attack's Energy cost. Don't apply Resistance."
       }
     ],
     "weaknesses": [
@@ -6370,8 +6373,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/108.png",
-      "large": "https://images.pokemontcg.io/neo4/108_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/108/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/108/high.webp"
     }
   },
   {
@@ -6414,7 +6417,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "40+",
-        "text": "Discard a Fire Energy card attached to Shining Mewtwo or this attack does nothing. This attack does 40 damage plus 10 damage for each Energy attached to the Defending Pokémon."
+        "text": "Discard a Energy card attached to Shining Mewtwo or this attack does nothing. This attack does 40 damage plus 10 damage for each Energy attached to the Defending Pokémon."
       }
     ],
     "weaknesses": [
@@ -6438,8 +6441,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/109.png",
-      "large": "https://images.pokemontcg.io/neo4/109_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/109/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/109/high.webp"
     }
   },
   {
@@ -6500,8 +6503,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/110.png",
-      "large": "https://images.pokemontcg.io/neo4/110_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/110/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/110/high.webp"
     }
   },
   {
@@ -6535,7 +6538,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "40",
-        "text": "If your opponent has any Benched Pokémon, choose 1 of them and this attack does 10 damage to that Pokémon for each Water Energy attached to Shining Raichu. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "If your opponent has any Benched Pokémon, choose 1 of them and this attack does 10 damage to that Pokémon for each Energy attached to Shining Raichu. (Don't apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
@@ -6558,8 +6561,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/111.png",
-      "large": "https://images.pokemontcg.io/neo4/111_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/111/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/111/high.webp"
     }
   },
   {
@@ -6624,8 +6627,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/112.png",
-      "large": "https://images.pokemontcg.io/neo4/112_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/112/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/112/high.webp"
     }
   },
   {
@@ -6650,7 +6653,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Mountain Crush",
+        "name": "",
         "cost": [
           "Darkness",
           "Fighting",
@@ -6658,10 +6661,10 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "30",
-        "text": "Flip a coin until you get tails. For each heads, your opponent discards the top card from his or her deck."
+        "text": ""
       },
       {
-        "name": "Destructive Fire",
+        "name": "",
         "cost": [
           "Darkness",
           "Fire",
@@ -6670,7 +6673,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "50",
-        "text": "Flip a coin for each Fire Energy card attached to Shining Tyranitar. For each heads, discard a Fire Energy card attached to Shining Tyranitar or this attack does nothing. Then, for each heads, choose an Energy card attached to the Defending Pokémon and discard it. If it has fewer Energy cards than that, remove all of them."
+        "text": ""
       }
     ],
     "weaknesses": [],
@@ -6695,8 +6698,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/neo4/113.png",
-      "large": "https://images.pokemontcg.io/neo4/113_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/neo4/113/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/neo4/113/high.webp"
     }
   }
 ]

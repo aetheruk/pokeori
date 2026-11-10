@@ -1,11 +1,11 @@
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import sharp from 'sharp'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.join(__dirname, '..')
-const setsMetadataPath = path.join(repoRoot, 'source_data', 'tcg', 'sets', 'en.json')
+const setSummariesPath = path.join(repoRoot, 'src', 'data', 'tcg', 'summaries.ts')
 const sourceArtworkDir = path.join(repoRoot, 'source_data', 'tcg', 'set-artwork')
 const baseDir = path.join(repoRoot, 'source_data', 'tcg', 'sprite-bases')
 const publicItemDir = path.join(repoRoot, 'public', 'sprites', 'items', 'tcg')
@@ -20,17 +20,14 @@ function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true })
 }
 
-function loadSetsMetadata() {
-  if (!fs.existsSync(setsMetadataPath)) {
-    throw new Error(`Set metadata file not found: ${setsMetadataPath}`)
+async function loadSetsMetadata() {
+  if (!fs.existsSync(setSummariesPath)) {
+    throw new Error(`Set summaries file not found: ${setSummariesPath}`)
   }
 
-  const parsed = JSON.parse(fs.readFileSync(setsMetadataPath, 'utf8'))
-  if (!Array.isArray(parsed)) {
-    throw new Error(`Expected ${setsMetadataPath} to contain an array`)
-  }
-
-  return parsed.filter((set) => set?.id)
+  const { tcgSetSummaries } = await import(pathToFileURL(setSummariesPath).href)
+  if (!Array.isArray(tcgSetSummaries)) throw new Error(`Expected ${setSummariesPath} to export tcgSetSummaries`)
+  return tcgSetSummaries.filter((set) => set?.id)
 }
 
 function sourcePathForSetImage(setId, kind) {
@@ -42,9 +39,20 @@ async function downloadToFile(url, outputPath) {
   if (!force && fs.existsSync(outputPath)) return true
   if (skipFetch) return fs.existsSync(outputPath)
 
-  const response = await fetch(url)
+  let response
+  try {
+    response = await fetch(url)
+  } catch (error) {
+    console.warn(`Could not fetch ${url}; retaining existing artwork when available.`, error)
+    return fs.existsSync(outputPath)
+  }
   if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`)
+    console.warn(`Could not fetch ${url}: ${response.status} ${response.statusText}; retaining existing artwork when available.`)
+    return fs.existsSync(outputPath)
+  }
+  if (!response.headers.get('content-type')?.startsWith('image/')) {
+    console.warn(`Could not fetch image data from ${url}; retaining existing artwork when available.`)
+    return fs.existsSync(outputPath)
   }
 
   ensureDir(path.dirname(outputPath))
@@ -134,7 +142,7 @@ try {
   ensureDir(sourceArtworkDir)
   ensureDir(publicItemDir)
 
-  const sets = loadSetsMetadata()
+  const sets = await loadSetsMetadata()
   const results = []
 
   await composeItemSprite({

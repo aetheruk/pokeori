@@ -2,11 +2,11 @@ import type { TcgCardDetail } from '../types'
 
 const cardDetails: TcgCardDetail[] = [
   {
-    "id": "me55c-4",
+    "id": "me55c-1",
     "name": "Charizard",
-    "number": "4",
+    "number": "1",
     "artist": "Mitsuhiro Arita",
-    "rarity": "Rare Holo",
+    "rarity": null,
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 2"
@@ -15,14 +15,22 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": "Charmeleon",
+    "evolvesFrom": null,
     "evolvesTo": [],
+    "convertedRetreatCost": 3,
+    "nationalPokedexNumbers": [
+      6
+    ],
+    "images": {
+      "small": "https://assets.tcgdex.net/en/me/30th-c/001/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/001/high.webp"
+    },
     "rules": [],
     "abilities": [
       {
         "name": "Energy Burn",
         "text": "As often as you like during your turn (before your attack), you may turn all Energy attached to Charizard into Fire Energy for the rest of the turn. This power can't be used if Charizard is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -56,25 +64,191 @@ const cardDetails: TcgCardDetail[] = [
       "Colorless",
       "Colorless"
     ],
+    "flavorText": null,
+    "legalities": {},
+    "regulationMark": null
+  },
+  {
+    "id": "me55c-2",
+    "name": "Delcatty",
+    "number": "2",
+    "artist": "Atsuko Nishida",
+    "rarity": null,
+    "supertype": "Pokémon",
+    "subtypes": [
+      "Stage 1"
+    ],
+    "hp": "70",
+    "types": [
+      "Colorless"
+    ],
+    "evolvesFrom": null,
+    "evolvesTo": [],
+    "convertedRetreatCost": 1,
+    "nationalPokedexNumbers": [
+      301
+    ],
+    "images": {
+      "small": "https://assets.tcgdex.net/en/me/30th-c/002/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/002/high.webp"
+    },
+    "rules": [],
+    "abilities": [],
+    "attacks": [
+      {
+        "name": "Max Energy Source",
+        "cost": [
+          "Colorless"
+        ],
+        "convertedEnergyCost": 1,
+        "damage": "10×",
+        "text": "Does 10 damage times the amount of Energy attached to all of your Active Pokémon."
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "Fighting",
+        "value": "×2"
+      }
+    ],
+    "resistances": [],
+    "retreatCost": [
+      "Colorless"
+    ],
+    "flavorText": null,
+    "legalities": {},
+    "regulationMark": null
+  },
+  {
+    "id": "me55c-3",
+    "name": "Metagross",
+    "number": "3",
+    "artist": "Masakazu Fukuda",
+    "rarity": null,
+    "supertype": "Pokémon",
+    "subtypes": [
+      "Stage 2"
+    ],
+    "hp": "100",
+    "types": [
+      "Lightning"
+    ],
+    "evolvesFrom": null,
+    "evolvesTo": [],
     "convertedRetreatCost": 3,
     "nationalPokedexNumbers": [
-      6
+      376
+    ],
+    "images": {
+      "small": "https://assets.tcgdex.net/en/me/30th-c/003/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/003/high.webp"
+    },
+    "rules": [],
+    "abilities": [],
+    "attacks": [
+      {
+        "name": "Crush and Burn",
+        "cost": [
+          "Lightning",
+          "Metal"
+        ],
+        "convertedEnergyCost": 2,
+        "damage": "30+",
+        "text": "You may discard as many Energy cards as you like attached to your Pokémon in play. If you do, this attack does 30 damage plus 20 more damage for each Energy card you discarded."
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "Fire",
+        "value": "×2"
+      }
+    ],
+    "resistances": [
+      {
+        "type": "Grass",
+        "value": "-30"
+      }
+    ],
+    "retreatCost": [
+      "Colorless",
+      "Colorless",
+      "Colorless"
+    ],
+    "flavorText": null,
+    "legalities": {},
+    "regulationMark": null
+  },
+  {
+    "id": "me55c-4",
+    "name": "Charizard",
+    "number": "4",
+    "artist": "Eske Yoshinob",
+    "rarity": "Rare Holo",
+    "supertype": "Pokémon",
+    "subtypes": [
+      "Stage 2"
+    ],
+    "hp": "170",
+    "types": [
+      "Grass"
+    ],
+    "evolvesFrom": "Charmeleon",
+    "evolvesTo": [],
+    "rules": [],
+    "abilities": [
+      {
+        "name": "Red Signal",
+        "text": "When you attach a Plasma Energy from your hand to this Pokémon, you may switch 1 of your opponent's Benched Pokémon with his or her Active Pokémon.",
+        "type": "Ability"
+      }
+    ],
+    "attacks": [
+      {
+        "name": "Megalo Cannon",
+        "cost": [
+          "Grass",
+          "Grass",
+          "Colorless"
+        ],
+        "convertedEnergyCost": 3,
+        "damage": "100",
+        "text": "Does 20 damage to 1 of your opponent's Benched Pokémon. <em>\t   (Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "Fire",
+        "value": "×2"
+      }
+    ],
+    "resistances": [
+      {
+        "type": "Fighting",
+        "value": "-30"
+      }
+    ],
+    "retreatCost": [
+      "Colorless"
+    ],
+    "convertedRetreatCost": 1,
+    "nationalPokedexNumbers": [
+      649
     ],
     "flavorText": null,
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-4/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-4/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/004/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/004/high.webp"
     }
   },
   {
     "id": "me55c-5",
     "name": "Delcatty",
     "number": "5",
-    "artist": "Atsuko Nishida",
+    "artist": "Ken Sugimori",
     "rarity": "Rare Holo",
-    "supertype": "Pokémon",
+    "supertype": "Trainer",
     "subtypes": [
       "Stage 1"
     ],
@@ -121,9 +295,149 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-5/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-5/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/005/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/005/high.webp"
     }
+  },
+  {
+    "id": "me55c-6",
+    "name": "Dark Tyranitar",
+    "number": "6",
+    "artist": "Nakaoka",
+    "rarity": null,
+    "supertype": "Pokémon",
+    "subtypes": [
+      "Stage 2"
+    ],
+    "hp": "120",
+    "types": [
+      "Darkness"
+    ],
+    "evolvesFrom": null,
+    "evolvesTo": [],
+    "convertedRetreatCost": 2,
+    "nationalPokedexNumbers": [
+      248
+    ],
+    "images": {
+      "small": "https://assets.tcgdex.net/en/me/30th-c/006/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/006/high.webp"
+    },
+    "rules": [],
+    "abilities": [],
+    "attacks": [
+      {
+        "name": "Grind",
+        "cost": [
+          "Colorless"
+        ],
+        "convertedEnergyCost": 1,
+        "damage": "10+",
+        "text": "Does 10 damage plus 10 more damage for each Energy attached to Dark Tyranitar."
+      },
+      {
+        "name": "Spinning Tail",
+        "cost": [
+          "Darkness",
+          "Colorless",
+          "Colorless"
+        ],
+        "convertedEnergyCost": 3,
+        "damage": "",
+        "text": "Does 20 damage to each of your opponent's Pokémon. <em>\t   (Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
+      },
+      {
+        "name": "Bite Off",
+        "cost": [
+          "Darkness",
+          "Darkness",
+          "Colorless",
+          "Colorless",
+          "Colorless"
+        ],
+        "convertedEnergyCost": 5,
+        "damage": "70+",
+        "text": "If the Defending Pokémon is Pokémon-<em>ex</em>, this attack does 70 damage plus 50 more damage."
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "Fighting",
+        "value": "×2"
+      }
+    ],
+    "resistances": [
+      {
+        "type": "Psychic",
+        "value": "-30"
+      }
+    ],
+    "retreatCost": [
+      "Colorless",
+      "Colorless"
+    ],
+    "flavorText": null,
+    "legalities": {},
+    "regulationMark": null
+  },
+  {
+    "id": "me55c-7",
+    "name": "Sneasel",
+    "number": "7",
+    "artist": "Ken Sugimori",
+    "rarity": null,
+    "supertype": "Pokémon",
+    "subtypes": [
+      "Basic"
+    ],
+    "hp": "60",
+    "types": [
+      "Darkness"
+    ],
+    "evolvesFrom": null,
+    "evolvesTo": [],
+    "convertedRetreatCost": 0,
+    "nationalPokedexNumbers": [
+      215
+    ],
+    "images": {
+      "small": "https://assets.tcgdex.net/en/me/30th-c/007/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/007/high.webp"
+    },
+    "rules": [],
+    "abilities": [],
+    "attacks": [
+      {
+        "name": "Fury Swipes",
+        "cost": [
+          "Colorless"
+        ],
+        "convertedEnergyCost": 1,
+        "damage": "10×",
+        "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
+      },
+      {
+        "name": "Beat Up",
+        "cost": [
+          "Darkness",
+          "Darkness"
+        ],
+        "convertedEnergyCost": 2,
+        "damage": "20×",
+        "text": "Flip a coin for each of your Pokémon in play (including this one). This attack does 20 damage times the number of heads."
+      }
+    ],
+    "weaknesses": [],
+    "resistances": [
+      {
+        "type": "Psychic",
+        "value": "-30"
+      }
+    ],
+    "retreatCost": [],
+    "flavorText": null,
+    "legalities": {},
+    "regulationMark": null
   },
   {
     "id": "me55c-11g",
@@ -191,16 +505,15 @@ const cardDetails: TcgCardDetail[] = [
     "id": "me55c-11",
     "name": "Metagross",
     "number": "11",
-    "artist": "Masakazu Fukuda",
+    "artist": "Makoto Imai",
     "rarity": "Rare Holo",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 2"
     ],
-    "hp": "100",
+    "hp": "80",
     "types": [
-      "Lightning",
-      "Metal"
+      "Psychic"
     ],
     "evolvesFrom": "Metang",
     "evolvesTo": [],
@@ -216,88 +529,121 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "attacks": [
       {
-        "name": "Crush and Burn",
+        "name": "Toxic Fang",
         "cost": [
-          "Lightning",
-          "Metal"
+          "Psychic",
+          "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30+",
-        "text": "You may discard as many Energy cards as you like attached to your Pokémon in play. If you do, this attack does 30 damage plus 20 more damage for each Energy card you discarded."
+        "damage": "",
+        "text": "The Defending Pokémon is now Poisoned. Put 2 damage counters instead of 1 on the Defending Pokémon between turns."
       }
     ],
     "weaknesses": [
       {
-        "type": "Fire",
+        "type": "Lightning",
         "value": "×2"
       }
     ],
     "resistances": [
       {
-        "type": "Grass",
-        "value": "-30"
+        "type": "Fighting",
+        "value": "-20"
       }
     ],
-    "retreatCost": [
-      "Colorless",
-      "Colorless",
-      "Colorless"
-    ],
-    "convertedRetreatCost": 3,
+    "retreatCost": [],
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
-      376
+      169
     ],
     "flavorText": null,
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-11/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-11/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/011/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/011/high.webp"
     }
   },
   {
     "id": "me55c-18",
     "name": "Misty",
     "number": "18",
-    "artist": "Ken Sugimori",
+    "artist": "Takashi Yamaguchi",
     "rarity": "Rare Holo",
-    "supertype": "Trainer",
-    "subtypes": [],
-    "hp": null,
-    "types": [],
+    "supertype": "Pokémon",
+    "subtypes": [
+      "Stage 2"
+    ],
+    "hp": "130",
+    "types": [
+      "Psychic"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [
       "Discard 2 of the other cards in your hand in order to play this card. If this turn's attack does damage to the Defending Pokémon (after applying Weakness and Resistance), and if the attacking Pokémon has Misty in its name, the attack does 20 more damage to the Defending Pokémon."
     ],
     "abilities": [],
-    "attacks": [],
-    "weaknesses": [],
-    "resistances": [],
+    "attacks": [
+      {
+        "name": "Hurl into Darkness",
+        "cost": [
+          "Psychic"
+        ],
+        "convertedEnergyCost": 1,
+        "damage": "",
+        "text": "Look at your opponent's hand and choose a number of Pokémon you find there up to the number of <span class=\"energy-symbol Psychic\" title=\"Psychic\">Psychic</span> Energy attached to Gengar. Put the Pokémon you chose in the Lost Zone."
+      },
+      {
+        "name": "Cursed Drop",
+        "cost": [
+          "Psychic",
+          "Colorless"
+        ],
+        "convertedEnergyCost": 2,
+        "damage": "",
+        "text": "Put 4 damage counters on your opponent's Pokémon in any way you like."
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "Darkness",
+        "value": "×2"
+      }
+    ],
+    "resistances": [
+      {
+        "type": "Colorless",
+        "value": "-20"
+      }
+    ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
-    "nationalPokedexNumbers": [],
+    "convertedRetreatCost": 0,
+    "nationalPokedexNumbers": [
+      94
+    ],
     "flavorText": null,
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-18/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-18/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/018/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/018/high.webp"
     }
   },
   {
     "id": "me55c-19",
     "name": "Dark Tyranitar",
     "number": "19",
-    "artist": "Nakaoka",
+    "artist": "Shinji Higuchi + Noriko Takaya",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 2"
     ],
-    "hp": "120",
+    "hp": "150",
     "types": [
-      "Darkness"
+      "Darkness",
+      "Psychic"
     ],
     "evolvesFrom": "Dark Pupitar",
     "evolvesTo": [],
@@ -350,35 +696,158 @@ const cardDetails: TcgCardDetail[] = [
         "value": "-30"
       }
     ],
-    "retreatCost": [
-      "Colorless",
-      "Colorless"
-    ],
-    "convertedRetreatCost": 2,
+    "retreatCost": [],
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
-      248
+      491,
+      488
     ],
     "flavorText": null,
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-19/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-19/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/019/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/019/high.webp"
     }
+  },
+  {
+    "id": "me55c-20",
+    "name": "Darkrai & Cresselia LEGEND",
+    "number": "20",
+    "artist": "Shinji Higuchi + Noriko Takaya",
+    "rarity": null,
+    "supertype": "Pokémon",
+    "subtypes": [
+      "Basic"
+    ],
+    "hp": "150",
+    "types": [
+      "Darkness",
+      "Psychic"
+    ],
+    "evolvesFrom": null,
+    "evolvesTo": [],
+    "convertedRetreatCost": 2,
+    "nationalPokedexNumbers": [
+      491,
+      488
+    ],
+    "images": {
+      "small": "https://assets.tcgdex.net/en/me/30th-c/020/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/020/high.webp"
+    },
+    "rules": [],
+    "abilities": [],
+    "attacks": [
+      {
+        "name": "Lost Crisis",
+        "cost": [
+          "Darkness",
+          "Darkness",
+          "Colorless",
+          "Colorless"
+        ],
+        "convertedEnergyCost": 4,
+        "damage": "100",
+        "text": "Choose 2 Energy attached to Darkrai & Cresselia LEGEND and put them into the Lost Zone. If any of your opponent's Pokémon would be Knocked Out by damage from this attack, put that Pokémon and all cards attached to it in the Lost Zone instead of discarding it."
+      },
+      {
+        "name": "Moon's Invite",
+        "cost": [
+          "Psychic"
+        ],
+        "convertedEnergyCost": 1,
+        "damage": "",
+        "text": "Move as many damage counters on your opponent's Pokémon as you like to any of your opponent's other Pokémon in any way you like."
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "Fighting",
+        "value": "x2"
+      },
+      {
+        "type": "Psychic",
+        "value": "x2"
+      }
+    ],
+    "resistances": [],
+    "retreatCost": [
+      "Colorless",
+      "Colorless"
+    ],
+    "flavorText": null,
+    "legalities": {},
+    "regulationMark": null
+  },
+  {
+    "id": "me55c-22",
+    "name": "Palkia",
+    "number": "22",
+    "artist": "Ryo Ueda",
+    "rarity": null,
+    "supertype": "Pokémon",
+    "subtypes": [
+      "Basic"
+    ],
+    "hp": "120",
+    "types": [
+      "Water"
+    ],
+    "evolvesFrom": null,
+    "evolvesTo": [],
+    "convertedRetreatCost": 3,
+    "nationalPokedexNumbers": [
+      484
+    ],
+    "images": {
+      "small": "https://assets.tcgdex.net/en/me/30th-c/022/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/022/high.webp"
+    },
+    "rules": [],
+    "abilities": [],
+    "attacks": [
+      {
+        "name": "Hydro Reflect",
+        "cost": [
+          "Water",
+          "Water",
+          "Water"
+        ],
+        "convertedEnergyCost": 3,
+        "damage": "60",
+        "text": "You may move all Energy cards attached to Palkia to your Benched Pokémon in any way you like. (Ignore this effect if you don't have any Benched Pokémon.)"
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "Lightning",
+        "value": "×2"
+      }
+    ],
+    "resistances": [],
+    "retreatCost": [
+      "Colorless",
+      "Colorless",
+      "Colorless"
+    ],
+    "flavorText": null,
+    "legalities": {},
+    "regulationMark": null
   },
   {
     "id": "me55c-25",
     "name": "Sneasel",
     "number": "25",
-    "artist": "Ken Sugimori",
+    "artist": "Mitsuhiro Arita",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
     ],
-    "hp": "60",
+    "hp": "120",
     "types": [
-      "Darkness"
+      "Metal"
     ],
     "evolvesFrom": null,
     "evolvesTo": [],
@@ -386,43 +855,52 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Fury Swipes",
+        "name": "Steel Wing",
         "cost": [
+          "Metal",
           "Colorless"
         ],
-        "convertedEnergyCost": 1,
-        "damage": "10×",
-        "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
+        "convertedEnergyCost": 2,
+        "damage": "40",
+        "text": "During your opponent's next turn, any damage done to Scizor <em>ex</em> by attacks is reduced by 20 <em>(after applying Weakness and Resistance)</em>."
       },
       {
-        "name": "Beat Up",
+        "name": "Cross-Cut",
         "cost": [
-          "Darkness",
-          "Darkness"
+          "Colorless",
+          "Colorless",
+          "Colorless"
         ],
-        "convertedEnergyCost": 2,
-        "damage": "20×",
-        "text": "Flip a coin for each of your Pokémon in play (including this one). This attack does 20 damage times the number of heads."
+        "convertedEnergyCost": 3,
+        "damage": "50+",
+        "text": "If the Defending Pokémon is an Evolved Pokémon, this attack does 50 damage plus 30 more damage."
       }
     ],
-    "weaknesses": [],
+    "weaknesses": [
+      {
+        "type": "Fire",
+        "value": "×2"
+      }
+    ],
     "resistances": [
       {
-        "type": "Psychic",
+        "type": "Grass",
         "value": "-30"
       }
     ],
-    "retreatCost": [],
-    "convertedRetreatCost": null,
+    "retreatCost": [
+      "Colorless"
+    ],
+    "convertedRetreatCost": 1,
     "nationalPokedexNumbers": [
-      215
+      212
     ],
     "flavorText": null,
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-25/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-25/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/025/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/025/high.webp"
     }
   },
   {
@@ -457,10 +935,10 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "150",
-        "text": "Search your deck for up to 3 Lightning Energy cards and attach them to 1 of your Pokémon. Then, shuffle your deck."
+        "text": "Search your deck for up to 3 <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> Energy cards and attach them to 1 of your Pokémon. Then, shuffle your deck."
       },
       {
-        "name": "Tag Bolt-GX",
+        "name": "Tag Bolt {GX}",
         "cost": [
           "Lightning",
           "Lightning",
@@ -468,7 +946,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "200",
-        "text": "If this Pokémon has at least 3 extra Lightning Energy attached to it (in addition to this attack's cost), this attack does 170 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.) (You can't use more than 1 GX attack in a game.)"
+        "text": "If this Pokémon has at least 3 extra <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> Energy attached to it <em>(in addition to this attack's cost)</em>, this attack does 170 damage to 1 of your opponent's Benched Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.) (You can't use more than 1 <em>GX</em> attack in a game.)</em>"
       }
     ],
     "weaknesses": [
@@ -490,14 +968,15 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "convertedRetreatCost": 3,
     "nationalPokedexNumbers": [
-      25
+      25,
+      644
     ],
     "flavorText": null,
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-33/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-33/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/008/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/008/high.webp"
     }
   },
   {
@@ -522,7 +1001,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Giant Water Shuriken",
-        "text": "Once during your turn (before your attack), if this Pokémon is your Active Pokémon, you may discard a Water Energy card from your hand. If you do, put 6 damage counters on 1 of your opponents Pokémon.",
+        "text": "Once during your turn (before your attack)\t   , if this Pokémon is your Active Pokémon, you may discard a Water Energy card from your hand. If you do, put 6 damage counters on 1 of your oppponent's Pokémon.",
         "type": "Ability"
       }
     ],
@@ -530,7 +1009,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       658
     ],
@@ -538,8 +1017,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-41/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-41/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/009/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/009/high.webp"
     }
   },
   {
@@ -595,8 +1074,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-43/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-43/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/010/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/010/high.webp"
     }
   },
   {
@@ -688,7 +1167,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "120",
-        "text": "This attack also does 120 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack also does 120 damage to 1 of your opponent's Benched Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -710,8 +1189,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "D",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-50/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-50/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/012/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/012/high.webp"
     }
   },
   {
@@ -743,7 +1222,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "30",
-        "text": "This attack does 30 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 30 damage to 1 of your opponent's Benched Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       },
       {
         "name": "Knuckle Impact",
@@ -757,7 +1236,7 @@ const cardDetails: TcgCardDetail[] = [
         "text": "This Pokémon can't attack during your next turn."
       },
       {
-        "name": "Absorption-GX",
+        "name": "Absorption {GX}",
         "cost": [
           "Fighting",
           "Fighting",
@@ -765,7 +1244,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "40×",
-        "text": "This attack does 40 damage for each of your remaining Prize cards. (You can't use more than 1 GX attack in a game.)"
+        "text": "This attack does 40 damage for each of your remaining Prize cards. <em>(You can't use more than 1 <em>GX</em> attack in a game.)</em>"
       }
     ],
     "weaknesses": [
@@ -787,8 +1266,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-57/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-57/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/013/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/013/high.webp"
     }
   },
   {
@@ -848,8 +1327,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-58/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-58/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/014/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/014/high.webp"
     }
   },
   {
@@ -858,7 +1337,7 @@ const cardDetails: TcgCardDetail[] = [
     "number": "69",
     "artist": "Ken Sugimori",
     "rarity": "Common",
-    "supertype": "Trainer",
+    "supertype": "Pokémon",
     "subtypes": [
       "Basic"
     ],
@@ -907,13 +1386,15 @@ const cardDetails: TcgCardDetail[] = [
       "Colorless"
     ],
     "convertedRetreatCost": 1,
-    "nationalPokedexNumbers": [],
+    "nationalPokedexNumbers": [
+      39
+    ],
     "flavorText": null,
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-69/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-69/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/015/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/015/high.webp"
     }
   },
   {
@@ -955,7 +1436,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "60×",
-        "text": "Discard all basic Fire Energy or all basic Lightning Energy attached to this Pokémon. This attack does 60 damage times the number of Energy cards you discarded."
+        "text": "Discard all basic <span class=\"energy-symbol Fire\" title=\"Fire\">Fire</span> Energy or all basic <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> Energy attached to this Pokémon. This attack does 60 damage times the number of Energy cards you discarded."
       }
     ],
     "weaknesses": [
@@ -976,8 +1457,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-85/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-85/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/016/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/016/high.webp"
     }
   },
   {
@@ -1003,7 +1484,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Ultra Road",
-        "text": "Once during your turn (before your attack), you may switch your Active Pokémon with 1 of your Benched Pokémon.",
+        "text": "Once during your turn\t\t(before your attack), you may switch your Active Pokémon with 1 of your Benched Pokémon.",
         "type": "Ability"
       }
     ],
@@ -1020,13 +1501,13 @@ const cardDetails: TcgCardDetail[] = [
         "text": "Discard all Energy from this Pokémon."
       },
       {
-        "name": "Sol Burst-GX",
+        "name": "Sol Burst {GX}",
         "cost": [
           "Metal"
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your deck for up to 5 Energy cards and attach them to your Pokémon in any way you like. Then, shuffle your deck. (You can't use more than 1 GX attack in a game.)"
+        "text": "Search your deck for up to 5 Energy cards and attach them to your Pokémon in any way you like. Then, shuffle your deck. <em>(You can't use more than 1 <em>GX</em> attack in a game.)</em>"
       }
     ],
     "weaknesses": [
@@ -1054,8 +1535,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-89/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-89/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/017/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/017/high.webp"
     }
   },
   {
@@ -1301,8 +1782,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-101/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-101/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/021/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/021/high.webp"
     }
   },
   {
@@ -1337,7 +1818,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "30×",
-        "text": "This attack does 30 damage times the number of Fairy Energy attached to all of your Pokémon."
+        "text": "This attack does 30 damage times the amount of <span class=\"energy-symbol Fairy\" title=\"Fairy\">Fairy</span> Energy attached to all of your Pokémon."
       }
     ],
     "weaknesses": [
@@ -1364,8 +1845,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-106m/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-106m/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/023/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/023/high.webp"
     }
   },
   {
@@ -1459,7 +1940,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Remove a number of damage counters from 1 of your Benched Pokémon equal to the number of Water Energy cards attached to Shining Celebi. If the Pokémon has fewer damage counters than that, remove all of them."
+        "text": "Remove a number of damage counters from 1 of your Benched Pokémon equal to the number of <span class=\"energy-symbol Water\" title=\"Water\">Water</span> Energy cards attached to Shining Celebi. If the Pokémon has fewer damage counters than that, remove all of them."
       },
       {
         "name": "Miracle Leaf",
@@ -1490,8 +1971,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-106/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-106/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/024/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/024/high.webp"
     }
   },
   {
@@ -1626,7 +2107,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       151
     ],
@@ -1634,8 +2115,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "E",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-114/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-114/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/026/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/026/high.webp"
     }
   },
   {
@@ -1696,8 +2177,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "F",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-123/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-123/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/027/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/027/high.webp"
     }
   },
   {
@@ -1764,8 +2245,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "D",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-138/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-138/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/028/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/028/high.webp"
     }
   },
   {
@@ -1796,8 +2277,8 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Psychic",
         "cost": [
-          "Psychic",
-          "Fire"
+          "Fire",
+          "Psychic"
         ],
         "convertedEnergyCost": 2,
         "damage": "10×",
@@ -1806,9 +2287,9 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Steam Blast",
         "cost": [
-          "Water",
-          "Water",
           "Fire",
+          "Water",
+          "Water",
           "Colorless"
         ],
         "convertedEnergyCost": 4,
@@ -1836,8 +2317,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": null,
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-149/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-149/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/029/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/029/high.webp"
     }
   },
   {
@@ -1887,8 +2368,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "G",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55c-203/small",
-      "large": "https://images.scrydex.com/pokemon/me55c-203/large"
+      "small": "https://assets.tcgdex.net/en/me/30th-c/030/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th-c/030/high.webp"
     }
   }
 ]

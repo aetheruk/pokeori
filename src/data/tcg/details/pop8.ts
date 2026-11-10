@@ -40,7 +40,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "90",
-        "text": "Discard 2 Basic Energy cards attached to Heatran. (If you can't discard cards, this attack does nothing."
+        "text": "Discard 2 basic Energy cards attached to Heatran. (If you can’t discard cards, this attack does nothing.)"
       }
     ],
     "weaknesses": [
@@ -65,8 +65,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/1.png",
-      "large": "https://images.pokemontcg.io/pop8/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/1/high.webp"
     }
   },
   {
@@ -96,7 +96,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "40",
-        "text": "During your opponent's next turn, any damage done to Lucario by attacks is reduced by 20 (after applying Weakness and Resistance)."
+        "text": "During your opponent’s next turn, any damage done to Lucario by attacks is reduced by 20 (after applying Weakness and Resistance)."
       },
       {
         "name": "Striking Kick",
@@ -107,7 +107,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "60",
-        "text": "This attack's damage isn't affected by Resistance, Poké-Powers, Poké-Bodies, or any other effects on the Defending Pokémon"
+        "text": "This attack’s damage isn’t affected by Resistance, Poké-Powers, Poké-Bodies, or any other effects on the Defending Pokémon."
       }
     ],
     "weaknesses": [
@@ -130,8 +130,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/2.png",
-      "large": "https://images.pokemontcg.io/pop8/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/2/high.webp"
     }
   },
   {
@@ -154,8 +154,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Intimidating Fang",
-        "text": "As long as Luxray is your Active Pokémon, any damage done by an opponent's attack is reduced by 10 (before applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "text": "As long as Luxray is your Active Pokémon, any damage done by an opponent’s attack is reduced by 10 (before applying Weakness and Resistance).",
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -197,8 +197,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/3.png",
-      "large": "https://images.pokemontcg.io/pop8/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/3/high.webp"
     }
   },
   {
@@ -228,7 +228,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "Does 10 damage to 2 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "Does 10 damage to 2 of your opponent’s Benched Pokémon. (Don’t apply Weakness and Resistance for Benched Pokémon.)"
       },
       {
         "name": "Triple Nose",
@@ -263,14 +263,14 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       476
     ],
-    "flavorText": "It exudes strong magnetism from all cover. It controls three small units called Mini-Noses.",
+    "flavorText": "It exudes strong magnetium from all cover. It controls three small units called Mini-Noses.",
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/4.png",
-      "large": "https://images.pokemontcg.io/pop8/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/4/high.webp"
     }
   },
   {
@@ -327,7 +327,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       469
     ],
@@ -337,8 +337,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/5.png",
-      "large": "https://images.pokemontcg.io/pop8/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/5/high.webp"
     }
   },
   {
@@ -406,8 +406,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/6.png",
-      "large": "https://images.pokemontcg.io/pop8/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/6/high.webp"
     }
   },
   {
@@ -437,7 +437,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "30",
-        "text": "Before doing damage, count the remaining HP of the Defending Pokémon and Carnivine. If the Defending Pokémon has fewer remaining HP than Carnivine's, this attack does 60 damage instead."
+        "text": "Before doing damage, count the remaining HP of the Defending Pokémon and Carnivine. If the Defending Pokémon has fewer remaining HP than Carnivine’s, this attack does 60 damage instead."
       },
       {
         "name": "Wring Out",
@@ -475,8 +475,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/7.png",
-      "large": "https://images.pokemontcg.io/pop8/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/7/high.webp"
     }
   },
   {
@@ -501,7 +501,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Fasten Claw",
+        "name": "Fasten Claws",
         "cost": [
           "Colorless"
         ],
@@ -533,7 +533,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       404
     ],
@@ -543,8 +543,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/8.png",
-      "large": "https://images.pokemontcg.io/pop8/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/8/high.webp"
     }
   },
   {
@@ -577,8 +577,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/9.png",
-      "large": "https://images.pokemontcg.io/pop8/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/9/high.webp"
     }
   },
   {
@@ -613,8 +613,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/10.png",
-      "large": "https://images.pokemontcg.io/pop8/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/10/high.webp"
     }
   },
   {
@@ -648,8 +648,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/11.png",
-      "large": "https://images.pokemontcg.io/pop8/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/11/high.webp"
     }
   },
   {
@@ -711,8 +711,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/12.png",
-      "large": "https://images.pokemontcg.io/pop8/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/12/high.webp"
     }
   },
   {
@@ -743,7 +743,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Flip a coin. If heads, your opponent can't play any Supporter cards from his or her hand during his or her next turn."
+        "text": "Flip a coin. If heads, your opponent can’t play any Supporter cards from his or her hand during his or her next turn."
       },
       {
         "name": "Finger Poke",
@@ -776,8 +776,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/13.png",
-      "large": "https://images.pokemontcg.io/pop8/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/13/high.webp"
     }
   },
   {
@@ -803,7 +803,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Baby Evolution",
         "text": "Once during your turn (before your attack), you may put Chansey from your hand onto Happiny (this counts as evolving Happiny) and remove all damage counters from Happiny.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -835,8 +835,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/14.png",
-      "large": "https://images.pokemontcg.io/pop8/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/14/high.webp"
     }
   },
   {
@@ -898,8 +898,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/15.png",
-      "large": "https://images.pokemontcg.io/pop8/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/15/high.webp"
     }
   },
   {
@@ -924,8 +924,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Inner Focus",
-        "text": "Riolu can't be Paralyzed.",
-        "type": "Poké-Body"
+        "text": "Riolu can’t be Paralyzed.",
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -959,8 +959,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/16.png",
-      "large": "https://images.pokemontcg.io/pop8/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/16/high.webp"
     }
   },
   {
@@ -1027,8 +1027,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop8/17.png",
-      "large": "https://images.pokemontcg.io/pop8/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop8/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop8/17/high.webp"
     }
   }
 ]

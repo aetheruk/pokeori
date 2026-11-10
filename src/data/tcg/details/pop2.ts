@@ -45,7 +45,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -62,8 +62,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/1.png",
-      "large": "https://images.pokemontcg.io/pop2/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/1/high.webp"
     }
   },
   {
@@ -87,7 +87,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Beating Wings",
         "text": "Once during your turn (before your attack), if Pidgeot is your Active Pokémon, you may shuffle 1 of your Benched Pokémon and all cards attached to it into your deck. This power can't be used if Pidgeot is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -106,7 +106,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [
@@ -116,7 +116,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       18
     ],
@@ -126,8 +126,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/2.png",
-      "large": "https://images.pokemontcg.io/pop2/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/2/high.webp"
     }
   },
   {
@@ -173,7 +173,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -190,8 +190,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/3.png",
-      "large": "https://images.pokemontcg.io/pop2/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/3/high.webp"
     }
   },
   {
@@ -215,7 +215,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Mirror Coat",
         "text": "If Suicune is Burned or Poisoned by an opponent's attack (even if Suicune is Knocked Out), the Attacking Pokémon is now affected by the same Special Conditions (1 if there is only 1).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -233,7 +233,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -250,8 +250,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/4.png",
-      "large": "https://images.pokemontcg.io/pop2/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/4/high.webp"
     }
   },
   {
@@ -298,7 +298,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -315,8 +315,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/5.png",
-      "large": "https://images.pokemontcg.io/pop2/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/5/high.webp"
     }
   },
   {
@@ -365,7 +365,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -384,8 +384,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/6.png",
-      "large": "https://images.pokemontcg.io/pop2/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/6/high.webp"
     }
   },
   {
@@ -433,7 +433,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -450,8 +450,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/7.png",
-      "large": "https://images.pokemontcg.io/pop2/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/7/high.webp"
     }
   },
   {
@@ -477,7 +477,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -485,15 +485,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/8.png",
-      "large": "https://images.pokemontcg.io/pop2/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/8/high.webp"
     }
   },
   {
     "id": "pop2-9",
     "name": "Multi Technical Machine 01",
     "number": "9",
-    "artist": "\"Big Mama\" Tagawa",
+    "artist": "\"Big Mama\" Tagawa\"Big Mama\" Tagawa",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -529,8 +529,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/9.png",
-      "large": "https://images.pokemontcg.io/pop2/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/9/high.webp"
     }
   },
   {
@@ -556,7 +556,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -564,8 +564,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/10.png",
-      "large": "https://images.pokemontcg.io/pop2/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/10/high.webp"
     }
   },
   {
@@ -591,7 +591,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -600,8 +600,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/11.png",
-      "large": "https://images.pokemontcg.io/pop2/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/11/high.webp"
     }
   },
   {
@@ -648,7 +648,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -665,8 +665,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/12.png",
-      "large": "https://images.pokemontcg.io/pop2/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/12/high.webp"
     }
   },
   {
@@ -703,7 +703,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -720,8 +720,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/13.png",
-      "large": "https://images.pokemontcg.io/pop2/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/13/high.webp"
     }
   },
   {
@@ -766,7 +766,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -783,8 +783,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/14.png",
-      "large": "https://images.pokemontcg.io/pop2/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/14/high.webp"
     }
   },
   {
@@ -831,7 +831,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -848,8 +848,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/15.png",
-      "large": "https://images.pokemontcg.io/pop2/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/15/high.webp"
     }
   },
   {
@@ -896,7 +896,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -913,8 +913,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/16.png",
-      "large": "https://images.pokemontcg.io/pop2/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/16/high.webp"
     }
   },
   {
@@ -941,7 +941,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Time Reversal",
         "text": "Once during your turn, when you put Celebi ex from your hand onto your Bench, you may search your discard pile for a card, show it to your opponent, and put it on top of your deck.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -959,7 +959,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -976,8 +976,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop2/17.png",
-      "large": "https://images.pokemontcg.io/pop2/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop2/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop2/17/high.webp"
     }
   }
 ]

@@ -22,7 +22,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Prehistoric Power",
         "text": "No more Evolution cards can be played. This power stops working while Aerodactyl is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -64,8 +64,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/1.png",
-      "large": "https://images.pokemontcg.io/base3/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/1/high.webp"
     }
   },
   {
@@ -132,8 +132,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/2.png",
-      "large": "https://images.pokemontcg.io/base3/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/2/high.webp"
     }
   },
   {
@@ -157,7 +157,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Transform",
         "text": "If Ditto is your Active Pokémon, treat it as if it were the same card as the Defending Pokémon, including type, Hit Points, Weakness, and so on, except Ditto can't evolve, always has this Pokémon Power, and you may treat any Energy attached to Ditto as Energy of any type. Ditto isn't a copy of any other Pokémon while Ditto is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [],
@@ -186,8 +186,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/3.png",
-      "large": "https://images.pokemontcg.io/base3/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/3/high.webp"
     }
   },
   {
@@ -210,8 +210,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Step In",
-        "text": "Once during your turn (before your attack), if Dragonite is on your Bench, you may switch it with your Active Pokémon.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before you attack) if Dragonite is on your Bench, you may switch it with your Active Pokémon.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -224,7 +224,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "40×",
+        "damage": "40x",
         "text": "Flip 2 coins. This attack does 40 damage times the number of heads."
       }
     ],
@@ -248,8 +248,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/4.png",
-      "large": "https://images.pokemontcg.io/base3/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/4/high.webp"
     }
   },
   {
@@ -273,7 +273,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Curse",
         "text": "Once during your turn (before your attack), you may move 1 damage counter from 1 of your opponent's Pokémon to another (even if it would Knock Out the other Pokémon). This power can't be used if Gengar is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -309,8 +309,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/5.png",
-      "large": "https://images.pokemontcg.io/base3/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/5/high.webp"
     }
   },
   {
@@ -335,8 +335,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Transparency",
-        "text": "Whenever an attack does anything to Haunter, flip a coin. If heads, prevent all effects of that attack, including damage, done to Haunter. This power stops working while Haunter is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "text": "Whenever an attack does anything to Haunter, flip a coin. If heads, prevent all effects of that attack, including damage, done to Haunter. This power stops working while Haunter is Asleep.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -369,8 +369,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/6.png",
-      "large": "https://images.pokemontcg.io/base3/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/6/high.webp"
     }
   },
   {
@@ -434,8 +434,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/7.png",
-      "large": "https://images.pokemontcg.io/base3/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/7/high.webp"
     }
   },
   {
@@ -499,8 +499,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/8.png",
-      "large": "https://images.pokemontcg.io/base3/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/8/high.webp"
     }
   },
   {
@@ -542,7 +542,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "40",
-        "text": "Remove a number of damage counters from Kabutops equal to half the damage done to the Defending Pokémon (after applying Weakness and Resistance) (rounded up to the nearest 10). If Kabutops has fewer damage counters than that, remove all of them."
+        "text": "Remove a number of damage counters from Kabutops equal to half the damage done to Defending Pokémon (after applying Weakness and Resistance) (rounded up to the nearest 10). If Kabutops has fewer damage counters than that, remove all of them."
       }
     ],
     "weaknesses": [
@@ -565,8 +565,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/9.png",
-      "large": "https://images.pokemontcg.io/base3/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/9/high.webp"
     }
   },
   {
@@ -595,7 +595,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "10+",
-        "text": "Does 10 damage plus 10 more damage for each Water Energy attached to Lapras but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
+        "text": "Does 10 damage plus 10 more damage for each Energy attached to Lapras but not used to pay for this attack's Energy cost. You can't add more than 20 damage this way."
       },
       {
         "name": "Confuse Ray",
@@ -629,8 +629,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/10.png",
-      "large": "https://images.pokemontcg.io/base3/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/10/high.webp"
     }
   },
   {
@@ -698,8 +698,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/11.png",
-      "large": "https://images.pokemontcg.io/base3/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/11/high.webp"
     }
   },
   {
@@ -728,7 +728,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "You may discard any number of Fire Energy cards attached to Moltres when you use this attack. If you do, discard that many cards from the top of your opponent's deck."
+        "text": "You may discard any number of R Energy cards attached to Moltres when you use this attack. If you do, discard that many cards from the top of your opponent's deck."
       },
       {
         "name": "Dive Bomb",
@@ -764,8 +764,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/12.png",
-      "large": "https://images.pokemontcg.io/base3/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/12/high.webp"
     }
   },
   {
@@ -789,7 +789,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Toxic Gas",
         "text": "Ignore all Pokémon Powers other than Toxic Gases. This power stops working while Muk is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -826,8 +826,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/13.png",
-      "large": "https://images.pokemontcg.io/base3/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/13/high.webp"
     }
   },
   {
@@ -882,8 +882,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/14.png",
-      "large": "https://images.pokemontcg.io/base3/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/14/high.webp"
     }
   },
   {
@@ -939,8 +939,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/15.png",
-      "large": "https://images.pokemontcg.io/base3/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/15/high.webp"
     }
   },
   {
@@ -964,7 +964,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Prehistoric Power",
         "text": "No more Evolution cards can be played. This power stops working while Aerodactyl is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1006,8 +1006,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/16.png",
-      "large": "https://images.pokemontcg.io/base3/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/16/high.webp"
     }
   },
   {
@@ -1074,8 +1074,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/17.png",
-      "large": "https://images.pokemontcg.io/base3/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/17/high.webp"
     }
   },
   {
@@ -1099,7 +1099,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Transform",
         "text": "If Ditto is your Active Pokémon, treat it as if it were the same card as the Defending Pokémon, including type, Hit Points, Weakness, and so on, except Ditto can't evolve, always has this Pokémon Power, and you may treat any Energy attached to Ditto as Energy of any type. Ditto isn't a copy of any other Pokémon while Ditto is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [],
@@ -1128,8 +1128,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/18.png",
-      "large": "https://images.pokemontcg.io/base3/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/18/high.webp"
     }
   },
   {
@@ -1152,8 +1152,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Step In",
-        "text": "Once during your turn (before your attack), if Dragonite is on your Bench, you may switch it with your Active Pokémon.",
-        "type": "Pokémon Power"
+        "text": "Once during your turn (before you attack) if Dragonite is on your Bench, you may switch it with your Active Pokémon.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1166,7 +1166,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "40×",
+        "damage": "40x",
         "text": "Flip 2 coins. This attack does 40 damage times the number of heads."
       }
     ],
@@ -1190,8 +1190,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/19.png",
-      "large": "https://images.pokemontcg.io/base3/19_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/19/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/19/high.webp"
     }
   },
   {
@@ -1215,7 +1215,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Curse",
         "text": "Once during your turn (before your attack), you may move 1 damage counter from 1 of your opponent's Pokémon to another (even if it would Knock Out the other Pokémon). This power can't be used if Gengar is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1251,8 +1251,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/20.png",
-      "large": "https://images.pokemontcg.io/base3/20_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/20/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/20/high.webp"
     }
   },
   {
@@ -1277,8 +1277,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Transparency",
-        "text": "Whenever an attack does anything to Haunter, flip a coin. If heads, prevent all effects of that attack, including damage, done to Haunter. This power stops working while Haunter is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "text": "Whenever an attack does anything to Haunter, flip a coin. If heads, prevent all effects of that attack, including damage, done to Haunter. This power stops working while Haunter is Asleep.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1311,8 +1311,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/21.png",
-      "large": "https://images.pokemontcg.io/base3/21_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/21/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/21/high.webp"
     }
   },
   {
@@ -1376,8 +1376,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/22.png",
-      "large": "https://images.pokemontcg.io/base3/22_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/22/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/22/high.webp"
     }
   },
   {
@@ -1441,8 +1441,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/23.png",
-      "large": "https://images.pokemontcg.io/base3/23_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/23/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/23/high.webp"
     }
   },
   {
@@ -1484,7 +1484,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "40",
-        "text": "Remove a number of damage counters from Kabutops equal to half the damage done to the Defending Pokémon (after applying Weakness and Resistance) (rounded up to the nearest 10). If Kabutops has fewer damage counters than that, remove all of them."
+        "text": "Remove a number of damage counters from Kabutops equal to half the damage done to Defending Pokémon (after applying Weakness and Resistance) (rounded up to the nearest 10). If Kabutops has fewer damage counters than that, remove all of them."
       }
     ],
     "weaknesses": [
@@ -1507,8 +1507,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/24.png",
-      "large": "https://images.pokemontcg.io/base3/24_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/24/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/24/high.webp"
     }
   },
   {
@@ -1537,7 +1537,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "10+",
-        "text": "Does 10 damage plus 10 more damage for each Water Energy attached to Lapras but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
+        "text": "Does 10 damage plus 10 more damage for each Energy attached to Lapras but not used to pay for this attack's Energy cost. You can't add more than 20 damage this way."
       },
       {
         "name": "Confuse Ray",
@@ -1571,8 +1571,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/25.png",
-      "large": "https://images.pokemontcg.io/base3/25_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/25/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/25/high.webp"
     }
   },
   {
@@ -1640,8 +1640,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/26.png",
-      "large": "https://images.pokemontcg.io/base3/26_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/26/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/26/high.webp"
     }
   },
   {
@@ -1670,7 +1670,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "You may discard any number of Fire Energy cards attached to Moltres when you use this attack. If you do, discard that many cards from the top of your opponent's deck."
+        "text": "You may discard any number of R Energy cards attached to Moltres when you use this attack. If you do, discard that many cards from the top of your opponent's deck."
       },
       {
         "name": "Dive Bomb",
@@ -1706,8 +1706,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/27.png",
-      "large": "https://images.pokemontcg.io/base3/27_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/27/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/27/high.webp"
     }
   },
   {
@@ -1731,7 +1731,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Toxic Gas",
         "text": "Ignore all Pokémon Powers other than Toxic Gases. This power stops working while Muk is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1768,8 +1768,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/28.png",
-      "large": "https://images.pokemontcg.io/base3/28_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/28/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/28/high.webp"
     }
   },
   {
@@ -1801,7 +1801,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "30",
-        "text": "Choose 3 of your opponent's Benched Pokémon and this attack does 10 damage to each of them. (Don't apply Weakness and Resistance for Benched Pokémon.) If your opponent has fewer than 3 Benched Pokémon, do that damage to each of them."
+        "text": "Choose 3 of your opponent's Benched Pokémon and this attack does 10 damage to each of them. (Don't apply Weakness and Resistance for Benched Pokémon.) If your opponent has fewer than 3 Benched Pokémon, do the damage to each of them."
       }
     ],
     "weaknesses": [
@@ -1824,8 +1824,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/29.png",
-      "large": "https://images.pokemontcg.io/base3/29_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/29/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/29/high.webp"
     }
   },
   {
@@ -1881,8 +1881,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/30.png",
-      "large": "https://images.pokemontcg.io/base3/30_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/30/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/30/high.webp"
     }
   },
   {
@@ -1946,8 +1946,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/31.png",
-      "large": "https://images.pokemontcg.io/base3/31_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/31/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/31/high.webp"
     }
   },
   {
@@ -1986,7 +1986,7 @@ const cardDetails: TcgCardDetail[] = [
           "Water"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30×",
+        "damage": "30x",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       }
     ],
@@ -2011,8 +2011,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/32.png",
-      "large": "https://images.pokemontcg.io/base3/32_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/32/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/32/high.webp"
     }
   },
   {
@@ -2074,8 +2074,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/33.png",
-      "large": "https://images.pokemontcg.io/base3/33_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/33/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/33/high.webp"
     }
   },
   {
@@ -2145,8 +2145,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/34.png",
-      "large": "https://images.pokemontcg.io/base3/34_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/34/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/34/high.webp"
     }
   },
   {
@@ -2209,8 +2209,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/35.png",
-      "large": "https://images.pokemontcg.io/base3/35_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/35/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/35/high.webp"
     }
   },
   {
@@ -2280,8 +2280,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/36.png",
-      "large": "https://images.pokemontcg.io/base3/36_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/36/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/36/high.webp"
     }
   },
   {
@@ -2348,8 +2348,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/37.png",
-      "large": "https://images.pokemontcg.io/base3/37_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/37/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/37/high.webp"
     }
   },
   {
@@ -2377,7 +2377,7 @@ const cardDetails: TcgCardDetail[] = [
           "Water"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Does 10 damage times the number of damage counters on Kingler."
       },
       {
@@ -2414,8 +2414,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/38.png",
-      "large": "https://images.pokemontcg.io/base3/38_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/38/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/38/high.webp"
     }
   },
   {
@@ -2432,7 +2432,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": null,
+    "evolvesFrom": "Magby",
     "evolvesTo": [
       "Magmortar"
     ],
@@ -2479,8 +2479,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/39.png",
-      "large": "https://images.pokemontcg.io/base3/39_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/39/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/39/high.webp"
     }
   },
   {
@@ -2510,7 +2510,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20+",
-        "text": "Does 20 damage plus 10 more damage for each Water Energy attached to Omastar but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
+        "text": "Does 20 damage plus 10 more damage for each Energy attached to Omastar but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
       },
       {
         "name": "Spike Cannon",
@@ -2519,7 +2519,7 @@ const cardDetails: TcgCardDetail[] = [
           "Water"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30×",
+        "damage": "30x",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       }
     ],
@@ -2543,8 +2543,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/40.png",
-      "large": "https://images.pokemontcg.io/base3/40_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/40/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/40/high.webp"
     }
   },
   {
@@ -2583,7 +2583,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 3 coins. This attack does 20 damage times the number of heads."
       }
     ],
@@ -2612,8 +2612,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/41.png",
-      "large": "https://images.pokemontcg.io/base3/41_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/41/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/41/high.webp"
     }
   },
   {
@@ -2645,7 +2645,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20+",
-        "text": "Does 20 damage plus 10 more damage for each Water Energy attached to Seadra but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
+        "text": "Does 20 damage plus 10 more damage for each Energy attached to Seadra but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
       },
       {
         "name": "Agility",
@@ -2679,8 +2679,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/42.png",
-      "large": "https://images.pokemontcg.io/base3/42_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/42/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/42/high.webp"
     }
   },
   {
@@ -2704,7 +2704,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Strange Behavior",
         "text": "As often as you like during your turn (before your attack), you may move 1 damage counter from 1 of your Pokémon to Slowbro as long as you don't Knock Out Slowbro. This power can't be used if Slowbro is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -2739,8 +2739,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/43.png",
-      "large": "https://images.pokemontcg.io/base3/43_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/43/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/43/high.webp"
     }
   },
   {
@@ -2800,8 +2800,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/44.png",
-      "large": "https://images.pokemontcg.io/base3/44_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/44/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/44/high.webp"
     }
   },
   {
@@ -2865,8 +2865,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/45.png",
-      "large": "https://images.pokemontcg.io/base3/45_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/45/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/45/high.webp"
     }
   },
   {
@@ -2902,8 +2902,8 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Wrap",
         "cost": [
-          "Grass",
-          "Colorless"
+          "Colorless",
+          "Grass"
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
@@ -2930,8 +2930,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/46.png",
-      "large": "https://images.pokemontcg.io/base3/46_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/46/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/46/high.webp"
     }
   },
   {
@@ -2962,7 +2962,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip a coin until you get tails. This attack does 10 damage times the number of heads."
       }
     ],
@@ -2986,8 +2986,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/47.png",
-      "large": "https://images.pokemontcg.io/base3/47_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/47/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/47/high.webp"
     }
   },
   {
@@ -3050,8 +3050,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/48.png",
-      "large": "https://images.pokemontcg.io/base3/48_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/48/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/48/high.webp"
     }
   },
   {
@@ -3103,8 +3103,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/49.png",
-      "large": "https://images.pokemontcg.io/base3/49_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/49/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/49/high.webp"
     }
   },
   {
@@ -3129,8 +3129,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Kabuto Armor",
-        "text": "Whenever an attack (even your own) does damage to Kabuto (after applying Weakness and Resistance), that attack does half the damage to Kabuto (rounded down to the nearest 10). (Any other effects of attacks still happen.) This power stops working while Kabuto is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "text": "Whenever an attack (even your own) does damage to Kabuto (after applying Weakness and Resistance), that attack only does half the damage to Kabuto (rounded down to nearest 10). (Any other effects of attacks still happen.) This power stops working while Kabuto is Asleep, Confused, or Paralyzed.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3164,8 +3164,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/50.png",
-      "large": "https://images.pokemontcg.io/base3/50_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/50/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/50/high.webp"
     }
   },
   {
@@ -3196,7 +3196,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your deck for a Basic Pokémon named Krabby and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench if full.)"
+        "text": "Search your deck for a Basic Pokémon named Krabby and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench is full.)"
       },
       {
         "name": "Irongrip",
@@ -3230,8 +3230,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/51.png",
-      "large": "https://images.pokemontcg.io/base3/51_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/51/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/51/high.webp"
     }
   },
   {
@@ -3257,7 +3257,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Clairvoyance",
         "text": "Your opponent plays with his or her hand face up. This power stops working while Omanyte is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3268,7 +3268,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "10+",
-        "text": "Does 10 damage plus 10 more damage for each Water Energy attached to Omanyte but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
+        "text": "Does 10 damage plus 10 more damage for each Energy attached to Omanyte but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
       }
     ],
     "weaknesses": [
@@ -3291,8 +3291,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/52.png",
-      "large": "https://images.pokemontcg.io/base3/52_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/52/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/52/high.webp"
     }
   },
   {
@@ -3331,7 +3331,7 @@ const cardDetails: TcgCardDetail[] = [
           "Water"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       }
     ],
@@ -3355,8 +3355,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/53.png",
-      "large": "https://images.pokemontcg.io/base3/53_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/53/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/53/high.webp"
     }
   },
   {
@@ -3419,8 +3419,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/54.png",
-      "large": "https://images.pokemontcg.io/base3/54_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/54/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/54/high.webp"
     }
   },
   {
@@ -3462,7 +3462,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "Discard 1 Psychic Energy card attached to Slowpoke in order to use this attack. Put a Trainer card from your discard pile into your hand."
+        "text": "Discard 1 Energy card attached to Slowpoke in order to use this attack. Put a Trainer card from your discard pile into your hand."
       }
     ],
     "weaknesses": [
@@ -3485,8 +3485,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/55.png",
-      "large": "https://images.pokemontcg.io/base3/55_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/55/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/55/high.webp"
     }
   },
   {
@@ -3512,7 +3512,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Cowardice",
         "text": "At any time during your turn (before your attack), you may return Tentacool to your hand. (Discard all cards attached to Tentacool.) This power can't be used the turn you put Tentacool into play or if Tentacool is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3544,8 +3544,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/56.png",
-      "large": "https://images.pokemontcg.io/base3/56_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/56/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/56/high.webp"
     }
   },
   {
@@ -3613,8 +3613,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/57.png",
-      "large": "https://images.pokemontcg.io/base3/57_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/57/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/57/high.webp"
     }
   },
   {
@@ -3645,8 +3645,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/58.png",
-      "large": "https://images.pokemontcg.io/base3/58_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/58/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/58/high.webp"
     }
   },
   {
@@ -3679,8 +3679,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/59.png",
-      "large": "https://images.pokemontcg.io/base3/59_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/59/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/59/high.webp"
     }
   },
   {
@@ -3711,8 +3711,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/60.png",
-      "large": "https://images.pokemontcg.io/base3/60_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/60/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/60/high.webp"
     }
   },
   {
@@ -3744,8 +3744,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/61.png",
-      "large": "https://images.pokemontcg.io/base3/61_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/61/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/61/high.webp"
     }
   },
   {
@@ -3776,8 +3776,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base3/62.png",
-      "large": "https://images.pokemontcg.io/base3/62_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base3/62/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base3/62/high.webp"
     }
   }
 ]

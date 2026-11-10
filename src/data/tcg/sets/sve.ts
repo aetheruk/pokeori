@@ -4,7 +4,7 @@ const setData: TcgSet = {
   "id": "sve",
   "name": "Scarlet & Violet Energies",
   "series": "Scarlet & Violet",
-  "total": 8,
+  "total": 24,
   "printedTotal": 8,
   "releaseDate": "2023/03/31",
   "images": {
@@ -29,8 +29,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/1.png",
-        "large": "https://images.pokemontcg.io/sve/1_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/001/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/001/high.webp"
       }
     },
     {
@@ -50,8 +50,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/2.png",
-        "large": "https://images.pokemontcg.io/sve/2_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/002/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/002/high.webp"
       }
     },
     {
@@ -71,8 +71,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/3.png",
-        "large": "https://images.pokemontcg.io/sve/3_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/003/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/003/high.webp"
       }
     },
     {
@@ -92,8 +92,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/4.png",
-        "large": "https://images.pokemontcg.io/sve/4_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/004/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/004/high.webp"
       }
     },
     {
@@ -113,8 +113,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/5.png",
-        "large": "https://images.pokemontcg.io/sve/5_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/005/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/005/high.webp"
       }
     },
     {
@@ -134,8 +134,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/6.png",
-        "large": "https://images.pokemontcg.io/sve/6_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/006/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/006/high.webp"
       }
     },
     {
@@ -155,8 +155,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/7.png",
-        "large": "https://images.pokemontcg.io/sve/7_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/007/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/007/high.webp"
       }
     },
     {
@@ -176,8 +176,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/8.png",
-        "large": "https://images.pokemontcg.io/sve/8_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/008/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/008/high.webp"
       }
     },
     {
@@ -197,8 +197,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/9.png",
-        "large": "https://images.pokemontcg.io/sve/9_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/009/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/009/high.webp"
       }
     },
     {
@@ -218,8 +218,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/10.png",
-        "large": "https://images.pokemontcg.io/sve/10_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/010/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/010/high.webp"
       }
     },
     {
@@ -239,8 +239,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/11.png",
-        "large": "https://images.pokemontcg.io/sve/11_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/011/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/011/high.webp"
       }
     },
     {
@@ -260,8 +260,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/12.png",
-        "large": "https://images.pokemontcg.io/sve/12_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/012/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/012/high.webp"
       }
     },
     {
@@ -281,8 +281,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/13.png",
-        "large": "https://images.pokemontcg.io/sve/13_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/013/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/013/high.webp"
       }
     },
     {
@@ -302,8 +302,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/14.png",
-        "large": "https://images.pokemontcg.io/sve/14_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/014/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/014/high.webp"
       }
     },
     {
@@ -323,8 +323,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/15.png",
-        "large": "https://images.pokemontcg.io/sve/15_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/015/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/015/high.webp"
       }
     },
     {
@@ -344,8 +344,160 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/sve/16.png",
-        "large": "https://images.pokemontcg.io/sve/16_hires.png"
+        "small": "https://assets.tcgdex.net/en/sv/sve/016/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/016/high.webp"
+      }
+    },
+    {
+      "id": "sve-17",
+      "name": "Grass Energy",
+      "number": "17",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/sv/sve/017/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/017/high.webp"
+      }
+    },
+    {
+      "id": "sve-18",
+      "name": "Fire Energy",
+      "number": "18",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/sv/sve/018/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/018/high.webp"
+      }
+    },
+    {
+      "id": "sve-19",
+      "name": "Water Energy",
+      "number": "19",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/sv/sve/019/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/019/high.webp"
+      }
+    },
+    {
+      "id": "sve-20",
+      "name": "Lightning Energy",
+      "number": "20",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/sv/sve/020/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/020/high.webp"
+      }
+    },
+    {
+      "id": "sve-21",
+      "name": "Psychic Energy",
+      "number": "21",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/sv/sve/021/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/021/high.webp"
+      }
+    },
+    {
+      "id": "sve-22",
+      "name": "Fighting Energy",
+      "number": "22",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/sv/sve/022/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/022/high.webp"
+      }
+    },
+    {
+      "id": "sve-23",
+      "name": "Darkness Energy",
+      "number": "23",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/sv/sve/023/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/023/high.webp"
+      }
+    },
+    {
+      "id": "sve-24",
+      "name": "Metal Energy",
+      "number": "24",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/sv/sve/024/low.webp",
+        "large": "https://assets.tcgdex.net/en/sv/sve/024/high.webp"
       }
     }
   ]

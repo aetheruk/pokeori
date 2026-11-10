@@ -15,7 +15,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": "Blaine's Growlithe",
+    "evolvesFrom": "Growlithe",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -47,7 +47,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -66,8 +66,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/1.png",
-      "large": "https://images.pokemontcg.io/gym2/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/1/high.webp"
     }
   },
   {
@@ -84,7 +84,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": "Blaine's Charmeleon",
+    "evolvesFrom": "Charmeleon",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -112,7 +112,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -136,8 +136,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/2.png",
-      "large": "https://images.pokemontcg.io/gym2/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/2/high.webp"
     }
   },
   {
@@ -154,14 +154,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": "Brock's Vulpix",
+    "evolvesFrom": "Vulpix",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Shapeshift",
         "text": "Once during your turn (before your attack), you may attach an Evolution card from your hand to Brock's Ninetales. (This doesn't count as evolving Brock's Ninetales.) Treat Brock's Ninetales as if it were that Pokémon instead. It can't evolve, devolve, or use the Pokémon Power of that Pokémon. During your turn, you may discard the Evolution card attached to Brock's Ninetales. This power can't be used if Brock's Ninetales is Asleep, Confused, or Paralyzed. If Brock's Ninetales becomes Asleep, Confused, or Paralyzed, discard all Evolution cards attached to it.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -179,7 +179,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -196,8 +196,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/3.png",
-      "large": "https://images.pokemontcg.io/gym2/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/3/high.webp"
     }
   },
   {
@@ -214,7 +214,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Erika's Ivysaur",
+    "evolvesFrom": "Ivysaur",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -244,7 +244,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -262,8 +262,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/4.png",
-      "large": "https://images.pokemontcg.io/gym2/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/4/high.webp"
     }
   },
   {
@@ -280,7 +280,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Water"
     ],
-    "evolvesFrom": "Giovanni's Magikarp",
+    "evolvesFrom": "Magikarp",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -310,7 +310,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -334,8 +334,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/5.png",
-      "large": "https://images.pokemontcg.io/gym2/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/5/high.webp"
     }
   },
   {
@@ -352,14 +352,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Giovanni's Machoke",
+    "evolvesFrom": "Machoke",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Fortitude",
         "text": "If Giovanni's Machamp would be Knocked Out by an opponent's attack, flip a coin. If heads, Giovanni's Machamp is not Knocked Out and its remaining HP become 10 instead. This power can't be used if Giovanni's Machamp is already Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -372,14 +372,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "30×",
+        "damage": "30x",
         "text": "Flip 4 coins. This attack does 30 damage times the number of heads."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -398,8 +398,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/6.png",
-      "large": "https://images.pokemontcg.io/gym2/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/6/high.webp"
     }
   },
   {
@@ -416,7 +416,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Giovanni's Nidorino",
+    "evolvesFrom": "Nidorino",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -446,7 +446,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -465,8 +465,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/7.png",
-      "large": "https://images.pokemontcg.io/gym2/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/7/high.webp"
     }
   },
   {
@@ -483,14 +483,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Colorless"
     ],
-    "evolvesFrom": "Giovanni's Meowth",
+    "evolvesFrom": "Meowth",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Call the Boss",
         "text": "When you play Giovanni's Persian from your hand, you may search your deck for the Trainer card named Giovanni, show it to your opponent, and put it into your hand. Shuffle your deck afterward.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -509,7 +509,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -519,7 +519,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       53
     ],
@@ -529,8 +529,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/8.png",
-      "large": "https://images.pokemontcg.io/gym2/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/8/high.webp"
     }
   },
   {
@@ -547,7 +547,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Koga's Kakuna",
+    "evolvesFrom": "Kakuna",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -570,14 +570,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "70",
+        "damage": "",
         "text": "Flip a coin. If tails, this attack does nothing. Either way, you can't use this attack again as long as Koga's Beedrill stays in play (even putting Koga's Beedrill on the Bench won't let you use it again)."
       }
     ],
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -587,7 +587,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       15
     ],
@@ -597,8 +597,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/9.png",
-      "large": "https://images.pokemontcg.io/gym2/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/9/high.webp"
     }
   },
   {
@@ -642,7 +642,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -664,8 +664,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/10.png",
-      "large": "https://images.pokemontcg.io/gym2/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/10/high.webp"
     }
   },
   {
@@ -682,7 +682,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Lightning"
     ],
-    "evolvesFrom": "Lt. Surge's Pikachu",
+    "evolvesFrom": "Pikachu",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -713,7 +713,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -731,8 +731,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/11.png",
-      "large": "https://images.pokemontcg.io/gym2/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/11/high.webp"
     }
   },
   {
@@ -749,7 +749,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Water"
     ],
-    "evolvesFrom": "Misty's Psyduck",
+    "evolvesFrom": "Psyduck",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -778,7 +778,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -795,8 +795,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/12.png",
-      "large": "https://images.pokemontcg.io/gym2/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/12/high.webp"
     }
   },
   {
@@ -813,14 +813,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Water"
     ],
-    "evolvesFrom": "Misty's Magikarp",
+    "evolvesFrom": "Magikarp",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Rebellion",
         "text": "Whenever Misty's Gyarados attacks, flip 2 coins. If both of them are tails, that attack does nothing. Instead, shuffle Misty's Gyarados and all cards attached to it into your deck. (This power works even if Misty's Gyarados is Confused.)",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -840,7 +840,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -864,8 +864,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/13.png",
-      "large": "https://images.pokemontcg.io/gym2/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/13/high.webp"
     }
   },
   {
@@ -922,7 +922,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -940,8 +940,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/14.png",
-      "large": "https://images.pokemontcg.io/gym2/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/14/high.webp"
     }
   },
   {
@@ -1006,8 +1006,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/15.png",
-      "large": "https://images.pokemontcg.io/gym2/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/15/high.webp"
     }
   },
   {
@@ -1024,14 +1024,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Psychic"
     ],
-    "evolvesFrom": "Sabrina's Kadabra",
+    "evolvesFrom": "Kadabra",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Psylink",
         "text": "Sabrina's Alakazam always has a copy of every attack your Psychic Pokémon in play have (including their Energy costs and anything else required in order to use those attacks, such as discarding Energy cards). This power can't be used if Sabrina's Alakazam is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1051,7 +1051,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1070,8 +1070,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/16.png",
-      "large": "https://images.pokemontcg.io/gym2/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/16/high.webp"
     }
   },
   {
@@ -1102,8 +1102,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/17.png",
-      "large": "https://images.pokemontcg.io/gym2/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/17/high.webp"
     }
   },
   {
@@ -1134,8 +1134,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/18.png",
-      "large": "https://images.pokemontcg.io/gym2/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/18/high.webp"
     }
   },
   {
@@ -1166,8 +1166,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/19.png",
-      "large": "https://images.pokemontcg.io/gym2/19_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/19/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/19/high.webp"
     }
   },
   {
@@ -1198,8 +1198,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/20.png",
-      "large": "https://images.pokemontcg.io/gym2/20_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/20/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/20/high.webp"
     }
   },
   {
@@ -1216,14 +1216,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": "Blaine's Vulpix",
+    "evolvesFrom": "Vulpix",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Healing Fire",
         "text": "Whenever you attach a Fire Energy card from your hand to Blaine's Ninetales, remove 1 damage counter from it, if it has any. This power stops working when Blaine's Ninetales is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1241,7 +1241,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1259,8 +1259,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/21.png",
-      "large": "https://images.pokemontcg.io/gym2/21_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/21/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/21/high.webp"
     }
   },
   {
@@ -1277,7 +1277,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Brock's Diglett",
+    "evolvesFrom": "Diglett",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -1299,14 +1299,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "60",
+        "damage": "",
         "text": "This attack can't be used unless Brock's Dugtrio used its Lie Low attack last turn."
       }
     ],
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1328,8 +1328,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/22.png",
-      "large": "https://images.pokemontcg.io/gym2/22_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/22/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/22/high.webp"
     }
   },
   {
@@ -1346,7 +1346,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Giovanni's Nidorina",
+    "evolvesFrom": "Nidorina",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -1378,7 +1378,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1397,8 +1397,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/23.png",
-      "large": "https://images.pokemontcg.io/gym2/23_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/23/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/23/high.webp"
     }
   },
   {
@@ -1445,7 +1445,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1463,8 +1463,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/24.png",
-      "large": "https://images.pokemontcg.io/gym2/24_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/24/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/24/high.webp"
     }
   },
   {
@@ -1481,7 +1481,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Koga's Ekans",
+    "evolvesFrom": "Ekans",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -1502,14 +1502,14 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20",
+        "damage": "",
         "text": "If Koga's Arbok is Poisoned, this attack's base damage is 40 instead of 20 and the Defending Pokémon is now Poisoned."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1527,8 +1527,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/25.png",
-      "large": "https://images.pokemontcg.io/gym2/25_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/25/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/25/high.webp"
     }
   },
   {
@@ -1545,14 +1545,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Koga's Grimer",
+    "evolvesFrom": "Grimer",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Energy Drain",
         "text": "If an opponent's attack does damage to Koga's Muk (even if Koga's Muk is Knocked Out), flip a coin. If heads and if it has any, choose 1 Energy card attached to the attacking Pokémon and discard it. This power can't be used if Koga's Muk is already Asleep, Confused, or Paralyzed when your opponent attacks.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1571,7 +1571,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1590,8 +1590,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/26.png",
-      "large": "https://images.pokemontcg.io/gym2/26_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/26/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/26/high.webp"
     }
   },
   {
@@ -1608,7 +1608,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Colorless"
     ],
-    "evolvesFrom": "Koga's Pidgey",
+    "evolvesFrom": "Pidgey",
     "evolvesTo": [
       "Pidgeot"
     ],
@@ -1623,7 +1623,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "30×",
+        "damage": "30x",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       },
       {
@@ -1642,7 +1642,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1652,7 +1652,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       17
     ],
@@ -1662,8 +1662,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/27.png",
-      "large": "https://images.pokemontcg.io/gym2/27_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/27/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/27/high.webp"
     }
   },
   {
@@ -1680,7 +1680,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Lightning"
     ],
-    "evolvesFrom": "Lt. Surge's Eevee",
+    "evolvesFrom": "Eevee",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -1710,7 +1710,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1727,8 +1727,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/28.png",
-      "large": "https://images.pokemontcg.io/gym2/28_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/28/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/28/high.webp"
     }
   },
   {
@@ -1745,7 +1745,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Psychic"
     ],
-    "evolvesFrom": "Sabrina's Haunter",
+    "evolvesFrom": "Haunter",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -1793,8 +1793,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/29.png",
-      "large": "https://images.pokemontcg.io/gym2/29_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/29/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/29/high.webp"
     }
   },
   {
@@ -1811,7 +1811,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Water"
     ],
-    "evolvesFrom": "Sabrina's Psyduck",
+    "evolvesFrom": "Psyduck",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -1841,7 +1841,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1859,8 +1859,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/30.png",
-      "large": "https://images.pokemontcg.io/gym2/30_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/30/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/30/high.webp"
     }
   },
   {
@@ -1877,7 +1877,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": "Blaine's Charmander",
+    "evolvesFrom": "Charmander",
     "evolvesTo": [
       "Charizard"
     ],
@@ -1902,14 +1902,14 @@ const cardDetails: TcgCardDetail[] = [
           "Fire"
         ],
         "convertedEnergyCost": 3,
-        "damage": "",
+        "damage": "10",
         "text": "Flip 3 coins. For each heads, discard 1 Fire Energy card attached to Blaine's Charmeleon. If you can't discard Energy cards, this attack does nothing. This attack does 10 damage times the number of heads to each of your opponent's Pokémon. Don't apply Weakness and Resistance for this attack. (Any other effects that would happen after applying Weakness and Resistance still happen.)"
       }
     ],
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1927,8 +1927,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/31.png",
-      "large": "https://images.pokemontcg.io/gym2/31_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/31/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/31/high.webp"
     }
   },
   {
@@ -1945,7 +1945,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Colorless"
     ],
-    "evolvesFrom": "Blaine's Doduo",
+    "evolvesFrom": "Doduo",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -1957,14 +1957,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "50",
+        "damage": "",
         "text": "Flip a coin. If tails, this attack does nothing."
       }
     ],
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1986,8 +1986,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/32.png",
-      "large": "https://images.pokemontcg.io/gym2/32_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/32/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/32/high.webp"
     }
   },
   {
@@ -2004,7 +2004,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fire"
     ],
-    "evolvesFrom": "Blaine's Ponyta",
+    "evolvesFrom": "Ponyta",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -2033,12 +2033,12 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       78
     ],
@@ -2048,8 +2048,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/33.png",
-      "large": "https://images.pokemontcg.io/gym2/33_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/33/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/33/high.webp"
     }
   },
   {
@@ -2066,7 +2066,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Brock's Geodude",
+    "evolvesFrom": "Geodude",
     "evolvesTo": [
       "Golem"
     ],
@@ -2098,7 +2098,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2116,8 +2116,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/34.png",
-      "large": "https://images.pokemontcg.io/gym2/34_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/34/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/34/high.webp"
     }
   },
   {
@@ -2134,14 +2134,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Brock's Mankey",
+    "evolvesFrom": "Mankey",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Scram",
         "text": "If Brock's Primeape ever has exactly 10 HP left, shuffle it and all cards attached to it into your deck. This power stops working while Brock's Primeape is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -2160,7 +2160,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2177,8 +2177,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/35.png",
-      "large": "https://images.pokemontcg.io/gym2/35_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/35/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/35/high.webp"
     }
   },
   {
@@ -2195,7 +2195,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Brock's Sandshrew",
+    "evolvesFrom": "Sandshrew",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -2217,14 +2217,14 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30",
+        "damage": "",
         "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
       }
     ],
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -2246,8 +2246,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/36.png",
-      "large": "https://images.pokemontcg.io/gym2/36_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/36/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/36/high.webp"
     }
   },
   {
@@ -2294,7 +2294,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2311,8 +2311,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/37.png",
-      "large": "https://images.pokemontcg.io/gym2/37_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/37/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/37/high.webp"
     }
   },
   {
@@ -2338,7 +2338,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Soak Up",
         "text": "Once during your turn (before your attack), you may take up to 2 Grass Energy cards attached to your other Pokémon and attach them to Erika's Bellsprout. This power can't be used if Erika's Bellsprout is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -2348,14 +2348,14 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 1,
-        "damage": "",
+        "damage": "10",
         "text": "Choose 1 of your opponent's Benched Pokémon, and this attack does 10 damage to it. (Don't apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2372,8 +2372,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/38.png",
-      "large": "https://images.pokemontcg.io/gym2/38_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/38/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/38/high.webp"
     }
   },
   {
@@ -2420,7 +2420,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2437,8 +2437,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/39.png",
-      "large": "https://images.pokemontcg.io/gym2/39_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/39/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/39/high.webp"
     }
   },
   {
@@ -2485,7 +2485,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -2507,8 +2507,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/40.png",
-      "large": "https://images.pokemontcg.io/gym2/40_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/40/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/40/high.webp"
     }
   },
   {
@@ -2525,7 +2525,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Erika's Bulbasaur",
+    "evolvesFrom": "Bulbasaur",
     "evolvesTo": [
       "Venusaur"
     ],
@@ -2534,7 +2534,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Relaxing Scent",
         "text": "As long as Erika's Ivysaur is your Active Pokémon, whenever an attack (even your own) does damage to any Pokémon (after applying Weakness and Resistance), that attack only does half the damage to that Pokémon (rounded up to the nearest 10). (Any other effects of attacks still happen.) This power stops working while Erika's Ivysaur is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -2546,14 +2546,14 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 3,
-        "damage": "40×",
+        "damage": "40x",
         "text": "Flip 2 coins. This attack does 40 damage times the number of heads."
       }
     ],
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2571,8 +2571,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/41.png",
-      "large": "https://images.pokemontcg.io/gym2/41_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/41/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/41/high.webp"
     }
   },
   {
@@ -2589,7 +2589,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Giovanni's Machop",
+    "evolvesFrom": "Machop",
     "evolvesTo": [
       "Machamp"
     ],
@@ -2602,7 +2602,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "60",
+        "damage": "",
         "text": "Flip a coin. If tails, this attack does no damage to the Defending Pokémon and Giovanni's Machoke does 100 damage to itself."
       },
       {
@@ -2620,7 +2620,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2638,8 +2638,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/42.png",
-      "large": "https://images.pokemontcg.io/gym2/42_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/42/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/42/high.webp"
     }
   },
   {
@@ -2679,14 +2679,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 2 coins. This attack does 20 damage times the number of heads."
       }
     ],
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -2708,8 +2708,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/43.png",
-      "large": "https://images.pokemontcg.io/gym2/43_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/43/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/43/high.webp"
     }
   },
   {
@@ -2726,7 +2726,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Giovanni's Nidoran ♀",
+    "evolvesFrom": "Nidoran♀",
     "evolvesTo": [
       "Nidoqueen"
     ],
@@ -2740,7 +2740,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30",
+        "damage": "",
         "text": "Giovanni's Nidorina does 20 damage to itself. Flip a coin. If heads, the Defending Pokémon is now Poisoned."
       },
       {
@@ -2758,7 +2758,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2776,8 +2776,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/44.png",
-      "large": "https://images.pokemontcg.io/gym2/44_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/44/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/44/high.webp"
     }
   },
   {
@@ -2794,7 +2794,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Giovanni's Nidoran ♂",
+    "evolvesFrom": "Nidoran♂",
     "evolvesTo": [
       "Nidoking"
     ],
@@ -2816,7 +2816,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2834,8 +2834,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/45.png",
-      "large": "https://images.pokemontcg.io/gym2/45_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/45/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/45/high.webp"
     }
   },
   {
@@ -2852,7 +2852,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Koga's Zubat",
+    "evolvesFrom": "Zubat",
     "evolvesTo": [
       "Crobat"
     ],
@@ -2884,7 +2884,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -2894,7 +2894,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       42
     ],
@@ -2904,8 +2904,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/46.png",
-      "large": "https://images.pokemontcg.io/gym2/46_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/46/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/46/high.webp"
     }
   },
   {
@@ -2922,7 +2922,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Koga's Weedle",
+    "evolvesFrom": "Weedle",
     "evolvesTo": [
       "Beedrill"
     ],
@@ -2931,7 +2931,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Emerge",
         "text": "Once during your turn (before your attack), you may flip a coin. If heads, search your deck for an Evolution card named Koga's Beedrill and put it on Koga's Kakuna. (This counts as evolving Koga's Kakuna.) Shuffle your deck afterward. This power can't be used if Koga's Kakuna is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -2948,7 +2948,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2966,8 +2966,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/47.png",
-      "large": "https://images.pokemontcg.io/gym2/47_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/47/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/47/high.webp"
     }
   },
   {
@@ -3014,7 +3014,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3031,8 +3031,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/48.png",
-      "large": "https://images.pokemontcg.io/gym2/48_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/48/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/48/high.webp"
     }
   },
   {
@@ -3079,7 +3079,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -3101,8 +3101,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/49.png",
-      "large": "https://images.pokemontcg.io/gym2/49_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/49/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/49/high.webp"
     }
   },
   {
@@ -3119,7 +3119,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Koga's Koffing",
+    "evolvesFrom": "Koffing",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -3142,14 +3142,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "20",
-        "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned. It now takes 20 Poison damage instead of 10 after each player's turn (even if it was already Poisoned)."
+        "damage": "",
+        "text": "Flip a coin. If heads, this Defending Pokémon is now Poisoned. It now takes 20 Poison damage instead of 10 after each player's turn (even if it was already Poisoned)."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3167,8 +3167,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/50.png",
-      "large": "https://images.pokemontcg.io/gym2/50_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/50/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/50/high.webp"
     }
   },
   {
@@ -3222,7 +3222,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -3244,8 +3244,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/51.png",
-      "large": "https://images.pokemontcg.io/gym2/51_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/51/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/51/high.webp"
     }
   },
   {
@@ -3262,14 +3262,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Lightning"
     ],
-    "evolvesFrom": "Lt. Surge's Voltorb",
+    "evolvesFrom": "Voltorb",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Shock Blast",
         "text": "If Lt. Surge's Electrode is your Active Pokémon and gets damaged (even if it's Knocked Out), flip a coin. If tails, this power does 20 damage to each Active Pokémon. This power works even if Lt. Surge's Electrode is already Asleep, Confused, or Paralyzed when it takes damage.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3288,7 +3288,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3306,8 +3306,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/52.png",
-      "large": "https://images.pokemontcg.io/gym2/52_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/52/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/52/high.webp"
     }
   },
   {
@@ -3324,7 +3324,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Colorless"
     ],
-    "evolvesFrom": "Lt. Surge's Rattata",
+    "evolvesFrom": "Rattata",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -3352,7 +3352,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -3374,8 +3374,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/53.png",
-      "large": "https://images.pokemontcg.io/gym2/53_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/53/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/53/high.webp"
     }
   },
   {
@@ -3392,7 +3392,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Water"
     ],
-    "evolvesFrom": "Misty's Seel",
+    "evolvesFrom": "Seel",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -3404,7 +3404,7 @@ const cardDetails: TcgCardDetail[] = [
           "Water"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20",
+        "damage": "",
         "text": "If the Defending Pokémon is Fighting, this attack's base damage is doubled."
       },
       {
@@ -3423,7 +3423,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3441,8 +3441,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/54.png",
-      "large": "https://images.pokemontcg.io/gym2/54_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/54/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/54/high.webp"
     }
   },
   {
@@ -3459,7 +3459,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Psychic"
     ],
-    "evolvesFrom": "Sabrina's Gastly",
+    "evolvesFrom": "Gastly",
     "evolvesTo": [
       "Gengar"
     ],
@@ -3496,7 +3496,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       93
     ],
@@ -3506,8 +3506,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/55.png",
-      "large": "https://images.pokemontcg.io/gym2/55_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/55/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/55/high.webp"
     }
   },
   {
@@ -3524,7 +3524,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Psychic"
     ],
-    "evolvesFrom": "Sabrina's Drowzee",
+    "evolvesFrom": "Drowzee",
     "evolvesTo": [],
     "rules": [],
     "abilities": [],
@@ -3545,14 +3545,14 @@ const cardDetails: TcgCardDetail[] = [
           "Psychic"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip a number of coins equal to the number of damage counters on the Defending Pokémon. This attack does 20 damage times the number of heads."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3570,8 +3570,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/56.png",
-      "large": "https://images.pokemontcg.io/gym2/56_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/56/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/56/high.webp"
     }
   },
   {
@@ -3616,7 +3616,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3633,8 +3633,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/57.png",
-      "large": "https://images.pokemontcg.io/gym2/57_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/57/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/57/high.webp"
     }
   },
   {
@@ -3651,7 +3651,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Psychic"
     ],
-    "evolvesFrom": "Sabrina's Abra",
+    "evolvesFrom": "Abra",
     "evolvesTo": [
       "Alakazam"
     ],
@@ -3682,7 +3682,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3699,8 +3699,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/58.png",
-      "large": "https://images.pokemontcg.io/gym2/58_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/58/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/58/high.webp"
     }
   },
   {
@@ -3729,14 +3729,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "",
+        "damage": "10",
         "text": "Choose 1 of your opponent's Pokémon and flip 3 coins. This attack does 10 damage times the number of heads to that Pokémon. Don't apply Weakness and Resistance for this attack."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3753,8 +3753,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/59.png",
-      "large": "https://images.pokemontcg.io/gym2/59_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/59/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/59/high.webp"
     }
   },
   {
@@ -3791,7 +3791,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3808,8 +3808,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/60.png",
-      "large": "https://images.pokemontcg.io/gym2/60_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/60/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/60/high.webp"
     }
   },
   {
@@ -3839,7 +3839,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "20",
+        "damage": "",
         "text": "Flip a coin. If tails, this attack does nothing."
       },
       {
@@ -3849,14 +3849,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Does 10 damage times the number of damage counters on Blaine's Doduo."
       }
     ],
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -3866,7 +3866,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       84
     ],
@@ -3876,8 +3876,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/61.png",
-      "large": "https://images.pokemontcg.io/gym2/61_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/61/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/61/high.webp"
     }
   },
   {
@@ -3925,7 +3925,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3942,8 +3942,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/62.png",
-      "large": "https://images.pokemontcg.io/gym2/62_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/62/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/62/high.webp"
     }
   },
   {
@@ -3982,19 +3982,19 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       56
     ],
@@ -4004,8 +4004,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/63.png",
-      "large": "https://images.pokemontcg.io/gym2/63_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/63/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/63/high.webp"
     }
   },
   {
@@ -4043,7 +4043,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4060,8 +4060,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/64.png",
-      "large": "https://images.pokemontcg.io/gym2/64_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/64/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/64/high.webp"
     }
   },
   {
@@ -4091,7 +4091,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "30",
+        "damage": "",
         "text": "Flip a coin. If tails, this attack does nothing."
       },
       {
@@ -4109,7 +4109,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4132,8 +4132,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/65.png",
-      "large": "https://images.pokemontcg.io/gym2/65_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/65/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/65/high.webp"
     }
   },
   {
@@ -4179,7 +4179,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4196,8 +4196,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/66.png",
-      "large": "https://images.pokemontcg.io/gym2/66_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/66/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/66/high.webp"
     }
   },
   {
@@ -4227,7 +4227,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "20",
+        "damage": "",
         "text": "Flip a coin. If tails, this attack does nothing."
       },
       {
@@ -4244,7 +4244,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4266,8 +4266,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/67.png",
-      "large": "https://images.pokemontcg.io/gym2/67_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/67/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/67/high.webp"
     }
   },
   {
@@ -4297,14 +4297,14 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       }
     ],
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4321,8 +4321,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/68.png",
-      "large": "https://images.pokemontcg.io/gym2/68_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/68/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/68/high.webp"
     }
   },
   {
@@ -4362,14 +4362,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "40-",
+        "damage": "",
         "text": "If the Defending Pokémon has no damage counters on it, this attack does 40 damage. If it has any damage counters on it, this attack does 10 damage."
       }
     ],
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4391,8 +4391,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/69.png",
-      "large": "https://images.pokemontcg.io/gym2/69_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/69/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/69/high.webp"
     }
   },
   {
@@ -4429,7 +4429,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4446,8 +4446,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/70.png",
-      "large": "https://images.pokemontcg.io/gym2/70_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/70/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/70/high.webp"
     }
   },
   {
@@ -4494,7 +4494,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4511,8 +4511,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/71.png",
-      "large": "https://images.pokemontcg.io/gym2/71_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/71/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/71/high.webp"
     }
   },
   {
@@ -4552,14 +4552,14 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip a coin. If heads, this attack does 20 damage times the number of damage counters on Giovanni's Machop."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4576,8 +4576,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/72.png",
-      "large": "https://images.pokemontcg.io/gym2/72_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/72/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/72/high.webp"
     }
   },
   {
@@ -4607,7 +4607,7 @@ const cardDetails: TcgCardDetail[] = [
           "Water"
         ],
         "convertedEnergyCost": 1,
-        "damage": "40",
+        "damage": "",
         "text": "Flip a coin. If tails, this attack does nothing. Either way, you can't use this attack again as long as Giovanni's Magikarp stays in play (even putting Giovanni's Magikarp on the Bench won't let you use it again)."
       },
       {
@@ -4617,14 +4617,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       }
     ],
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4641,8 +4641,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/73.png",
-      "large": "https://images.pokemontcg.io/gym2/73_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/73/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/73/high.webp"
     }
   },
   {
@@ -4690,7 +4690,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4713,8 +4713,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/74.png",
-      "large": "https://images.pokemontcg.io/gym2/74_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/74/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/74/high.webp"
     }
   },
   {
@@ -4744,7 +4744,7 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 1,
-        "damage": "20",
+        "damage": "",
         "text": "Flip a coin. If tails, this attack does nothing."
       },
       {
@@ -4761,7 +4761,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4778,8 +4778,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/75.png",
-      "large": "https://images.pokemontcg.io/gym2/75_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/75/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/75/high.webp"
     }
   },
   {
@@ -4809,7 +4809,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 2 coins. This attack does 10 damage times the number of heads."
       },
       {
@@ -4825,7 +4825,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4842,8 +4842,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/76.png",
-      "large": "https://images.pokemontcg.io/gym2/76_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/76/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/76/high.webp"
     }
   },
   {
@@ -4873,14 +4873,14 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10",
+        "damage": "",
         "text": "Flip 2 coins. If both are heads, the Defending Pokémon is now Confused and Poisoned."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4897,8 +4897,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/77.png",
-      "large": "https://images.pokemontcg.io/gym2/77_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/77/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/77/high.webp"
     }
   },
   {
@@ -4928,7 +4928,7 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 1,
-        "damage": "",
+        "damage": "10",
         "text": "If your opponent has any Benched Pokémon, flip a coin. If heads, choose 1 of your opponent's Benched Pokémon and switch it with the Defending Pokémon. The new Defending Pokémon is now Poisoned."
       },
       {
@@ -4945,7 +4945,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4962,8 +4962,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/78.png",
-      "large": "https://images.pokemontcg.io/gym2/78_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/78/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/78/high.webp"
     }
   },
   {
@@ -5000,7 +5000,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5017,8 +5017,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/79.png",
-      "large": "https://images.pokemontcg.io/gym2/79_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/79/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/79/high.webp"
     }
   },
   {
@@ -5066,7 +5066,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -5088,8 +5088,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/80.png",
-      "large": "https://images.pokemontcg.io/gym2/80_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/80/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/80/high.webp"
     }
   },
   {
@@ -5136,7 +5136,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5154,8 +5154,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/81.png",
-      "large": "https://images.pokemontcg.io/gym2/81_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/81/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/81/high.webp"
     }
   },
   {
@@ -5195,14 +5195,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10",
+        "damage": "",
         "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned; if tails, the Defending Pokémon is now Paralyzed."
       }
     ],
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5219,8 +5219,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/82.png",
-      "large": "https://images.pokemontcg.io/gym2/82_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/82/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/82/high.webp"
     }
   },
   {
@@ -5251,14 +5251,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Does 10 damage times the number of Koga's Zubats you have in play. Before doing damage, you may search your deck for any number of Basic Pokémon named Koga's Zubat and put them onto your Bench. (You can't get more cards with this attack than you have room on your Bench.) If you do, shuffle your deck afterward."
       }
     ],
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -5268,7 +5268,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       41
     ],
@@ -5278,8 +5278,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/83.png",
-      "large": "https://images.pokemontcg.io/gym2/83_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/83/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/83/high.webp"
     }
   },
   {
@@ -5317,12 +5317,12 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       25
     ],
@@ -5332,8 +5332,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/84.png",
-      "large": "https://images.pokemontcg.io/gym2/84_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/84/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/84/high.webp"
     }
   },
   {
@@ -5380,7 +5380,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -5390,7 +5390,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       19
     ],
@@ -5400,8 +5400,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/85.png",
-      "large": "https://images.pokemontcg.io/gym2/85_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/85/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/85/high.webp"
     }
   },
   {
@@ -5439,7 +5439,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5456,8 +5456,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/86.png",
-      "large": "https://images.pokemontcg.io/gym2/86_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/86/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/86/high.webp"
     }
   },
   {
@@ -5495,12 +5495,12 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       116
     ],
@@ -5510,8 +5510,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/87.png",
-      "large": "https://images.pokemontcg.io/gym2/87_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/87/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/87/high.webp"
     }
   },
   {
@@ -5557,7 +5557,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5574,8 +5574,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/88.png",
-      "large": "https://images.pokemontcg.io/gym2/88_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/88/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/88/high.webp"
     }
   },
   {
@@ -5622,7 +5622,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5639,8 +5639,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/89.png",
-      "large": "https://images.pokemontcg.io/gym2/89_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/89/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/89/high.webp"
     }
   },
   {
@@ -5677,7 +5677,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5694,8 +5694,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/90.png",
-      "large": "https://images.pokemontcg.io/gym2/90_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/90/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/90/high.webp"
     }
   },
   {
@@ -5742,7 +5742,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5759,8 +5759,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/91.png",
-      "large": "https://images.pokemontcg.io/gym2/91_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/91/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/91/high.webp"
     }
   },
   {
@@ -5797,7 +5797,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5814,8 +5814,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/92.png",
-      "large": "https://images.pokemontcg.io/gym2/92_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/92/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/92/high.webp"
     }
   },
   {
@@ -5862,12 +5862,12 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       63
     ],
@@ -5877,8 +5877,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/93.png",
-      "large": "https://images.pokemontcg.io/gym2/93_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/93/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/93/high.webp"
     }
   },
   {
@@ -5924,7 +5924,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5941,8 +5941,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/94.png",
-      "large": "https://images.pokemontcg.io/gym2/94_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/94/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/94/high.webp"
     }
   },
   {
@@ -5989,7 +5989,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -6006,8 +6006,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/95.png",
-      "large": "https://images.pokemontcg.io/gym2/95_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/95/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/95/high.webp"
     }
   },
   {
@@ -6059,7 +6059,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       92
     ],
@@ -6069,8 +6069,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/96.png",
-      "large": "https://images.pokemontcg.io/gym2/96_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/96/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/96/high.webp"
     }
   },
   {
@@ -6096,7 +6096,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Gaseous Form",
         "text": "Sabrina's Gastly gets +10 HP for each Psychic Energy card attached to it. This power works even if Sabrina's Gastly is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -6131,8 +6131,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/97.png",
-      "large": "https://images.pokemontcg.io/gym2/97_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/97/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/97/high.webp"
     }
   },
   {
@@ -6179,7 +6179,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -6201,8 +6201,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/98.png",
-      "large": "https://images.pokemontcg.io/gym2/98_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/98/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/98/high.webp"
     }
   },
   {
@@ -6248,7 +6248,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -6265,8 +6265,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/99.png",
-      "large": "https://images.pokemontcg.io/gym2/99_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/99/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/99/high.webp"
     }
   },
   {
@@ -6297,8 +6297,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/100.png",
-      "large": "https://images.pokemontcg.io/gym2/100_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/100/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/100/high.webp"
     }
   },
   {
@@ -6329,8 +6329,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/101.png",
-      "large": "https://images.pokemontcg.io/gym2/101_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/101/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/101/high.webp"
     }
   },
   {
@@ -6364,8 +6364,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/102.png",
-      "large": "https://images.pokemontcg.io/gym2/102_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/102/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/102/high.webp"
     }
   },
   {
@@ -6396,8 +6396,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/103.png",
-      "large": "https://images.pokemontcg.io/gym2/103_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/103/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/103/high.webp"
     }
   },
   {
@@ -6428,8 +6428,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/104.png",
-      "large": "https://images.pokemontcg.io/gym2/104_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/104/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/104/high.webp"
     }
   },
   {
@@ -6460,8 +6460,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/105.png",
-      "large": "https://images.pokemontcg.io/gym2/105_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/105/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/105/high.webp"
     }
   },
   {
@@ -6492,8 +6492,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/106.png",
-      "large": "https://images.pokemontcg.io/gym2/106_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/106/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/106/high.webp"
     }
   },
   {
@@ -6524,8 +6524,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/107.png",
-      "large": "https://images.pokemontcg.io/gym2/107_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/107/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/107/high.webp"
     }
   },
   {
@@ -6556,8 +6556,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/108.png",
-      "large": "https://images.pokemontcg.io/gym2/108_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/108/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/108/high.webp"
     }
   },
   {
@@ -6591,8 +6591,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/109.png",
-      "large": "https://images.pokemontcg.io/gym2/109_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/109/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/109/high.webp"
     }
   },
   {
@@ -6623,8 +6623,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/110.png",
-      "large": "https://images.pokemontcg.io/gym2/110_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/110/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/110/high.webp"
     }
   },
   {
@@ -6655,8 +6655,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/111.png",
-      "large": "https://images.pokemontcg.io/gym2/111_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/111/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/111/high.webp"
     }
   },
   {
@@ -6687,8 +6687,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/112.png",
-      "large": "https://images.pokemontcg.io/gym2/112_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/112/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/112/high.webp"
     }
   },
   {
@@ -6722,8 +6722,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/113.png",
-      "large": "https://images.pokemontcg.io/gym2/113_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/113/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/113/high.webp"
     }
   },
   {
@@ -6757,8 +6757,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/114.png",
-      "large": "https://images.pokemontcg.io/gym2/114_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/114/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/114/high.webp"
     }
   },
   {
@@ -6789,8 +6789,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/115.png",
-      "large": "https://images.pokemontcg.io/gym2/115_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/115/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/115/high.webp"
     }
   },
   {
@@ -6821,8 +6821,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/116.png",
-      "large": "https://images.pokemontcg.io/gym2/116_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/116/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/116/high.webp"
     }
   },
   {
@@ -6853,8 +6853,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/117.png",
-      "large": "https://images.pokemontcg.io/gym2/117_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/117/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/117/high.webp"
     }
   },
   {
@@ -6885,8 +6885,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/118.png",
-      "large": "https://images.pokemontcg.io/gym2/118_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/118/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/118/high.webp"
     }
   },
   {
@@ -6920,8 +6920,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/119.png",
-      "large": "https://images.pokemontcg.io/gym2/119_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/119/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/119/high.webp"
     }
   },
   {
@@ -6952,8 +6952,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/120.png",
-      "large": "https://images.pokemontcg.io/gym2/120_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/120/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/120/high.webp"
     }
   },
   {
@@ -6984,8 +6984,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/121.png",
-      "large": "https://images.pokemontcg.io/gym2/121_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/121/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/121/high.webp"
     }
   },
   {
@@ -7019,8 +7019,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/122.png",
-      "large": "https://images.pokemontcg.io/gym2/122_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/122/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/122/high.webp"
     }
   },
   {
@@ -7054,8 +7054,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/123.png",
-      "large": "https://images.pokemontcg.io/gym2/123_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/123/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/123/high.webp"
     }
   },
   {
@@ -7086,8 +7086,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/124.png",
-      "large": "https://images.pokemontcg.io/gym2/124_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/124/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/124/high.webp"
     }
   },
   {
@@ -7118,8 +7118,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/125.png",
-      "large": "https://images.pokemontcg.io/gym2/125_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/125/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/125/high.webp"
     }
   },
   {
@@ -7150,8 +7150,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/126.png",
-      "large": "https://images.pokemontcg.io/gym2/126_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/126/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/126/high.webp"
     }
   },
   {
@@ -7159,13 +7159,15 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Fighting Energy",
     "number": "127",
     "artist": "Keiji Kinebuchi",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Energy",
     "subtypes": [
       "Basic"
     ],
     "hp": null,
-    "types": [],
+    "types": [
+      "Fighting"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [],
@@ -7184,8 +7186,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/127.png",
-      "large": "https://images.pokemontcg.io/gym2/127_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/127/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/127/high.webp"
     }
   },
   {
@@ -7193,13 +7195,15 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Fire Energy",
     "number": "128",
     "artist": "Keiji Kinebuchi",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Energy",
     "subtypes": [
       "Basic"
     ],
     "hp": null,
-    "types": [],
+    "types": [
+      "Fire"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [],
@@ -7218,8 +7222,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/128.png",
-      "large": "https://images.pokemontcg.io/gym2/128_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/128/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/128/high.webp"
     }
   },
   {
@@ -7227,13 +7231,15 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Grass Energy",
     "number": "129",
     "artist": "Keiji Kinebuchi",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Energy",
     "subtypes": [
       "Basic"
     ],
     "hp": null,
-    "types": [],
+    "types": [
+      "Grass"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [],
@@ -7252,8 +7258,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/129.png",
-      "large": "https://images.pokemontcg.io/gym2/129_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/129/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/129/high.webp"
     }
   },
   {
@@ -7261,7 +7267,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Lightning Energy",
     "number": "130",
     "artist": "Keiji Kinebuchi",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Energy",
     "subtypes": [
       "Basic"
@@ -7286,8 +7292,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/130.png",
-      "large": "https://images.pokemontcg.io/gym2/130_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/130/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/130/high.webp"
     }
   },
   {
@@ -7295,13 +7301,15 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Psychic Energy",
     "number": "131",
     "artist": "Keiji Kinebuchi",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Energy",
     "subtypes": [
       "Basic"
     ],
     "hp": null,
-    "types": [],
+    "types": [
+      "Psychic"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [],
@@ -7320,8 +7328,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/131.png",
-      "large": "https://images.pokemontcg.io/gym2/131_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/131/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/131/high.webp"
     }
   },
   {
@@ -7329,13 +7337,15 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Water Energy",
     "number": "132",
     "artist": "Keiji Kinebuchi",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Energy",
     "subtypes": [
       "Basic"
     ],
     "hp": null,
-    "types": [],
+    "types": [
+      "Water"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [],
@@ -7354,8 +7364,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/gym2/132.png",
-      "large": "https://images.pokemontcg.io/gym2/132_hires.png"
+      "small": "https://assets.tcgdex.net/en/gym/gym2/132/low.webp",
+      "large": "https://assets.tcgdex.net/en/gym/gym2/132/high.webp"
     }
   }
 ]

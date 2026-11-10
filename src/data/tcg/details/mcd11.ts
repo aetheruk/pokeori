@@ -24,11 +24,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Slam",
-        "cost": [
-          "Grass",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20×",
         "text": "Flip 2 coins. This attack does 20 damage times the number of heads."
       }
@@ -59,8 +56,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/1.png",
-      "large": "https://images.pokemontcg.io/mcd11/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/1/high.webp"
     }
   },
   {
@@ -84,21 +81,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Mega Drain",
-        "cost": [
-          "Grass"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
         "text": "Heal 20 damage from this Pokémon."
       },
       {
         "name": "Pin Missile",
-        "cost": [
-          "Grass",
-          "Grass",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 3,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20×",
         "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
       }
@@ -130,8 +121,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/2.png",
-      "large": "https://images.pokemontcg.io/mcd11/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/2/high.webp"
     }
   },
   {
@@ -157,11 +148,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Ember",
-        "cost": [
-          "Fire",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "30",
         "text": "Discard an Energy attached to this Pokémon."
       }
@@ -188,8 +176,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/3.png",
-      "large": "https://images.pokemontcg.io/mcd11/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/3/high.webp"
     }
   },
   {
@@ -215,11 +203,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Water Pulse",
-        "cost": [
-          "Water",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
         "text": "Flip a coin. If heads, the Defending Pokémon is now Asleep."
       }
@@ -245,8 +230,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/4.png",
-      "large": "https://images.pokemontcg.io/mcd11/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/4/high.webp"
     }
   },
   {
@@ -270,23 +255,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Pound",
-        "cost": [
-          "Colorless",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
         "text": ""
       },
       {
         "name": "Wave Splash",
-        "cost": [
-          "Water",
-          "Water",
-          "Colorless",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 4,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "60",
         "text": ""
       }
@@ -313,8 +290,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/5.png",
-      "large": "https://images.pokemontcg.io/mcd11/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/5/high.webp"
     }
   },
   {
@@ -340,11 +317,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Quick Attack",
-        "cost": [
-          "Lightning",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10+",
         "text": "Flip a coin. If heads, this attack does 20 more damage."
       }
@@ -370,8 +344,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/6.png",
-      "large": "https://images.pokemontcg.io/mcd11/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/6/high.webp"
     }
   },
   {
@@ -397,10 +371,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Yawn",
-        "cost": [
-          "Psychic"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
         "text": "The Defending Pokémon is now Asleep."
       }
@@ -426,8 +398,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/7.png",
-      "large": "https://images.pokemontcg.io/mcd11/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/7/high.webp"
     }
   },
   {
@@ -453,14 +425,10 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Sand Tomb",
-        "cost": [
-          "Fighting",
-          "Colorless",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 3,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "30",
-        "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+        "text": "The Defending Pokémon can’t retreat during your opponent’s next turn."
       }
     ],
     "weaknesses": [
@@ -478,15 +446,15 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       551
     ],
-    "flavorText": "It moves along below the sand's surface, except for its nose and eyes. A dark membrane shields its eyes from the sun.",
+    "flavorText": "It moves along below the sand’s surface, except for its nose and eyes. A dark membrane shields its eyes from the sun.",
     "legalities": {
       "unlimited": "Legal",
       "expanded": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/8.png",
-      "large": "https://images.pokemontcg.io/mcd11/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/8/high.webp"
     }
   },
   {
@@ -512,20 +480,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Scratch",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10",
         "text": ""
       },
       {
         "name": "Fury Swipes",
-        "cost": [
-          "Darkness",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10×",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       }
@@ -556,8 +519,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/9.png",
-      "large": "https://images.pokemontcg.io/mcd11/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/9/high.webp"
     }
   },
   {
@@ -583,20 +546,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Charge Beam",
-        "cost": [
-          "Metal"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10",
         "text": "Flip a coin. If heads, attach an Energy card from your discard pile to this Pokémon."
       },
       {
         "name": "Irongrip",
-        "cost": [
-          "Metal",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
         "text": ""
       }
@@ -627,8 +585,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/10.png",
-      "large": "https://images.pokemontcg.io/mcd11/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/10/high.webp"
     }
   },
   {
@@ -654,19 +612,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Growl",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
-        "text": "During your opponent's next turn, any damage done by attacks from the Defending Pokémon is reduced by 20 (before applying Weakness and Resistance)."
+        "text": "During your opponent’s next turn, any damage done by attacks from the Defending Pokémon is reduced by 20 (before applying Weakness and Resistance)."
       },
       {
         "name": "Gust",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10",
         "text": ""
       }
@@ -697,8 +651,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/11.png",
-      "large": "https://images.pokemontcg.io/mcd11/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/11/high.webp"
     }
   },
   {
@@ -722,11 +676,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Double Slap",
-        "cost": [
-          "Colorless",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "30×",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       }
@@ -753,8 +704,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd11/12.png",
-      "large": "https://images.pokemontcg.io/mcd11/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2011bw/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2011bw/12/high.webp"
     }
   }
 ]

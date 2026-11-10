@@ -31,7 +31,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "60",
-        "text": "This Pokémon does 20 damage to itself."
+        "text": "This Pokémon does 20 damage to itself"
       }
     ],
     "weaknesses": [
@@ -56,8 +56,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/1.png",
-      "large": "https://images.pokemontcg.io/mcd18/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/1/high.webp"
     }
   },
   {
@@ -88,7 +88,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Both Active Pokémon are now Confused."
+        "text": "Both Activate Pokémon are now Confused"
       }
     ],
     "weaknesses": [
@@ -113,8 +113,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/2.png",
-      "large": "https://images.pokemontcg.io/mcd18/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/2/high.webp"
     }
   },
   {
@@ -169,8 +169,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/3.png",
-      "large": "https://images.pokemontcg.io/mcd18/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/3/high.webp"
     }
   },
   {
@@ -201,7 +201,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Draw a card."
+        "text": "Draw a card"
       },
       {
         "name": "Quick Attack",
@@ -211,7 +211,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20+",
-        "text": "Flip a coin. If heads, this attack does 20 more damage."
+        "text": "Flip a coin. If heads this attack does 20 more damage."
       }
     ],
     "weaknesses": [
@@ -240,8 +240,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/4.png",
-      "large": "https://images.pokemontcg.io/mcd18/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/4/high.webp"
     }
   },
   {
@@ -284,7 +284,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "60",
-        "text": "Flip a coin. If tails, this attack does nothing."
+        "text": "Flip a coin. If tails this attack does nothing."
       }
     ],
     "weaknesses": [
@@ -310,8 +310,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/5.png",
-      "large": "https://images.pokemontcg.io/mcd18/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/5/high.webp"
     }
   },
   {
@@ -368,8 +368,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/6.png",
-      "large": "https://images.pokemontcg.io/mcd18/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/6/high.webp"
     }
   },
   {
@@ -400,7 +400,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+        "text": "Flip a coin, If heas, your opponent's Active Pokémon is now Paralyzed"
       },
       {
         "name": "Headbutt",
@@ -435,8 +435,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/7.png",
-      "large": "https://images.pokemontcg.io/mcd18/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/7/high.webp"
     }
   },
   {
@@ -505,8 +505,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/8.png",
-      "large": "https://images.pokemontcg.io/mcd18/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/8/high.webp"
     }
   },
   {
@@ -537,7 +537,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your deck for a Dratini, a Dragonair, and a Dragonite, reveal them, and put them into your hand. Then, shuffle your deck."
+        "text": "Search your deck for a Dratini, a Dragonair, and a Dragonite. reveal them, and put them into your hand. Then, shuffle your deck."
       },
       {
         "name": "Tail Smack",
@@ -571,8 +571,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/9.png",
-      "large": "https://images.pokemontcg.io/mcd18/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/9/high.webp"
     }
   },
   {
@@ -641,8 +641,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/10.png",
-      "large": "https://images.pokemontcg.io/mcd18/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/10/high.webp"
     }
   },
   {
@@ -685,7 +685,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "",
+        "damage": "80",
         "text": "Flip a coin. If heads, draw a card."
       }
     ],
@@ -711,8 +711,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/11.png",
-      "large": "https://images.pokemontcg.io/mcd18/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/11/high.webp"
     }
   },
   {
@@ -776,8 +776,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd18/12.png",
-      "large": "https://images.pokemontcg.io/mcd18/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2018sm/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2018sm/12/high.webp"
     }
   }
 ]

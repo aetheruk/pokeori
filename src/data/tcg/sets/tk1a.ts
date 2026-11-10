@@ -35,8 +35,8 @@ const setData: TcgSet = {
         371
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/1.png",
-        "large": "https://images.pokemontcg.io/tk1a/1_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/1/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/1/high.webp"
       }
     },
     {
@@ -62,8 +62,8 @@ const setData: TcgSet = {
         256
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/2.png",
-        "large": "https://images.pokemontcg.io/tk1a/2_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/2/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/2/high.webp"
       }
     },
     {
@@ -87,8 +87,8 @@ const setData: TcgSet = {
         301
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/3.png",
-        "large": "https://images.pokemontcg.io/tk1a/3_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/3/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/3/high.webp"
       }
     },
     {
@@ -112,8 +112,8 @@ const setData: TcgSet = {
         380
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/4.png",
-        "large": "https://images.pokemontcg.io/tk1a/4_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/4/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/4/high.webp"
       }
     },
     {
@@ -139,8 +139,8 @@ const setData: TcgSet = {
         322
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/5.png",
-        "large": "https://images.pokemontcg.io/tk1a/5_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/5/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/5/high.webp"
       }
     },
     {
@@ -166,8 +166,8 @@ const setData: TcgSet = {
         300
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/6.png",
-        "large": "https://images.pokemontcg.io/tk1a/6_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/6/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/6/high.webp"
       }
     },
     {
@@ -193,8 +193,8 @@ const setData: TcgSet = {
         255
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/7.png",
-        "large": "https://images.pokemontcg.io/tk1a/7_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/7/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/7/high.webp"
       }
     },
     {
@@ -211,11 +211,11 @@ const setData: TcgSet = {
       "types": [],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/8.png",
-        "large": "https://images.pokemontcg.io/tk1a/8_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/8/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/8/high.webp"
       }
     },
     {
@@ -232,11 +232,11 @@ const setData: TcgSet = {
       "types": [],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/9.png",
-        "large": "https://images.pokemontcg.io/tk1a/9_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/9/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/9/high.webp"
       }
     },
     {
@@ -250,14 +250,16 @@ const setData: TcgSet = {
         "Basic"
       ],
       "hp": null,
-      "types": [],
+      "types": [
+        "Fire"
+      ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/tk1a/10.png",
-        "large": "https://images.pokemontcg.io/tk1a/10_hires.png"
+        "small": "https://assets.tcgdex.net/en/tk/tk-ex-latia/10/low.webp",
+        "large": "https://assets.tcgdex.net/en/tk/tk-ex-latia/10/high.webp"
       }
     }
   ]

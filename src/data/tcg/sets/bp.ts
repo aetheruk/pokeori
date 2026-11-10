@@ -35,8 +35,8 @@ const setData: TcgSet = {
         125
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/1.png",
-        "large": "https://images.pokemontcg.io/bp/1_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/1/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/1/high.webp"
       }
     },
     {
@@ -60,8 +60,8 @@ const setData: TcgSet = {
         107
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/2.png",
-        "large": "https://images.pokemontcg.io/bp/2_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/2/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/2/high.webp"
       }
     },
     {
@@ -79,15 +79,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/3.png",
-        "large": "https://images.pokemontcg.io/bp/3_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/3/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/3/high.webp"
       }
     },
     {
       "id": "bp-4",
       "name": "Rocket's Scizor",
       "number": "4",
-      "artist": "K Hoshiba",
+      "artist": "K. Hoshiba",
       "rarity": "Promo",
       "supertype": "Pokémon",
       "subtypes": [
@@ -104,8 +104,8 @@ const setData: TcgSet = {
         212
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/4.png",
-        "large": "https://images.pokemontcg.io/bp/4_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/4/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/4/high.webp"
       }
     },
     {
@@ -129,8 +129,8 @@ const setData: TcgSet = {
         215
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/5.png",
-        "large": "https://images.pokemontcg.io/bp/5_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/5/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/5/high.webp"
       }
     },
     {
@@ -156,8 +156,8 @@ const setData: TcgSet = {
         2
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/6.png",
-        "large": "https://images.pokemontcg.io/bp/6_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/6/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/6/high.webp"
       }
     },
     {
@@ -181,8 +181,8 @@ const setData: TcgSet = {
         3
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/7.png",
-        "large": "https://images.pokemontcg.io/bp/7_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/7/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/7/high.webp"
       }
     },
     {
@@ -206,8 +206,8 @@ const setData: TcgSet = {
         150
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/8.png",
-        "large": "https://images.pokemontcg.io/bp/8_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/8/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/8/high.webp"
       }
     },
     {
@@ -231,8 +231,8 @@ const setData: TcgSet = {
         107
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/bp/9.png",
-        "large": "https://images.pokemontcg.io/bp/9_hires.png"
+        "small": "https://assets.tcgdex.net/en/ecard/bog/9/low.webp",
+        "large": "https://assets.tcgdex.net/en/ecard/bog/9/high.webp"
       }
     }
   ]

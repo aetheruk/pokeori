@@ -45,6 +45,8 @@ Card ownership is stored in normalized `user-tcg-cards` rows, each containing a 
 
 ## Catalog Delivery
 
+Card records and card artwork are generated from English records in the open-source TCGdex card database. The generator adapts those records to Pokeori's existing catalog shape and keeps the current set and card IDs wherever records match. Those IDs are the keys used by ownership, binders, decks, packs, and authored rewards, so keeping them means existing player progress does not need a database migration. New source cards are added under their local collector number when that ID is free; old cards that cannot be confidently matched retain their existing Pokeori data. Pokeori's curated set list, series groupings, and set artwork remain in place, so TCGdex-only sets are not added automatically.
+
 The browser no longer downloads the complete authored TCG catalog with the game bundle. The Carddex loads compact set summaries first, then requests cards from `/api/game/catalog/tcg` in bounded pages. Deck cards are resolved by ID through the same authenticated endpoint.
 
 TCG catalog responses are versioned with the application release and privately returned without shared caching because they include `ownedTotal`, the authenticated trainer's ownership count across the complete matching query. That count remains stable as cursor pages append. Search, ownership, supertype, Pokémon type, normalized rarity, and stable sort rules are applied before pagination, while uncollected cards use discovery-safe visual and accessible labels.

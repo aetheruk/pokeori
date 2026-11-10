@@ -5,7 +5,7 @@ const cardDetails: TcgCardDetail[] = [
     "id": "fut20-1",
     "name": "Pikachu on the Ball",
     "number": "1",
-    "artist": "The Pokémon Company Art Team",
+    "artist": "Illus. & Direc. The Pokémon Company Art Team",
     "rarity": null,
     "supertype": "Pokémon",
     "subtypes": [
@@ -62,15 +62,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "D",
     "images": {
-      "small": "https://images.pokemontcg.io/fut20/1.png",
-      "large": "https://images.pokemontcg.io/fut20/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/fut2020/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/fut2020/1/high.webp"
     }
   },
   {
     "id": "fut20-2",
     "name": "Eevee on the Ball",
     "number": "2",
-    "artist": "The Pokémon Company Art Team",
+    "artist": "Illus. & Direc. The Pokémon Company Art Team",
     "rarity": null,
     "supertype": "Pokémon",
     "subtypes": [
@@ -126,15 +126,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "D",
     "images": {
-      "small": "https://images.pokemontcg.io/fut20/2.png",
-      "large": "https://images.pokemontcg.io/fut20/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/fut2020/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/fut2020/2/high.webp"
     }
   },
   {
     "id": "fut20-3",
     "name": "Grookey on the Ball",
     "number": "3",
-    "artist": "The Pokémon Company Art Team",
+    "artist": "Illus. & Direc. The Pokémon Company Art Team",
     "rarity": null,
     "supertype": "Pokémon",
     "subtypes": [
@@ -191,15 +191,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "D",
     "images": {
-      "small": "https://images.pokemontcg.io/fut20/3.png",
-      "large": "https://images.pokemontcg.io/fut20/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/fut2020/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/fut2020/3/high.webp"
     }
   },
   {
     "id": "fut20-4",
     "name": "Scorbunny on the Ball",
     "number": "4",
-    "artist": "The Pokémon Company Art Team",
+    "artist": "Illus. & Direc. The Pokémon Company Art Team",
     "rarity": null,
     "supertype": "Pokémon",
     "subtypes": [
@@ -255,15 +255,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "D",
     "images": {
-      "small": "https://images.pokemontcg.io/fut20/4.png",
-      "large": "https://images.pokemontcg.io/fut20/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/fut2020/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/fut2020/4/high.webp"
     }
   },
   {
     "id": "fut20-5",
     "name": "Sobble on the Ball",
     "number": "5",
-    "artist": "The Pokémon Company Art Team",
+    "artist": "Illus. & Direc. The Pokémon Company Art Team",
     "rarity": null,
     "supertype": "Pokémon",
     "subtypes": [
@@ -319,8 +319,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "D",
     "images": {
-      "small": "https://images.pokemontcg.io/fut20/5.png",
-      "large": "https://images.pokemontcg.io/fut20/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/fut2020/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/fut2020/5/high.webp"
     }
   }
 ]

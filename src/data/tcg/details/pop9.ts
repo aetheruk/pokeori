@@ -49,7 +49,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       445
     ],
@@ -59,8 +59,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/1.png",
-      "large": "https://images.pokemontcg.io/pop9/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/1/high.webp"
     }
   },
   {
@@ -121,8 +121,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/2.png",
-      "large": "https://images.pokemontcg.io/pop9/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/2/high.webp"
     }
   },
   {
@@ -191,8 +191,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/3.png",
-      "large": "https://images.pokemontcg.io/pop9/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/3/high.webp"
     }
   },
   {
@@ -241,7 +241,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -261,8 +261,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/4.png",
-      "large": "https://images.pokemontcg.io/pop9/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/4/high.webp"
     }
   },
   {
@@ -286,7 +286,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Type Shift",
         "text": "Once during your turn (before your attack), you may use this power. Rotom's type is Psychic until the end of your turn.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -326,8 +326,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/5.png",
-      "large": "https://images.pokemontcg.io/pop9/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/5/high.webp"
     }
   },
   {
@@ -391,8 +391,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/6.png",
-      "large": "https://images.pokemontcg.io/pop9/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/6/high.webp"
     }
   },
   {
@@ -457,8 +457,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/7.png",
-      "large": "https://images.pokemontcg.io/pop9/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/7/high.webp"
     }
   },
   {
@@ -523,8 +523,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/8.png",
-      "large": "https://images.pokemontcg.io/pop9/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/8/high.webp"
     }
   },
   {
@@ -588,8 +588,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/9.png",
-      "large": "https://images.pokemontcg.io/pop9/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/9/high.webp"
     }
   },
   {
@@ -656,8 +656,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/10.png",
-      "large": "https://images.pokemontcg.io/pop9/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/10/high.webp"
     }
   },
   {
@@ -683,7 +683,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Baby Evolution",
         "text": "Once during your turn (before your attack), you may put Pikachu from your hand onto Pichu (this counts as evolving Pichu) and remove all damage counters from Pichu.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -720,8 +720,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/11.png",
-      "large": "https://images.pokemontcg.io/pop9/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/11/high.webp"
     }
   },
   {
@@ -785,8 +785,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/12.png",
-      "large": "https://images.pokemontcg.io/pop9/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/12/high.webp"
     }
   },
   {
@@ -845,14 +845,14 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       390
     ],
-    "flavorText": "Its fiery rear end is fueled by gas made in its belly. Even rain can't extinguish the fire.",
+    "flavorText": "Its fiery rear end is fueld by gas made in its belly. Even rain can’t extinguish the fire.",
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/13.png",
-      "large": "https://images.pokemontcg.io/pop9/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/13/high.webp"
     }
   },
   {
@@ -906,8 +906,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/14.png",
-      "large": "https://images.pokemontcg.io/pop9/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/14/high.webp"
     }
   },
   {
@@ -977,8 +977,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/15.png",
-      "large": "https://images.pokemontcg.io/pop9/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/15/high.webp"
     }
   },
   {
@@ -1043,8 +1043,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/16.png",
-      "large": "https://images.pokemontcg.io/pop9/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/16/high.webp"
     }
   },
   {
@@ -1115,8 +1115,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop9/17.png",
-      "large": "https://images.pokemontcg.io/pop9/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop9/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop9/17/high.webp"
     }
   }
 ]

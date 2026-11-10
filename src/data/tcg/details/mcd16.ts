@@ -24,19 +24,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Roar",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
         "text": "Your opponent switches his or her Active Pokémon with 1 of his or her Benched Pokémon."
       },
       {
         "name": "Gnaw",
-        "cost": [
-          "Fire"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10",
         "text": ""
       }
@@ -62,8 +58,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/1.png",
-      "large": "https://images.pokemontcg.io/mcd16/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/1/high.webp"
     }
   },
   {
@@ -89,10 +85,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Ember",
-        "cost": [
-          "Fire"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
         "text": "Flip a coin. If tails, discard a Fire Energy attached to this Pokémon."
       }
@@ -118,8 +112,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/2.png",
-      "large": "https://images.pokemontcg.io/mcd16/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/2/high.webp"
     }
   },
   {
@@ -145,10 +139,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Will-O-Wisp",
-        "cost": [
-          "Fire"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "20",
         "text": ""
       }
@@ -174,8 +166,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/3.png",
-      "large": "https://images.pokemontcg.io/mcd16/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/3/high.webp"
     }
   },
   {
@@ -201,10 +193,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Epic Splash",
-        "cost": [
-          "Water"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "30",
         "text": "Flip 2 coins. If either of them is tails, this attack does nothing."
       }
@@ -230,8 +220,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/4.png",
-      "large": "https://images.pokemontcg.io/mcd16/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/4/high.webp"
     }
   },
   {
@@ -257,10 +247,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Fury Strikes",
-        "cost": [
-          "Water"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10×",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       }
@@ -279,15 +267,15 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       158
     ],
-    "flavorText": "It is small but rough and tough. It won't hesitate to take a bite out of anything that moves.",
+    "flavorText": "It is small but rough and tough. It won’t hesitate to take a bite out of anything that moves.",
     "legalities": {
       "unlimited": "Legal",
       "expanded": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/5.png",
-      "large": "https://images.pokemontcg.io/mcd16/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/5/high.webp"
     }
   },
   {
@@ -313,20 +301,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Tail Whip",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
-        "text": "Flip a coin. If heads, the Defending Pokémon can't attack during your opponent's next turn."
+        "text": "Flip a coin. If heads, the Defending Pokémon can’t attack during your opponent’s next turn."
       },
       {
         "name": "Electro Ball",
-        "cost": [
-          "Lightning",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "30",
         "text": ""
       }
@@ -357,8 +340,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/6.png",
-      "large": "https://images.pokemontcg.io/mcd16/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/6/high.webp"
     }
   },
   {
@@ -384,11 +367,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Corkscrew Punch",
-        "cost": [
-          "Darkness",
-          "Darkness"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "30",
         "text": ""
       }
@@ -420,8 +400,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/7.png",
-      "large": "https://images.pokemontcg.io/mcd16/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/7/high.webp"
     }
   },
   {
@@ -447,21 +427,17 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Rollout",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10",
         "text": ""
       },
       {
         "name": "Heartfelt Song",
-        "cost": [
-          "Fairy"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
-        "text": "Discard a Darkness Energy attached to your opponent's Active Pokémon."
+        "text": "Discard a Darkness Energy attached to your opponent’s Active Pokémon."
       }
     ],
     "weaknesses": [
@@ -490,8 +466,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/8.png",
-      "large": "https://images.pokemontcg.io/mcd16/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/8/high.webp"
     }
   },
   {
@@ -517,10 +493,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Sweet Kiss",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10",
         "text": "Your opponent draws a card."
       }
@@ -551,8 +525,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/9.png",
-      "large": "https://images.pokemontcg.io/mcd16/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/9/high.webp"
     }
   },
   {
@@ -576,21 +550,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Nuzzle",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "",
-        "text": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+        "text": "Flip a coin. If heads, your opponent’s Active Pokémon is now Paralyzed."
       },
       {
         "name": "Spiral Drain",
-        "cost": [
-          "Fairy",
-          "Colorless",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 3,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "60",
         "text": "Heal 20 damage from this Pokémon."
       }
@@ -621,8 +589,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/10.png",
-      "large": "https://images.pokemontcg.io/mcd16/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/10/high.webp"
     }
   },
   {
@@ -648,10 +616,8 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Act Tough",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10+",
         "text": "If this Pokémon has any Darkness Energy attached to it, this attack does 20 more damage."
       }
@@ -677,8 +643,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/11.png",
-      "large": "https://images.pokemontcg.io/mcd16/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/11/high.webp"
     }
   },
   {
@@ -711,20 +677,15 @@ const cardDetails: TcgCardDetail[] = [
     "attacks": [
       {
         "name": "Tackle",
-        "cost": [
-          "Colorless"
-        ],
-        "convertedEnergyCost": 1,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "10",
         "text": ""
       },
       {
         "name": "Lunge",
-        "cost": [
-          "Colorless",
-          "Colorless"
-        ],
-        "convertedEnergyCost": 2,
+        "cost": [],
+        "convertedEnergyCost": 0,
         "damage": "30",
         "text": "Flip a coin. If tails, this attack does nothing."
       }
@@ -750,8 +711,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd16/12.png",
-      "large": "https://images.pokemontcg.io/mcd16/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2016xy/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2016xy/12/high.webp"
     }
   }
 ]

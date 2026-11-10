@@ -39,7 +39,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "30+",
-        "text": "Flip a coin. If heads, this attack does 30 damage plus 10 more damage; if tails, this attack does 30 damage plus Electabuzz does 10 damage to itself."
+        "text": "Flip a coin. If heads, this attack does 30 damage plus 10 more damage; if tails, the attack does 30 damage and Electabuzz does 10 damage to itself."
       }
     ],
     "weaknesses": [
@@ -63,8 +63,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/1.png",
-      "large": "https://images.pokemontcg.io/bp/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/1/high.webp"
     }
   },
   {
@@ -128,8 +128,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/2.png",
-      "large": "https://images.pokemontcg.io/bp/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/2/high.webp"
     }
   },
   {
@@ -160,15 +160,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/3.png",
-      "large": "https://images.pokemontcg.io/bp/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/3/high.webp"
     }
   },
   {
     "id": "bp-4",
     "name": "Rocket's Scizor",
     "number": "4",
-    "artist": "K Hoshiba",
+    "artist": "K. Hoshiba",
     "rarity": "Promo",
     "supertype": "Pokémon",
     "subtypes": [
@@ -190,7 +190,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "During your next turn, Rocket's Scizor's Agility attack's damage is doubled."
+        "text": "During your next turn, Rocket’s Scizor’s Agility attack’s damage is doubled."
       },
       {
         "name": "Agility",
@@ -201,7 +201,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "20",
-        "text": "Flip a coin. If heads, during your opponent's next turn, prevent all effects of attacks, including damage, done to Rocket's Scizor."
+        "text": "Flip a coin. If heads, during your opponent’s next turn, prevent all effects of attacks, including damage, done to Rocket’s Scizor."
       }
     ],
     "weaknesses": [
@@ -230,8 +230,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/4.png",
-      "large": "https://images.pokemontcg.io/bp/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/4/high.webp"
     }
   },
   {
@@ -260,7 +260,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+        "text": "The Defending Pokémon can’t retreat during your opponent’s next turn."
       },
       {
         "name": "Continuous Scratch",
@@ -298,8 +298,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/5.png",
-      "large": "https://images.pokemontcg.io/bp/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/5/high.webp"
     }
   },
   {
@@ -324,8 +324,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Vine Pull",
-        "text": "Once during your turn when Dark Ivysaur retreats, choose 1 of your opponent's Benched Pokémon and switch it with his or her Active Pokémon.",
-        "type": "Poké-Body"
+        "text": "Once during your turn when Dark Ivysaur retreats, choose 1 of your opponent’s Benched Pokémon and switch it with his or her Active Pokémon.",
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -337,7 +337,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "Your opponent puts 3 markers onto his or her Pokémon (divided as he or she chooses). (More than 1 marker can be put on the same Pokémon.) Then, this attack does 10 damage to each Pokémon for each marker on it. Don't apply Weakness and Resistance. Remove the markers at the end of the turn."
+        "text": "Your opponent puts 3 markers onto his or her Pokémon (divided as he or she chooses). (More than 1 marker can be put on the same Pokémon.) Then, this attack does 10 damage to each Pokémon for each marker on it. Don’t apply Weakness and Resistance. Remove the markers at the end of the turn."
       }
     ],
     "weaknesses": [
@@ -361,8 +361,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/6.png",
-      "large": "https://images.pokemontcg.io/bp/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/6/high.webp"
     }
   },
   {
@@ -417,8 +417,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/7.png",
-      "large": "https://images.pokemontcg.io/bp/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/7/high.webp"
     }
   },
   {
@@ -447,7 +447,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Flip a coin. If heads, switch the number of damage counters on Rocket's Mewtwo with the number of damage counters on the Defending Pokémon (even if it would Knock Out either Pokémon). (It's okay if 1 of the Pokémon has no damage counters on it.)"
+        "text": "Flip a coin. If heads, switch the number of damage counters on Rocket’s Mewtwo with the number of damage counters on the Defending Pokémon (even if it would Knock Out either Pokémon). (It’s okay if 1 of the Pokémon has no damage counters on it.)"
       },
       {
         "name": "Hypnoblast",
@@ -493,8 +493,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/8.png",
-      "large": "https://images.pokemontcg.io/bp/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/8/high.webp"
     }
   },
   {
@@ -523,7 +523,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "If an attack does damage to Rocket's Hitmonchan during your opponent's next turn (even if Rocket's Hitmonchan is Knocked Out), flip a coin. If heads, Rocket's Hitmonchan attacks your opponent's Active Pokémon for double that amount of damage. (If Rocket's Hitmonchan takes 20 damage, it does 40 damage to that Pokémon.)"
+        "text": "If an attack does damage to Rocket’s Hitmonchan during your opponent’s next turn (even if Rocket’s Hitmonchan is Knocked Out), flip a coin. If heads, Rocket’s Hitmonchan attacks your opponent’s Active Pokémon for double that amount of damage. (If Rocket’s Hitmonchan takes 20 damage, it does 40 damage to that Pokémon.)"
       },
       {
         "name": "Magnum Punch",
@@ -557,8 +557,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/bp/9.png",
-      "large": "https://images.pokemontcg.io/bp/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/ecard/bog/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/ecard/bog/9/high.webp"
     }
   }
 ]
