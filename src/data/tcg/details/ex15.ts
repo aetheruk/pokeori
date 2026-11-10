@@ -22,7 +22,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Holon Veil",
         "text": "Treat each Basic Pokémon and Evolution card in your deck, in your discard pile, in your hand, and in play as a Pokémon that has δ on its card.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -59,8 +59,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/1.png",
-      "large": "https://images.pokemontcg.io/ex15/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/1/high.webp"
     }
   },
   {
@@ -84,7 +84,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Battle Aura",
         "text": "Each of your Pokémon that has δ on its card does 10 more damage to the Defending Pokémon (before applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -131,8 +131,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/2.png",
-      "large": "https://images.pokemontcg.io/ex15/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/2/high.webp"
     }
   },
   {
@@ -156,7 +156,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Shining Horn",
         "text": "As long as Heracross is the only Pokémon you have in play, your opponent's Basic Pokémon can't attack.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -200,8 +200,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/3.png",
-      "large": "https://images.pokemontcg.io/ex15/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/3/high.webp"
     }
   },
   {
@@ -225,7 +225,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Evolutionary Call",
         "text": "Once during your turn, when you play Meganium from your hand to evolve 1 of your Pokémon, you may search your deck for up to 3 in any combination of Basic Pokémon or Evolution cards. Show them to your opponent and put them into your hand. Shuffle your deck afterward.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -277,8 +277,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/4.png",
-      "large": "https://images.pokemontcg.io/ex15/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/4/high.webp"
     }
   },
   {
@@ -302,7 +302,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Sharing",
         "text": "Once during your turn (before your attack), you may look at your opponent's hand. You may use the effect of a Supporter card you find there as the effect of this power. (The Supporter card remains in your opponent's hand.) You can't use more than 1 Sharing Poké-Power each turn. This power can't be used if Milotic is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -339,8 +339,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/5.png",
-      "large": "https://images.pokemontcg.io/ex15/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/5/high.webp"
     }
   },
   {
@@ -406,8 +406,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/6.png",
-      "large": "https://images.pokemontcg.io/ex15/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/6/high.webp"
     }
   },
   {
@@ -431,7 +431,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Invitation",
         "text": "Once during your turn (before your attack), you may search your deck for a Basic Pokémon or Evolution card, show it to your opponent, and put it into your hand. Shuffle your deck afterward. This power can't be used if Nidoqueen is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -468,8 +468,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/7.png",
-      "large": "https://images.pokemontcg.io/ex15/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/7/high.webp"
     }
   },
   {
@@ -493,7 +493,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Volunteer",
         "text": "Once during your turn (before your attack), you may remove 4 damage counters from Ninetales and discard Ninetales from Vulpix. If you do, search your deck for Ninetales or Ninetales ex and put it onto Vulpix (this counts as evolving Vulpix). Shuffle your deck afterward.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -516,7 +516,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       38
     ],
@@ -526,8 +526,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/8.png",
-      "large": "https://images.pokemontcg.io/ex15/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/8/high.webp"
     }
   },
   {
@@ -550,8 +550,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Armor",
-        "text": "If your opponent has 5 of more cards in his or her hand, any damage done to Pinsir by attacks is reduced by 30 (after applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "text": "If your opponent has 5 or more cards in his or her hand, any damage done to Pinsir by attacks is reduced by 30 (after applying Weakness and Resistance).",
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -596,8 +596,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/9.png",
-      "large": "https://images.pokemontcg.io/ex15/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/9/high.webp"
     }
   },
   {
@@ -621,12 +621,12 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Bedhead",
         "text": "As long as Snorlax remains Asleep between turns, put 2 damage counters on 1 of the Defending Pokémon.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       },
       {
-        "name": "Dozing",
-        "text": "Once during your turn (before your attack), if Snorlax is your Active Pokémon, you may remove 2 damage counters from Snorlax and Snorlax is now Asleep. This power can't be used if Snorlax is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "name": "",
+        "text": "",
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [],
@@ -652,8 +652,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/10.png",
-      "large": "https://images.pokemontcg.io/ex15/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/10/high.webp"
     }
   },
   {
@@ -711,7 +711,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       176
     ],
@@ -721,8 +721,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/11.png",
-      "large": "https://images.pokemontcg.io/ex15/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/11/high.webp"
     }
   },
   {
@@ -746,7 +746,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Shady Move",
         "text": "Once during your turn (before your attack), if Typhlosion is your Active Pokémon, you may move 1 damage counter from either player's Pokémon to another Pokémon (yours or your opponent's). This power can't be used if Typhlosion is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -782,8 +782,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/12.png",
-      "large": "https://images.pokemontcg.io/ex15/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/12/high.webp"
     }
   },
   {
@@ -846,8 +846,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/13.png",
-      "large": "https://images.pokemontcg.io/ex15/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/13/high.webp"
     }
   },
   {
@@ -870,8 +870,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Solid Shell",
-        "text": "Prevent all effects of attacks, including damage, done by your opponent's Pokémon to each of your Benched Pokémon that has δ on its card.",
-        "type": "Poké-Body"
+        "text": "Prevent all of effects of attacks, including damage, done by your opponent's Pokémon to each of your Benched Pokémon that has δ on its card.",
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -905,8 +905,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/14.png",
-      "large": "https://images.pokemontcg.io/ex15/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/14/high.webp"
     }
   },
   {
@@ -930,7 +930,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Delta Protection",
         "text": "Any damage done to Dewgong by attacks from your opponent's Pokémon that has δ on its card is reduced by 40 (after applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -977,8 +977,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/15.png",
-      "large": "https://images.pokemontcg.io/ex15/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/15/high.webp"
     }
   },
   {
@@ -1041,8 +1041,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/16.png",
-      "large": "https://images.pokemontcg.io/ex15/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/16/high.webp"
     }
   },
   {
@@ -1066,7 +1066,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Stages of Evolution",
         "text": "As long as Jynx is an Evolved Pokémon, you pay Colorless less to retreat your Fire and Psychic Pokémon.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -1101,8 +1101,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/17.png",
-      "large": "https://images.pokemontcg.io/ex15/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/17/high.webp"
     }
   },
   {
@@ -1126,7 +1126,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Prowl",
         "text": "Once during your turn, when you play Ledian from your hand to evolve 1 of your Pokémon, you may search your deck for any 1 card and put it into your hand. Shuffle your deck afterward.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1149,7 +1149,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       166
     ],
@@ -1159,8 +1159,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/18.png",
-      "large": "https://images.pokemontcg.io/ex15/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/18/high.webp"
     }
   },
   {
@@ -1223,8 +1223,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/19.png",
-      "large": "https://images.pokemontcg.io/ex15/19_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/19/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/19/high.webp"
     }
   },
   {
@@ -1248,7 +1248,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Power Circulation",
         "text": "Once during your turn (before your attack), you may search your discard pile for a basic Energy card, show it to your opponent, and put it on top of your deck. If you do, put 1 damage counter on Mantine. This power can't be used if Mantine is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1282,8 +1282,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/20.png",
-      "large": "https://images.pokemontcg.io/ex15/20_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/20/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/20/high.webp"
     }
   },
   {
@@ -1305,9 +1305,9 @@ const cardDetails: TcgCardDetail[] = [
     "rules": [],
     "abilities": [
       {
-        "name": "Dig Up",
+        "name": "Dig up",
         "text": "Once during your turn, when you play Quagsire from your hand to evolve 1 of your Pokémon, you may search your discard pile for up to 2 Pokémon Tool cards, show them to your opponent, and put them into your hand.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1343,8 +1343,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/21.png",
-      "large": "https://images.pokemontcg.io/ex15/21_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/21/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/21/high.webp"
     }
   },
   {
@@ -1410,8 +1410,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/22.png",
-      "large": "https://images.pokemontcg.io/ex15/22_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/22/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/22/high.webp"
     }
   },
   {
@@ -1435,7 +1435,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Tropical Heal",
         "text": "Once during your turn, when you put Tropius from your hand onto your Bench, you may remove all Special Conditions, Imprison markers, and Shock-wave markers from your Pokémon.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1445,7 +1445,7 @@ const cardDetails: TcgCardDetail[] = [
           "Metal"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Does 10 damage times the amount of Energy attached to Tropius."
       }
     ],
@@ -1469,8 +1469,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/23.png",
-      "large": "https://images.pokemontcg.io/ex15/23_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/23/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/23/high.webp"
     }
   },
   {
@@ -1496,7 +1496,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Psychic Wing",
         "text": "If Vibrava has any Psychic Energy attached to it, the Retreat Cost for Vibrava is 0.",
-        "type": "Poké-Body"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1541,8 +1541,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/24.png",
-      "large": "https://images.pokemontcg.io/ex15/24_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/24/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/24/high.webp"
     }
   },
   {
@@ -1566,7 +1566,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Extra Feather",
         "text": "Each of your Stage 2 Pokémon-ex does 10 more damage to the Defending Pokémon (before applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1578,7 +1578,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+        "text": "Flip a coin. If heads, the Defending Pokémon is Confused."
       }
     ],
     "weaknesses": [
@@ -1601,8 +1601,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/25.png",
-      "large": "https://images.pokemontcg.io/ex15/25_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/25/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/25/high.webp"
     }
   },
   {
@@ -1662,8 +1662,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/26.png",
-      "large": "https://images.pokemontcg.io/ex15/26_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/26/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/26/high.webp"
     }
   },
   {
@@ -1728,8 +1728,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/27.png",
-      "large": "https://images.pokemontcg.io/ex15/27_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/27/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/27/high.webp"
     }
   },
   {
@@ -1790,8 +1790,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/28.png",
-      "large": "https://images.pokemontcg.io/ex15/28_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/28/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/28/high.webp"
     }
   },
   {
@@ -1817,7 +1817,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Power of Evolution",
         "text": "Once during your turn (before your attack), if Electabuzz is an Evolved Pokémon, you may draw a card from the bottom of your deck. This power can't be used if Electabuzz is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1852,8 +1852,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/29.png",
-      "large": "https://images.pokemontcg.io/ex15/29_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/29/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/29/high.webp"
     }
   },
   {
@@ -1908,8 +1908,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/30.png",
-      "large": "https://images.pokemontcg.io/ex15/30_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/30/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/30/high.webp"
     }
   },
   {
@@ -1973,8 +1973,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/31.png",
-      "large": "https://images.pokemontcg.io/ex15/31_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/31/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/31/high.webp"
     }
   },
   {
@@ -2041,8 +2041,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/32.png",
-      "large": "https://images.pokemontcg.io/ex15/32_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/32/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/32/high.webp"
     }
   },
   {
@@ -2109,8 +2109,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/33.png",
-      "large": "https://images.pokemontcg.io/ex15/33_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/33/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/33/high.webp"
     }
   },
   {
@@ -2127,7 +2127,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Metal"
     ],
-    "evolvesFrom": "Nidoran ♀",
+    "evolvesFrom": "Nidoran?",
     "evolvesTo": [
       "Nidoqueen"
     ],
@@ -2176,8 +2176,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/34.png",
-      "large": "https://images.pokemontcg.io/ex15/34_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/34/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/34/high.webp"
     }
   },
   {
@@ -2194,7 +2194,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Darkness"
     ],
-    "evolvesFrom": "Nidoran ♂",
+    "evolvesFrom": "Nidoran?",
     "evolvesTo": [
       "Nidoking"
     ],
@@ -2243,8 +2243,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/35.png",
-      "large": "https://images.pokemontcg.io/ex15/35_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/35/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/35/high.webp"
     }
   },
   {
@@ -2310,8 +2310,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/36.png",
-      "large": "https://images.pokemontcg.io/ex15/36_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/36/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/36/high.webp"
     }
   },
   {
@@ -2354,7 +2354,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "30+",
-        "text": "If the Defending Pokémon is a Pokémon-ex, this attack does 30 damage plus 30 more damage."
+        "text": "If the Defending Pokémon is Pokémon-ex, this attack does 30 damage plus 30 more damage."
       }
     ],
     "weaknesses": [
@@ -2377,8 +2377,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/37.png",
-      "large": "https://images.pokemontcg.io/ex15/37_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/37/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/37/high.webp"
     }
   },
   {
@@ -2440,8 +2440,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/38.png",
-      "large": "https://images.pokemontcg.io/ex15/38_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/38/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/38/high.webp"
     }
   },
   {
@@ -2502,8 +2502,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/39.png",
-      "large": "https://images.pokemontcg.io/ex15/39_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/39/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/39/high.webp"
     }
   },
   {
@@ -2527,7 +2527,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Extra Wing",
         "text": "The Retreat Cost for each of your Stage 2 Pokémon-ex is 0.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -2555,7 +2555,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       277
     ],
@@ -2565,8 +2565,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/40.png",
-      "large": "https://images.pokemontcg.io/ex15/40_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/40/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/40/high.webp"
     }
   },
   {
@@ -2620,8 +2620,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/41.png",
-      "large": "https://images.pokemontcg.io/ex15/41_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/41/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/41/high.webp"
     }
   },
   {
@@ -2680,8 +2680,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/42.png",
-      "large": "https://images.pokemontcg.io/ex15/42_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/42/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/42/high.webp"
     }
   },
   {
@@ -2730,8 +2730,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/43.png",
-      "large": "https://images.pokemontcg.io/ex15/43_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/43/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/43/high.webp"
     }
   },
   {
@@ -2800,8 +2800,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/44.png",
-      "large": "https://images.pokemontcg.io/ex15/44_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/44/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/44/high.webp"
     }
   },
   {
@@ -2856,8 +2856,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/45.png",
-      "large": "https://images.pokemontcg.io/ex15/45_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/45/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/45/high.webp"
     }
   },
   {
@@ -2906,8 +2906,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/46.png",
-      "large": "https://images.pokemontcg.io/ex15/46_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/46/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/46/high.webp"
     }
   },
   {
@@ -2971,8 +2971,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/47.png",
-      "large": "https://images.pokemontcg.io/ex15/47_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/47/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/47/high.webp"
     }
   },
   {
@@ -2998,7 +2998,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Baby Evolution",
         "text": "Once during your turn (before your attack), you may put Electabuzz from your hand onto Elekid (this counts as evolving Elekid) and remove all damage counters from Elekid.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -3032,8 +3032,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/48.png",
-      "large": "https://images.pokemontcg.io/ex15/48_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/48/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/48/high.webp"
     }
   },
   {
@@ -3063,7 +3063,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fire"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Does 10 damage times the number of damage counters on Feebas."
       }
     ],
@@ -3087,8 +3087,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/49.png",
-      "large": "https://images.pokemontcg.io/ex15/49_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/49/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/49/high.webp"
     }
   },
   {
@@ -3142,8 +3142,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/50.png",
-      "large": "https://images.pokemontcg.io/ex15/50_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/50/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/50/high.webp"
     }
   },
   {
@@ -3207,8 +3207,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/51.png",
-      "large": "https://images.pokemontcg.io/ex15/51_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/51/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/51/high.webp"
     }
   },
   {
@@ -3272,8 +3272,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/52.png",
-      "large": "https://images.pokemontcg.io/ex15/52_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/52/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/52/high.webp"
     }
   },
   {
@@ -3336,8 +3336,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/53.png",
-      "large": "https://images.pokemontcg.io/ex15/53_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/53/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/53/high.webp"
     }
   },
   {
@@ -3391,8 +3391,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/54.png",
-      "large": "https://images.pokemontcg.io/ex15/54_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/54/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/54/high.webp"
     }
   },
   {
@@ -3446,8 +3446,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/55.png",
-      "large": "https://images.pokemontcg.io/ex15/55_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/55/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/55/high.webp"
     }
   },
   {
@@ -3510,8 +3510,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/56.png",
-      "large": "https://images.pokemontcg.io/ex15/56_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/56/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/56/high.webp"
     }
   },
   {
@@ -3574,8 +3574,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/57.png",
-      "large": "https://images.pokemontcg.io/ex15/57_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/57/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/57/high.webp"
     }
   },
   {
@@ -3629,8 +3629,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/58.png",
-      "large": "https://images.pokemontcg.io/ex15/58_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/58/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/58/high.webp"
     }
   },
   {
@@ -3685,8 +3685,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/59.png",
-      "large": "https://images.pokemontcg.io/ex15/59_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/59/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/59/high.webp"
     }
   },
   {
@@ -3725,7 +3725,7 @@ const cardDetails: TcgCardDetail[] = [
           "Psychic"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Does 10 damage times the amount of Energy attached to the Defending Pokémon."
       }
     ],
@@ -3749,8 +3749,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/60.png",
-      "large": "https://images.pokemontcg.io/ex15/60_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/60/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/60/high.webp"
     }
   },
   {
@@ -3814,8 +3814,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/61.png",
-      "large": "https://images.pokemontcg.io/ex15/61_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/61/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/61/high.webp"
     }
   },
   {
@@ -3879,8 +3879,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/62.png",
-      "large": "https://images.pokemontcg.io/ex15/62_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/62/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/62/high.webp"
     }
   },
   {
@@ -3934,8 +3934,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/63.png",
-      "large": "https://images.pokemontcg.io/ex15/63_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/63/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/63/high.webp"
     }
   },
   {
@@ -3961,7 +3961,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Baby Evolution",
         "text": "Once during your turn (before your attack), you may put Jynx from your hand onto Smoochum (this counts as evolving Smoochum) and remove all damage counters from Smoochum.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -3972,7 +3972,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your deck for a Basic Pokémon and basic Energy card, show them to your opponent, and put them into your hand. Shuffle your deck afterward."
+        "text": "Search your deck for a Basic Pokémon and a basic Energy card, show them to your opponent, and put them into your hand. Shuffle your deck afterward."
       }
     ],
     "weaknesses": [
@@ -3995,8 +3995,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/64.png",
-      "large": "https://images.pokemontcg.io/ex15/64_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/64/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/64/high.webp"
     }
   },
   {
@@ -4055,8 +4055,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/65.png",
-      "large": "https://images.pokemontcg.io/ex15/65_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/65/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/65/high.webp"
     }
   },
   {
@@ -4115,8 +4115,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/66.png",
-      "large": "https://images.pokemontcg.io/ex15/66_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/66/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/66/high.webp"
     }
   },
   {
@@ -4180,8 +4180,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/67.png",
-      "large": "https://images.pokemontcg.io/ex15/67_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/67/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/67/high.webp"
     }
   },
   {
@@ -4245,8 +4245,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/68.png",
-      "large": "https://images.pokemontcg.io/ex15/68_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/68/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/68/high.webp"
     }
   },
   {
@@ -4300,8 +4300,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/69.png",
-      "large": "https://images.pokemontcg.io/ex15/69_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/69/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/69/high.webp"
     }
   },
   {
@@ -4365,8 +4365,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/70.png",
-      "large": "https://images.pokemontcg.io/ex15/70_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/70/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/70/high.webp"
     }
   },
   {
@@ -4430,8 +4430,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/71.png",
-      "large": "https://images.pokemontcg.io/ex15/71_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/71/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/71/high.webp"
     }
   },
   {
@@ -4465,8 +4465,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/72.png",
-      "large": "https://images.pokemontcg.io/ex15/72_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/72/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/72/high.webp"
     }
   },
   {
@@ -4501,8 +4501,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/73.png",
-      "large": "https://images.pokemontcg.io/ex15/73_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/73/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/73/high.webp"
     }
   },
   {
@@ -4536,8 +4536,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/74.png",
-      "large": "https://images.pokemontcg.io/ex15/74_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/74/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/74/high.webp"
     }
   },
   {
@@ -4572,8 +4572,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/75.png",
-      "large": "https://images.pokemontcg.io/ex15/75_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/75/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/75/high.webp"
     }
   },
   {
@@ -4607,8 +4607,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/76.png",
-      "large": "https://images.pokemontcg.io/ex15/76_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/76/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/76/high.webp"
     }
   },
   {
@@ -4642,8 +4642,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/77.png",
-      "large": "https://images.pokemontcg.io/ex15/77_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/77/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/77/high.webp"
     }
   },
   {
@@ -4676,8 +4676,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/78.png",
-      "large": "https://images.pokemontcg.io/ex15/78_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/78/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/78/high.webp"
     }
   },
   {
@@ -4711,8 +4711,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/79.png",
-      "large": "https://images.pokemontcg.io/ex15/79_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/79/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/79/high.webp"
     }
   },
   {
@@ -4746,8 +4746,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/80.png",
-      "large": "https://images.pokemontcg.io/ex15/80_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/80/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/80/high.webp"
     }
   },
   {
@@ -4781,8 +4781,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/81.png",
-      "large": "https://images.pokemontcg.io/ex15/81_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/81/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/81/high.webp"
     }
   },
   {
@@ -4817,8 +4817,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/82.png",
-      "large": "https://images.pokemontcg.io/ex15/82_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/82/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/82/high.webp"
     }
   },
   {
@@ -4853,8 +4853,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/83.png",
-      "large": "https://images.pokemontcg.io/ex15/83_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/83/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/83/high.webp"
     }
   },
   {
@@ -4888,8 +4888,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/84.png",
-      "large": "https://images.pokemontcg.io/ex15/84_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/84/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/84/high.webp"
     }
   },
   {
@@ -4923,8 +4923,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/85.png",
-      "large": "https://images.pokemontcg.io/ex15/85_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/85/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/85/high.webp"
     }
   },
   {
@@ -4958,8 +4958,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/86.png",
-      "large": "https://images.pokemontcg.io/ex15/86_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/86/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/86/high.webp"
     }
   },
   {
@@ -4992,8 +4992,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/87.png",
-      "large": "https://images.pokemontcg.io/ex15/87_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/87/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/87/high.webp"
     }
   },
   {
@@ -5026,8 +5026,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/88.png",
-      "large": "https://images.pokemontcg.io/ex15/88_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/88/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/88/high.webp"
     }
   },
   {
@@ -5060,8 +5060,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/89.png",
-      "large": "https://images.pokemontcg.io/ex15/89_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/89/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/89/high.webp"
     }
   },
   {
@@ -5088,7 +5088,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Extra Boost",
         "text": "Once during your turn (before your attack), you may attach a basic Energy card from your hand to 1 of your Stage 2 Pokémon-ex. This power can't be used if Altaria ex is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -5133,8 +5133,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/90.png",
-      "large": "https://images.pokemontcg.io/ex15/90_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/90/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/90/high.webp"
     }
   },
   {
@@ -5179,7 +5179,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "",
-        "text": "Put 8 damage counters on the Defending Pokémon. If that Pokémon would be Knocked Out by this attack, put any damage counters not necessary to Knock Out the Defending Pokémon on your opponent's Benched Pokémon in any way you like."
+        "text": "Put 8 damage counters on the Defending Pokémon. If that Pokémon would be Knocked Out by this attack, you may put any damage counters not necessary to Knocked Out the Defending Pokémon on your opponent's Benched Pokémon in any way you like."
       }
     ],
     "weaknesses": [],
@@ -5198,8 +5198,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/91.png",
-      "large": "https://images.pokemontcg.io/ex15/91_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/91/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/91/high.webp"
     }
   },
   {
@@ -5226,7 +5226,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Sand Damage",
         "text": "As long as Flygon ex is your Active Pokémon, put 1 damage counter on each of your opponent's Benched Basic Pokémon between turns. You can't use more than 1 Sand Damage Poké-Body between turns.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -5258,8 +5258,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/92.png",
-      "large": "https://images.pokemontcg.io/ex15/92_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/92/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/92/high.webp"
     }
   },
   {
@@ -5286,7 +5286,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Imprison",
         "text": "Once during your turn (before your attack), if Gardevoir ex is your Active Pokémon, you may put an Imprison marker on 1 of your opponent's Pokémon. Any Pokémon that has any Imprison markers on it can't use any Poké-Powers or Poké-Bodies. This power can't be used if Gardevoir ex is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -5323,8 +5323,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/93.png",
-      "large": "https://images.pokemontcg.io/ex15/93_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/93/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/93/high.webp"
     }
   },
   {
@@ -5351,7 +5351,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Extra Smoke",
         "text": "Any damage done to your Stage 2 Pokémon-ex by your opponent's attacks is reduced by 10 (before applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -5397,8 +5397,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/94.png",
-      "large": "https://images.pokemontcg.io/ex15/94_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/94/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/94/high.webp"
     }
   },
   {
@@ -5424,8 +5424,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Fellow Boost",
-        "text": "Once during your turn (before your attack), you may attach a basic Energy card from your hand to your Latias, Latias ex, Latios, or Latios ex. If you do, your turn ends. This power can't be used if Latias ex is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "text": "Once during your turn (before your attack), you may attach a basic Energy card from your hand to your Latias, Latias ex, Latios or Latios ex. If you do, your turn ends. This power can't be used if Latias ex is affected by a Special Condition.",
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -5462,8 +5462,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/95.png",
-      "large": "https://images.pokemontcg.io/ex15/95_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/95/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/95/high.webp"
     }
   },
   {
@@ -5490,7 +5490,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Link Wing",
         "text": "The Retreat Cost for each of your Latias, Latias ex, Latios, and Latios ex is 0.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -5502,7 +5502,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "30",
-        "text": "Prevent all effects of attack, including damage, done to Latios ex by your opponent's Pokémon-ex during your opponent's next turn."
+        "text": "Prevent all effects of an attack, including damage, done to Latios ex by your opponent's Pokémon-ex during your opponent's next turn."
       },
       {
         "name": "Hydro Splash",
@@ -5537,8 +5537,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/96.png",
-      "large": "https://images.pokemontcg.io/ex15/96_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/96/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/96/high.webp"
     }
   },
   {
@@ -5564,8 +5564,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Rage Aura",
-        "text": "If you have more Prize cards left than your opponent, ignore all Colorless Energy necessary to use Rayquaza ex's Special Circuit and Sky-high Claws attacks.",
-        "type": "Poké-Body"
+        "text": "If you have more Prize cards left than your opponent, the attack cost of Rayquaza ex's Special Circuit is now Lightning and Rayquaza ex's Sky-high Claws is now Lightning Lightning.",
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -5577,7 +5577,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "Choose 1 of your opponent's Pokémon. This attack does 30 damage to the Pokémon. If you choose a Pokémon that has any Poké-Powers or Poké-Bodies, this attack does 50 damage instead. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "Choose 1 of your opponent's Pokémon. This attack does 30 damage to that Pokémon. If you choose a Pokémon that has any Poké-Powers or Poké-Bodies, this attack does 50 damage instead. (Don't apply Weakness and Resistance for Benched Pokémon.)"
       },
       {
         "name": "Sky-high Claws",
@@ -5608,8 +5608,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/97.png",
-      "large": "https://images.pokemontcg.io/ex15/97_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/97/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/97/high.webp"
     }
   },
   {
@@ -5636,7 +5636,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Type Shift",
         "text": "Once during your turn (before your attack), you may use this power. Salamence ex's type is Fire until the end of your turn.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -5661,7 +5661,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "80",
-        "text": "You may do up to 40 damage instead of 80 to the Defending Pokémon. If you do, this attack does 40 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "You may do 40 damage instead of 80 to the Defending Pokémon. If you do, this attack does 40 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
@@ -5694,8 +5694,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/98.png",
-      "large": "https://images.pokemontcg.io/ex15/98_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/98/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/98/high.webp"
     }
   },
   {
@@ -5775,8 +5775,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/99.png",
-      "large": "https://images.pokemontcg.io/ex15/99_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/99/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/99/high.webp"
     }
   },
   {
@@ -5809,7 +5809,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "You may discard an Energy card attached to Charizard Star. If you do, search your discard pile for an Energy card (excluding the one you discarded) and attach it to Charizard Star."
+        "text": "You may discard an Energy card attached to Charizard ☆. If you do, search your discard pile for an Energy card (excluding the one you discarded) and attach it to Charizard ☆."
       },
       {
         "name": "Dark Swirl",
@@ -5847,8 +5847,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/100.png",
-      "large": "https://images.pokemontcg.io/ex15/100_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/100/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/100/high.webp"
     }
   },
   {
@@ -5880,7 +5880,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Choose an attack on 1 of your opponent's Pokémon in play. Mimicry copies that attack. This attack does nothing if Mew Star doesn't have the Energy necessary to use that attack. (You must still do anything else required for that attack.) Mew Star performs that attack."
+        "text": "Choose an attack on 1 of your opponent's Pokémon in play. Mimicry copies that attack. This attack does nothing if Mew ☆ doesn't have the Energy necessary to use that attack. (You must still do anything else required for that attack.) Mew ☆ performs that attack."
       },
       {
         "name": "Rainbow Wave",
@@ -5912,8 +5912,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex15/101.png",
-      "large": "https://images.pokemontcg.io/ex15/101_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex15/101/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex15/101/high.webp"
     }
   }
 ]

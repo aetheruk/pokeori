@@ -43,7 +43,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -65,8 +65,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/1.png",
-      "large": "https://images.pokemontcg.io/ex3/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/1/high.webp"
     }
   },
   {
@@ -111,7 +111,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -137,8 +137,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/2.png",
-      "large": "https://images.pokemontcg.io/ex3/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/2/high.webp"
     }
   },
   {
@@ -162,7 +162,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Power Pinchers",
         "text": "As long as Crawdaunt is your Active Pokémon, when any of your Active Pokémon does damage to the Defending Pokémon, the attack does 10 more damage (before applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -181,7 +181,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -199,8 +199,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/3.png",
-      "large": "https://images.pokemontcg.io/ex3/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/3/high.webp"
     }
   },
   {
@@ -247,7 +247,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -274,8 +274,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/4.png",
-      "large": "https://images.pokemontcg.io/ex3/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/4/high.webp"
     }
   },
   {
@@ -325,7 +325,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -345,8 +345,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/5.png",
-      "large": "https://images.pokemontcg.io/ex3/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/5/high.webp"
     }
   },
   {
@@ -393,7 +393,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -410,8 +410,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/6.png",
-      "large": "https://images.pokemontcg.io/ex3/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/6/high.webp"
     }
   },
   {
@@ -435,7 +435,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Chain of Events",
         "text": "As long as Minun is your Active Pokémon, whenever your other Active Pokémon, if any, attacks, you may use Cheer On after the first attack (you still need the necessary Energy to use Cheer On). You can't use Cheer On more than once in this way even if your other Active Pokémon has the Chain of Events Poké-Body.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -462,7 +462,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -484,8 +484,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/7.png",
-      "large": "https://images.pokemontcg.io/ex3/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/7/high.webp"
     }
   },
   {
@@ -509,7 +509,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Chain of Events",
         "text": "As long as Plusle is your Active Pokémon, whenever your other Active Pokémon, if any, attacks, you may use Cheer On after the first attack (you still need the necessary Energy to use Cheer On). You can't use Cheer On more than once in this way even if your other Active Pokémon has the Chain of Events Poké-Body.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -536,7 +536,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -558,8 +558,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/8.png",
-      "large": "https://images.pokemontcg.io/ex3/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/8/high.webp"
     }
   },
   {
@@ -585,7 +585,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Thick Skin",
         "text": "Roselia can't be affected by any Special Conditions.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -611,7 +611,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -628,8 +628,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/9.png",
-      "large": "https://images.pokemontcg.io/ex3/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/9/high.webp"
     }
   },
   {
@@ -653,7 +653,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Dragon Wind",
         "text": "Once during your turn (before your attack), if Salamence is your Active Pokémon, you may switch 1 of your opponent's Benched Pokémon with 1 of the Defending Pokémon. Your opponent chooses the Defending Pokémon to switch. This power can't be used if Salamence is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -683,7 +683,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -710,8 +710,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/10.png",
-      "large": "https://images.pokemontcg.io/ex3/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/10/high.webp"
     }
   },
   {
@@ -735,7 +735,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Wonder Guard",
         "text": "Prevent all effects of attacks, including damage, done to Shedinja by your opponent's Evolved Pokémon and Pokémon-ex.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -764,8 +764,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/11.png",
-      "large": "https://images.pokemontcg.io/ex3/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/11/high.webp"
     }
   },
   {
@@ -809,7 +809,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -828,8 +828,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/12.png",
-      "large": "https://images.pokemontcg.io/ex3/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/12/high.webp"
     }
   },
   {
@@ -875,7 +875,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -892,8 +892,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/13.png",
-      "large": "https://images.pokemontcg.io/ex3/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/13/high.webp"
     }
   },
   {
@@ -942,7 +942,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -969,8 +969,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/14.png",
-      "large": "https://images.pokemontcg.io/ex3/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/14/high.webp"
     }
   },
   {
@@ -994,7 +994,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Sand Guard",
         "text": "Whenever Flygon would be damaged by your opponent's attack (after applying Weakness and Resistance), flip a coin. If heads, reduce that damage by 20.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -1026,8 +1026,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/15.png",
-      "large": "https://images.pokemontcg.io/ex3/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/15/high.webp"
     }
   },
   {
@@ -1072,7 +1072,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1089,8 +1089,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/16.png",
-      "large": "https://images.pokemontcg.io/ex3/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/16/high.webp"
     }
   },
   {
@@ -1116,7 +1116,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Magnetic Field",
         "text": "Once during your turn (before your attack), if you have basic Energy cards in your discard pile, you may discard any 1 card from your hand. Then search for up to 2 basic Energy cards from your discard pile, show them to your opponent, and put them into your hand. You can't return the card you first discarded to your hand in this way. This power can't be used if Magneton is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1134,7 +1134,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1156,8 +1156,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/17.png",
-      "large": "https://images.pokemontcg.io/ex3/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/17/high.webp"
     }
   },
   {
@@ -1183,7 +1183,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Loose Shell",
         "text": "Once during your turn, when you play Ninjask from your hand to evolve 1 of your Pokémon, you may search your deck for Shedinja and put it onto your Bench. Treat the new Benched Pokémon as a Basic Pokémon. Shuffle your deck afterward.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1201,12 +1201,12 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       291
     ],
@@ -1216,8 +1216,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/18.png",
-      "large": "https://images.pokemontcg.io/ex3/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/18/high.webp"
     }
   },
   {
@@ -1241,7 +1241,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Intimidating Fang",
         "text": "As long as Salamence is your Active Pokémon, any damage done to your Pokémon by an opponent's attack is reduced by 10 (before applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -1273,8 +1273,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/19.png",
-      "large": "https://images.pokemontcg.io/ex3/19_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/19/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/19/high.webp"
     }
   },
   {
@@ -1322,7 +1322,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1349,8 +1349,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/20.png",
-      "large": "https://images.pokemontcg.io/ex3/20_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/20/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/20/high.webp"
     }
   },
   {
@@ -1395,7 +1395,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1417,8 +1417,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/21.png",
-      "large": "https://images.pokemontcg.io/ex3/21_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/21/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/21/high.webp"
     }
   },
   {
@@ -1455,7 +1455,7 @@ const cardDetails: TcgCardDetail[] = [
         "name": "Dragon Spark",
         "cost": [
           "Grass",
-          "Lightning"
+          "Colorless"
         ],
         "convertedEnergyCost": 2,
         "damage": "",
@@ -1465,7 +1465,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1491,8 +1491,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/22.png",
-      "large": "https://images.pokemontcg.io/ex3/22_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/22/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/22/high.webp"
     }
   },
   {
@@ -1539,7 +1539,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1565,8 +1565,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/23.png",
-      "large": "https://images.pokemontcg.io/ex3/23_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/23/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/23/high.webp"
     }
   },
   {
@@ -1613,7 +1613,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1631,8 +1631,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/24.png",
-      "large": "https://images.pokemontcg.io/ex3/24_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/24/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/24/high.webp"
     }
   },
   {
@@ -1681,7 +1681,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1698,8 +1698,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/25.png",
-      "large": "https://images.pokemontcg.io/ex3/25_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/25/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/25/high.webp"
     }
   },
   {
@@ -1745,7 +1745,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1771,8 +1771,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/26.png",
-      "large": "https://images.pokemontcg.io/ex3/26_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/26/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/26/high.webp"
     }
   },
   {
@@ -1819,7 +1819,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1841,8 +1841,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/27.png",
-      "large": "https://images.pokemontcg.io/ex3/27_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/27/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/27/high.webp"
     }
   },
   {
@@ -1889,7 +1889,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -1912,8 +1912,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/28.png",
-      "large": "https://images.pokemontcg.io/ex3/28_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/28/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/28/high.webp"
     }
   },
   {
@@ -1955,14 +1955,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "",
+        "damage": "10x",
         "text": "Does 80 damage to each Active Pokémon (both yours and your opponent's)."
       }
     ],
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -1981,8 +1981,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/29.png",
-      "large": "https://images.pokemontcg.io/ex3/29_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/29/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/29/high.webp"
     }
   },
   {
@@ -2031,7 +2031,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2050,8 +2050,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/30.png",
-      "large": "https://images.pokemontcg.io/ex3/30_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/30/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/30/high.webp"
     }
   },
   {
@@ -2089,7 +2089,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -2111,8 +2111,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/31.png",
-      "large": "https://images.pokemontcg.io/ex3/31_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/31/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/31/high.webp"
     }
   },
   {
@@ -2160,7 +2160,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2178,8 +2178,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/32.png",
-      "large": "https://images.pokemontcg.io/ex3/32_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/32/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/32/high.webp"
     }
   },
   {
@@ -2225,7 +2225,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2242,8 +2242,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/33.png",
-      "large": "https://images.pokemontcg.io/ex3/33_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/33/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/33/high.webp"
     }
   },
   {
@@ -2278,7 +2278,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Flamethrower",
         "cost": [
-          "Fighting",
+          "Fire",
           "Colorless",
           "Colorless"
         ],
@@ -2290,7 +2290,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -2312,8 +2312,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/34.png",
-      "large": "https://images.pokemontcg.io/ex3/34_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/34/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/34/high.webp"
     }
   },
   {
@@ -2362,7 +2362,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2379,8 +2379,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/35.png",
-      "large": "https://images.pokemontcg.io/ex3/35_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/35/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/35/high.webp"
     }
   },
   {
@@ -2418,7 +2418,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2435,8 +2435,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/36.png",
-      "large": "https://images.pokemontcg.io/ex3/36_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/36/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/36/high.webp"
     }
   },
   {
@@ -2483,7 +2483,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2500,8 +2500,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/37.png",
-      "large": "https://images.pokemontcg.io/ex3/37_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/37/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/37/high.webp"
     }
   },
   {
@@ -2548,12 +2548,12 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       291
     ],
@@ -2563,8 +2563,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/38.png",
-      "large": "https://images.pokemontcg.io/ex3/38_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/38/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/38/high.webp"
     }
   },
   {
@@ -2612,7 +2612,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2629,8 +2629,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/39.png",
-      "large": "https://images.pokemontcg.io/ex3/39_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/39/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/39/high.webp"
     }
   },
   {
@@ -2679,7 +2679,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2696,8 +2696,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/40.png",
-      "large": "https://images.pokemontcg.io/ex3/40_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/40/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/40/high.webp"
     }
   },
   {
@@ -2723,7 +2723,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Energy Guard",
         "text": "As long as Shelgon has any basic Energy cards attached to it, damage done to Shelgon by an opponent's attack is reduced by 10 (after applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -2754,8 +2754,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/41.png",
-      "large": "https://images.pokemontcg.io/ex3/41_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/41/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/41/high.webp"
     }
   },
   {
@@ -2817,8 +2817,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/42.png",
-      "large": "https://images.pokemontcg.io/ex3/42_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/42/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/42/high.webp"
     }
   },
   {
@@ -2864,7 +2864,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Darkness",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -2886,8 +2886,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/43.png",
-      "large": "https://images.pokemontcg.io/ex3/43_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/43/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/43/high.webp"
     }
   },
   {
@@ -2925,7 +2925,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Metal",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -2942,8 +2942,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/44.png",
-      "large": "https://images.pokemontcg.io/ex3/44_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/44/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/44/high.webp"
     }
   },
   {
@@ -2988,7 +2988,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -2998,7 +2998,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       277
     ],
@@ -3008,8 +3008,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/45.png",
-      "large": "https://images.pokemontcg.io/ex3/45_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/45/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/45/high.webp"
     }
   },
   {
@@ -3035,7 +3035,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Levitate",
         "text": "If Vibrava has any basic Energy cards attached to it, Vibrava's Retreat Cost is 0.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -3065,8 +3065,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/46.png",
-      "large": "https://images.pokemontcg.io/ex3/46_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/46/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/46/high.webp"
     }
   },
   {
@@ -3127,8 +3127,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/47.png",
-      "large": "https://images.pokemontcg.io/ex3/47_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/47/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/47/high.webp"
     }
   },
   {
@@ -3152,7 +3152,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Submerge",
         "text": "As long as Whiscash is on your Bench, prevent all damage done to Whiscash by your opponent's attacks.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -3182,7 +3182,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3200,8 +3200,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/48.png",
-      "large": "https://images.pokemontcg.io/ex3/48_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/48/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/48/high.webp"
     }
   },
   {
@@ -3260,8 +3260,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/49.png",
-      "large": "https://images.pokemontcg.io/ex3/49_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/49/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/49/high.webp"
     }
   },
   {
@@ -3320,8 +3320,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/50.png",
-      "large": "https://images.pokemontcg.io/ex3/50_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/50/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/50/high.webp"
     }
   },
   {
@@ -3368,7 +3368,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3385,8 +3385,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/51.png",
-      "large": "https://images.pokemontcg.io/ex3/51_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/51/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/51/high.webp"
     }
   },
   {
@@ -3432,7 +3432,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3449,8 +3449,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/52.png",
-      "large": "https://images.pokemontcg.io/ex3/52_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/52/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/52/high.webp"
     }
   },
   {
@@ -3497,7 +3497,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3514,8 +3514,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/53.png",
-      "large": "https://images.pokemontcg.io/ex3/53_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/53/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/53/high.webp"
     }
   },
   {
@@ -3555,14 +3555,14 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "",
+        "damage": "10",
         "text": "The Defending Pokémon is now Poisoned."
       }
     ],
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3579,8 +3579,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/54.png",
-      "large": "https://images.pokemontcg.io/ex3/54_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/54/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/54/high.webp"
     }
   },
   {
@@ -3626,7 +3626,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3643,8 +3643,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/55.png",
-      "large": "https://images.pokemontcg.io/ex3/55_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/55/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/55/high.webp"
     }
   },
   {
@@ -3681,7 +3681,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3698,8 +3698,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/56.png",
-      "large": "https://images.pokemontcg.io/ex3/56_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/56/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/56/high.webp"
     }
   },
   {
@@ -3745,7 +3745,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3762,8 +3762,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/57.png",
-      "large": "https://images.pokemontcg.io/ex3/57_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/57/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/57/high.webp"
     }
   },
   {
@@ -3810,7 +3810,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3827,8 +3827,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/58.png",
-      "large": "https://images.pokemontcg.io/ex3/58_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/58/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/58/high.webp"
     }
   },
   {
@@ -3875,7 +3875,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -3897,8 +3897,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/59.png",
-      "large": "https://images.pokemontcg.io/ex3/59_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/59/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/59/high.webp"
     }
   },
   {
@@ -3945,7 +3945,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -3962,8 +3962,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/60.png",
-      "large": "https://images.pokemontcg.io/ex3/60_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/60/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/60/high.webp"
     }
   },
   {
@@ -4010,7 +4010,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4032,8 +4032,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/61.png",
-      "large": "https://images.pokemontcg.io/ex3/61_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/61/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/61/high.webp"
     }
   },
   {
@@ -4060,7 +4060,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Random Spark",
         "cost": [
-          "Lightning"
+          "Colorless"
         ],
         "convertedEnergyCost": 1,
         "damage": "",
@@ -4070,7 +4070,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4092,8 +4092,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/62.png",
-      "large": "https://images.pokemontcg.io/ex3/62_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/62/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/62/high.webp"
     }
   },
   {
@@ -4130,7 +4130,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4147,8 +4147,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/63.png",
-      "large": "https://images.pokemontcg.io/ex3/63_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/63/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/63/high.webp"
     }
   },
   {
@@ -4185,7 +4185,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4207,8 +4207,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/64.png",
-      "large": "https://images.pokemontcg.io/ex3/64_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/64/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/64/high.webp"
     }
   },
   {
@@ -4245,7 +4245,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4262,8 +4262,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/65.png",
-      "large": "https://images.pokemontcg.io/ex3/65_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/65/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/65/high.webp"
     }
   },
   {
@@ -4300,7 +4300,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4317,8 +4317,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/66.png",
-      "large": "https://images.pokemontcg.io/ex3/66_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/66/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/66/high.webp"
     }
   },
   {
@@ -4354,8 +4354,8 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Double Scratch",
         "cost": [
-          "Grass",
-          "Colorless"
+          "Colorless",
+          "Grass"
         ],
         "convertedEnergyCost": 2,
         "damage": "20×",
@@ -4365,7 +4365,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4382,8 +4382,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/67.png",
-      "large": "https://images.pokemontcg.io/ex3/67_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/67/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/67/high.webp"
     }
   },
   {
@@ -4420,7 +4420,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4437,8 +4437,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/68.png",
-      "large": "https://images.pokemontcg.io/ex3/68_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/68/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/68/high.webp"
     }
   },
   {
@@ -4485,7 +4485,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4502,8 +4502,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/69.png",
-      "large": "https://images.pokemontcg.io/ex3/69_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/69/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/69/high.webp"
     }
   },
   {
@@ -4549,7 +4549,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4567,8 +4567,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/70.png",
-      "large": "https://images.pokemontcg.io/ex3/70_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/70/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/70/high.webp"
     }
   },
   {
@@ -4594,7 +4594,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Exoskeleton",
         "text": "Any damage done to Pineco by attacks is reduced by 10 (after applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -4612,7 +4612,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4629,8 +4629,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/71.png",
-      "large": "https://images.pokemontcg.io/ex3/71_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/71/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/71/high.webp"
     }
   },
   {
@@ -4677,7 +4677,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4695,8 +4695,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/72.png",
-      "large": "https://images.pokemontcg.io/ex3/72_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/72/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/72/high.webp"
     }
   },
   {
@@ -4733,7 +4733,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4750,8 +4750,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/73.png",
-      "large": "https://images.pokemontcg.io/ex3/73_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/73/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/73/high.webp"
     }
   },
   {
@@ -4798,7 +4798,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -4815,8 +4815,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/74.png",
-      "large": "https://images.pokemontcg.io/ex3/74_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/74/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/74/high.webp"
     }
   },
   {
@@ -4862,7 +4862,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4884,8 +4884,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/75.png",
-      "large": "https://images.pokemontcg.io/ex3/75_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/75/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/75/high.webp"
     }
   },
   {
@@ -4922,7 +4922,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -4944,8 +4944,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/76.png",
-      "large": "https://images.pokemontcg.io/ex3/76_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/76/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/76/high.webp"
     }
   },
   {
@@ -4983,7 +4983,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5000,8 +5000,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/77.png",
-      "large": "https://images.pokemontcg.io/ex3/77_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/77/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/77/high.webp"
     }
   },
   {
@@ -5038,7 +5038,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5055,8 +5055,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/78.png",
-      "large": "https://images.pokemontcg.io/ex3/78_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/78/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/78/high.webp"
     }
   },
   {
@@ -5103,7 +5103,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5120,8 +5120,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/79.png",
-      "large": "https://images.pokemontcg.io/ex3/79_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/79/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/79/high.webp"
     }
   },
   {
@@ -5159,7 +5159,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -5181,8 +5181,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/80.png",
-      "large": "https://images.pokemontcg.io/ex3/80_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/80/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/80/high.webp"
     }
   },
   {
@@ -5229,7 +5229,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5246,8 +5246,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/81.png",
-      "large": "https://images.pokemontcg.io/ex3/81_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/81/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/81/high.webp"
     }
   },
   {
@@ -5281,8 +5281,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/82.png",
-      "large": "https://images.pokemontcg.io/ex3/82_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/82/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/82/high.webp"
     }
   },
   {
@@ -5316,8 +5316,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/83.png",
-      "large": "https://images.pokemontcg.io/ex3/83_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/83/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/83/high.webp"
     }
   },
   {
@@ -5351,8 +5351,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/84.png",
-      "large": "https://images.pokemontcg.io/ex3/84_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/84/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/84/high.webp"
     }
   },
   {
@@ -5386,8 +5386,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/85.png",
-      "large": "https://images.pokemontcg.io/ex3/85_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/85/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/85/high.webp"
     }
   },
   {
@@ -5413,7 +5413,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -5421,8 +5421,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/86.png",
-      "large": "https://images.pokemontcg.io/ex3/86_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/86/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/86/high.webp"
     }
   },
   {
@@ -5456,8 +5456,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/87.png",
-      "large": "https://images.pokemontcg.io/ex3/87_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/87/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/87/high.webp"
     }
   },
   {
@@ -5492,8 +5492,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/88.png",
-      "large": "https://images.pokemontcg.io/ex3/88_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/88/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/88/high.webp"
     }
   },
   {
@@ -5520,7 +5520,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Conductivity",
         "text": "As long as Ampharos ex is in play, whenever your opponent attaches an Energy card to his or her Pokémon from hand, put 1 damage counter on that Pokémon. You can't put more than 1 damage counter even if there is more than 1 Ampharos ex in play.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -5539,7 +5539,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -5563,8 +5563,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/89.png",
-      "large": "https://images.pokemontcg.io/ex3/89_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/89/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/89/high.webp"
     }
   },
   {
@@ -5591,7 +5591,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Call for Power",
         "text": "As often as you like during your turn, you may move an Energy card attached to 1 of your Pokémon to Dragonite ex. This power can't be used if Dragonite ex is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -5621,7 +5621,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -5648,8 +5648,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/90.png",
-      "large": "https://images.pokemontcg.io/ex3/90_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/90/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/90/high.webp"
     }
   },
   {
@@ -5702,11 +5702,11 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       },
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5727,8 +5727,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/91.png",
-      "large": "https://images.pokemontcg.io/ex3/91_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/91/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/91/high.webp"
     }
   },
   {
@@ -5777,11 +5777,11 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": "x2"
       },
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -5800,8 +5800,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/92.png",
-      "large": "https://images.pokemontcg.io/ex3/92_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/92/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/92/high.webp"
     }
   },
   {
@@ -5850,7 +5850,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -5877,8 +5877,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/93.png",
-      "large": "https://images.pokemontcg.io/ex3/93_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/93/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/93/high.webp"
     }
   },
   {
@@ -5927,7 +5927,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -5954,8 +5954,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/94.png",
-      "large": "https://images.pokemontcg.io/ex3/94_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/94/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/94/high.webp"
     }
   },
   {
@@ -6004,7 +6004,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -6023,8 +6023,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/95.png",
-      "large": "https://images.pokemontcg.io/ex3/95_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/95/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/95/high.webp"
     }
   },
   {
@@ -6051,7 +6051,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Toxic Gas",
         "text": "As long as Muk ex is your Active Pokémon, ignore all Poké-Powers and Poké-Bodies other than Toxic Gas.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -6079,7 +6079,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -6097,8 +6097,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/96.png",
-      "large": "https://images.pokemontcg.io/ex3/96_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/96/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/96/high.webp"
     }
   },
   {
@@ -6146,7 +6146,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Colorless",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [
@@ -6173,8 +6173,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/97.png",
-      "large": "https://images.pokemontcg.io/ex3/97_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/97/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/97/high.webp"
     }
   },
   {
@@ -6221,7 +6221,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -6238,8 +6238,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/98.png",
-      "large": "https://images.pokemontcg.io/ex3/98_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/98/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/98/high.webp"
     }
   },
   {
@@ -6286,7 +6286,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -6303,8 +6303,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/99.png",
-      "large": "https://images.pokemontcg.io/ex3/99_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/99/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/99/high.webp"
     }
   },
   {
@@ -6352,7 +6352,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": "x2"
       }
     ],
     "resistances": [],
@@ -6370,8 +6370,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/ex3/100.png",
-      "large": "https://images.pokemontcg.io/ex3/100_hires.png"
+      "small": "https://assets.tcgdex.net/en/ex/ex3/100/low.webp",
+      "large": "https://assets.tcgdex.net/en/ex/ex3/100/high.webp"
     }
   }
 ]

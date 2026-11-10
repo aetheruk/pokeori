@@ -16,7 +16,7 @@ const setData: TcgSet = {
       "id": "me3-1",
       "name": "Spinarak",
       "number": "1",
-      "artist": null,
+      "artist": "Katsunori Sato",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -33,15 +33,15 @@ const setData: TcgSet = {
         167
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-1/small",
-        "large": "https://images.scrydex.com/pokemon/me3-1/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/001/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/001/high.webp"
       }
     },
     {
       "id": "me3-2",
       "name": "Ariados",
       "number": "2",
-      "artist": null,
+      "artist": "svlt",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -58,15 +58,15 @@ const setData: TcgSet = {
         168
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-2/small",
-        "large": "https://images.scrydex.com/pokemon/me3-2/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/002/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/002/high.webp"
       }
     },
     {
       "id": "me3-3",
       "name": "Shaymin",
       "number": "3",
-      "artist": null,
+      "artist": "saino misaki",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -78,20 +78,20 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         492
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-3/small",
-        "large": "https://images.scrydex.com/pokemon/me3-3/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/003/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/003/high.webp"
       }
     },
     {
       "id": "me3-4",
       "name": "Snivy",
       "number": "4",
-      "artist": null,
+      "artist": "Narumi Sato",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -108,15 +108,15 @@ const setData: TcgSet = {
         495
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-4/small",
-        "large": "https://images.scrydex.com/pokemon/me3-4/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/004/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/004/high.webp"
       }
     },
     {
       "id": "me3-5",
       "name": "Servine",
       "number": "5",
-      "artist": null,
+      "artist": "Kurata So",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -133,15 +133,15 @@ const setData: TcgSet = {
         496
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-5/small",
-        "large": "https://images.scrydex.com/pokemon/me3-5/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/005/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/005/high.webp"
       }
     },
     {
       "id": "me3-6",
       "name": "Serperior",
       "number": "6",
-      "artist": null,
+      "artist": "kodama",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -158,15 +158,15 @@ const setData: TcgSet = {
         497
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-6/small",
-        "large": "https://images.scrydex.com/pokemon/me3-6/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/006/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/006/high.webp"
       }
     },
     {
       "id": "me3-7",
       "name": "Scatterbug",
       "number": "7",
-      "artist": null,
+      "artist": "OKACHEKE",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -183,15 +183,15 @@ const setData: TcgSet = {
         664
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-7/small",
-        "large": "https://images.scrydex.com/pokemon/me3-7/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/007/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/007/high.webp"
       }
     },
     {
       "id": "me3-8",
       "name": "Spewpa",
       "number": "8",
-      "artist": null,
+      "artist": "Ounishi",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -208,15 +208,15 @@ const setData: TcgSet = {
         665
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-8/small",
-        "large": "https://images.scrydex.com/pokemon/me3-8/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/008/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/008/high.webp"
       }
     },
     {
       "id": "me3-9",
       "name": "Vivillon",
       "number": "9",
-      "artist": null,
+      "artist": "mingo",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -233,15 +233,15 @@ const setData: TcgSet = {
         666
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-9/small",
-        "large": "https://images.scrydex.com/pokemon/me3-9/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/009/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/009/high.webp"
       }
     },
     {
       "id": "me3-10",
       "name": "Rowlet",
       "number": "10",
-      "artist": null,
+      "artist": "Atsuya Uki",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -258,15 +258,15 @@ const setData: TcgSet = {
         722
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-10/small",
-        "large": "https://images.scrydex.com/pokemon/me3-10/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/010/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/010/high.webp"
       }
     },
     {
       "id": "me3-11",
       "name": "Dartrix",
       "number": "11",
-      "artist": null,
+      "artist": "aspara",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -283,15 +283,15 @@ const setData: TcgSet = {
         723
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-11/small",
-        "large": "https://images.scrydex.com/pokemon/me3-11/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/011/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/011/high.webp"
       }
     },
     {
       "id": "me3-12",
       "name": "Decidueye ex",
       "number": "12",
-      "artist": null,
+      "artist": "aky CG Works",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -309,15 +309,15 @@ const setData: TcgSet = {
         724
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-12/small",
-        "large": "https://images.scrydex.com/pokemon/me3-12/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/012/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/012/high.webp"
       }
     },
     {
       "id": "me3-13",
       "name": "Fletchinder",
       "number": "13",
-      "artist": null,
+      "artist": "Sumiyoshi Kizuki",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -334,15 +334,15 @@ const setData: TcgSet = {
         662
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-13/small",
-        "large": "https://images.scrydex.com/pokemon/me3-13/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/013/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/013/high.webp"
       }
     },
     {
       "id": "me3-14",
       "name": "Talonflame",
       "number": "14",
-      "artist": null,
+      "artist": "Shinji Kanda",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -359,15 +359,15 @@ const setData: TcgSet = {
         663
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-14/small",
-        "large": "https://images.scrydex.com/pokemon/me3-14/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/014/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/014/high.webp"
       }
     },
     {
       "id": "me3-15",
       "name": "Salandit",
       "number": "15",
-      "artist": null,
+      "artist": "Kazuhisa Uragami",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -384,15 +384,15 @@ const setData: TcgSet = {
         757
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-15/small",
-        "large": "https://images.scrydex.com/pokemon/me3-15/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/015/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/015/high.webp"
       }
     },
     {
       "id": "me3-16",
       "name": "Salazzle ex",
       "number": "16",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -410,15 +410,15 @@ const setData: TcgSet = {
         758
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-16/small",
-        "large": "https://images.scrydex.com/pokemon/me3-16/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/016/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/016/high.webp"
       }
     },
     {
       "id": "me3-17",
       "name": "Turtonator",
       "number": "17",
-      "artist": null,
+      "artist": "Hasuno",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -435,15 +435,15 @@ const setData: TcgSet = {
         776
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-17/small",
-        "large": "https://images.scrydex.com/pokemon/me3-17/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/017/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/017/high.webp"
       }
     },
     {
       "id": "me3-18",
       "name": "Seel",
       "number": "18",
-      "artist": null,
+      "artist": "Kanami Ogata",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -460,15 +460,15 @@ const setData: TcgSet = {
         86
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-18/small",
-        "large": "https://images.scrydex.com/pokemon/me3-18/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/018/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/018/high.webp"
       }
     },
     {
       "id": "me3-19",
       "name": "Dewgong",
       "number": "19",
-      "artist": null,
+      "artist": "Yoshioka",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -485,15 +485,15 @@ const setData: TcgSet = {
         87
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-19/small",
-        "large": "https://images.scrydex.com/pokemon/me3-19/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/019/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/019/high.webp"
       }
     },
     {
       "id": "me3-20",
       "name": "Staryu",
       "number": "20",
-      "artist": null,
+      "artist": "Takeshi Nakamura",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -510,15 +510,15 @@ const setData: TcgSet = {
         120
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-20/small",
-        "large": "https://images.scrydex.com/pokemon/me3-20/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/020/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/020/high.webp"
       }
     },
     {
       "id": "me3-21",
       "name": "Mega Starmie ex",
       "number": "21",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -537,15 +537,15 @@ const setData: TcgSet = {
         121
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-21/small",
-        "large": "https://images.scrydex.com/pokemon/me3-21/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/021/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/021/high.webp"
       }
     },
     {
       "id": "me3-22",
       "name": "Lapras ex",
       "number": "22",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -563,15 +563,15 @@ const setData: TcgSet = {
         131
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-22/small",
-        "large": "https://images.scrydex.com/pokemon/me3-22/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/022/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/022/high.webp"
       }
     },
     {
       "id": "me3-23",
       "name": "Amaura",
       "number": "23",
-      "artist": null,
+      "artist": "Hitoshi Ariga",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -588,15 +588,15 @@ const setData: TcgSet = {
         698
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-23/small",
-        "large": "https://images.scrydex.com/pokemon/me3-23/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/023/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/023/high.webp"
       }
     },
     {
       "id": "me3-24",
       "name": "Aurorus",
       "number": "24",
-      "artist": null,
+      "artist": "HACCAN",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -613,15 +613,15 @@ const setData: TcgSet = {
         699
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-24/small",
-        "large": "https://images.scrydex.com/pokemon/me3-24/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/024/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/024/high.webp"
       }
     },
     {
       "id": "me3-25",
       "name": "Volcanion",
       "number": "25",
-      "artist": null,
+      "artist": "AKIRA EGAWA",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -638,15 +638,15 @@ const setData: TcgSet = {
         721
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-25/small",
-        "large": "https://images.scrydex.com/pokemon/me3-25/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/025/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/025/high.webp"
       }
     },
     {
       "id": "me3-26",
       "name": "Shinx",
       "number": "26",
-      "artist": null,
+      "artist": "Saboteri",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -663,15 +663,15 @@ const setData: TcgSet = {
         403
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-26/small",
-        "large": "https://images.scrydex.com/pokemon/me3-26/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/026/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/026/high.webp"
       }
     },
     {
       "id": "me3-27",
       "name": "Luxio",
       "number": "27",
-      "artist": null,
+      "artist": "Atsuko Nishida",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -688,15 +688,15 @@ const setData: TcgSet = {
         404
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-27/small",
-        "large": "https://images.scrydex.com/pokemon/me3-27/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/027/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/027/high.webp"
       }
     },
     {
       "id": "me3-28",
       "name": "Luxray",
       "number": "28",
-      "artist": null,
+      "artist": "Taiga Kasai",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -708,20 +708,20 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": "Luxio",
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         405
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-28/small",
-        "large": "https://images.scrydex.com/pokemon/me3-28/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/028/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/028/high.webp"
       }
     },
     {
       "id": "me3-29",
       "name": "Dedenne",
       "number": "29",
-      "artist": null,
+      "artist": "sowsow",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -738,15 +738,15 @@ const setData: TcgSet = {
         702
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-29/small",
-        "large": "https://images.scrydex.com/pokemon/me3-29/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/029/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/029/high.webp"
       }
     },
     {
       "id": "me3-30",
       "name": "Clefairy",
       "number": "30",
-      "artist": null,
+      "artist": "Natsumi Yoshida",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -763,15 +763,15 @@ const setData: TcgSet = {
         35
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-30/small",
-        "large": "https://images.scrydex.com/pokemon/me3-30/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/030/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/030/high.webp"
       }
     },
     {
       "id": "me3-31",
       "name": "Mega Clefable ex",
       "number": "31",
-      "artist": null,
+      "artist": "aky CG Works",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -790,15 +790,15 @@ const setData: TcgSet = {
         36
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-31/small",
-        "large": "https://images.scrydex.com/pokemon/me3-31/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/031/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/031/high.webp"
       }
     },
     {
       "id": "me3-32",
       "name": "Mawile",
       "number": "32",
-      "artist": null,
+      "artist": "OKACHEKE",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -815,15 +815,15 @@ const setData: TcgSet = {
         303
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-32/small",
-        "large": "https://images.scrydex.com/pokemon/me3-32/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/032/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/032/high.webp"
       }
     },
     {
       "id": "me3-33",
       "name": "Espurr",
       "number": "33",
-      "artist": null,
+      "artist": "Terada Tera",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -840,15 +840,15 @@ const setData: TcgSet = {
         677
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-33/small",
-        "large": "https://images.scrydex.com/pokemon/me3-33/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/033/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/033/high.webp"
       }
     },
     {
       "id": "me3-34",
       "name": "Meowstic",
       "number": "34",
-      "artist": null,
+      "artist": "Kannnu",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -865,15 +865,15 @@ const setData: TcgSet = {
         678
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-34/small",
-        "large": "https://images.scrydex.com/pokemon/me3-34/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/034/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/034/high.webp"
       }
     },
     {
       "id": "me3-35",
       "name": "Spritzee",
       "number": "35",
-      "artist": null,
+      "artist": "Pani Kobayashi",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -890,15 +890,15 @@ const setData: TcgSet = {
         682
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-35/small",
-        "large": "https://images.scrydex.com/pokemon/me3-35/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/035/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/035/high.webp"
       }
     },
     {
       "id": "me3-36",
       "name": "Aromatisse",
       "number": "36",
-      "artist": null,
+      "artist": "Mori Yuu",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -915,15 +915,15 @@ const setData: TcgSet = {
         683
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-36/small",
-        "large": "https://images.scrydex.com/pokemon/me3-36/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/036/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/036/high.webp"
       }
     },
     {
       "id": "me3-37",
       "name": "Nosepass",
       "number": "37",
-      "artist": null,
+      "artist": "Jerky",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -940,15 +940,15 @@ const setData: TcgSet = {
         299
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-37/small",
-        "large": "https://images.scrydex.com/pokemon/me3-37/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/037/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/037/high.webp"
       }
     },
     {
       "id": "me3-38",
       "name": "Probopass",
       "number": "38",
-      "artist": null,
+      "artist": "Nurikabe",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -965,15 +965,15 @@ const setData: TcgSet = {
         476
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-38/small",
-        "large": "https://images.scrydex.com/pokemon/me3-38/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/038/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/038/high.webp"
       }
     },
     {
       "id": "me3-39",
       "name": "Hippopotas",
       "number": "39",
-      "artist": null,
+      "artist": "Kagemaru Himeno",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -990,15 +990,15 @@ const setData: TcgSet = {
         449
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-39/small",
-        "large": "https://images.scrydex.com/pokemon/me3-39/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/039/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/039/high.webp"
       }
     },
     {
       "id": "me3-40",
       "name": "Hippowdon",
       "number": "40",
-      "artist": null,
+      "artist": "Souichirou Gunjima",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1015,15 +1015,15 @@ const setData: TcgSet = {
         450
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-40/small",
-        "large": "https://images.scrydex.com/pokemon/me3-40/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/040/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/040/high.webp"
       }
     },
     {
       "id": "me3-41",
       "name": "Landorus",
       "number": "41",
-      "artist": null,
+      "artist": "aoki",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1040,15 +1040,15 @@ const setData: TcgSet = {
         645
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-41/small",
-        "large": "https://images.scrydex.com/pokemon/me3-41/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/041/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/041/high.webp"
       }
     },
     {
       "id": "me3-42",
       "name": "Binacle",
       "number": "42",
-      "artist": null,
+      "artist": "nagimiso",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1065,15 +1065,15 @@ const setData: TcgSet = {
         688
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-42/small",
-        "large": "https://images.scrydex.com/pokemon/me3-42/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/042/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/042/high.webp"
       }
     },
     {
       "id": "me3-43",
       "name": "Barbaracle",
       "number": "43",
-      "artist": null,
+      "artist": "Kazumasa Yasukuni",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1090,15 +1090,15 @@ const setData: TcgSet = {
         689
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-43/small",
-        "large": "https://images.scrydex.com/pokemon/me3-43/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/043/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/043/high.webp"
       }
     },
     {
       "id": "me3-44",
       "name": "Tyrunt",
       "number": "44",
-      "artist": null,
+      "artist": "Tomomi Kaneko",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1115,15 +1115,15 @@ const setData: TcgSet = {
         696
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-44/small",
-        "large": "https://images.scrydex.com/pokemon/me3-44/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/044/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/044/high.webp"
       }
     },
     {
       "id": "me3-45",
       "name": "Tyrantrum",
       "number": "45",
-      "artist": null,
+      "artist": "Dsuke",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1140,15 +1140,15 @@ const setData: TcgSet = {
         697
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-45/small",
-        "large": "https://images.scrydex.com/pokemon/me3-45/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/045/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/045/high.webp"
       }
     },
     {
       "id": "me3-46",
       "name": "Hawlucha",
       "number": "46",
-      "artist": null,
+      "artist": "osare",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1160,20 +1160,20 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         701
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-46/small",
-        "large": "https://images.scrydex.com/pokemon/me3-46/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/046/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/046/high.webp"
       }
     },
     {
       "id": "me3-47",
       "name": "Mega Zygarde ex",
       "number": "47",
-      "artist": null,
+      "artist": "takuyoa",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1192,15 +1192,15 @@ const setData: TcgSet = {
         718
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-47/small",
-        "large": "https://images.scrydex.com/pokemon/me3-47/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/047/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/047/high.webp"
       }
     },
     {
       "id": "me3-48",
       "name": "Gastly",
       "number": "48",
-      "artist": null,
+      "artist": "MARINA Chikazawa",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1217,15 +1217,15 @@ const setData: TcgSet = {
         92
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-48/small",
-        "large": "https://images.scrydex.com/pokemon/me3-48/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/048/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/048/high.webp"
       }
     },
     {
       "id": "me3-49",
       "name": "Haunter",
       "number": "49",
-      "artist": null,
+      "artist": "Kedamahadaitai Yawarakai",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1242,15 +1242,15 @@ const setData: TcgSet = {
         93
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-49/small",
-        "large": "https://images.scrydex.com/pokemon/me3-49/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/049/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/049/high.webp"
       }
     },
     {
       "id": "me3-50",
       "name": "Gengar",
       "number": "50",
-      "artist": null,
+      "artist": "Masako Tomii",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1267,15 +1267,15 @@ const setData: TcgSet = {
         94
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-50/small",
-        "large": "https://images.scrydex.com/pokemon/me3-50/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/050/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/050/high.webp"
       }
     },
     {
       "id": "me3-51",
       "name": "Skorupi",
       "number": "51",
-      "artist": null,
+      "artist": "Aya Kusube",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1292,15 +1292,15 @@ const setData: TcgSet = {
         451
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-51/small",
-        "large": "https://images.scrydex.com/pokemon/me3-51/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/051/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/051/high.webp"
       }
     },
     {
       "id": "me3-52",
       "name": "Drapion",
       "number": "52",
-      "artist": null,
+      "artist": "Nelnal",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1317,15 +1317,15 @@ const setData: TcgSet = {
         452
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-52/small",
-        "large": "https://images.scrydex.com/pokemon/me3-52/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/052/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/052/high.webp"
       }
     },
     {
       "id": "me3-53",
       "name": "Yveltal ex",
       "number": "53",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1343,15 +1343,15 @@ const setData: TcgSet = {
         717
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-53/small",
-        "large": "https://images.scrydex.com/pokemon/me3-53/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/053/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/053/high.webp"
       }
     },
     {
       "id": "me3-54",
       "name": "Chien-Pao",
       "number": "54",
-      "artist": null,
+      "artist": "Satoshi Ohta",
       "rarity": "Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1368,15 +1368,15 @@ const setData: TcgSet = {
         1002
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-54/small",
-        "large": "https://images.scrydex.com/pokemon/me3-54/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/054/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/054/high.webp"
       }
     },
     {
       "id": "me3-55",
       "name": "Mega Skarmory ex",
       "number": "55",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1390,20 +1390,20 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         227
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-55/small",
-        "large": "https://images.scrydex.com/pokemon/me3-55/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/055/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/055/high.webp"
       }
     },
     {
       "id": "me3-56",
       "name": "Honedge",
       "number": "56",
-      "artist": null,
+      "artist": "Apios",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1420,15 +1420,15 @@ const setData: TcgSet = {
         679
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-56/small",
-        "large": "https://images.scrydex.com/pokemon/me3-56/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/056/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/056/high.webp"
       }
     },
     {
       "id": "me3-57",
       "name": "Doublade",
       "number": "57",
-      "artist": null,
+      "artist": "Kamome Shirahama",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1445,15 +1445,15 @@ const setData: TcgSet = {
         680
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-57/small",
-        "large": "https://images.scrydex.com/pokemon/me3-57/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/057/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/057/high.webp"
       }
     },
     {
       "id": "me3-58",
       "name": "Aegislash",
       "number": "58",
-      "artist": null,
+      "artist": "Mitsuhiro Arita",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1470,15 +1470,15 @@ const setData: TcgSet = {
         681
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-58/small",
-        "large": "https://images.scrydex.com/pokemon/me3-58/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/058/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/058/high.webp"
       }
     },
     {
       "id": "me3-59",
       "name": "Klefki",
       "number": "59",
-      "artist": null,
+      "artist": "MINAMINAMI Take",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1495,15 +1495,15 @@ const setData: TcgSet = {
         707
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-59/small",
-        "large": "https://images.scrydex.com/pokemon/me3-59/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/059/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/059/high.webp"
       }
     },
     {
       "id": "me3-60",
       "name": "Rattata",
       "number": "60",
-      "artist": null,
+      "artist": "Shinya Komatsu",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1520,15 +1520,15 @@ const setData: TcgSet = {
         19
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-60/small",
-        "large": "https://images.scrydex.com/pokemon/me3-60/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/060/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/060/high.webp"
       }
     },
     {
       "id": "me3-61",
       "name": "Raticate",
       "number": "61",
-      "artist": null,
+      "artist": "Minahamu",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1545,15 +1545,15 @@ const setData: TcgSet = {
         20
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-61/small",
-        "large": "https://images.scrydex.com/pokemon/me3-61/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/061/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/061/high.webp"
       }
     },
     {
       "id": "me3-62",
       "name": "Meowth ex",
       "number": "62",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Double Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1571,15 +1571,15 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-62/small",
-        "large": "https://images.scrydex.com/pokemon/me3-62/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/062/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/062/high.webp"
       }
     },
     {
       "id": "me3-63",
       "name": "Snorlax",
       "number": "63",
-      "artist": null,
+      "artist": "Toshinao Aoki",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1596,15 +1596,15 @@ const setData: TcgSet = {
         143
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-63/small",
-        "large": "https://images.scrydex.com/pokemon/me3-63/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/063/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/063/high.webp"
       }
     },
     {
       "id": "me3-64",
       "name": "Bunnelby",
       "number": "64",
-      "artist": null,
+      "artist": "MINAMINAMI Take",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1621,15 +1621,15 @@ const setData: TcgSet = {
         659
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-64/small",
-        "large": "https://images.scrydex.com/pokemon/me3-64/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/064/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/064/high.webp"
       }
     },
     {
       "id": "me3-65",
       "name": "Diggersby",
       "number": "65",
-      "artist": null,
+      "artist": "Mousho",
       "rarity": "Uncommon",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1646,15 +1646,15 @@ const setData: TcgSet = {
         660
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-65/small",
-        "large": "https://images.scrydex.com/pokemon/me3-65/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/065/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/065/high.webp"
       }
     },
     {
       "id": "me3-66",
       "name": "Fletchling",
       "number": "66",
-      "artist": null,
+      "artist": "sowsow",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1671,15 +1671,15 @@ const setData: TcgSet = {
         661
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-66/small",
-        "large": "https://images.scrydex.com/pokemon/me3-66/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/066/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/066/high.webp"
       }
     },
     {
       "id": "me3-67",
       "name": "Furfrou",
       "number": "67",
-      "artist": null,
+      "artist": "Teeziro",
       "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
@@ -1696,15 +1696,15 @@ const setData: TcgSet = {
         676
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-67/small",
-        "large": "https://images.scrydex.com/pokemon/me3-67/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/067/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/067/high.webp"
       }
     },
     {
       "id": "me3-68",
       "name": "Antique Jaw Fossil",
       "number": "68",
-      "artist": null,
+      "artist": "AYUMI ODASHIMA",
       "rarity": "Common",
       "supertype": "Trainer",
       "subtypes": [
@@ -1717,15 +1717,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-68/small",
-        "large": "https://images.scrydex.com/pokemon/me3-68/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/068/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/068/high.webp"
       }
     },
     {
       "id": "me3-69",
       "name": "Antique Sail Fossil",
       "number": "69",
-      "artist": null,
+      "artist": "AYUMI ODASHIMA",
       "rarity": "Common",
       "supertype": "Trainer",
       "subtypes": [
@@ -1738,15 +1738,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-69/small",
-        "large": "https://images.scrydex.com/pokemon/me3-69/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/069/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/069/high.webp"
       }
     },
     {
       "id": "me3-70",
       "name": "Core Memory",
       "number": "70",
-      "artist": null,
+      "artist": "Toyste Beach",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -1759,15 +1759,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-70/small",
-        "large": "https://images.scrydex.com/pokemon/me3-70/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/070/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/070/high.webp"
       }
     },
     {
       "id": "me3-71",
       "name": "Crushing Hammer",
       "number": "71",
-      "artist": null,
+      "artist": "Ayaka Yoshida",
       "rarity": "Common",
       "supertype": "Trainer",
       "subtypes": [
@@ -1780,15 +1780,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-71/small",
-        "large": "https://images.scrydex.com/pokemon/me3-71/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/071/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/071/high.webp"
       }
     },
     {
       "id": "me3-72",
       "name": "Energy Search",
       "number": "72",
-      "artist": null,
+      "artist": "Toyste Beach",
       "rarity": "Common",
       "supertype": "Trainer",
       "subtypes": [
@@ -1801,15 +1801,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-72/small",
-        "large": "https://images.scrydex.com/pokemon/me3-72/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/072/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/072/high.webp"
       }
     },
     {
       "id": "me3-73",
       "name": "Energy Swatter",
       "number": "73",
-      "artist": null,
+      "artist": "Toyste Beach",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -1822,15 +1822,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-73/small",
-        "large": "https://images.scrydex.com/pokemon/me3-73/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/073/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/073/high.webp"
       }
     },
     {
       "id": "me3-74",
       "name": "Hole-Digging Shovel",
       "number": "74",
-      "artist": null,
+      "artist": "Toyste Beach",
       "rarity": "Common",
       "supertype": "Trainer",
       "subtypes": [
@@ -1843,15 +1843,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-74/small",
-        "large": "https://images.scrydex.com/pokemon/me3-74/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/074/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/074/high.webp"
       }
     },
     {
       "id": "me3-75",
       "name": "Jacinthe",
       "number": "75",
-      "artist": null,
+      "artist": "Susumu Maeya",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -1864,15 +1864,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-75/small",
-        "large": "https://images.scrydex.com/pokemon/me3-75/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/075/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/075/high.webp"
       }
     },
     {
       "id": "me3-76",
       "name": "Judge",
       "number": "76",
-      "artist": null,
+      "artist": "kantaro",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -1885,15 +1885,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-76/small",
-        "large": "https://images.scrydex.com/pokemon/me3-76/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/076/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/076/high.webp"
       }
     },
     {
       "id": "me3-77",
       "name": "Lumiose City",
       "number": "77",
-      "artist": null,
+      "artist": "MARINA Chikazawa",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -1906,15 +1906,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-77/small",
-        "large": "https://images.scrydex.com/pokemon/me3-77/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/077/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/077/high.webp"
       }
     },
     {
       "id": "me3-78",
       "name": "Lumiose Galette",
       "number": "78",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -1927,15 +1927,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-78/small",
-        "large": "https://images.scrydex.com/pokemon/me3-78/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/078/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/078/high.webp"
       }
     },
     {
       "id": "me3-79",
       "name": "Naveen",
       "number": "79",
-      "artist": null,
+      "artist": "DOM",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -1948,15 +1948,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-79/small",
-        "large": "https://images.scrydex.com/pokemon/me3-79/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/079/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/079/high.webp"
       }
     },
     {
       "id": "me3-80",
       "name": "Poké Ball",
       "number": "80",
-      "artist": null,
+      "artist": "Studio Bora Inc.",
       "rarity": "Common",
       "supertype": "Trainer",
       "subtypes": [
@@ -1969,15 +1969,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-80/small",
-        "large": "https://images.scrydex.com/pokemon/me3-80/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/080/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/080/high.webp"
       }
     },
     {
       "id": "me3-81",
       "name": "Poké Pad",
       "number": "81",
-      "artist": null,
+      "artist": "Studio Bora Inc.",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -1990,15 +1990,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-81/small",
-        "large": "https://images.scrydex.com/pokemon/me3-81/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/081/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/081/high.webp"
       }
     },
     {
       "id": "me3-82",
       "name": "Pokémon Catcher",
       "number": "82",
-      "artist": null,
+      "artist": "Studio Bora Inc.",
       "rarity": "Common",
       "supertype": "Trainer",
       "subtypes": [
@@ -2011,15 +2011,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-82/small",
-        "large": "https://images.scrydex.com/pokemon/me3-82/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/082/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/082/high.webp"
       }
     },
     {
       "id": "me3-83",
       "name": "Potion",
       "number": "83",
-      "artist": null,
+      "artist": "Ayaka Yoshida",
       "rarity": "Common",
       "supertype": "Trainer",
       "subtypes": [
@@ -2032,15 +2032,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-83/small",
-        "large": "https://images.scrydex.com/pokemon/me3-83/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/083/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/083/high.webp"
       }
     },
     {
       "id": "me3-84",
       "name": "Rosa's Encouragement",
       "number": "84",
-      "artist": null,
+      "artist": "Atsushi Furusawa",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -2053,15 +2053,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-84/small",
-        "large": "https://images.scrydex.com/pokemon/me3-84/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/084/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/084/high.webp"
       }
     },
     {
       "id": "me3-85",
       "name": "Tarragon",
       "number": "85",
-      "artist": null,
+      "artist": "Akira Komayama",
       "rarity": "Uncommon",
       "supertype": "Trainer",
       "subtypes": [
@@ -2074,8 +2074,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-85/small",
-        "large": "https://images.scrydex.com/pokemon/me3-85/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/085/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/085/high.webp"
       }
     },
     {
@@ -2095,8 +2095,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-86/small",
-        "large": "https://images.scrydex.com/pokemon/me3-86/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/086/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/086/high.webp"
       }
     },
     {
@@ -2116,8 +2116,8 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-87/small",
-        "large": "https://images.scrydex.com/pokemon/me3-87/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/087/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/087/high.webp"
       }
     },
     {
@@ -2137,15 +2137,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-88/small",
-        "large": "https://images.scrydex.com/pokemon/me3-88/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/088/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/088/high.webp"
       }
     },
     {
       "id": "me3-89",
       "name": "Spewpa",
       "number": "89",
-      "artist": null,
+      "artist": "kamonabe",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2162,15 +2162,15 @@ const setData: TcgSet = {
         665
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-89/small",
-        "large": "https://images.scrydex.com/pokemon/me3-89/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/089/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/089/high.webp"
       }
     },
     {
       "id": "me3-90",
       "name": "Rowlet",
       "number": "90",
-      "artist": null,
+      "artist": "ryoma uratsuka",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2187,15 +2187,15 @@ const setData: TcgSet = {
         722
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-90/small",
-        "large": "https://images.scrydex.com/pokemon/me3-90/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/090/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/090/high.webp"
       }
     },
     {
       "id": "me3-91",
       "name": "Talonflame",
       "number": "91",
-      "artist": null,
+      "artist": "OKACHEKE",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2212,15 +2212,15 @@ const setData: TcgSet = {
         663
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-91/small",
-        "large": "https://images.scrydex.com/pokemon/me3-91/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/091/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/091/high.webp"
       }
     },
     {
       "id": "me3-92",
       "name": "Aurorus",
       "number": "92",
-      "artist": null,
+      "artist": "Masa",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2237,15 +2237,15 @@ const setData: TcgSet = {
         699
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-92/small",
-        "large": "https://images.scrydex.com/pokemon/me3-92/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/092/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/092/high.webp"
       }
     },
     {
       "id": "me3-93",
       "name": "Dedenne",
       "number": "93",
-      "artist": null,
+      "artist": "HYOGONOSUKE",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2262,15 +2262,15 @@ const setData: TcgSet = {
         702
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-93/small",
-        "large": "https://images.scrydex.com/pokemon/me3-93/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/093/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/093/high.webp"
       }
     },
     {
       "id": "me3-94",
       "name": "Clefairy",
       "number": "94",
-      "artist": null,
+      "artist": "Cona Nitanda",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2287,15 +2287,15 @@ const setData: TcgSet = {
         35
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-94/small",
-        "large": "https://images.scrydex.com/pokemon/me3-94/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/094/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/094/high.webp"
       }
     },
     {
       "id": "me3-95",
       "name": "Espurr",
       "number": "95",
-      "artist": null,
+      "artist": "MINAMINAMI Take",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2312,15 +2312,15 @@ const setData: TcgSet = {
         677
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-95/small",
-        "large": "https://images.scrydex.com/pokemon/me3-95/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/095/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/095/high.webp"
       }
     },
     {
       "id": "me3-96",
       "name": "Probopass",
       "number": "96",
-      "artist": null,
+      "artist": "Kinu Nishimura",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2337,15 +2337,15 @@ const setData: TcgSet = {
         476
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-96/small",
-        "large": "https://images.scrydex.com/pokemon/me3-96/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/096/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/096/high.webp"
       }
     },
     {
       "id": "me3-97",
       "name": "Drapion",
       "number": "97",
-      "artist": null,
+      "artist": "kawayoo",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2362,15 +2362,15 @@ const setData: TcgSet = {
         452
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-97/small",
-        "large": "https://images.scrydex.com/pokemon/me3-97/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/097/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/097/high.webp"
       }
     },
     {
       "id": "me3-98",
       "name": "Doublade",
       "number": "98",
-      "artist": null,
+      "artist": "Anesaki Dynamic",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2387,15 +2387,15 @@ const setData: TcgSet = {
         680
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-98/small",
-        "large": "https://images.scrydex.com/pokemon/me3-98/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/098/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/098/high.webp"
       }
     },
     {
       "id": "me3-99",
       "name": "Raticate",
       "number": "99",
-      "artist": null,
+      "artist": "Mina Nakai",
       "rarity": "Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2412,15 +2412,15 @@ const setData: TcgSet = {
         20
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-99/small",
-        "large": "https://images.scrydex.com/pokemon/me3-99/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/099/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/099/high.webp"
       }
     },
     {
       "id": "me3-100",
       "name": "Decidueye ex",
       "number": "100",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Ultra Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2438,15 +2438,15 @@ const setData: TcgSet = {
         724
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-100/small",
-        "large": "https://images.scrydex.com/pokemon/me3-100/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/100/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/100/high.webp"
       }
     },
     {
       "id": "me3-101",
       "name": "Salazzle ex",
       "number": "101",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Ultra Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2464,15 +2464,15 @@ const setData: TcgSet = {
         758
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-101/small",
-        "large": "https://images.scrydex.com/pokemon/me3-101/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/101/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/101/high.webp"
       }
     },
     {
       "id": "me3-102",
       "name": "Mega Starmie ex",
       "number": "102",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Ultra Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2491,15 +2491,15 @@ const setData: TcgSet = {
         121
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-102/small",
-        "large": "https://images.scrydex.com/pokemon/me3-102/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/102/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/102/high.webp"
       }
     },
     {
       "id": "me3-103",
       "name": "Mega Clefable ex",
       "number": "103",
-      "artist": null,
+      "artist": "aky CG Works",
       "rarity": "Ultra Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2518,15 +2518,15 @@ const setData: TcgSet = {
         36
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-103/small",
-        "large": "https://images.scrydex.com/pokemon/me3-103/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/103/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/103/high.webp"
       }
     },
     {
       "id": "me3-104",
       "name": "Mega Zygarde ex",
       "number": "104",
-      "artist": null,
+      "artist": "takuyoa",
       "rarity": "Ultra Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2545,15 +2545,15 @@ const setData: TcgSet = {
         718
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-104/small",
-        "large": "https://images.scrydex.com/pokemon/me3-104/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/104/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/104/high.webp"
       }
     },
     {
       "id": "me3-105",
       "name": "Yveltal ex",
       "number": "105",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Ultra Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2571,15 +2571,15 @@ const setData: TcgSet = {
         717
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-105/small",
-        "large": "https://images.scrydex.com/pokemon/me3-105/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/105/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/105/high.webp"
       }
     },
     {
       "id": "me3-106",
       "name": "Mega Skarmory ex",
       "number": "106",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Ultra Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2593,20 +2593,20 @@ const setData: TcgSet = {
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 0,
       "nationalPokedexNumbers": [
         227
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-106/small",
-        "large": "https://images.scrydex.com/pokemon/me3-106/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/106/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/106/high.webp"
       }
     },
     {
       "id": "me3-107",
       "name": "Meowth ex",
       "number": "107",
-      "artist": null,
+      "artist": "5ban Graphics",
       "rarity": "Ultra Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2624,15 +2624,15 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-107/small",
-        "large": "https://images.scrydex.com/pokemon/me3-107/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/107/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/107/high.webp"
       }
     },
     {
       "id": "me3-108",
       "name": "Energy Recycler",
       "number": "108",
-      "artist": null,
+      "artist": "Toyste Beach",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2645,15 +2645,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-108/small",
-        "large": "https://images.scrydex.com/pokemon/me3-108/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/108/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/108/high.webp"
       }
     },
     {
       "id": "me3-109",
       "name": "Forest of Vitality",
       "number": "109",
-      "artist": null,
+      "artist": "AYUMI ODASHIMA",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2666,15 +2666,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-109/small",
-        "large": "https://images.scrydex.com/pokemon/me3-109/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/109/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/109/high.webp"
       }
     },
     {
       "id": "me3-110",
       "name": "Jacinthe",
       "number": "110",
-      "artist": null,
+      "artist": "Susumu Maeya",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2687,15 +2687,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-110/small",
-        "large": "https://images.scrydex.com/pokemon/me3-110/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/110/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/110/high.webp"
       }
     },
     {
       "id": "me3-111",
       "name": "Lumiose City",
       "number": "111",
-      "artist": null,
+      "artist": "MARINA Chikazawa",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2708,15 +2708,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-111/small",
-        "large": "https://images.scrydex.com/pokemon/me3-111/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/111/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/111/high.webp"
       }
     },
     {
       "id": "me3-112",
       "name": "Naveen",
       "number": "112",
-      "artist": null,
+      "artist": "DOM",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2729,15 +2729,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-112/small",
-        "large": "https://images.scrydex.com/pokemon/me3-112/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/112/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/112/high.webp"
       }
     },
     {
       "id": "me3-113",
       "name": "Poké Pad",
       "number": "113",
-      "artist": null,
+      "artist": "Studio Bora Inc.",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2750,15 +2750,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-113/small",
-        "large": "https://images.scrydex.com/pokemon/me3-113/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/113/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/113/high.webp"
       }
     },
     {
       "id": "me3-114",
       "name": "Rosa's Encouragement",
       "number": "114",
-      "artist": null,
+      "artist": "Atsushi Furusawa",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2771,15 +2771,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-114/small",
-        "large": "https://images.scrydex.com/pokemon/me3-114/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/114/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/114/high.webp"
       }
     },
     {
       "id": "me3-115",
       "name": "Sacred Ash",
       "number": "115",
-      "artist": null,
+      "artist": "Toyste Beach",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2792,15 +2792,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-115/small",
-        "large": "https://images.scrydex.com/pokemon/me3-115/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/115/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/115/high.webp"
       }
     },
     {
       "id": "me3-116",
       "name": "Tarragon",
       "number": "116",
-      "artist": null,
+      "artist": "Akira Komayama",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2813,15 +2813,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-116/small",
-        "large": "https://images.scrydex.com/pokemon/me3-116/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/116/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/116/high.webp"
       }
     },
     {
       "id": "me3-117",
       "name": "Wondrous Patch",
       "number": "117",
-      "artist": null,
+      "artist": "Studio Bora Inc.",
       "rarity": "Ultra Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2834,15 +2834,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-117/small",
-        "large": "https://images.scrydex.com/pokemon/me3-117/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/117/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/117/high.webp"
       }
     },
     {
       "id": "me3-118",
       "name": "Mega Starmie ex",
       "number": "118",
-      "artist": null,
+      "artist": "takuyoa",
       "rarity": "Special Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2861,15 +2861,15 @@ const setData: TcgSet = {
         121
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-118/small",
-        "large": "https://images.scrydex.com/pokemon/me3-118/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/118/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/118/high.webp"
       }
     },
     {
       "id": "me3-119",
       "name": "Mega Clefable ex",
       "number": "119",
-      "artist": null,
+      "artist": "Cona Nitanda",
       "rarity": "Special Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2888,15 +2888,15 @@ const setData: TcgSet = {
         36
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-119/small",
-        "large": "https://images.scrydex.com/pokemon/me3-119/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/119/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/119/high.webp"
       }
     },
     {
       "id": "me3-120",
       "name": "Mega Zygarde ex",
       "number": "120",
-      "artist": null,
+      "artist": "kantaro",
       "rarity": "Special Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2915,15 +2915,15 @@ const setData: TcgSet = {
         718
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-120/small",
-        "large": "https://images.scrydex.com/pokemon/me3-120/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/120/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/120/high.webp"
       }
     },
     {
       "id": "me3-121",
       "name": "Meowth ex",
       "number": "121",
-      "artist": null,
+      "artist": "Natsumi Yoshida",
       "rarity": "Special Illustration Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -2941,15 +2941,15 @@ const setData: TcgSet = {
         52
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-121/small",
-        "large": "https://images.scrydex.com/pokemon/me3-121/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/121/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/121/high.webp"
       }
     },
     {
       "id": "me3-122",
       "name": "Jacinthe",
       "number": "122",
-      "artist": null,
+      "artist": "Souichirou Gunjima",
       "rarity": "Special Illustration Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2962,15 +2962,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-122/small",
-        "large": "https://images.scrydex.com/pokemon/me3-122/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/122/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/122/high.webp"
       }
     },
     {
       "id": "me3-123",
       "name": "Rosa's Encouragement",
       "number": "123",
-      "artist": null,
+      "artist": "Iori Suzuki",
       "rarity": "Special Illustration Rare",
       "supertype": "Trainer",
       "subtypes": [
@@ -2983,15 +2983,15 @@ const setData: TcgSet = {
       "convertedRetreatCost": null,
       "nationalPokedexNumbers": [],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-123/small",
-        "large": "https://images.scrydex.com/pokemon/me3-123/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/123/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/123/high.webp"
       }
     },
     {
       "id": "me3-124",
       "name": "Mega Zygarde ex",
       "number": "124",
-      "artist": null,
+      "artist": "takuyoa",
       "rarity": "Mega Hyper Rare",
       "supertype": "Pokémon",
       "subtypes": [
@@ -3010,8 +3010,8 @@ const setData: TcgSet = {
         718
       ],
       "images": {
-        "small": "https://images.scrydex.com/pokemon/me3-124/small",
-        "large": "https://images.scrydex.com/pokemon/me3-124/large"
+        "small": "https://assets.tcgdex.net/en/me/me03/124/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/me03/124/high.webp"
       }
     }
   ]

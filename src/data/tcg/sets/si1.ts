@@ -17,7 +17,7 @@ const setData: TcgSet = {
       "name": "Mew",
       "number": "1",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -33,8 +33,8 @@ const setData: TcgSet = {
         151
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/1.png",
-        "large": "https://images.pokemontcg.io/si1/1_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/1/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/1/high.webp"
       }
     },
     {
@@ -42,7 +42,7 @@ const setData: TcgSet = {
       "name": "Pidgeot",
       "number": "2",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 2"
@@ -58,8 +58,8 @@ const setData: TcgSet = {
         18
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/2.png",
-        "large": "https://images.pokemontcg.io/si1/2_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/2/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/2/high.webp"
       }
     },
     {
@@ -67,7 +67,7 @@ const setData: TcgSet = {
       "name": "Onix",
       "number": "3",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -85,8 +85,8 @@ const setData: TcgSet = {
         95
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/3.png",
-        "large": "https://images.pokemontcg.io/si1/3_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/3/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/3/high.webp"
       }
     },
     {
@@ -94,7 +94,7 @@ const setData: TcgSet = {
       "name": "Togepi",
       "number": "4",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -112,8 +112,8 @@ const setData: TcgSet = {
         175
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/4.png",
-        "large": "https://images.pokemontcg.io/si1/4_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/4/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/4/high.webp"
       }
     },
     {
@@ -121,7 +121,7 @@ const setData: TcgSet = {
       "name": "Ivysaur",
       "number": "5",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 1"
@@ -139,8 +139,8 @@ const setData: TcgSet = {
         2
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/5.png",
-        "large": "https://images.pokemontcg.io/si1/5_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/5/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/5/high.webp"
       }
     },
     {
@@ -148,7 +148,7 @@ const setData: TcgSet = {
       "name": "Raticate",
       "number": "6",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 1"
@@ -164,8 +164,8 @@ const setData: TcgSet = {
         20
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/6.png",
-        "large": "https://images.pokemontcg.io/si1/6_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/6/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/6/high.webp"
       }
     },
     {
@@ -173,7 +173,7 @@ const setData: TcgSet = {
       "name": "Ledyba",
       "number": "7",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -191,8 +191,8 @@ const setData: TcgSet = {
         165
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/7.png",
-        "large": "https://images.pokemontcg.io/si1/7_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/7/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/7/high.webp"
       }
     },
     {
@@ -200,7 +200,7 @@ const setData: TcgSet = {
       "name": "Jigglypuff",
       "number": "8",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -218,8 +218,8 @@ const setData: TcgSet = {
         39
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/8.png",
-        "large": "https://images.pokemontcg.io/si1/8_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/8/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/8/high.webp"
       }
     },
     {
@@ -227,7 +227,7 @@ const setData: TcgSet = {
       "name": "Butterfree",
       "number": "9",
       "artist": "Keiko Fukuyama",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 2"
@@ -243,8 +243,8 @@ const setData: TcgSet = {
         12
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/9.png",
-        "large": "https://images.pokemontcg.io/si1/9_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/9/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/9/high.webp"
       }
     },
     {
@@ -252,7 +252,7 @@ const setData: TcgSet = {
       "name": "Tentacruel",
       "number": "10",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 1"
@@ -268,8 +268,8 @@ const setData: TcgSet = {
         73
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/10.png",
-        "large": "https://images.pokemontcg.io/si1/10_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/10/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/10/high.webp"
       }
     },
     {
@@ -277,7 +277,7 @@ const setData: TcgSet = {
       "name": "Marill",
       "number": "11",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -295,8 +295,8 @@ const setData: TcgSet = {
         183
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/11.png",
-        "large": "https://images.pokemontcg.io/si1/11_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/11/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/11/high.webp"
       }
     },
     {
@@ -304,7 +304,7 @@ const setData: TcgSet = {
       "name": "Lapras",
       "number": "12",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -320,8 +320,8 @@ const setData: TcgSet = {
         131
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/12.png",
-        "large": "https://images.pokemontcg.io/si1/12_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/12/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/12/high.webp"
       }
     },
     {
@@ -329,7 +329,7 @@ const setData: TcgSet = {
       "name": "Exeggutor",
       "number": "13",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 1"
@@ -345,8 +345,8 @@ const setData: TcgSet = {
         103
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/13.png",
-        "large": "https://images.pokemontcg.io/si1/13_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/13/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/13/high.webp"
       }
     },
     {
@@ -354,7 +354,7 @@ const setData: TcgSet = {
       "name": "Slowking",
       "number": "14",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 1"
@@ -370,8 +370,8 @@ const setData: TcgSet = {
         199
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/14.png",
-        "large": "https://images.pokemontcg.io/si1/14_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/14/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/14/high.webp"
       }
     },
     {
@@ -379,7 +379,7 @@ const setData: TcgSet = {
       "name": "Wartortle",
       "number": "15",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 1"
@@ -397,8 +397,8 @@ const setData: TcgSet = {
         8
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/15.png",
-        "large": "https://images.pokemontcg.io/si1/15_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/15/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/15/high.webp"
       }
     },
     {
@@ -406,7 +406,7 @@ const setData: TcgSet = {
       "name": "Lickitung",
       "number": "16",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Basic"
@@ -424,8 +424,8 @@ const setData: TcgSet = {
         108
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/16.png",
-        "large": "https://images.pokemontcg.io/si1/16_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/16/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/16/high.webp"
       }
     },
     {
@@ -433,7 +433,7 @@ const setData: TcgSet = {
       "name": "Vileplume",
       "number": "17",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 2"
@@ -449,8 +449,8 @@ const setData: TcgSet = {
         45
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/17.png",
-        "large": "https://images.pokemontcg.io/si1/17_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/17/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/17/high.webp"
       }
     },
     {
@@ -458,7 +458,7 @@ const setData: TcgSet = {
       "name": "Primeape",
       "number": "18",
       "artist": "Naoyo Kimura",
-      "rarity": null,
+      "rarity": "Common",
       "supertype": "Pokémon",
       "subtypes": [
         "Stage 1"
@@ -474,8 +474,8 @@ const setData: TcgSet = {
         57
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/si1/18.png",
-        "large": "https://images.pokemontcg.io/si1/18_hires.png"
+        "small": "https://assets.tcgdex.net/en/neo/si1/18/low.webp",
+        "large": "https://assets.tcgdex.net/en/neo/si1/18/high.webp"
       }
     }
   ]

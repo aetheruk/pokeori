@@ -44,7 +44,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -61,8 +61,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/1.png",
-      "large": "https://images.pokemontcg.io/tk2a/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/1/high.webp"
     }
   },
   {
@@ -109,7 +109,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -126,8 +126,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/2.png",
-      "large": "https://images.pokemontcg.io/tk2a/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/2/high.webp"
     }
   },
   {
@@ -172,7 +172,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -189,8 +189,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/3.png",
-      "large": "https://images.pokemontcg.io/tk2a/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/3/high.webp"
     }
   },
   {
@@ -237,7 +237,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -254,8 +254,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/4.png",
-      "large": "https://images.pokemontcg.io/tk2a/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/4/high.webp"
     }
   },
   {
@@ -304,7 +304,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -322,8 +322,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/5.png",
-      "large": "https://images.pokemontcg.io/tk2a/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/5/high.webp"
     }
   },
   {
@@ -352,7 +352,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your discard pile for an Energy card, show it to your opponent, and put it in your hand"
+        "text": "Search your discard pile for an Energy card, show it to your opponent, and put it into your hand."
       },
       {
         "name": "Rear Spark",
@@ -362,13 +362,13 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "10",
-        "text": "Does 20 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "Does 20 damage to 1 of your opponent’s Benched Pokémon. (Don’t apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [
@@ -390,8 +390,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/6.png",
-      "large": "https://images.pokemontcg.io/tk2a/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/6/high.webp"
     }
   },
   {
@@ -428,7 +428,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -445,8 +445,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/7.png",
-      "large": "https://images.pokemontcg.io/tk2a/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/7/high.webp"
     }
   },
   {
@@ -471,7 +471,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -481,8 +481,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/8.png",
-      "large": "https://images.pokemontcg.io/tk2a/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/8/high.webp"
     }
   },
   {
@@ -507,7 +507,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -517,8 +517,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/9.png",
-      "large": "https://images.pokemontcg.io/tk2a/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/9/high.webp"
     }
   },
   {
@@ -544,7 +544,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -552,8 +552,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/10.png",
-      "large": "https://images.pokemontcg.io/tk2a/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/10/high.webp"
     }
   },
   {
@@ -576,7 +576,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -586,8 +586,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/11.png",
-      "large": "https://images.pokemontcg.io/tk2a/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/11/high.webp"
     }
   },
   {
@@ -601,7 +601,9 @@ const cardDetails: TcgCardDetail[] = [
       "Basic"
     ],
     "hp": null,
-    "types": [],
+    "types": [
+      "Psychic"
+    ],
     "evolvesFrom": null,
     "evolvesTo": [],
     "rules": [],
@@ -610,7 +612,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [],
     "flavorText": null,
     "legalities": {
@@ -620,8 +622,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/tk2a/12.png",
-      "large": "https://images.pokemontcg.io/tk2a/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/tk/tk-ex-p/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/tk/tk-ex-p/12/high.webp"
     }
   }
 ]

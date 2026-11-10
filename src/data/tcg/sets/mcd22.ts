@@ -35,8 +35,8 @@ const setData: TcgSet = {
         165
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/1.png",
-        "large": "https://images.pokemontcg.io/mcd22/1_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/1/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/1/high.webp"
       }
     },
     {
@@ -62,8 +62,8 @@ const setData: TcgSet = {
         722
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/2.png",
-        "large": "https://images.pokemontcg.io/mcd22/2_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/2/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/2/high.webp"
       }
     },
     {
@@ -89,8 +89,8 @@ const setData: TcgSet = {
         829
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/3.png",
-        "large": "https://images.pokemontcg.io/mcd22/3_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/3/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/3/high.webp"
       }
     },
     {
@@ -116,8 +116,8 @@ const setData: TcgSet = {
         58
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/4.png",
-        "large": "https://images.pokemontcg.io/mcd22/4_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/4/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/4/high.webp"
       }
     },
     {
@@ -141,8 +141,8 @@ const setData: TcgSet = {
         494
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/5.png",
-        "large": "https://images.pokemontcg.io/mcd22/5_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/5/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/5/high.webp"
       }
     },
     {
@@ -166,8 +166,8 @@ const setData: TcgSet = {
         131
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/6.png",
-        "large": "https://images.pokemontcg.io/mcd22/6_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/6/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/6/high.webp"
       }
     },
     {
@@ -193,8 +193,8 @@ const setData: TcgSet = {
         25
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/7.png",
-        "large": "https://images.pokemontcg.io/mcd22/7_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/7/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/7/high.webp"
       }
     },
     {
@@ -220,8 +220,8 @@ const setData: TcgSet = {
         170
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/8.png",
-        "large": "https://images.pokemontcg.io/mcd22/8_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/8/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/8/high.webp"
       }
     },
     {
@@ -247,8 +247,8 @@ const setData: TcgSet = {
         180
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/9.png",
-        "large": "https://images.pokemontcg.io/mcd22/9_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/9/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/9/high.webp"
       }
     },
     {
@@ -274,8 +274,8 @@ const setData: TcgSet = {
         602
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/10.png",
-        "large": "https://images.pokemontcg.io/mcd22/10_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/10/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/10/high.webp"
       }
     },
     {
@@ -296,13 +296,13 @@ const setData: TcgSet = {
       "evolvesTo": [
         "Ribombee"
       ],
-      "convertedRetreatCost": null,
+      "convertedRetreatCost": 1,
       "nationalPokedexNumbers": [
         742
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/11.png",
-        "large": "https://images.pokemontcg.io/mcd22/11_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/11/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/11/high.webp"
       }
     },
     {
@@ -326,8 +326,8 @@ const setData: TcgSet = {
         760
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/12.png",
-        "large": "https://images.pokemontcg.io/mcd22/12_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/12/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/12/high.webp"
       }
     },
     {
@@ -351,8 +351,8 @@ const setData: TcgSet = {
         675
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/13.png",
-        "large": "https://images.pokemontcg.io/mcd22/13_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/13/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/13/high.webp"
       }
     },
     {
@@ -367,7 +367,7 @@ const setData: TcgSet = {
       ],
       "hp": "120",
       "types": [
-        "Dragon"
+        "Colorless"
       ],
       "evolvesFrom": null,
       "evolvesTo": [],
@@ -376,8 +376,8 @@ const setData: TcgSet = {
         780
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/14.png",
-        "large": "https://images.pokemontcg.io/mcd22/14_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/14/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/14/high.webp"
       }
     },
     {
@@ -401,8 +401,8 @@ const setData: TcgSet = {
         235
       ],
       "images": {
-        "small": "https://images.pokemontcg.io/mcd22/15.png",
-        "large": "https://images.pokemontcg.io/mcd22/15_hires.png"
+        "small": "https://assets.tcgdex.net/en/mc/2022swsh/15/low.webp",
+        "large": "https://assets.tcgdex.net/en/mc/2022swsh/15/high.webp"
       }
     }
   ]

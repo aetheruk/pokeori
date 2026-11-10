@@ -22,7 +22,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Rain Dance",
         "text": "As often as you like during your turn (before your attack), you may attach 1 Water Energy card to 1 of your Water Pokémon. (This doesn't use up your 1 Energy card attachment for the turn.) This power can't be used if Blastoise is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -41,7 +41,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -60,8 +60,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/2_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/2_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC001/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC001/high.webp"
     }
   },
   {
@@ -85,7 +85,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Energy Burn",
         "text": "As often as you like during your turn (before your attack), you may turn all Energy attached to Charizard into Fire Energy for the rest of the turn. This power can't be used if Charizard is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -105,7 +105,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Water",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [
@@ -129,8 +129,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/4_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/4_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC002/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC002/high.webp"
     }
   },
   {
@@ -154,7 +154,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Final Beam",
         "text": "When Dark Gyarados is Knocked Out by an attack, flip a coin. If heads, this power does 20 damage for each Water Energy attached to Dark Gyarados to the Pokémon that Knocked Out Dark Gyarados. Apply Weakness and Resistance. This power doesn't work if Dark Gyarados is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -173,7 +173,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [
@@ -196,8 +196,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/8_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/8_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC005/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC005/high.webp"
     }
   },
   {
@@ -212,8 +212,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "hp": "100",
     "types": [
-      "Fighting",
-      "Darkness"
+      "Fighting"
     ],
     "evolvesFrom": null,
     "evolvesTo": [],
@@ -224,7 +223,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Power Saver",
         "text": "As long as the number of Pokémon in play (both yours and your opponent's) that has Team Magma in its name is 3 or less, Team Magma's Groudon can't attack.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -253,7 +252,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Grass",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -272,8 +271,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/9_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/9_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC011/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC011/high.webp"
     }
   },
   {
@@ -297,7 +296,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Cosmic Power",
         "text": "Once during your turn (before your attack), you may choose up to 2 cards from your hand and put them on the bottom of your deck in any order. If you do, draw cards until you have 6 cards in your hand. This power can't be used if Claydol is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -333,8 +332,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/15_D.png",
-      "large": "https://images.pokemontcg.io/cel25c/15_D_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC016/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC016/high.webp"
     }
   },
   {
@@ -344,7 +343,9 @@ const cardDetails: TcgCardDetail[] = [
     "artist": "Ken Sugimori",
     "rarity": "Classic Collection",
     "supertype": "Trainer",
-    "subtypes": [],
+    "subtypes": [
+      "Supporter"
+    ],
     "hp": null,
     "types": [],
     "evolvesFrom": null,
@@ -365,8 +366,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/15_B.png",
-      "large": "https://images.pokemontcg.io/cel25c/15_B_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC006/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC006/high.webp"
     }
   },
   {
@@ -431,8 +432,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/15_C.png",
-      "large": "https://images.pokemontcg.io/cel25c/15_C_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC007/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC007/high.webp"
     }
   },
   {
@@ -476,7 +477,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fire",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -494,8 +495,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/15_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/15_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC003/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC003/high.webp"
     }
   },
   {
@@ -521,8 +522,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Dark Ray",
-        "text": "Once during your turn, when you put Umbreon Star from your hand onto your Bench, you may choose 1 card from your opponent's hand without looking and discard it.",
-        "type": "Poké-Power"
+        "text": "Once during your turn, when you put Umbreon ☆ from your hand onto your Bench, you may choose 1 card from your opponent's hand without looking and discard it.",
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -540,7 +541,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [
@@ -562,8 +563,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/17_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/17_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC015/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC015/high.webp"
     }
   },
   {
@@ -602,7 +603,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       173
     ],
@@ -612,8 +613,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/20_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/20_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC009/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC009/high.webp"
     }
   },
   {
@@ -649,7 +650,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -666,8 +667,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/24_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/24_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC008/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC008/high.webp"
     }
   },
   {
@@ -736,8 +737,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/54_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/54_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC022/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC022/high.webp"
     }
   },
   {
@@ -779,7 +780,7 @@ const cardDetails: TcgCardDetail[] = [
         "text": "This attack does 20 damage times the amount of Energy attached to both Active Pokémon. This damage isn't affected by Weakness or Resistance."
       },
       {
-        "name": "Tapu Cure-GX",
+        "name": "Tapu Cure GX",
         "cost": [
           "Psychic"
         ],
@@ -804,8 +805,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/60_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/60_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC025/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC025/high.webp"
     }
   },
   {
@@ -853,7 +854,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Lightning",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -870,8 +871,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/66_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/66_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC010/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC010/high.webp"
     }
   },
   {
@@ -881,7 +882,9 @@ const cardDetails: TcgCardDetail[] = [
     "artist": "Ken Sugimori",
     "rarity": "Classic Collection",
     "supertype": "Trainer",
-    "subtypes": [],
+    "subtypes": [
+      "Supporter"
+    ],
     "hp": null,
     "types": [],
     "evolvesFrom": null,
@@ -902,8 +905,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/73_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/73_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC004/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC004/high.webp"
     }
   },
   {
@@ -927,7 +930,13 @@ const cardDetails: TcgCardDetail[] = [
       "Pokémon-EX rule: When a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
       "Mega Evolution rule: When 1 of your Pokémon becomes a Mega Evolution Pokémon, your turn ends."
     ],
-    "abilities": [],
+    "abilities": [
+      {
+        "name": "Δ Evolution",
+        "text": "You may play this card from your hand to evolve a Pokémon during your first turn or the turn you play that Pokémon.",
+        "type": "Ancient Trait"
+      }
+    ],
     "attacks": [
       {
         "name": "Emerald Break",
@@ -967,8 +976,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/76_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/76_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC024/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC024/high.webp"
     }
   },
   {
@@ -1002,8 +1011,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/86_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/86_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC012/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC012/high.webp"
     }
   },
   {
@@ -1030,7 +1039,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Versatile",
         "text": "Mew ex can use the attacks of all Pokémon in play as its own. (You still need the necessary Energy to use each attack.)",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -1048,7 +1057,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -1065,8 +1074,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/88_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/88_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC013/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC013/high.webp"
     }
   },
   {
@@ -1093,7 +1102,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Imprison",
         "text": "Once during your turn (before your attack), if Gardevoir ex is your Active Pokémon, you may put an Imprison marker on 1 of your opponent's Pokémon. Any Pokémon that has any Imprison markers on it can't use any Poké-Powers or Poké-Bodies. This power can't be used if Gardevoir ex is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1112,7 +1121,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [
       {
         "type": "Psychic",
-        "value": "×2"
+        "value": ""
       }
     ],
     "resistances": [],
@@ -1130,8 +1139,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/93_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/93_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC014/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC014/high.webp"
     }
   },
   {
@@ -1207,8 +1216,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/97_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/97_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC023/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC023/high.webp"
     }
   },
   {
@@ -1233,7 +1242,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Exoskeleton",
         "text": "Any damage done to Donphan by attacks is reduced by 20 (after applying Weakness and Resistance).",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -1286,8 +1295,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/107_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/107_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC019/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC019/high.webp"
     }
   },
   {
@@ -1314,7 +1323,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Bright Look",
         "text": "Once during your turn (before your attack), when you put Luxray GL LV.X from your hand onto your Active Luxray GL, you may switch the Defending Pokémon with 1 of your opponent's Benched Pokémon.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1342,7 +1351,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       405
     ],
@@ -1352,8 +1361,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/109_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/109_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC017/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC017/high.webp"
     }
   },
   {
@@ -1419,8 +1428,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/113_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/113_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC020/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC020/high.webp"
     }
   },
   {
@@ -1486,8 +1495,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/114_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/114_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC021/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC021/high.webp"
     }
   },
   {
@@ -1514,7 +1523,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Healing Breath",
         "text": "Once during your turn (before your attack), when you put Garchomp C LV.X from your hand onto your Active Garchomp C, you may remove all damage counters from each of your Pokémon SP.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -1538,7 +1547,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       445
     ],
@@ -1548,8 +1557,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/cel25c/145_A.png",
-      "large": "https://images.pokemontcg.io/cel25c/145_A_hires.png"
+      "small": "https://assets.tcgdex.net/en/swsh/cel25cc/CC018/low.webp",
+      "large": "https://assets.tcgdex.net/en/swsh/cel25cc/CC018/high.webp"
     }
   }
 ]

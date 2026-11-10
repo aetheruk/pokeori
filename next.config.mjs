@@ -88,6 +88,11 @@ const nextConfig = {
         hostname: 'images.scrydex.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'assets.tcgdex.net',
+        pathname: '/**',
+      },
     ],
     // Optimize images with modern formats
     formats: ['image/avif', 'image/webp'],

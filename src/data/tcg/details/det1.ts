@@ -53,8 +53,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/1.png",
-      "large": "https://images.pokemontcg.io/det1/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/1/high.webp"
     }
   },
   {
@@ -117,8 +117,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/2.png",
-      "large": "https://images.pokemontcg.io/det1/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/2/high.webp"
     }
   },
   {
@@ -149,7 +149,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "10",
-        "text": "Your opponent's Active Pokémon is now Asleep."
+        "text": "Your opponent’s Active Pokémon is now Asleep."
       }
     ],
     "weaknesses": [
@@ -173,8 +173,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/3.png",
-      "large": "https://images.pokemontcg.io/det1/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/3/high.webp"
     }
   },
   {
@@ -229,8 +229,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/4.png",
-      "large": "https://images.pokemontcg.io/det1/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/4/high.webp"
     }
   },
   {
@@ -299,8 +299,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/5.png",
-      "large": "https://images.pokemontcg.io/det1/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/5/high.webp"
     }
   },
   {
@@ -323,7 +323,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Security Guard",
-        "text": "As long as this Pokémon is your Active Pokémon, all of your Pokémon take 30 less damage from your opponent's attacks (after applying Weakness and Resistance).",
+        "text": "As long as this Pokémon is your Active Pokémon, all of your Pokémon take 30 less damage from your opponent’s attacks (after applying Weakness and Resistance).",
         "type": "Ability"
       }
     ],
@@ -363,8 +363,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/6.png",
-      "large": "https://images.pokemontcg.io/det1/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/6/high.webp"
     }
   },
   {
@@ -421,8 +421,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/7.png",
-      "large": "https://images.pokemontcg.io/det1/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/7/high.webp"
     }
   },
   {
@@ -477,8 +477,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/8.png",
-      "large": "https://images.pokemontcg.io/det1/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/8/high.webp"
     }
   },
   {
@@ -514,7 +514,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "This attack does 50 damage to 2 of your opponent's Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 50 damage to 2 of your opponent’s Pokémon. (Don’t apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
@@ -538,8 +538,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/9.png",
-      "large": "https://images.pokemontcg.io/det1/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/9/high.webp"
     }
   },
   {
@@ -611,8 +611,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/10.png",
-      "large": "https://images.pokemontcg.io/det1/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/10/high.webp"
     }
   },
   {
@@ -672,8 +672,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/11.png",
-      "large": "https://images.pokemontcg.io/det1/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/11/high.webp"
     }
   },
   {
@@ -703,7 +703,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "30",
-        "text": "Choose 1 of your opponent's Active Pokémon's attacks. That Pokémon can't use that attack during your opponent's next turn."
+        "text": "Choose 1 of your opponent’s Active Pokémon’s attacks. That Pokémon can’t use that attack during your opponent’s next turn."
       },
       {
         "name": "Break Burn",
@@ -739,8 +739,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/12.png",
-      "large": "https://images.pokemontcg.io/det1/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/12/high.webp"
     }
   },
   {
@@ -804,8 +804,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/13.png",
-      "large": "https://images.pokemontcg.io/det1/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/13/high.webp"
     }
   },
   {
@@ -865,8 +865,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/14.png",
-      "large": "https://images.pokemontcg.io/det1/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/14/high.webp"
     }
   },
   {
@@ -928,8 +928,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/15.png",
-      "large": "https://images.pokemontcg.io/det1/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/15/high.webp"
     }
   },
   {
@@ -987,8 +987,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/16.png",
-      "large": "https://images.pokemontcg.io/det1/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/16/high.webp"
     }
   },
   {
@@ -1017,7 +1017,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Choose 1 of your opponent's Pokémon's attacks and use it as this attack. If this Pokémon doesn't have the necessary Energy to use that attack, this attack does nothing."
+        "text": "Choose 1 of your opponent’s Pokémon’s attacks and use it as this attack. If this Pokémon doesn’t have the necessary Energy to use that attack, this attack does nothing."
       }
     ],
     "weaknesses": [
@@ -1041,8 +1041,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/17.png",
-      "large": "https://images.pokemontcg.io/det1/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/17/high.webp"
     }
   },
   {
@@ -1101,9 +1101,39 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/det1/18.png",
-      "large": "https://images.pokemontcg.io/det1/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/sm/det1/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/18/high.webp"
     }
+  },
+  {
+    "id": "det1-25",
+    "name": "Lt. Yoshida",
+    "number": "25",
+    "artist": null,
+    "rarity": "Promo",
+    "supertype": "Trainer",
+    "subtypes": [
+      "Supporter"
+    ],
+    "hp": null,
+    "types": [],
+    "evolvesFrom": null,
+    "evolvesTo": [],
+    "convertedRetreatCost": null,
+    "nationalPokedexNumbers": [],
+    "images": {
+      "small": "https://assets.tcgdex.net/en/sm/det1/25/low.webp",
+      "large": "https://assets.tcgdex.net/en/sm/det1/25/high.webp"
+    },
+    "rules": [],
+    "abilities": [],
+    "attacks": [],
+    "weaknesses": [],
+    "resistances": [],
+    "retreatCost": [],
+    "flavorText": null,
+    "legalities": {},
+    "regulationMark": null
   }
 ]
 

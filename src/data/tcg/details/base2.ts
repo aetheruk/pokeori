@@ -60,14 +60,14 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       36
     ],
-    "flavorText": "A timid Fairy Pokémon that is rarely seen. It will run and hide the moment it senses people.",
+    "flavorText": "A timid fairy Pokémon that is rarely seen. It will run and hide the moment it senses people.",
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/1.png",
-      "large": "https://images.pokemontcg.io/base2/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/1/high.webp"
     }
   },
   {
@@ -131,8 +131,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/2.png",
-      "large": "https://images.pokemontcg.io/base2/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/2/high.webp"
     }
   },
   {
@@ -174,7 +174,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "60",
-        "text": "Discard 1 Fire Energy card attached to Flareon in order to use this attack."
+        "text": "Discard 1 Energy card attached to Flareon in order to use this attack."
       }
     ],
     "weaknesses": [
@@ -197,8 +197,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/3.png",
-      "large": "https://images.pokemontcg.io/base2/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/3/high.webp"
     }
   },
   {
@@ -238,7 +238,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
       }
     ],
@@ -262,8 +262,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/4.png",
-      "large": "https://images.pokemontcg.io/base2/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/4/high.webp"
     }
   },
   {
@@ -303,7 +303,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
       }
     ],
@@ -334,8 +334,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/5.png",
-      "large": "https://images.pokemontcg.io/base2/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/5/high.webp"
     }
   },
   {
@@ -352,14 +352,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Psychic"
     ],
-    "evolvesFrom": null,
+    "evolvesFrom": "Mime Jr.",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Invisible Wall",
         "text": "Whenever an attack (including your own) does 30 or more damage to Mr. Mime (after applying Weakness and Resistance), prevent that damage. (Any other effects of attacks still happen.) This power can't be used if Mr. Mime is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -394,8 +394,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/6.png",
-      "large": "https://images.pokemontcg.io/base2/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/6/high.webp"
     }
   },
   {
@@ -462,8 +462,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/7.png",
-      "large": "https://images.pokemontcg.io/base2/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/7/high.webp"
     }
   },
   {
@@ -530,8 +530,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/8.png",
-      "large": "https://images.pokemontcg.io/base2/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/8/high.webp"
     }
   },
   {
@@ -596,8 +596,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/9.png",
-      "large": "https://images.pokemontcg.io/base2/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/9/high.webp"
     }
   },
   {
@@ -665,8 +665,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/10.png",
-      "large": "https://images.pokemontcg.io/base2/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/10/high.webp"
     }
   },
   {
@@ -683,14 +683,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Colorless"
     ],
-    "evolvesFrom": null,
+    "evolvesFrom": "Munchlax",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Thick Skinned",
         "text": "Snorlax can't become Asleep, Confused, Paralyzed, or Poisoned. This power can't be used if Snorlax is already Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -735,8 +735,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/11.png",
-      "large": "https://images.pokemontcg.io/base2/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/11/high.webp"
     }
   },
   {
@@ -777,7 +777,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "30+",
-        "text": "Does 30 damage plus 10 more damage for each Water Energy attached to Vaporeon but not used to pay for this attack's Energy cost. Extra Water Energy after the 2nd doesn't count."
+        "text": "Does 30 damage plus 10 more damage for each Energy attached to Vaporeon but not used to pay for this attack's Energy cost. Extra Energy after the 2nd doesn't count."
       }
     ],
     "weaknesses": [
@@ -800,8 +800,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/12.png",
-      "large": "https://images.pokemontcg.io/base2/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/12/high.webp"
     }
   },
   {
@@ -825,7 +825,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Shift",
         "text": "Once during your turn (before your attack), you may change the type of Venomoth to the type of any other Pokémon in play other than Colorless. This power can't be used if Venomoth is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -863,8 +863,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/13.png",
-      "large": "https://images.pokemontcg.io/base2/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/13/high.webp"
     }
   },
   {
@@ -903,7 +903,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "Flip a coin. If heads, the Defending Pokémon can't retreat during your next turn."
+        "text": "Flip a coin. If heads, the Defending Pokémon can't retreat during your opponent's next turn."
       }
     ],
     "weaknesses": [
@@ -927,8 +927,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/14.png",
-      "large": "https://images.pokemontcg.io/base2/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/14/high.webp"
     }
   },
   {
@@ -952,7 +952,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Heal",
         "text": "Once during your turn (before your attack), you may flip a coin. If heads, remove 1 damage counter from 1 of your Pokémon. This power can't be used if Vileplume is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -964,7 +964,7 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 3,
-        "damage": "40×",
+        "damage": "40x",
         "text": "Flip 3 coins. This attack does 40 damage times the number of heads. Vileplume is now Confused (after doing damage)."
       }
     ],
@@ -989,8 +989,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/15.png",
-      "large": "https://images.pokemontcg.io/base2/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/15/high.webp"
     }
   },
   {
@@ -1059,8 +1059,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/16.png",
-      "large": "https://images.pokemontcg.io/base2/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/16/high.webp"
     }
   },
   {
@@ -1128,8 +1128,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/17.png",
-      "large": "https://images.pokemontcg.io/base2/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/17/high.webp"
     }
   },
   {
@@ -1193,8 +1193,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/18.png",
-      "large": "https://images.pokemontcg.io/base2/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/18/high.webp"
     }
   },
   {
@@ -1236,7 +1236,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "60",
-        "text": "Discard 1 Fire Energy card attached to Flareon in order to use this attack."
+        "text": "Discard 1 Energy card attached to Flareon in order to use this attack."
       }
     ],
     "weaknesses": [
@@ -1259,8 +1259,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/19.png",
-      "large": "https://images.pokemontcg.io/base2/19_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/19/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/19/high.webp"
     }
   },
   {
@@ -1300,7 +1300,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
       }
     ],
@@ -1324,8 +1324,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/20.png",
-      "large": "https://images.pokemontcg.io/base2/20_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/20/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/20/high.webp"
     }
   },
   {
@@ -1365,7 +1365,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
       }
     ],
@@ -1396,8 +1396,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/21.png",
-      "large": "https://images.pokemontcg.io/base2/21_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/21/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/21/high.webp"
     }
   },
   {
@@ -1414,14 +1414,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Psychic"
     ],
-    "evolvesFrom": null,
+    "evolvesFrom": "Mime Jr.",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Invisible Wall",
         "text": "Whenever an attack (including your own) does 30 or more damage to Mr. Mime (after applying Weakness and Resistance), prevent that damage. (Any other effects of attacks still happen.) This power can't be used if Mr. Mime is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1456,8 +1456,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/22.png",
-      "large": "https://images.pokemontcg.io/base2/22_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/22/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/22/high.webp"
     }
   },
   {
@@ -1524,8 +1524,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/23.png",
-      "large": "https://images.pokemontcg.io/base2/23_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/23/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/23/high.webp"
     }
   },
   {
@@ -1592,8 +1592,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/24.png",
-      "large": "https://images.pokemontcg.io/base2/24_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/24/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/24/high.webp"
     }
   },
   {
@@ -1658,8 +1658,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/25.png",
-      "large": "https://images.pokemontcg.io/base2/25_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/25/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/25/high.webp"
     }
   },
   {
@@ -1727,8 +1727,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/26.png",
-      "large": "https://images.pokemontcg.io/base2/26_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/26/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/26/high.webp"
     }
   },
   {
@@ -1745,14 +1745,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Colorless"
     ],
-    "evolvesFrom": null,
+    "evolvesFrom": "Munchlax",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Thick Skinned",
         "text": "Snorlax can't become Asleep, Confused, Paralyzed, or Poisoned. This power can't be used if Snorlax is already Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1797,8 +1797,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/27.png",
-      "large": "https://images.pokemontcg.io/base2/27_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/27/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/27/high.webp"
     }
   },
   {
@@ -1839,7 +1839,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "30+",
-        "text": "Does 30 damage plus 10 more damage for each Water Energy attached to Vaporeon but not used to pay for this attack's Energy cost. Extra Water Energy after the 2nd doesn't count."
+        "text": "Does 30 damage plus 10 more damage for each Energy attached to Vaporeon but not used to pay for this attack's Energy cost. Extra Energy after the 2nd doesn't count."
       }
     ],
     "weaknesses": [
@@ -1862,8 +1862,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/28.png",
-      "large": "https://images.pokemontcg.io/base2/28_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/28/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/28/high.webp"
     }
   },
   {
@@ -1887,7 +1887,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Shift",
         "text": "Once during your turn (before your attack), you may change the type of Venomoth to the type of any other Pokémon in play other than Colorless. This power can't be used if Venomoth is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -1925,8 +1925,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/29.png",
-      "large": "https://images.pokemontcg.io/base2/29_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/29/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/29/high.webp"
     }
   },
   {
@@ -1965,7 +1965,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "Flip a coin. If heads, the Defending Pokémon can't retreat during your next turn."
+        "text": "Flip a coin. If heads, the Defending Pokémon can't retreat during your opponent's next turn."
       }
     ],
     "weaknesses": [
@@ -1989,8 +1989,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/30.png",
-      "large": "https://images.pokemontcg.io/base2/30_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/30/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/30/high.webp"
     }
   },
   {
@@ -2014,7 +2014,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Heal",
         "text": "Once during your turn (before your attack), you may flip a coin. If heads, remove 1 damage counter from 1 of your Pokémon. This power can't be used if Vileplume is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -2026,7 +2026,7 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 3,
-        "damage": "40×",
+        "damage": "40x",
         "text": "Flip 3 coins. This attack does 40 damage times the number of heads. Vileplume is now Confused (after doing damage)."
       }
     ],
@@ -2051,8 +2051,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/31.png",
-      "large": "https://images.pokemontcg.io/base2/31_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/31/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/31/high.webp"
     }
   },
   {
@@ -2121,8 +2121,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/32.png",
-      "large": "https://images.pokemontcg.io/base2/32_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/32/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/32/high.webp"
     }
   },
   {
@@ -2190,8 +2190,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/33.png",
-      "large": "https://images.pokemontcg.io/base2/33_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/33/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/33/high.webp"
     }
   },
   {
@@ -2214,8 +2214,8 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Retreat Aid",
-        "text": "As long as Dodrio is Benched, pay Colorless less to retreat your Active Pokémon.",
-        "type": "Pokémon Power"
+        "text": "As long as Dodrio is Benched, pay 1 Colorless less to retreat your Active Pokémon.",
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -2254,8 +2254,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/34.png",
-      "large": "https://images.pokemontcg.io/base2/34_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/34/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/34/high.webp"
     }
   },
   {
@@ -2292,7 +2292,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip a number of coins equal to the number of Energy attached to Exeggutor. This attack does 20 damage times the number of heads."
       }
     ],
@@ -2318,8 +2318,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/35.png",
-      "large": "https://images.pokemontcg.io/base2/35_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/35/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/35/high.webp"
     }
   },
   {
@@ -2388,8 +2388,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/36.png",
-      "large": "https://images.pokemontcg.io/base2/36_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/36/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/36/high.webp"
     }
   },
   {
@@ -2454,8 +2454,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/37.png",
-      "large": "https://images.pokemontcg.io/base2/37_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/37/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/37/high.webp"
     }
   },
   {
@@ -2526,8 +2526,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/38.png",
-      "large": "https://images.pokemontcg.io/base2/38_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/38/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/38/high.webp"
     }
   },
   {
@@ -2556,7 +2556,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 2,
-        "damage": "30×",
+        "damage": "30x",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       },
       {
@@ -2596,8 +2596,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/39.png",
-      "large": "https://images.pokemontcg.io/base2/39_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/39/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/39/high.webp"
     }
   },
   {
@@ -2614,7 +2614,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Nidoran ♀",
+    "evolvesFrom": "Nidoran♀",
     "evolvesTo": [
       "Nidoqueen"
     ],
@@ -2638,7 +2638,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "30×",
+        "damage": "30x",
         "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
       }
     ],
@@ -2662,8 +2662,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/40.png",
-      "large": "https://images.pokemontcg.io/base2/40_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/40/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/40/high.webp"
     }
   },
   {
@@ -2727,8 +2727,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/41.png",
-      "large": "https://images.pokemontcg.io/base2/41_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/41/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/41/high.webp"
     }
   },
   {
@@ -2795,8 +2795,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/42.png",
-      "large": "https://images.pokemontcg.io/base2/42_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/42/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/42/high.webp"
     }
   },
   {
@@ -2825,7 +2825,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20x",
         "text": "Flip 3 coins. This attack does 20 damage times the number of heads."
       },
       {
@@ -2860,8 +2860,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/43.png",
-      "large": "https://images.pokemontcg.io/base2/43_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/43/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/43/high.webp"
     }
   },
   {
@@ -2923,8 +2923,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/44.png",
-      "large": "https://images.pokemontcg.io/base2/44_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/44/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/44/high.webp"
     }
   },
   {
@@ -2999,8 +2999,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/45.png",
-      "large": "https://images.pokemontcg.io/base2/45_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/45/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/45/high.webp"
     }
   },
   {
@@ -3062,8 +3062,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/46.png",
-      "large": "https://images.pokemontcg.io/base2/46_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/46/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/46/high.webp"
     }
   },
   {
@@ -3092,7 +3092,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20+",
+        "damage": "20",
         "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage; if tails, this attack does 20 damage."
       },
       {
@@ -3133,8 +3133,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/47.png",
-      "large": "https://images.pokemontcg.io/base2/47_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/47/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/47/high.webp"
     }
   },
   {
@@ -3198,8 +3198,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/48.png",
-      "large": "https://images.pokemontcg.io/base2/48_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/48/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/48/high.webp"
     }
   },
   {
@@ -3262,8 +3262,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/49.png",
-      "large": "https://images.pokemontcg.io/base2/49_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/49/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/49/high.webp"
     }
   },
   {
@@ -3332,8 +3332,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/50.png",
-      "large": "https://images.pokemontcg.io/base2/50_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/50/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/50/high.webp"
     }
   },
   {
@@ -3409,8 +3409,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/51.png",
-      "large": "https://images.pokemontcg.io/base2/51_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/51/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/51/high.webp"
     }
   },
   {
@@ -3474,8 +3474,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/52.png",
-      "large": "https://images.pokemontcg.io/base2/52_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/52/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/52/high.webp"
     }
   },
   {
@@ -3527,8 +3527,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/53.png",
-      "large": "https://images.pokemontcg.io/base2/53_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/53/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/53/high.webp"
     }
   },
   {
@@ -3597,8 +3597,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/54.png",
-      "large": "https://images.pokemontcg.io/base2/54_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/54/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/54/high.webp"
     }
   },
   {
@@ -3624,7 +3624,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Peek",
         "text": "Once during your turn (before your attack), you may look at one of the following: the top card of either player's deck, a random card from your opponent's hand, or one of either player's Prizes. This power can't be used if Mankey is Asleep, Confused, or Paralyzed.",
-        "type": "Pokémon Power"
+        "type": "Pokemon Power"
       }
     ],
     "attacks": [
@@ -3656,8 +3656,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/55.png",
-      "large": "https://images.pokemontcg.io/base2/55_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/55/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/55/high.webp"
     }
   },
   {
@@ -3717,8 +3717,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/56.png",
-      "large": "https://images.pokemontcg.io/base2/56_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/56/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/56/high.webp"
     }
   },
   {
@@ -3748,7 +3748,7 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 1,
-        "damage": "10×",
+        "damage": "10x",
         "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
       },
       {
@@ -3759,7 +3759,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "Search your deck for a Basic Pokémon named Nidoran ♂ or Nidoran ♀ and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench is full.)"
+        "text": "Search your deck for a Basic Pokémon named Nidoran M or Nidoran F and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench is full.)"
       }
     ],
     "weaknesses": [
@@ -3782,8 +3782,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/57.png",
-      "large": "https://images.pokemontcg.io/base2/57_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/57/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/57/high.webp"
     }
   },
   {
@@ -3847,8 +3847,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/58.png",
-      "large": "https://images.pokemontcg.io/base2/58_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/58/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/58/high.webp"
     }
   },
   {
@@ -3913,8 +3913,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/59.png",
-      "large": "https://images.pokemontcg.io/base2/59_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/59/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/59/high.webp"
     }
   },
   {
@@ -3931,7 +3931,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Lightning"
     ],
-    "evolvesFrom": null,
+    "evolvesFrom": "Pichu",
     "evolvesTo": [
       "Raichu"
     ],
@@ -3969,8 +3969,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/60.png",
-      "large": "https://images.pokemontcg.io/base2/60_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/60/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/60/high.webp"
     }
   },
   {
@@ -4042,8 +4042,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/61.png",
-      "large": "https://images.pokemontcg.io/base2/61_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/61/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/61/high.webp"
     }
   },
   {
@@ -4111,8 +4111,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/62.png",
-      "large": "https://images.pokemontcg.io/base2/62_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/62/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/62/high.webp"
     }
   },
   {
@@ -4176,8 +4176,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/63.png",
-      "large": "https://images.pokemontcg.io/base2/63_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/63/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/63/high.webp"
     }
   },
   {
@@ -4210,8 +4210,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/base2/64.png",
-      "large": "https://images.pokemontcg.io/base2/64_hires.png"
+      "small": "https://assets.tcgdex.net/en/base/base2/64/low.webp",
+      "large": "https://assets.tcgdex.net/en/base/base2/64/high.webp"
     }
   }
 ]

@@ -52,8 +52,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-1/small",
-      "large": "https://images.scrydex.com/pokemon/me4-1/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/001/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/001/high.webp"
     }
   },
   {
@@ -115,8 +115,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-2/small",
-      "large": "https://images.scrydex.com/pokemon/me4-2/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/002/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/002/high.webp"
     }
   },
   {
@@ -173,8 +173,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-3/small",
-      "large": "https://images.scrydex.com/pokemon/me4-3/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/003/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/003/high.webp"
     }
   },
   {
@@ -231,8 +231,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-4/small",
-      "large": "https://images.scrydex.com/pokemon/me4-4/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/004/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/004/high.webp"
     }
   },
   {
@@ -297,8 +297,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-5/small",
-      "large": "https://images.scrydex.com/pokemon/me4-5/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/005/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/005/high.webp"
     }
   },
   {
@@ -327,7 +327,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "20",
-        "text": "Search your deck for a Basic Grass Energy card and attach it to this Pokémon. Then, shuffle your deck."
+        "text": "Search your deck for a Basic {G} Energy card and attach it to this Pokémon. Then, shuffle your deck."
       },
       {
         "name": "Vine Whip",
@@ -365,8 +365,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-6/small",
-      "large": "https://images.scrydex.com/pokemon/me4-6/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/006/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/006/high.webp"
     }
   },
   {
@@ -389,7 +389,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Needly Armor",
-        "text": "If this Pokémon is in the Active Spot and is damaged by an attack from your opponent's Pokémon (even if this Pokémon is Knocked Out), place 3 damage counters on the Attacking Pokémon for each Grass Energy attached to this Pokémon.",
+        "text": "If this Pokémon is in the Active Spot and is damaged by an attack from your opponent's Pokémon (even if this Pokémon is Knocked Out), place 3 damage counters on the Attacking Pokémon for each {G} Energy attached to this Pokémon.",
         "type": "Ability"
       }
     ],
@@ -431,8 +431,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-7/small",
-      "large": "https://images.scrydex.com/pokemon/me4-7/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/007/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/007/high.webp"
     }
   },
   {
@@ -486,8 +486,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-8/small",
-      "large": "https://images.scrydex.com/pokemon/me4-8/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/008/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/008/high.webp"
     }
   },
   {
@@ -551,8 +551,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-9/small",
-      "large": "https://images.scrydex.com/pokemon/me4-9/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/009/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/009/high.webp"
     }
   },
   {
@@ -592,7 +592,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "130",
-        "text": "Discard a Fire Energy from this Pokémon."
+        "text": "Discard a {R} Energy from this Pokémon."
       }
     ],
     "weaknesses": [
@@ -618,8 +618,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-10/small",
-      "large": "https://images.scrydex.com/pokemon/me4-10/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/010/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/010/high.webp"
     }
   },
   {
@@ -682,8 +682,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-11/small",
-      "large": "https://images.scrydex.com/pokemon/me4-11/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/011/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/011/high.webp"
     }
   },
   {
@@ -738,8 +738,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-12/small",
-      "large": "https://images.scrydex.com/pokemon/me4-12/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/012/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/012/high.webp"
     }
   },
   {
@@ -762,7 +762,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Flaring Magic",
-        "text": "Once during your turn, you may discard a Basic Fire Energy card from your hand in order to use this Ability. Draw cards until you have 7 cards in your hand.",
+        "text": "Once during your turn, you may discard a Basic {R} Energy card from your hand in order to use this Ability. Draw cards until you have 7 cards in your hand.",
         "type": "Ability"
       }
     ],
@@ -801,8 +801,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-13/small",
-      "large": "https://images.scrydex.com/pokemon/me4-13/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/013/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/013/high.webp"
     }
   },
   {
@@ -856,8 +856,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-14/small",
-      "large": "https://images.scrydex.com/pokemon/me4-14/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/014/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/014/high.webp"
     }
   },
   {
@@ -928,15 +928,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-15/small",
-      "large": "https://images.scrydex.com/pokemon/me4-15/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/015/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/015/high.webp"
     }
   },
   {
     "id": "me4-16",
     "name": "Remoraid",
     "number": "16",
-    "artist": "Mori You",
+    "artist": "Mori Yuu",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -983,8 +983,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-16/small",
-      "large": "https://images.scrydex.com/pokemon/me4-16/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/016/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/016/high.webp"
     }
   },
   {
@@ -1049,8 +1049,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-17/small",
-      "large": "https://images.scrydex.com/pokemon/me4-17/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/017/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/017/high.webp"
     }
   },
   {
@@ -1114,8 +1114,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-18/small",
-      "large": "https://images.scrydex.com/pokemon/me4-18/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/018/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/018/high.webp"
     }
   },
   {
@@ -1179,8 +1179,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-19/small",
-      "large": "https://images.scrydex.com/pokemon/me4-19/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/019/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/019/high.webp"
     }
   },
   {
@@ -1243,8 +1243,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-20/small",
-      "large": "https://images.scrydex.com/pokemon/me4-20/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/020/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/020/high.webp"
     }
   },
   {
@@ -1308,8 +1308,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-21/small",
-      "large": "https://images.scrydex.com/pokemon/me4-21/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/021/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/021/high.webp"
     }
   },
   {
@@ -1336,7 +1336,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Mortal Shuriken",
-        "text": "Once during your turn, if this Pokémon is in the Active Spot, you may discard a Basic Water Energy card from your hand in order to use this Ability. Place 6 damage counters on 1 of your opponent's Pokémon.",
+        "text": "Once during your turn, if this Pokémon is in the Active Spot, you may discard a Basic {W} Energy card from your hand in order to use this Ability. Place 6 damage counters on 1 of your opponent's Pokémon.",
         "type": "Ability"
       }
     ],
@@ -1349,7 +1349,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "120+",
-        "text": "You may put a Water Energy attached to this Pokémon into your hand and have this attack do 80 more damage."
+        "text": "You may put a {W} Energy attached to this Pokémon into your hand and have this attack do 80 more damage."
       }
     ],
     "weaknesses": [
@@ -1374,8 +1374,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-22/small",
-      "large": "https://images.scrydex.com/pokemon/me4-22/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/022/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/022/high.webp"
     }
   },
   {
@@ -1441,15 +1441,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-23/small",
-      "large": "https://images.scrydex.com/pokemon/me4-23/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/023/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/023/high.webp"
     }
   },
   {
     "id": "me4-24",
     "name": "Avalugg",
     "number": "24",
-    "artist": "Tomoki Sone",
+    "artist": "Tomomi Kaneko",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1471,7 +1471,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "60×",
-        "text": "Discard the top 6 cards of your deck, and this attack does 60 damage for each Basic Water Energy card you discarded in this way."
+        "text": "Discard the top 6 cards of your deck, and this attack does 60 damage for each Basic {W} Energy card you discarded in this way."
       },
       {
         "name": "Frost Stamp",
@@ -1511,8 +1511,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-24/small",
-      "large": "https://images.scrydex.com/pokemon/me4-24/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/024/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/024/high.webp"
     }
   },
   {
@@ -1577,8 +1577,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-25/small",
-      "large": "https://images.scrydex.com/pokemon/me4-25/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/025/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/025/high.webp"
     }
   },
   {
@@ -1644,15 +1644,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-26/small",
-      "large": "https://images.scrydex.com/pokemon/me4-26/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/026/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/026/high.webp"
     }
   },
   {
     "id": "me4-27",
     "name": "Mareep",
     "number": "27",
-    "artist": "UKUMO viti",
+    "artist": "UKUMO uiti",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1701,8 +1701,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-27/small",
-      "large": "https://images.scrydex.com/pokemon/me4-27/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/027/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/027/high.webp"
     }
   },
   {
@@ -1758,8 +1758,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-28/small",
-      "large": "https://images.scrydex.com/pokemon/me4-28/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/028/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/028/high.webp"
     }
   },
   {
@@ -1821,8 +1821,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-29/small",
-      "large": "https://images.scrydex.com/pokemon/me4-29/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/029/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/029/high.webp"
     }
   },
   {
@@ -1885,8 +1885,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-30/small",
-      "large": "https://images.scrydex.com/pokemon/me4-30/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/030/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/030/high.webp"
     }
   },
   {
@@ -1915,7 +1915,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your deck for up to 2 Basic Psychic Energy cards and attach them to this Pokémon. Then, shuffle your deck."
+        "text": "Search your deck for up to 2 Basic {P} Energy cards and attach them to this Pokémon. Then, shuffle your deck."
       },
       {
         "name": "Psychic",
@@ -1956,8 +1956,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-31/small",
-      "large": "https://images.scrydex.com/pokemon/me4-31/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/031/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/031/high.webp"
     }
   },
   {
@@ -2019,8 +2019,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-32/small",
-      "large": "https://images.scrydex.com/pokemon/me4-32/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/032/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/032/high.webp"
     }
   },
   {
@@ -2083,8 +2083,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-33/small",
-      "large": "https://images.scrydex.com/pokemon/me4-33/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/033/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/033/high.webp"
     }
   },
   {
@@ -2129,7 +2129,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       386
     ],
@@ -2141,8 +2141,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-34/small",
-      "large": "https://images.scrydex.com/pokemon/me4-34/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/034/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/034/high.webp"
     }
   },
   {
@@ -2186,7 +2186,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "200",
-        "text": "Search your deck for up to 4 Basic Psychic Energy cards and attach them to your Benched Pokémon in any way you like. Then, shuffle your deck."
+        "text": "Search your deck for up to 4 Basic {P} Energy cards and attach them to your Benched Pokémon in any way you like. Then, shuffle your deck."
       }
     ],
     "weaknesses": [
@@ -2211,8 +2211,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-35/small",
-      "large": "https://images.scrydex.com/pokemon/me4-35/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/035/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/035/high.webp"
     }
   },
   {
@@ -2271,8 +2271,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-36/small",
-      "large": "https://images.scrydex.com/pokemon/me4-36/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/036/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/036/high.webp"
     }
   },
   {
@@ -2332,8 +2332,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-37/small",
-      "large": "https://images.scrydex.com/pokemon/me4-37/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/037/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/037/high.webp"
     }
   },
   {
@@ -2399,8 +2399,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-38/small",
-      "large": "https://images.scrydex.com/pokemon/me4-38/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/038/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/038/high.webp"
     }
   },
   {
@@ -2471,8 +2471,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-39/small",
-      "large": "https://images.scrydex.com/pokemon/me4-39/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/039/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/039/high.webp"
     }
   },
   {
@@ -2532,8 +2532,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-40/small",
-      "large": "https://images.scrydex.com/pokemon/me4-40/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/040/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/040/high.webp"
     }
   },
   {
@@ -2606,8 +2606,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-41/small",
-      "large": "https://images.scrydex.com/pokemon/me4-41/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/041/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/041/high.webp"
     }
   },
   {
@@ -2638,7 +2638,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "30×",
-        "text": "This attack does 30 damage for each Psychic Energy attached to all of your Pokémon."
+        "text": "This attack does 30 damage for each {P} Energy attached to all of your Pokémon."
       }
     ],
     "weaknesses": [
@@ -2664,8 +2664,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-42/small",
-      "large": "https://images.scrydex.com/pokemon/me4-42/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/042/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/042/high.webp"
     }
   },
   {
@@ -2728,8 +2728,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-43/small",
-      "large": "https://images.scrydex.com/pokemon/me4-43/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/043/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/043/high.webp"
     }
   },
   {
@@ -2795,8 +2795,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-44/small",
-      "large": "https://images.scrydex.com/pokemon/me4-44/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/044/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/044/high.webp"
     }
   },
   {
@@ -2864,8 +2864,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-45/small",
-      "large": "https://images.scrydex.com/pokemon/me4-45/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/045/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/045/high.webp"
     }
   },
   {
@@ -2920,8 +2920,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-46/small",
-      "large": "https://images.scrydex.com/pokemon/me4-46/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/046/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/046/high.webp"
     }
   },
   {
@@ -2976,8 +2976,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-47/small",
-      "large": "https://images.scrydex.com/pokemon/me4-47/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/047/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/047/high.webp"
     }
   },
   {
@@ -3047,8 +3047,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-48/small",
-      "large": "https://images.scrydex.com/pokemon/me4-48/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/048/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/048/high.webp"
     }
   },
   {
@@ -3093,7 +3093,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       41
     ],
@@ -3105,8 +3105,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-49/small",
-      "large": "https://images.scrydex.com/pokemon/me4-49/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/049/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/049/high.webp"
     }
   },
   {
@@ -3165,8 +3165,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-50/small",
-      "large": "https://images.scrydex.com/pokemon/me4-50/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/050/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/050/high.webp"
     }
   },
   {
@@ -3231,8 +3231,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-51/small",
-      "large": "https://images.scrydex.com/pokemon/me4-51/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/051/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/051/high.webp"
     }
   },
   {
@@ -3292,8 +3292,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-52/small",
-      "large": "https://images.scrydex.com/pokemon/me4-52/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/052/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/052/high.webp"
     }
   },
   {
@@ -3348,8 +3348,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-53/small",
-      "large": "https://images.scrydex.com/pokemon/me4-53/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/053/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/053/high.webp"
     }
   },
   {
@@ -3415,8 +3415,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-54/small",
-      "large": "https://images.scrydex.com/pokemon/me4-54/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/054/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/054/high.webp"
     }
   },
   {
@@ -3487,8 +3487,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "I",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-55/small",
-      "large": "https://images.scrydex.com/pokemon/me4-55/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/055/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/055/high.webp"
     }
   },
   {
@@ -3543,8 +3543,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-56/small",
-      "large": "https://images.scrydex.com/pokemon/me4-56/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/056/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/056/high.webp"
     }
   },
   {
@@ -3608,8 +3608,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-57/small",
-      "large": "https://images.scrydex.com/pokemon/me4-57/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/057/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/057/high.webp"
     }
   },
   {
@@ -3663,8 +3663,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-58/small",
-      "large": "https://images.scrydex.com/pokemon/me4-58/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/058/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/058/high.webp"
     }
   },
   {
@@ -3733,8 +3733,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-59/small",
-      "large": "https://images.scrydex.com/pokemon/me4-59/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/059/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/059/high.webp"
     }
   },
   {
@@ -3805,8 +3805,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-60/small",
-      "large": "https://images.scrydex.com/pokemon/me4-60/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/060/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/060/high.webp"
     }
   },
   {
@@ -3847,7 +3847,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "150+",
-        "text": "You may discard 3 Metal Energy from this Pokémon and have this attack do 150 more damage."
+        "text": "You may discard 3 {M} Energy from this Pokémon and have this attack do 150 more damage."
       }
     ],
     "weaknesses": [
@@ -3879,8 +3879,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-61/small",
-      "large": "https://images.scrydex.com/pokemon/me4-61/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/061/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/061/high.webp"
     }
   },
   {
@@ -3941,8 +3941,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-62/small",
-      "large": "https://images.scrydex.com/pokemon/me4-62/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/062/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/062/high.webp"
     }
   },
   {
@@ -4010,8 +4010,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-63/small",
-      "large": "https://images.scrydex.com/pokemon/me4-63/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/063/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/063/high.webp"
     }
   },
   {
@@ -4037,7 +4037,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Metal Road",
-        "text": "Once during your turn, when this Pokémon moves from your Bench to the Active Spot, you may use this Ability. Move any amount of Metal Energy from your other Pokémon to this Pokémon.",
+        "text": "Once during your turn, when this Pokémon moves from your Bench to the Active Spot, you may use this Ability. Move any amount of {M} Energy from your other Pokémon to this Pokémon.",
         "type": "Ability"
       }
     ],
@@ -4082,8 +4082,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-64/small",
-      "large": "https://images.scrydex.com/pokemon/me4-64/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/064/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/064/high.webp"
     }
   },
   {
@@ -4148,8 +4148,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-65/small",
-      "large": "https://images.scrydex.com/pokemon/me4-65/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/065/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/065/high.webp"
     }
   },
   {
@@ -4200,8 +4200,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-66/small",
-      "large": "https://images.scrydex.com/pokemon/me4-66/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/066/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/066/high.webp"
     }
   },
   {
@@ -4253,8 +4253,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-67/small",
-      "large": "https://images.scrydex.com/pokemon/me4-67/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/067/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/067/high.webp"
     }
   },
   {
@@ -4312,15 +4312,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-68/small",
-      "large": "https://images.scrydex.com/pokemon/me4-68/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/068/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/068/high.webp"
     }
   },
   {
     "id": "me4-69",
     "name": "Tauros",
     "number": "69",
-    "artist": "Satoshi Ito",
+    "artist": "Satoshi Ohta",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4369,8 +4369,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-69/small",
-      "large": "https://images.scrydex.com/pokemon/me4-69/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/069/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/069/high.webp"
     }
   },
   {
@@ -4430,8 +4430,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-70/small",
-      "large": "https://images.scrydex.com/pokemon/me4-70/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/070/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/070/high.webp"
     }
   },
   {
@@ -4494,8 +4494,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-71/small",
-      "large": "https://images.scrydex.com/pokemon/me4-71/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/071/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/071/high.webp"
     }
   },
   {
@@ -4549,8 +4549,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-72/small",
-      "large": "https://images.scrydex.com/pokemon/me4-72/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/072/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/072/high.webp"
     }
   },
   {
@@ -4613,8 +4613,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-73/small",
-      "large": "https://images.scrydex.com/pokemon/me4-73/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/073/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/073/high.webp"
     }
   },
   {
@@ -4649,8 +4649,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "I",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-74/small",
-      "large": "https://images.scrydex.com/pokemon/me4-74/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/074/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/074/high.webp"
     }
   },
   {
@@ -4685,8 +4685,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-75/small",
-      "large": "https://images.scrydex.com/pokemon/me4-75/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/075/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/075/high.webp"
     }
   },
   {
@@ -4721,8 +4721,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-76/small",
-      "large": "https://images.scrydex.com/pokemon/me4-76/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/076/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/076/high.webp"
     }
   },
   {
@@ -4757,8 +4757,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-77/small",
-      "large": "https://images.scrydex.com/pokemon/me4-77/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/077/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/077/high.webp"
     }
   },
   {
@@ -4793,8 +4793,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-78/small",
-      "large": "https://images.scrydex.com/pokemon/me4-78/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/078/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/078/high.webp"
     }
   },
   {
@@ -4829,8 +4829,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-79/small",
-      "large": "https://images.scrydex.com/pokemon/me4-79/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/079/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/079/high.webp"
     }
   },
   {
@@ -4865,8 +4865,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-80/small",
-      "large": "https://images.scrydex.com/pokemon/me4-80/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/080/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/080/high.webp"
     }
   },
   {
@@ -4901,8 +4901,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-81/small",
-      "large": "https://images.scrydex.com/pokemon/me4-81/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/081/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/081/high.webp"
     }
   },
   {
@@ -4937,8 +4937,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-82/small",
-      "large": "https://images.scrydex.com/pokemon/me4-82/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/082/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/082/high.webp"
     }
   },
   {
@@ -4973,8 +4973,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-83/small",
-      "large": "https://images.scrydex.com/pokemon/me4-83/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/083/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/083/high.webp"
     }
   },
   {
@@ -5009,8 +5009,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-84/small",
-      "large": "https://images.scrydex.com/pokemon/me4-84/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/084/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/084/high.webp"
     }
   },
   {
@@ -5045,8 +5045,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-85/small",
-      "large": "https://images.scrydex.com/pokemon/me4-85/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/085/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/085/high.webp"
     }
   },
   {
@@ -5081,8 +5081,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-86/small",
-      "large": "https://images.scrydex.com/pokemon/me4-86/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/086/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/086/high.webp"
     }
   },
   {
@@ -5147,8 +5147,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-87/small",
-      "large": "https://images.scrydex.com/pokemon/me4-87/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/087/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/087/high.webp"
     }
   },
   {
@@ -5211,8 +5211,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-88/small",
-      "large": "https://images.scrydex.com/pokemon/me4-88/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/088/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/088/high.webp"
     }
   },
   {
@@ -5276,8 +5276,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-89/small",
-      "large": "https://images.scrydex.com/pokemon/me4-89/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/089/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/089/high.webp"
     }
   },
   {
@@ -5339,8 +5339,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-90/small",
-      "large": "https://images.scrydex.com/pokemon/me4-90/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/090/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/090/high.webp"
     }
   },
   {
@@ -5371,7 +5371,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "30×",
-        "text": "This attack does 30 damage for each Psychic Energy attached to all of your Pokémon."
+        "text": "This attack does 30 damage for each {P} Energy attached to all of your Pokémon."
       }
     ],
     "weaknesses": [
@@ -5397,8 +5397,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-91/small",
-      "large": "https://images.scrydex.com/pokemon/me4-91/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/091/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/091/high.webp"
     }
   },
   {
@@ -5453,8 +5453,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-92/small",
-      "large": "https://images.scrydex.com/pokemon/me4-92/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/092/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/092/high.webp"
     }
   },
   {
@@ -5519,8 +5519,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-93/small",
-      "large": "https://images.scrydex.com/pokemon/me4-93/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/093/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/093/high.webp"
     }
   },
   {
@@ -5591,8 +5591,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-94/small",
-      "large": "https://images.scrydex.com/pokemon/me4-94/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/094/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/094/high.webp"
     }
   },
   {
@@ -5644,8 +5644,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-95/small",
-      "large": "https://images.scrydex.com/pokemon/me4-95/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/095/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/095/high.webp"
     }
   },
   {
@@ -5701,8 +5701,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-96/small",
-      "large": "https://images.scrydex.com/pokemon/me4-96/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/096/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/096/high.webp"
     }
   },
   {
@@ -5765,8 +5765,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-97/small",
-      "large": "https://images.scrydex.com/pokemon/me4-97/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/097/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/097/high.webp"
     }
   },
   {
@@ -5823,8 +5823,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-98/small",
-      "large": "https://images.scrydex.com/pokemon/me4-98/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/098/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/098/high.webp"
     }
   },
   {
@@ -5895,8 +5895,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-99/small",
-      "large": "https://images.scrydex.com/pokemon/me4-99/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/099/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/099/high.webp"
     }
   },
   {
@@ -5923,7 +5923,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Mortal Shuriken",
-        "text": "Once during your turn, if this Pokémon is in the Active Spot, you may discard a Basic Water Energy card from your hand in order to use this Ability. Place 6 damage counters on 1 of your opponent's Pokémon.",
+        "text": "Once during your turn, if this Pokémon is in the Active Spot, you may discard a Basic {W} Energy card from your hand in order to use this Ability. Place 6 damage counters on 1 of your opponent's Pokémon.",
         "type": "Ability"
       }
     ],
@@ -5936,7 +5936,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "120+",
-        "text": "You may put a Water Energy attached to this Pokémon into your hand and have this attack do 80 more damage."
+        "text": "You may put a {W} Energy attached to this Pokémon into your hand and have this attack do 80 more damage."
       }
     ],
     "weaknesses": [
@@ -5961,8 +5961,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-100/small",
-      "large": "https://images.scrydex.com/pokemon/me4-100/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/100/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/100/high.webp"
     }
   },
   {
@@ -6006,7 +6006,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "200",
-        "text": "Search your deck for up to 4 Basic Psychic Energy cards and attach them to your Benched Pokémon in any way you like. Then, shuffle your deck."
+        "text": "Search your deck for up to 4 Basic {P} Energy cards and attach them to your Benched Pokémon in any way you like. Then, shuffle your deck."
       }
     ],
     "weaknesses": [
@@ -6031,8 +6031,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-101/small",
-      "large": "https://images.scrydex.com/pokemon/me4-101/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/101/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/101/high.webp"
     }
   },
   {
@@ -6105,8 +6105,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-102/small",
-      "large": "https://images.scrydex.com/pokemon/me4-102/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/102/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/102/high.webp"
     }
   },
   {
@@ -6132,7 +6132,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Metal Road",
-        "text": "Once during your turn, when this Pokémon moves from your Bench to the Active Spot, you may use this Ability. Move any amount of Metal Energy from your other Pokémon to this Pokémon.",
+        "text": "Once during your turn, when this Pokémon moves from your Bench to the Active Spot, you may use this Ability. Move any amount of {M} Energy from your other Pokémon to this Pokémon.",
         "type": "Ability"
       }
     ],
@@ -6177,8 +6177,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-103/small",
-      "large": "https://images.scrydex.com/pokemon/me4-103/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/103/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/103/high.webp"
     }
   },
   {
@@ -6243,8 +6243,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-104/small",
-      "large": "https://images.scrydex.com/pokemon/me4-104/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/104/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/104/high.webp"
     }
   },
   {
@@ -6307,8 +6307,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-105/small",
-      "large": "https://images.scrydex.com/pokemon/me4-105/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/105/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/105/high.webp"
     }
   },
   {
@@ -6343,8 +6343,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-106/small",
-      "large": "https://images.scrydex.com/pokemon/me4-106/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/106/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/106/high.webp"
     }
   },
   {
@@ -6379,8 +6379,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-107/small",
-      "large": "https://images.scrydex.com/pokemon/me4-107/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/107/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/107/high.webp"
     }
   },
   {
@@ -6415,8 +6415,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "I",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-108/small",
-      "large": "https://images.scrydex.com/pokemon/me4-108/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/108/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/108/high.webp"
     }
   },
   {
@@ -6451,8 +6451,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "I",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-109/small",
-      "large": "https://images.scrydex.com/pokemon/me4-109/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/109/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/109/high.webp"
     }
   },
   {
@@ -6487,8 +6487,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-110/small",
-      "large": "https://images.scrydex.com/pokemon/me4-110/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/110/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/110/high.webp"
     }
   },
   {
@@ -6523,8 +6523,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-111/small",
-      "large": "https://images.scrydex.com/pokemon/me4-111/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/111/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/111/high.webp"
     }
   },
   {
@@ -6559,8 +6559,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-112/small",
-      "large": "https://images.scrydex.com/pokemon/me4-112/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/112/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/112/high.webp"
     }
   },
   {
@@ -6595,8 +6595,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-113/small",
-      "large": "https://images.scrydex.com/pokemon/me4-113/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/113/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/113/high.webp"
     }
   },
   {
@@ -6631,8 +6631,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "I",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-114/small",
-      "large": "https://images.scrydex.com/pokemon/me4-114/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/114/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/114/high.webp"
     }
   },
   {
@@ -6667,8 +6667,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "I",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-115/small",
-      "large": "https://images.scrydex.com/pokemon/me4-115/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/115/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/115/high.webp"
     }
   },
   {
@@ -6695,7 +6695,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Mortal Shuriken",
-        "text": "Once during your turn, if this Pokémon is in the Active Spot, you may discard a Basic Water Energy card from your hand in order to use this Ability. Place 6 damage counters on 1 of your opponent's Pokémon.",
+        "text": "Once during your turn, if this Pokémon is in the Active Spot, you may discard a Basic {W} Energy card from your hand in order to use this Ability. Place 6 damage counters on 1 of your opponent's Pokémon.",
         "type": "Ability"
       }
     ],
@@ -6708,7 +6708,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "120+",
-        "text": "You may put a Water Energy attached to this Pokémon into your hand and have this attack do 80 more damage."
+        "text": "You may put a {W} Energy attached to this Pokémon into your hand and have this attack do 80 more damage."
       }
     ],
     "weaknesses": [
@@ -6733,8 +6733,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-116/small",
-      "large": "https://images.scrydex.com/pokemon/me4-116/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/116/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/116/high.webp"
     }
   },
   {
@@ -6778,7 +6778,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "200",
-        "text": "Search your deck for up to 4 Basic Psychic Energy cards and attach them to your Benched Pokémon in any way you like. Then, shuffle your deck."
+        "text": "Search your deck for up to 4 Basic {P} Energy cards and attach them to your Benched Pokémon in any way you like. Then, shuffle your deck."
       }
     ],
     "weaknesses": [
@@ -6803,15 +6803,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-117/small",
-      "large": "https://images.scrydex.com/pokemon/me4-117/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/117/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/117/high.webp"
     }
   },
   {
     "id": "me4-118",
     "name": "Mega Dragalge ex",
     "number": "118",
-    "artist": "Kazumasa Yasukunio",
+    "artist": "Kazumasa Yasukuni",
     "rarity": "Special Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6869,8 +6869,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-118/small",
-      "large": "https://images.scrydex.com/pokemon/me4-118/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/118/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/118/high.webp"
     }
   },
   {
@@ -6933,8 +6933,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-119/small",
-      "large": "https://images.scrydex.com/pokemon/me4-119/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/119/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/119/high.webp"
     }
   },
   {
@@ -6969,8 +6969,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-120/small",
-      "large": "https://images.scrydex.com/pokemon/me4-120/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/120/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/120/high.webp"
     }
   },
   {
@@ -7005,8 +7005,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-121/small",
-      "large": "https://images.scrydex.com/pokemon/me4-121/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/121/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/121/high.webp"
     }
   },
   {
@@ -7033,7 +7033,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Mortal Shuriken",
-        "text": "Once during your turn, if this Pokémon is in the Active Spot, you may discard a Basic Water Energy card from your hand in order to use this Ability. Place 6 damage counters on 1 of your opponent's Pokémon.",
+        "text": "Once during your turn, if this Pokémon is in the Active Spot, you may discard a Basic {W} Energy card from your hand in order to use this Ability. Place 6 damage counters on 1 of your opponent's Pokémon.",
         "type": "Ability"
       }
     ],
@@ -7046,7 +7046,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "120+",
-        "text": "You may put a Water Energy attached to this Pokémon into your hand and have this attack do 80 more damage."
+        "text": "You may put a {W} Energy attached to this Pokémon into your hand and have this attack do 80 more damage."
       }
     ],
     "weaknesses": [
@@ -7071,8 +7071,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me4-122/small",
-      "large": "https://images.scrydex.com/pokemon/me4-122/large"
+      "small": "https://assets.tcgdex.net/en/me/me04/122/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/me04/122/high.webp"
     }
   }
 ]

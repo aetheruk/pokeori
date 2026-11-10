@@ -17,11 +17,13 @@ const sourceLinks = [
   { label: 'PokeAPI data', href: 'https://github.com/PokeAPI/pokeapi' },
   { label: 'PokeAPI sprites', href: 'https://github.com/PokeAPI/sprites' },
   { label: 'PokeAPI cries', href: 'https://github.com/PokeAPI/cries' },
-  { label: 'Pokémon TCG API', href: 'https://pokemontcg.io/' },
+  { label: 'TCGdex', href: 'https://tcgdex.dev/' },
   {
-    label: 'Pokémon TCG data repository',
-    href: 'https://github.com/PokemonTCG/pokemon-tcg-data',
+    label: 'TCGdex card data',
+    href: 'https://github.com/tcgdex/cards-database',
   },
+  { label: 'Legacy TCG set artwork', href: 'https://pokemontcg.io/' },
+  { label: 'Scrydex set artwork', href: 'https://scrydex.com/' },
 ]
 
 const softwareLinks = [

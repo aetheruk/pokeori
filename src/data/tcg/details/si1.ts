@@ -6,7 +6,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Mew",
     "number": "1",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
@@ -48,8 +48,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/1.png",
-      "large": "https://images.pokemontcg.io/si1/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/1/high.webp"
     }
   },
   {
@@ -57,7 +57,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Pidgeot",
     "number": "2",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 2"
@@ -117,8 +117,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/2.png",
-      "large": "https://images.pokemontcg.io/si1/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/2/high.webp"
     }
   },
   {
@@ -126,7 +126,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Onix",
     "number": "3",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
@@ -149,7 +149,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20×",
+        "damage": "20",
         "text": "Flip 2 coins. This attack does 20 damage times the number of heads."
       },
       {
@@ -187,8 +187,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/3.png",
-      "large": "https://images.pokemontcg.io/si1/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/3/high.webp"
     }
   },
   {
@@ -196,7 +196,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Togepi",
     "number": "4",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
@@ -242,8 +242,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/4.png",
-      "large": "https://images.pokemontcg.io/si1/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/4/high.webp"
     }
   },
   {
@@ -251,7 +251,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Ivysaur",
     "number": "5",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 1"
@@ -307,8 +307,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/5.png",
-      "large": "https://images.pokemontcg.io/si1/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/5/high.webp"
     }
   },
   {
@@ -316,7 +316,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Raticate",
     "number": "6",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 1"
@@ -337,7 +337,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10+",
+        "damage": "10",
         "text": "Flip a coin. If heads, this attack does 10 damage plus 30 more damage; if tails, this attack does 10 damage."
       }
     ],
@@ -364,8 +364,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/6.png",
-      "large": "https://images.pokemontcg.io/si1/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/6/high.webp"
     }
   },
   {
@@ -373,7 +373,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Ledyba",
     "number": "7",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
@@ -434,8 +434,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/7.png",
-      "large": "https://images.pokemontcg.io/si1/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/7/high.webp"
     }
   },
   {
@@ -443,7 +443,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Jigglypuff",
     "number": "8",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
@@ -503,8 +503,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/8.png",
-      "large": "https://images.pokemontcg.io/si1/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/8/high.webp"
     }
   },
   {
@@ -512,7 +512,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Butterfree",
     "number": "9",
     "artist": "Keiko Fukuyama",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 2"
@@ -574,8 +574,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/9.png",
-      "large": "https://images.pokemontcg.io/si1/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/9/high.webp"
     }
   },
   {
@@ -583,7 +583,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Tentacruel",
     "number": "10",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 1"
@@ -604,7 +604,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Flip a number of coins equal to the number of Water Energy attached to Tentacruel. For each heads, draw 2 cards."
+        "text": "Flip a number of coins equal to the number of Water Energy cards attached to Tentacruel. For each heads, draw 2 cards."
       },
       {
         "name": "Poison Sting",
@@ -615,6 +615,25 @@ const cardDetails: TcgCardDetail[] = [
         "convertedEnergyCost": 2,
         "damage": "20",
         "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+      },
+      {
+        "name": "Tentacle Grip",
+        "cost": [
+          "Water"
+        ],
+        "convertedEnergyCost": 1,
+        "damage": "",
+        "text": "Flip a number of coins equal to the number of Water Energy cards attached to Tentacruel. For each heads, draw 2 cards."
+      },
+      {
+        "name": "Poison Sting",
+        "cost": [
+          "Water",
+          "Water"
+        ],
+        "convertedEnergyCost": 2,
+        "damage": "20",
+        "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
       }
     ],
     "weaknesses": [
@@ -637,8 +656,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/10.png",
-      "large": "https://images.pokemontcg.io/si1/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/10/high.webp"
     }
   },
   {
@@ -646,7 +665,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Marill",
     "number": "11",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
@@ -702,8 +721,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/11.png",
-      "large": "https://images.pokemontcg.io/si1/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/11/high.webp"
     }
   },
   {
@@ -711,7 +730,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Lapras",
     "number": "12",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
@@ -765,8 +784,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/12.png",
-      "large": "https://images.pokemontcg.io/si1/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/12/high.webp"
     }
   },
   {
@@ -774,7 +793,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Exeggutor",
     "number": "13",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 1"
@@ -819,8 +838,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/13.png",
-      "large": "https://images.pokemontcg.io/si1/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/13/high.webp"
     }
   },
   {
@@ -828,7 +847,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Slowking",
     "number": "14",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 1"
@@ -858,7 +877,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10+",
+        "damage": "10",
         "text": "Does 10 damage plus 10 more damage for each Energy card attached to the Defending Pokémon."
       }
     ],
@@ -883,8 +902,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/14.png",
-      "large": "https://images.pokemontcg.io/si1/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/14/high.webp"
     }
   },
   {
@@ -892,7 +911,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Wartortle",
     "number": "15",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 1"
@@ -915,7 +934,7 @@ const cardDetails: TcgCardDetail[] = [
           "Water"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20+",
+        "damage": "20",
         "text": "Does 20 damage plus 10 more damage for each Water Energy attached to Wartortle but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
       }
     ],
@@ -939,8 +958,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/15.png",
-      "large": "https://images.pokemontcg.io/si1/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/15/high.webp"
     }
   },
   {
@@ -948,7 +967,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Lickitung",
     "number": "16",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Basic"
@@ -1010,8 +1029,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/16.png",
-      "large": "https://images.pokemontcg.io/si1/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/16/high.webp"
     }
   },
   {
@@ -1019,7 +1038,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Vileplume",
     "number": "17",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 2"
@@ -1075,8 +1094,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/17.png",
-      "large": "https://images.pokemontcg.io/si1/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/17/high.webp"
     }
   },
   {
@@ -1084,7 +1103,7 @@ const cardDetails: TcgCardDetail[] = [
     "name": "Primeape",
     "number": "18",
     "artist": "Naoyo Kimura",
-    "rarity": null,
+    "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
       "Stage 1"
@@ -1114,7 +1133,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 2,
-        "damage": "20+",
+        "damage": "20",
         "text": "Does 20 damage plus 10 more damage for each damage counter on Primeape. Flip a coin. If tails, Primeape is now Confused (after doing damage)."
       }
     ],
@@ -1138,8 +1157,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/si1/18.png",
-      "large": "https://images.pokemontcg.io/si1/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/neo/si1/18/low.webp",
+      "large": "https://assets.tcgdex.net/en/neo/si1/18/high.webp"
     }
   }
 ]

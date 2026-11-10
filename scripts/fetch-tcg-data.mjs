@@ -1,90 +1,94 @@
 #!/usr/bin/env bun
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { spawnSync } from 'node:child_process'
 
-const GITHUB_REPO = 'PokemonTCG/pokemon-tcg-data'
-const BRANCH = 'master'
-
-function githubHeaders() {
-  const headers = { Accept: 'application/vnd.github.v3+json' }
-  if (process.env.GITHUB_TOKEN) headers.Authorization = `token ${process.env.GITHUB_TOKEN}`
-  return headers
-}
-
-async function listContents(dir) {
-  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${dir}?ref=${BRANCH}`
-  const res = await fetch(url, { headers: githubHeaders() })
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Failed to list ${dir}: ${res.status} ${res.statusText} - ${text}`)
-  }
-  return res.json()
-}
-
-async function downloadToFile(url, dest) {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Failed to download ${url}: ${res.status} ${res.statusText}`)
-  const body = await res.text()
-  await fs.writeFile(dest, body, 'utf8')
-}
+const GITHUB_REPO = 'tcgdex/cards-database'
+const BRANCH = process.env.TCGDEX_BRANCH || 'master'
 
 function usage() {
-  console.log(`Usage: bun scripts/fetch-tcg-data.mjs [--only=sets|cards]
+  console.log(`Usage: bun scripts/fetch-tcg-data.mjs
 
-Options:
-  --only=sets    Only fetch the sets JSON files (fast, small)
-  --only=cards   Only fetch the cards JSON files (many files, large)
+Downloads the English-capable TCGdex card database source. The card modules include
+language fields; the generator currently imports English only.
 
 Environment:
-  GITHUB_TOKEN   Optional GitHub token to increase API rate limits
+  TCGDEX_BRANCH  Optional TCGdex cards-database branch (default: master)
 `)
 }
 
 async function main() {
   const args = process.argv.slice(2)
   if (args.includes('--help') || args.includes('-h')) return usage()
-  let only = null
-  const onlyArg = args.find((a) => a.startsWith('--only='))
-  if (onlyArg) only = onlyArg.split('=')[1]
 
   const root = process.cwd()
-  const outRoot = path.join(root, 'source_data', 'tcg')
-  await fs.mkdir(outRoot, { recursive: true })
+  const dataRoot = path.join(root, 'source_data', 'tcg')
+  const targetRoot = path.join(dataRoot, 'tcgdex')
+  const temporaryRoot = path.join(dataRoot, `.tcgdex-download-${process.pid}`)
+  const extractionRoot = path.join(temporaryRoot, 'extract')
+  const archivePath = path.join(temporaryRoot, 'cards-database.tar.gz')
+  const encodedBranch = BRANCH.split('/').map(encodeURIComponent).join('/')
+  const archiveUrl = `https://codeload.github.com/${GITHUB_REPO}/tar.gz/refs/heads/${encodedBranch}`
 
-  const targets = [
-    { dir: 'cards/en', out: path.join(outRoot, 'cards', 'en') },
-    { dir: 'sets', out: path.join(outRoot, 'sets') },
-  ]
+  await fs.mkdir(dataRoot, { recursive: true })
+  await fs.rm(temporaryRoot, { recursive: true, force: true })
+  await fs.mkdir(extractionRoot, { recursive: true })
 
-  for (const t of targets) {
-    if (only) {
-      if (only === 'sets' && t.dir !== 'sets') continue
-      if (only === 'cards' && !t.dir.startsWith('cards')) continue
+  console.log(`Downloading ${GITHUB_REPO}@${BRANCH}...`)
+  try {
+    const response = await fetch(archiveUrl)
+    if (!response.ok) {
+      throw new Error(`Failed to download ${archiveUrl}: ${response.status} ${response.statusText}`)
     }
 
-    await fs.mkdir(t.out, { recursive: true })
-    console.log(`Listing ${t.dir}...`)
-    const items = await listContents(t.dir)
-    const files = items.filter((it) => it.type === 'file' && it.name.endsWith('.json'))
-    console.log(`Found ${files.length} JSON files in ${t.dir}`)
+    await fs.writeFile(archivePath, Buffer.from(await response.arrayBuffer()))
 
-    for (const file of files) {
-      const dest = path.join(t.out, file.name)
-      process.stdout.write(`Downloading ${file.name} -> ${path.relative(root, dest)}... `)
-      try {
-        await downloadToFile(file.download_url, dest)
-        console.log('OK')
-      } catch (err) {
-        console.log('FAILED')
-        console.error(err.message)
-      }
+    const listing = spawnSync('tar', ['-tzf', archivePath], {
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+    })
+    if (listing.error) throw listing.error
+    if (listing.status !== 0) {
+      throw new Error(listing.stderr || `tar listing exited with status ${listing.status}`)
     }
+    const archiveRoot = listing.stdout.split('\n').find(Boolean)?.split('/')[0]
+    if (!archiveRoot) throw new Error('The downloaded TCGdex archive is empty.')
+
+    const extraction = spawnSync(
+      'tar',
+      [
+        '-xzf',
+        archivePath,
+        '-C',
+        extractionRoot,
+        '--strip-components=1',
+        `${archiveRoot}/data`,
+        `${archiveRoot}/interfaces.d.ts`,
+      ],
+      { encoding: 'utf8' },
+    )
+
+    if (extraction.error) throw extraction.error
+    if (extraction.status !== 0) {
+      throw new Error(extraction.stderr || `tar exited with status ${extraction.status}`)
+    }
+
+    const extractedDataRoot = path.join(extractionRoot, 'data')
+    const extractedInterfaces = path.join(extractionRoot, 'interfaces.d.ts')
+    if (!(await fs.stat(extractedDataRoot).catch(() => null)) ||
+        !(await fs.stat(extractedInterfaces).catch(() => null))) {
+      throw new Error('The TCGdex archive did not contain its expected data and interfaces files.')
+    }
+
+    await fs.rm(targetRoot, { recursive: true, force: true })
+    await fs.rename(extractionRoot, targetRoot)
+    console.log(`Saved TCGdex source to ${path.relative(root, targetRoot)}`)
+  } finally {
+    await fs.rm(temporaryRoot, { recursive: true, force: true })
   }
-
-  console.log('All done.')
 }
 
-main().catch((err) => {
-  console.error(err)
+main().catch((error) => {
+  console.error(error)
   process.exit(1)
 })

@@ -17,12 +17,6 @@ const steps = [
     flag: '--skip-fetch',
   },
   {
-    name: 'Sync bundled TCG set sprites',
-    command: ['bun', 'scripts/sync-tcg-set-sprites.mjs'],
-    flag: '--skip-tcg-sprites',
-    passSkipFetch: true,
-  },
-  {
     name: 'Generate Pokemon modules',
     command: ['bun', 'scripts/generate-pokemon-modules.mjs'],
   },
@@ -39,6 +33,12 @@ const steps = [
   {
     name: 'Generate TCG modules and booster packs',
     command: ['bun', 'scripts/generate-tcg-modules.mjs'],
+  },
+  {
+    name: 'Sync bundled TCG set sprites',
+    command: ['bun', 'scripts/sync-tcg-set-sprites.mjs'],
+    flag: '--skip-tcg-sprites',
+    passSkipFetch: true,
   },
   {
     name: 'Generate mega stone items',

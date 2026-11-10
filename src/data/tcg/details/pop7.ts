@@ -22,7 +22,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Jamming",
         "text": "After your opponent plays a Supporter card from his or her hand, put 1 damage counter on each of your opponent's Pokémon. You can't use more than 1 Jamming Poké-Body each turn.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -59,14 +59,14 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       181
     ],
-    "flavorText": "The tip of its tail shines brightly. In the olden days, people sent signals using the tail's light.",
+    "flavorText": "The tip of its tail shines brightly. In the olden days, people sent signals using the tail’s light.",
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/1.png",
-      "large": "https://images.pokemontcg.io/pop7/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/1/high.webp"
     }
   },
   {
@@ -131,8 +131,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/2.png",
-      "large": "https://images.pokemontcg.io/pop7/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/2/high.webp"
     }
   },
   {
@@ -194,14 +194,14 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       380
     ],
-    "flavorText": "Its body is covered with a down that can refract light in such a way that it becomes invisible.",
+    "flavorText": "Its body is covered with a down that can refract light in such a way that it becomes invisble.",
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/3.png",
-      "large": "https://images.pokemontcg.io/pop7/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/3/high.webp"
     }
   },
   {
@@ -271,8 +271,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/4.png",
-      "large": "https://images.pokemontcg.io/pop7/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/4/high.webp"
     }
   },
   {
@@ -325,7 +325,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       414
     ],
@@ -335,8 +335,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/5.png",
-      "large": "https://images.pokemontcg.io/pop7/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/5/high.webp"
     }
   },
   {
@@ -395,8 +395,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/6.png",
-      "large": "https://images.pokemontcg.io/pop7/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/6/high.webp"
     }
   },
   {
@@ -466,8 +466,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/7.png",
-      "large": "https://images.pokemontcg.io/pop7/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/7/high.webp"
     }
   },
   {
@@ -527,14 +527,14 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       281
     ],
-    "flavorText": "It is highly perceptive of its Trainer's feelings. It dances when it is feeling happy.",
+    "flavorText": "It is highly perceptive of its Trainer’s feelings. It dances when it is feeling happy.",
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/8.png",
-      "large": "https://images.pokemontcg.io/pop7/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/8/high.webp"
     }
   },
   {
@@ -594,8 +594,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/9.png",
-      "large": "https://images.pokemontcg.io/pop7/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/9/high.webp"
     }
   },
   {
@@ -612,14 +612,14 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Fighting"
     ],
-    "evolvesFrom": "Burmy Sandy Cloak",
+    "evolvesFrom": "Burmy",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
       {
         "name": "Sandy Cloak",
         "text": "Prevent all effects, excluding damage, done to Wormadam Sandy Cloak.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -654,14 +654,14 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       413
     ],
-    "flavorText": "When BURMY evolved, it cloak became a part of this Pokémon's body. The cloak is never shed.",
+    "flavorText": "When BURMY evolved, it cloak became a part of this Pokémon’s body. The cloak is never shed.",
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/10.png",
-      "large": "https://images.pokemontcg.io/pop7/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/10/high.webp"
     }
   },
   {
@@ -688,7 +688,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Wear Cloak",
         "text": "Once during your turn (before your attack), if Burmy Plant Cloak is your Active Pokémon, you may search your discard pile for a basic Grass Energy card and attach it to Burmy Plant Cloak.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -722,8 +722,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/11.png",
-      "large": "https://images.pokemontcg.io/pop7/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/11/high.webp"
     }
   },
   {
@@ -750,7 +750,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Wear Cloak",
         "text": "Once during your turn (before your attack), if Burmy Sandy Cloak is your Active Pokémon, you may search your discard pile for a basic Fighting Energy card and attach it to Burmy Sandy Cloak.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -784,8 +784,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/12.png",
-      "large": "https://images.pokemontcg.io/pop7/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/12/high.webp"
     }
   },
   {
@@ -843,14 +843,14 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       222
     ],
-    "flavorText": "Many live in the clean seas of the south. They apparently can't live in polluted waters.",
+    "flavorText": "Many live in the clean seas of the south. They apparently can’t live in polluted waters.",
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/13.png",
-      "large": "https://images.pokemontcg.io/pop7/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/13/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/13/high.webp"
     }
   },
   {
@@ -919,8 +919,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/14.png",
-      "large": "https://images.pokemontcg.io/pop7/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/14/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/14/high.webp"
     }
   },
   {
@@ -983,8 +983,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/15.png",
-      "large": "https://images.pokemontcg.io/pop7/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/15/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/15/high.webp"
     }
   },
   {
@@ -1047,8 +1047,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/16.png",
-      "large": "https://images.pokemontcg.io/pop7/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/16/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/16/high.webp"
     }
   },
   {
@@ -1109,8 +1109,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/pop7/17.png",
-      "large": "https://images.pokemontcg.io/pop7/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/pop/pop7/17/low.webp",
+      "large": "https://assets.tcgdex.net/en/pop/pop7/17/high.webp"
     }
   }
 ]

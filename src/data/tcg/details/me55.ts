@@ -44,12 +44,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       102
     ],
-    "flavorText": null,
+    "flavorText": "Using telepathy only fellow Exeggcute can pick up on, they always form a cluster of six.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-1/small",
-      "large": "https://images.scrydex.com/pokemon/me55-1/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/001/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/001/high.webp"
     }
   },
   {
@@ -87,7 +87,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "150",
-        "text": "Heal 50 damage from this Pokémon"
+        "text": "Heal 50 damage from this Pokémon."
       }
     ],
     "weaknesses": [
@@ -107,12 +107,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       103
     ],
-    "flavorText": null,
+    "flavorText": "As it grew taller and taller, it outgrew its reliance on psychic powers, while within it awakened the power of the sleeping dragon.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-2/small",
-      "large": "https://images.scrydex.com/pokemon/me55-2/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/002/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/002/high.webp"
     }
   },
   {
@@ -169,12 +169,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       313
     ],
-    "flavorText": null,
+    "flavorText": "It flashes the light on its rear to communicate with other Volbeat. It loves the sweet aroma given off by Illumise.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-3/small",
-      "large": "https://images.scrydex.com/pokemon/me55-3/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/003/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/003/high.webp"
     }
   },
   {
@@ -197,7 +197,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Supereffective Pheromones",
-        "text": "If you have Volbeat in play, apply Weakness for both Active Pokémon as x3",
+        "text": "If you have Volbeat in play, apply Weakness for both Active Pokémon as ×3.",
         "type": "Ability"
       }
     ],
@@ -227,12 +227,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       314
     ],
-    "flavorText": null,
+    "flavorText": "It guides Volbeat to draw signs in the night sky. There are scholars who research the meaning of these signs.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-4/small",
-      "large": "https://images.scrydex.com/pokemon/me55-4/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/004/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/004/high.webp"
     }
   },
   {
@@ -291,12 +291,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       357
     ],
-    "flavorText": null,
+    "flavorText": "Delicious fruits grew out from around its neck because it always ate the same kind of fruit.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-5/small",
-      "large": "https://images.scrydex.com/pokemon/me55-5/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/005/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/005/high.webp"
     }
   },
   {
@@ -351,12 +351,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       420
     ],
-    "flavorText": null,
+    "flavorText": "It nimbly dashes about to avoid getting pecked by bird Pokémon that would love to make off with its small, nutrient-rich storage ball.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-6/small",
-      "large": "https://images.scrydex.com/pokemon/me55-6/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/006/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/006/high.webp"
     }
   },
   {
@@ -412,12 +412,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       421
     ],
-    "flavorText": null,
+    "flavorText": "After absorbing plenty of sunlight, Cherrim takes this form. It's full of energy while it's like this, and its liveliness will go on until sundown.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-7/small",
-      "large": "https://images.scrydex.com/pokemon/me55-7/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/007/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/007/high.webp"
     }
   },
   {
@@ -470,12 +470,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       666
     ],
-    "flavorText": null,
+    "flavorText": "This Pokémon was born in a special land. It scatters colorful, toxic scales from its wings during battle.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-8/small",
-      "large": "https://images.scrydex.com/pokemon/me55-8/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/008/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/008/high.webp"
     }
   },
   {
@@ -521,12 +521,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       37
     ],
-    "flavorText": null,
+    "flavorText": "As its body grows larger, its six warm tails become more beautiful, with a more luxurious coat of fur.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-9/small",
-      "large": "https://images.scrydex.com/pokemon/me55-9/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/009/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/009/high.webp"
     }
   },
   {
@@ -572,12 +572,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       38
     ],
-    "flavorText": null,
+    "flavorText": "It has nine long tails and fur that gleams gold. It is said to live for 1,000 years.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-10/small",
-      "large": "https://images.scrydex.com/pokemon/me55-10/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/010/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/010/high.webp"
     }
   },
   {
@@ -631,12 +631,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       146
     ],
-    "flavorText": null,
+    "flavorText": "It's one of the legendary bird Pokémon. When Moltres flaps its flaming wings, they glimmer with a dazzling red glow.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-11/small",
-      "large": "https://images.scrydex.com/pokemon/me55-11/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/011/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/011/high.webp"
     }
   },
   {
@@ -695,12 +695,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       250
     ],
-    "flavorText": null,
+    "flavorText": "A legend says that its body glows in seven colors. A rainbow is said to form behind it when it flies.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-12/small",
-      "large": "https://images.scrydex.com/pokemon/me55-12/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/012/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/012/high.webp"
     }
   },
   {
@@ -756,12 +756,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       494
     ],
-    "flavorText": null,
+    "flavorText": "This Pokémon brings victory. It is said that Trainers with Victini always win, regardless of the type of encounter.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-13/small",
-      "large": "https://images.scrydex.com/pokemon/me55-13/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/013/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/013/high.webp"
     }
   },
   {
@@ -802,7 +802,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "80+",
-        "text": "If this Pokémon has any Lightning Energy attached, this attack does 80 more damage."
+        "text": "If this Pokémon has any <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> Energy attached, this attack does 80 more damage."
       }
     ],
     "weaknesses": [
@@ -820,12 +820,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       643
     ],
-    "flavorText": null,
+    "flavorText": "This legendary Pokémon can scorch the world with fire. It helps those who want to build a world of truth.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-14/small",
-      "large": "https://images.scrydex.com/pokemon/me55-14/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/014/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/014/high.webp"
     }
   },
   {
@@ -890,8 +890,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-15/small",
-      "large": "https://images.scrydex.com/pokemon/me55-15/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/015/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/015/high.webp"
     }
   },
   {
@@ -948,12 +948,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       79
     ],
-    "flavorText": null,
+    "flavorText": "It lazes vacantly near water. If something bites its tail, it won't even notice for a whole day.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-16/small",
-      "large": "https://images.scrydex.com/pokemon/me55-16/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/016/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/016/high.webp"
     }
   },
   {
@@ -1011,12 +1011,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       131
     ],
-    "flavorText": null,
+    "flavorText": "Able to understand human speech and very intelligent, it loves to swim in the sea with people on its back.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-17/small",
-      "large": "https://images.scrydex.com/pokemon/me55-17/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/017/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/017/high.webp"
     }
   },
   {
@@ -1053,7 +1053,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "",
-        "text": "This attack does 30 damage to each of your opponent's Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 30 damage to each of your opponent's Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -1070,12 +1070,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       144
     ],
-    "flavorText": null,
+    "flavorText": "It's said that this Pokémon's beautiful blue wings are made of ice. Articuno flies over snowy mountains, its long tail fluttering along behind it.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-18/small",
-      "large": "https://images.scrydex.com/pokemon/me55-18/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/018/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/018/high.webp"
     }
   },
   {
@@ -1107,7 +1107,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "60+",
-        "text": "This attack does 30 more damage for each Water Energy attached to this Pokémon."
+        "text": "This attack does 30 more damage for each <span class=\"energy-symbol Water\" title=\"Water\">Water</span> Energy attached to this Pokémon."
       }
     ],
     "weaknesses": [
@@ -1127,12 +1127,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       382
     ],
-    "flavorText": null,
+    "flavorText": "In myths, this Pokémon expanded the seas with torrential rains and great tsunamis. It battled ferociously against Groudon.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-19/small",
-      "large": "https://images.scrydex.com/pokemon/me55-19/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/019/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/019/high.webp"
     }
   },
   {
@@ -1163,7 +1163,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "100",
-        "text": "Switch this Pokémon with 1 of your Benched Pokémon. If you do, switch out your oppoennt's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)"
+        "text": "Switch this Pokémon with 1 of your Benched Pokémon. If you do, switch out your opponent's Active Pokémon to the Bench. <em>(Your opponent chooses the new Active Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -1181,12 +1181,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       484
     ],
-    "flavorText": null,
+    "flavorText": "It is said to live in a gap in the spatial dimension parallel to ours. It appears in mythology.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-20/small",
-      "large": "https://images.scrydex.com/pokemon/me55-20/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/020/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/020/high.webp"
     }
   },
   {
@@ -1218,7 +1218,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "This attack does 30 damage to 1 of your opponent's Pokémon for each damage counter on that Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 30 damage to 1 of your opponent's Pokémon for each damage counter on that Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       },
       {
         "name": "Aqua Edge",
@@ -1249,8 +1249,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-21/small",
-      "large": "https://images.scrydex.com/pokemon/me55-21/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/021/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/021/high.webp"
     }
   },
   {
@@ -1273,7 +1273,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Counterattack Grouping",
-        "text": "If your Wishiwashi or Wishiwashi ex is in the Active Spot and is damaged by an attack from your opponent's Pokémon (even if your Pokémon is Knocked Out), place 3 damage counters on the Attacking Pokémon.",
+        "text": "If your Wishiwashi or Wishiwashi ex is in the Active Spot and is damaged by an attack from your opponent's Pokémon (even if your Pokémon\t\tis Knocked Out), place 3 damage counters on the Attacking Pokémon.",
         "type": "Ability"
       }
     ],
@@ -1302,12 +1302,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       746
     ],
-    "flavorText": null,
+    "flavorText": "Individually, they're incredibly weak. It's by gathering up into schools that they're able to confront opponents.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-22/small",
-      "large": "https://images.scrydex.com/pokemon/me55-22/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/022/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/022/high.webp"
     }
   },
   {
@@ -1354,12 +1354,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-23/small",
-      "large": "https://images.scrydex.com/pokemon/me55-23/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/023/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/023/high.webp"
     }
   },
   {
@@ -1407,12 +1407,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-24/small",
-      "large": "https://images.scrydex.com/pokemon/me55-24/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/024/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/024/high.webp"
     }
   },
   {
@@ -1442,7 +1442,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "This attack also does 20 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack also does 20 damage to 1 of your opponent's Benched Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -1460,12 +1460,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-25/small",
-      "large": "https://images.scrydex.com/pokemon/me55-25/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/025/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/025/high.webp"
     }
   },
   {
@@ -1512,12 +1512,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-26/small",
-      "large": "https://images.scrydex.com/pokemon/me55-26/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/026/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/026/high.webp"
     }
   },
   {
@@ -1565,12 +1565,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-27/small",
-      "large": "https://images.scrydex.com/pokemon/me55-27/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/027/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/027/high.webp"
     }
   },
   {
@@ -1623,12 +1623,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-28/small",
-      "large": "https://images.scrydex.com/pokemon/me55-28/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/028/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/028/high.webp"
     }
   },
   {
@@ -1674,12 +1674,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-29/small",
-      "large": "https://images.scrydex.com/pokemon/me55-29/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/029/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/029/high.webp"
     }
   },
   {
@@ -1725,12 +1725,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-30/small",
-      "large": "https://images.scrydex.com/pokemon/me55-30/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/030/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/030/high.webp"
     }
   },
   {
@@ -1770,16 +1770,16 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-31/small",
-      "large": "https://images.scrydex.com/pokemon/me55-31/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/031/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/031/high.webp"
     }
   },
   {
@@ -1825,12 +1825,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-32/small",
-      "large": "https://images.scrydex.com/pokemon/me55-32/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/032/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/032/high.webp"
     }
   },
   {
@@ -1882,12 +1882,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-33/small",
-      "large": "https://images.scrydex.com/pokemon/me55-33/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/033/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/033/high.webp"
     }
   },
   {
@@ -1918,7 +1918,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "40×",
-        "text": "This attack does 40 damage for each of your Pikachu and Pikachu ex in play."
+        "text": "This attack does 40 damage for each of your Pikachu and Pikachu <em>ex</em> in play."
       }
     ],
     "weaknesses": [
@@ -1936,12 +1936,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-34/small",
-      "large": "https://images.scrydex.com/pokemon/me55-34/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/034/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/034/high.webp"
     }
   },
   {
@@ -1988,12 +1988,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-35/small",
-      "large": "https://images.scrydex.com/pokemon/me55-35/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/035/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/035/high.webp"
     }
   },
   {
@@ -2041,12 +2041,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-36/small",
-      "large": "https://images.scrydex.com/pokemon/me55-36/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/036/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/036/high.webp"
     }
   },
   {
@@ -2102,12 +2102,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-37/small",
-      "large": "https://images.scrydex.com/pokemon/me55-37/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/037/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/037/high.webp"
     }
   },
   {
@@ -2136,7 +2136,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "This attack does 20 damage to 1 of your opponent's Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 20 damage to 1 of your opponent's Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -2153,12 +2153,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-38/small",
-      "large": "https://images.scrydex.com/pokemon/me55-38/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/038/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/038/high.webp"
     }
   },
   {
@@ -2204,12 +2204,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-39/small",
-      "large": "https://images.scrydex.com/pokemon/me55-39/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/039/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/039/high.webp"
     }
   },
   {
@@ -2238,7 +2238,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "10",
-        "text": "The Defending Pokémon's Weakness is now Lightning until the end of your next turn. (Apply Weakness as x2.)"
+        "text": "The Defending Pokémon's Weakness is now <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> until the end of your next turn. <em>(Apply Weakness as ×2.)</em>"
       }
     ],
     "weaknesses": [
@@ -2256,12 +2256,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-40/small",
-      "large": "https://images.scrydex.com/pokemon/me55-40/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/040/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/040/high.webp"
     }
   },
   {
@@ -2318,12 +2318,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-41/small",
-      "large": "https://images.scrydex.com/pokemon/me55-41/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/041/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/041/high.webp"
     }
   },
   {
@@ -2352,7 +2352,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Flip a coin until you get tails. Search your deck for an amount of Basic Lightning Energy up to the number of heads and attach it to this Pokémon. Then, shuffle your deck."
+        "text": "Flip a coin until you get tails. Search your deck for an amount of Basic <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> Energy up to the number of heads and attach it to this Pokémon. Then, shuffle your deck."
       },
       {
         "name": "Pika Bolt",
@@ -2380,12 +2380,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-42/small",
-      "large": "https://images.scrydex.com/pokemon/me55-42/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/042/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/042/high.webp"
     }
   },
   {
@@ -2433,12 +2433,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-43/small",
-      "large": "https://images.scrydex.com/pokemon/me55-43/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/043/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/043/high.webp"
     }
   },
   {
@@ -2484,12 +2484,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-44/small",
-      "large": "https://images.scrydex.com/pokemon/me55-44/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/044/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/044/high.webp"
     }
   },
   {
@@ -2512,7 +2512,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Nightime Stroll",
+        "name": "Nighttime Stroll",
         "cost": [
           "Colorless"
         ],
@@ -2545,12 +2545,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-45/small",
-      "large": "https://images.scrydex.com/pokemon/me55-45/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/045/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/045/high.webp"
     }
   },
   {
@@ -2606,12 +2606,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-46/small",
-      "large": "https://images.scrydex.com/pokemon/me55-46/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/046/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/046/high.webp"
     }
   },
   {
@@ -2657,12 +2657,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-47/small",
-      "large": "https://images.scrydex.com/pokemon/me55-47/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/047/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/047/high.webp"
     }
   },
   {
@@ -2708,12 +2708,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-48/small",
-      "large": "https://images.scrydex.com/pokemon/me55-48/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/048/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/048/high.webp"
     }
   },
   {
@@ -2744,7 +2744,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "20+",
-        "text": "If your opponent's Active Pokémon is a Pokémon ex, this attack does 80 more damage."
+        "text": "If your opponent's Active Pokémon is a Pokémon <em>ex</em>, this attack does 80 more damage."
       }
     ],
     "weaknesses": [
@@ -2763,12 +2763,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-49/small",
-      "large": "https://images.scrydex.com/pokemon/me55-49/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/049/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/049/high.webp"
     }
   },
   {
@@ -2819,12 +2819,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-50/small",
-      "large": "https://images.scrydex.com/pokemon/me55-50/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/050/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/050/high.webp"
     }
   },
   {
@@ -2855,7 +2855,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "",
-        "text": "Discard all Lightning Energy from this Pokémon, and this attack does 90 damage to 1 of your opponent's Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "Discard all <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> Energy from this Pokémon, and this attack does 90 damage to 1 of your opponent's Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -2873,12 +2873,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-51/small",
-      "large": "https://images.scrydex.com/pokemon/me55-51/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/051/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/051/high.webp"
     }
   },
   {
@@ -2924,12 +2924,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       25
     ],
-    "flavorText": null,
+    "flavorText": "It has small electric sacs on both its cheeks. When in a tough spot, this Pokémon discharges electricity.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-52/small",
-      "large": "https://images.scrydex.com/pokemon/me55-52/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/052/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/052/high.webp"
     }
   },
   {
@@ -2993,8 +2993,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-53/small",
-      "large": "https://images.scrydex.com/pokemon/me55-53/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/053/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/053/high.webp"
     }
   },
   {
@@ -3058,8 +3058,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-54/small",
-      "large": "https://images.scrydex.com/pokemon/me55-54/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/054/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/054/high.webp"
     }
   },
   {
@@ -3114,12 +3114,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       145
     ],
-    "flavorText": null,
+    "flavorText": "This Pokémon has complete control over electricity. There are tales of Zapdos nesting in the dark depths of pitch-black thunderclouds.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-55/small",
-      "large": "https://images.scrydex.com/pokemon/me55-55/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/055/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/055/high.webp"
     }
   },
   {
@@ -3160,7 +3160,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "80+",
-        "text": "If this Pokémon has any Fire Energy attaches, this attack does 80 more damage."
+        "text": "If this Pokémon has any <span class=\"energy-symbol Fire\" title=\"Fire\">Fire</span> Energy attached, this attack does 80 more damage."
       }
     ],
     "weaknesses": [
@@ -3178,12 +3178,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       644
     ],
-    "flavorText": null,
+    "flavorText": "This legendary Pokémon can scorch the world with lightning. It assists those who want to build an ideal world.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-56/small",
-      "large": "https://images.scrydex.com/pokemon/me55-56/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/056/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/056/high.webp"
     }
   },
   {
@@ -3222,7 +3222,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "50",
-        "text": "This attack also does 20 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack also does 20 damage to 1 of your opponent's Benched Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -3239,12 +3239,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       807
     ],
-    "flavorText": null,
+    "flavorText": "It runs as fast as lightning strikes, shredding its opponents with its high-voltage claws.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-57/small",
-      "large": "https://images.scrydex.com/pokemon/me55-57/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/057/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/057/high.webp"
     }
   },
   {
@@ -3290,12 +3290,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       848
     ],
-    "flavorText": null,
+    "flavorText": "This selfish, attention-seeking Pokémon stores poison and electricity in two different sacs inside its body.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-58/small",
-      "large": "https://images.scrydex.com/pokemon/me55-58/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/058/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/058/high.webp"
     }
   },
   {
@@ -3343,12 +3343,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       849
     ],
-    "flavorText": null,
+    "flavorText": "As it gulps down stagnant water and generates electricity in its body, a sound like a rhythm played by a bass guitar reverberates all around.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-59/small",
-      "large": "https://images.scrydex.com/pokemon/me55-59/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/059/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/059/high.webp"
     }
   },
   {
@@ -3406,12 +3406,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       849
     ],
-    "flavorText": null,
+    "flavorText": "The jolts of electricity it launches by violently strumming the protrusions on its chest easily exceed 15,000 volts.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-60/small",
-      "large": "https://images.scrydex.com/pokemon/me55-60/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/060/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/060/high.webp"
     }
   },
   {
@@ -3466,12 +3466,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       877
     ],
-    "flavorText": null,
+    "flavorText": "It has a small stomach. If it isn't constantly eating the seeds it keeps in its pockets, it will get hungry immediately.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-61/small",
-      "large": "https://images.scrydex.com/pokemon/me55-61/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/061/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/061/high.webp"
     }
   },
   {
@@ -3511,7 +3511,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "140",
-        "text": "Discard 2 Lightning Energy from this Pokémon."
+        "text": "Discard 2 <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> Energy from this Pokémon."
       }
     ],
     "weaknesses": [
@@ -3528,12 +3528,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       1008
     ],
-    "flavorText": null,
+    "flavorText": "This seems to be the Iron Serpent mentioned in an old book. The Iron Serpent is said to have turned the land to ash with its lightning.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-62/small",
-      "large": "https://images.scrydex.com/pokemon/me55-62/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/062/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/062/high.webp"
     }
   },
   {
@@ -3596,12 +3596,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       150
     ],
-    "flavorText": null,
+    "flavorText": "Created from the DNA of Mew, this Pokémon is a dangerous combination of overwhelming power and a savage heart.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-63/small",
-      "large": "https://images.scrydex.com/pokemon/me55-63/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/063/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/063/high.webp"
     }
   },
   {
@@ -3634,7 +3634,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "This attack does 50 damage to each of your opponent's Pokémon ex. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 50 damage to each of your opponent's Pokémon <em>ex</em>. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       },
       {
         "name": "Psychic Powers",
@@ -3672,8 +3672,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-64/small",
-      "large": "https://images.scrydex.com/pokemon/me55-64/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/064/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/064/high.webp"
     }
   },
   {
@@ -3725,12 +3725,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       151
     ],
-    "flavorText": null,
+    "flavorText": "So rare that it is still said to be a mirage by many experts. Only a few people have seen it worldwide.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-65/small",
-      "large": "https://images.scrydex.com/pokemon/me55-65/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/065/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/065/high.webp"
     }
   },
   {
@@ -3784,7 +3784,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       151
     ],
@@ -3792,8 +3792,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-66/small",
-      "large": "https://images.scrydex.com/pokemon/me55-66/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/066/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/066/high.webp"
     }
   },
   {
@@ -3840,12 +3840,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       183
     ],
-    "flavorText": null,
+    "flavorText": "The oil-filled tail functions as a buoy, so it's fine even in rivers with strong currents.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-67/small",
-      "large": "https://images.scrydex.com/pokemon/me55-67/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/067/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/067/high.webp"
     }
   },
   {
@@ -3876,7 +3876,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "90",
-        "text": "Flip a coin. If heads, your opponent's Active Pokémon is now paralyzed."
+        "text": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
       }
     ],
     "weaknesses": [
@@ -3894,12 +3894,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       184
     ],
-    "flavorText": null,
+    "flavorText": "By keeping still and listening intently, it can tell what is in even wild, fast-moving rivers.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-68/small",
-      "large": "https://images.scrydex.com/pokemon/me55-68/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/068/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/068/high.webp"
     }
   },
   {
@@ -3962,12 +3962,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       196
     ],
-    "flavorText": null,
+    "flavorText": "It uses the fine fur on its body to sense movement in the air and predict the weather...as well as its foes' thoughts.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-69/small",
-      "large": "https://images.scrydex.com/pokemon/me55-69/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/069/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/069/high.webp"
     }
   },
   {
@@ -4026,8 +4026,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-70/small",
-      "large": "https://images.scrydex.com/pokemon/me55-70/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/070/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/070/high.webp"
     }
   },
   {
@@ -4083,8 +4083,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-71/small",
-      "large": "https://images.scrydex.com/pokemon/me55-71/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/071/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/071/high.webp"
     }
   },
   {
@@ -4136,12 +4136,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       201
     ],
-    "flavorText": null,
+    "flavorText": "Its flat, thin body is always stuck on walls. Its shape appears to have some meaning.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-72/small",
-      "large": "https://images.scrydex.com/pokemon/me55-72/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/072/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/072/high.webp"
     }
   },
   {
@@ -4192,12 +4192,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       425
     ],
-    "flavorText": null,
+    "flavorText": "Because of the way it floats aimlessly, an old folktale calls it a “signpost for wandering spirits.”",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-73/small",
-      "large": "https://images.scrydex.com/pokemon/me55-73/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/073/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/073/high.webp"
     }
   },
   {
@@ -4260,12 +4260,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       488
     ],
-    "flavorText": null,
+    "flavorText": "Shiny particles are released from its wings like a veil. It is said to represent the crescent moon.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-74/small",
-      "large": "https://images.scrydex.com/pokemon/me55-74/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/074/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/074/high.webp"
     }
   },
   {
@@ -4318,12 +4318,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       609
     ],
-    "flavorText": null,
+    "flavorText": "Being consumed in Chandelure's flame burns up the spirit, leaving the body behind.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-75/small",
-      "large": "https://images.scrydex.com/pokemon/me55-75/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/075/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/075/high.webp"
     }
   },
   {
@@ -4352,7 +4352,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your deck for up to 2 Stadium card, reveal them, and put them into your hand. Then, shuffle your deck."
+        "text": "Search your deck for up to 2 Stadium cards, reveal them, and put them into your hand. Then, shuffle your deck."
       },
       {
         "name": "Aurora Horns",
@@ -4381,12 +4381,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       716
     ],
-    "flavorText": null,
+    "flavorText": "When the horns on its head shine in seven colors, it is said to be sharing everlasting life.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-76/small",
-      "large": "https://images.scrydex.com/pokemon/me55-76/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/076/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/076/high.webp"
     }
   },
   {
@@ -4441,12 +4441,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       764
     ],
-    "flavorText": null,
+    "flavorText": "It prefers areas with lots of flowers. A Comfey adorned with flowers is a happy Comfey, and the flowers gain healing effects.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-77/small",
-      "large": "https://images.scrydex.com/pokemon/me55-77/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/077/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/077/high.webp"
     }
   },
   {
@@ -4497,12 +4497,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       789
     ],
-    "flavorText": null,
+    "flavorText": "This Pokémon came from another universe. Its gaseous body is so light that even a gentle breeze can blow it away.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-78/small",
-      "large": "https://images.scrydex.com/pokemon/me55-78/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/078/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/078/high.webp"
     }
   },
   {
@@ -4532,7 +4532,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "During your opponent's next turn, this Pokémon takes 60 less damage from attacks (after applying Weakness and Resistance)."
+        "text": "During your opponent's next turn, this Pokémon takes 60 less damage from attacks <em>(after applying Weakness and Resistance)</em>."
       }
     ],
     "weaknesses": [
@@ -4556,12 +4556,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       790
     ],
-    "flavorText": null,
+    "flavorText": "The absorption of starlight fuels this Pokémon's growth. The shell that encases it is harder than any known material.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-79/small",
-      "large": "https://images.scrydex.com/pokemon/me55-79/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/079/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/079/high.webp"
     }
   },
   {
@@ -4624,12 +4624,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       792
     ],
-    "flavorText": null,
+    "flavorText": "Known as the Beast That Calls the Moon, this Pokémon lives by taking in any and all light and converting it into its own energy.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-80/small",
-      "large": "https://images.scrydex.com/pokemon/me55-80/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/080/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/080/high.webp"
     }
   },
   {
@@ -4680,12 +4680,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       999
     ],
-    "flavorText": null,
+    "flavorText": "It wanders around, carrying an old coin on its back. It survives by draining the life-force from humans who try to pick up its coin.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-81/small",
-      "large": "https://images.scrydex.com/pokemon/me55-81/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/081/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/081/high.webp"
     }
   },
   {
@@ -4718,7 +4718,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 5,
         "damage": "250",
-        "text": "This attack also does 20 damage to each of your Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack also does 20 damage to each of your Benched Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -4738,12 +4738,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       383
     ],
-    "flavorText": null,
+    "flavorText": "Groudon is said to have expanded the reach of dry land by evaporating water with raging heat. It battled ferociously against Kyogre.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-82/small",
-      "large": "https://images.scrydex.com/pokemon/me55-82/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/082/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/082/high.webp"
     }
   },
   {
@@ -4774,7 +4774,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "100",
-        "text": "This attack also does 60 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack also does 60 damage to 1 of your opponent's Benched Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -4792,12 +4792,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       448
     ],
-    "flavorText": null,
+    "flavorText": "By reading the auras of all things, it can tell how others are feeling from over half a mile away.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-83/small",
-      "large": "https://images.scrydex.com/pokemon/me55-83/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/083/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/083/high.webp"
     }
   },
   {
@@ -4857,12 +4857,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       537
     ],
-    "flavorText": null,
+    "flavorText": "The vibrating of the bumps all over its body causes earthquake-like tremors. Seismitoad and Croagunk are similar species.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-84/small",
-      "large": "https://images.scrydex.com/pokemon/me55-84/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/084/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/084/high.webp"
     }
   },
   {
@@ -4919,12 +4919,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       745
     ],
-    "flavorText": null,
+    "flavorText": "This Lycanroc has an extremely vicious temperament. It will happily sustain injuries for the sake of taking down its opponent.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-85/small",
-      "large": "https://images.scrydex.com/pokemon/me55-85/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/085/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/085/high.webp"
     }
   },
   {
@@ -4965,7 +4965,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "140",
-        "text": "Discard 2 Fighting Energy from this Pokémon."
+        "text": "Discard 2 <span class=\"energy-symbol Fighting\" title=\"Fighting\">Fighting</span> Energy from this Pokémon."
       }
     ],
     "weaknesses": [
@@ -4983,12 +4983,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       1007
     ],
-    "flavorText": null,
+    "flavorText": "This seems to be the Winged King mentioned in an old expedition journal. It was said to have split the land with its bare fists.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-86/small",
-      "large": "https://images.scrydex.com/pokemon/me55-86/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/086/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/086/high.webp"
     }
   },
   {
@@ -5017,7 +5017,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "During your opponent's next turn, attacks used by the Defending Pokémon do 30 less damage (before applying Weakness and Resistance)."
+        "text": "During your opponent's next turn, attacks used by the Defending Pokémon do 30 less damage <em>(before applying Weakness and Resistance)</em>."
       },
       {
         "name": "Headbutt",
@@ -5043,12 +5043,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       29
     ],
-    "flavorText": null,
+    "flavorText": "Females are more sensitive to smells than males. While foraging, they'll use their whiskers to check wind direction and stay downwind of predators.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-87/small",
-      "large": "https://images.scrydex.com/pokemon/me55-87/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/087/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/087/high.webp"
     }
   },
   {
@@ -5102,12 +5102,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       30
     ],
-    "flavorText": null,
+    "flavorText": "The horn on its head has atrophied. It's thought that this happens so Nidorina's children won't get poked while their mother is feeding them.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-88/small",
-      "large": "https://images.scrydex.com/pokemon/me55-88/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/088/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/088/high.webp"
     }
   },
   {
@@ -5151,12 +5151,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       52
     ],
-    "flavorText": null,
+    "flavorText": "It's accustomed to luxury because it used to live with Alolan royalty. As a result, it's very picky about food.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-89/small",
-      "large": "https://images.scrydex.com/pokemon/me55-89/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/089/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/089/high.webp"
     }
   },
   {
@@ -5182,7 +5182,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Fainting Spell",
-        "text": "If this Pokémon is Knocket Out by damage from an attack from your opponent's Pokémon, flip a coin. If heads, the Attacking Pokémon is Knocket Out.",
+        "text": "If this Pokémon is Knocked Out by damage from an attack from your opponent's Pokémon, flip a coin. If heads, the Attacking Pokémon is Knocked Out.",
         "type": "Ability"
       }
     ],
@@ -5217,8 +5217,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-90/small",
-      "large": "https://images.scrydex.com/pokemon/me55-90/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/090/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/090/high.webp"
     }
   },
   {
@@ -5275,12 +5275,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       197
     ],
-    "flavorText": null,
+    "flavorText": "The light of the moon changed Eevee's genetic structure. It lurks in the darkness, waiting for prey.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-91/small",
-      "large": "https://images.scrydex.com/pokemon/me55-91/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/091/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/091/high.webp"
     }
   },
   {
@@ -5335,8 +5335,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-92/small",
-      "large": "https://images.scrydex.com/pokemon/me55-92/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/092/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/092/high.webp"
     }
   },
   {
@@ -5377,7 +5377,7 @@ const cardDetails: TcgCardDetail[] = [
     "resistances": [
       {
         "type": "Fighting",
-        "value": "×2"
+        "value": "-30"
       }
     ],
     "retreatCost": [
@@ -5387,12 +5387,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       198
     ],
-    "flavorText": null,
+    "flavorText": "If spotted, it will lure an unwary person into chasing it, then lose the pursuer on mountain trails.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-93/small",
-      "large": "https://images.scrydex.com/pokemon/me55-93/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/093/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/093/high.webp"
     }
   },
   {
@@ -5449,12 +5449,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       559
     ],
-    "flavorText": null,
+    "flavorText": "Its skin has a rubbery elasticity, so it can reduce damage by defensively pulling its skin up to its neck.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-94/small",
-      "large": "https://images.scrydex.com/pokemon/me55-94/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/094/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/094/high.webp"
     }
   },
   {
@@ -5501,12 +5501,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       570
     ],
-    "flavorText": null,
+    "flavorText": "To protect themselves from danger, they hide their true identities by transforming into people and Pokémon.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-95/small",
-      "large": "https://images.scrydex.com/pokemon/me55-95/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/095/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/095/high.webp"
     }
   },
   {
@@ -5529,7 +5529,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Nighttime Byway",
-        "text": "As long as this Pokémon is on your Bench, your Active Pokémon's Retreat Cost is 2 less.",
+        "text": "As long as this Pokémon is on your Bench, your Active Pokémon's Retreat Cost is ColorlessColorless less.",
         "type": "Ability"
       }
     ],
@@ -5560,12 +5560,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       571
     ],
-    "flavorText": null,
+    "flavorText": "Each has the ability to fool a large group of people simultaneously. They protect their lair with illusory scenery.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-96/small",
-      "large": "https://images.scrydex.com/pokemon/me55-96/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/096/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/096/high.webp"
     }
   },
   {
@@ -5622,12 +5622,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       633
     ],
-    "flavorText": null,
+    "flavorText": "It nests deep inside a cave. Food there is scarce, so Deino will sink its teeth into anything that moves and attempt to eat it.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-97/small",
-      "large": "https://images.scrydex.com/pokemon/me55-97/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/097/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/097/high.webp"
     }
   },
   {
@@ -5684,12 +5684,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       634
     ],
-    "flavorText": null,
+    "flavorText": "The two heads have different likes and dislikes. Because the heads fight with each other, Zweilous gets stronger without needing to rely on others.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-98/small",
-      "large": "https://images.scrydex.com/pokemon/me55-98/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/098/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/098/high.webp"
     }
   },
   {
@@ -5746,12 +5746,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       635
     ],
-    "flavorText": null,
+    "flavorText": "It's said that Hydreigon grew ferocious because people in times long past loathed it, considering it to be evil incarnate and attacking it relentlessly.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-99/small",
-      "large": "https://images.scrydex.com/pokemon/me55-99/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/099/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/099/high.webp"
     }
   },
   {
@@ -5810,12 +5810,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       717
     ],
-    "flavorText": null,
+    "flavorText": "It's said that when its life comes to an end, it absorbs the life energy of every living thing and turns into a cocoon once more.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-100/small",
-      "large": "https://images.scrydex.com/pokemon/me55-100/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/100/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/100/high.webp"
     }
   },
   {
@@ -5875,12 +5875,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       52
     ],
-    "flavorText": null,
+    "flavorText": "Living with a savage, seafaring people has toughened this Pokémon's body so much that parts of it have turned to iron.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-101/small",
-      "large": "https://images.scrydex.com/pokemon/me55-101/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/101/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/101/high.webp"
     }
   },
   {
@@ -5935,7 +5935,7 @@ const cardDetails: TcgCardDetail[] = [
     "resistances": [
       {
         "type": "Grass",
-        "value": "-20"
+        "value": "-30"
       }
     ],
     "retreatCost": [
@@ -5949,8 +5949,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-102/small",
-      "large": "https://images.scrydex.com/pokemon/me55-102/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/102/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/102/high.webp"
     }
   },
   {
@@ -6013,12 +6013,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       483
     ],
-    "flavorText": null,
+    "flavorText": "A Pokémon spoken of in legend. It is said that time began moving when Dialga was born.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-103/small",
-      "large": "https://images.scrydex.com/pokemon/me55-103/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/103/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/103/high.webp"
     }
   },
   {
@@ -6058,7 +6058,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "This attack does 50 damage to each of your opponent's Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.) This Pokémon also does 130 damage to itself."
+        "text": "This attack does 50 damage to each of your opponent's Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.) </em>This Pokémon also does 130 damage to itself."
       }
     ],
     "weaknesses": [
@@ -6082,12 +6082,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       598
     ],
-    "flavorText": null,
+    "flavorText": "This Pokémon scrapes its spikes across rocks, and then uses the tips of its feelers to absorb the nutrients it finds within the stone.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-104/small",
-      "large": "https://images.scrydex.com/pokemon/me55-104/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/104/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/104/high.webp"
     }
   },
   {
@@ -6148,12 +6148,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       791
     ],
-    "flavorText": null,
+    "flavorText": "Solgaleo was once known as the Beast That Devours the Sun. Energy in the form of light radiates boundlessly from it.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-105/small",
-      "large": "https://images.scrydex.com/pokemon/me55-105/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/105/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/105/high.webp"
     }
   },
   {
@@ -6193,7 +6193,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "120",
-        "text": "During your next turn, this Pokémon can't use Slashing Strike"
+        "text": "During your next turn, this Pokémon can't use Slashing Strike."
       }
     ],
     "weaknesses": [
@@ -6216,12 +6216,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       888
     ],
-    "flavorText": null,
+    "flavorText": "Able to cut down anything with a single strike, it became known as the Fairy King's Sword, and it inspired awe in friend and foe alike.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-106/small",
-      "large": "https://images.scrydex.com/pokemon/me55-106/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/106/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/106/high.webp"
     }
   },
   {
@@ -6261,7 +6261,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "100",
-        "text": "During your opponent's next turn, this Pokémon takes 50 less damage from attacks (after applying Weakness and Resistance)."
+        "text": "During your opponent's next turn, this Pokémon takes 50 less damage from attacks <em>(after applying Weakness and Resistance)</em>."
       }
     ],
     "weaknesses": [
@@ -6284,12 +6284,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       889
     ],
-    "flavorText": null,
+    "flavorText": "Its ability to deflect any attack led to it being known as the Fighting Master's Shield. It was feared and respected by all.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-107/small",
-      "large": "https://images.scrydex.com/pokemon/me55-107/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/107/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/107/high.webp"
     }
   },
   {
@@ -6318,7 +6318,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "if you have exactly 30 cards in your hand, take 2 Prize cards. If you do, shuffle your hand into your deck."
+        "text": "If you have exactly 30 cards in your hand, take 2 Prize cards. If you do, shuffle your hand into your deck."
       },
       {
         "name": "Triple Smash",
@@ -6350,12 +6350,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       1000
     ],
-    "flavorText": null,
+    "flavorText": "It has a sturdy body made up of stacked coins. Gholdengo overwhelms its enemies by firing coin after coin at them in quick succession.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-108/small",
-      "large": "https://images.scrydex.com/pokemon/me55-108/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/108/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/108/high.webp"
     }
   },
   {
@@ -6387,7 +6387,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Put up to 3 Dragon Pokémon from your discard pile onto your Bench."
+        "text": "Put up to 3 <span class=\"energy-symbol Dragon\" title=\"Dragon\">Dragon</span> Pokémon from your discard pile onto your Bench."
       },
       {
         "name": "Dragon Pulse",
@@ -6414,8 +6414,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-109/small",
-      "large": "https://images.scrydex.com/pokemon/me55-109/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/109/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/109/high.webp"
     }
   },
   {
@@ -6444,7 +6444,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "During your next turn, the Defending Pokémon takes 30 more damage from attacks (after applying Weakness and Resistance)."
+        "text": "During your next turn, the Defending Pokémon takes 30 more damage from attacks <em>(after applying Weakness and Resistance)</em>."
       },
       {
         "name": "Dragon Claw",
@@ -6466,12 +6466,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       782
     ],
-    "flavorText": null,
+    "flavorText": "They communicate with their allies using the sounds their scales make when struck. A group of these Pokémon causes quite a racket.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-110/small",
-      "large": "https://images.scrydex.com/pokemon/me55-110/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/110/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/110/high.webp"
     }
   },
   {
@@ -6523,12 +6523,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       783
     ],
-    "flavorText": null,
+    "flavorText": "It fires itself up by striking its scales with force as it dances. Its roar is a battle cry.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-111/small",
-      "large": "https://images.scrydex.com/pokemon/me55-111/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/111/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/111/high.webp"
     }
   },
   {
@@ -6572,12 +6572,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       784
     ],
-    "flavorText": null,
+    "flavorText": "It bashes its scales to test its opponents' mettle. The sound of struck Kommo-o scales frightens weaker foes and sends them running.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-112/small",
-      "large": "https://images.scrydex.com/pokemon/me55-112/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/112/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/112/high.webp"
     }
   },
   {
@@ -6624,12 +6624,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       52
     ],
-    "flavorText": null,
+    "flavorText": "It loves things that sparkle. When it sees a shiny object, the gold coin on its head shines, too.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-113/small",
-      "large": "https://images.scrydex.com/pokemon/me55-113/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/113/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/113/high.webp"
     }
   },
   {
@@ -6688,12 +6688,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       115
     ],
-    "flavorText": null,
+    "flavorText": "It raises its offspring in its belly pouch. It lets its baby out to play only when it feels safe to do so.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-114/small",
-      "large": "https://images.scrydex.com/pokemon/me55-114/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/114/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/114/high.webp"
     }
   },
   {
@@ -6740,12 +6740,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       132
     ],
-    "flavorText": null,
+    "flavorText": "It can freely recombine its own cellular structure to transform into other life-forms.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-115/small",
-      "large": "https://images.scrydex.com/pokemon/me55-115/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/115/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/115/high.webp"
     }
   },
   {
@@ -6800,12 +6800,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       133
     ],
-    "flavorText": null,
+    "flavorText": "Thanks to its unstable genetic makeup, this special Pokémon conceals many different possible evolutions.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-116/small",
-      "large": "https://images.scrydex.com/pokemon/me55-116/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/116/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/116/high.webp"
     }
   },
   {
@@ -6852,12 +6852,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       133
     ],
-    "flavorText": null,
+    "flavorText": "Thanks to its unstable genetic makeup, this special Pokémon conceals many different possible evolutions.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-117/small",
-      "large": "https://images.scrydex.com/pokemon/me55-117/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/117/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/117/high.webp"
     }
   },
   {
@@ -6904,12 +6904,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       133
     ],
-    "flavorText": null,
+    "flavorText": "Thanks to its unstable genetic makeup, this special Pokémon conceals many different possible evolutions.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-118/small",
-      "large": "https://images.scrydex.com/pokemon/me55-118/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/118/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/118/high.webp"
     }
   },
   {
@@ -6966,12 +6966,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       143
     ],
-    "flavorText": null,
+    "flavorText": "Its stomach's digestive juices can dissolve any kind of poison. Eating things off the ground doesn't bother it at all.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-119/small",
-      "large": "https://images.scrydex.com/pokemon/me55-119/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/119/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/119/high.webp"
     }
   },
   {
@@ -7009,16 +7009,16 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       174
     ],
-    "flavorText": null,
+    "flavorText": "It likes to sing but is not yet good at it. With praise and encouragement, it will get better little by little.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-120/small",
-      "large": "https://images.scrydex.com/pokemon/me55-120/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/120/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/120/high.webp"
     }
   },
   {
@@ -7049,7 +7049,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "250",
-        "text": "Discard a Fire Energy, a Water Energy, and a Lightning Energy from this Pokémon."
+        "text": "Discard a <span class=\"energy-symbol Fire\" title=\"Fire\">Fire</span> Energy, a <span class=\"energy-symbol Water\" title=\"Water\">Water</span> Energy, and a <span class=\"energy-symbol Lightning\" title=\"Lightning\">Lightning</span> Energy from this Pokémon."
       }
     ],
     "weaknesses": [
@@ -7072,12 +7072,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       249
     ],
-    "flavorText": null,
+    "flavorText": "It sleeps in a deep-sea trench. If it flaps its wings, it is said to cause a 40-day storm.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-121/small",
-      "large": "https://images.scrydex.com/pokemon/me55-121/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/121/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/121/high.webp"
     }
   },
   {
@@ -7123,12 +7123,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       570
     ],
-    "flavorText": null,
+    "flavorText": "A once-departed soul, returned to life in Hisui. Derives power from resentment, which rises as energy atop its head and takes on the forms of foes. In this way, Zorua vents lingering malice.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-122/small",
-      "large": "https://images.scrydex.com/pokemon/me55-122/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/122/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/122/high.webp"
     }
   },
   {
@@ -7185,12 +7185,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       571
     ],
-    "flavorText": null,
+    "flavorText": "With its disheveled white fur, it looks like an embodiment of death. Heedless of its own safety, Zoroark attacks its nemeses with a bitter energy so intense, it lacerates Zoroark's own body.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-123/small",
-      "large": "https://images.scrydex.com/pokemon/me55-123/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/123/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/123/high.webp"
     }
   },
   {
@@ -7221,7 +7221,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "",
-        "text": "Discard all Energy from this Pokémon, and this attack does 120 damage to 1 of your opponent's Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "Discard all Energy from this Pokémon, and this attack does 120 damage to 1 of your opponent's Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -7244,12 +7244,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       774
     ],
-    "flavorText": null,
+    "flavorText": "It feeds on dust in the atmosphere. The color of its core is said to be determined by the composition of the dust it eats.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-124/small",
-      "large": "https://images.scrydex.com/pokemon/me55-124/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/124/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/124/high.webp"
     }
   },
   {
@@ -7304,12 +7304,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       925
     ],
-    "flavorText": null,
+    "flavorText": "The larger pair protects the little ones during battles. When facing strong opponents, the whole group will join the fight.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-125/small",
-      "large": "https://images.scrydex.com/pokemon/me55-125/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/125/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/125/high.webp"
     }
   },
   {
@@ -7341,8 +7341,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-126/small",
-      "large": "https://images.scrydex.com/pokemon/me55-126/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/126/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/126/high.webp"
     }
   },
   {
@@ -7374,8 +7374,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "I",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-127/small",
-      "large": "https://images.scrydex.com/pokemon/me55-127/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/127/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/127/high.webp"
     }
   },
   {
@@ -7407,8 +7407,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "I",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-128/small",
-      "large": "https://images.scrydex.com/pokemon/me55-128/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/128/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/128/high.webp"
     }
   },
   {
@@ -7446,7 +7446,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 4,
         "damage": "150",
-        "text": "Heal 50 damage from this Pokémon"
+        "text": "Heal 50 damage from this Pokémon."
       }
     ],
     "weaknesses": [
@@ -7466,12 +7466,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       103
     ],
-    "flavorText": null,
+    "flavorText": "As it grew taller and taller, it outgrew its reliance on psychic powers, while within it awakened the power of the sleeping dragon.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-129/small",
-      "large": "https://images.scrydex.com/pokemon/me55-129/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/129/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/129/high.webp"
     }
   },
   {
@@ -7525,12 +7525,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       146
     ],
-    "flavorText": null,
+    "flavorText": "It's one of the legendary bird Pokémon. When Moltres flaps its flaming wings, they glimmer with a dazzling red glow.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-130/small",
-      "large": "https://images.scrydex.com/pokemon/me55-130/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/130/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/130/high.webp"
     }
   },
   {
@@ -7588,12 +7588,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       131
     ],
-    "flavorText": null,
+    "flavorText": "Able to understand human speech and very intelligent, it loves to swim in the sea with people on its back.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-131/small",
-      "large": "https://images.scrydex.com/pokemon/me55-131/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/131/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/131/high.webp"
     }
   },
   {
@@ -7630,7 +7630,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "",
-        "text": "This attack does 30 damage to each of your opponent's Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 30 damage to each of your opponent's Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       }
     ],
     "weaknesses": [
@@ -7647,12 +7647,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       144
     ],
-    "flavorText": null,
+    "flavorText": "It's said that this Pokémon's beautiful blue wings are made of ice. Articuno flies over snowy mountains, its long tail fluttering along behind it.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-132/small",
-      "large": "https://images.scrydex.com/pokemon/me55-132/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/132/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/132/high.webp"
     }
   },
   {
@@ -7707,12 +7707,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       145
     ],
-    "flavorText": null,
+    "flavorText": "This Pokémon has complete control over electricity. There are tales of Zapdos nesting in the dark depths of pitch-black thunderclouds.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-133/small",
-      "large": "https://images.scrydex.com/pokemon/me55-133/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/133/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/133/high.webp"
     }
   },
   {
@@ -7770,12 +7770,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       849
     ],
-    "flavorText": null,
+    "flavorText": "The jolts of electricity it launches by violently strumming the protrusions on its chest easily exceed 15,000 volts.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-134/small",
-      "large": "https://images.scrydex.com/pokemon/me55-134/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/134/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/134/high.webp"
     }
   },
   {
@@ -7830,12 +7830,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       877
     ],
-    "flavorText": null,
+    "flavorText": "It has a small stomach. If it isn't constantly eating the seeds it keeps in its pockets, it will get hungry immediately.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-135/small",
-      "large": "https://images.scrydex.com/pokemon/me55-135/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/135/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/135/high.webp"
     }
   },
   {
@@ -7886,12 +7886,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       425
     ],
-    "flavorText": null,
+    "flavorText": "Because of the way it floats aimlessly, an old folktale calls it a “signpost for wandering spirits.”",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-136/small",
-      "large": "https://images.scrydex.com/pokemon/me55-136/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/136/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/136/high.webp"
     }
   },
   {
@@ -7944,12 +7944,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       609
     ],
-    "flavorText": null,
+    "flavorText": "Being consumed in Chandelure's flame burns up the spirit, leaving the body behind.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-137/small",
-      "large": "https://images.scrydex.com/pokemon/me55-137/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/137/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/137/high.webp"
     }
   },
   {
@@ -8006,12 +8006,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       745
     ],
-    "flavorText": null,
+    "flavorText": "This Lycanroc has an extremely vicious temperament. It will happily sustain injuries for the sake of taking down its opponent.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-138/small",
-      "large": "https://images.scrydex.com/pokemon/me55-138/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/138/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/138/high.webp"
     }
   },
   {
@@ -8055,12 +8055,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       52
     ],
-    "flavorText": null,
+    "flavorText": "It's accustomed to luxury because it used to live with Alolan royalty. As a result, it's very picky about food.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-139/small",
-      "large": "https://images.scrydex.com/pokemon/me55-139/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/139/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/139/high.webp"
     }
   },
   {
@@ -8117,12 +8117,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       559
     ],
-    "flavorText": null,
+    "flavorText": "Its skin has a rubbery elasticity, so it can reduce damage by defensively pulling its skin up to its neck.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-140/small",
-      "large": "https://images.scrydex.com/pokemon/me55-140/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/140/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/140/high.webp"
     }
   },
   {
@@ -8182,12 +8182,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       52
     ],
-    "flavorText": null,
+    "flavorText": "Living with a savage, seafaring people has toughened this Pokémon's body so much that parts of it have turned to iron.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-141/small",
-      "large": "https://images.scrydex.com/pokemon/me55-141/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/141/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/141/high.webp"
     }
   },
   {
@@ -8216,7 +8216,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "if you have exactly 30 cards in your hand, take 2 Prize cards. If you do, shuffle your hand into your deck."
+        "text": "If you have exactly 30 cards in your hand, take 2 Prize cards. If you do, shuffle your hand into your deck."
       },
       {
         "name": "Triple Smash",
@@ -8248,12 +8248,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       1000
     ],
-    "flavorText": null,
+    "flavorText": "It has a sturdy body made up of stacked coins. Gholdengo overwhelms its enemies by firing coin after coin at them in quick succession.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-142/small",
-      "large": "https://images.scrydex.com/pokemon/me55-142/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/142/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/142/high.webp"
     }
   },
   {
@@ -8297,12 +8297,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       784
     ],
-    "flavorText": null,
+    "flavorText": "It bashes its scales to test its opponents' mettle. The sound of struck Kommo-o scales frightens weaker foes and sends them running.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-143/small",
-      "large": "https://images.scrydex.com/pokemon/me55-143/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/143/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/143/high.webp"
     }
   },
   {
@@ -8349,12 +8349,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       52
     ],
-    "flavorText": null,
+    "flavorText": "It loves things that sparkle. When it sees a shiny object, the gold coin on its head shines, too.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-144/small",
-      "large": "https://images.scrydex.com/pokemon/me55-144/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/144/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/144/high.webp"
     }
   },
   {
@@ -8400,12 +8400,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       570
     ],
-    "flavorText": null,
+    "flavorText": "A once-departed soul, returned to life in Hisui. Derives power from resentment, which rises as energy atop its head and takes on the forms of foes. In this way, Zorua vents lingering malice.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-145/small",
-      "large": "https://images.scrydex.com/pokemon/me55-145/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/145/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/145/high.webp"
     }
   },
   {
@@ -8460,12 +8460,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       925
     ],
-    "flavorText": null,
+    "flavorText": "The larger pair protects the little ones during battles. When facing strong opponents, the whole group will join the fight.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-146/small",
-      "large": "https://images.scrydex.com/pokemon/me55-146/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/146/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/146/high.webp"
     }
   },
   {
@@ -8530,8 +8530,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-147/small",
-      "large": "https://images.scrydex.com/pokemon/me55-147/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/147/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/147/high.webp"
     }
   },
   {
@@ -8563,7 +8563,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "This attack does 30 damage to 1 of your opponent's Pokémon for each damage counter on that Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 30 damage to 1 of your opponent's Pokémon for each damage counter on that Pokémon. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       },
       {
         "name": "Aqua Edge",
@@ -8594,8 +8594,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-148/small",
-      "large": "https://images.scrydex.com/pokemon/me55-148/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/148/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/148/high.webp"
     }
   },
   {
@@ -8659,8 +8659,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-149/small",
-      "large": "https://images.scrydex.com/pokemon/me55-149/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/149/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/149/high.webp"
     }
   },
   {
@@ -8724,8 +8724,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-150/small",
-      "large": "https://images.scrydex.com/pokemon/me55-150/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/150/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/150/high.webp"
     }
   },
   {
@@ -8758,7 +8758,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "This attack does 50 damage to each of your opponent's Pokémon ex. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 50 damage to each of your opponent's Pokémon <em>ex</em>. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       },
       {
         "name": "Psychic Powers",
@@ -8796,8 +8796,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-151/small",
-      "large": "https://images.scrydex.com/pokemon/me55-151/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/151/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/151/high.webp"
     }
   },
   {
@@ -8851,7 +8851,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       151
     ],
@@ -8859,8 +8859,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-152/small",
-      "large": "https://images.scrydex.com/pokemon/me55-152/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/152/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/152/high.webp"
     }
   },
   {
@@ -8916,8 +8916,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-153/small",
-      "large": "https://images.scrydex.com/pokemon/me55-153/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/153/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/153/high.webp"
     }
   },
   {
@@ -8943,7 +8943,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Fainting Spell",
-        "text": "If this Pokémon is Knocket Out by damage from an attack from your opponent's Pokémon, flip a coin. If heads, the Attacking Pokémon is Knocket Out.",
+        "text": "If this Pokémon is Knocked Out by damage from an attack from your opponent's Pokémon, flip a coin. If heads, the Attacking Pokémon is Knocked Out.",
         "type": "Ability"
       }
     ],
@@ -8978,8 +8978,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-154/small",
-      "large": "https://images.scrydex.com/pokemon/me55-154/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/154/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/154/high.webp"
     }
   },
   {
@@ -9034,7 +9034,7 @@ const cardDetails: TcgCardDetail[] = [
     "resistances": [
       {
         "type": "Grass",
-        "value": "-20"
+        "value": "-30"
       }
     ],
     "retreatCost": [
@@ -9048,8 +9048,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-155/small",
-      "large": "https://images.scrydex.com/pokemon/me55-155/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/155/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/155/high.webp"
     }
   },
   {
@@ -9081,7 +9081,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Put up to 3 Dragon Pokémon from your discard pile onto your Bench."
+        "text": "Put up to 3 <span class=\"energy-symbol Dragon\" title=\"Dragon\">Dragon</span> Pokémon from your discard pile onto your Bench."
       },
       {
         "name": "Dragon Pulse",
@@ -9108,8 +9108,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-156/small",
-      "large": "https://images.scrydex.com/pokemon/me55-156/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/156/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/156/high.webp"
     }
   },
   {
@@ -9142,7 +9142,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "",
-        "text": "This attack does 50 damage to each of your opponent's Pokémon ex. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "This attack does 50 damage to each of your opponent's Pokémon <em>ex</em>. <em>(Don't apply Weakness and Resistance for Benched Pokémon.)</em>"
       },
       {
         "name": "Psychic Powers",
@@ -9180,8 +9180,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-157/small",
-      "large": "https://images.scrydex.com/pokemon/me55-157/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/157/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/157/high.webp"
     }
   },
   {
@@ -9235,7 +9235,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       151
     ],
@@ -9243,8 +9243,8 @@ const cardDetails: TcgCardDetail[] = [
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-158/small",
-      "large": "https://images.scrydex.com/pokemon/me55-158/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/158/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/158/high.webp"
     }
   },
   {
@@ -9296,12 +9296,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       151
     ],
-    "flavorText": null,
+    "flavorText": "So rare that it is still said to be a mirage by many experts. Only a few people have seen it worldwide.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-B/small",
-      "large": "https://images.scrydex.com/pokemon/me55-B/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/B/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/B/high.webp"
     }
   },
   {
@@ -9353,12 +9353,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       151
     ],
-    "flavorText": null,
+    "flavorText": "So rare that it is still said to be a mirage by many experts. Only a few people have seen it worldwide.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-G/small",
-      "large": "https://images.scrydex.com/pokemon/me55-G/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/G/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/G/high.webp"
     }
   },
   {
@@ -9410,12 +9410,12 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       151
     ],
-    "flavorText": null,
+    "flavorText": "So rare that it is still said to be a mirage by many experts. Only a few people have seen it worldwide.",
     "legalities": {},
     "regulationMark": "J",
     "images": {
-      "small": "https://images.scrydex.com/pokemon/me55-R/small",
-      "large": "https://images.scrydex.com/pokemon/me55-R/large"
+      "small": "https://assets.tcgdex.net/en/me/30th/R/low.webp",
+      "large": "https://assets.tcgdex.net/en/me/30th/R/high.webp"
     }
   }
 ]

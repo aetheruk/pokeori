@@ -44,7 +44,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "weaknesses": [
       {
-        "type": "Fire",
+        "type": "Fighting",
         "value": "×2"
       }
     ],
@@ -68,8 +68,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/1.png",
-      "large": "https://images.pokemontcg.io/mcd12/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/1/high.webp"
     }
   },
   {
@@ -139,8 +139,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/2.png",
-      "large": "https://images.pokemontcg.io/mcd12/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/2/high.webp"
     }
   },
   {
@@ -171,7 +171,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Flip a coin. If heads, prevent all damage done to this Pokémon by attacks during your opponent's next turn."
+        "text": "Flip a coin. If heads, prevent all damage done to this Pokémon by attacks during your opponent’s next turn."
       },
       {
         "name": "Slash",
@@ -206,8 +206,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/3.png",
-      "large": "https://images.pokemontcg.io/mcd12/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/3/high.webp"
     }
   },
   {
@@ -275,8 +275,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/4.png",
-      "large": "https://images.pokemontcg.io/mcd12/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/4/high.webp"
     }
   },
   {
@@ -343,8 +343,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/5.png",
-      "large": "https://images.pokemontcg.io/mcd12/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/5/high.webp"
     }
   },
   {
@@ -394,19 +394,19 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       587
     ],
-    "flavorText": "The energy made in its cheeks' electric pouches is stored inside its membranes and released while it is gliding.",
+    "flavorText": "The energy made in its cheeks’ electric pouches is stored inside its membranes and released while it is gliding.",
     "legalities": {
       "unlimited": "Legal",
       "expanded": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/6.png",
-      "large": "https://images.pokemontcg.io/mcd12/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/6/high.webp"
     }
   },
   {
@@ -462,8 +462,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/7.png",
-      "large": "https://images.pokemontcg.io/mcd12/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/7/high.webp"
     }
   },
   {
@@ -488,14 +488,22 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Hone ClawsScratch",
+        "name": "Hone Claws",
         "cost": [
-          "Colorless",
+          "Colorless"
+        ],
+        "convertedEnergyCost": 1,
+        "damage": "",
+        "text": "During your next turn, each of this Pokémon’s attacks does 30 more damage (before applying Weakness and Resistance)."
+      },
+      {
+        "name": "Scratch",
+        "cost": [
           "Fighting"
         ],
-        "convertedEnergyCost": 2,
+        "convertedEnergyCost": 1,
         "damage": "10",
-        "text": "During your next turn, each of this Pokémon's attacks does 30 more damage (before applying Weakness and Resistance)."
+        "text": ""
       }
     ],
     "weaknesses": [
@@ -525,8 +533,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/8.png",
-      "large": "https://images.pokemontcg.io/mcd12/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/8/high.webp"
     }
   },
   {
@@ -558,7 +566,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "20",
-        "text": "Flip a coin. If heads, discard a random card from your opponent's hand."
+        "text": "Flip a coin. If heads, discard a random card from your opponent’s hand."
       }
     ],
     "weaknesses": [
@@ -580,15 +588,15 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       509
     ],
-    "flavorText": "They steal from people for fun, but their victims can't help but forgive them. Their deceptively cute act is perfect.",
+    "flavorText": "They steal from people for fun, but their victims can’t help but forgive them. Their deceptively cute act is perfect.",
     "legalities": {
       "unlimited": "Legal",
       "expanded": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/9.png",
-      "large": "https://images.pokemontcg.io/mcd12/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/9/high.webp"
     }
   },
   {
@@ -648,8 +656,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/10.png",
-      "large": "https://images.pokemontcg.io/mcd12/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/10/high.webp"
     }
   },
   {
@@ -691,7 +699,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "60",
-        "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after applying Weakness and Resistance)."
+        "text": "During your opponent’s next turn, any damage done to this Pokémon by attacks is reduced by 20 (after applying Weakness and Resistance)."
       }
     ],
     "weaknesses": [
@@ -713,15 +721,15 @@ const cardDetails: TcgCardDetail[] = [
     "nationalPokedexNumbers": [
       600
     ],
-    "flavorText": "Spinning minigears are rotated at high speed and repeatedly fired away. It is dangerous if the gears don't return.",
+    "flavorText": "Spinning minigears are rotated at high speed and repeatedly fired away. It is dangerous if the gears don’t return.",
     "legalities": {
       "unlimited": "Legal",
       "expanded": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/11.png",
-      "large": "https://images.pokemontcg.io/mcd12/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/11/high.webp"
     }
   },
   {
@@ -771,8 +779,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd12/12.png",
-      "large": "https://images.pokemontcg.io/mcd12/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2012bw/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2012bw/12/high.webp"
     }
   }
 ]

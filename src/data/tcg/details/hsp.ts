@@ -69,8 +69,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS01.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS01_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS01/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS01/high.webp"
     }
   },
   {
@@ -140,8 +140,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS02.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS02_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS02/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS02/high.webp"
     }
   },
   {
@@ -212,8 +212,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS03.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS03_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS03/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS03/high.webp"
     }
   },
   {
@@ -237,7 +237,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Tenacious Bind",
         "text": "As long as Wobbuffet is your Active Pokémon, your opponent's Active Pokémon's Retreat Cost is ColorlessColorless more.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -274,8 +274,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS04.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS04_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS04/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS04/high.webp"
     }
   },
   {
@@ -301,7 +301,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Insomnia",
         "text": "Hoothoot can't be Asleep.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -340,8 +340,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS05.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS05_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS05/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS05/high.webp"
     }
   },
   {
@@ -365,7 +365,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Night Scope",
         "text": "Once during your turn (before your attack), you may look at your opponent's hand. This power can't be used if Noctowl is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -406,8 +406,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS06.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS06_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS06/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS06/high.webp"
     }
   },
   {
@@ -432,7 +432,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Rain Dance",
         "text": "As often as you like during your turn (before your attack), you may attach a Water Energy from your hand to 1 of your Water Pokémon. This power can't be used if Feraligatr is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -471,8 +471,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS07.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS07_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS07/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS07/high.webp"
     }
   },
   {
@@ -497,7 +497,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Leaf Trans",
         "text": "As often as you like during your turn (before your attack), you may move a Grass Energy attached to 1 of your Pokémon to another of your Pokémon. This power can't be used if Meganium is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -540,8 +540,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS08.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS08_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS08/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS08/high.webp"
     }
   },
   {
@@ -566,7 +566,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Afterburner",
         "text": "Once during your turn (before your attack), you may search your discard pile for a Fire Energy card and attach it to 1 of your Pokémon. If you do, put 1 damage counter on that Pokémon. This power can't be used if Typhlosion is affected by a Special Condition.",
-        "type": "Poké-Power"
+        "type": "Poke-POWER"
       }
     ],
     "attacks": [
@@ -603,8 +603,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS09.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS09_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS09/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS09/high.webp"
     }
   },
   {
@@ -667,8 +667,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS10.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS10_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS10/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS10/high.webp"
     }
   },
   {
@@ -692,7 +692,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Luster Float",
         "text": "If you have Latias in play, the Retreat Cost for Latios is 0.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -730,8 +730,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS11.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS11_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS11/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS11/high.webp"
     }
   },
   {
@@ -757,7 +757,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Sweet Sleeping Face",
         "text": "As long as Cleffa is Asleep, prevent all damage done to Cleffa by attacks.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -772,7 +772,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       173
     ],
@@ -782,8 +782,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS12.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS12_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS12/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS12/high.webp"
     }
   },
   {
@@ -809,7 +809,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Sweet Sleeping Face",
         "text": "As long as Smoochum is Asleep, prevent all damage done to Smoochum by attacks.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -824,7 +824,7 @@ const cardDetails: TcgCardDetail[] = [
     "weaknesses": [],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       238
     ],
@@ -834,8 +834,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS13.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS13_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS13/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS13/high.webp"
     }
   },
   {
@@ -899,8 +899,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS14.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS14_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS14/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS14/high.webp"
     }
   },
   {
@@ -924,7 +924,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Fermenting Liquid",
         "text": "Whenever you attach an Energy card from your hand to Shuckle, draw a card.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -959,8 +959,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS15.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS15_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS15/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS15/high.webp"
     }
   },
   {
@@ -1026,8 +1026,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS16.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS16_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS16/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS16/high.webp"
     }
   },
   {
@@ -1093,8 +1093,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS17.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS17_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS17/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS17/high.webp"
     }
   },
   {
@@ -1120,15 +1120,20 @@ const cardDetails: TcgCardDetail[] = [
     "resistances": [],
     "retreatCost": [],
     "convertedRetreatCost": null,
-    "nationalPokedexNumbers": [],
+    "nationalPokedexNumbers": [
+      25,
+      183,
+      54,
+      187
+    ],
     "flavorText": null,
     "legalities": {
       "unlimited": "Legal"
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS18.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS18_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS18/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS18/high.webp"
     }
   },
   {
@@ -1187,8 +1192,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS19.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS19_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS19/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS19/high.webp"
     }
   },
   {
@@ -1242,8 +1247,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS20.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS20_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS20/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS20/high.webp"
     }
   },
   {
@@ -1297,8 +1302,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS21.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS21_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS21/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS21/high.webp"
     }
   },
   {
@@ -1362,8 +1367,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS22.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS22_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS22/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS22/high.webp"
     }
   },
   {
@@ -1389,7 +1394,7 @@ const cardDetails: TcgCardDetail[] = [
       {
         "name": "Shortcut",
         "text": "The Retreat Cost for each Porygon, Porygon2, and Porygon-Z you have in play is Colorless less.",
-        "type": "Poké-Body"
+        "type": "Poke-BODY"
       }
     ],
     "attacks": [
@@ -1426,8 +1431,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS23.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS23_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS23/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS23/high.webp"
     }
   },
   {
@@ -1489,8 +1494,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS24.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS24_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS24/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS24/high.webp"
     }
   },
   {
@@ -1554,8 +1559,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/hsp/HGSS25.png",
-      "large": "https://images.pokemontcg.io/hsp/HGSS25_hires.png"
+      "small": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS25/low.webp",
+      "large": "https://assets.tcgdex.net/en/hgss/hgssp/HGSS25/high.webp"
     }
   }
 ]

@@ -53,8 +53,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/1.png",
-      "large": "https://images.pokemontcg.io/mcd14/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/1/high.webp"
     }
   },
   {
@@ -119,8 +119,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/2.png",
-      "large": "https://images.pokemontcg.io/mcd14/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/2/high.webp"
     }
   },
   {
@@ -185,8 +185,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/3.png",
-      "large": "https://images.pokemontcg.io/mcd14/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/3/high.webp"
     }
   },
   {
@@ -251,8 +251,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/4.png",
-      "large": "https://images.pokemontcg.io/mcd14/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/4/high.webp"
     }
   },
   {
@@ -322,8 +322,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/5.png",
-      "large": "https://images.pokemontcg.io/mcd14/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/5/high.webp"
     }
   },
   {
@@ -383,8 +383,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/6.png",
-      "large": "https://images.pokemontcg.io/mcd14/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/6/high.webp"
     }
   },
   {
@@ -409,7 +409,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Continuous Slash",
+        "name": "Continuous Slice",
         "cost": [
           "Metal",
           "Colorless"
@@ -446,8 +446,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/7.png",
-      "large": "https://images.pokemontcg.io/mcd14/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/7/high.webp"
     }
   },
   {
@@ -509,8 +509,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/8.png",
-      "large": "https://images.pokemontcg.io/mcd14/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/8/high.webp"
     }
   },
   {
@@ -570,8 +570,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/9.png",
-      "large": "https://images.pokemontcg.io/mcd14/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/9/high.webp"
     }
   },
   {
@@ -614,9 +614,10 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [
+      "Colorless",
       "Colorless"
     ],
-    "convertedRetreatCost": 1,
+    "convertedRetreatCost": 2,
     "nationalPokedexNumbers": [
       659
     ],
@@ -627,8 +628,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/10.png",
-      "large": "https://images.pokemontcg.io/mcd14/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/10/high.webp"
     }
   },
   {
@@ -688,8 +689,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/11.png",
-      "large": "https://images.pokemontcg.io/mcd14/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/11/high.webp"
     }
   },
   {
@@ -754,8 +755,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd14/12.png",
-      "large": "https://images.pokemontcg.io/mcd14/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2014xy/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2014xy/12/high.webp"
     }
   }
 ]

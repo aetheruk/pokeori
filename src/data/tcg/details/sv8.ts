@@ -5,7 +5,7 @@ const cardDetails: TcgCardDetail[] = [
     "id": "sv8-1",
     "name": "Exeggcute",
     "number": "1",
-    "artist": null,
+    "artist": "Tetsu Kayama",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -54,15 +54,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/1.png",
-      "large": "https://images.pokemontcg.io/sv8/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/001/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/001/high.webp"
     }
   },
   {
     "id": "sv8-2",
     "name": "Exeggcute",
     "number": "2",
-    "artist": null,
+    "artist": "OKUBO",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -111,15 +111,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/2.png",
-      "large": "https://images.pokemontcg.io/sv8/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/002/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/002/high.webp"
     }
   },
   {
     "id": "sv8-3",
     "name": "Exeggutor",
     "number": "3",
-    "artist": null,
+    "artist": "Oswaldo KATO",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -167,15 +167,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/3.png",
-      "large": "https://images.pokemontcg.io/sv8/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/003/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/003/high.webp"
     }
   },
   {
     "id": "sv8-4",
     "name": "Durant ex",
     "number": "4",
-    "artist": null,
+    "artist": "PLANETA Tsuji",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -234,15 +234,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/4.png",
-      "large": "https://images.pokemontcg.io/sv8/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/004/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/004/high.webp"
     }
   },
   {
     "id": "sv8-5",
     "name": "Scatterbug",
     "number": "5",
-    "artist": null,
+    "artist": "Iori Suzuki",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -291,15 +291,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/5.png",
-      "large": "https://images.pokemontcg.io/sv8/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/005/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/005/high.webp"
     }
   },
   {
     "id": "sv8-6",
     "name": "Spewpa",
     "number": "6",
-    "artist": null,
+    "artist": "tono",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -359,15 +359,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/6.png",
-      "large": "https://images.pokemontcg.io/sv8/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/006/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/006/high.webp"
     }
   },
   {
     "id": "sv8-7",
     "name": "Vivillon",
     "number": "7",
-    "artist": null,
+    "artist": "Amelicart",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -423,15 +423,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/7.png",
-      "large": "https://images.pokemontcg.io/sv8/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/007/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/007/high.webp"
     }
   },
   {
     "id": "sv8-8",
     "name": "Morelull",
     "number": "8",
-    "artist": null,
+    "artist": "Tomokazu Komiya",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -480,15 +480,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/8.png",
-      "large": "https://images.pokemontcg.io/sv8/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/008/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/008/high.webp"
     }
   },
   {
     "id": "sv8-9",
     "name": "Shiinotic",
     "number": "9",
-    "artist": null,
+    "artist": "Aya Kusube",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -543,15 +543,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/9.png",
-      "large": "https://images.pokemontcg.io/sv8/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/009/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/009/high.webp"
     }
   },
   {
     "id": "sv8-10",
     "name": "Dhelmise",
     "number": "10",
-    "artist": null,
+    "artist": "Mori Yuu",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -611,15 +611,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/10.png",
-      "large": "https://images.pokemontcg.io/sv8/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/010/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/010/high.webp"
     }
   },
   {
     "id": "sv8-11",
     "name": "Zarude",
     "number": "11",
-    "artist": null,
+    "artist": "GOSSAN",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -677,15 +677,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/11.png",
-      "large": "https://images.pokemontcg.io/sv8/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/011/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/011/high.webp"
     }
   },
   {
     "id": "sv8-12",
     "name": "Capsakid",
     "number": "12",
-    "artist": null,
+    "artist": "Julie Hang",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -733,15 +733,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/12.png",
-      "large": "https://images.pokemontcg.io/sv8/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/012/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/012/high.webp"
     }
   },
   {
     "id": "sv8-13",
     "name": "Rellor",
     "number": "13",
-    "artist": null,
+    "artist": "Toshinao Aoki",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -797,15 +797,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/13.png",
-      "large": "https://images.pokemontcg.io/sv8/13_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/013/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/013/high.webp"
     }
   },
   {
     "id": "sv8-14",
     "name": "Rabsca",
     "number": "14",
-    "artist": null,
+    "artist": "Masako Tomii",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -861,15 +861,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/14.png",
-      "large": "https://images.pokemontcg.io/sv8/14_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/014/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/014/high.webp"
     }
   },
   {
     "id": "sv8-15",
     "name": "Wo-Chien",
     "number": "15",
-    "artist": null,
+    "artist": "danciao",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -930,15 +930,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/15.png",
-      "large": "https://images.pokemontcg.io/sv8/15_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/015/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/015/high.webp"
     }
   },
   {
     "id": "sv8-16",
     "name": "Vulpix",
     "number": "16",
-    "artist": null,
+    "artist": "Narumi Sato",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -987,15 +987,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/16.png",
-      "large": "https://images.pokemontcg.io/sv8/16_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/016/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/016/high.webp"
     }
   },
   {
     "id": "sv8-17",
     "name": "Ninetales",
     "number": "17",
-    "artist": null,
+    "artist": "Kamome Shirahama",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1042,15 +1042,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/17.png",
-      "large": "https://images.pokemontcg.io/sv8/17_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/017/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/017/high.webp"
     }
   },
   {
     "id": "sv8-18",
     "name": "Paldean Tauros",
     "number": "18",
-    "artist": null,
+    "artist": "Taiga Kasai",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1109,15 +1109,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/18.png",
-      "large": "https://images.pokemontcg.io/sv8/18_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/018/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/018/high.webp"
     }
   },
   {
     "id": "sv8-19",
     "name": "Ho-Oh",
     "number": "19",
-    "artist": null,
+    "artist": "kodama",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1182,15 +1182,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/19.png",
-      "large": "https://images.pokemontcg.io/sv8/19_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/019/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/019/high.webp"
     }
   },
   {
     "id": "sv8-20",
     "name": "Castform Sunny Form",
     "number": "20",
-    "artist": null,
+    "artist": "osare",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1233,7 +1233,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       351
     ],
@@ -1245,15 +1245,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/20.png",
-      "large": "https://images.pokemontcg.io/sv8/20_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/020/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/020/high.webp"
     }
   },
   {
     "id": "sv8-21",
     "name": "Victini",
     "number": "21",
-    "artist": null,
+    "artist": "0313",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1269,7 +1269,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Victory Cheer",
-        "text": "Attacks used by your Evolution Fire Pokémon do 10 more damage to your opponent's Active Pokémon (before applying Weakness and Resistance).",
+        "text": "Attacks used by your Evolution {R} Pokémon do 10 more damage to your opponent's Active Pokémon (before applying Weakness and Resistance).",
         "type": "Ability"
       }
     ],
@@ -1307,15 +1307,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/21.png",
-      "large": "https://images.pokemontcg.io/sv8/21_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/021/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/021/high.webp"
     }
   },
   {
     "id": "sv8-22",
     "name": "Pansear",
     "number": "22",
-    "artist": null,
+    "artist": "Wintr Wandr",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1364,15 +1364,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/22.png",
-      "large": "https://images.pokemontcg.io/sv8/22_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/022/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/022/high.webp"
     }
   },
   {
     "id": "sv8-23",
     "name": "Simisear",
     "number": "23",
-    "artist": null,
+    "artist": "Taiga Kasai",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1419,15 +1419,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/23.png",
-      "large": "https://images.pokemontcg.io/sv8/23_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/023/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/023/high.webp"
     }
   },
   {
     "id": "sv8-24",
     "name": "Larvesta",
     "number": "24",
-    "artist": null,
+    "artist": "MARINA Chikazawa",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1487,15 +1487,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/24.png",
-      "large": "https://images.pokemontcg.io/sv8/24_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/024/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/024/high.webp"
     }
   },
   {
     "id": "sv8-25",
     "name": "Volcarona",
     "number": "25",
-    "artist": null,
+    "artist": "matazo",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1554,15 +1554,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/25.png",
-      "large": "https://images.pokemontcg.io/sv8/25_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/025/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/025/high.webp"
     }
   },
   {
     "id": "sv8-26",
     "name": "Oricorio",
     "number": "26",
-    "artist": null,
+    "artist": "Heisuke Kitazawa",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1618,15 +1618,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/26.png",
-      "large": "https://images.pokemontcg.io/sv8/26_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/026/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/026/high.webp"
     }
   },
   {
     "id": "sv8-27",
     "name": "Sizzlipede",
     "number": "27",
-    "artist": null,
+    "artist": "Minahamu",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1687,15 +1687,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/27.png",
-      "large": "https://images.pokemontcg.io/sv8/27_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/027/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/027/high.webp"
     }
   },
   {
     "id": "sv8-28",
     "name": "Centiskorch",
     "number": "28",
-    "artist": null,
+    "artist": "Aliya Chen",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1754,15 +1754,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/28.png",
-      "large": "https://images.pokemontcg.io/sv8/28_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/028/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/028/high.webp"
     }
   },
   {
     "id": "sv8-29",
     "name": "Fuecoco",
     "number": "29",
-    "artist": null,
+    "artist": "Tomomi Ozaki",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1811,15 +1811,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/29.png",
-      "large": "https://images.pokemontcg.io/sv8/29_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/029/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/029/high.webp"
     }
   },
   {
     "id": "sv8-30",
     "name": "Crocalor",
     "number": "30",
-    "artist": null,
+    "artist": "Atsuya Uki",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1869,15 +1869,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/30.png",
-      "large": "https://images.pokemontcg.io/sv8/30_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/030/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/030/high.webp"
     }
   },
   {
     "id": "sv8-31",
     "name": "Skeledirge",
     "number": "31",
-    "artist": null,
+    "artist": "akagi",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1933,15 +1933,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/31.png",
-      "large": "https://images.pokemontcg.io/sv8/31_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/031/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/031/high.webp"
     }
   },
   {
     "id": "sv8-32",
     "name": "Charcadet",
     "number": "32",
-    "artist": null,
+    "artist": "Kariya",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -1988,15 +1988,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/32.png",
-      "large": "https://images.pokemontcg.io/sv8/32_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/032/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/032/high.webp"
     }
   },
   {
     "id": "sv8-33",
     "name": "Charcadet",
     "number": "33",
-    "artist": null,
+    "artist": "Mékayu",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2055,15 +2055,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/33.png",
-      "large": "https://images.pokemontcg.io/sv8/33_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/033/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/033/high.webp"
     }
   },
   {
     "id": "sv8-34",
     "name": "Armarouge",
     "number": "34",
-    "artist": null,
+    "artist": "DOM",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2097,7 +2097,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "",
-        "text": "Discard all Fire Energy from this Pokémon, and this attack does 180 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        "text": "Discard all {R} Energy from this Pokémon, and this attack does 180 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
       }
     ],
     "weaknesses": [
@@ -2123,15 +2123,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/34.png",
-      "large": "https://images.pokemontcg.io/sv8/34_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/034/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/034/high.webp"
     }
   },
   {
     "id": "sv8-35",
     "name": "Ceruledge",
     "number": "35",
-    "artist": null,
+    "artist": "kantaro",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2190,15 +2190,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/35.png",
-      "large": "https://images.pokemontcg.io/sv8/35_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/035/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/035/high.webp"
     }
   },
   {
     "id": "sv8-36",
     "name": "Ceruledge ex",
     "number": "36",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2262,15 +2262,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/36.png",
-      "large": "https://images.pokemontcg.io/sv8/36_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/036/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/036/high.webp"
     }
   },
   {
     "id": "sv8-37",
     "name": "Scovillain ex",
     "number": "37",
-    "artist": null,
+    "artist": "PLANETA Mochizuki",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2289,7 +2289,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Double Type",
-        "text": "As long as this Pokémon is in play, it is Grass and Fire type.",
+        "text": "As long as this Pokémon is in play, it is {G} and {R} type.",
         "type": "Ability"
       }
     ],
@@ -2328,15 +2328,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/37.png",
-      "large": "https://images.pokemontcg.io/sv8/37_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/037/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/037/high.webp"
     }
   },
   {
     "id": "sv8-38",
     "name": "Gouging Fire",
     "number": "38",
-    "artist": null,
+    "artist": "AKIRA EGAWA",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2396,15 +2396,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/38.png",
-      "large": "https://images.pokemontcg.io/sv8/38_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/038/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/038/high.webp"
     }
   },
   {
     "id": "sv8-39",
     "name": "Paldean Tauros",
     "number": "39",
-    "artist": null,
+    "artist": "toi8",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2464,15 +2464,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/39.png",
-      "large": "https://images.pokemontcg.io/sv8/39_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/039/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/039/high.webp"
     }
   },
   {
     "id": "sv8-40",
     "name": "Mantine",
     "number": "40",
-    "artist": null,
+    "artist": "satoma",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2529,15 +2529,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/40.png",
-      "large": "https://images.pokemontcg.io/sv8/40_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/040/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/040/high.webp"
     }
   },
   {
     "id": "sv8-41",
     "name": "Feebas",
     "number": "41",
-    "artist": null,
+    "artist": "Kedamahadaitai Yawarakai",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2586,15 +2586,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/41.png",
-      "large": "https://images.pokemontcg.io/sv8/41_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/041/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/041/high.webp"
     }
   },
   {
     "id": "sv8-42",
     "name": "Milotic ex",
     "number": "42",
-    "artist": null,
+    "artist": "hncl",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2653,15 +2653,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/42.png",
-      "large": "https://images.pokemontcg.io/sv8/42_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/042/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/042/high.webp"
     }
   },
   {
     "id": "sv8-43",
     "name": "Spheal",
     "number": "43",
-    "artist": null,
+    "artist": "Teeziro",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2711,15 +2711,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/43.png",
-      "large": "https://images.pokemontcg.io/sv8/43_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/043/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/043/high.webp"
     }
   },
   {
     "id": "sv8-44",
     "name": "Sealeo",
     "number": "44",
-    "artist": null,
+    "artist": "Mina Nakai",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2780,15 +2780,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/44.png",
-      "large": "https://images.pokemontcg.io/sv8/44_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/044/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/044/high.webp"
     }
   },
   {
     "id": "sv8-45",
     "name": "Walrein",
     "number": "45",
-    "artist": null,
+    "artist": "Mitsuhiro Arita",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2847,15 +2847,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/45.png",
-      "large": "https://images.pokemontcg.io/sv8/45_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/045/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/045/high.webp"
     }
   },
   {
     "id": "sv8-46",
     "name": "Shellos",
     "number": "46",
-    "artist": null,
+    "artist": "Shinya Komatsu",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2906,15 +2906,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/46.png",
-      "large": "https://images.pokemontcg.io/sv8/46_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/046/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/046/high.webp"
     }
   },
   {
     "id": "sv8-47",
     "name": "Cryogonal",
     "number": "47",
-    "artist": null,
+    "artist": "sui",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -2970,15 +2970,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/47.png",
-      "large": "https://images.pokemontcg.io/sv8/47_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/047/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/047/high.webp"
     }
   },
   {
     "id": "sv8-48",
     "name": "Black Kyurem ex",
     "number": "48",
-    "artist": null,
+    "artist": "kawayoo",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3005,7 +3005,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "90",
-        "text": "If your opponent's Active Pokémon is a Dragon Pokémon, it is now Paralyzed."
+        "text": "If your opponent's Active Pokémon is a {N} Pokémon, it is now Paralyzed."
       },
       {
         "name": "Black Frost",
@@ -3044,15 +3044,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/48.png",
-      "large": "https://images.pokemontcg.io/sv8/48_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/048/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/048/high.webp"
     }
   },
   {
     "id": "sv8-49",
     "name": "Bruxish",
     "number": "49",
-    "artist": null,
+    "artist": "Shibuzoh.",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3106,15 +3106,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/49.png",
-      "large": "https://images.pokemontcg.io/sv8/49_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/049/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/049/high.webp"
     }
   },
   {
     "id": "sv8-50",
     "name": "Quaxly",
     "number": "50",
-    "artist": null,
+    "artist": "Saboteri",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3161,15 +3161,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/50.png",
-      "large": "https://images.pokemontcg.io/sv8/50_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/050/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/050/high.webp"
     }
   },
   {
     "id": "sv8-51",
     "name": "Quaxwell",
     "number": "51",
-    "artist": null,
+    "artist": "OKACHEKE",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3216,15 +3216,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/51.png",
-      "large": "https://images.pokemontcg.io/sv8/51_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/051/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/051/high.webp"
     }
   },
   {
     "id": "sv8-52",
     "name": "Quaquaval",
     "number": "52",
-    "artist": null,
+    "artist": "nagimiso",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3279,15 +3279,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/52.png",
-      "large": "https://images.pokemontcg.io/sv8/52_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/052/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/052/high.webp"
     }
   },
   {
     "id": "sv8-53",
     "name": "Cetoddle",
     "number": "53",
-    "artist": null,
+    "artist": "Ayako Ozaki",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3337,15 +3337,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/53.png",
-      "large": "https://images.pokemontcg.io/sv8/53_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/053/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/053/high.webp"
     }
   },
   {
     "id": "sv8-54",
     "name": "Cetitan",
     "number": "54",
-    "artist": null,
+    "artist": "Uta",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3403,15 +3403,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/54.png",
-      "large": "https://images.pokemontcg.io/sv8/54_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/054/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/054/high.webp"
     }
   },
   {
     "id": "sv8-55",
     "name": "Iron Bundle",
     "number": "55",
-    "artist": null,
+    "artist": "rika",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3436,7 +3436,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "200-",
-        "text": "This attack does 50 less damage for each Colorless in your opponent's Active Pokémon's Retreat Cost."
+        "text": "This attack does 50 less damage for each {C} in your opponent's Active Pokémon's Retreat Cost."
       }
     ],
     "weaknesses": [
@@ -3461,15 +3461,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/55.png",
-      "large": "https://images.pokemontcg.io/sv8/55_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/055/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/055/high.webp"
     }
   },
   {
     "id": "sv8-56",
     "name": "Chien-Pao",
     "number": "56",
-    "artist": null,
+    "artist": "Yuya Oka",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3524,15 +3524,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/56.png",
-      "large": "https://images.pokemontcg.io/sv8/56_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/056/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/056/high.webp"
     }
   },
   {
     "id": "sv8-57",
     "name": "Pikachu ex",
     "number": "57",
-    "artist": null,
+    "artist": "aky CG Works",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3594,15 +3594,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/57.png",
-      "large": "https://images.pokemontcg.io/sv8/57_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/057/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/057/high.webp"
     }
   },
   {
     "id": "sv8-58",
     "name": "Magnemite",
     "number": "58",
-    "artist": null,
+    "artist": "Hoshino KURO",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3651,15 +3651,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/58.png",
-      "large": "https://images.pokemontcg.io/sv8/58_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/058/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/058/high.webp"
     }
   },
   {
     "id": "sv8-59",
     "name": "Magneton",
     "number": "59",
-    "artist": null,
+    "artist": "Nisota Niso",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3677,7 +3677,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Overvolt Discharge",
-        "text": "Once during your turn, you may attach up to 3 Basic Energy cards from your discard pile to your Lightning Pokémon in any way you like. If you use this Ability, this Pokémon is Knocked Out.",
+        "text": "Once during your turn, you may attach up to 3 Basic Energy cards from your discard pile to your {L} Pokémon in any way you like. If you use this Ability, this Pokémon is Knocked Out.",
         "type": "Ability"
       }
     ],
@@ -3715,15 +3715,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/59.png",
-      "large": "https://images.pokemontcg.io/sv8/59_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/059/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/059/high.webp"
     }
   },
   {
     "id": "sv8-60",
     "name": "Magnezone",
     "number": "60",
-    "artist": null,
+    "artist": "Po-Suzuki",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3786,15 +3786,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/60.png",
-      "large": "https://images.pokemontcg.io/sv8/60_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/060/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/060/high.webp"
     }
   },
   {
     "id": "sv8-61",
     "name": "Rotom",
     "number": "61",
-    "artist": null,
+    "artist": "Shinya Mizuno",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3850,15 +3850,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/61.png",
-      "large": "https://images.pokemontcg.io/sv8/61_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/061/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/061/high.webp"
     }
   },
   {
     "id": "sv8-62",
     "name": "Blitzle",
     "number": "62",
-    "artist": null,
+    "artist": "kamonabe",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3917,15 +3917,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/62.png",
-      "large": "https://images.pokemontcg.io/sv8/62_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/062/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/062/high.webp"
     }
   },
   {
     "id": "sv8-63",
     "name": "Zebstrika",
     "number": "63",
-    "artist": null,
+    "artist": "Sanosuke Sakuma",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -3983,15 +3983,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/63.png",
-      "large": "https://images.pokemontcg.io/sv8/63_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/063/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/063/high.webp"
     }
   },
   {
     "id": "sv8-64",
     "name": "Stunfisk",
     "number": "64",
-    "artist": null,
+    "artist": "Miki Tanaka",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4040,15 +4040,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/64.png",
-      "large": "https://images.pokemontcg.io/sv8/64_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/064/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/064/high.webp"
     }
   },
   {
     "id": "sv8-65",
     "name": "Tapu Koko",
     "number": "65",
-    "artist": null,
+    "artist": "Souichirou Gunjima",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4070,7 +4070,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Search your deck for up to 2 Lightning Pokémon, reveal them, and put them into your hand. Then, shuffle your deck."
+        "text": "Search your deck for up to 2 {L} Pokémon, reveal them, and put them into your hand. Then, shuffle your deck."
       },
       {
         "name": "Prize Count",
@@ -4106,15 +4106,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/65.png",
-      "large": "https://images.pokemontcg.io/sv8/65_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/065/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/065/high.webp"
     }
   },
   {
     "id": "sv8-66",
     "name": "Wattrel",
     "number": "66",
-    "artist": null,
+    "artist": "Pani Kobayashi",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4166,15 +4166,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/66.png",
-      "large": "https://images.pokemontcg.io/sv8/66_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/066/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/066/high.webp"
     }
   },
   {
     "id": "sv8-67",
     "name": "Kilowattrel",
     "number": "67",
-    "artist": null,
+    "artist": "KEIICHIRO ITO",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4238,15 +4238,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/67.png",
-      "large": "https://images.pokemontcg.io/sv8/67_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/067/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/067/high.webp"
     }
   },
   {
     "id": "sv8-68",
     "name": "Kilowattrel ex",
     "number": "68",
-    "artist": null,
+    "artist": "PLANETA Yamashita",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4271,7 +4271,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Switch this Pokémon with 1 of your Benched Pokémon. If you do, attach up to 2 Basic Lightning Energy cards from your hand to this Pokémon."
+        "text": "Switch this Pokémon with 1 of your Benched Pokémon. If you do, attach up to 2 Basic {L} Energy cards from your hand to this Pokémon."
       },
       {
         "name": "Thunder Lance",
@@ -4281,7 +4281,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "40+",
-        "text": "This attack does 40 more damage for each Lightning Energy attached to this Pokémon."
+        "text": "This attack does 40 more damage for each {L} Energy attached to this Pokémon."
       }
     ],
     "weaknesses": [
@@ -4297,7 +4297,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       941
     ],
@@ -4309,15 +4309,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/68.png",
-      "large": "https://images.pokemontcg.io/sv8/68_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/068/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/068/high.webp"
     }
   },
   {
     "id": "sv8-69",
     "name": "Miraidon",
     "number": "69",
-    "artist": null,
+    "artist": "Nurikabe",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4377,15 +4377,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/69.png",
-      "large": "https://images.pokemontcg.io/sv8/69_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/069/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/069/high.webp"
     }
   },
   {
     "id": "sv8-70",
     "name": "Togepi",
     "number": "70",
-    "artist": null,
+    "artist": "Yoko Hishida",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4435,15 +4435,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/70.png",
-      "large": "https://images.pokemontcg.io/sv8/70_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/070/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/070/high.webp"
     }
   },
   {
     "id": "sv8-71",
     "name": "Togetic",
     "number": "71",
-    "artist": null,
+    "artist": "Teeziro",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4493,15 +4493,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/71.png",
-      "large": "https://images.pokemontcg.io/sv8/71_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/071/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/071/high.webp"
     }
   },
   {
     "id": "sv8-72",
     "name": "Togekiss",
     "number": "72",
-    "artist": null,
+    "artist": "Narano",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4556,15 +4556,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/72.png",
-      "large": "https://images.pokemontcg.io/sv8/72_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/072/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/072/high.webp"
     }
   },
   {
     "id": "sv8-73",
     "name": "Marill",
     "number": "73",
-    "artist": null,
+    "artist": "Shimaris Yukichi",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4613,15 +4613,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/73.png",
-      "large": "https://images.pokemontcg.io/sv8/73_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/073/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/073/high.webp"
     }
   },
   {
     "id": "sv8-74",
     "name": "Azumarill",
     "number": "74",
-    "artist": null,
+    "artist": "Orca",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4637,7 +4637,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Glistening Bubbles",
-        "text": "If you have any Tera Pokémon in play, this Pokémon can use the Double-Edge attack for Psychic.",
+        "text": "If you have any Tera Pokémon in play, this Pokémon can use the Double-Edge attack for {P}.",
         "type": "Ability"
       }
     ],
@@ -4678,15 +4678,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/74.png",
-      "large": "https://images.pokemontcg.io/sv8/74_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/074/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/074/high.webp"
     }
   },
   {
     "id": "sv8-75",
     "name": "Smoochum",
     "number": "75",
-    "artist": null,
+    "artist": "Saya Tsuruta",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4708,7 +4708,7 @@ const cardDetails: TcgCardDetail[] = [
         "cost": [],
         "convertedEnergyCost": 0,
         "damage": "",
-        "text": "Search your deck for up to 2 Basic Psychic Energy cards and attach them to 1 of your Benched Pokémon. Then, shuffle your deck."
+        "text": "Search your deck for up to 2 Basic {P} Energy cards and attach them to 1 of your Benched Pokémon. Then, shuffle your deck."
       }
     ],
     "weaknesses": [
@@ -4724,7 +4724,7 @@ const cardDetails: TcgCardDetail[] = [
       }
     ],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       238
     ],
@@ -4736,15 +4736,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/75.png",
-      "large": "https://images.pokemontcg.io/sv8/75_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/075/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/075/high.webp"
     }
   },
   {
     "id": "sv8-76",
     "name": "Latias ex",
     "number": "76",
-    "artist": null,
+    "artist": "takuyoa",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4808,15 +4808,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/76.png",
-      "large": "https://images.pokemontcg.io/sv8/76_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/076/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/076/high.webp"
     }
   },
   {
     "id": "sv8-77",
     "name": "Latios",
     "number": "77",
-    "artist": null,
+    "artist": "kantaro",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4881,15 +4881,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/77.png",
-      "large": "https://images.pokemontcg.io/sv8/77_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/077/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/077/high.webp"
     }
   },
   {
     "id": "sv8-78",
     "name": "Uxie",
     "number": "78",
-    "artist": null,
+    "artist": "HYOGONOSUKE",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4941,15 +4941,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/78.png",
-      "large": "https://images.pokemontcg.io/sv8/78_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/078/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/078/high.webp"
     }
   },
   {
     "id": "sv8-79",
     "name": "Mesprit",
     "number": "79",
-    "artist": null,
+    "artist": "HYOGONOSUKE",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -4971,7 +4971,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Attach up to 2 Basic Psychic Energy cards from your hand to your Pokémon in any way you like."
+        "text": "Attach up to 2 Basic {P} Energy cards from your hand to your Pokémon in any way you like."
       },
       {
         "name": "Guardian Burst",
@@ -5011,15 +5011,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/79.png",
-      "large": "https://images.pokemontcg.io/sv8/79_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/079/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/079/high.webp"
     }
   },
   {
     "id": "sv8-80",
     "name": "Azelf",
     "number": "80",
-    "artist": null,
+    "artist": "HYOGONOSUKE",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5072,15 +5072,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/80.png",
-      "large": "https://images.pokemontcg.io/sv8/80_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/080/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/080/high.webp"
     }
   },
   {
     "id": "sv8-81",
     "name": "Sigilyph",
     "number": "81",
-    "artist": null,
+    "artist": "svlt",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5143,15 +5143,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/81.png",
-      "large": "https://images.pokemontcg.io/sv8/81_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/081/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/081/high.webp"
     }
   },
   {
     "id": "sv8-82",
     "name": "Yamask",
     "number": "82",
-    "artist": null,
+    "artist": "IKEDA Saki",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5216,15 +5216,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/82.png",
-      "large": "https://images.pokemontcg.io/sv8/82_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/082/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/082/high.webp"
     }
   },
   {
     "id": "sv8-83",
     "name": "Cofagrigus",
     "number": "83",
-    "artist": null,
+    "artist": "Shiburingaru",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5288,15 +5288,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/83.png",
-      "large": "https://images.pokemontcg.io/sv8/83_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/083/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/083/high.webp"
     }
   },
   {
     "id": "sv8-84",
     "name": "Espurr",
     "number": "84",
-    "artist": null,
+    "artist": "Natsumi Yoshida",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5360,15 +5360,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/84.png",
-      "large": "https://images.pokemontcg.io/sv8/84_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/084/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/084/high.webp"
     }
   },
   {
     "id": "sv8-85",
     "name": "Meowstic",
     "number": "85",
-    "artist": null,
+    "artist": "Yoriyuki Ikegami",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5428,15 +5428,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/85.png",
-      "large": "https://images.pokemontcg.io/sv8/85_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/085/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/085/high.webp"
     }
   },
   {
     "id": "sv8-86",
     "name": "Sylveon ex",
     "number": "86",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5502,15 +5502,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/86.png",
-      "large": "https://images.pokemontcg.io/sv8/86_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/086/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/086/high.webp"
     }
   },
   {
     "id": "sv8-87",
     "name": "Dedenne",
     "number": "87",
-    "artist": null,
+    "artist": "Uninori",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5566,15 +5566,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/87.png",
-      "large": "https://images.pokemontcg.io/sv8/87_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/087/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/087/high.webp"
     }
   },
   {
     "id": "sv8-88",
     "name": "Xerneas",
     "number": "88",
-    "artist": null,
+    "artist": "Ryuta Fuse",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5634,15 +5634,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/88.png",
-      "large": "https://images.pokemontcg.io/sv8/88_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/088/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/088/high.webp"
     }
   },
   {
     "id": "sv8-89",
     "name": "Oricorio",
     "number": "89",
-    "artist": null,
+    "artist": "saino misaki",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5704,15 +5704,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/89.png",
-      "large": "https://images.pokemontcg.io/sv8/89_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/089/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/089/high.webp"
     }
   },
   {
     "id": "sv8-90",
     "name": "Sandygast",
     "number": "90",
-    "artist": null,
+    "artist": "Koji Nakata",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5770,15 +5770,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/90.png",
-      "large": "https://images.pokemontcg.io/sv8/90_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/090/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/090/high.webp"
     }
   },
   {
     "id": "sv8-91",
     "name": "Palossand ex",
     "number": "91",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5851,15 +5851,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/91.png",
-      "large": "https://images.pokemontcg.io/sv8/91_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/091/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/091/high.webp"
     }
   },
   {
     "id": "sv8-92",
     "name": "Tapu Lele",
     "number": "92",
-    "artist": null,
+    "artist": "Natsumi Yoshida",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5918,15 +5918,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/92.png",
-      "large": "https://images.pokemontcg.io/sv8/92_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/092/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/092/high.webp"
     }
   },
   {
     "id": "sv8-93",
     "name": "Indeedee",
     "number": "93",
-    "artist": null,
+    "artist": "Sekio",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -5985,15 +5985,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/93.png",
-      "large": "https://images.pokemontcg.io/sv8/93_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/093/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/093/high.webp"
     }
   },
   {
     "id": "sv8-94",
     "name": "Flittle",
     "number": "94",
-    "artist": null,
+    "artist": "buchi",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6045,15 +6045,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/94.png",
-      "large": "https://images.pokemontcg.io/sv8/94_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/094/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/094/high.webp"
     }
   },
   {
     "id": "sv8-95",
     "name": "Espathra",
     "number": "95",
-    "artist": null,
+    "artist": "Anesaki Dynamic",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6115,15 +6115,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/95.png",
-      "large": "https://images.pokemontcg.io/sv8/95_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/095/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/095/high.webp"
     }
   },
   {
     "id": "sv8-96",
     "name": "Flutter Mane",
     "number": "96",
-    "artist": null,
+    "artist": "Ebila",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6182,15 +6182,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/96.png",
-      "large": "https://images.pokemontcg.io/sv8/96_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/096/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/096/high.webp"
     }
   },
   {
     "id": "sv8-97",
     "name": "Gimmighoul",
     "number": "97",
-    "artist": null,
+    "artist": "Scav",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6254,15 +6254,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/97.png",
-      "large": "https://images.pokemontcg.io/sv8/97_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/097/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/097/high.webp"
     }
   },
   {
     "id": "sv8-98",
     "name": "Mankey",
     "number": "98",
-    "artist": null,
+    "artist": "Apios",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6311,15 +6311,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/98.png",
-      "large": "https://images.pokemontcg.io/sv8/98_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/098/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/098/high.webp"
     }
   },
   {
     "id": "sv8-99",
     "name": "Primeape",
     "number": "99",
-    "artist": null,
+    "artist": "Felicia Chen",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6377,15 +6377,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/99.png",
-      "large": "https://images.pokemontcg.io/sv8/99_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/099/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/099/high.webp"
     }
   },
   {
     "id": "sv8-100",
     "name": "Annihilape",
     "number": "100",
-    "artist": null,
+    "artist": "SIE NANAHARA",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6443,15 +6443,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/100.png",
-      "large": "https://images.pokemontcg.io/sv8/100_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/100/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/100/high.webp"
     }
   },
   {
     "id": "sv8-101",
     "name": "Paldean Tauros",
     "number": "101",
-    "artist": null,
+    "artist": "Uta",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6511,15 +6511,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/101.png",
-      "large": "https://images.pokemontcg.io/sv8/101_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/101/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/101/high.webp"
     }
   },
   {
     "id": "sv8-102",
     "name": "Phanpy",
     "number": "102",
-    "artist": null,
+    "artist": "ryoma uratsuka",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6569,15 +6569,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/102.png",
-      "large": "https://images.pokemontcg.io/sv8/102_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/102/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/102/high.webp"
     }
   },
   {
     "id": "sv8-103",
     "name": "Donphan",
     "number": "103",
-    "artist": null,
+    "artist": "GOSSAN",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6638,15 +6638,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/103.png",
-      "large": "https://images.pokemontcg.io/sv8/103_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/103/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/103/high.webp"
     }
   },
   {
     "id": "sv8-104",
     "name": "Trapinch",
     "number": "104",
-    "artist": null,
+    "artist": "Taiga Kayama",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6705,15 +6705,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/104.png",
-      "large": "https://images.pokemontcg.io/sv8/104_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/104/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/104/high.webp"
     }
   },
   {
     "id": "sv8-105",
     "name": "Vibrava",
     "number": "105",
-    "artist": null,
+    "artist": "Teeziro",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6772,15 +6772,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/105.png",
-      "large": "https://images.pokemontcg.io/sv8/105_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/105/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/105/high.webp"
     }
   },
   {
     "id": "sv8-106",
     "name": "Flygon ex",
     "number": "106",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6843,15 +6843,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/106.png",
-      "large": "https://images.pokemontcg.io/sv8/106_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/106/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/106/high.webp"
     }
   },
   {
     "id": "sv8-107",
     "name": "Gastrodon",
     "number": "107",
-    "artist": null,
+    "artist": "Scav",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6908,15 +6908,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/107.png",
-      "large": "https://images.pokemontcg.io/sv8/107_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/107/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/107/high.webp"
     }
   },
   {
     "id": "sv8-108",
     "name": "Drilbur",
     "number": "108",
-    "artist": null,
+    "artist": "Ounishi",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -6975,15 +6975,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/108.png",
-      "large": "https://images.pokemontcg.io/sv8/108_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/108/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/108/high.webp"
     }
   },
   {
     "id": "sv8-109",
     "name": "Excadrill",
     "number": "109",
-    "artist": null,
+    "artist": "Yuya Oka",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7015,7 +7015,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 2,
         "damage": "60+",
-        "text": "If you have any Metal Pokémon on your Bench, this attack does 80 more damage."
+        "text": "If you have any {M} Pokémon on your Bench, this attack does 80 more damage."
       }
     ],
     "weaknesses": [
@@ -7041,15 +7041,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/109.png",
-      "large": "https://images.pokemontcg.io/sv8/109_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/109/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/109/high.webp"
     }
   },
   {
     "id": "sv8-110",
     "name": "Landorus",
     "number": "110",
-    "artist": null,
+    "artist": "Souichirou Gunjima",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7109,15 +7109,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/110.png",
-      "large": "https://images.pokemontcg.io/sv8/110_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/110/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/110/high.webp"
     }
   },
   {
     "id": "sv8-111",
     "name": "Passimian",
     "number": "111",
-    "artist": null,
+    "artist": "Teeziro",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7165,15 +7165,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/111.png",
-      "large": "https://images.pokemontcg.io/sv8/111_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/111/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/111/high.webp"
     }
   },
   {
     "id": "sv8-112",
     "name": "Clobbopus",
     "number": "112",
-    "artist": null,
+    "artist": "Shimaris Yukichi",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7223,15 +7223,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/112.png",
-      "large": "https://images.pokemontcg.io/sv8/112_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/112/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/112/high.webp"
     }
   },
   {
     "id": "sv8-113",
     "name": "Grapploct",
     "number": "113",
-    "artist": null,
+    "artist": "KEIICHIRO ITO",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7264,7 +7264,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "130",
-        "text": "If this Pokémon has any damage counters on it, this attack can be used for Fighting."
+        "text": "If this Pokémon has any damage counters on it, this attack can be used for {F}."
       }
     ],
     "weaknesses": [
@@ -7291,15 +7291,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/113.png",
-      "large": "https://images.pokemontcg.io/sv8/113_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/113/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/113/high.webp"
     }
   },
   {
     "id": "sv8-114",
     "name": "Glimmet",
     "number": "114",
-    "artist": null,
+    "artist": "Eri Kamei",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7347,15 +7347,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/114.png",
-      "large": "https://images.pokemontcg.io/sv8/114_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/114/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/114/high.webp"
     }
   },
   {
     "id": "sv8-115",
     "name": "Glimmora",
     "number": "115",
-    "artist": null,
+    "artist": "takashi shiraishi",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7413,15 +7413,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/115.png",
-      "large": "https://images.pokemontcg.io/sv8/115_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/115/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/115/high.webp"
     }
   },
   {
     "id": "sv8-116",
     "name": "Koraidon",
     "number": "116",
-    "artist": null,
+    "artist": "Ryuta Fuse",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7482,15 +7482,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/116.png",
-      "large": "https://images.pokemontcg.io/sv8/116_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/116/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/116/high.webp"
     }
   },
   {
     "id": "sv8-117",
     "name": "Deino",
     "number": "117",
-    "artist": null,
+    "artist": "YASHIRO Nanaco",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7549,15 +7549,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/117.png",
-      "large": "https://images.pokemontcg.io/sv8/117_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/117/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/117/high.webp"
     }
   },
   {
     "id": "sv8-118",
     "name": "Zweilous",
     "number": "118",
-    "artist": null,
+    "artist": "chibi",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7618,15 +7618,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/118.png",
-      "large": "https://images.pokemontcg.io/sv8/118_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/118/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/118/high.webp"
     }
   },
   {
     "id": "sv8-119",
     "name": "Hydreigon ex",
     "number": "119",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7693,15 +7693,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/119.png",
-      "large": "https://images.pokemontcg.io/sv8/119_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/119/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/119/high.webp"
     }
   },
   {
     "id": "sv8-120",
     "name": "Shroodle",
     "number": "120",
-    "artist": null,
+    "artist": "Yukiko Baba",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7748,15 +7748,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/120.png",
-      "large": "https://images.pokemontcg.io/sv8/120_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/120/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/120/high.webp"
     }
   },
   {
     "id": "sv8-121",
     "name": "Grafaiai",
     "number": "121",
-    "artist": null,
+    "artist": "NC Empire",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7813,15 +7813,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/121.png",
-      "large": "https://images.pokemontcg.io/sv8/121_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/121/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/121/high.webp"
     }
   },
   {
     "id": "sv8-122",
     "name": "Alolan Diglett",
     "number": "122",
-    "artist": null,
+    "artist": "Akino Fukuji",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7873,15 +7873,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/122.png",
-      "large": "https://images.pokemontcg.io/sv8/122_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/122/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/122/high.webp"
     }
   },
   {
     "id": "sv8-123",
     "name": "Alolan Dugtrio",
     "number": "123",
-    "artist": null,
+    "artist": "Dsuke",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7932,15 +7932,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/123.png",
-      "large": "https://images.pokemontcg.io/sv8/123_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/123/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/123/high.webp"
     }
   },
   {
     "id": "sv8-124",
     "name": "Skarmory",
     "number": "124",
-    "artist": null,
+    "artist": "kawayoo",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -7993,15 +7993,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/124.png",
-      "large": "https://images.pokemontcg.io/sv8/124_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/124/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/124/high.webp"
     }
   },
   {
     "id": "sv8-125",
     "name": "Registeel",
     "number": "125",
-    "artist": null,
+    "artist": "Shiburingaru",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8056,15 +8056,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/125.png",
-      "large": "https://images.pokemontcg.io/sv8/125_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/125/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/125/high.webp"
     }
   },
   {
     "id": "sv8-126",
     "name": "Bronzor",
     "number": "126",
-    "artist": null,
+    "artist": "Nabatame Kazutaka",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8119,15 +8119,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/126.png",
-      "large": "https://images.pokemontcg.io/sv8/126_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/126/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/126/high.webp"
     }
   },
   {
     "id": "sv8-127",
     "name": "Bronzong",
     "number": "127",
-    "artist": null,
+    "artist": "kawayoo",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8193,15 +8193,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/127.png",
-      "large": "https://images.pokemontcg.io/sv8/127_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/127/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/127/high.webp"
     }
   },
   {
     "id": "sv8-128",
     "name": "Klefki",
     "number": "128",
-    "artist": null,
+    "artist": "mingo",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8262,15 +8262,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/128.png",
-      "large": "https://images.pokemontcg.io/sv8/128_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/128/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/128/high.webp"
     }
   },
   {
     "id": "sv8-129",
     "name": "Duraludon",
     "number": "129",
-    "artist": null,
+    "artist": "Tonji Matsuno",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8335,15 +8335,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/129.png",
-      "large": "https://images.pokemontcg.io/sv8/129_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/129/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/129/high.webp"
     }
   },
   {
     "id": "sv8-130",
     "name": "Archaludon ex",
     "number": "130",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8362,7 +8362,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Assemble Alloy",
-        "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may attach up to 2 Basic Metal Energy cards from your discard pile to your Metal Pokémon in any way you like.",
+        "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may attach up to 2 Basic {M} Energy cards from your discard pile to your {M} Pokémon in any way you like.",
         "type": "Ability"
       }
     ],
@@ -8407,15 +8407,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/130.png",
-      "large": "https://images.pokemontcg.io/sv8/130_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/130/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/130/high.webp"
     }
   },
   {
     "id": "sv8-131",
     "name": "Gholdengo",
     "number": "131",
-    "artist": null,
+    "artist": "Dsuke",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8479,15 +8479,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/131.png",
-      "large": "https://images.pokemontcg.io/sv8/131_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/131/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/131/high.webp"
     }
   },
   {
     "id": "sv8-132",
     "name": "Iron Crown",
     "number": "132",
-    "artist": null,
+    "artist": "akagi",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8553,15 +8553,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/132.png",
-      "large": "https://images.pokemontcg.io/sv8/132_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/132/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/132/high.webp"
     }
   },
   {
     "id": "sv8-133",
     "name": "Alolan Exeggutor ex",
     "number": "133",
-    "artist": null,
+    "artist": "aky CG Works",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8622,15 +8622,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/133.png",
-      "large": "https://images.pokemontcg.io/sv8/133_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/133/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/133/high.webp"
     }
   },
   {
     "id": "sv8-134",
     "name": "Altaria",
     "number": "134",
-    "artist": null,
+    "artist": "rika",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8682,15 +8682,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/134.png",
-      "large": "https://images.pokemontcg.io/sv8/134_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/134/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/134/high.webp"
     }
   },
   {
     "id": "sv8-135",
     "name": "Dialga",
     "number": "135",
-    "artist": null,
+    "artist": "Takumi Wada",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8744,15 +8744,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/135.png",
-      "large": "https://images.pokemontcg.io/sv8/135_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/135/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/135/high.webp"
     }
   },
   {
     "id": "sv8-136",
     "name": "Palkia",
     "number": "136",
-    "artist": null,
+    "artist": "danciao",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8796,15 +8796,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/136.png",
-      "large": "https://images.pokemontcg.io/sv8/136_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/136/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/136/high.webp"
     }
   },
   {
     "id": "sv8-137",
     "name": "Turtonator",
     "number": "137",
-    "artist": null,
+    "artist": "Rianti Hidayat",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8859,15 +8859,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/137.png",
-      "large": "https://images.pokemontcg.io/sv8/137_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/137/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/137/high.webp"
     }
   },
   {
     "id": "sv8-138",
     "name": "Applin",
     "number": "138",
-    "artist": null,
+    "artist": "Yuka Morii",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8921,15 +8921,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/138.png",
-      "large": "https://images.pokemontcg.io/sv8/138_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/138/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/138/high.webp"
     }
   },
   {
     "id": "sv8-139",
     "name": "Flapple",
     "number": "139",
-    "artist": null,
+    "artist": "GOTO minori",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -8981,15 +8981,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/139.png",
-      "large": "https://images.pokemontcg.io/sv8/139_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/139/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/139/high.webp"
     }
   },
   {
     "id": "sv8-140",
     "name": "Appletun",
     "number": "140",
-    "artist": null,
+    "artist": "Oswaldo KATO",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9044,15 +9044,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/140.png",
-      "large": "https://images.pokemontcg.io/sv8/140_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/140/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/140/high.webp"
     }
   },
   {
     "id": "sv8-141",
     "name": "Eternatus",
     "number": "141",
-    "artist": null,
+    "artist": "AKIRA EGAWA",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9106,15 +9106,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/141.png",
-      "large": "https://images.pokemontcg.io/sv8/141_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/141/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/141/high.webp"
     }
   },
   {
     "id": "sv8-142",
     "name": "Tatsugiri ex",
     "number": "142",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9173,15 +9173,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/142.png",
-      "large": "https://images.pokemontcg.io/sv8/142_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/142/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/142/high.webp"
     }
   },
   {
     "id": "sv8-143",
     "name": "Eevee",
     "number": "143",
-    "artist": null,
+    "artist": "Naoyo Kimura",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9244,15 +9244,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/143.png",
-      "large": "https://images.pokemontcg.io/sv8/143_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/143/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/143/high.webp"
     }
   },
   {
     "id": "sv8-144",
     "name": "Snorlax",
     "number": "144",
-    "artist": null,
+    "artist": "Ounishi",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9312,15 +9312,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/144.png",
-      "large": "https://images.pokemontcg.io/sv8/144_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/144/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/144/high.webp"
     }
   },
   {
     "id": "sv8-145",
     "name": "Slakoth",
     "number": "145",
-    "artist": null,
+    "artist": "Aya Kusube",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9370,15 +9370,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/145.png",
-      "large": "https://images.pokemontcg.io/sv8/145_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/145/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/145/high.webp"
     }
   },
   {
     "id": "sv8-146",
     "name": "Vigoroth",
     "number": "146",
-    "artist": null,
+    "artist": "Kurata So",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9429,15 +9429,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/146.png",
-      "large": "https://images.pokemontcg.io/sv8/146_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/146/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/146/high.webp"
     }
   },
   {
     "id": "sv8-147",
     "name": "Slaking ex",
     "number": "147",
-    "artist": null,
+    "artist": "PLANETA Igarashi",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9497,15 +9497,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/147.png",
-      "large": "https://images.pokemontcg.io/sv8/147_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/147/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/147/high.webp"
     }
   },
   {
     "id": "sv8-148",
     "name": "Swablu",
     "number": "148",
-    "artist": null,
+    "artist": "sowsow",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9559,15 +9559,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/148.png",
-      "large": "https://images.pokemontcg.io/sv8/148_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/148/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/148/high.webp"
     }
   },
   {
     "id": "sv8-149",
     "name": "Zangoose",
     "number": "149",
-    "artist": null,
+    "artist": "Ligton",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9614,15 +9614,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/149.png",
-      "large": "https://images.pokemontcg.io/sv8/149_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/149/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/149/high.webp"
     }
   },
   {
     "id": "sv8-150",
     "name": "Kecleon",
     "number": "150",
-    "artist": null,
+    "artist": "Shinji Kanda",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9676,15 +9676,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/150.png",
-      "large": "https://images.pokemontcg.io/sv8/150_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/150/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/150/high.webp"
     }
   },
   {
     "id": "sv8-151",
     "name": "Bouffalant",
     "number": "151",
-    "artist": null,
+    "artist": "Anesaki Dynamic",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9745,15 +9745,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/151.png",
-      "large": "https://images.pokemontcg.io/sv8/151_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/151/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/151/high.webp"
     }
   },
   {
     "id": "sv8-152",
     "name": "Rufflet",
     "number": "152",
-    "artist": null,
+    "artist": "Nakamura Ippan",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9808,15 +9808,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/152.png",
-      "large": "https://images.pokemontcg.io/sv8/152_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/152/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/152/high.webp"
     }
   },
   {
     "id": "sv8-153",
     "name": "Braviary",
     "number": "153",
-    "artist": null,
+    "artist": "Anesaki Dynamic",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9880,15 +9880,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/153.png",
-      "large": "https://images.pokemontcg.io/sv8/153_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/153/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/153/high.webp"
     }
   },
   {
     "id": "sv8-154",
     "name": "Helioptile",
     "number": "154",
-    "artist": null,
+    "artist": "miki kudo",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -9948,15 +9948,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/154.png",
-      "large": "https://images.pokemontcg.io/sv8/154_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/154/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/154/high.webp"
     }
   },
   {
     "id": "sv8-155",
     "name": "Heliolisk",
     "number": "155",
-    "artist": null,
+    "artist": "Ryota Murayama",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -10014,15 +10014,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/155.png",
-      "large": "https://images.pokemontcg.io/sv8/155_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/155/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/155/high.webp"
     }
   },
   {
     "id": "sv8-156",
     "name": "Oranguru",
     "number": "156",
-    "artist": null,
+    "artist": "Saboteri",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -10044,7 +10044,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Until the end of your next turn, the Defending Pokémon's Weakness is now Colorless. (The amount of Weakness doesn't change.)"
+        "text": "Until the end of your next turn, the Defending Pokémon's Weakness is now {C}. (The amount of Weakness doesn't change.)"
       },
       {
         "name": "Smack",
@@ -10081,15 +10081,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/156.png",
-      "large": "https://images.pokemontcg.io/sv8/156_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/156/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/156/high.webp"
     }
   },
   {
     "id": "sv8-157",
     "name": "Tandemaus",
     "number": "157",
-    "artist": null,
+    "artist": "USGMEN",
     "rarity": "Common",
     "supertype": "Pokémon",
     "subtypes": [
@@ -10136,15 +10136,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/157.png",
-      "large": "https://images.pokemontcg.io/sv8/157_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/157/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/157/high.webp"
     }
   },
   {
     "id": "sv8-158",
     "name": "Maushold",
     "number": "158",
-    "artist": null,
+    "artist": "DOM",
     "rarity": "Uncommon",
     "supertype": "Pokémon",
     "subtypes": [
@@ -10200,15 +10200,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/158.png",
-      "large": "https://images.pokemontcg.io/sv8/158_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/158/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/158/high.webp"
     }
   },
   {
     "id": "sv8-159",
     "name": "Cyclizar ex",
     "number": "159",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -10273,15 +10273,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/159.png",
-      "large": "https://images.pokemontcg.io/sv8/159_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/159/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/159/high.webp"
     }
   },
   {
     "id": "sv8-160",
     "name": "Flamigo ex",
     "number": "160",
-    "artist": null,
+    "artist": "N-DESIGN Inc.",
     "rarity": "Double Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -10349,15 +10349,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/160.png",
-      "large": "https://images.pokemontcg.io/sv8/160_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/160/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/160/high.webp"
     }
   },
   {
     "id": "sv8-161",
     "name": "Terapagos",
     "number": "161",
-    "artist": null,
+    "artist": "GIDORA",
     "rarity": "Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -10416,15 +10416,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/161.png",
-      "large": "https://images.pokemontcg.io/sv8/161_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/161/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/161/high.webp"
     }
   },
   {
     "id": "sv8-162",
     "name": "Amulet of Hope",
     "number": "162",
-    "artist": null,
+    "artist": "Toyste Beach",
     "rarity": "ACE SPEC Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -10456,15 +10456,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/162.png",
-      "large": "https://images.pokemontcg.io/sv8/162_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/162/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/162/high.webp"
     }
   },
   {
     "id": "sv8-163",
     "name": "Babiri Berry",
     "number": "163",
-    "artist": null,
+    "artist": "Studio Bora Inc.",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10494,15 +10494,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/163.png",
-      "large": "https://images.pokemontcg.io/sv8/163_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/163/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/163/high.webp"
     }
   },
   {
     "id": "sv8-164",
     "name": "Brilliant Blender",
     "number": "164",
-    "artist": null,
+    "artist": "Toyste Beach",
     "rarity": "ACE SPEC Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -10533,15 +10533,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/164.png",
-      "large": "https://images.pokemontcg.io/sv8/164_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/164/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/164/high.webp"
     }
   },
   {
     "id": "sv8-165",
     "name": "Call Bell",
     "number": "165",
-    "artist": null,
+    "artist": "Ayaka Yoshida",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10570,15 +10570,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/165.png",
-      "large": "https://images.pokemontcg.io/sv8/165_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/165/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/165/high.webp"
     }
   },
   {
     "id": "sv8-166",
     "name": "Chill Teaser Toy",
     "number": "166",
-    "artist": null,
+    "artist": "AYUMI ODASHIMA",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10607,15 +10607,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/166.png",
-      "large": "https://images.pokemontcg.io/sv8/166_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/166/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/166/high.webp"
     }
   },
   {
     "id": "sv8-167",
     "name": "Clemont's Quick Wit",
     "number": "167",
-    "artist": null,
+    "artist": "Naoki Saito",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10644,15 +10644,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/167.png",
-      "large": "https://images.pokemontcg.io/sv8/167_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/167/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/167/high.webp"
     }
   },
   {
     "id": "sv8-168",
     "name": "Colbur Berry",
     "number": "168",
-    "artist": null,
+    "artist": "Studio Bora Inc.",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10682,15 +10682,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/168.png",
-      "large": "https://images.pokemontcg.io/sv8/168_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/168/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/168/high.webp"
     }
   },
   {
     "id": "sv8-169",
     "name": "Counter Gain",
     "number": "169",
-    "artist": null,
+    "artist": "Toyste Beach",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10720,15 +10720,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/169.png",
-      "large": "https://images.pokemontcg.io/sv8/169_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/169/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/169/high.webp"
     }
   },
   {
     "id": "sv8-170",
     "name": "Cyrano",
     "number": "170",
-    "artist": null,
+    "artist": "Akira Komayama",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10757,15 +10757,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/170.png",
-      "large": "https://images.pokemontcg.io/sv8/170_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/170/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/170/high.webp"
     }
   },
   {
     "id": "sv8-171",
     "name": "Deduction Kit",
     "number": "171",
-    "artist": null,
+    "artist": "AYUMI ODASHIMA",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10794,15 +10794,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/171.png",
-      "large": "https://images.pokemontcg.io/sv8/171_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/171/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/171/high.webp"
     }
   },
   {
     "id": "sv8-172",
     "name": "Dragon Elixir",
     "number": "172",
-    "artist": null,
+    "artist": "AYUMI ODASHIMA",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10831,15 +10831,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/172.png",
-      "large": "https://images.pokemontcg.io/sv8/172_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/172/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/172/high.webp"
     }
   },
   {
     "id": "sv8-173",
     "name": "Drasna",
     "number": "173",
-    "artist": null,
+    "artist": "Hideki Ishikawa",
     "rarity": "Common",
     "supertype": "Trainer",
     "subtypes": [
@@ -10868,15 +10868,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/173.png",
-      "large": "https://images.pokemontcg.io/sv8/173_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/173/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/173/high.webp"
     }
   },
   {
     "id": "sv8-174",
     "name": "Drayton",
     "number": "174",
-    "artist": null,
+    "artist": "GIDORA",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10905,15 +10905,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/174.png",
-      "large": "https://images.pokemontcg.io/sv8/174_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/174/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/174/high.webp"
     }
   },
   {
     "id": "sv8-175",
     "name": "Dusk Ball",
     "number": "175",
-    "artist": null,
+    "artist": "Studio Bora Inc.",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -10942,15 +10942,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/175.png",
-      "large": "https://images.pokemontcg.io/sv8/175_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/175/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/175/high.webp"
     }
   },
   {
     "id": "sv8-176",
     "name": "Energy Search Pro",
     "number": "176",
-    "artist": null,
+    "artist": "Toyste Beach",
     "rarity": "ACE SPEC Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -10981,15 +10981,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/176.png",
-      "large": "https://images.pokemontcg.io/sv8/176_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/176/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/176/high.webp"
     }
   },
   {
     "id": "sv8-177",
     "name": "Gravity Mountain",
     "number": "177",
-    "artist": null,
+    "artist": "AYUMI ODASHIMA",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11018,15 +11018,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/177.png",
-      "large": "https://images.pokemontcg.io/sv8/177_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/177/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/177/high.webp"
     }
   },
   {
     "id": "sv8-178",
     "name": "Jasmine's Gaze",
     "number": "178",
-    "artist": null,
+    "artist": "Taira Akitsu",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11055,15 +11055,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/178.png",
-      "large": "https://images.pokemontcg.io/sv8/178_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/178/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/178/high.webp"
     }
   },
   {
     "id": "sv8-179",
     "name": "Lisia's Appeal",
     "number": "179",
-    "artist": null,
+    "artist": "En Morikura",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11092,15 +11092,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/179.png",
-      "large": "https://images.pokemontcg.io/sv8/179_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/179/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/179/high.webp"
     }
   },
   {
     "id": "sv8-180",
     "name": "Lively Stadium",
     "number": "180",
-    "artist": null,
+    "artist": "imoniii",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11129,15 +11129,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/180.png",
-      "large": "https://images.pokemontcg.io/sv8/180_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/180/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/180/high.webp"
     }
   },
   {
     "id": "sv8-181",
     "name": "Meddling Memo",
     "number": "181",
-    "artist": null,
+    "artist": "Ayaka Yoshida",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11166,15 +11166,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/181.png",
-      "large": "https://images.pokemontcg.io/sv8/181_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/181/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/181/high.webp"
     }
   },
   {
     "id": "sv8-182",
     "name": "Megaton Blower",
     "number": "182",
-    "artist": null,
+    "artist": "Toyste Beach",
     "rarity": "ACE SPEC Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -11205,15 +11205,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/182.png",
-      "large": "https://images.pokemontcg.io/sv8/182_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/182/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/182/high.webp"
     }
   },
   {
     "id": "sv8-183",
     "name": "Miracle Headset",
     "number": "183",
-    "artist": null,
+    "artist": "inose yukie",
     "rarity": "ACE SPEC Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -11244,15 +11244,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/183.png",
-      "large": "https://images.pokemontcg.io/sv8/183_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/183/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/183/high.webp"
     }
   },
   {
     "id": "sv8-184",
     "name": "Passho Berry",
     "number": "184",
-    "artist": null,
+    "artist": "Studio Bora Inc.",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11282,15 +11282,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/184.png",
-      "large": "https://images.pokemontcg.io/sv8/184_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/184/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/184/high.webp"
     }
   },
   {
     "id": "sv8-185",
     "name": "Precious Trolley",
     "number": "185",
-    "artist": null,
+    "artist": "inose yukie",
     "rarity": "ACE SPEC Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -11321,15 +11321,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/185.png",
-      "large": "https://images.pokemontcg.io/sv8/185_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/185/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/185/high.webp"
     }
   },
   {
     "id": "sv8-186",
     "name": "Scramble Switch",
     "number": "186",
-    "artist": null,
+    "artist": "Ayaka Yoshida",
     "rarity": "ACE SPEC Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -11360,15 +11360,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/186.png",
-      "large": "https://images.pokemontcg.io/sv8/186_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/186/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/186/high.webp"
     }
   },
   {
     "id": "sv8-187",
     "name": "Surfer",
     "number": "187",
-    "artist": null,
+    "artist": "Sanosuke Sakuma",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11397,15 +11397,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/187.png",
-      "large": "https://images.pokemontcg.io/sv8/187_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/187/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/187/high.webp"
     }
   },
   {
     "id": "sv8-188",
     "name": "Technical Machine: Fluorite",
     "number": "188",
-    "artist": null,
+    "artist": "Studio Bora Inc.",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11447,15 +11447,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/188.png",
-      "large": "https://images.pokemontcg.io/sv8/188_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/188/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/188/high.webp"
     }
   },
   {
     "id": "sv8-189",
     "name": "Tera Orb",
     "number": "189",
-    "artist": null,
+    "artist": "Ayaka Yoshida",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11484,15 +11484,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/189.png",
-      "large": "https://images.pokemontcg.io/sv8/189_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/189/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/189/high.webp"
     }
   },
   {
     "id": "sv8-190",
     "name": "Tyme",
     "number": "190",
-    "artist": null,
+    "artist": "Akira Komayama",
     "rarity": "Uncommon",
     "supertype": "Trainer",
     "subtypes": [
@@ -11521,8 +11521,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/190.png",
-      "large": "https://images.pokemontcg.io/sv8/190_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/190/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/190/high.webp"
     }
   },
   {
@@ -11559,15 +11559,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/191.png",
-      "large": "https://images.pokemontcg.io/sv8/191_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/191/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/191/high.webp"
     }
   },
   {
     "id": "sv8-192",
     "name": "Exeggcute",
     "number": "192",
-    "artist": null,
+    "artist": "Yuriko Akase",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -11616,15 +11616,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/192.png",
-      "large": "https://images.pokemontcg.io/sv8/192_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/192/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/192/high.webp"
     }
   },
   {
     "id": "sv8-193",
     "name": "Vivillon",
     "number": "193",
-    "artist": null,
+    "artist": "REND",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -11680,15 +11680,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/193.png",
-      "large": "https://images.pokemontcg.io/sv8/193_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/193/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/193/high.webp"
     }
   },
   {
     "id": "sv8-194",
     "name": "Shiinotic",
     "number": "194",
-    "artist": null,
+    "artist": "matazo",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -11743,15 +11743,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/194.png",
-      "large": "https://images.pokemontcg.io/sv8/194_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/194/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/194/high.webp"
     }
   },
   {
     "id": "sv8-195",
     "name": "Castform Sunny Form",
     "number": "195",
-    "artist": null,
+    "artist": "Narano",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -11794,7 +11794,7 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "resistances": [],
     "retreatCost": [],
-    "convertedRetreatCost": null,
+    "convertedRetreatCost": 0,
     "nationalPokedexNumbers": [
       351
     ],
@@ -11806,15 +11806,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/195.png",
-      "large": "https://images.pokemontcg.io/sv8/195_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/195/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/195/high.webp"
     }
   },
   {
     "id": "sv8-196",
     "name": "Larvesta",
     "number": "196",
-    "artist": null,
+    "artist": "Whisker",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -11874,15 +11874,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/196.png",
-      "large": "https://images.pokemontcg.io/sv8/196_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/196/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/196/high.webp"
     }
   },
   {
     "id": "sv8-197",
     "name": "Ceruledge",
     "number": "197",
-    "artist": null,
+    "artist": "Rond",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -11941,15 +11941,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/197.png",
-      "large": "https://images.pokemontcg.io/sv8/197_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/197/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/197/high.webp"
     }
   },
   {
     "id": "sv8-198",
     "name": "Feebas",
     "number": "198",
-    "artist": null,
+    "artist": "Kuroimori",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -11998,15 +11998,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/198.png",
-      "large": "https://images.pokemontcg.io/sv8/198_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/198/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/198/high.webp"
     }
   },
   {
     "id": "sv8-199",
     "name": "Spheal",
     "number": "199",
-    "artist": null,
+    "artist": "miki kudo",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12056,15 +12056,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/199.png",
-      "large": "https://images.pokemontcg.io/sv8/199_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/199/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/199/high.webp"
     }
   },
   {
     "id": "sv8-200",
     "name": "Bruxish",
     "number": "200",
-    "artist": null,
+    "artist": "Mitsuhiro Arita",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12118,15 +12118,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/200.png",
-      "large": "https://images.pokemontcg.io/sv8/200_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/200/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/200/high.webp"
     }
   },
   {
     "id": "sv8-201",
     "name": "Cetitan",
     "number": "201",
-    "artist": null,
+    "artist": "Jerky",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12184,15 +12184,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/201.png",
-      "large": "https://images.pokemontcg.io/sv8/201_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/201/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/201/high.webp"
     }
   },
   {
     "id": "sv8-202",
     "name": "Stunfisk",
     "number": "202",
-    "artist": null,
+    "artist": "N-DESIGN Inc.",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12241,15 +12241,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/202.png",
-      "large": "https://images.pokemontcg.io/sv8/202_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/202/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/202/high.webp"
     }
   },
   {
     "id": "sv8-203",
     "name": "Latios",
     "number": "203",
-    "artist": null,
+    "artist": "OKACHEKE",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12314,15 +12314,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/203.png",
-      "large": "https://images.pokemontcg.io/sv8/203_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/203/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/203/high.webp"
     }
   },
   {
     "id": "sv8-204",
     "name": "Mesprit",
     "number": "204",
-    "artist": null,
+    "artist": "HYOGONOSUKE",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12344,7 +12344,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Attach up to 2 Basic Psychic Energy cards from your hand to your Pokémon in any way you like."
+        "text": "Attach up to 2 Basic {P} Energy cards from your hand to your Pokémon in any way you like."
       },
       {
         "name": "Guardian Burst",
@@ -12384,15 +12384,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/204.png",
-      "large": "https://images.pokemontcg.io/sv8/204_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/204/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/204/high.webp"
     }
   },
   {
     "id": "sv8-205",
     "name": "Phanpy",
     "number": "205",
-    "artist": null,
+    "artist": "Saboteri",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12442,15 +12442,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/205.png",
-      "large": "https://images.pokemontcg.io/sv8/205_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/205/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/205/high.webp"
     }
   },
   {
     "id": "sv8-206",
     "name": "Vibrava",
     "number": "206",
-    "artist": null,
+    "artist": "toriyufu",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12509,15 +12509,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/206.png",
-      "large": "https://images.pokemontcg.io/sv8/206_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/206/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/206/high.webp"
     }
   },
   {
     "id": "sv8-207",
     "name": "Clobbopus",
     "number": "207",
-    "artist": null,
+    "artist": "USGMEN",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12567,15 +12567,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/207.png",
-      "large": "https://images.pokemontcg.io/sv8/207_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/207/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/207/high.webp"
     }
   },
   {
     "id": "sv8-208",
     "name": "Alolan Dugtrio",
     "number": "208",
-    "artist": null,
+    "artist": "Yukihiro Tada",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12626,15 +12626,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/208.png",
-      "large": "https://images.pokemontcg.io/sv8/208_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/208/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/208/high.webp"
     }
   },
   {
     "id": "sv8-209",
     "name": "Skarmory",
     "number": "209",
-    "artist": null,
+    "artist": "Takumi Wada",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12687,15 +12687,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/209.png",
-      "large": "https://images.pokemontcg.io/sv8/209_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/209/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/209/high.webp"
     }
   },
   {
     "id": "sv8-210",
     "name": "Flapple",
     "number": "210",
-    "artist": null,
+    "artist": "Uninori",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12747,15 +12747,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/210.png",
-      "large": "https://images.pokemontcg.io/sv8/210_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/210/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/210/high.webp"
     }
   },
   {
     "id": "sv8-211",
     "name": "Appletun",
     "number": "211",
-    "artist": null,
+    "artist": "MINAMINAMI Take",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12810,15 +12810,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/211.png",
-      "large": "https://images.pokemontcg.io/sv8/211_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/211/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/211/high.webp"
     }
   },
   {
     "id": "sv8-212",
     "name": "Slakoth",
     "number": "212",
-    "artist": null,
+    "artist": "Mékayu",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12868,15 +12868,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/212.png",
-      "large": "https://images.pokemontcg.io/sv8/212_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/212/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/212/high.webp"
     }
   },
   {
     "id": "sv8-213",
     "name": "Kecleon",
     "number": "213",
-    "artist": null,
+    "artist": "Mori Yuu",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -12930,15 +12930,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/213.png",
-      "large": "https://images.pokemontcg.io/sv8/213_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/213/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/213/high.webp"
     }
   },
   {
     "id": "sv8-214",
     "name": "Braviary",
     "number": "214",
-    "artist": null,
+    "artist": "Gapao",
     "rarity": "Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13002,15 +13002,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/214.png",
-      "large": "https://images.pokemontcg.io/sv8/214_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/214/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/214/high.webp"
     }
   },
   {
     "id": "sv8-215",
     "name": "Durant ex",
     "number": "215",
-    "artist": null,
+    "artist": "PLANETA Tsuji",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13069,15 +13069,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/215.png",
-      "large": "https://images.pokemontcg.io/sv8/215_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/215/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/215/high.webp"
     }
   },
   {
     "id": "sv8-216",
     "name": "Scovillain ex",
     "number": "216",
-    "artist": null,
+    "artist": "PLANETA Igarashi",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13096,7 +13096,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Double Type",
-        "text": "As long as this Pokémon is in play, it is Grass and Fire type.",
+        "text": "As long as this Pokémon is in play, it is {G} and {R} type.",
         "type": "Ability"
       }
     ],
@@ -13135,15 +13135,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/216.png",
-      "large": "https://images.pokemontcg.io/sv8/216_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/216/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/216/high.webp"
     }
   },
   {
     "id": "sv8-217",
     "name": "Milotic ex",
     "number": "217",
-    "artist": null,
+    "artist": "N-DESIGN Inc.",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13202,15 +13202,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/217.png",
-      "large": "https://images.pokemontcg.io/sv8/217_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/217/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/217/high.webp"
     }
   },
   {
     "id": "sv8-218",
     "name": "Black Kyurem ex",
     "number": "218",
-    "artist": null,
+    "artist": "N-DESIGN Inc.",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13237,7 +13237,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 3,
         "damage": "90",
-        "text": "If your opponent's Active Pokémon is a Dragon Pokémon, it is now Paralyzed."
+        "text": "If your opponent's Active Pokémon is a {N} Pokémon, it is now Paralyzed."
       },
       {
         "name": "Black Frost",
@@ -13276,15 +13276,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/218.png",
-      "large": "https://images.pokemontcg.io/sv8/218_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/218/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/218/high.webp"
     }
   },
   {
     "id": "sv8-219",
     "name": "Pikachu ex",
     "number": "219",
-    "artist": null,
+    "artist": "aky CG Works",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13346,15 +13346,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/219.png",
-      "large": "https://images.pokemontcg.io/sv8/219_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/219/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/219/high.webp"
     }
   },
   {
     "id": "sv8-220",
     "name": "Latias ex",
     "number": "220",
-    "artist": null,
+    "artist": "takuyoa",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13418,15 +13418,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/220.png",
-      "large": "https://images.pokemontcg.io/sv8/220_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/220/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/220/high.webp"
     }
   },
   {
     "id": "sv8-221",
     "name": "Palossand ex",
     "number": "221",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13499,15 +13499,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/221.png",
-      "large": "https://images.pokemontcg.io/sv8/221_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/221/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/221/high.webp"
     }
   },
   {
     "id": "sv8-222",
     "name": "Flygon ex",
     "number": "222",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13570,15 +13570,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/222.png",
-      "large": "https://images.pokemontcg.io/sv8/222_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/222/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/222/high.webp"
     }
   },
   {
     "id": "sv8-223",
     "name": "Hydreigon ex",
     "number": "223",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13645,15 +13645,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/223.png",
-      "large": "https://images.pokemontcg.io/sv8/223_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/223/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/223/high.webp"
     }
   },
   {
     "id": "sv8-224",
     "name": "Archaludon ex",
     "number": "224",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13672,7 +13672,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Assemble Alloy",
-        "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may attach up to 2 Basic Metal Energy cards from your discard pile to your Metal Pokémon in any way you like.",
+        "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may attach up to 2 Basic {M} Energy cards from your discard pile to your {M} Pokémon in any way you like.",
         "type": "Ability"
       }
     ],
@@ -13717,15 +13717,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/224.png",
-      "large": "https://images.pokemontcg.io/sv8/224_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/224/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/224/high.webp"
     }
   },
   {
     "id": "sv8-225",
     "name": "Alolan Exeggutor ex",
     "number": "225",
-    "artist": null,
+    "artist": "aky CG Works",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13786,15 +13786,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/225.png",
-      "large": "https://images.pokemontcg.io/sv8/225_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/225/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/225/high.webp"
     }
   },
   {
     "id": "sv8-226",
     "name": "Tatsugiri ex",
     "number": "226",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13853,15 +13853,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/226.png",
-      "large": "https://images.pokemontcg.io/sv8/226_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/226/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/226/high.webp"
     }
   },
   {
     "id": "sv8-227",
     "name": "Slaking ex",
     "number": "227",
-    "artist": null,
+    "artist": "PLANETA Igarashi",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13921,15 +13921,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/227.png",
-      "large": "https://images.pokemontcg.io/sv8/227_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/227/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/227/high.webp"
     }
   },
   {
     "id": "sv8-228",
     "name": "Cyclizar ex",
     "number": "228",
-    "artist": null,
+    "artist": "5ban Graphics",
     "rarity": "Ultra Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -13994,15 +13994,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/228.png",
-      "large": "https://images.pokemontcg.io/sv8/228_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/228/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/228/high.webp"
     }
   },
   {
     "id": "sv8-229",
     "name": "Clemont's Quick Wit",
     "number": "229",
-    "artist": null,
+    "artist": "Naoki Saito",
     "rarity": "Ultra Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14031,15 +14031,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/229.png",
-      "large": "https://images.pokemontcg.io/sv8/229_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/229/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/229/high.webp"
     }
   },
   {
     "id": "sv8-230",
     "name": "Cyrano",
     "number": "230",
-    "artist": null,
+    "artist": "Akira Komayama",
     "rarity": "Ultra Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14068,15 +14068,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/230.png",
-      "large": "https://images.pokemontcg.io/sv8/230_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/230/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/230/high.webp"
     }
   },
   {
     "id": "sv8-231",
     "name": "Drasna",
     "number": "231",
-    "artist": null,
+    "artist": "Hideki Ishikawa",
     "rarity": "Ultra Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14105,15 +14105,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/231.png",
-      "large": "https://images.pokemontcg.io/sv8/231_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/231/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/231/high.webp"
     }
   },
   {
     "id": "sv8-232",
     "name": "Drayton",
     "number": "232",
-    "artist": null,
+    "artist": "GIDORA",
     "rarity": "Ultra Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14142,15 +14142,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/232.png",
-      "large": "https://images.pokemontcg.io/sv8/232_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/232/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/232/high.webp"
     }
   },
   {
     "id": "sv8-233",
     "name": "Jasmine's Gaze",
     "number": "233",
-    "artist": null,
+    "artist": "Taira Akitsu",
     "rarity": "Ultra Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14179,15 +14179,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/233.png",
-      "large": "https://images.pokemontcg.io/sv8/233_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/233/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/233/high.webp"
     }
   },
   {
     "id": "sv8-234",
     "name": "Lisia's Appeal",
     "number": "234",
-    "artist": null,
+    "artist": "En Morikura",
     "rarity": "Ultra Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14216,15 +14216,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/234.png",
-      "large": "https://images.pokemontcg.io/sv8/234_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/234/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/234/high.webp"
     }
   },
   {
     "id": "sv8-235",
     "name": "Surfer",
     "number": "235",
-    "artist": null,
+    "artist": "Sanosuke Sakuma",
     "rarity": "Ultra Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14253,15 +14253,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/235.png",
-      "large": "https://images.pokemontcg.io/sv8/235_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/235/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/235/high.webp"
     }
   },
   {
     "id": "sv8-236",
     "name": "Durant ex",
     "number": "236",
-    "artist": null,
+    "artist": "osare",
     "rarity": "Special Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -14320,15 +14320,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/236.png",
-      "large": "https://images.pokemontcg.io/sv8/236_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/236/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/236/high.webp"
     }
   },
   {
     "id": "sv8-237",
     "name": "Milotic ex",
     "number": "237",
-    "artist": null,
+    "artist": "Kuroimori",
     "rarity": "Special Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -14387,15 +14387,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/237.png",
-      "large": "https://images.pokemontcg.io/sv8/237_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/237/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/237/high.webp"
     }
   },
   {
     "id": "sv8-238",
     "name": "Pikachu ex",
     "number": "238",
-    "artist": null,
+    "artist": "GIDORA",
     "rarity": "Special Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -14457,15 +14457,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/238.png",
-      "large": "https://images.pokemontcg.io/sv8/238_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/238/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/238/high.webp"
     }
   },
   {
     "id": "sv8-239",
     "name": "Latias ex",
     "number": "239",
-    "artist": null,
+    "artist": "OKACHEKE",
     "rarity": "Special Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -14529,15 +14529,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/239.png",
-      "large": "https://images.pokemontcg.io/sv8/239_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/239/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/239/high.webp"
     }
   },
   {
     "id": "sv8-240",
     "name": "Hydreigon ex",
     "number": "240",
-    "artist": null,
+    "artist": "AKIRA EGAWA",
     "rarity": "Special Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -14604,15 +14604,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/240.png",
-      "large": "https://images.pokemontcg.io/sv8/240_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/240/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/240/high.webp"
     }
   },
   {
     "id": "sv8-241",
     "name": "Archaludon ex",
     "number": "241",
-    "artist": null,
+    "artist": "Shinya Mizuno",
     "rarity": "Special Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -14631,7 +14631,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [
       {
         "name": "Assemble Alloy",
-        "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may attach up to 2 Basic Metal Energy cards from your discard pile to your Metal Pokémon in any way you like.",
+        "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may attach up to 2 Basic {M} Energy cards from your discard pile to your {M} Pokémon in any way you like.",
         "type": "Ability"
       }
     ],
@@ -14676,15 +14676,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/241.png",
-      "large": "https://images.pokemontcg.io/sv8/241_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/241/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/241/high.webp"
     }
   },
   {
     "id": "sv8-242",
     "name": "Alolan Exeggutor ex",
     "number": "242",
-    "artist": null,
+    "artist": "Yuriko Akase",
     "rarity": "Special Illustration Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -14745,15 +14745,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/242.png",
-      "large": "https://images.pokemontcg.io/sv8/242_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/242/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/242/high.webp"
     }
   },
   {
     "id": "sv8-243",
     "name": "Clemont's Quick Wit",
     "number": "243",
-    "artist": null,
+    "artist": "Shinya Mizuno",
     "rarity": "Special Illustration Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14782,15 +14782,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/243.png",
-      "large": "https://images.pokemontcg.io/sv8/243_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/243/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/243/high.webp"
     }
   },
   {
     "id": "sv8-244",
     "name": "Drayton",
     "number": "244",
-    "artist": null,
+    "artist": "DOM",
     "rarity": "Special Illustration Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14819,15 +14819,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/244.png",
-      "large": "https://images.pokemontcg.io/sv8/244_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/244/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/244/high.webp"
     }
   },
   {
     "id": "sv8-245",
     "name": "Jasmine's Gaze",
     "number": "245",
-    "artist": null,
+    "artist": "Fujimoto Gold",
     "rarity": "Special Illustration Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14856,15 +14856,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/245.png",
-      "large": "https://images.pokemontcg.io/sv8/245_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/245/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/245/high.webp"
     }
   },
   {
     "id": "sv8-246",
     "name": "Lisia's Appeal",
     "number": "246",
-    "artist": null,
+    "artist": "Nobusawa/Mochipuyo",
     "rarity": "Special Illustration Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -14893,15 +14893,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/246.png",
-      "large": "https://images.pokemontcg.io/sv8/246_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/246/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/246/high.webp"
     }
   },
   {
     "id": "sv8-247",
     "name": "Pikachu ex",
     "number": "247",
-    "artist": null,
+    "artist": "aky CG Works",
     "rarity": "Hyper Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -14963,15 +14963,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/247.png",
-      "large": "https://images.pokemontcg.io/sv8/247_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/247/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/247/high.webp"
     }
   },
   {
     "id": "sv8-248",
     "name": "Alolan Exeggutor ex",
     "number": "248",
-    "artist": null,
+    "artist": "aky CG Works",
     "rarity": "Hyper Rare",
     "supertype": "Pokémon",
     "subtypes": [
@@ -15032,15 +15032,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/248.png",
-      "large": "https://images.pokemontcg.io/sv8/248_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/248/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/248/high.webp"
     }
   },
   {
     "id": "sv8-249",
     "name": "Counter Gain",
     "number": "249",
-    "artist": null,
+    "artist": "Toyste Beach",
     "rarity": "Hyper Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -15070,15 +15070,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/249.png",
-      "large": "https://images.pokemontcg.io/sv8/249_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/249/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/249/high.webp"
     }
   },
   {
     "id": "sv8-250",
     "name": "Gravity Mountain",
     "number": "250",
-    "artist": null,
+    "artist": "AYUMI ODASHIMA",
     "rarity": "Hyper Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -15107,15 +15107,15 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/250.png",
-      "large": "https://images.pokemontcg.io/sv8/250_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/250/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/250/high.webp"
     }
   },
   {
     "id": "sv8-251",
     "name": "Night Stretcher",
     "number": "251",
-    "artist": null,
+    "artist": "Toyste Beach",
     "rarity": "Hyper Rare",
     "supertype": "Trainer",
     "subtypes": [
@@ -15144,8 +15144,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": "H",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/251.png",
-      "large": "https://images.pokemontcg.io/sv8/251_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/251/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/251/high.webp"
     }
   },
   {
@@ -15178,10 +15178,10 @@ const cardDetails: TcgCardDetail[] = [
       "standard": "Legal",
       "expanded": "Legal"
     },
-    "regulationMark": "H",
+    "regulationMark": "G",
     "images": {
-      "small": "https://images.pokemontcg.io/sv8/252.png",
-      "large": "https://images.pokemontcg.io/sv8/252_hires.png"
+      "small": "https://assets.tcgdex.net/en/sv/sv08/252/low.webp",
+      "large": "https://assets.tcgdex.net/en/sv/sv08/252/high.webp"
     }
   }
 ]

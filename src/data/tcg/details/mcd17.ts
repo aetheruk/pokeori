@@ -63,8 +63,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/1.png",
-      "large": "https://images.pokemontcg.io/mcd17/1_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/1/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/1/high.webp"
     }
   },
   {
@@ -89,7 +89,7 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "Vice Grip",
+        "name": "Vice Grips",
         "cost": [
           "Colorless",
           "Colorless"
@@ -121,8 +121,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/2.png",
-      "large": "https://images.pokemontcg.io/mcd17/2_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/2/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/2/high.webp"
     }
   },
   {
@@ -187,8 +187,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/3.png",
-      "large": "https://images.pokemontcg.io/mcd17/3_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/3/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/3/high.webp"
     }
   },
   {
@@ -253,8 +253,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/4.png",
-      "large": "https://images.pokemontcg.io/mcd17/4_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/4/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/4/high.webp"
     }
   },
   {
@@ -285,7 +285,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+        "text": "Flip a coin, If heads your opponent's active Pokémon is now Paralyzed."
       },
       {
         "name": "Electro Ball",
@@ -325,8 +325,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/5.png",
-      "large": "https://images.pokemontcg.io/mcd17/5_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/5/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/5/high.webp"
     }
   },
   {
@@ -357,7 +357,7 @@ const cardDetails: TcgCardDetail[] = [
         ],
         "convertedEnergyCost": 1,
         "damage": "",
-        "text": "Draw a card."
+        "text": "Draw a card"
       }
     ],
     "weaknesses": [
@@ -381,8 +381,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/6.png",
-      "large": "https://images.pokemontcg.io/mcd17/6_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/6/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/6/high.webp"
     }
   },
   {
@@ -450,8 +450,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/7.png",
-      "large": "https://images.pokemontcg.io/mcd17/7_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/7/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/7/high.webp"
     }
   },
   {
@@ -480,7 +480,7 @@ const cardDetails: TcgCardDetail[] = [
         "cost": [],
         "convertedEnergyCost": 0,
         "damage": "10×",
-        "text": "Flip 3 coins. This attack does 10 damage for each heads."
+        "text": "Flip 3 coins. This attack does 10 damage for each heads"
       }
     ],
     "weaknesses": [
@@ -509,8 +509,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/8.png",
-      "large": "https://images.pokemontcg.io/mcd17/8_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/8/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/8/high.webp"
     }
   },
   {
@@ -577,8 +577,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/9.png",
-      "large": "https://images.pokemontcg.io/mcd17/9_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/9/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/9/high.webp"
     }
   },
   {
@@ -638,8 +638,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/10.png",
-      "large": "https://images.pokemontcg.io/mcd17/10_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/10/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/10/high.webp"
     }
   },
   {
@@ -699,8 +699,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/11.png",
-      "large": "https://images.pokemontcg.io/mcd17/11_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/11/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/11/high.webp"
     }
   },
   {
@@ -765,8 +765,8 @@ const cardDetails: TcgCardDetail[] = [
     },
     "regulationMark": null,
     "images": {
-      "small": "https://images.pokemontcg.io/mcd17/12.png",
-      "large": "https://images.pokemontcg.io/mcd17/12_hires.png"
+      "small": "https://assets.tcgdex.net/en/mc/2017sm/12/low.webp",
+      "large": "https://assets.tcgdex.net/en/mc/2017sm/12/high.webp"
     }
   }
 ]
