@@ -14,6 +14,14 @@ const boosterPacksOutputPath = path.join(outputDir, 'items/entries/booster-packs
 const setSummariesOutputPath = path.join(tcgRootDir, 'summaries.ts')
 const setLoaderOutputPath = path.join(tcgRootDir, 'set-loader.ts')
 
+// Keep curated game groupings here so regenerated TCG source data preserves them.
+const SET_METADATA_OVERRIDES = {
+  base6: { series: 'Base' },
+  bp: { series: 'Base' },
+  fut20: { series: 'Sword & Shield' },
+  si1: { series: 'Neo' },
+}
+
 if (!fs.existsSync(tcgRootDir)) {
   fs.mkdirSync(tcgRootDir, { recursive: true })
 }
@@ -36,7 +44,10 @@ function loadSetsMetadata() {
   const map = new Map()
   parsed.forEach((set) => {
     if (!set || typeof set !== 'object' || !set.id) return
-    map.set(set.id, set)
+    map.set(set.id, {
+      ...set,
+      ...SET_METADATA_OVERRIDES[set.id],
+    })
   })
   return map
 }

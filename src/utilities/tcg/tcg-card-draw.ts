@@ -18,9 +18,13 @@ export interface CardDrawParams {
   bonusThreshold?: number
   allowedRarities?: string[]
   guaranteed?: boolean
+  /** Excludes owned cards and prevents duplicates within this draw operation. */
+  missingOnly?: boolean
   rng?: () => number
   logger?: Pick<Console, 'debug' | 'warn'>
   userInventory?: Record<string, number>
+  /** Runtime TCG ownership map, used when missingOnly is enabled. */
+  collection?: Record<string, number>
   payload?: Payload
   req?: PayloadRequest
   persist?: boolean
@@ -442,6 +446,20 @@ export async function drawRandomTcgCard(params: CardDrawParams = {}): Promise<Ca
   const rarityFilter = normalizeSetIds(params.allowedRarities)
   const cards = getAllTcgCards()
 
+  let payload = params.payload
+  let collection = params.collection
+  if (params.missingOnly && !collection) {
+    payload ||= await getPayload({ config: await payloadConfig })
+    collection = await getUserTcgMap(payload as any, userId, params.req ? { req: params.req } : {})
+  }
+  const ownedCardIds = new Set(
+    params.missingOnly
+      ? Object.entries(collection || {})
+          .filter(([, count]) => count > 0)
+          .map(([cardId]) => cardId.toLowerCase())
+      : [],
+  )
+
   const initialPool = cards.filter((card) => {
     if (cardIdFilter && !cardIdFilter.has(card.id.toLowerCase())) {
       return false
@@ -461,6 +479,10 @@ export async function drawRandomTcgCard(params: CardDrawParams = {}): Promise<Ca
       if (!matchesPokemon) {
         return false
       }
+    }
+
+    if (ownedCardIds.has(card.id.toLowerCase())) {
+      return false
     }
 
     return true
@@ -486,23 +508,25 @@ export async function drawRandomTcgCard(params: CardDrawParams = {}): Promise<Ca
   }
 
   const draws: SingleCardDrawResult[] = []
+  const availableMissingCards = [...initialPool]
 
   for (let attempt = 0; attempt < quantity; attempt += 1) {
     const roll = clamp(rng(), 0, 1)
     logger.debug?.(`[TCG Draw] Roll #${attempt + 1}:`, roll)
     const guaranteedBonus = roll < GUARANTEED_BONUS_ROLL_CUTOFF
 
-    const eligibleCards = initialPool.filter((card) => roll <= getCardRarityChance(card, modifier))
+    const drawPool = params.missingOnly ? availableMissingCards : initialPool
+    const eligibleCards = drawPool.filter((card) => roll <= getCardRarityChance(card, modifier))
     logger.debug?.(`[TCG Draw] Final pool size #${attempt + 1}:`, eligibleCards.length)
 
     let workingPool = eligibleCards
 
-    // If guaranteed is true and rarity check failed, fall back to initialPool
+    // If guaranteed is true and rarity check failed, fall back to this draw's eligible pool.
     if (params.guaranteed && workingPool.length === 0) {
       logger.debug?.(
-        `[TCG Draw] Rarity check failed for guaranteed draw #${attempt + 1}; falling back to initial pool.`,
+        `[TCG Draw] Rarity check failed for guaranteed draw #${attempt + 1}; falling back to the available pool.`,
       )
-      workingPool = initialPool
+      workingPool = drawPool
     }
 
     let selectedCard: TcgCard | null = null
@@ -559,6 +583,11 @@ export async function drawRandomTcgCard(params: CardDrawParams = {}): Promise<Ca
       const selectedIndex = Math.floor(selectionRoll * workingPool.length)
       selectedCard = workingPool[selectedIndex]
       logger.debug?.(`[TCG Draw] Selected card #${attempt + 1}:`, selectedCard?.id ?? 'None')
+      if (params.missingOnly && selectedCard) {
+        const selectedCardId = selectedCard.id
+        const missingCardIndex = availableMissingCards.findIndex((card) => card.id === selectedCardId)
+        if (missingCardIndex >= 0) availableMissingCards.splice(missingCardIndex, 1)
+      }
     }
 
     draws.push({
@@ -587,7 +616,7 @@ export async function drawRandomTcgCard(params: CardDrawParams = {}): Promise<Ca
         draws,
         logger,
         userInventory,
-        params.payload,
+        payload,
         params.req,
       )
     }

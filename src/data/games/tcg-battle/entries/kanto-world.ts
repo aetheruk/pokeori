@@ -19,6 +19,22 @@ function promoReward(cardId: string, dropChance: number) {
   }
 }
 
+function missingSetCardReward(setId: string) {
+  return {
+    type: 'card' as const,
+    quantity: 1,
+    dropChance: 80,
+    cardDrawParams: {
+      allowedSetIds: [setId],
+      missingOnly: true,
+      // All rarity odds become eligible; the reward can be any card rarity.
+      rarityModifier: 1,
+      bonusThreshold: 0,
+      guaranteed: true,
+    },
+  }
+}
+
 function worldBattle(input: {
   id: string
   trainer: string
@@ -95,6 +111,12 @@ const dayCareCoupleDeck = [
   'base1-23', 'basep-6', 'base1-32', 'base4-46', 'base1-1',
 ]
 
+const hikerMarcosDeck = [
+  'base3-47', 'base3-37', 'base3-36', 'base1-47', 'base1-19',
+  'base4-71', 'base5-52', 'base2-61', 'base2-45', 'base4-90',
+  'base4-59', 'base1-62', 'base3-41', 'base1-56', 'base4-84',
+]
+
 export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
   worldBattle({
     id: 'tcg-world-bug-catcher-barry',
@@ -108,6 +130,7 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     cards: bugCatcherBarryDeck,
     additionalRewards: [
       { type: 'item', targetId: 'pack-base2', quantity: 3, dropChance: 100 },
+      missingSetCardReward('base2'),
       promoReward('basep-45', 35),
       promoReward('basep-27', 20),
     ],
@@ -143,6 +166,7 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     cards: billDeck,
     additionalRewards: [
       { type: 'item', targetId: 'pack-base1', quantity: 3, dropChance: 100 },
+      missingSetCardReward('base1'),
       promoReward('basep-11', 35),
       promoReward('basep-16', 20),
     ],
@@ -162,6 +186,7 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
     ],
     additionalRewards: [
       { type: 'item', targetId: 'pack-base5', quantity: 3, dropChance: 100 },
+      missingSetCardReward('base5'),
       promoReward('basep-17', 35),
       promoReward('basep-18', 20),
     ],
@@ -194,6 +219,22 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
       promoReward('basep-31', 20),
       promoReward('basep-36', 20),
       promoReward('basep-35', 10),
+    ],
+  }),
+  worldBattle({
+    id: 'tcg-world-hiker-marcos',
+    trainer: 'Hiker Marcos',
+    trainerIcon: 'hiker',
+    category: 'Kanto',
+    subCategory: 'Pewter City',
+    background: '/backgrounds/pewter.avif',
+    energy: 'Fighting',
+    colour: '#8b7355',
+    cards: hikerMarcosDeck,
+    additionalRewards: [
+      { type: 'item', targetId: 'pack-base3', quantity: 3, dropChance: 100 },
+      missingSetCardReward('base3'),
+      promoReward('basep-7', 35),
     ],
   }),
 ]

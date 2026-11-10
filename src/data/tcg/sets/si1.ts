@@ -3,7 +3,7 @@ import type { TcgSet } from '../types'
 const setData: TcgSet = {
   "id": "si1",
   "name": "Southern Islands",
-  "series": "Other",
+  "series": "Neo",
   "total": 18,
   "printedTotal": 18,
   "releaseDate": "2001/07/31",

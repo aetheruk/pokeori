@@ -3,7 +3,7 @@ import type { TcgSet } from '../types'
 const setData: TcgSet = {
   "id": "bp",
   "name": "Best of Game",
-  "series": "Other",
+  "series": "Base",
   "total": 9,
   "printedTotal": 9,
   "releaseDate": "2002/12/01",

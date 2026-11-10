@@ -3,7 +3,7 @@ import type { TcgSet } from '../types'
 const setData: TcgSet = {
   "id": "base6",
   "name": "Legendary Collection",
-  "series": "Other",
+  "series": "Base",
   "total": 110,
   "printedTotal": 110,
   "releaseDate": "2002/05/24",
