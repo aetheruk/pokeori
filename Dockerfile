@@ -61,6 +61,10 @@ COPY --chown=pokeori:pokeori public ./public
 COPY --from=builder --chown=pokeori:pokeori /app/.next/standalone ./
 COPY --from=builder --chown=pokeori:pokeori /app/.next/static ./.next/static
 
+# Seed a writable mount point for Coolify's persistent Next image-optimizer cache.
+RUN mkdir -p /app/.next/cache/images && \
+    chown -R pokeori:pokeori /app/.next/cache
+
 USER pokeori
 
 EXPOSE 3000
