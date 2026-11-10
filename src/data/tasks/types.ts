@@ -173,6 +173,7 @@ export interface TaskCardRewardParams {
   bonusThreshold?: number
   allowedRarities?: string[]
   guaranteed?: boolean
+  missingOnly?: boolean
 }
 
 // Backwards compatibility alias - use Reward from ../types for all reward configurations

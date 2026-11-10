@@ -3,7 +3,7 @@ import type { TcgSet } from '../types'
 const setData: TcgSet = {
   "id": "fut20",
   "name": "Pokémon Futsal Collection",
-  "series": "Other",
+  "series": "Sword & Shield",
   "total": 5,
   "printedTotal": 5,
   "releaseDate": "2020/09/11",

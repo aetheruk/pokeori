@@ -11,6 +11,8 @@ Trading Card Game collection and booster pack opening.
 
 ## Features
 - Collect TCG cards from various sets
+- Preserve curated set-series overrides during TCG data generation: Legendary Collection and Best of Game are grouped into Base, Pokémon Futsal Collection into Sword & Shield, and Southern Islands into Neo for collection filters and battle deck eligibility
+- Author random card rewards by allowed set(s), card IDs, Pokémon, and exact rarity labels; reward draws can exclude cards already owned with `missingOnly`
 - Open booster packs
 - Open all owned packs for a set from the inventory lightning action, skipping card-by-card flips and going straight to the summary
 - View collection by set
@@ -59,7 +61,7 @@ The Carddex preserves an artwork-first index and organizes unlocked expansions a
 - Each generation+format deck also stores one extra energy-card type slot (outside the 15 card list). The selected type must be valid for that generation series.
 - Each TCG Battle game entry can now require a specific series (`settings.requiredSeries`), and battle start enforces both the required series and required format.
 - PVE entries may set `settings.cost` for a server-authoritative entry fee. Explore shows the fee and disables starting when the current balance is too low; after both decks validate, the battle start debits the fee transactionally with an idempotency key tied to the research session. A retry resumes that battle without another debit, and a finished battle cannot be restarted until the player claims its result and starts a new session.
-- Five repeatable Kanto world challenges use Base Baby rules after the three Underground tutorial deck wins. They charge 50 Crystals, award 100 Crystals and 25 Underground Society guild XP on a win, and layer their trainer-specific pack, material, Egg, and promo-card drops on top.
+- Six repeatable Kanto world challenges use Base Baby rules after the three Underground tutorial deck wins. They charge 50 Crystals, award 100 Crystals and 25 Underground Society guild XP on a win, and layer their trainer-specific pack, material, Egg, and promo-card drops on top.
 - Kanto Underground adds a free, unranked Base Champions PVP table after the TCG battle wrap-up. It requires the `deck-box`, is unavailable in Kid Mode, and revalidates each collector's saved Base Champions deck against ownership, series, legality, card count, and the Champions cost cap before matchmaking can create a battle.
 - TCG PVP supports six-digit friendly lobbies and an unranked Quick Match queue. The Explore card fixes the format and deck level; players cannot negotiate or override them in the lobby.
 - PVP stores one authoritative shared battle under a match-scoped Redis key and returns a redacted viewer-relative copy to each client. The local collector is always rendered at the bottom, the opponent at the top, private hands and unused opponent deck cards are never sent, and opening arrangements remain hidden until both collectors are ready.

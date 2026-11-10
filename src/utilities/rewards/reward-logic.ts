@@ -528,6 +528,7 @@ export async function grantRewards(
           ...params,
           qty: quantity,
           userInventory: inventory,
+          collection: tcg,
           persist: false,
         })
 
