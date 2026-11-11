@@ -590,6 +590,7 @@ describe('TCG Basic Training content', () => {
       targetId: 'gym1',
       count: 132,
       unique: true,
+      inverse: false,
     })
     expect(shouldConsumeCraftCosts(base4!, 'bad')).toBe(true)
     expect(resolveCraftRewards(base4!, 'bad')).toEqual([])
