@@ -1,4 +1,17 @@
 import { Task } from '../../types'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
+
+function fullSetRequirement(setId: string) {
+  const setSummary = tcgSetSummaries.find((set) => set.id === setId)
+  if (!setSummary) throw new Error(`Missing TCG set summary for ${setId}`)
+
+  return {
+    type: 'card_collected_set' as const,
+    targetId: setId,
+    count: setSummary.total,
+    unique: true,
+  }
+}
 
 export const celadonGameCornerTasks: Task[] = [
   {
@@ -256,7 +269,7 @@ export const celadonGameCornerTasks: Task[] = [
       {
         type: 'currency',
         targetId: 'fun-tokens',
-        quantity: 20,
+        quantity: 50,
       },
     ],
     exitModal: {
@@ -267,8 +280,46 @@ export const celadonGameCornerTasks: Task[] = [
         id: 'maid',
       },
       message:
-        'No Fun Tokens at all? We cannot have that. Here are 20 on the house. Just enough to get the fun started again.',
+        'No Fun Tokens at all? We cannot have that. Here are 50 on the house. Just enough to get the fun started again.',
       closeButtonText: 'Try My Luck',
+    },
+  },
+  {
+    id: 'extra-service',
+    name: 'Extra Service',
+    description:
+      'The lady at the token exchange is in awe of my full Rocket collection.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    background: '/backgrounds/celadon-game-corner-prize-exchange.avif',
+    icon: {
+      type: 'trainer',
+      id: 'maid',
+    },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Accept the Offer',
+    requirements: [fullSetRequirement('base5')],
+    criteria: [],
+    rewards: [
+      {
+        type: 'currency',
+        targetId: 'fun-tokens',
+        quantity: 1000,
+        secret: true,
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/celadon-game-corner-prize-exchange.avif',
+      title: 'Extra Service',
+      icon: {
+        type: 'trainer',
+        id: 'maid',
+      },
+      message:
+        'The lady winks, “Oh, I didn’t realise you were a member of THAT club.” Just let me know if you’re ever short of tokens; I’m sure I can help you out.',
+      closeButtonText: 'Take the Tokens',
     },
   },
   {
