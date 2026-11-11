@@ -2535,7 +2535,7 @@ describe('static data references', () => {
     ])
   })
 
-  test('Cerulean Berry Trade sells openable ball bags and material pouches', () => {
+  test('Cerulean Berry Trade sells openable ball bags and material and nut pouches', () => {
     const shop = shops.find((entry) => entry.id === 'cerulean-berry-shop')
     const bundle = shop?.items.find((item) => item.id === 'poke-ball-bundle-bp')
 
@@ -2553,6 +2553,13 @@ describe('static data references', () => {
     const pouch = shop?.items.find((entry) => entry.id === 'pouch-of-materials-bp')
     expect(pouch?.cost).toEqual([{ type: 'currency', id: 'berry-powder', amount: 75 }])
     expect(pouch?.rewards).toEqual([{ type: 'item', targetId: 'pouch-of-materials', quantity: 1, dropChance: 100 }])
+
+    const nutPouch = shop?.items.find((entry) => entry.id === 'pouch-of-nuts-bp')
+    expect(nutPouch?.cost).toEqual([{ type: 'currency', id: 'berry-powder', amount: 75 }])
+    expect(nutPouch?.icon).toEqual({ type: 'item', id: 'pouch-of-nuts' })
+    expect(nutPouch?.rewards).toEqual([
+      { type: 'item', targetId: 'pouch-of-nuts', quantity: 1, dropChance: 100 },
+    ])
 
     const journalIds = [
       'researchers-journal',
