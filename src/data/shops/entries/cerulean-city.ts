@@ -268,6 +268,15 @@ export const ceruleanCityShops: ShopConfig[] = [
         rewards: [{ type: 'item', targetId: 'pouch-of-materials', quantity: 1, dropChance: 100 }],
       },
       {
+        id: 'pouch-of-nuts-bp',
+        name: 'Pouch of Nuts',
+        description:
+          'Open for 3–5 dye nuts in colours unlocked by your Researching level. Colours may repeat.',
+        icon: { type: 'item', id: 'pouch-of-nuts' },
+        cost: [{ type: 'currency', id: 'berry-powder', amount: 75 }],
+        rewards: [{ type: 'item', targetId: 'pouch-of-nuts', quantity: 1, dropChance: 100 }],
+      },
+      {
         id: 'researchers-journal-bp',
         name: "Researcher's Journal",
         description: 'A journal full of research notes.',
