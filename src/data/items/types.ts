@@ -219,6 +219,10 @@ export interface Item {
       min: number
       max: number
     }
+    grantRandomDyeNuts?: {
+      min: number
+      max: number
+    }
   }
   battleEffect?: BattleEffect // New: for battle-usable items
   enemyBattleUse?: BattleAiUseConfig

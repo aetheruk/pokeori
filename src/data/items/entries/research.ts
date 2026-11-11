@@ -2,6 +2,17 @@ import { Item } from '../types'
 
 export const researchItems: Item[] = [
   {
+    id: 'pouch-of-nuts',
+    name: 'Pouch of Nuts',
+    description:
+      'Open for 3–5 dye nuts in colours unlocked by your Researching level. Colours may repeat.',
+    category: 'misc',
+    spriteId: 'pouch-of-materials',
+    effects: {
+      grantRandomDyeNuts: { min: 3, max: 5 },
+    },
+  },
+  {
     id: 'golden-scale',
     name: 'Golden Scale',
     description: 'A rare Golden scale found while fishing.',

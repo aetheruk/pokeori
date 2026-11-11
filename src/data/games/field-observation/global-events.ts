@@ -2,7 +2,10 @@ import type {
   FieldObservationGlobalItemEvent,
   FieldObservationGlobalPokemonEvent,
 } from './types'
-import { FIELD_OBSERVATION_RESEARCH_KIT_DROP_CHANCE } from './rewards'
+import {
+  FIELD_OBSERVATION_NUT_POUCH_UNLOCK_LEVEL,
+  FIELD_OBSERVATION_RESEARCH_KIT_DROP_CHANCE,
+} from './rewards'
 
 const notOwned = (itemId: string) => ({
   type: 'item_owned' as const,
@@ -99,6 +102,18 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
 ]
 
 export const fieldObservationGlobalItemEvents: FieldObservationGlobalItemEvent[] = [
+  {
+    id: 'global-field-observation-nut-pouch',
+    itemId: 'pouch-of-nuts',
+    dropChance: 15,
+    requirements: [
+      {
+        type: 'skill_level',
+        targetId: 'researching',
+        count: FIELD_OBSERVATION_NUT_POUCH_UNLOCK_LEVEL,
+      },
+    ],
+  },
   {
     id: 'global-field-observation-research-kit',
     itemId: 'research-kit',

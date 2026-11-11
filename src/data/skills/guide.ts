@@ -19,6 +19,7 @@ import {
 } from '@/utilities/skills/unlocks'
 import { FIELD_OBSERVATION_RESEARCH_XP_UNLOCKS } from '@/utilities/research/research-levels'
 import { FIELD_OBSERVATION_PRIMARY_MATERIAL_LIMIT_UNLOCKS } from '@/utilities/artisan/material-drops'
+import { FIELD_OBSERVATION_NUT_POUCH_UNLOCK_LEVEL } from '@/data/games/field-observation/rewards'
 import {
   FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL,
   FIELD_OBSERVATION_EV_BERRY_UNLOCKS,
@@ -184,6 +185,18 @@ const additionalNutDropUnlock: SkillGuideUnlock = {
   source: 'authored',
   itemId: 'nut-red',
   icon: itemIcon('nut-red'),
+}
+
+const nutPouchUnlock: SkillGuideUnlock = {
+  skillId: 'researching',
+  level: FIELD_OBSERVATION_NUT_POUCH_UNLOCK_LEVEL,
+  category: 'items',
+  label: 'Pouch of Nuts',
+  description:
+    'Field Observation has a 15% chance to yield a Pouch of Nuts. Opening it grants 3–5 dye nuts in colours unlocked by your Researching level; colours may repeat.',
+  source: 'authored',
+  itemId: 'pouch-of-nuts',
+  icon: itemIcon('pouch-of-nuts'),
 }
 
 const evBerryUnlocks: SkillGuideUnlock[] = FIELD_OBSERVATION_EV_BERRY_UNLOCKS.map((unlock) => {
@@ -453,6 +466,7 @@ export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
   ...fieldObservationMaterialUnlocks,
   ...nutUnlocks,
   additionalNutDropUnlock,
+  nutPouchUnlock,
   ...healingBerryUnlocks,
   ...evBerryUnlocks,
   ...researcherMoveSlotUnlocks,
