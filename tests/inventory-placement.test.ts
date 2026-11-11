@@ -29,6 +29,11 @@ describe('inventory placement', () => {
       group: 'training',
       subCategory: 'trainer',
     })
+
+    const nutPouch = item('pouch-of-nuts')
+    expect(getInventoryDisplayPlacement(nutPouch)).toEqual(
+      getInventoryDisplayPlacement(pouch),
+    )
   })
 
   test('inventory top-level groups and labels match the current navigation', () => {

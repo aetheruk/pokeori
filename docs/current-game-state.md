@@ -4,7 +4,7 @@ Unreleased: Six repeatable Base Baby TCG challenges now appear in the main Kanto
 
 Unreleased: Celadon Game Corner's one-time `Extra Service` task unlocks after completing the 83-card Team Rocket set and awards 1,000 Fun Tokens as a secret reward. The repeatable `The Fun Never Stops` task now grants 50 Fun Tokens when the player has none.
 
-Unreleased: Researching 31 unlocks a 15% Field Observation chance for a Pouch of Nuts. Opening it grants 3–5 randomly selected dye nuts from the colours unlocked at the player's current Researching level, with repeats allowed. It uses the Pouch of Materials sprite and is sold for 75 Berry Powder in Cerulean Berry Trade after `a-berry-good-invention`.
+Unreleased: Researching 31 unlocks a 15% Field Observation chance for a Pouch of Nuts. Opening it grants 3–5 randomly selected dye nuts from the colours unlocked at the player's current Researching level, with repeats allowed. It uses the Pouch of Materials sprite, appears under Training → Trainer in Inventory, and is sold for 75 Berry Powder in Cerulean Berry Trade after `a-berry-good-invention`.
 
 Unreleased: NPC TCG opponents use deterministic expected-outcome scoring for attacks, valuing knockouts, status, recoil, healing, protection, and Energy effects. Their opening front row favors early legal attacks and survivability; their turn choice can evolve for a strong next-turn upgrade or to clear harmful conditions, and charge when the added Energy outweighs delaying an attack. Full-Energy attack requirements and immediate knockout priorities are preserved. PVP remains unchanged.
 
