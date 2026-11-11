@@ -2315,22 +2315,6 @@ function runOpponentTurn(state: TcgBattleState) {
   finishOpponentTurn(state)
 }
 
-function runOpponentPressureTurns(state: TcgBattleState) {
-  let guard = 0
-  while (
-    guard < 20 &&
-    state.phase === 'battle' &&
-    state.activeSide === 'player' &&
-    state.player.energy <= 0 &&
-    canSideTakeTcgBattleAction(state, 'opponent')
-  ) {
-    guard += 1
-    state.log.unshift('You have no energy remaining. Opponent continues.')
-    advanceTurn(state, 'opponent')
-    runOpponentTurn(state)
-  }
-}
-
 function afterPlayerAction(state: TcgBattleState) {
   promoteOpponentIfNeeded(state)
   requirePlayerPromotionIfNeeded(state)
@@ -2343,7 +2327,6 @@ function afterPlayerAction(state: TcgBattleState) {
   if (state.pendingPromotion) return
   advanceTurn(state, 'opponent')
   runOpponentTurn(state)
-  runOpponentPressureTurns(state)
 }
 
 function getTcgPvpViewerSide(
