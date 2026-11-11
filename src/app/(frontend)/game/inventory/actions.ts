@@ -21,12 +21,13 @@ import {
 } from '@/utilities/games/activity-domain'
 import { drawTcgBoosterPacks } from '@/utilities/tcg/tcg-card-draw'
 import type { TcgCard } from '@/data/tcg/types'
-import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
+import { getItemSkillLockReason, getSkillLevel } from '@/utilities/skills/unlocks'
 import {
   buildRandomGemRewards,
   buildRandomPokemonMaterialRewards,
   rollRandomPokemonMaterialCount,
 } from '@/utilities/artisan/material-drops'
+import { buildFieldObservationNutPouchRewards } from '@/utilities/research/berry-drops'
 import {
   getUserCompletedTasksMap,
   getUserInventoryMap,
@@ -370,15 +371,24 @@ export async function useConsumable(
   if (
     itemDef.effects?.grantRandomPokemonMaterials ||
     itemDef.effects?.grantRandomGems ||
+    itemDef.effects?.grantRandomDyeNuts ||
     itemDef.effects?.openRewards
   ) {
     const materialRange = itemDef.effects.grantRandomPokemonMaterials
     const gemRange = itemDef.effects.grantRandomGems
+    const nutRange = itemDef.effects.grantRandomDyeNuts
 
     try {
       const response = await runEconomyAction(
         { userId: user.id, action: 'use-material-pouch', requestId: clientActionId },
         async ({ payload: transactionPayload, req }) => {
+          const freshUser = nutRange
+            ? await transactionPayload.findByID({
+                collection: 'users',
+                id: user.id,
+                req,
+              })
+            : null
           const inventory = await getUserInventoryMap(transactionPayload, user.id, { req })
           const currentQty = inventory[itemId] || 0
           if (currentQty < 1) return { success: false, error: 'You do not have this item' }
@@ -394,12 +404,21 @@ export async function useConsumable(
           const gemCount = gemRange
             ? rollRandomPokemonMaterialCount(gemRange.min, gemRange.max)
             : 0
+          const nutCount = nutRange
+            ? rollRandomPokemonMaterialCount(nutRange.min, nutRange.max)
+            : 0
           const rewards = [
             ...(itemDef.effects?.openRewards || []),
             ...(materialRange
               ? buildRandomPokemonMaterialRewards(materialCount)
               : []),
             ...(gemRange ? buildRandomGemRewards(gemCount) : []),
+            ...(nutRange
+              ? buildFieldObservationNutPouchRewards(
+                  nutCount,
+                  getSkillLevel(freshUser?.skills, 'researching'),
+                )
+              : []),
           ]
           const result = await grantRewards(user.id, rewards, {
             source: 'consumable', payload: transactionPayload, req,
@@ -409,6 +428,9 @@ export async function useConsumable(
               ? `${materialCount} crafting ${materialCount === 1 ? 'material' : 'materials'}`
               : null,
             gemCount > 0 ? `${gemCount} ${gemCount === 1 ? 'gem' : 'gems'}` : null,
+            nutCount > 0
+              ? `${nutCount} dye ${nutCount === 1 ? 'nut' : 'nuts'}`
+              : null,
           ].filter(Boolean)
           return {
             success: true,
@@ -423,7 +445,7 @@ export async function useConsumable(
       revalidatePath('/game/inventory')
       return response
     } catch (error) {
-      console.error('Error opening material pouch:', error)
+      console.error('Error opening inventory pouch:', error)
       return { success: false, error: 'Failed to open item' }
     }
   }

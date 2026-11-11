@@ -215,7 +215,11 @@ function getItemActionLabel(
   canChannel = false,
 ): string | null {
   if (canChannel) return 'Channel'
-  if (item.effects?.grantRandomPokemonMaterials || item.effects?.openRewards) return 'Open'
+  if (
+    item.effects?.grantRandomPokemonMaterials ||
+    item.effects?.grantRandomDyeNuts ||
+    item.effects?.openRewards
+  ) return 'Open'
   if (isArtisanIngredientItem(item)) return 'Craft'
   if (item.category === 'booster-pack') return 'Open'
   if (item.category === 'scratch-card') return 'Scratch'
@@ -767,6 +771,7 @@ export function InventoryList() {
           item.effects?.grantSkillXp ||
           item.effects?.openRewards ||
           item.effects?.grantRandomPokemonMaterials ||
+          item.effects?.grantRandomDyeNuts ||
           item.effects?.grantPokemonResearchXp?.formId ||
           item.effects?.startBattle ||
           item.effects?.startEncounter ||
@@ -1122,6 +1127,7 @@ export function InventoryList() {
           ) : selectedItem?.effects?.grantSkillXp ||
             selectedItem?.effects?.openRewards ||
             selectedItem?.effects?.grantRandomPokemonMaterials ||
+            selectedItem?.effects?.grantRandomDyeNuts ||
             selectedItem?.effects?.grantPokemonResearchXp?.formId ||
             selectedItem?.effects?.startBattle ||
             selectedItem?.effects?.startEncounter ||
@@ -1137,6 +1143,7 @@ export function InventoryList() {
                 : selectedItem.effects?.openRewards
                   ? 'Open Bag'
                   : selectedItem.effects?.grantRandomPokemonMaterials
+                    || selectedItem.effects?.grantRandomDyeNuts
                     ? 'Open Pouch'
                     : 'Use Item'}
             </Button>

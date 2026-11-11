@@ -53,6 +53,37 @@ export function getFieldObservationNuts(researchingLevel: number): string[] {
   ).map((unlock) => unlock.itemId)
 }
 
+export function getFieldObservationDyeNuts(researchingLevel: number): string[] {
+  const safeLevel = Math.max(1, Math.floor(researchingLevel || 1))
+  return FIELD_OBSERVATION_NUT_UNLOCKS.filter(
+    (unlock) => unlock.itemId.startsWith('nut-') && safeLevel >= unlock.level,
+  ).map((unlock) => unlock.itemId)
+}
+
+export function buildFieldObservationNutPouchRewards(
+  count: number,
+  researchingLevel: number,
+  random: () => number = Math.random,
+): Reward[] {
+  const dyeNuts = getFieldObservationDyeNuts(researchingLevel)
+  const safeCount = Math.max(0, Math.floor(count))
+
+  if (dyeNuts.length === 0 || safeCount === 0) return []
+
+  return Array.from({ length: safeCount }, () => {
+    const index = Math.min(
+      dyeNuts.length - 1,
+      Math.floor(random() * dyeNuts.length),
+    )
+    return {
+      type: 'item' as const,
+      targetId: dyeNuts[index],
+      quantity: 1,
+      dropChance: 100,
+    }
+  })
+}
+
 export function getFieldObservationNutDropWeights(
   researchingLevel: number,
 ): { itemId: string; weight: number }[] {
