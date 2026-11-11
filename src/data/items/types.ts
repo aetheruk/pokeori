@@ -510,6 +510,7 @@ export function getInventoryDisplayPlacement(item: Item): {
     item.effects?.grantSkillXp ||
     item.effects?.grantPokemonResearchXp ||
     item.effects?.grantRandomPokemonMaterials ||
+    item.effects?.grantRandomDyeNuts ||
     item.effects?.openRewards
   ) {
     return { group: 'training', subCategory: 'trainer' }
