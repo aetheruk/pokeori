@@ -177,6 +177,12 @@ const eggRequirements: TaskCondition[] = [
   { type: 'task_completed', targetId: 'day-care-egg-program' },
 ]
 
+const chanseyWheelEggSource = {
+  sourceBackground: '/backgrounds/chansey.avif',
+  sourceRegion: 'Kanto',
+  sourceLocation: 'Viridian City',
+}
+
 const badgePremiums = [
   { badgeId: 'badge-kanto-boulder', itemId: 'moon-stone' },
   { badgeId: 'badge-kanto-cascade', itemId: 'water-stone' },
@@ -253,7 +259,7 @@ const slots: PrizeWheelSlot[] = [
         type: 'egg',
         quantity: 1,
         dropChance: 100,
-        eggData: { rarity: 'normal' },
+        eggData: { rarity: 'normal', ...chanseyWheelEggSource },
       },
     ],
   },
@@ -270,7 +276,7 @@ const slots: PrizeWheelSlot[] = [
         type: 'egg',
         quantity: 1,
         dropChance: 100,
-        eggData: { rarity: 'shiny' },
+        eggData: { rarity: 'shiny', ...chanseyWheelEggSource },
       },
     ],
   },
