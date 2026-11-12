@@ -236,6 +236,7 @@ export const kantoWorldTcgBattleEntries: TcgBattleGameConfig[] = [
         dropChance: 10,
         eggData: {
           rarity: 'normal',
+          sourceBackground: '/backgrounds/tcg.avif',
           sourceRegion: 'Kanto',
           sourceLocation: 'Cerulean City',
         },
