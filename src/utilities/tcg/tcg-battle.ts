@@ -24,6 +24,12 @@ export type TcgBattleCoinCondition =
   | 'tails'
   | { result: 'heads' | 'tails'; minimum: number; exactly?: number; first?: boolean }
 export type TcgBattleCoinResult = 'heads' | 'tails'
+export type TcgBattleCoinFlipPurpose =
+  | 'status-check'
+  | 'attack'
+  | 'attack-failure'
+  | 'endure'
+  | 'effect'
 export type TcgBattleStatusCondition = 'asleep' | 'poisoned' | 'burned' | 'paralyzed' | 'confused'
 
 export type TcgBattleCountSource =
@@ -619,6 +625,7 @@ export interface TcgBattleState {
     results: TcgBattleCoinResult[]
     heads: number
     tails: number
+    purpose?: TcgBattleCoinFlipPurpose
   }
   lastCoinFlipEvents?: {
     id: string
@@ -627,6 +634,7 @@ export interface TcgBattleState {
     results: TcgBattleCoinResult[]
     heads: number
     tails: number
+    purpose?: TcgBattleCoinFlipPurpose
   }[]
   lastStatusEvent?: {
     id: string
