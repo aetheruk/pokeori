@@ -44,6 +44,7 @@ import type {
   TcgBattleAttackChoice,
   TcgBattleCardState,
   TcgBattleChoiceRequirement,
+  TcgBattleCoinFlipPurpose,
   TcgBattleEnergyType,
   TcgBattleEvolutionOption,
   TcgBattleState,
@@ -91,9 +92,6 @@ type TcgClientActionResult =
   | { success: false; error: string }
 type TcgAttack = TcgBattleCardState['attacks'][number]
 type TcgDamageEvent = NonNullable<TcgBattleState['lastDamageEvents']>[number]
-type TcgCoinFlipEvent = NonNullable<
-  TcgBattleState['lastCoinFlipEvents']
->[number]
 type TcgStatusEvent = NonNullable<TcgBattleState['lastStatusEvents']>[number]
 type DamageCue = {
   id: string
@@ -105,6 +103,7 @@ type CoinCue = {
   id: string
   sourceId: string
   side: SideTone
+  purpose?: TcgBattleCoinFlipPurpose
   results: Array<'heads' | 'tails'>
   heads: number
   tails: number
@@ -168,6 +167,7 @@ const RESOLUTION_TIMING = {
   recoil: 860,
   faint: 760,
   boardUpdate: 900,
+  statusUpdate: 140,
   finalSettle: 780,
 } as const
 
@@ -382,6 +382,37 @@ function applyVisualStatusEvent(state: TcgBattleState, event: TcgStatusEvent) {
   state.lastStatusEvents = [...(state.lastStatusEvents || []), event]
 }
 
+function applyVisualStatusRemovals(
+  state: TcgBattleState,
+  previousState: TcgBattleState,
+  nextState: TcgBattleState,
+  side: SideTone,
+  cardId: string,
+) {
+  const visualCard = findSideCard(state[side], cardId)
+  const previousCard = findSideCard(previousState[side], cardId)
+  const resolvedCard = findSideCard(nextState[side], cardId)
+  if (!visualCard || !previousCard || !resolvedCard) return
+
+  const resolvedStatuses = new Set(resolvedCard.statusConditions || [])
+  const removedStatuses = new Set(
+    (previousCard.statusConditions || []).filter(
+      (status) =>
+        (status === 'asleep' ||
+          status === 'paralyzed' ||
+          status === 'confused') &&
+        !resolvedStatuses.has(status),
+    ),
+  )
+  if (removedStatuses.size === 0) return
+
+  const remainingStatuses = (visualCard.statusConditions || []).filter(
+    (status) => !removedStatuses.has(status),
+  )
+  visualCard.statusConditions =
+    remainingStatuses.length > 0 ? remainingStatuses : undefined
+}
+
 function mergeTcgBattleStatusConditions(
   currentStatuses: TcgBattleStatusCondition[] | undefined,
   statuses: TcgBattleStatusCondition[],
@@ -475,20 +506,6 @@ function findDamageEvent(
   return state.lastDamageEvents?.find(predicate)
 }
 
-function findCoinEvent(
-  state: TcgBattleState,
-  predicate: (event: TcgCoinFlipEvent) => boolean,
-) {
-  return state.lastCoinFlipEvents?.find(predicate)
-}
-
-function findStatusEvent(
-  state: TcgBattleState,
-  predicate: (event: TcgStatusEvent) => boolean,
-) {
-  return state.lastStatusEvents?.find(predicate)
-}
-
 function makeResolutionId(prefix: string) {
   return `${prefix}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`
 }
@@ -501,9 +518,42 @@ function makeCoinCue(
     id: event.id,
     sourceId: event.sourceId,
     side: event.side,
+    purpose: event.purpose,
     results: event.results,
     heads: event.heads,
     tails: event.tails,
+  }
+}
+
+function getAttackCoinCues(
+  state: TcgBattleState,
+  sourceId: string,
+  side: SideTone,
+): CoinCue[] {
+  return (state.lastCoinFlipEvents || [])
+    .filter(
+      (event) =>
+        event.sourceId === sourceId &&
+        (event.purpose === undefined ||
+          event.purpose === 'status-check' ||
+          event.purpose === 'attack' ||
+          event.purpose === 'attack-failure'),
+    )
+    .map((event) => ({ ...makeCoinCue(event)!, side }))
+}
+
+function getCoinCueTitle(cue: CoinCue): string {
+  switch (cue.purpose) {
+    case 'status-check':
+      return 'Status Check'
+    case 'attack-failure':
+      return 'Attack Check'
+    case 'endure':
+      return 'Endure Check'
+    case 'effect':
+      return 'Effect Check'
+    default:
+      return 'Attack Flip'
   }
 }
 
@@ -788,6 +838,28 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       const visualState = cloneTcgBattleState(previousState)
       clearVisualActionEvents(plannedState)
       clearVisualActionEvents(visualState)
+      if (meta.kind === 'attack') {
+        const attacker = findSideCard(previousState.player, meta.attackerId)
+        const attack = attacker?.attacks[meta.attackIndex]
+        const attackWasPrevented = nextState.lastCoinFlipEvents?.some(
+          (event) =>
+            event.sourceId === meta.attackerId &&
+            (event.purpose === 'status-check' ||
+              event.purpose === 'attack-failure') &&
+            event.tails > 0,
+        )
+        if (attack && !attackWasPrevented) {
+          const paidEnergy = getAttackCost(attack, previousState)
+          plannedState.player.energy = Math.max(
+            0,
+            plannedState.player.energy - paidEnergy,
+          )
+          visualState.player.energy = Math.max(
+            0,
+            visualState.player.energy - paidEnergy,
+          )
+        }
+      }
       setState(cloneTcgBattleState(visualState))
 
       const publishVisualState = (updater: (draft: TcgBattleState) => void) => {
@@ -844,7 +916,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         )
         applyVisualStatusEvent(plannedState, event)
         queueResolution(
-          RESOLUTION_TIMING.boardUpdate,
+          RESOLUTION_TIMING.statusUpdate,
           {
             id: makeResolutionId('status-condition'),
             tone: event.targetSide === 'player' ? 'opponent' : 'player',
@@ -984,10 +1056,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                 event.targetSide === 'player',
             )
           : undefined
-      const playerStatusEvent =
+      const playerStatusEvents =
         meta.kind === 'attack'
-          ? findStatusEvent(
-              nextState,
+          ? (nextState.lastStatusEvents || []).filter(
               (event) => event.sourceId === meta.attackerId,
             )
           : undefined
@@ -1012,10 +1083,31 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           event.targetSide === 'opponent' &&
           event.sourceId === event.targetId,
       )
-      const opponentStatusEvent = findStatusEvent(
-        nextState,
-        (event) => event.targetSide === 'player',
+      const opponentStatusEvents = (nextState.lastStatusEvents || []).filter(
+        (event) =>
+          event.targetSide === 'player' &&
+          previousState.opponent.front.some(
+            (card) => card.instanceId === event.sourceId,
+          ),
       )
+      const opponentAttackAction =
+        nextState.lastAction?.side === 'opponent' &&
+        nextState.lastAction.kind === 'attack' &&
+        nextState.lastAction.id !== previousState.lastAction?.id
+          ? nextState.lastAction
+          : undefined
+      const opponentAttackerId =
+        opponentAttackAction?.attackerId ||
+        opponentDamageEvent?.sourceId ||
+        opponentStatusEvents[0]?.sourceId ||
+        nextState.lastCoinFlipEvents?.find(
+          (event) =>
+            previousState.opponent.front.some(
+              (card) => card.instanceId === event.sourceId,
+            ) &&
+            event.purpose !== 'endure' &&
+            event.purpose !== 'effect',
+        )?.sourceId
       const playerEffectEvent =
         meta.kind === 'attack'
           ? nextState.lastEffectEvents?.find(
@@ -1026,21 +1118,42 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         nextState.lastDamageEvents?.filter(
           (event) => event.reason === 'status',
         ) || []
-      const opponentCoinCue = makeCoinCue(
-        findCoinEvent(nextState, (event) => event.side === 'opponent'),
+      const opponentCoinCues = opponentAttackerId
+        ? getAttackCoinCues(nextState, opponentAttackerId, 'opponent')
+        : []
+      const opponentAttacker = opponentAttackerId
+        ? findSideCard(plannedState.opponent, opponentAttackerId)
+        : undefined
+      const opponentAttack =
+        opponentAttacker && opponentAttackAction
+          ? opponentAttacker.attacks[opponentAttackAction.attackIndex || 0]
+          : undefined
+      const opponentAttackWasPrevented = opponentCoinCues.some(
+        (cue) =>
+          (cue.purpose === 'status-check' ||
+            cue.purpose === 'attack-failure') &&
+          cue.tails > 0,
       )
+      const applyVisualOpponentAttackPayment = (draft: TcgBattleState) => {
+        draft.activeSide = 'opponent'
+        if (opponentAttack && !opponentAttackWasPrevented) {
+          draft.opponent.energy = Math.max(
+            0,
+            draft.opponent.energy - getAttackCost(opponentAttack, previousState),
+          )
+        }
+      }
 
       if (meta.kind === 'attack') {
         const attacker = findSideCard(previousState.player, meta.attackerId)
         const target = findSideCard(previousState.opponent, meta.targetId)
         const attack = attacker?.attacks[meta.attackIndex]
-        const playerCoinCue = makeCoinCue(
-          findCoinEvent(
-            nextState,
-            (event) =>
-              event.sourceId === meta.attackerId && event.side === 'player',
-          ),
+        const playerCoinCues = getAttackCoinCues(
+          nextState,
+          meta.attackerId,
+          'player',
         )
+        const playerCoinCue = playerCoinCues[0]
         const damage =
           playerTargetDamageEvent?.damage ??
           (playerCoinCue
@@ -1055,7 +1168,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               playerCoinCue ? 'player-flip' : 'player-attack',
             ),
             tone: 'player',
-            title: playerCoinCue ? 'Coin Flip' : attack?.name || 'Attack',
+            title: playerCoinCue
+              ? getCoinCueTitle(playerCoinCue)
+              : attack?.name || 'Attack',
             detail: playerCoinCue
               ? formatCoinSummary(playerCoinCue)
               : target
@@ -1065,7 +1180,34 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             coinCue: playerCoinCue,
           },
           'good',
+          playerCoinCue?.purpose === 'status-check'
+            ? () =>
+                publishVisualState((draft) =>
+                  applyVisualStatusRemovals(
+                    draft,
+                    previousState,
+                    nextState,
+                    'player',
+                    meta.attackerId,
+                  ),
+                )
+            : undefined,
         )
+
+        for (const coinCue of playerCoinCues.slice(1)) {
+          queueResolution(
+            RESOLUTION_TIMING.coinFlip,
+            {
+              id: makeResolutionId(`player-${coinCue.purpose || 'coin'}-flip`),
+              tone: 'player',
+              title: getCoinCueTitle(coinCue),
+              detail: formatCoinSummary(coinCue),
+              sourceId: attacker?.instanceId,
+              coinCue,
+            },
+            'good',
+          )
+        }
 
         queueDamageResolution(
           playerCoinCue
@@ -1095,6 +1237,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           damage > 0 ? 'good' : 'select',
           playerTargetDamageEvent,
         )
+
+        for (const statusEvent of playerStatusEvents || []) {
+          queueStatusResolution(statusEvent)
+        }
 
         cursor += RESOLUTION_TIMING.damageHold
 
@@ -1142,7 +1288,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           cursor += RESOLUTION_TIMING.recoil
         }
 
-        queueStatusResolution(playerStatusEvent)
         if (playerEffectEvent) {
           const effectDetail =
             'label' in playerEffectEvent
@@ -1205,46 +1350,37 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
 
       const skipOpponentStep =
         nextState.pendingPromotion === 'player' &&
-        !opponentCoinCue &&
+        opponentCoinCues.length === 0 &&
         !opponentDamageEvent &&
         !opponentRecoilEvent &&
         !opponentConfusionEvent &&
-        !opponentStatusEvent &&
+        opponentStatusEvents.length === 0 &&
         endOfRoundStatusDamageEvents.length === 0
-      const opponentAttacker = opponentDamageEvent
-        ? findSideCard(plannedState.opponent, opponentDamageEvent.sourceId)
-        : opponentCoinCue
-          ? findSideCard(plannedState.opponent, opponentCoinCue.sourceId)
-          : opponentRecoilEvent
-            ? findSideCard(plannedState.opponent, opponentRecoilEvent.sourceId)
-            : opponentConfusionEvent
-              ? findSideCard(
-                  plannedState.opponent,
-                  opponentConfusionEvent.sourceId,
-                )
-              : undefined
       const playerTarget = opponentDamageEvent
         ? findSideCard(plannedState.player, opponentDamageEvent.targetId)
         : undefined
 
       if (!skipOpponentStep && nextState.battleMode !== 'pvp') {
-        if (opponentCoinCue) {
-          queueResolution(
-            RESOLUTION_TIMING.betweenActions,
-            {
-              id: makeResolutionId('opponent-flip'),
-              tone: 'opponent',
-              title: 'Opponent Flip',
-              detail: formatCoinSummary(opponentCoinCue),
-              sourceId: opponentAttacker?.instanceId,
-              coinCue: opponentCoinCue,
-            },
-            'bad',
-            () =>
-              publishVisualState((draft) => {
-                draft.activeSide = 'opponent'
-              }),
-          )
+        if (opponentCoinCues.length > 0) {
+          opponentCoinCues.forEach((coinCue, index) => {
+            queueResolution(
+              index === 0
+                ? RESOLUTION_TIMING.betweenActions
+                : RESOLUTION_TIMING.coinFlip,
+              {
+                id: makeResolutionId(`opponent-${coinCue.purpose || 'coin'}-flip`),
+                tone: 'opponent',
+                title: getCoinCueTitle(coinCue),
+                detail: formatCoinSummary(coinCue),
+                sourceId: opponentAttacker?.instanceId,
+                coinCue,
+              },
+              'bad',
+              index === 0
+                ? () => publishVisualState(applyVisualOpponentAttackPayment)
+                : undefined,
+            )
+          })
 
           queueDamageResolution(
             RESOLUTION_TIMING.coinFlip,
@@ -1289,9 +1425,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             },
             'bad',
             opponentDamageEvent,
-            (draft) => {
-              draft.activeSide = 'opponent'
-            },
+            applyVisualOpponentAttackPayment,
           )
           cursor += RESOLUTION_TIMING.damageHold
         } else if (opponentRecoilEvent) {
@@ -1305,10 +1439,20 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               sourceId: opponentAttacker?.instanceId,
             },
             'bad',
-            () =>
-              publishVisualState((draft) => {
-                draft.activeSide = 'opponent'
-              }),
+            () => publishVisualState(applyVisualOpponentAttackPayment),
+          )
+        } else if (opponentAttackAction) {
+          queueResolution(
+            RESOLUTION_TIMING.betweenActions,
+            {
+              id: makeResolutionId('opponent-attack'),
+              tone: 'opponent',
+              title: opponentAttack?.name || 'Opponent Attack',
+              detail: nextState.log[0] || 'The opponent attack resolves.',
+              sourceId: opponentAttacker?.instanceId,
+            },
+            'bad',
+            () => publishVisualState(applyVisualOpponentAttackPayment),
           )
         } else {
           queueResolution(
@@ -1382,7 +1526,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           cursor += RESOLUTION_TIMING.recoil
         }
 
-        queueStatusResolution(opponentStatusEvent)
+        for (const statusEvent of opponentStatusEvents) {
+          queueStatusResolution(statusEvent)
+        }
         for (const statusDamageEvent of endOfRoundStatusDamageEvents) {
           const statusTarget = findSideCard(
             plannedState[statusDamageEvent.targetSide],
@@ -1454,42 +1600,80 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
 
       const visualState = cloneTcgBattleState(previousState)
       clearVisualActionEvents(visualState)
-      setState(visualState)
       const remoteDamage = nextState.lastDamageEvents?.find(
         (event) =>
           event.reason !== 'status' &&
           (event.targetSide === 'player' || event.targetSide === 'opponent'),
       )
-      const remoteCoin = makeCoinCue(
-        nextState.lastCoinFlipEvents?.find(
-          (event) => event.side === 'opponent',
-        ),
-      )
 
       if (action.kind === 'attack') {
+        const remoteCoinCues = action.attackerId
+          ? getAttackCoinCues(nextState, action.attackerId, 'opponent')
+          : []
         const attacker = findSideCard(
           previousState.opponent,
           action.attackerId || '',
         )
         const target = findSideCard(previousState.player, action.targetId || '')
         const attack = attacker?.attacks[action.attackIndex || 0]
+        const attackWasPrevented = remoteCoinCues.some(
+          (cue) =>
+            (cue.purpose === 'status-check' ||
+              cue.purpose === 'attack-failure') &&
+            cue.tails > 0,
+        )
+        if (attack && !attackWasPrevented) {
+          visualState.opponent.energy = Math.max(
+            0,
+            visualState.opponent.energy - getAttackCost(attack, previousState),
+          )
+        }
+        setState(visualState)
+        const firstCoinCue = remoteCoinCues[0]
         setResolution({
           id: makeResolutionId('remote-attack'),
           tone: 'opponent',
-          title: remoteCoin
-            ? 'Opponent Flip'
+          title: firstCoinCue
+            ? getCoinCueTitle(firstCoinCue)
             : attack?.name || 'Opponent Attack',
-          detail: remoteCoin
-            ? formatCoinSummary(remoteCoin)
+          detail: firstCoinCue
+            ? formatCoinSummary(firstCoinCue)
             : target
               ? `${attacker?.name || 'Opponent card'} targets ${target.name}`
               : nextState.log[0] || 'The opposing front line acts.',
           sourceId: attacker?.instanceId,
-          coinCue: remoteCoin,
+          coinCue: firstCoinCue,
         })
         playSfx('bad')
-        const damageDelay = remoteCoin
-          ? RESOLUTION_TIMING.coinFlip
+        if (firstCoinCue?.purpose === 'status-check' && action.attackerId) {
+          setState((current) => {
+            if (!current) return current
+            const draft = cloneTcgBattleState(current)
+            applyVisualStatusRemovals(
+              draft,
+              previousState,
+              nextState,
+              'opponent',
+              action.attackerId!,
+            )
+            return draft
+          })
+        }
+        remoteCoinCues.slice(1).forEach((coinCue, index) => {
+          scheduleResolutionStep(() => {
+            setResolution({
+              id: makeResolutionId(`remote-${coinCue.purpose || 'coin'}-flip`),
+              tone: 'opponent',
+              title: getCoinCueTitle(coinCue),
+              detail: formatCoinSummary(coinCue),
+              sourceId: attacker?.instanceId,
+              coinCue,
+            })
+            playSfx('bad')
+          }, RESOLUTION_TIMING.coinFlip * (index + 1))
+        })
+        const damageDelay = remoteCoinCues.length > 0
+          ? RESOLUTION_TIMING.coinFlip * remoteCoinCues.length
           : RESOLUTION_TIMING.actionIntro
         if (remoteDamage) {
           scheduleResolutionStep(() => {
@@ -1520,13 +1704,45 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             playSfx(remoteDamage.targetSide === 'player' ? 'bad' : 'select')
           }, damageDelay)
         }
+        const remoteStatusEvents = (nextState.lastStatusEvents || []).filter(
+          (event) => event.sourceId === action.attackerId,
+        )
+        let statusDelay = damageDelay + (remoteDamage ? RESOLUTION_TIMING.statusUpdate : 0)
+        remoteStatusEvents.forEach((statusEvent, index) => {
+          statusDelay += index === 0 ? 0 : RESOLUTION_TIMING.statusUpdate
+          scheduleResolutionStep(() => {
+            const statusTarget = findSideCard(
+              nextState[statusEvent.targetSide],
+              statusEvent.targetId,
+            )
+            setResolution({
+              id: makeResolutionId('remote-status'),
+              tone: 'opponent',
+              title: 'Status Condition',
+              detail: `${statusTarget?.name || 'Active card'} is now ${formatStatusSummary(statusEvent.statuses)}`,
+              sourceId: statusEvent.sourceId,
+            })
+            setState((current) => {
+              if (!current) return current
+              const draft = cloneTcgBattleState(current)
+              applyVisualStatusEvent(draft, statusEvent)
+              return draft
+            })
+            playSfx('select')
+          }, statusDelay)
+        })
+        const finalDelay = Math.max(
+          damageDelay + (remoteDamage ? RESOLUTION_TIMING.damageHold : 0),
+          statusDelay,
+        )
         scheduleResolutionStep(
           () => commitActionResult(nextState),
-          damageDelay + RESOLUTION_TIMING.damageHold,
+          finalDelay + RESOLUTION_TIMING.finalSettle,
         )
         return
       }
 
+      setState(visualState)
       const detail =
         action.kind === 'retreat'
           ? 'The opposing collector rotates their front line.'
@@ -1688,12 +1904,25 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     setIsActionBusy(true)
     if (meta.kind === 'claim') setClaimError(null)
     primeActionResolution(previousState, meta)
+    if (previousState && meta.kind === 'attack') {
+      const optimisticState = cloneTcgBattleState(previousState)
+      const attacker = findSideCard(previousState.player, meta.attackerId)
+      const attack = attacker?.attacks[meta.attackIndex]
+      if (attack) {
+        optimisticState.player.energy = Math.max(
+          0,
+          optimisticState.player.energy - getAttackCost(attack, previousState),
+        )
+        setState(optimisticState)
+      }
+    }
     startTransition(async () => {
       try {
         const response = await action()
         if (!response.success) {
           setIsActionBusy(false)
           setResolution(null)
+          if (previousState) setState(previousState)
           const errorMessage =
             response.error || 'Unable to complete the TCG battle action.'
           if (meta.kind === 'claim') setClaimError(errorMessage)
@@ -1703,6 +1932,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         if (meta.kind === 'claim' && !response.completion) {
           setIsActionBusy(false)
           setResolution(null)
+          if (previousState) setState(previousState)
           setClaimError(
             'The battle finished, but its rewards could not be loaded.',
           )
@@ -1723,6 +1953,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       } catch (error) {
         setIsActionBusy(false)
         setResolution(null)
+        if (previousState) setState(previousState)
         const errorMessage =
           error instanceof Error
             ? error.message

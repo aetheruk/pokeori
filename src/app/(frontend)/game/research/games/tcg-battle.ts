@@ -663,6 +663,7 @@ function applyAttackDamageToCard(
       results: [result],
       heads: result === 'heads' ? 1 : 0,
       tails: result === 'tails' ? 1 : 0,
+      purpose: 'endure',
     })
     if (result === 'heads') {
       target.currentHp = 10
@@ -1861,6 +1862,14 @@ function applyAttack(
     ...state.lastOpponentAttackKnockout,
     [defendingSide]: { turnNumber: defendingSideTurnNumber, knockedOut: false, knockedOutNames: [] },
   }
+  state.lastAction = {
+    id: randomUUID(),
+    side: sideKey,
+    kind: 'attack',
+    attackerId: attacker.instanceId,
+    attackIndex,
+    targetId: target.instanceId,
+  }
 
   const statusCheck = resolveTcgBattleStatusAttackCheck(
     attacker,
@@ -1874,6 +1883,7 @@ function applyAttack(
       results: statusCheck.coinFlips.results,
       heads: statusCheck.coinFlips.heads,
       tails: statusCheck.coinFlips.tails,
+      purpose: 'status-check',
     })
   }
   if (statusCheck.clearedStatus) {
@@ -1916,6 +1926,7 @@ function applyAttack(
       results: [result],
       heads: result === 'heads' ? 1 : 0,
       tails: result === 'tails' ? 1 : 0,
+      purpose: 'attack-failure',
     })
     if (result === 'tails') {
       state.consecutivePasses = 0
@@ -1991,6 +2002,7 @@ function applyAttack(
       results: resolution.coinFlips.results,
       heads: resolution.coinFlips.heads,
       tails: resolution.coinFlips.tails,
+      purpose: 'attack',
     })
   }
   const opponentSideKey = sideKey === 'player' ? 'opponent' : 'player'
@@ -2104,6 +2116,7 @@ function applyAttack(
         results: [result],
         heads: result === 'heads' ? 1 : 0,
         tails: result === 'tails' ? 1 : 0,
+        purpose: 'effect',
       })
       reflectDamage = typeof targetReflectDamage.coinGate === 'string'
         ? result === targetReflectDamage.coinGate
