@@ -33,6 +33,7 @@ const PACK_SIZE_OVERRIDES: Record<string, number> = {
   "mcd19": 1,
   "mcd21": 1,
   "mcd22": 1,
+  "tcgp_p_a": 1,
   "tk1a": 1,
   "tk1b": 1,
   "tk2a": 1,

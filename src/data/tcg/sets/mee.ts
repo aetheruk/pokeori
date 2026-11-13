@@ -1,0 +1,322 @@
+import type { TcgSet } from '../types'
+
+const setData: TcgSet = {
+  "id": "mee",
+  "name": "Mega Evolution Energy",
+  "series": "Mega Evolution",
+  "total": 16,
+  "printedTotal": 16,
+  "releaseDate": "2025-09-25",
+  "images": {
+    "symbol": "",
+    "logo": ""
+  },
+  "cards": [
+    {
+      "id": "mee-1",
+      "name": "Grass Energy",
+      "number": "1",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/001/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/001/high.webp"
+      }
+    },
+    {
+      "id": "mee-2",
+      "name": "Fire Energy",
+      "number": "2",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/002/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/002/high.webp"
+      }
+    },
+    {
+      "id": "mee-3",
+      "name": "Water Energy",
+      "number": "3",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/003/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/003/high.webp"
+      }
+    },
+    {
+      "id": "mee-4",
+      "name": "Lightning Energy",
+      "number": "4",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/004/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/004/high.webp"
+      }
+    },
+    {
+      "id": "mee-5",
+      "name": "Psychic Energy",
+      "number": "5",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/005/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/005/high.webp"
+      }
+    },
+    {
+      "id": "mee-6",
+      "name": "Fighting Energy",
+      "number": "6",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/006/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/006/high.webp"
+      }
+    },
+    {
+      "id": "mee-7",
+      "name": "Darkness Energy",
+      "number": "7",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/007/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/007/high.webp"
+      }
+    },
+    {
+      "id": "mee-8",
+      "name": "Metal Energy",
+      "number": "8",
+      "artist": null,
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/008/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/008/high.webp"
+      }
+    },
+    {
+      "id": "mee-9",
+      "name": "Basic Grass Energy",
+      "number": "9",
+      "artist": "YOSHIROTTEN",
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/009/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/009/high.webp"
+      }
+    },
+    {
+      "id": "mee-10",
+      "name": "Basic Fire Energy",
+      "number": "10",
+      "artist": "YOSHIROTTEN",
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/010/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/010/high.webp"
+      }
+    },
+    {
+      "id": "mee-11",
+      "name": "Basic Water Energy",
+      "number": "11",
+      "artist": "YOSHIROTTEN",
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/011/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/011/high.webp"
+      }
+    },
+    {
+      "id": "mee-12",
+      "name": "Basic Lightning Energy",
+      "number": "12",
+      "artist": "YOSHIROTTEN",
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/012/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/012/high.webp"
+      }
+    },
+    {
+      "id": "mee-13",
+      "name": "Basic Psychic Energy",
+      "number": "13",
+      "artist": "YOSHIROTTEN",
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/013/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/013/high.webp"
+      }
+    },
+    {
+      "id": "mee-14",
+      "name": "Basic Fighting Energy",
+      "number": "14",
+      "artist": "YOSHIROTTEN",
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/014/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/014/high.webp"
+      }
+    },
+    {
+      "id": "mee-15",
+      "name": "Basic Darkness Energy",
+      "number": "15",
+      "artist": "YOSHIROTTEN",
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/015/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/015/high.webp"
+      }
+    },
+    {
+      "id": "mee-16",
+      "name": "Basic Metal Energy",
+      "number": "16",
+      "artist": "YOSHIROTTEN",
+      "rarity": "Common",
+      "supertype": "Energy",
+      "subtypes": [],
+      "hp": null,
+      "types": [],
+      "evolvesFrom": null,
+      "evolvesTo": [],
+      "convertedRetreatCost": null,
+      "nationalPokedexNumbers": [],
+      "images": {
+        "small": "https://assets.tcgdex.net/en/me/mee/016/low.webp",
+        "large": "https://assets.tcgdex.net/en/me/mee/016/high.webp"
+      }
+    }
+  ]
+}
+
+export default setData

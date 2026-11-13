@@ -1,5 +1,7 @@
 # Current Game State
 
+Unreleased: The TCG catalog imports English sets from every TCGdex series when card records are available, preserving existing Pokeori set IDs through aliases and sanitizing IDs for new sets. New source entries without English names or card records are omitted, so cardless API entries such as Jumbo cards, W Promotional, Sample, and Radiant Collection do not appear as empty shelves. The 15 English Pokémon TCG Pocket sets remain grouped under a separate series with `tcgp_` IDs and Pocket rarity mappings. Pocket-specific booster odds, booster variants, pack crafting/rewards, and battle rules are not implemented.
+
 Unreleased: Eggs from the Day Care Couple TCG battle now retain the TCG background, and both normal and shiny eggs from the Viridian Pokemon Center Wheel retain the Chansey background and Viridian City origin.
 
 Unreleased: TCG battle action playback deducts attack Energy as soon as the player chooses an attack, restores it if the server rejects the action or a status/failure flip prevents it, and displays status-check and attack flips sequentially. Statuses applied by an attack now appear shortly after its damage resolves; a successful sleep/paralysis/confusion check clears the displayed condition as soon as that check is shown. PVE and PVP opponent attacks also animate their individual flips, Energy cost, and status changes before the authoritative board is committed.
