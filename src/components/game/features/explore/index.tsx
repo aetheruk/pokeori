@@ -78,6 +78,8 @@ import {
   type RegionData,
 } from '@/data/sub-region-map'
 
+const mapPinIcon: TaskIcon = { type: 'lucide', id: 'MapPin' }
+
 const ExploreDetailsModal = lazy(() =>
   import('./ExploreDetailsModal').then((module) => ({
     default: module.ExploreDetailsModal,
@@ -88,19 +90,30 @@ const ExploreDetailsModal = lazy(() =>
 const getRegionData = (
   activeCategory: string,
   activeSubCategory: string,
-  regionCategories: any,
+  regionCategories: Record<string, RegionData>,
 ) => {
   const currentRegionData = activeCategory
-    ? regionCategories[activeCategory as keyof typeof regionCategories]
+    ? regionCategories[activeCategory]
     : null
   const currentSubCategoryData = activeSubCategory
-    ? (subCategoryDataMap as any)[activeSubCategory]
+    ? subCategoryDataMap[activeSubCategory]
     : null
+  const regionIcon =
+    currentRegionData?.icon ||
+    Object.values(subCategoryDataMap)
+      .filter((location) => location.region === activeCategory && location.icon)
+      .sort(
+        (a, b) =>
+          (a.order ?? Number.MAX_SAFE_INTEGER) -
+          (b.order ?? Number.MAX_SAFE_INTEGER),
+      )[0]?.icon || mapPinIcon
 
   return {
     currentImage: currentSubCategoryData?.image || currentRegionData?.image,
     currentTitle: activeSubCategory || activeCategory,
     currentMusic: currentSubCategoryData?.music,
+    currentRegionIcon: regionIcon,
+    currentLocationIcon: currentSubCategoryData?.icon || mapPinIcon,
   }
 }
 
@@ -206,13 +219,20 @@ function ExploreListContent({
   const actions = useExploreActions(userData, refreshUser)
 
   // 5. Derived UI Data
+  const isDailies = activeCategory === 'Dailies'
+  const areaSelectorLocation = isDailies
+    ? getFallbackLocation(previousCategory, previousSubCategory)
+    : { category: activeCategory, subCategory: activeSubCategory }
   const regionData = getRegionData(
     displayCategory,
     displaySubCategory,
     regionCategories,
   )
-
-  const isDailies = activeCategory === 'Dailies'
+  const returnLocationData = getRegionData(
+    areaSelectorLocation.category,
+    areaSelectorLocation.subCategory,
+    regionCategories,
+  )
 
   const currentImage = isDailies
     ? '/backgrounds/chansey.avif'
@@ -341,9 +361,6 @@ function ExploreListContent({
   const isSelectionTaskModalOpen =
     actions.isSelectionModalOpen && !!selectionTaskItemForModal
 
-  const areaSelectorLocation = isDailies
-    ? getFallbackLocation(previousCategory, previousSubCategory)
-    : { category: activeCategory, subCategory: activeSubCategory }
   const areaSelectorSubCategories = isDailies
     ? getSubCategoriesFor(areaSelectorLocation.category)
     : subCategories
@@ -558,6 +575,9 @@ function ExploreListContent({
           returnLocationName={
             areaSelectorLocation.subCategory || areaSelectorLocation.category
           }
+          regionIcon={regionData.currentRegionIcon}
+          locationIcon={regionData.currentLocationIcon}
+          returnLocationIcon={returnLocationData.currentLocationIcon}
           onOpenRegionModal={() => setRegionModalOpen(true)}
           onOpenAreaModal={() => setAreaModalOpen(true)}
           onOpenDailies={openDailyChallenges}

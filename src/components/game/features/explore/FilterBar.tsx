@@ -1,20 +1,19 @@
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
-
-const explorerIcon = {
-  type: 'local' as const,
-  id: '/fallback/skills/explorer-v2.png',
-}
+import type { TaskIcon } from '@/data/tasks/types'
 
 const dailyIcon = {
-  type: 'pokemon' as const,
-  id: '122',
+  type: 'item' as const,
+  id: 'timer-ball',
 }
 
 interface FilterBarProps {
   activeCategory: string
   activeSubCategory?: string
   returnLocationName: string
+  regionIcon: TaskIcon
+  locationIcon: TaskIcon
+  returnLocationIcon: TaskIcon
   onOpenRegionModal: () => void
   onOpenAreaModal: () => void
   onOpenDailies: () => void
@@ -25,6 +24,9 @@ export function FilterBar({
   activeCategory,
   activeSubCategory,
   returnLocationName,
+  regionIcon,
+  locationIcon,
+  returnLocationIcon,
   onOpenRegionModal,
   onOpenAreaModal,
   onOpenDailies,
@@ -43,7 +45,7 @@ export function FilterBar({
           aria-label={`Return to ${returnLocationName} Explore`}
           className="game-focus-ring flex h-12 w-full items-center justify-center gap-2 rounded-md border border-game-border bg-game-surface px-3 text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40"
         >
-          <TaskIconDisplay icon={dailyIcon} className="h-8 w-8 shrink-0" />
+          <TaskIconDisplay icon={returnLocationIcon} className="h-8 w-8 shrink-0" />
           <span className="truncate">{returnLocationName}</span>
         </button>
       ) : (
@@ -55,7 +57,7 @@ export function FilterBar({
             className="game-focus-ring flex h-12 min-w-0 items-center rounded-md border border-game-border bg-game-surface px-3 text-left text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40"
           >
             <TaskIconDisplay
-              icon={explorerIcon}
+              icon={regionIcon}
               normalizeVisibleBounds
               className="mr-2 h-7 w-7 shrink-0"
             />
@@ -68,7 +70,7 @@ export function FilterBar({
             className="game-focus-ring flex h-12 min-w-0 items-center rounded-md border border-game-border bg-game-surface px-3 text-left text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40"
           >
             <TaskIconDisplay
-              icon={explorerIcon}
+              icon={locationIcon}
               normalizeVisibleBounds
               className="mr-2 h-7 w-7 shrink-0"
             />

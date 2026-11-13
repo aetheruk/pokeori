@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import Image from 'next/image'
+import { ItemSprite } from '@/components/ui/item-sprite'
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 
 interface DailyRefreshModalProps {
   open: boolean
@@ -24,8 +23,8 @@ export function DailyRefreshModal({ open, onOpenChange, onLetsGo }: DailyRefresh
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="daily-challenges-modal border-game-border bg-white text-game-ink sm:max-w-sm">
         <DialogHeader className="flex flex-col items-center justify-center gap-4 space-y-0 pt-3 pr-0 text-center">
-          <Image
-            src={getPokemonImageUrl('122', 'sprite')}
+          <ItemSprite
+            itemId="timer-ball"
             alt=""
             width={64}
             height={64}
