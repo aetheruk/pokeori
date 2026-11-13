@@ -14,11 +14,7 @@ import {
   imageCacheKey,
 } from '@/utilities/image-cache'
 
-export function TrainerSettings({
-  deferImageChecks = true,
-}: {
-  deferImageChecks?: boolean
-}) {
+export function TrainerSettings() {
   const { isAudioEnabled, toggleAudioEnabled } = useAudio()
   const router = useRouter()
   const [images, setImages] = useState<DownloadImage[]>([])
@@ -29,30 +25,9 @@ export function TrainerSettings({
   const [supported, setSupported] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [shouldCheckImages, setShouldCheckImages] = useState(false)
-  const settingsRef = useRef<HTMLElement | null>(null)
   const download = useRef<AbortController | null>(null)
 
   useEffect(() => () => download.current?.abort(), [])
-
-  useEffect(() => {
-    if (!deferImageChecks) {
-      setShouldCheckImages(true)
-      return
-    }
-    const element = settingsRef.current
-    if (!element || shouldCheckImages) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setShouldCheckImages(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: '1000px' },
-    )
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [deferImageChecks, shouldCheckImages])
 
   useEffect(() => {
     if (!shouldCheckImages) return
@@ -177,7 +152,7 @@ export function TrainerSettings({
   }
 
   return (
-    <section ref={settingsRef} aria-label="Settings" className="space-y-4 text-game-ink">
+    <section aria-label="Settings" className="space-y-4 text-game-ink">
       <SectionDivider>
         <h2>Settings</h2>
       </SectionDivider>
@@ -204,7 +179,18 @@ export function TrainerSettings({
             Image downloads
           </h3>
           {!shouldCheckImages ? (
-            <p className="text-sm">Image storage will be checked when you reach this section.</p>
+            <div className="space-y-2">
+              <p className="text-sm">
+                Check how many game images are saved on this device.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setShouldCheckImages(true)}
+                className="min-h-11"
+              >
+                Check saved images
+              </Button>
+            </div>
           ) : !supported && !loading ? (
             <p className="text-sm">
               Image downloads are unavailable in this browser.

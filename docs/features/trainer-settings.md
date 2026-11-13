@@ -12,4 +12,4 @@ The small `/sw.js` script loads and caches the manifest once per release. `pokeo
 
 Activation migrates matching bytes from older `pokeori-sprites-*` caches and removes outdated image revisions and manifests. Ordinary code-only deploys retain all image bytes. Changed/new images load on use or through Resume download; they are not silently bulk-downloaded. The app-version endpoint and activity-safe PWA reload behavior remain independent of image storage.
 
-This is a loading-speed feature, not offline gameplay. Browser eviction, private-mode restrictions, and user-cleared site data can remove assets. Settings measures actual cache keys when the Trainer page mounts rather than trusting a saved completion flag.
+This is a loading-speed feature, not offline gameplay. Browser eviction, private-mode restrictions, and user-cleared site data can remove assets. Settings measures actual cache keys when the player selects “Check saved images,” rather than trusting a saved completion flag. The check fetches the full image manifest and enumerates the browser cache; it does not run just because the Trainer page opens or the player scrolls through Settings.
