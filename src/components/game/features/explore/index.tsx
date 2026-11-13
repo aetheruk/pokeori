@@ -1,6 +1,14 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+  Suspense,
+  lazy,
+} from 'react'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { useUser } from '@/context/UserContext'
 import { useAudio } from '@/context/AudioContext'
@@ -48,11 +56,7 @@ import { PvpQueueModal } from '@/app/(frontend)/game/battles/pvp/pvp-queue-modal
 import { TcgPvpModal } from '@/app/(frontend)/game/research/games/tcg-pvp-modal'
 import { DailyRefreshModal } from '@/components/game/modals/DailyRefreshModal'
 import { RivalSelectionDialog } from '@/components/game/rivals/rival-selection-dialog'
-import {
-  clearExpeditionReturn,
-  getExpeditionReturn,
-  markExpeditionReturn,
-} from './expedition-return'
+import { getExpeditionReturn } from './expedition-return'
 
 import {
   AlertDialog,
@@ -156,8 +160,7 @@ function ExploreListContent({
   const [goldenFlash, setGoldenFlash] = useState(false)
   const [eggRevealed, setEggRevealed] = useState(false)
   const goldenTapRef = useRef(0)
-  const [hasSyncedExpeditionReturn, setHasSyncedExpeditionReturn] =
-    useState(false)
+  const hasHandledExpeditionReturnRef = useRef(false)
 
   useEffect(() => {
     refreshDailyTasks()
@@ -297,54 +300,14 @@ function ExploreListContent({
       ? 'EXPEDITION STEP'
       : 'TASK'
 
-  useEffect(() => {
-    if (!getExpeditionReturn()) {
-      setHasSyncedExpeditionReturn(true)
-      return
-    }
-
-    let cancelled = false
-    setHasSyncedExpeditionReturn(false)
-
-    refreshUser()
-      .then(() => {
-        if (!cancelled) setHasSyncedExpeditionReturn(true)
-      })
-      .catch((error) => {
-        console.error('Failed to refresh expedition return state', error)
-        clearExpeditionReturn()
-        if (!cancelled) setHasSyncedExpeditionReturn(true)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [refreshUser])
-
-  useEffect(() => {
-    if (!hasSyncedExpeditionReturn) return
-
+  useLayoutEffect(() => {
+    if (hasHandledExpeditionReturnRef.current) return
     const returnExpeditionId = getExpeditionReturn()
-    if (!returnExpeditionId || actions.selectedItem) return
+    if (!returnExpeditionId) return
 
-    const expeditionItem = allUnlockedItems.find(
-      (item) => item.type === 'expedition' && item.id === returnExpeditionId,
-    )
-    const expeditionDefinition = expeditions.find(
-      (entry) => entry.id === returnExpeditionId,
-    )
-
-    clearExpeditionReturn()
-    if (expeditionItem) {
-      actions.setSelectedItem(expeditionItem)
-    } else if (expeditionDefinition) {
-      actions.setSelectedItem({
-        ...expeditionDefinition,
-        type: 'expedition',
-        originalData: expeditionDefinition,
-      } as any)
-    }
-  }, [activeExpedition, actions, allUnlockedItems, hasSyncedExpeditionReturn])
+    hasHandledExpeditionReturnRef.current = true
+    void actions.reopenExpeditionPanel(returnExpeditionId)
+  }, [actions.reopenExpeditionPanel])
 
   const trainerName = extendedUser.trainerName || 'Trainer'
   const selectionTaskItemForModal = actions.selectedTaskForCompletion

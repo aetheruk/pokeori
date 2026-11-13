@@ -1,5 +1,7 @@
 # Current Game State
 
+Unreleased: Returning from an expedition or Chronicle activity now opens its Explore panel immediately. Explore refreshes the run in the background and keeps the expedition action busy until the latest progress is available, avoiding a brief empty Explore view before the expedition reappears.
+
 Unreleased: The TCG catalog imports English sets from every TCGdex series when card records are available, preserving existing Pokeori set IDs through aliases and sanitizing IDs for new sets. New source entries without English names or card records are omitted, so cardless API entries such as Jumbo cards, W Promotional, Sample, and Radiant Collection do not appear as empty shelves. The 15 English Pokémon TCG Pocket sets remain grouped under a separate series with `tcgp_` IDs and Pocket rarity mappings. Pocket-specific booster odds, booster variants, pack crafting/rewards, and battle rules are not implemented.
 
 Unreleased: Eggs from the Day Care Couple TCG battle now retain the TCG background, and both normal and shiny eggs from the Viridian Pokemon Center Wheel retain the Chansey background and Viridian City origin.
