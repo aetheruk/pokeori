@@ -2,14 +2,13 @@
 
 # Bun is the package manager, build runtime, and production runtime. Keep the
 # image on the same stable patch used by packageManager in package.json.
-FROM mirror.gcr.io/oven/bun:1.4.4-alpine AS base
+FROM mirror.gcr.io/oven/bun:1.4.4-alpine@sha256:4cf82f5686b196504fe119db3fcd9185b191f82ece82c40680e597228ec6070a AS base
 WORKDIR /app
 
 # Keep the package-manager, build, and runtime image on one exact Bun release.
 RUN test "$(bun --version)" = "1.4.4"
 
-# Refresh OS security packages when advancing this base stage. The 1.4.2 image
-# shipped OpenSSL 3.5.7; Alpine 3.5.8 fixes CVE-2026-14456.
+# Apply current Alpine security updates while keeping the Bun base image pinned.
 RUN apk upgrade --no-cache && apk add --no-cache libc6-compat
 
 # Copy lockfiles before application source so dependency installation is reused
@@ -20,6 +19,16 @@ COPY package.json bun.lock ./
 COPY patches ./patches
 RUN --mount=type=cache,id=pokeori-bun-cache,target=/root/.bun/install/cache,sharing=locked \
     NODE_ENV=development bun install --frozen-lockfile
+
+# Generate the image revision list outside the compiler stage. Artwork changes
+# rebuild this small asset stage without rerunning the Next.js compiler.
+FROM base AS assets
+WORKDIR /app
+COPY public ./public
+COPY scripts/generate-game-image-manifest.ts ./scripts/generate-game-image-manifest.ts
+COPY src/utilities/image-manifest.ts ./src/utilities/image-manifest.ts
+COPY src/utilities/public-assets.ts ./src/utilities/public-assets.ts
+RUN bun scripts/generate-game-image-manifest.ts public
 
 FROM base AS builder
 
@@ -52,11 +61,13 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV POKEORI_PUBLIC_DIR=/app/public
 
 RUN addgroup -S pokeori && \
     adduser -S pokeori -u 1001 -G pokeori
 
 COPY --chown=pokeori:pokeori public ./public
+COPY --from=assets --chown=pokeori:pokeori /app/public/game-image-manifest.json ./public/game-image-manifest.json
 
 COPY --from=builder --chown=pokeori:pokeori /app/.next/standalone ./
 COPY --from=builder --chown=pokeori:pokeori /app/.next/static ./.next/static

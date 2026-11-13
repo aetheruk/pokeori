@@ -9,15 +9,9 @@ import {
   CarouselItem,
 } from '@/components/ui/carousel'
 import { ItemSprite } from '@/components/ui/item-sprite'
-import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
-import { items } from '@/data/items'
+import { badgeItems } from '@/data/items/entries/badges'
 import { cn } from '@/lib/utils'
-
-interface BadgeGroup {
-  region: string
-  badges: typeof items
-}
 
 const REGION_ORDER = [
   'kanto',
@@ -67,10 +61,10 @@ export function BadgeShowcase() {
 
   const badgeGroups = useMemo(() => {
     // Get ALL badges from items
-    const allBadges = items.filter((item) => item.category === 'badge')
+    const allBadges = badgeItems
 
     // Group by region
-    const groups: Record<string, typeof items> = {}
+    const groups: Record<string, typeof badgeItems> = {}
 
     allBadges.forEach((badge) => {
       const parts = badge.id.split('-')
@@ -85,10 +79,8 @@ export function BadgeShowcase() {
       .map(([region, badges]) => ({
         region,
         badges: badges.sort((a, b) => {
-          return (
-            items.findIndex((i) => i.id === a.id) -
-            items.findIndex((i) => i.id === b.id)
-          )
+          return badgeItems.findIndex((item) => item.id === a.id) -
+            badgeItems.findIndex((item) => item.id === b.id)
         }),
       }))
       .filter((group) => (inventory[`${group.region}-badge-case`] || 0) > 0)

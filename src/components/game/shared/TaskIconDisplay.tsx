@@ -25,7 +25,7 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { TaskIcon } from '@/data/tasks/types'
 import { getTrainerSpriteUrl } from '@/data/trainers'
 import { cn } from '@/lib/utils'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { getBundledPokemonSpriteUrl } from '@/utilities/pokemon/local-sprites'
 import { getVisibleBoundsImageStyle } from '@/utilities/visible-image-bounds'
 
 const LUCIDE_ICONS: Record<string, any> = {
@@ -110,7 +110,11 @@ export function TaskIconDisplay({
         style={visiblePixelOutlineStyle}
       >
         <Image
-          src={getPokemonImageUrl(icon.id, 'sprite')}
+          src={getBundledPokemonSpriteUrl({
+            formId: icon.id,
+            family: 'gen-v',
+            direction: 'front',
+          })}
           alt="Icon"
           width={48}
           height={48}

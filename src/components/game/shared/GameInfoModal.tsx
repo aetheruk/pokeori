@@ -155,56 +155,10 @@ export function GameInfoModal({
   const isResultLayout = resultLayout && !isDrawer
   const hasProperties = Boolean(properties && properties.length > 0)
   const hasStats = Boolean(stats && stats.length > 0)
-  const Header = ({
-    className,
-    children,
-  }: {
-    className?: string
-    children: ReactNode
-  }) =>
-    isDrawer ? (
-      <div className={className}>{children}</div>
-    ) : (
-      <DialogHeader className={className}>{children}</DialogHeader>
-    )
-  const Title = ({
-    className,
-    children,
-  }: {
-    className?: string
-    children: ReactNode
-  }) =>
-    isDrawer ? (
-      <h2 className={className}>{children}</h2>
-    ) : (
-      <DialogTitle className={className}>{children}</DialogTitle>
-    )
-  const Close = ({
-    className,
-    children,
-  }: {
-    className?: string
-    children: ReactNode
-  }) =>
-    isDrawer ? (
-      <button
-        type="button"
-        aria-label="Close"
-        title="Close"
-        onClick={() => onOpenChange(false)}
-        className={className}
-      >
-        {children}
-      </button>
-    ) : (
-      <DialogClose aria-label="Close" title="Close" className={className}>
-        {children}
-      </DialogClose>
-    )
   const content = (
     <>
       {!isDrawer && (
-        <Header className="p-0 space-y-0 shrink-0">
+        <DialogHeader className="p-0 space-y-0 shrink-0">
           <div
             className={cn(
               'relative w-full overflow-hidden border-b border-game-border bg-game-surface',
@@ -243,7 +197,9 @@ export function GameInfoModal({
             )}
 
             {/* Close Button */}
-            <Close
+            <DialogClose
+              aria-label="Close"
+              title="Close"
               className={cn(
                 'game-focus-ring absolute right-7 top-[max(1.75rem,env(safe-area-inset-top))] z-50 flex size-10 items-center justify-center rounded-md border transition-colors',
                 isResultLayout
@@ -252,7 +208,7 @@ export function GameInfoModal({
               )}
             >
               <X className="h-4 w-4" aria-hidden="true" />
-            </Close>
+            </DialogClose>
 
             {/* Header Content */}
             <div
@@ -284,22 +240,22 @@ export function GameInfoModal({
                 )}
               </div>
               {isResultLayout && (
-                <Title className="max-w-2xl font-display text-3xl font-semibold leading-tight !text-white md:text-4xl">
+                <DialogTitle className="max-w-2xl font-display text-3xl font-semibold leading-tight !text-white md:text-4xl">
                   {title}
-                </Title>
+                </DialogTitle>
               )}
             </div>
           </div>
-        </Header>
+        </DialogHeader>
       )}
 
       <div className="custom-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-game-canvas p-5 md:p-6">
         <div className="mx-auto max-w-3xl space-y-7 pb-8">
           {!isResultLayout && !isDrawer && (
             <div className="text-center">
-              <Title className="font-display text-2xl font-semibold text-game-ink md:text-3xl">
+              <DialogTitle className="font-display text-2xl font-semibold text-game-ink md:text-3xl">
                 {title}
-              </Title>
+              </DialogTitle>
             </div>
           )}
           {description &&

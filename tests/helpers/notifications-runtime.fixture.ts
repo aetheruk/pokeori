@@ -35,11 +35,11 @@ mock.module('@/utilities/user-state', () => ({ getUserCompletedTasksMap: async (
 mock.module('@/data/voyages', () => ({ getVoyage: (id: string) => ({ id, name: id, icon: { type: 'local', id: 'voyage.png' } }) }))
 mock.module('@/data/items', () => ({ getItemSpriteUrl: () => '/journal.png' }))
 mock.module('@/utilities/pokemon/local-sprites', () => ({ getBundledPokemonSpriteUrl: () => '/pokemon.png' }))
-mock.module('web-push', () => ({ default: { sendNotification: async (subscription: any, body: string, options: any) => {
+mock.module('web-push', () => ({ sendNotification: async (subscription: any, body: string, options: any) => {
   const message = JSON.parse(body)
   if (sendFailure && (!failTag || message.tag.startsWith(failTag))) throw { statusCode: sendFailure }
   messages.push({ subscription, message, options })
-} } }))
+} }))
 const { getNotificationSettings, saveNotificationSettings, resetDeviceNotifications, sendTestNotification } = await import('@/utilities/notifications/actions')
 const { dispatchNotifications } = await import('@/utilities/notifications/worker')
 

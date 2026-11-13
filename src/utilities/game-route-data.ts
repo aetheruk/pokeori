@@ -1,8 +1,7 @@
 import { getPayload, type Payload } from 'payload'
 import type { User } from '@/payload-types'
-import configPromise from '@payload-config'
-import { headers } from 'next/headers'
 import { getGameUserData } from '@/utilities/game-data'
+import { getGameRequestContext } from '@/utilities/game-request-context'
 import {
   GAME_DATA_SCOPE_KEYS,
   getPokemonPayloadForScope,
@@ -46,9 +45,7 @@ export async function getGameRouteData(
   scope: GameDataScope,
   requestHeaders?: Headers,
 ) {
-  const resolvedHeaders = requestHeaders || (await headers())
-  const payload = await getPayload({ config: configPromise })
-  const { user } = await payload.auth({ headers: resolvedHeaders })
+  const { payload, user } = await getGameRequestContext(requestHeaders)
 
   if (!user) return null
 

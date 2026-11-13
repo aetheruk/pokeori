@@ -10,16 +10,12 @@ import {
 import {
   getUserStateData,
   toSlimUser,
-  USER_STATE_COLLECTIONS,
 } from '@/utilities/user-state'
-import {
-  deriveStoryStateFromTasks,
-  SAFFRON_ESCAPE_COMPLETE_TASK_ID,
-  SAFFRON_GYM_AMBUSH_TASK_ID,
-} from '@/utilities/story-state'
+import { deriveStoryStateFromTasks } from '@/utilities/story-state'
 import { ensureUserWeatherSlot } from '@/utilities/weather'
 import { normalizeKidModeExpeditionSteps } from '@/utilities/expeditions/path-builder'
 import { loadExplorePokemonReadModel } from '@/utilities/pokemon/explore-read-model'
+import { getStoryTaskRowsForUser } from '@/utilities/game-request-context'
 
 interface ActiveExpeditionData {
   id: string
@@ -108,31 +104,7 @@ export async function getGameUserData(
 
   const loadStoryTasks = async () => {
     if (shouldFetch('completedTasks')) return []
-    const storyTaskRows =
-      (
-        (await payload.find({
-          collection: USER_STATE_COLLECTIONS.tasks,
-          where: {
-            and: [
-              { user: { equals: user.id } },
-              {
-                taskId: {
-                  in: [
-                    SAFFRON_GYM_AMBUSH_TASK_ID,
-                    SAFFRON_ESCAPE_COMPLETE_TASK_ID,
-                  ],
-                },
-              },
-            ],
-          },
-          pagination: false,
-          depth: 0,
-          overrideAccess: true,
-          select: { taskId: true },
-          ...requestOptions,
-        })) as unknown as { docs?: Array<{ taskId?: unknown }> }
-      ).docs || []
-    return storyTaskRows
+    return getStoryTaskRowsForUser(payload, user.id, options.req ? requestOptions : undefined)
   }
 
   const loadWeather = async () =>

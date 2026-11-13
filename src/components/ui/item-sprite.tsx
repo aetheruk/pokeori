@@ -11,7 +11,7 @@ import {
   getItemHueRotate,
   getItemSpriteFilter,
   getItemSpriteUrl,
-} from '@/data/items'
+} from '@/data/items/utils'
 import { getVisibleBoundsImageStyle } from '@/utilities/visible-image-bounds'
 
 interface ItemSpriteProps {

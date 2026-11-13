@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { getPayload, type Payload } from 'payload'
-import webpush from 'web-push'
+import { sendNotification } from 'web-push'
 import config from '@payload-config'
 import type { PushSubscription } from '@/payload-types'
 import { getVoyage } from '@/data/voyages'
@@ -45,7 +45,7 @@ async function processSubscription(payload: Payload, id: string) {
     let sent = (Array.isArray(record.sentVoyages) ? record.sentVoyages : []).filter((key): key is string => typeof key === 'string' && activeKeys.has(key))
     let cursor = record.dailyCursor
     const send = async (message: { title: string; body: string; icon: string; tag: string }) => {
-      await webpush.sendNotification(subscription, JSON.stringify({ ...message, url: '/game/explore' }), {
+      await sendNotification(subscription, JSON.stringify({ ...message, url: '/game/explore' }), {
         vapidDetails: settings, TTL: 3600, urgency: 'normal', timeout: 5000,
       })
     }
@@ -67,7 +67,7 @@ async function processSubscription(payload: Payload, id: string) {
       cursor = new Date(now).toISOString()
     }
     if (record.gameEvents) await (await import('@/utilities/events/notifications')).dispatchEventNotifications(payload, record, async (message, ttl) => {
-      await webpush.sendNotification(subscription, JSON.stringify(message), { vapidDetails: settings, TTL: ttl, urgency: 'normal', timeout: 5000 })
+      await sendNotification(subscription, JSON.stringify(message), { vapidDetails: settings, TTL: ttl, urgency: 'normal', timeout: 5000 })
     })
     await payload.update({ collection: 'push-subscriptions', id, data: { sentVoyages: sent, dailyCursor: cursor, nextCheckAt: new Date(now + 60_000).toISOString(), failures: 0 } })
   } catch (error) {
