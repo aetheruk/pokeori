@@ -96,8 +96,11 @@ published IP ranges.
 manually dispatched from `main`. It builds for `linux/amd64`, pushes the private GHCR image,
 and triggers Coolify only after the push succeeds. Each image is tagged
 `latest`, `v<package-version>`, and `sha-<12-character-commit>`. The workflow
-retains the three newest release image versions in GHCR. Coolify tracks
-`latest`; the retained version and commit tags identify rollback candidates.
+retains the three newest semver-tagged release image versions in GHCR. It
+preserves untagged platform and attestation manifests because the tagged OCI
+image index references them. Do not prune those untagged GHCR
+package versions. Coolify tracks `latest`; the retained version and commit
+tags identify rollback candidates.
 
 The existing `ghcr.io/aetheruk/pokeori` package is public and currently holds
 the old `v0.29.9` image. GitHub does not allow a published public personal

@@ -42,15 +42,14 @@ if (requiredTag && !releases.some(({ tag }) => tag === requiredTag)) {
 }
 
 const keepIds = new Set(releases.slice(0, keepCount).map(({ version }) => version.id))
-if (keepIds.size === 0) {
-  const bootstrap = versions.find((version) =>
-    version.metadata?.container?.tags?.includes('bootstrap'),
-  )
-  if (bootstrap) keepIds.add(bootstrap.id)
-}
 
 for (const version of versions) {
-  if (keepIds.has(version.id)) continue
+  const tags = version.metadata?.container?.tags ?? []
+  const isReleaseVersion = tags.some((tag) => releaseTag.test(tag))
+  // GHCR reports the image index and its untagged platform/attestation
+  // manifests as separate package versions. The release tag belongs to the
+  // index; deleting untagged entries breaks pulls of that index.
+  if (!isReleaseVersion || keepIds.has(version.id)) continue
   const result = Bun.spawnSync({
     cmd: [
       'gh',
@@ -67,4 +66,6 @@ for (const version of versions) {
   }
 }
 
-console.log(`Retained ${keepIds.size} GHCR release image version(s)`)
+console.log(
+  `Retained ${keepIds.size} GHCR release image version(s) and preserved untagged manifests`,
+)
