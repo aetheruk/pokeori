@@ -4,7 +4,7 @@ Use this checklist before deploying gameplay, schema, security, or generated-dat
 changes.
 
 ## Security
-- Run `bun run security:audit`. Payload packages must stay on matching versions (currently 3.90.2); Sharp is 0.35.5. Overrides keep fast-copy, shell-quote, and source-map-js on patched releases, while Sass 1.105.1 removes the unpatched braces dependency from the old watcher chain. The audit verifies the admin-only unlock policy for the known Payload advisory, checks the local `deepmerge@4.3.1` prototype-key patch, and checks the installed `graphql-scalars` version against its advisory before allowing the known safe package. It rejects other advisories.
+- Run `bun outdated` and `bun run security:audit` when updating dependencies. Keep Payload packages on matching versions (currently 3.93.0) and Sharp on 0.35.5. `typescript6` is intentionally pinned to TypeScript 6 for the content editor's TypeScript compiler API; the app uses the latest TypeScript separately. Overrides keep fast-copy, shell-quote, and source-map-js on patched releases, while Sass 1.105.1 removes the unpatched braces dependency from the old watcher chain. The audit verifies the admin-only unlock policy for the known Payload advisory, checks the local `deepmerge@4.3.1` prototype-key patch, and checks the installed `graphql-scalars` version against its advisory before allowing the known safe package. It rejects other advisories.
 - Rotate credentials known to have been exposed to unauthorized parties.
 - Confirm production has `DATABASE_URI`, `PAYLOAD_SECRET`, and `RESEND_API_KEY`.
 - Confirm GitHub Actions has `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` as a build secret and Coolify has the same stable value at runtime. Keep the unlinked `pokeori-production` GHCR package and its registry build cache private.
@@ -27,7 +27,7 @@ changes.
 - Run `bun run typecheck`.
 - Run `bun test`.
 - Run `bun run test:security:integration` and `bun run test:e2e` against the isolated services described in the testing guide.
-- GitHub Actions does not run or require validation jobs for release publication. Run the relevant commands above manually when validating a change.
+- The release workflow verifies the Bun pins, builds and publishes the image, and attaches a BuildKit SBOM and minimal provenance. Run the quality and security checks above manually before opening a release PR.
 - Run focused manual smoke tests for changed game modes.
 
 ## Gameplay

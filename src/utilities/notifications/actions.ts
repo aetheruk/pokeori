@@ -3,7 +3,7 @@
 import { createHash, ECDH } from 'node:crypto'
 import { headers } from 'next/headers'
 import { getPayload } from 'payload'
-import webpush from 'web-push'
+import { sendNotification } from 'web-push'
 import config from '@payload-config'
 import { acquireActionLock, checkActionRateLimit, releaseActionLock } from '@/utilities/game-integrity'
 import { getPushConfig } from './config'
@@ -111,7 +111,7 @@ export async function sendTestNotification(value: unknown) {
     const stored = pushSubscriptionSchema.parse(record.subscription)
     if (stored.keys.auth !== subscription.keys.auth || stored.keys.p256dh !== subscription.keys.p256dh) throw new Error('Please reset device notifications and enable them again.')
     try {
-      await webpush.sendNotification(stored, JSON.stringify({ title: 'Pokeori notifications are ready', body: 'This device can receive your enabled activity alerts.', icon: '/app-icon.avif', tag: 'pokeori-test', url: '/game' }), { vapidDetails: settings, TTL: 60, urgency: 'normal', timeout: 5000 })
+      await sendNotification(stored, JSON.stringify({ title: 'Pokeori notifications are ready', body: 'This device can receive your enabled activity alerts.', icon: '/app-icon.avif', tag: 'pokeori-test', url: '/game' }), { vapidDetails: settings, TTL: 60, urgency: 'normal', timeout: 5000 })
     } catch {
       throw new Error('The test could not be sent. Reset device notifications and enable them again, or try later.')
     }

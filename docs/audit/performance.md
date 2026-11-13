@@ -18,6 +18,12 @@ Use the [production performance runbook](../development/performance-runbook.md) 
 | Mongo Pokémon query, same account | 4 ms; 1,002 keys/documents examined | 2 ms; 1,002 keys/documents examined | Existing owner index already bounds the query to the account; these samples do not justify another index. |
 | Run initial observed JavaScript bodies | 4,544,014 bytes / 42 scripts | 2,656,088 bytes / 29 scripts | 41.55% fewer decoded body bytes after the client game-registry split in an isolated Linux production container. These are not compressed transfer bytes or a measured latency reduction. |
 
+## November 2026 implementation check
+
+The local optimized build completed Next compilation in 11.5 seconds on macOS. A cached `linux/amd64` Docker build compiled Next in 57 seconds, generated the 14,076-entry public-image manifest in 2.3 seconds in its independent asset stage, and produced an image with a reported virtual size of 336,206,353 bytes (320.6 MiB). These are diagnostic timings on different machines/cache states, not a controlled before/after comparison. No production p50/p95 or host peak-memory measurement was available. The local Docker Scout SBOM indexed 215 packages; its vulnerability scan was unavailable without Docker authentication.
+
+The November `/game` Turbopack analyzer showed 591,032 compressed bytes across its initial client-render chunk set. Importing item sprite helpers through the item-data barrel also pulled authored TM and item data into that set, while the Pokemon icon helper imported the full species dataset. Switching those presentation-only lookups to the compact sprite indexes and loading only badge entries reduced the same analyzer-defined initial chunk set to 305,665 compressed bytes (48.3% less; 3,333,012 to 1,671,972 uncompressed bytes). The shared game layout and route loader now also reuse Payload authentication and story-task reads within one server render. These are build-graph and query-deduplication changes, not a measured production time-to-interactive; an authenticated low-end mobile run is still needed to measure the user's reported 3–5 second delay.
+
 Sources: [query baseline](large-account-query-baseline.json), [query/read-model result](large-account-query-after.json), [production browser baseline](production-browser-baseline.json), and [production browser result](production-browser-final.json). Small-account Explore samples overlap (32–33 ms before, 29–42 ms after), so a small-account speedup is not established. The native Explore path is read-only, bypassed inside transactions, and falls back to Payload for read hooks or missing selected defaults. Projection tests cover origins, legacy rarity flags, team/companion selection, female sprites, and markings.
 
 The initial production browser sample used fresh 1280px Chromium contexts and an observation window ending 800 ms after hydration. Pokemon/inventory fixtures were empty, and Run was observed during its countdown. Separate final interaction tests then loaded 160 Pokemon: deferring closed inspector calculations removed all eight measured 412–562ms scrolling long tasks, with 1,562 DOM nodes retained. Keyboard focus return also passes. Navigation makes no automatic expensive-route prefetch, one Pokemon intent prefetch and zero sync requests on the measured route revisit. See [browser verification](production-browser-verification.md) for scope and fixture details.
@@ -50,3 +56,10 @@ The parsed local Docker stage observations below use different source/cache stat
 [Read-only production operations evidence](production-operations-2026-09-07.md)
 records the old release's 3m56s deployment, 70s compilation, live indexes and
 resource snapshot. It does not establish a before/after production improvement.
+## First-screen navigation request budget
+
+The global game navigation disables Next.js route prefetching for the six major
+sections. These links are present on every game page, so prefetching all of
+them can compete with the active route's data and image requests and add work
+to a small deployment server before the player navigates anywhere. Selecting a
+section still navigates normally; its route data and assets load on demand.

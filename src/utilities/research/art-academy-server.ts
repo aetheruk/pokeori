@@ -2,6 +2,7 @@ import path from 'node:path'
 import sharp from 'sharp'
 import type { ArtAcademySettings } from '@/data/games/art-academy'
 import { getBundledPokemonSpriteUrl } from '@/utilities/pokemon/local-sprites'
+import { getPublicAssetDirectory } from '@/utilities/public-assets'
 import {
   ART_ACADEMY_GUIDE_GRID_SIZE,
   ART_ACADEMY_SCORE_GRID_SIZE,
@@ -37,8 +38,9 @@ export async function createArtAcademyRound(
     formId: settings.formId,
     family: 'home',
   })
-  const imagePath = path.join(process.cwd(), 'public', spriteUrl)
-  const { data } = await sharp(imagePath)
+  const imagePath = path.join(getPublicAssetDirectory(), spriteUrl)
+  const image = Buffer.from(await Bun.file(imagePath).arrayBuffer())
+  const { data } = await sharp(image)
     .ensureAlpha()
     .resize(ART_ACADEMY_SCORE_GRID_SIZE, ART_ACADEMY_SCORE_GRID_SIZE, {
       fit: 'contain',
