@@ -48,7 +48,10 @@ export function TrainerSettings({
           observer.disconnect()
         }
       },
-      { rootMargin: '1000px' },
+      // Image-cache inspection parses the full manifest and enumerates the
+      // browser cache. Wait until Settings is actually visible so it cannot
+      // compete with the initial Trainer screen's hydration and image loads.
+      { rootMargin: '0px' },
     )
     observer.observe(element)
     return () => observer.disconnect()
