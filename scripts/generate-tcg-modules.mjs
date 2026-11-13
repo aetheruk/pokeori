@@ -89,6 +89,27 @@ function getEnglish(value) {
   return typeof value?.en === 'string' ? value.en : ''
 }
 
+function getPokeoriSetId(sourceSet) {
+  const sourceSetId = String(sourceSet?.id || '')
+  if (sourceSet?.serie?.id === 'tcgp') {
+    return `tcgp_${sanitizeIdentifier(sourceSetId).toLowerCase()}`
+  }
+  return TCGDEX_SET_ID_ALIASES[sourceSetId] || sanitizeIdentifier(sourceSetId).toLowerCase()
+}
+
+function getTcgdexSetImages(sourceSet) {
+  const seriesId = sourceSet?.serie?.id
+  if (!seriesId || !sourceSet?.id) return { symbol: '', logo: '' }
+  const setPath = `${encodeURIComponent(seriesId)}/${encodeURIComponent(sourceSet.id)}`
+  const logo = `https://assets.tcgdex.net/en/${setPath}/logo.webp`
+  return {
+    // Pocket sets provide logos but no symbol assets. Physical sets use their
+    // shared TCGdex symbol artwork for binder marks.
+    symbol: seriesId === 'tcgp' ? logo : `https://assets.tcgdex.net/univ/${setPath}/symbol.webp`,
+    logo,
+  }
+}
+
 function normalizeName(value) {
   return String(value || '')
     .normalize('NFKD')
@@ -159,7 +180,7 @@ async function loadExistingCatalog() {
   return { sets, detailsById, summariesById }
 }
 
-async function loadTcgdexSets(existingSetIds) {
+async function loadTcgdexSets() {
   if (!fs.existsSync(tcgdexDataDir)) {
     throw new Error('TCGdex source files are missing. Run `bun run fetch:tcg` first.')
   }
@@ -171,10 +192,13 @@ async function loadTcgdexSets(existingSetIds) {
       const filePath = path.join(groupDir, file)
       const module = await import(pathToFileURL(filePath).href)
       const sourceSet = module.default
-      if (!sourceSet?.id || !sourceSet?.name) continue
+      if (
+        !sourceSet?.id ||
+        !getEnglish(sourceSet.name) ||
+        !getEnglish(sourceSet.serie?.name)
+      ) continue
 
-      const setId = TCGDEX_SET_ID_ALIASES[sourceSet.id] || sourceSet.id
-      if (!existingSetIds.has(setId)) continue
+      const setId = getPokeoriSetId(sourceSet)
       if (sets.has(setId)) {
         throw new Error(`More than one TCGdex set maps to Pokeori set ${setId}.`)
       }
@@ -185,7 +209,7 @@ async function loadTcgdexSets(existingSetIds) {
         for (const cardFile of fs.readdirSync(cardDir).filter((entry) => entry.endsWith('.ts'))) {
           const cardPath = path.join(cardDir, cardFile)
           const cardModule = await import(pathToFileURL(cardPath).href)
-          if (!cardModule.default) continue
+          if (!cardModule.default || !getEnglish(cardModule.default.name)) continue
           cards.push({
             localId: path.basename(cardFile, '.ts'),
             card: cardModule.default,
@@ -398,7 +422,7 @@ function toLegacyCardDetail(sourceCard, sourceSet, localId, legacyCard, legacyDe
 
 async function buildCompatibleCatalog() {
   const existing = await loadExistingCatalog()
-  const tcgdexSets = await loadTcgdexSets(new Set(existing.sets.keys()))
+  const tcgdexSets = await loadTcgdexSets()
   const migratedSets = new Map()
   const migrationStats = {
     legacySets: existing.sets.size,
@@ -534,7 +558,63 @@ async function buildCompatibleCatalog() {
         releaseDate: legacySet.releaseDate,
         // Existing set symbols/logos have complete coverage; migrate card art
         // separately because TCGdex's set-symbol endpoint is currently unavailable.
-        images: existing.summariesById.get(setId)?.images || legacySet.images || { symbol: '', logo: '' },
+        images:
+          source?.sourceSet.serie?.id === 'tcgp'
+            ? getTcgdexSetImages(source.sourceSet)
+            : existing.summariesById.get(setId)?.images || legacySet.images || { symbol: '', logo: '' },
+      },
+      cards,
+      details,
+    })
+  }
+
+  for (const [setId, source] of tcgdexSets) {
+    // Some TCGdex records describe a set and card count but provide no card
+    // records. Keep those out of the player catalog until the cards are indexed.
+    if (existing.sets.has(setId) || source.cards.length === 0) continue
+
+    const cards = []
+    const details = []
+    const orderedSourceCards = [...source.cards].sort((left, right) =>
+      String(left.localId).localeCompare(String(right.localId), undefined, { numeric: true }),
+    )
+
+    for (const sourceEntry of orderedSourceCards) {
+      const localNumber = normalizeLocalId(sourceEntry.localId)
+      const legacyCard = {
+        id: `${setId}-${localNumber}`,
+        name: getEnglish(sourceEntry.card.name),
+        number: localNumber,
+        artist: null,
+        rarity: null,
+        supertype: '',
+        subtypes: [],
+        hp: null,
+        types: [],
+        evolvesFrom: null,
+        evolvesTo: [],
+        convertedRetreatCost: null,
+        nationalPokedexNumbers: [],
+        images: { small: '', large: '' },
+      }
+      const card = toLegacyCard(sourceEntry.card, source.sourceSet, sourceEntry.localId, legacyCard)
+      cards.push(card)
+      details.push(
+        toLegacyCardDetail(sourceEntry.card, source.sourceSet, sourceEntry.localId, card, null),
+      )
+      migrationStats.addedCards += 1
+    }
+
+    const officialTotal = Number(source.sourceSet.cardCount?.official) || null
+    migratedSets.set(setId, {
+      metadata: {
+        id: setId,
+        name: getEnglish(source.sourceSet.name) || setId,
+        series: getEnglish(source.sourceSet.serie?.name) || 'Pokémon TCG Pocket',
+        total: Math.max(Number(source.sourceSet.cardCount?.total) || 0, cards.length),
+        printedTotal: officialTotal,
+        releaseDate: source.sourceSet.releaseDate || null,
+        images: getTcgdexSetImages(source.sourceSet),
       },
       cards,
       details,
@@ -727,6 +807,9 @@ function writeBoosterPacksFile(setIds) {
     mcd19: 1,
     mcd21: 1,
     mcd22: 1,
+    // Pokémon TCG Pocket's Promos-A set contains individual cards, not a
+    // standard booster, so keep its generated pack item to one card.
+    tcgp_p_a: 1,
     // Trainer Kits
     tk1a: 1,
     tk1b: 1,

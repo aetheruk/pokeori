@@ -1,3 +1,5 @@
+import _2023sv from './sets/_2023sv'
+import _2024sv from './sets/_2024sv'
 import base1 from './sets/base1'
 import base2 from './sets/base2'
 import base3 from './sets/base3'
@@ -47,10 +49,12 @@ import ex2 from './sets/ex2'
 import ex3 from './sets/ex3'
 import ex4 from './sets/ex4'
 import ex5 from './sets/ex5'
+import ex5_5 from './sets/ex5_5'
 import ex6 from './sets/ex6'
 import ex7 from './sets/ex7'
 import ex8 from './sets/ex8'
 import ex9 from './sets/ex9'
+import exu from './sets/exu'
 import fut20 from './sets/fut20'
 import g1 from './sets/g1'
 import gym1 from './sets/gym1'
@@ -70,6 +74,7 @@ import mcd18 from './sets/mcd18'
 import mcd19 from './sets/mcd19'
 import mcd21 from './sets/mcd21'
 import mcd22 from './sets/mcd22'
+import me06 from './sets/me06'
 import me1 from './sets/me1'
 import me2 from './sets/me2'
 import me2pt5 from './sets/me2pt5'
@@ -78,6 +83,10 @@ import me4 from './sets/me4'
 import me5 from './sets/me5'
 import me55 from './sets/me55'
 import me55c from './sets/me55c'
+import mee from './sets/mee'
+import mep from './sets/mep'
+import mfb from './sets/mfb'
+import miscp from './sets/miscp'
 import neo1 from './sets/neo1'
 import neo2 from './sets/neo2'
 import neo3 from './sets/neo3'
@@ -155,10 +164,41 @@ import swsh8 from './sets/swsh8'
 import swsh9 from './sets/swsh9'
 import swsh9tg from './sets/swsh9tg'
 import swshp from './sets/swshp'
+import tcgp_a1 from './sets/tcgp_a1'
+import tcgp_a1a from './sets/tcgp_a1a'
+import tcgp_a2 from './sets/tcgp_a2'
+import tcgp_a2a from './sets/tcgp_a2a'
+import tcgp_a2b from './sets/tcgp_a2b'
+import tcgp_a3 from './sets/tcgp_a3'
+import tcgp_a3a from './sets/tcgp_a3a'
+import tcgp_a3b from './sets/tcgp_a3b'
+import tcgp_a4 from './sets/tcgp_a4'
+import tcgp_a4a from './sets/tcgp_a4a'
+import tcgp_b1 from './sets/tcgp_b1'
+import tcgp_b1a from './sets/tcgp_b1a'
+import tcgp_b2 from './sets/tcgp_b2'
+import tcgp_b2a from './sets/tcgp_b2a'
+import tcgp_p_a from './sets/tcgp_p_a'
 import tk1a from './sets/tk1a'
 import tk1b from './sets/tk1b'
 import tk2a from './sets/tk2a'
 import tk2b from './sets/tk2b'
+import tk_bw_e from './sets/tk_bw_e'
+import tk_bw_z from './sets/tk_bw_z'
+import tk_dp_l from './sets/tk_dp_l'
+import tk_dp_m from './sets/tk_dp_m'
+import tk_hs_g from './sets/tk_hs_g'
+import tk_hs_r from './sets/tk_hs_r'
+import tk_sm_l from './sets/tk_sm_l'
+import tk_sm_r from './sets/tk_sm_r'
+import tk_xy_b from './sets/tk_xy_b'
+import tk_xy_latia from './sets/tk_xy_latia'
+import tk_xy_latio from './sets/tk_xy_latio'
+import tk_xy_n from './sets/tk_xy_n'
+import tk_xy_p from './sets/tk_xy_p'
+import tk_xy_su from './sets/tk_xy_su'
+import tk_xy_sy from './sets/tk_xy_sy'
+import tk_xy_w from './sets/tk_xy_w'
 import xy0 from './sets/xy0'
 import xy1 from './sets/xy1'
 import xy10 from './sets/xy10'
@@ -172,12 +212,15 @@ import xy6 from './sets/xy6'
 import xy7 from './sets/xy7'
 import xy8 from './sets/xy8'
 import xy9 from './sets/xy9'
+import xya from './sets/xya'
 import xyp from './sets/xyp'
 import zsv10pt5 from './sets/zsv10pt5'
 
 import type { TcgSet } from './types'
 
 export const tcgSets: TcgSet[] = [
+  _2023sv,
+  _2024sv,
   base1,
   base2,
   base3,
@@ -227,10 +270,12 @@ export const tcgSets: TcgSet[] = [
   ex3,
   ex4,
   ex5,
+  ex5_5,
   ex6,
   ex7,
   ex8,
   ex9,
+  exu,
   fut20,
   g1,
   gym1,
@@ -250,6 +295,7 @@ export const tcgSets: TcgSet[] = [
   mcd19,
   mcd21,
   mcd22,
+  me06,
   me1,
   me2,
   me2pt5,
@@ -258,6 +304,10 @@ export const tcgSets: TcgSet[] = [
   me5,
   me55,
   me55c,
+  mee,
+  mep,
+  mfb,
+  miscp,
   neo1,
   neo2,
   neo3,
@@ -335,10 +385,41 @@ export const tcgSets: TcgSet[] = [
   swsh9,
   swsh9tg,
   swshp,
+  tcgp_a1,
+  tcgp_a1a,
+  tcgp_a2,
+  tcgp_a2a,
+  tcgp_a2b,
+  tcgp_a3,
+  tcgp_a3a,
+  tcgp_a3b,
+  tcgp_a4,
+  tcgp_a4a,
+  tcgp_b1,
+  tcgp_b1a,
+  tcgp_b2,
+  tcgp_b2a,
+  tcgp_p_a,
   tk1a,
   tk1b,
   tk2a,
   tk2b,
+  tk_bw_e,
+  tk_bw_z,
+  tk_dp_l,
+  tk_dp_m,
+  tk_hs_g,
+  tk_hs_r,
+  tk_sm_l,
+  tk_sm_r,
+  tk_xy_b,
+  tk_xy_latia,
+  tk_xy_latio,
+  tk_xy_n,
+  tk_xy_p,
+  tk_xy_su,
+  tk_xy_sy,
+  tk_xy_w,
   xy0,
   xy1,
   xy10,
@@ -352,6 +433,7 @@ export const tcgSets: TcgSet[] = [
   xy7,
   xy8,
   xy9,
+  xya,
   xyp,
   zsv10pt5,
 ]

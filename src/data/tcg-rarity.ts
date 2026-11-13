@@ -1,19 +1,27 @@
 // prettier-ignore
 export const tcgRarityOdds = {
   'Common': 10, // So we can lower odds Commons are always available
+  'One Diamond': 10,
   'Unknown': 1000, // So we can lower odds Energies are always available
   'Uncommon': 0.85,
+  'Two Diamond': 0.85,
   'Rare': 0.3,
   'Rare Holo': 0.3,
+  'Three Diamond': 0.3,
+  'Four Diamond': 0.2,
 
   'Rare Shining': 0.1,
+  'One Shiny': 0.1,
   'Rare Shiny': 0.1,
   'Shiny Rare': 0.1,
 
   'Double Rare': 0.2,
+  'Double rare': 0.2,
   'Rare Holo EX': 0.2,
+  'Rare Holo ex': 0.2,
   'Rare Holo GX': 0.2,
   'Rare Holo V': 0.2,
+  'Holo Rare V': 0.2,
   'Rare ACE': 0.1,
   'ACE SPEC Rare': 0.1,
   'Amazing Rare': 0.1,
@@ -25,6 +33,8 @@ export const tcgRarityOdds = {
   'Rare Holo LV.X': 0.15,
 
   'Illustration Rare': 0.1,
+  'Illustration rare': 0.1,
+  'One Star': 0.1,
   'Trainer Gallery Rare Holo': 0.1,
   'LEGEND': 0.1,
   'Rare BREAK': 0.1,
@@ -36,15 +46,24 @@ export const tcgRarityOdds = {
   'Classic Collection': 0.1,
 
   'Special Illustration Rare': 0.08,
+  'Special illustration rare': 0.08,
+  'Pikachu Rare': 0.08,
+  'Futuristic Rare': 0.08,
+  'Two Star': 0.08,
+  'Two Shiny': 0.08,
   'MEGA_ATTACK_RARE': 0.08,
   'Rare Secret': 0.1,
   'Rare Holo VSTAR': 0.1,
+  'Holo Rare VSTAR': 0.1,
+  'Holo Rare VMAX': 0.1,
 
   'Rare Rainbow': 0.02,
   'Hyper Rare': 0.02,
   'Mega Hyper Rare': 0.02,
   'Black White Rare': 0.02,
   'Rare Holo Star': 0.02,
+  'Three Star': 0.02,
+  'Crown': 0.02,
 
   'Promo': 0,
 } as const satisfies Record<string, number>
@@ -53,19 +72,27 @@ export type TcgRarity = keyof typeof tcgRarityOdds
 
 export const tcgRarityCrystalValues: Record<string, number> = {
   Common: 1,
+  'One Diamond': 1,
   Unknown: 1,
   Uncommon: 2,
+  'Two Diamond': 2,
   Rare: 5,
+  'Three Diamond': 5,
+  'Four Diamond': 20,
   'Rare Holo': 10,
 
   'Rare Shining': 25,
+  'One Shiny': 40,
   'Rare Shiny': 25,
   'Shiny Rare': 25,
 
   'Double Rare': 20,
+  'Double rare': 20,
   'Rare Holo EX': 20,
+  'Rare Holo ex': 20,
   'Rare Holo GX': 20,
   'Rare Holo V': 20,
+  'Holo Rare V': 20,
   'Rare ACE': 50,
   'ACE SPEC Rare': 50,
   'Amazing Rare': 30,
@@ -77,6 +104,8 @@ export const tcgRarityCrystalValues: Record<string, number> = {
   'Rare Holo LV.X': 40,
 
   'Illustration Rare': 40,
+  'Illustration rare': 40,
+  'One Star': 40,
   'Trainer Gallery Rare Holo': 40,
   LEGEND: 50,
   'Rare BREAK': 25,
@@ -88,9 +117,16 @@ export const tcgRarityCrystalValues: Record<string, number> = {
   'Classic Collection': 40,
 
   'Special Illustration Rare': 150,
+  'Special illustration rare': 150,
+  'Pikachu Rare': 150,
+  'Futuristic Rare': 150,
+  'Two Star': 150,
+  'Two Shiny': 150,
   MEGA_ATTACK_RARE: 150,
   'Rare Secret': 150,
   'Rare Holo VSTAR': 150,
+  'Holo Rare VSTAR': 150,
+  'Holo Rare VMAX': 40,
 
   'Rare Rainbow': 150,
   'Hyper Rare': 200,
@@ -98,6 +134,8 @@ export const tcgRarityCrystalValues: Record<string, number> = {
   'Black White Rare': 200,
 
   'Rare Holo Star': 300,
+  'Three Star': 200,
+  Crown: 300,
 
   Promo: 5,
 }
@@ -109,19 +147,27 @@ export const tcgRarityCrystalValues: Record<string, number> = {
  */
 export const tcgRarityPokedollarValues: Record<string, number> = {
   Common: 5,
+  'One Diamond': 5,
   Unknown: 5,
   Promo: 5,
   Uncommon: 10,
+  'Two Diamond': 10,
   Rare: 20,
+  'Three Diamond': 20,
+  'Four Diamond': 50,
   'Rare Holo': 35,
 
   'Rare Shining': 50,
+  'One Shiny': 75,
   'Rare Shiny': 50,
   'Shiny Rare': 50,
   'Double Rare': 50,
+  'Double rare': 50,
   'Rare Holo EX': 50,
+  'Rare Holo ex': 50,
   'Rare Holo GX': 50,
   'Rare Holo V': 50,
+  'Holo Rare V': 50,
 
   'Rare ACE': 75,
   'ACE SPEC Rare': 75,
@@ -132,6 +178,8 @@ export const tcgRarityPokedollarValues: Record<string, number> = {
   'Rare Shiny GX': 75,
   'Rare Holo LV.X': 75,
   'Illustration Rare': 75,
+  'Illustration rare': 75,
+  'One Star': 75,
   'Trainer Gallery Rare Holo': 75,
   LEGEND: 75,
   'Rare BREAK': 75,
@@ -142,12 +190,21 @@ export const tcgRarityPokedollarValues: Record<string, number> = {
   'Ultra Rare': 100,
   'Classic Collection': 100,
   'Special Illustration Rare': 100,
+  'Special illustration rare': 100,
+  'Pikachu Rare': 100,
+  'Futuristic Rare': 100,
+  'Two Star': 100,
+  'Two Shiny': 100,
   MEGA_ATTACK_RARE: 100,
   'Rare Secret': 100,
   'Rare Holo VSTAR': 100,
+  'Holo Rare VSTAR': 100,
+  'Holo Rare VMAX': 75,
   'Rare Rainbow': 100,
 
   'Hyper Rare': 150,
+  'Three Star': 150,
+  Crown: 150,
   'Mega Hyper Rare': 150,
   'Black White Rare': 150,
   'Rare Holo Star': 150,

@@ -2,6 +2,10 @@ import type { TcgCardDetail } from './types'
 
 export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail[] | null> {
   switch (setId) {
+    case '_2023sv':
+      return (await import('./details/_2023sv')).default
+    case '_2024sv':
+      return (await import('./details/_2024sv')).default
     case 'base1':
       return (await import('./details/base1')).default
     case 'base2':
@@ -100,6 +104,8 @@ export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail
       return (await import('./details/ex4')).default
     case 'ex5':
       return (await import('./details/ex5')).default
+    case 'ex5_5':
+      return (await import('./details/ex5_5')).default
     case 'ex6':
       return (await import('./details/ex6')).default
     case 'ex7':
@@ -108,6 +114,8 @@ export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail
       return (await import('./details/ex8')).default
     case 'ex9':
       return (await import('./details/ex9')).default
+    case 'exu':
+      return (await import('./details/exu')).default
     case 'fut20':
       return (await import('./details/fut20')).default
     case 'g1':
@@ -146,6 +154,8 @@ export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail
       return (await import('./details/mcd21')).default
     case 'mcd22':
       return (await import('./details/mcd22')).default
+    case 'me06':
+      return (await import('./details/me06')).default
     case 'me1':
       return (await import('./details/me1')).default
     case 'me2':
@@ -162,6 +172,14 @@ export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail
       return (await import('./details/me55')).default
     case 'me55c':
       return (await import('./details/me55c')).default
+    case 'mee':
+      return (await import('./details/mee')).default
+    case 'mep':
+      return (await import('./details/mep')).default
+    case 'mfb':
+      return (await import('./details/mfb')).default
+    case 'miscp':
+      return (await import('./details/miscp')).default
     case 'neo1':
       return (await import('./details/neo1')).default
     case 'neo2':
@@ -316,6 +334,36 @@ export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail
       return (await import('./details/swsh9tg')).default
     case 'swshp':
       return (await import('./details/swshp')).default
+    case 'tcgp_a1':
+      return (await import('./details/tcgp_a1')).default
+    case 'tcgp_a1a':
+      return (await import('./details/tcgp_a1a')).default
+    case 'tcgp_a2':
+      return (await import('./details/tcgp_a2')).default
+    case 'tcgp_a2a':
+      return (await import('./details/tcgp_a2a')).default
+    case 'tcgp_a2b':
+      return (await import('./details/tcgp_a2b')).default
+    case 'tcgp_a3':
+      return (await import('./details/tcgp_a3')).default
+    case 'tcgp_a3a':
+      return (await import('./details/tcgp_a3a')).default
+    case 'tcgp_a3b':
+      return (await import('./details/tcgp_a3b')).default
+    case 'tcgp_a4':
+      return (await import('./details/tcgp_a4')).default
+    case 'tcgp_a4a':
+      return (await import('./details/tcgp_a4a')).default
+    case 'tcgp_b1':
+      return (await import('./details/tcgp_b1')).default
+    case 'tcgp_b1a':
+      return (await import('./details/tcgp_b1a')).default
+    case 'tcgp_b2':
+      return (await import('./details/tcgp_b2')).default
+    case 'tcgp_b2a':
+      return (await import('./details/tcgp_b2a')).default
+    case 'tcgp_p_a':
+      return (await import('./details/tcgp_p_a')).default
     case 'tk1a':
       return (await import('./details/tk1a')).default
     case 'tk1b':
@@ -324,6 +372,38 @@ export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail
       return (await import('./details/tk2a')).default
     case 'tk2b':
       return (await import('./details/tk2b')).default
+    case 'tk_bw_e':
+      return (await import('./details/tk_bw_e')).default
+    case 'tk_bw_z':
+      return (await import('./details/tk_bw_z')).default
+    case 'tk_dp_l':
+      return (await import('./details/tk_dp_l')).default
+    case 'tk_dp_m':
+      return (await import('./details/tk_dp_m')).default
+    case 'tk_hs_g':
+      return (await import('./details/tk_hs_g')).default
+    case 'tk_hs_r':
+      return (await import('./details/tk_hs_r')).default
+    case 'tk_sm_l':
+      return (await import('./details/tk_sm_l')).default
+    case 'tk_sm_r':
+      return (await import('./details/tk_sm_r')).default
+    case 'tk_xy_b':
+      return (await import('./details/tk_xy_b')).default
+    case 'tk_xy_latia':
+      return (await import('./details/tk_xy_latia')).default
+    case 'tk_xy_latio':
+      return (await import('./details/tk_xy_latio')).default
+    case 'tk_xy_n':
+      return (await import('./details/tk_xy_n')).default
+    case 'tk_xy_p':
+      return (await import('./details/tk_xy_p')).default
+    case 'tk_xy_su':
+      return (await import('./details/tk_xy_su')).default
+    case 'tk_xy_sy':
+      return (await import('./details/tk_xy_sy')).default
+    case 'tk_xy_w':
+      return (await import('./details/tk_xy_w')).default
     case 'xy0':
       return (await import('./details/xy0')).default
     case 'xy1':
@@ -350,6 +430,8 @@ export async function getTcgSetDetailsById(setId: string): Promise<TcgCardDetail
       return (await import('./details/xy8')).default
     case 'xy9':
       return (await import('./details/xy9')).default
+    case 'xya':
+      return (await import('./details/xya')).default
     case 'xyp':
       return (await import('./details/xyp')).default
     case 'zsv10pt5':
