@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useAudio } from '@/context/AudioContext'
@@ -167,38 +167,44 @@ export function useExploreActions(
     } as ExploreItem
   }
 
-  const reopenExpeditionPanel = async (expeditionId?: string | null) => {
-    const targetExpeditionId =
-      expeditionId || getActiveExpeditionRun()?.expeditionId
-    const expedition = targetExpeditionId
-      ? expeditions.find((entry) => entry.id === targetExpeditionId)
-      : undefined
+  const reopenExpeditionPanel = useCallback(
+    async (expeditionId?: string | null) => {
+      const targetExpeditionId =
+        expeditionId || (userData as any)?.activeExpedition?.expeditionId
+      const expedition = targetExpeditionId
+        ? expeditions.find((entry) => entry.id === targetExpeditionId)
+        : undefined
 
-    if (!expedition) {
+      if (!expedition) {
+        clearExpeditionReturn()
+        setSelectedItem(null)
+        return
+      }
+
       clearExpeditionReturn()
-      setSelectedItem(null)
-      return
-    }
+      setSelectedPokemonIds([])
+      setSelectedEncounterItemId(null)
+      setSelectedItem({
+        ...expedition,
+        type: 'expedition',
+        originalData: expedition,
+      } as ExploreItem)
+      setLoadingId(targetExpeditionId)
 
-    try {
-      await refreshUser()
-    } catch (error) {
-      console.error('Failed to refresh expedition progress', error)
-      clearExpeditionReturn()
-      setSelectedItem(null)
-      toast.error(
-        'Progress was saved, but Explore could not refresh. Reopen the expedition to continue.',
-      )
-      return
-    }
-
-    clearExpeditionReturn()
-    setSelectedItem({
-      ...expedition,
-      type: 'expedition',
-      originalData: expedition,
-    } as ExploreItem)
-  }
+      try {
+        await refreshUser()
+      } catch (error) {
+        console.error('Failed to refresh expedition progress', error)
+        setSelectedItem(null)
+        toast.error(
+          'Progress was saved, but Explore could not refresh. Reopen the expedition to continue.',
+        )
+      } finally {
+        setLoadingId(null)
+      }
+    },
+    [refreshUser, userData],
+  )
 
   const handleStartExpedition = async (expeditionId: string) => {
     const expeditionLabel = getExpeditionLabel(expeditionId)
