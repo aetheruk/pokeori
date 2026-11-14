@@ -345,8 +345,8 @@ function buildBattlePokemon(params: {
       isWildBattle: false,
       random,
     }),
-    rarity: 'shadow',
-    isShadow: true,
+    rarity: 'normal',
+    isShadow: false,
     isRadiant: false,
     shiny: false,
     heldItemId: enemy.heldItemId,
@@ -354,7 +354,7 @@ function buildBattlePokemon(params: {
   } as unknown as Pokemon
 
   const pokemon = initializeBattlePokemon(mockPokemon)
-  pokemon.isShadow = true
+  pokemon.isShadow = false
   pokemon.aiMoves = enemy.aiMoves
   return pokemon
 }
@@ -376,7 +376,7 @@ function createTeamConfig(params: {
       speciesId: entry.speciesId,
       formId: entry.formId,
       level,
-      isShadow: true,
+      isShadow: false,
     }
     if (
       HELD_BERRY_IDS.length > 0 &&
@@ -479,13 +479,13 @@ function createBattleBetsFixture(params: {
       name: 'Rocket Grunt F',
       icon: '/sprites/trainers/rocket-grunt-f.avif',
       banner: 'celadon-game-corner',
-      title: 'Shadow Champ',
+      title: 'Battle Champ',
     },
     enemyTrainer: {
       name: 'Rocket Grunt M',
       icon: '/sprites/trainers/rocket-grunt-m.avif',
       banner: 'celadon-game-corner',
-      title: 'Shadow Champ',
+      title: 'Battle Champ',
     },
   }
 
@@ -788,7 +788,7 @@ function createTeamPreview(
         level: pokemon.level,
         types: pokemon.types,
         heldItemId: pokemon.heldItem?.id,
-        isShadow: true,
+        isShadow: false,
       }),
     ),
     trainerItemId: trainerItems?.[0]?.itemId,
