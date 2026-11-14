@@ -46,7 +46,7 @@ export const celadonGameCornerTasks: Task[] = [
         },
         title: 'Battle Bets',
         message:
-          'Two Rocket Grunts stand at either side of a luxurious arena, their Shadow Pokemon waiting for an order.',
+          'Two Rocket Grunts stand at either side of a luxurious arena, their Pokémon waiting for an order.',
         background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
         buttons: [
           {

@@ -4,7 +4,7 @@ export const battleBetsGames: BattleBetsGameConfig[] = [
   {
     id: 'celadon-high-stakes-battle-bets',
     name: 'Battle Bets',
-    description: 'Back one of two Rocket Grunts and watch their Shadow teams settle the wager.',
+    description: 'Back one of two Rocket Grunts and watch their Pokémon battle settle the wager.',
     category: 'Kanto',
     subCategory: 'Celadon Game Corner',
     icon: { type: 'trainer', id: 'rocket-grunt-f' },
