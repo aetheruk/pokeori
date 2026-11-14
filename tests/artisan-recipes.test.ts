@@ -214,7 +214,9 @@ describe('artisan recipes', () => {
 
     expect(recipe?.artisanLevel).toBe(100)
     expect(recipe?.costs).toContainEqual({ id: 'paint-white', amount: 1 })
-    expect(recipe?.costs).toContainEqual({ id: 'poke-powder-xl', amount: 2 })
+    expect(recipe?.costs.some((cost) => cost.id.includes('powder'))).toBe(
+      false,
+    )
     expect(recipe?.costs.some((cost) => cost.id === 'paint-red')).toBe(false)
   })
 
@@ -243,7 +245,6 @@ describe('artisan recipes', () => {
       { id: 'broken-ball-t1', amount: 3 },
       { id: 'paint-green', amount: 1 },
       { id: 'paint-yellow', amount: 1 },
-      { id: 'poke-powder-s', amount: 2 },
     ])
     expect(recipe?.costs.some((cost) => cost.id === 'wood-scraps-t1')).toBe(false)
     expect(recipe?.requirements).toContainEqual({
@@ -1277,7 +1278,7 @@ describe('artisan recipes', () => {
     expect(rewards.some((reward) => reward.type === 'item')).toBe(false)
   })
 
-  test('ball recipes use broken ball casings instead of metal scrap shells', () => {
+  test('ball recipes use casings and themed materials without any powder', () => {
     const ballRecipes = artisanRecipes.filter((recipe) =>
       recipe.rewards.some((reward) => {
         const output = items.find((item) => item.id === reward.targetId)
@@ -1289,22 +1290,14 @@ describe('artisan recipes', () => {
       const costIds = recipe.costs.map((cost) => cost.id)
       expect(costIds.some((id) => id.startsWith('broken-ball-'))).toBe(true)
       expect(costIds.some((id) => id.startsWith('metal-scrap-'))).toBe(false)
+      expect(costIds.some((id) => id.includes('powder'))).toBe(false)
       expect(recipe.bulk).toBe(3)
       expect(getArtisanCraftRequiredLevel(recipe, 3)).toBe(
         recipe.artisanLevel + 5,
       )
 
-      if (recipe.id === 'craft-poke-ball') {
+      if (recipe.id === 'craft-poke-ball')
         expect(recipe.costs).toContainEqual({ id: 'broken-ball-t1', amount: 1 })
-        expect(
-          recipe.costs.some((cost) => cost.id.startsWith('poke-powder-')),
-        ).toBe(false)
-      } else {
-        expect(recipe.costs).toContainEqual({
-          id: expectedPokePowderForLevel(recipe.artisanLevel),
-          amount: 2,
-        })
-      }
 
       for (const cost of recipe.costs) {
         expect(cost.id.endsWith('-t2')).toBe(false)

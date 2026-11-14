@@ -299,13 +299,6 @@ function getPokePowderIdForArtisanLevel(level: number): string {
   return `poke-powder-${POKE_POWDER_TIERS[tierIndex]}`
 }
 
-function withPokePowderCost(recipe: ArtisanRecipeDraft, amount = 2): ArtisanRecipeDraft {
-  return {
-    ...recipe,
-    costs: [...recipe.costs, { id: getPokePowderIdForArtisanLevel(recipe.artisanLevel), amount }],
-  }
-}
-
 const BALL_RECIPES_WITHOUT_MANUALS = new Set(['poke-ball', 'great-ball', 'ultra-ball'])
 
 function getRecipePrimaryItemId(recipe: ArtisanRecipeDraft) {
@@ -382,7 +375,6 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
     costs: [
       { id: 'broken-ball-t1', amount: 2 },
       { id: 'paint-green', amount: 1 },
-      { id: 'pixie-powder-t1', amount: 1 },
     ],
     rewards: [{ type: 'item', targetId: 'friend-ball', quantity: 2, dropChance: 100 }],
   },
@@ -478,7 +470,6 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
     costs: [
       { id: 'broken-ball-t1', amount: 3 },
       { id: 'fairy-gem', amount: 2 },
-      { id: 'pixie-powder-t1', amount: 3 },
     ],
     rewards: [{ type: 'item', targetId: 'moon-ball', quantity: 2, dropChance: 100 }],
   },
@@ -490,7 +481,6 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
     costs: [
       { id: 'broken-ball-t1', amount: 3 },
       { id: 'paint-red', amount: 1 },
-      { id: 'pixie-powder-t1', amount: 1 },
     ],
     rewards: [{ type: 'item', targetId: 'love-ball', quantity: 2, dropChance: 100 }],
   },
@@ -1774,7 +1764,7 @@ export const kantoArtisanRecipes: ArtisanRecipe[] = [
     'balls',
     BALL_RECIPES.map((recipe) =>
       withBallManualRequirement({
-        ...(recipe.id === 'craft-poke-ball' ? recipe : withPokePowderCost(recipe)),
+        ...recipe,
         bulk: 3,
       }),
     ),
