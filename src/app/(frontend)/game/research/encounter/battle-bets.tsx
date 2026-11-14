@@ -418,7 +418,7 @@ function TeamCard({
             <PokemonRaritySprite
               formId={pokemon.formId}
               view="front"
-              isShadow
+              isShadow={pokemon.isShadow}
               alt=""
               className="h-9 w-9 shrink-0"
               sizes="36px"

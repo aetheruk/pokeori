@@ -10,7 +10,7 @@ export interface BattleBetsPokemonPreview {
   level: number
   types: string[]
   heldItemId?: string
-  isShadow: true
+  isShadow: boolean
 }
 
 export interface BattleBetsTeamPreview {

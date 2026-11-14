@@ -11,7 +11,7 @@ const RELOADED_AT_KEY = 'pokeori:last-reloaded-at'
 const RELOAD_ATTEMPTS_KEY = 'pokeori:reload-attempts'
 const RELOAD_RETRY_DELAY_MS = 30_000
 const MAX_RELOAD_RETRY_DELAY_MS = 5 * 60_000
-const IMAGE_MANIFEST_PREPARATION_TIMEOUT_MS = 10_000
+const IMAGE_MANIFEST_PREPARATION_TIMEOUT_MS = 1_000
 
 type AppVersionResponse = {
   version?: unknown
@@ -38,7 +38,7 @@ export function PwaRegister() {
               registration.active?.postMessage({ type: 'PREPARE_IMAGE_CACHE' })
             })
             .catch(() => {})
-        }, 1_000)
+        }, 250)
       }
 
       const requestIdle = window.requestIdleCallback?.bind(window)
@@ -47,7 +47,7 @@ export function PwaRegister() {
           timeout: IMAGE_MANIFEST_PREPARATION_TIMEOUT_MS,
         })
       } else {
-        preparationTimer = window.setTimeout(prepare, 5_000)
+        preparationTimer = window.setTimeout(prepare, 250)
       }
     }
 

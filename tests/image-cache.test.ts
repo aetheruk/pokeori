@@ -68,12 +68,12 @@ function setup() {
     runInNewContext(createImageServiceWorker(version), {
       self: {
         location: { origin },
+        clients: { claim() {} },
         addEventListener: (name: string, callback: any) => {
           handlers[name] = callback
         },
         skipWaiting() {},
       },
-      clients: { claim() {} },
       caches,
       URL,
       Request,
@@ -99,15 +99,30 @@ function setup() {
         })
         await result
       },
+      async prepare() {
+        let result: Promise<void> | undefined
+        handlers.message({
+          data: { type: 'PREPARE_IMAGE_CACHE' },
+          waitUntil: (promise: Promise<void>) => {
+            result = promise
+          },
+        })
+        await result
+      },
       async fetch(url: string, method = 'GET') {
         let result: Promise<Response> | undefined
+        const background: Promise<unknown>[] = []
         handlers.fetch({
           request: new Request(new URL(url, origin), { method }),
+          waitUntil: (promise: Promise<unknown>) => background.push(promise),
           respondWith: (promise: Promise<Response>) => {
             result = promise
           },
         })
-        return result
+        if (!result) return undefined
+        const response = await result
+        await Promise.all(background)
+        return response
       },
     }
   }
@@ -129,6 +144,7 @@ describe('image downloads across releases', () => {
     const state = setup()
     const first = state.worker('1.0.0')
     await first.activate()
+    await first.prepare()
     expect(await (await first.fetch('/art.png'))?.text()).toBe('first')
     const second = state.worker('1.0.1')
     await second.activate()
@@ -153,9 +169,11 @@ describe('image downloads across releases', () => {
     expect(state.requests).toHaveLength(0)
   })
 
-  test('refreshes changed art and removes only outdated image entries', async () => {
+  test('fetches changed art by revision and preserves unrelated cache entries', async () => {
     const state = setup()
-    await state.worker('1').fetch('/art.png')
+    const first = state.worker('1')
+    await first.prepare()
+    await first.fetch('/art.png')
     await (await state.caches.open('unrelated')).put(
       '/data',
       new Response('keep'),
@@ -163,11 +181,15 @@ describe('image downloads across releases', () => {
     state.setContent('second')
     const updated = state.worker('2')
     await updated.activate()
+    await updated.prepare()
     expect(
       (await (await state.caches.open(IMAGE_CACHE_NAME)).keys()).length,
-    ).toBe(0)
+    ).toBe(1)
     expect(await (await updated.fetch('/art.png'))?.text()).toBe('second')
     expect(state.requests).toHaveLength(2)
+    expect(
+      (await (await state.caches.open(IMAGE_CACHE_NAME)).keys()).length,
+    ).toBe(2)
     expect(
       await (
         await (await state.caches.open('unrelated')).match('/data')
@@ -175,17 +197,18 @@ describe('image downloads across releases', () => {
     ).toBe('keep')
   })
 
-  test('migrates valid legacy sprites without downloading them again', async () => {
+  test('prepares the manifest in the background on first uncached image use', async () => {
     const state = setup()
-    await (await state.caches.open('pokeori-sprites-0.29.22')).put(
-      '/art.png',
-      image('first'),
-    )
-    const worker = state.worker('0.30.0')
+    const worker = state.worker('1.0.0')
     await worker.activate()
+
     expect(await (await worker.fetch('/art.png'))?.text()).toBe('first')
-    expect(state.requests).toHaveLength(0)
-    expect(await state.caches.keys()).not.toContain('pokeori-sprites-0.29.22')
+    expect(state.manifestRequests).toBe(1)
+
+    expect(await (await worker.fetch('/art.png'))?.text()).toBe('first')
+    expect(
+      (await (await state.caches.open(IMAGE_CACHE_NAME)).keys()).length,
+    ).toBe(1)
   })
 
   test('does not cache mismatched bytes or intercept APIs, remote images, or downloads', async () => {

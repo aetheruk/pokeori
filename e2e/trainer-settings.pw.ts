@@ -13,6 +13,19 @@ test('real service worker serves bundled art and Next image variants offline', a
       navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true })
     })
   })
+  await page.evaluate(async () => {
+    const controller = navigator.serviceWorker.controller
+    if (!controller) throw new Error('Service worker is not controlling the page')
+    await new Promise<void>((resolve, reject) => {
+      const channel = new MessageChannel()
+      const timeout = window.setTimeout(() => reject(new Error('Image manifest did not load')), 10_000)
+      channel.port1.onmessage = () => {
+        window.clearTimeout(timeout)
+        resolve()
+      }
+      controller.postMessage({ type: 'PREPARE_IMAGE_CACHE' }, [channel.port2])
+    })
+  })
   const asset = '/sprites/pokemon/home/normal/1.avif'
   const initial = await page.evaluate(async (url) => {
     const response = await fetch(url)
@@ -20,6 +33,14 @@ test('real service worker serves bundled art and Next image variants offline', a
   }, asset)
   expect(initial.status).toBe(200)
   expect(initial.bytes).toBeGreaterThan(0)
+  await page.waitForFunction(async (url) => {
+    const cache = await caches.open('pokeori-images-v1')
+    const path = new URL(url, location.origin).pathname
+    return (await cache.keys()).some((key) => {
+      const cachedUrl = new URL(key.url)
+      return cachedUrl.pathname === path && cachedUrl.searchParams.has('revision')
+    })
+  }, asset)
   await context.setOffline(true)
   for (const url of [asset, `/_next/image?url=${encodeURIComponent(asset)}&w=640&q=75`]) {
     const result = await page.evaluate(async (source) => {
@@ -61,6 +82,8 @@ for (const width of [390, 1280]) {
     const before = await audio.getAttribute('aria-pressed')
     await audio.click()
     await expect(audio).toHaveAttribute('aria-pressed', before === 'true' ? 'false' : 'true')
+    await panel.getByRole('button', { name: 'Check saved images' }).click()
+    await expect(panel.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
     await panel.getByRole('button', { name: 'Download', exact: true }).click()
     await expect(panel.getByRole('button', { name: 'Downloaded' })).toBeDisabled()
     expect(downloads).toBe(1)
@@ -71,6 +94,8 @@ for (const width of [390, 1280]) {
     await panel.screenshot({ path: `/tmp/pokeori-inline-settings-${width}.png` })
     await page.reload()
     await page.getByRole('button', { name: 'Test trainer settings', exact: true }).click()
+    await panel.getByRole('button', { name: 'Check saved images' }).click()
+    await expect(panel.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1')
     await expect(panel.getByRole('button', { name: 'Downloaded' })).toBeDisabled()
     expect(downloads).toBe(1)
     await panel.getByRole('button', { name: 'Remove', exact: true }).click()
@@ -97,6 +122,8 @@ test('cancelled downloads retain completed files and resume only missing images'
   await page.goto('/ui-test')
   await page.getByRole('button', { name: 'Test trainer settings', exact: true }).click()
   const panel = page.getByRole('region', { name: 'Settings', exact: true })
+  await panel.getByRole('button', { name: 'Check saved images' }).click()
+  await expect(panel.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
   await panel.getByRole('button', { name: 'Download', exact: true }).click()
   await expect(panel.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1')
   await panel.getByRole('button', { name: 'Pause', exact: true }).click()
