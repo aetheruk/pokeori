@@ -43,6 +43,12 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim())
 })
 
+self.addEventListener('message', (event) => {
+  if (event.data?.type !== 'PREPARE_IMAGE_CACHE') return
+  // Cache preparation is manifest-only: never enumerate image caches here.
+  event.waitUntil(getImages().then(() => undefined).catch(() => undefined))
+})
+
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url)
   if (event.request.method !== 'GET' || url.origin !== self.location.origin) return
@@ -74,26 +80,15 @@ self.addEventListener('fetch', (event) => {
     return bundledAssetPromise
   }
 
-  // Warm the image cache on first use. If the map is not ready yet, fetching
-  // it happens in the background; the current request still goes to the
-  // normal image path immediately.
+  // Do not fetch the manifest or touch CacheStorage during the first screen.
+  // The page prepares the manifest after load and browser idle; later requests
+  // warm their cache entries in the background.
   const cacheWork = imagesAtRequest
     ? getBundledAsset().then(asset => asset?.store)
-    : getImages().then(() => undefined)
+    : Promise.resolve()
   event.waitUntil(cacheWork.catch(() => { /* Online images must not depend on storage. */ }))
 
   event.respondWith((async () => {
-    // A player's explicitly downloaded pack is already hash-verified. Serve it
-    // without waiting for the manifest to parse on a cold worker start.
-    try {
-      const cache = await caches.open(CACHE)
-      const downloaded = await cache.match(
-        new Request(new URL(path, self.location.origin)),
-        { ignoreSearch: true },
-      )
-      if (downloaded) return downloaded
-    } catch { /* Storage restrictions must not block online play. */ }
-
     // Cached bundled art is instant. On a miss, return verified-revision
     // bytes as soon as they arrive, while digesting and storing a clone in the
     // event's background lifetime.
