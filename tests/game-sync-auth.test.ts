@@ -21,7 +21,13 @@ test('game sync authenticates once, enforces ownership, and emits private timing
     mock.module('@payload-config', () => ({ default: {} }))
     mock.module('next/headers', () => ({ headers: async () => new Headers() }))
     mock.module('@/utilities/rate-limiter', () => ({ getClientIp: () => '127.0.0.1', rateLimit: async () => ({ allowed: true }) }))
-    mock.module('@/utilities/game-data', () => ({ getGameUserData: async user => ({ user }) }))
+    mock.module('@/utilities/game-route-data', () => ({
+      getGameRouteDataForUser: async (_scope, _payload, user) => {
+        reads++
+        assert.equal(user.id, 'player-1')
+        return { user }
+      },
+    }))
     const { GET } = await import('./src/app/api/game/sync/route.ts')
     const response = await GET(new Request('https://example.test/api/game/sync?scope=core&userId=someone-else'))
     assert.equal(response.status, 200)

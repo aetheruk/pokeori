@@ -24,8 +24,8 @@ console.log(`Isolated server log: ${logPath}`)
 const testRedis = new Redis(env.REDIS_URL)
 await testRedis.flushdb()
 await testRedis.quit()
-const server = spawn(process.execPath.includes('bun') ? 'node' : process.execPath,
-  ['node_modules/next/dist/bin/next', 'dev', '--hostname', '127.0.0.1', '--port', '3110'],
+const server = spawn('bun',
+  ['--bun', 'next', 'dev', '--hostname', '127.0.0.1', '--port', '3110'],
   { env: { ...env, NODE_ENV: 'development' }, stdio: ['ignore', log, log] })
 let exited = false
 server.on('exit', () => { exited = true })

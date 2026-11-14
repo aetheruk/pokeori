@@ -27,11 +27,13 @@ const getImages = () => {
 const keyFor = (path, revision) => path + '?revision=' + revision
 const verifyAndStore = async (path, revision, response) => {
   if (!response.ok || !response.headers.get('Content-Type')?.startsWith('image/')) return
-  const digest = await crypto.subtle.digest('SHA-256', await response.clone().arrayBuffer())
+  const digestResponse = response.clone()
+  const cachedResponse = response.clone()
+  const digest = await crypto.subtle.digest('SHA-256', await digestResponse.arrayBuffer())
   const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
   if (hash !== revision) return
   const cache = await caches.open(CACHE)
-  await cache.put(keyFor(path, revision), response.clone())
+  await cache.put(keyFor(path, revision), cachedResponse)
 }
 
 self.addEventListener('install', (event) => {
@@ -46,7 +48,10 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data?.type !== 'PREPARE_IMAGE_CACHE') return
   // Cache preparation is manifest-only: never enumerate image caches here.
-  event.waitUntil(getImages().then(() => undefined).catch(() => undefined))
+  const preparation = getImages().then(() => undefined).catch(() => undefined)
+  event.waitUntil(preparation)
+  const replyPort = event.ports?.[0]
+  if (replyPort) preparation.then(() => replyPort.postMessage({ type: 'IMAGE_CACHE_PREPARED' }))
 })
 
 self.addEventListener('fetch', (event) => {
@@ -80,15 +85,40 @@ self.addEventListener('fetch', (event) => {
     return bundledAssetPromise
   }
 
-  // Do not fetch the manifest or touch CacheStorage during the first screen.
-  // The page prepares the manifest after load and browser idle; later requests
-  // warm their cache entries in the background.
-  const cacheWork = imagesAtRequest
-    ? getBundledAsset().then(asset => asset?.store)
-    : Promise.resolve()
+  let downloadedAssetPromise
+  const getDownloadedAsset = () => {
+    if (!downloadedAssetPromise) downloadedAssetPromise = (async () => {
+      const cache = await caches.open(CACHE)
+      const revision = imagesAtRequest?.get(path)
+      if (revision) return cache.match(keyFor(path, revision))
+      return cache.match(
+        new Request(new URL(path, self.location.origin)),
+        { ignoreSearch: true },
+      )
+    })()
+    return downloadedAssetPromise
+  }
+
+  // If idle preparation has not run yet, begin fetching the small revision
+  // manifest in the background on first image use. The current image still
+  // follows its regular network path without waiting for it.
+  const cacheWork = getDownloadedAsset().then(downloaded => {
+    if (downloaded) return undefined
+    return imagesAtRequest
+      ? getBundledAsset().then(asset => asset?.store)
+      : getImages().then(() => undefined)
+  })
   event.waitUntil(cacheWork.catch(() => { /* Online images must not depend on storage. */ }))
 
   event.respondWith((async () => {
+    // Explicitly downloaded images are already verified and keyed by their
+    // original URL. Serve them before the deferred manifest is ready so a
+    // cold worker start does not force the first screen onto the network.
+    try {
+      const downloaded = await getDownloadedAsset()
+      if (downloaded) return downloaded
+    } catch { /* Storage restrictions must not block online play. */ }
+
     // Cached bundled art is instant. On a miss, return verified-revision
     // bytes as soon as they arrive, while digesting and storing a clone in the
     // event's background lifetime.
