@@ -11,6 +11,7 @@ const RELOADED_AT_KEY = 'pokeori:last-reloaded-at'
 const RELOAD_ATTEMPTS_KEY = 'pokeori:reload-attempts'
 const RELOAD_RETRY_DELAY_MS = 30_000
 const MAX_RELOAD_RETRY_DELAY_MS = 5 * 60_000
+const IMAGE_MANIFEST_PREPARATION_TIMEOUT_MS = 10_000
 
 type AppVersionResponse = {
   version?: unknown
@@ -20,6 +21,50 @@ export function PwaRegister() {
   const pathname = usePathname()
   const [pendingVersion, setPendingVersion] = useState<string | null>(null)
   const [reloadIn, setReloadIn] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+
+    let idleCallback: number | undefined
+    let preparationTimer: number | undefined
+    let disposed = false
+
+    const prepareAfterIdle = () => {
+      const prepare = () => {
+        if (disposed) return
+        preparationTimer = window.setTimeout(() => {
+          void navigator.serviceWorker.ready
+            .then((registration) => {
+              registration.active?.postMessage({ type: 'PREPARE_IMAGE_CACHE' })
+            })
+            .catch(() => {})
+        }, 1_000)
+      }
+
+      const requestIdle = window.requestIdleCallback?.bind(window)
+      if (requestIdle) {
+        idleCallback = requestIdle(prepare, {
+          timeout: IMAGE_MANIFEST_PREPARATION_TIMEOUT_MS,
+        })
+      } else {
+        preparationTimer = window.setTimeout(prepare, 5_000)
+      }
+    }
+
+    if (document.readyState === 'complete') {
+      prepareAfterIdle()
+    } else {
+      window.addEventListener('load', prepareAfterIdle, { once: true })
+    }
+
+    return () => {
+      disposed = true
+      if (idleCallback !== undefined) window.cancelIdleCallback?.(idleCallback)
+      window.clearTimeout(preparationTimer)
+      window.removeEventListener('load', prepareAfterIdle)
+    }
+  }, [])
+
   useEffect(() => {
     setReloadIn(null)
     let registration: ServiceWorkerRegistration | undefined
