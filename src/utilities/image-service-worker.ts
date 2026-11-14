@@ -25,6 +25,14 @@ const getImages = () => {
   return manifest
 }
 const keyFor = (path, revision) => path + '?revision=' + revision
+const verifyAndStore = async (path, revision, response) => {
+  if (!response.ok || !response.headers.get('Content-Type')?.startsWith('image/')) return
+  const digest = await crypto.subtle.digest('SHA-256', await response.clone().arrayBuffer())
+  const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
+  if (hash !== revision) return
+  const cache = await caches.open(CACHE)
+  await cache.put(keyFor(path, revision), response.clone())
+}
 
 self.addEventListener('install', (event) => {
   // Install and activate without downloading the large image manifest. The
@@ -33,42 +41,6 @@ self.addEventListener('install', (event) => {
 })
 self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim())
-})
-
-const prepareImageCache = async () => {
-  const images = await getImages()
-  const cache = await caches.open(CACHE)
-  // Preserve previously downloaded sprites when their bytes still match.
-  for (const name of await caches.keys()) {
-    if (!name.startsWith('pokeori-sprites-')) continue
-    const legacy = await caches.open(name)
-    for (const request of await legacy.keys()) {
-      const path = new URL(request.url).pathname
-      const revision = images.get(path)
-      if (!revision || await cache.match(keyFor(path, revision))) continue
-      const response = await legacy.match(request)
-      if (!response) continue
-      const digest = await crypto.subtle.digest('SHA-256', await response.clone().arrayBuffer())
-      const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
-      if (hash === revision) await cache.put(keyFor(path, revision), response)
-    }
-    await caches.delete(name)
-  }
-  for (const request of await cache.keys()) {
-    const url = new URL(request.url)
-    if (images.get(url.pathname) !== url.searchParams.get('revision')) await cache.delete(request)
-  }
-  const metadata = await caches.open(META_CACHE)
-  for (const request of await metadata.keys()) {
-    if (new URL(request.url).pathname + new URL(request.url).search !== manifestKey) await metadata.delete(request)
-  }
-}
-
-self.addEventListener('message', (event) => {
-  if (event.data?.type !== 'PREPARE_IMAGE_CACHE') return
-  event.waitUntil(prepareImageCache().catch(() => {
-    /* Restricted storage must not block page interaction. */
-  }))
 })
 
 self.addEventListener('fetch', (event) => {
@@ -85,18 +57,50 @@ self.addEventListener('fetch', (event) => {
   }
   // Only public artwork and the Next image endpoint are candidates.
   if (!optimized && !/\\.(avif|webp|png|jpe?g|gif|svg|ico)$/i.test(path)) return
+  const imagesAtRequest = imagesByPath
+  let bundledAssetPromise
+  const getBundledAsset = () => {
+    if (!bundledAssetPromise) bundledAssetPromise = (async () => {
+      const revision = imagesAtRequest?.get(path)
+      if (!revision) return null
+      const cache = await caches.open(CACHE)
+      const key = keyFor(path, revision)
+      const cached = await cache.match(key)
+      if (cached) return { response: cached, store: Promise.resolve() }
+      const response = await fetch(key, { cache: 'reload' })
+      const store = verifyAndStore(path, revision, response)
+      return { response, store }
+    })()
+    return bundledAssetPromise
+  }
+
+  // Warm the image cache on first use. If the map is not ready yet, fetching
+  // it happens in the background; the current request still goes to the
+  // normal image path immediately.
+  const cacheWork = imagesAtRequest
+    ? getBundledAsset().then(asset => asset?.store)
+    : getImages().then(() => undefined)
+  event.waitUntil(cacheWork.catch(() => { /* Online images must not depend on storage. */ }))
+
   event.respondWith((async () => {
-    // Before the page schedules cache preparation, let uncached artwork use
-    // the normal network path without waiting for a manifest fetch or digest.
-    const images = imagesByPath
-    if (images) {
+    // A player's explicitly downloaded pack is already hash-verified. Serve it
+    // without waiting for the manifest to parse on a cold worker start.
+    try {
+      const cache = await caches.open(CACHE)
+      const downloaded = await cache.match(
+        new Request(new URL(path, self.location.origin)),
+        { ignoreSearch: true },
+      )
+      if (downloaded) return downloaded
+    } catch { /* Storage restrictions must not block online play. */ }
+
+    // Cached bundled art is instant. On a miss, return verified-revision
+    // bytes as soon as they arrive, while digesting and storing a clone in the
+    // event's background lifetime.
+    if (imagesAtRequest) {
       try {
-        const revision = images.get(path)
-        if (revision) {
-          const cache = await caches.open(CACHE)
-          const cached = await cache.match(keyFor(path, revision))
-          if (cached) return cached
-        }
+        const asset = await getBundledAsset()
+        if (asset) return asset.response
       } catch { /* Storage restrictions must not block online play. */ }
     }
     return fetch(event.request)

@@ -11,7 +11,6 @@ const RELOADED_AT_KEY = 'pokeori:last-reloaded-at'
 const RELOAD_ATTEMPTS_KEY = 'pokeori:reload-attempts'
 const RELOAD_RETRY_DELAY_MS = 30_000
 const MAX_RELOAD_RETRY_DELAY_MS = 5 * 60_000
-const IMAGE_CACHE_PREPARATION_DELAY_MS = 5_000
 
 type AppVersionResponse = {
   version?: unknown
@@ -31,7 +30,6 @@ export function PwaRegister() {
     let deferredVersion: string | null = null
     let reloadTimer: ReturnType<typeof setInterval> | undefined
     let reloadResetTimer: ReturnType<typeof setTimeout> | undefined
-    let imageCachePreparationTimer: number | undefined
 
     if (sessionStorage.getItem(RELOADED_VERSION_KEY) === APP_VERSION) {
       sessionStorage.removeItem(RELOADED_VERSION_KEY)
@@ -112,15 +110,6 @@ export function PwaRegister() {
       }
     }
 
-    const prepareImageCacheAfterLoad = () => {
-      if (disposed || document.visibilityState === 'hidden') return
-      imageCachePreparationTimer = window.setTimeout(() => {
-        void navigator.serviceWorker.ready.then((readyRegistration) => {
-          readyRegistration.active?.postMessage({ type: 'PREPARE_IMAGE_CACHE' })
-        }).catch(() => {})
-      }, IMAGE_CACHE_PREPARATION_DELAY_MS)
-    }
-
     if ('serviceWorker' in navigator) {
       void navigator.serviceWorker
         .register('/sw.js')
@@ -138,11 +127,6 @@ export function PwaRegister() {
             console.log('Service Worker registration failed: ', error)
           }
         })
-      if (document.readyState === 'complete') {
-        prepareImageCacheAfterLoad()
-      } else {
-        window.addEventListener('load', prepareImageCacheAfterLoad, { once: true })
-      }
     }
 
     void checkForUpdate()
@@ -176,8 +160,6 @@ export function PwaRegister() {
       window.clearInterval(interval)
       clearInterval(reloadTimer)
       clearTimeout(reloadResetTimer)
-      window.clearTimeout(imageCachePreparationTimer)
-      window.removeEventListener('load', prepareImageCacheAfterLoad)
       window.removeEventListener(ACTIVITY_STARTED_EVENT, markStarted)
       window.removeEventListener(ACTIVITY_SETTLED_EVENT, markSettled)
       window.removeEventListener('focus', checkForUpdate)
