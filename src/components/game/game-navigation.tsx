@@ -2,7 +2,7 @@
 
 import { BookOpen, Compass, Hammer, PackageOpen, User } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { TbPokeball } from 'react-icons/tb'
 import { BrandLockup } from '@/components/game/shared/BrandLockup'
@@ -59,12 +59,14 @@ const navItems: NavItem[] = [
 
 export function GameNavigation() {
   const pathname = usePathname()
+  const router = useRouter()
   const { playSfx } = useAudio()
   const { user } = useUser()
   const [tapPulse, setTapPulse] = useState<{
     href: string
     id: number
   } | null>(null)
+  const [prefetchIntent, setPrefetchIntent] = useState<string | null>(null)
   const tapPulseId = useRef(0)
   const tapPulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -194,10 +196,20 @@ export function GameNavigation() {
             <Link
               key={item.href}
               href={item.href}
-              prefetch={false}
+              // Keep startup light, then warm only the section the player is
+              // about to open. On touch, pointer enter/down fire before click.
+              prefetch={prefetchIntent === item.href}
               onClick={() => handleMobileNavClick(item.href)}
+              onPointerEnter={() => setPrefetchIntent(item.href)}
+              onFocus={() => setPrefetchIntent(item.href)}
               onPointerDownCapture={(event) => {
                 event.currentTarget.setAttribute('data-pointer-focus', 'true')
+                // Touch has no useful hover lead time, so start the route
+                // request directly before the link's click navigation runs.
+                if (event.pointerType === 'touch') {
+                  router.prefetch(item.href)
+                }
+                setPrefetchIntent(item.href)
               }}
               onBlur={(event) => {
                 event.currentTarget.removeAttribute('data-pointer-focus')
