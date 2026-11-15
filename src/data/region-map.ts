@@ -43,7 +43,7 @@ export const regionCategories: Record<string, RegionData> = {
         "category": "Johto",
         "image": "/backgrounds/johto.avif",
         "timeZone": "Asia/Tokyo",
-        "icon": { type: 'pokemon', id: '152' }
+        "icon": { type: 'pokemon', id: '251' }
     },
         'Hoenn': {
         "category": "Hoenn",
