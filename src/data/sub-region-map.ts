@@ -417,7 +417,6 @@ export const subCategories: Record<string, RegionData> = {
     category: 'New Bark Town',
     region: 'Johto',
     order: 10,
-    alwaysAvailable: true,
     image: '/backgrounds/johto-new-bark-town.avif',
     icon: { type: 'trainer', id: 'elm' },
     music: '/music/johto-new-bark-town.m4a',
