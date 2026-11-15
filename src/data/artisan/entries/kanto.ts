@@ -321,7 +321,7 @@ function withBallManualRequirement(recipe: ArtisanRecipeDraft): ArtisanRecipeDra
 const BALL_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-poke-ball',
-    name: 'Craft Poké Ball',
+    name: 'Poké Ball',
     description: 'Assemble basic Poké Balls from artisan components.',
     artisanLevel: 1,
     costs: [
@@ -333,7 +333,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-premier-ball',
-    name: 'Craft Premier Ball',
+    name: 'Premier Ball',
     description: 'Craft ceremonial white Poké Balls.',
     artisanLevel: 100,
     costs: [
@@ -345,7 +345,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-nest-ball',
-    name: 'Craft Nest Ball',
+    name: 'Nest Ball',
     description: 'Craft a ball tuned for weaker wild Pokémon.',
     artisanLevel: 29,
     costs: [
@@ -357,7 +357,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-net-ball',
-    name: 'Craft Net Ball',
+    name: 'Net Ball',
     description: 'Craft netted balls for Bug catches.',
     artisanLevel: 16,
     costs: [
@@ -369,7 +369,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-friend-ball',
-    name: 'Craft Friend Ball',
+    name: 'Friend Ball',
     description: 'Craft soothing balls that help build friendship.',
     artisanLevel: 100,
     costs: [
@@ -380,7 +380,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-lure-ball',
-    name: 'Craft Lure Ball',
+    name: 'Lure Ball',
     description: 'Craft specialty balls designed for hooked encounters.',
     artisanLevel: 100,
     costs: [
@@ -392,7 +392,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-dive-ball',
-    name: 'Craft Dive Ball',
+    name: 'Dive Ball',
     description: 'Craft pressure-resistant capture balls for aquatic hunts.',
     artisanLevel: 100,
     costs: [
@@ -404,7 +404,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-great-ball',
-    name: 'Craft Great Ball',
+    name: 'Great Ball',
     description: 'Assemble sturdy Great Balls from basic parts.',
     artisanLevel: 25,
     costs: [
@@ -416,7 +416,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-repeat-ball',
-    name: 'Craft Repeat Ball',
+    name: 'Repeat Ball',
     description: 'Craft tracker-linked balls for already catalogued species.',
     artisanLevel: 100,
     costs: [
@@ -428,7 +428,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-level-ball',
-    name: 'Craft Level Ball',
+    name: 'Level Ball',
     description: 'Craft calibrating balls keyed to level advantage.',
     artisanLevel: 100,
     costs: [
@@ -440,7 +440,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-fast-ball',
-    name: 'Craft Fast Ball',
+    name: 'Fast Ball',
     description: 'Craft low-drag balls for speedy targets.',
     artisanLevel: 100,
     costs: [
@@ -452,7 +452,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-heavy-ball',
-    name: 'Craft Heavy Ball',
+    name: 'Heavy Ball',
     description: 'Craft dense impact balls effective on heavy Pokémon.',
     artisanLevel: 100,
     costs: [
@@ -464,7 +464,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-moon-ball',
-    name: 'Craft Moon Ball',
+    name: 'Moon Ball',
     description: 'Craft moon-reactive balls for evolution-line targets.',
     artisanLevel: 12,
     costs: [
@@ -475,7 +475,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-love-ball',
-    name: 'Craft Love Ball',
+    name: 'Love Ball',
     description: 'Craft affinity-tuned balls for compatible pairs.',
     artisanLevel: 100,
     costs: [
@@ -486,7 +486,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-dusk-ball',
-    name: 'Craft Dusk Ball',
+    name: 'Dusk Ball',
     description: 'Craft low-light balls tuned for caves and nighttime.',
     artisanLevel: 100,
     costs: [
@@ -498,7 +498,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-ultra-ball',
-    name: 'Craft Ultra Ball',
+    name: 'Ultra Ball',
     description: 'Assemble Ultra Balls from sturdy basic parts.',
     artisanLevel: 50,
     costs: [
@@ -510,7 +510,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-timer-ball',
-    name: 'Craft Timer Ball',
+    name: 'Timer Ball',
     description: 'Craft adaptive balls that improve over drawn-out encounters.',
     artisanLevel: 100,
     costs: [
@@ -522,7 +522,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-luxury-ball',
-    name: 'Craft Luxury Ball',
+    name: 'Luxury Ball',
     description: 'Craft premium comfort-lined capture balls.',
     artisanLevel: 100,
     costs: [
@@ -534,7 +534,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-quick-ball',
-    name: 'Craft Quick Ball',
+    name: 'Quick Ball',
     description: 'Craft pre-primed balls optimized for opening throws.',
     artisanLevel: 100,
     costs: [
@@ -546,7 +546,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-rocket-ball',
-    name: 'Craft Rocket Ball',
+    name: 'Rocket Ball',
     description: 'Craft a specialised ball for capturing Shadow Pokémon.',
     artisanLevel: 100,
     costs: [
@@ -558,7 +558,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-dream-ball',
-    name: 'Craft Dream Ball',
+    name: 'Dream Ball',
     description: 'Craft oneiric balls tuned to sleeping targets.',
     artisanLevel: 100,
     costs: [
@@ -570,7 +570,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-cherish-ball',
-    name: 'Craft Cherish Ball',
+    name: 'Cherish Ball',
     description: 'Craft limited commemorative artisan balls.',
     artisanLevel: 100,
     costs: [
@@ -582,7 +582,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   },
   {
     id: 'craft-beast-ball',
-    name: 'Craft Beast Ball',
+    name: 'Beast Ball',
     description: 'Craft unstable dimensional capsules for exotic targets.',
     artisanLevel: 100,
     costs: [
