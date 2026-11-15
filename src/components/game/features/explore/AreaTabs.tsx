@@ -75,7 +75,7 @@ export function AreaTabs({
                     />
                   }
                   background={subRegionData?.image || '/backgrounds/town.avif'}
-                  title={subCategory}
+                  title={subRegionData?.category || subCategory}
                   icon={
                     subRegionData?.icon ? (
                       <TaskIconDisplay

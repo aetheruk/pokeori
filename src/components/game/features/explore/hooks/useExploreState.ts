@@ -37,8 +37,11 @@ export function useExploreState(availableItems: ExploreItem[], userData: Require
 
   // Categories Calculation
   const categories = useMemo(() => {
+    const categoriesWithAreas = Object.values(subCategoryDataMap)
+      .filter((area) => area.alwaysAvailable && area.region)
+      .map((area) => area.region!)
     const rawCategories = Array.from(
-      new Set(availableItems.map((i) => i.category)),
+      new Set([...availableItems.map((i) => i.category), ...categoriesWithAreas]),
     ).sort()
     if (isTakeover) {
       return rawCategories

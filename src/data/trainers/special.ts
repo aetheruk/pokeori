@@ -27,6 +27,7 @@ export const specialTrainerClasses = [
   { id: 'ariana', name: 'Ariana', spriteId: '/sprites/trainers/special/ariana.avif', overworldSpriteId: 'trainer-rocket-grunt-f', payoutModifier: 65, gender: 'f', kind: 'special', special: true },
   { id: 'bill', name: 'Bill', spriteId: '/sprites/trainers/special/bill.avif', overworldSpriteId: 'trainer-pokemaniac', payoutModifier: 35, gender: 'm', kind: 'special', special: true },
   { id: 'detective', name: 'Detective', spriteId: '/sprites/trainers/special/detective.avif', payoutModifier: 65, gender: 'm', kind: 'special', special: true, overworldSpriteId: 'trainer-gentleman' },
+  { id: 'elm', name: 'Professor Elm', spriteId: '/sprites/trainers/special/elm.avif', overworldSpriteId: 'trainer-elm', payoutModifier: 65, gender: 'm', kind: 'special', special: true },
   { id: 'joey', name: 'Joey', spriteId: '/sprites/trainers/special/joey.avif', overworldSpriteId: 'trainer-youngster', payoutModifier: 15, gender: 'm', kind: 'special', special: true },
   { id: 'leaf', name: 'Leaf', spriteId: '/sprites/trainers/special/leaf.avif', overworldSpriteId: 'trainer-leaf', payoutModifier: 65, gender: 'f', kind: 'special', special: true },
   { id: 'oak', name: 'Professor Oak', spriteId: '/sprites/trainers/special/oak.avif', overworldSpriteId: 'trainer-oak', payoutModifier: 65, gender: 'm', kind: 'special', special: true },
