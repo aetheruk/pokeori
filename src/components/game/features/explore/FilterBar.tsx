@@ -1,5 +1,6 @@
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { subCategories } from '@/data/sub-region-map'
 import type { TaskIcon } from '@/data/tasks/types'
 
 const dailyIcon = {
@@ -75,7 +76,9 @@ export function FilterBar({
               className="mr-2 h-7 w-7 shrink-0"
             />
             <span className="min-w-0 flex-1 truncate">
-              {activeSubCategory || 'Choose area'}
+              {activeSubCategory
+                ? subCategories[activeSubCategory]?.category || activeSubCategory
+                : 'Choose area'}
             </span>
           </button>
           <button

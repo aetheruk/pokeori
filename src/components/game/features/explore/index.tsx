@@ -114,7 +114,8 @@ const getRegionData = (
 
   return {
     currentImage: currentSubCategoryData?.image || currentRegionData?.image,
-    currentTitle: activeSubCategory || activeCategory,
+    currentTitle:
+      currentSubCategoryData?.category || activeSubCategory || activeCategory,
     currentMusic: currentSubCategoryData?.music,
     currentRegionIcon: regionIcon,
     currentLocationIcon: currentSubCategoryData?.icon || mapPinIcon,
