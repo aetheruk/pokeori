@@ -20,6 +20,36 @@ export const ceruleanCityShops: ShopConfig[] = [
     ],
     items: [
       {
+        id: 'gym-heroes-booster-pack',
+        name: 'Gym Heroes Booster Pack',
+        description: 'A Booster Pack of 5 Gym Heroes cards.',
+        icon: {
+          type: 'item',
+          id: 'pack-gym1',
+        },
+        cost: [
+          {
+            type: 'currency',
+            id: 'crystals',
+            amount: 300,
+          },
+        ],
+        rewards: [
+          {
+            type: 'item',
+            targetId: 'pack-gym1',
+            quantity: 1,
+            dropChance: 100,
+          },
+        ],
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'underground-tcg-misty-madness',
+          },
+        ],
+      },
+      {
         id: 'poke-ball',
         name: 'Poké Ball',
         description: 'A device for catching wild Pokémon.',

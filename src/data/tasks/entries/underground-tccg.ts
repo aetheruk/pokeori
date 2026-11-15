@@ -952,6 +952,96 @@ export const undergroundTccgTasks: Task[] = [
       closeButtonText: 'Return to the Presses',
     },
   },
+  {
+    id: 'underground-tcg-misty-madness',
+    name: 'Misty Madness',
+    description: 'Gideon looks very excited about something.',
+    category: 'Underground',
+    subCategory: 'Kanto Underground',
+    icon: maniacMale,
+    background: undergroundBackground,
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hey Gideon',
+    chat: true,
+    requirements: [
+      {
+        type: 'card_collected_set',
+        targetId: 'gym1',
+        count: 100,
+        unique: true,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Gideon',
+        message:
+          '{Trainer}! It’s finally happened, we’ve got official distribution! It’s only Cerulean Poké Mart for now, but the Gym Heroes set has become so popular they’re going to be stocking our booster packs right there on the shelves! Turns out putting Misty on the cards was the best idea we ever had! Best of all, they’ve agreed to charge trainers in Crystals!',
+        background: undergroundBackground,
+        icon: maniacMale,
+        buttons: [{ text: 'No way!', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: undergroundBackground,
+      title: 'Misty Madness',
+      icon: maniacMale,
+      message:
+        'Due to the overwhelming popularity of Misty, Cerulean City Poké Mart now stocks Gym Heroes Booster Packs for 300 Crystals.',
+      closeButtonText: 'Celebrate the Deal',
+    },
+  },
+  {
+    id: 'underground-tcg-sabrina-shenanigans',
+    name: 'Sabrina Shenanigans',
+    description: 'Gideon’s hyped up again.',
+    category: 'Underground',
+    subCategory: 'Kanto Underground',
+    icon: maniacMale,
+    background: undergroundBackground,
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hey Gideon',
+    chat: true,
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'underground-tcg-misty-madness',
+      },
+      {
+        type: 'card_collected_set',
+        targetId: 'gym2',
+        count: 100,
+        unique: true,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Gideon',
+        message:
+          'Lightning does strike twice! Trainers are now going mad for the Sabrina cards! Saffron City Poké Mart has agreed to supply the Gym Challenge set! Crystals are going to be coming in at a rate never seen before!',
+        background: undergroundBackground,
+        icon: maniacMale,
+        buttons: [{ text: 'Nice!', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: undergroundBackground,
+      title: 'Sabrina Shenanigans',
+      icon: maniacMale,
+      message:
+        'Gideon has secured Saffron City Poké Mart as the next Gym Challenge Booster Pack distributor. When the Saffron shop is authored, its pack offer can be unlocked by this task.',
+      closeButtonText: 'Celebrate the Deal',
+    },
+  },
 ] as Task[]
 
 // One claimable Society archive task is authored for every set. The task is
