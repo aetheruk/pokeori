@@ -133,8 +133,6 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
       amount: userCurrency[currencyId] || 0,
     }))
     .filter(({ currency }) => !!currency)
-  const shopCurrencyId = shopCurrencyBalances[0]?.id
-
   return (
     <div ref={containerRef} className="relative z-10">
       <RewardResultOverlay
@@ -205,6 +203,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
           {visibleItems.map((item) => {
             const purchaseData = shopPurchases[item.id]
             const outOfStock = isOutOfStock(item, purchaseData)
+            const itemCurrencyId = item.cost.find((cost) => cost.type === 'currency')?.id
 
             // Check Can Afford
             let canAfford = true
@@ -306,9 +305,9 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                     >
                       {purchasingItem === item.id ? (
                         <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-                      ) : shopCurrencyId ? (
+                      ) : itemCurrencyId ? (
                         <CurrencySprite
-                          currencyId={shopCurrencyId}
+                          currencyId={itemCurrencyId}
                           width={24}
                           height={24}
                           alt=""
