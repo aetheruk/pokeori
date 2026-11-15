@@ -2615,6 +2615,7 @@ describe('static data references', () => {
         'burn-heal',
         'awakening',
         'paralyze-heal',
+        'pack-gym1',
       ]),
     )
     expect(availableRewardIds('vermilion-city-mart')).toEqual(
