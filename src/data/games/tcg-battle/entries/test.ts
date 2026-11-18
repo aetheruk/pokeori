@@ -4,8 +4,8 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
   {
     id: 'tcg-battle-baby-test',
     gameType: 'tcg-battle',
-    name: 'TCG Battle Test: Baby',
-    description: 'Test the Baby deck format against a low-cost opponent deck.',
+    name: 'TCG Battle Test: Basics',
+    description: 'Test the standard deck rules against a low-cost opponent deck.',
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'lucide', id: 'CreditCard' },
@@ -13,7 +13,6 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     requirements: [],
     rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 100 }],
     settings: {
-      deckFormat: 'baby',
       requiredSeries: 'Base',
       themeColour: 'teal',
       opponentDeckCardIds: [
@@ -38,8 +37,8 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
   {
     id: 'tcg-battle-champions-test',
     gameType: 'tcg-battle',
-    name: 'TCG Battle Test: Champions',
-    description: 'Test the Champions deck format against evolved Kanto cards.',
+    name: 'TCG Battle Test: Evolutions',
+    description: 'Test the standard deck rules against evolved Kanto cards.',
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'lucide', id: 'CreditCard' },
@@ -47,7 +46,6 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     requirements: [],
     rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 100 }],
     settings: {
-      deckFormat: 'champions',
       requiredSeries: 'Base',
       themeColour: 'amber',
       opponentDeckCardIds: [
@@ -72,8 +70,8 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
   {
     id: 'tcg-battle-masters-test',
     gameType: 'tcg-battle',
-    name: 'TCG Battle Test: Masters',
-    description: 'Test the Masters deck format against three complete Kanto evolution lines.',
+    name: 'TCG Battle Test: Evolution Lines',
+    description: 'Test the standard deck rules against three complete Kanto evolution lines.',
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'lucide', id: 'CreditCard' },
@@ -81,7 +79,6 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     requirements: [],
     rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 100 }],
     settings: {
-      deckFormat: 'masters',
       requiredSeries: 'Base',
       themeColour: 'violet',
       opponentDeckCardIds: [

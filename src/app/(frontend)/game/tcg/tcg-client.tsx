@@ -78,12 +78,7 @@ const CARD_CRYSTALIZER_ITEM_ID = 'card-crystalizer'
 const TCG_SET_ARTWORK_BY_ID = new Map(
   tcgSetSummaries.map((set) => [set.id, set.images]),
 )
-type DeckFormat = 'baby' | 'champions' | 'masters'
-const DECK_FORMATS: { id: DeckFormat; label: string }[] = [
-  { id: 'baby', label: 'Baby' },
-  { id: 'champions', label: 'Champions' },
-  { id: 'masters', label: 'Masters' },
-]
+type TcgDeckEntry = { cards: string[]; energy?: TcgBattleEnergyType }
 
 function getTcgCardHeroDescription(card: TcgCard) {
   const stage =
@@ -141,15 +136,10 @@ export default function TcgExplorerPage({
   const [bulkRedistributing, setBulkRedistributing] = useState(false)
   const [rewardSummary, setRewardSummary] = useState<RewardSummary | null>(null)
   const [generationDecks, setGenerationDecks] = useState<
-    Record<
-      string,
-      Partial<
-        Record<DeckFormat, { cards: string[]; energy?: TcgBattleEnergyType }>
-      >
-    >
+    Record<string, TcgDeckEntry>
   >({})
   const [deckValidation, setDeckValidation] = useState<
-    Record<string, Record<DeckFormat, { totalCost: number }>>
+    Record<string, { totalCost: number }>
   >({})
   const [deckCardsById, setDeckCardsById] = useState<Map<string, TcgCard>>(
     () => new Map(),
@@ -379,12 +369,8 @@ export default function TcgExplorerPage({
       if (!mounted) return
       if (result.ok) {
         setGenerationDecks(result.generationDecks || {})
-        setDeckValidation(
-          (result.validation || {}) as Record<
-            string,
-            Record<DeckFormat, { totalCost: number }>
-          >,
-        )
+        setDeckValidation(result.validation || {})
+        if (result.resetLegacyDecks) setDeckMessage('Old decks cleared. Add cards to build new series decks.')
       } else if (result.error) {
         setDeckMessage(result.error)
       }
@@ -399,9 +385,7 @@ export default function TcgExplorerPage({
     () =>
       Array.from(
         new Set(
-          Object.values(generationDecks[selectedCardGeneration] || {}).flatMap(
-            (deck) => deck?.cards || [],
-          ),
+          generationDecks[selectedCardGeneration]?.cards || [],
         ),
       ),
     [generationDecks, selectedCardGeneration],
@@ -431,8 +415,8 @@ export default function TcgExplorerPage({
     return () => controller.abort()
   }, [selectedGenerationDeckCardIds])
 
-  const getGenerationDeckCost = (generation: string, format: DeckFormat) => {
-    const deck = generationDecks[generation]?.[format]?.cards || []
+  const getGenerationDeckCost = (generation: string) => {
+    const deck = generationDecks[generation]?.cards || []
     const hasAllCards = deck.every((cardId) => deckCardsById.has(cardId))
     if (hasAllCards) {
       return deck.reduce(
@@ -441,25 +425,24 @@ export default function TcgExplorerPage({
         0,
       )
     }
-    return deckValidation[generation]?.[format]?.totalCost || 0
+    return deckValidation[generation]?.totalCost || 0
   }
 
   const toggleCardInGenerationDeck = async (
     generation: string,
-    format: DeckFormat,
     cardId: string,
   ) => {
     if (!selectedCard) return
-    const currentDeck = generationDecks[generation]?.[format]?.cards || []
-    const currentEnergy = generationDecks[generation]?.[format]?.energy
+    const currentDeck = generationDecks[generation]?.cards || []
+    const currentEnergy = generationDecks[generation]?.energy
     const cardCost = calculateTcgBattleCardCost(selectedCard.card)
-    const currentCost = getGenerationDeckCost(generation, format)
+    const currentCost = getGenerationDeckCost(generation)
     if (
       !currentDeck.includes(cardId) &&
-      currentCost + cardCost > TCG_BATTLE_FORMATS[format].deckCostLimit
+      currentCost + cardCost > TCG_BATTLE_FORMATS.standard.deckCostLimit
     ) {
       setDeckMessage(
-        `${selectedCard?.card.name || 'That card'} would exceed the ${TCG_BATTLE_FORMATS[format].label} cost limit.`,
+        `${selectedCard?.card.name || 'That card'} would exceed the 60-point deck limit.`,
       )
       return
     }
@@ -472,7 +455,6 @@ export default function TcgExplorerPage({
     setDeckMessage('')
     const result = await saveTcgDeck(
       generation,
-      format,
       nextDeck,
       currentEnergy || null,
     )
@@ -1116,52 +1098,28 @@ export default function TcgExplorerPage({
                       {selectedCard.card.supertype === 'Pokémon' &&
                       (selectedCard.card.types?.length || 0) > 0 ? (
                         <div className="grid grid-cols-1 gap-2">
-                          {DECK_FORMATS.map((format) => {
+                          {(() => {
                             const generation = selectedCard.set.series
-                            const deck =
-                              generationDecks[generation]?.[format.id]?.cards ||
-                              []
+                            const deck = generationDecks[generation]?.cards || []
                             const isInDeck = deck.includes(selectedCard.card.id)
-                            const deckCost = getGenerationDeckCost(
-                              generation,
-                              format.id,
-                            )
-                            const cardCost = calculateTcgBattleCardCost(
-                              selectedCard.card,
-                            )
-                            const costLimit =
-                              TCG_BATTLE_FORMATS[format.id].deckCostLimit
-                            const wouldExceedCost =
-                              !isInDeck && deckCost + cardCost > costLimit
+                            const deckCost = getGenerationDeckCost(generation)
+                            const cardCost = calculateTcgBattleCardCost(selectedCard.card)
+                            const costLimit = TCG_BATTLE_FORMATS.standard.deckCostLimit
+                            const wouldExceedCost = !isInDeck && deckCost + cardCost > costLimit
                             return (
                               <Button
-                                key={format.id}
                                 variant={isInDeck ? 'default' : 'outline'}
                                 className="w-full justify-between"
-                                disabled={
-                                  !isInDeck &&
-                                  (deck.length >= 15 || wouldExceedCost)
-                                }
-                                onClick={() =>
-                                  toggleCardInGenerationDeck(
-                                    generation,
-                                    format.id,
-                                    selectedCard.card.id,
-                                  )
-                                }
+                                disabled={!isInDeck && (deck.length >= 15 || wouldExceedCost)}
+                                onClick={() => toggleCardInGenerationDeck(generation, selectedCard.card.id)}
                               >
-                                <span>
-                                  {isInDeck
-                                    ? `Remove from ${format.label}`
-                                    : `Add to ${format.label} (+${cardCost} cost)`}
-                                </span>
+                                <span>{isInDeck ? 'Remove from deck' : `Add to deck (+${cardCost} points)`}</span>
                                 <span className="text-xs font-mono text-game-muted">
-                                  {deck.length}/15 cards · {deckCost}/
-                                  {costLimit} cost
+                                  {deck.length}/15 cards · {deckCost}/{costLimit} points
                                 </span>
                               </Button>
                             )
-                          })}
+                          })()}
                           {deckMessage && (
                             <span className="text-xs text-game-muted">
                               {deckMessage}

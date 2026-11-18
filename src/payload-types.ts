@@ -348,7 +348,7 @@ export interface User {
     | boolean
     | null;
   /**
-   * Saved TCG battle decks by format
+   * Deprecated legacy TCG decks; new decks are stored by generation series.
    */
   tcgDecks?:
     | {
@@ -360,7 +360,7 @@ export interface User {
     | boolean
     | null;
   /**
-   * Saved TCG battle decks grouped by generation series, each with baby/champions/masters.
+   * One saved TCG battle deck per generation series.
    */
   tcgDecksByGeneration?:
     | {

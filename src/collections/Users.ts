@@ -391,7 +391,7 @@ export const Users: CollectionConfig = {
       type: 'json',
       defaultValue: {},
       admin: {
-        description: 'Saved TCG battle decks by format',
+        description: 'Legacy TCG battle decks, cleared when deck management is opened.',
       },
     },
     {
@@ -399,7 +399,7 @@ export const Users: CollectionConfig = {
       type: 'json',
       defaultValue: {},
       admin: {
-        description: 'Saved TCG battle decks grouped by generation series, each with baby/champions/masters.',
+        description: 'One saved 15-card TCG battle deck per generation series, capped at 60 cost points.',
       },
     },
     {

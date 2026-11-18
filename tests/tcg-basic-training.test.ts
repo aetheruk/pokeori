@@ -375,7 +375,6 @@ describe('TCG Basic Training content', () => {
     expect(tutorial?.name).toBe('Lost-and-Found Practice')
     expect(tutorial?.settings.opponentDeckCardIds).toHaveLength(15)
     expect(new Set(tutorial?.settings.opponentDeckCardIds).size).toBe(15)
-    expect(tutorial?.settings.deckFormat).toBe('baby')
     expect(tutorial?.settings.requiredSeries).toBe('Base')
     expect(
       (tutorial!.settings as { opponentEnergyType?: string })
@@ -426,14 +425,13 @@ describe('TCG Basic Training content', () => {
       gameType: 'tcg-battle',
       name: 'Underground TCG PVP',
       description:
-        'Challenge another collector in a fast-paced Base Champions TCG battle.',
+        'Challenge another collector in a fast-paced Base set TCG battle.',
       category: 'Underground',
       subCategory: 'Kanto Underground',
       icon: { type: 'trainer', id: 'tcg-maniac-m' },
       rewards: [],
       settings: {
         battleMode: 'pvp',
-        deckFormat: 'champions',
         requiredSeries: 'Base',
         matchmakingModes: ['friendly', 'quick'],
       },
@@ -486,8 +484,8 @@ describe('TCG Basic Training content', () => {
     )
     expect(taskDialogue(deckLesson)).toContain('Auto Fill')
     expect(taskDialogue(deckLesson)).toContain('CardDex')
-    expect(taskDialogue(deckLesson)).toContain('Base Rules')
-    expect(taskDialogue(deckLesson)).toContain('30, 55, and 85')
+    expect(taskDialogue(deckLesson)).toContain('fifteen unique Pokémon cards')
+    expect(taskDialogue(deckLesson)).toContain('60 or less')
     expect(taskDialogue(energyLesson)).toContain(
       'Stage 1 cards unlock on turn 3',
     )
@@ -503,13 +501,10 @@ describe('TCG Basic Training content', () => {
       const validation = await validateTcgBattleDeck(
         cardIds,
         Object.fromEntries(cardIds.map((cardId) => [cardId, 1])),
-        'baby',
       )
-      expect(validation.valid, `${game?.id} should be a valid Baby deck`).toBe(
-        true,
-      )
+      expect(validation.valid, `${game?.id} should be a valid deck`).toBe(true)
       expect(validation.totalCost, `${game?.id} deck cost`).toBeLessThanOrEqual(
-        30,
+        60,
       )
       if (game?.id === 'underground-tcg-battle-tutorial') {
         expect(validation.totalCost).toBe(15)
