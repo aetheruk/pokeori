@@ -9,11 +9,9 @@ import { drawRandomTcgCard } from '@/utilities/tcg/tcg-card-draw'
 import {
   autoBuildTcgBattleDeck,
   normalizeTcgBattleEnergyType,
-  normalizeTcgDeckFormat,
   TCG_BATTLE_FORMATS,
   validateTcgBattleDeck,
   type TcgBattleCardSummary,
-  type TcgBattleDeckFormat,
   type TcgBattleEnergyType,
 } from '@/utilities/tcg/tcg-battle'
 import { getAllTcgSets, getTcgCardSeriesById } from '@/utilities/tcg/tcg'
@@ -37,19 +35,20 @@ export interface DrawActionState {
 export interface TcgDeckActionResult {
   ok: boolean
   error?: string
-  generationDecks?: Record<string, Partial<Record<TcgBattleDeckFormat, { cards: string[]; energy?: TcgBattleEnergyType }>>>
+  generationDecks?: Record<string, { cards: string[]; energy?: TcgBattleEnergyType }>
   generations?: string[]
+  resetLegacyDecks?: boolean
   generation?: string
   deck?: string[]
   cards?: TcgBattleCardSummary[]
   totalCost?: number
   costLimit?: number
   startingEnergy?: number
-  validation?: Record<string, Record<TcgBattleDeckFormat, { valid: boolean; errors: string[]; totalCost: number }>>
+  validation?: Record<string, { valid: boolean; errors: string[]; totalCost: number }>
 }
 
 type TcgDeckEntry = { cards: string[]; energy?: TcgBattleEnergyType }
-type TcgGenerationDeckMap = Record<string, Partial<Record<TcgBattleDeckFormat, TcgDeckEntry>>>
+type TcgGenerationDeckMap = Record<string, TcgDeckEntry>
 const CARD_CRYSTALIZER_ITEM_ID = 'card-crystalizer'
 
 function normalizeGenerationDecks(
@@ -59,28 +58,23 @@ function normalizeGenerationDecks(
   const result: TcgGenerationDeckMap = {}
   for (const [generation, generationDecks] of Object.entries(raw)) {
     if (!generation || !generationDecks || typeof generationDecks !== 'object') continue
-    const decks = generationDecks as Record<string, unknown>
-    const normalizeEntry = (format: TcgBattleDeckFormat): TcgDeckEntry => {
-      const formatValue = decks[format]
-      if (Array.isArray(formatValue)) {
-        return {
-          cards: formatValue.filter((id): id is string => typeof id === 'string'),
-        }
-      }
-      if (!formatValue || typeof formatValue !== 'object') return { cards: [] }
-      const entry = formatValue as Record<string, unknown>
-      return {
-        cards: Array.isArray(entry.cards) ? entry.cards.filter((id): id is string => typeof id === 'string') : [],
-        energy: normalizeTcgBattleEnergyType(entry.energy) || undefined,
-      }
-    }
+    const entry = generationDecks as Record<string, unknown>
+    if (!Array.isArray(entry.cards)) continue
     result[generation] = {
-      baby: normalizeEntry('baby'),
-      champions: normalizeEntry('champions'),
-      masters: normalizeEntry('masters'),
+      cards: entry.cards.filter((id): id is string => typeof id === 'string'),
+      energy: normalizeTcgBattleEnergyType(entry.energy) || undefined,
     }
   }
   return result
+}
+
+function hasLegacyDeckData(user: Record<string, unknown>): boolean {
+  const decks = (user.tcgDecksByGeneration || {}) as Record<string, unknown>
+  const hasFormatDecks = Object.values(decks).some((value) =>
+    Boolean(value && typeof value === 'object' && !Array.isArray(value) && ['baby', 'champions', 'masters'].some((format) => format in (value as Record<string, unknown>))),
+  )
+  const oldDecks = user.tcgDecks
+  return hasFormatDecks || Boolean(oldDecks && typeof oldDecks === 'object' && Object.keys(oldDecks as Record<string, unknown>).length)
 }
 
 function getKnownTcgGenerations(): string[] {
@@ -132,31 +126,25 @@ export async function getTcgDecks(): Promise<TcgDeckActionResult> {
     ])
     if (!hasDeckBox(inventory)) return { ok: false, error: 'Deck Box required.' }
 
-    const generationDecks = normalizeGenerationDecks((user as any).tcgDecksByGeneration)
+    const resetLegacyDecks = hasLegacyDeckData(user as unknown as Record<string, unknown>)
+    if (resetLegacyDecks) {
+      await payload.update({
+        collection: 'users',
+        id: user.id,
+        data: { tcgDecksByGeneration: {}, tcgDecks: {} } as any,
+      })
+    }
+    const generationDecks = resetLegacyDecks ? {} : normalizeGenerationDecks((user as any).tcgDecksByGeneration)
     const generations = getKnownTcgGenerations()
-    const validation = {} as Record<
-      string,
-      Record<TcgBattleDeckFormat, { valid: boolean; errors: string[]; totalCost: number }>
-    >
+    const validation = {} as Record<string, { valid: boolean; errors: string[]; totalCost: number }>
 
     for (const generation of generations) {
-      validation[generation] = {} as Record<
-        TcgBattleDeckFormat,
-        { valid: boolean; errors: string[]; totalCost: number }
-      >
-      const generationEntry = generationDecks[generation] || {}
-      for (const format of Object.keys(TCG_BATTLE_FORMATS) as TcgBattleDeckFormat[]) {
-        const generationDeck = filterDeckToGeneration(generationEntry[format]?.cards || [], generation)
-        const result = await validateTcgBattleDeck(generationDeck, collection, format)
-        validation[generation][format] = {
-          valid: result.valid,
-          errors: result.errors,
-          totalCost: result.totalCost,
-        }
-      }
+      const generationDeck = filterDeckToGeneration(generationDecks[generation]?.cards || [], generation)
+      const result = await validateTcgBattleDeck(generationDeck, collection)
+      validation[generation] = { valid: result.valid, errors: result.errors, totalCost: result.totalCost }
     }
 
-    return { ok: true, generationDecks, generations, validation }
+    return { ok: true, generationDecks, generations, validation, resetLegacyDecks }
   } catch (error) {
     console.error('[TCG Decks] Failed to load decks.', error)
     return { ok: false, error: error instanceof Error ? error.message : 'Unable to load decks.' }
@@ -165,15 +153,12 @@ export async function getTcgDecks(): Promise<TcgDeckActionResult> {
 
 export async function saveTcgDeck(
   generationInput: string,
-  formatInput: string,
   cardIds: string[],
   energyTypeInput?: string | null,
 ): Promise<TcgDeckActionResult> {
   try {
     const generation = ensureGeneration(generationInput)
     if (!generation) return { ok: false, error: 'Invalid generation.' }
-    const format = normalizeTcgDeckFormat(formatInput)
-    if (!format) return { ok: false, error: 'Invalid deck format.' }
     const energyType = energyTypeInput ? normalizeTcgBattleEnergyType(energyTypeInput) : null
     if (energyTypeInput && !energyType) return { ok: false, error: 'Invalid energy type.' }
     if (energyType && !generationSupportsEnergyType(generation, energyType)) {
@@ -209,7 +194,7 @@ export async function saveTcgDeck(
 
     const validation =
       generationCards.length === 15
-        ? await validateTcgBattleDeck(generationCards, collection, format)
+        ? await validateTcgBattleDeck(generationCards, collection)
         : {
             valid: true,
             errors: [],
@@ -219,12 +204,11 @@ export async function saveTcgDeck(
     if (!validation.valid) return { ok: false, error: validation.errors.join(' '), ...validation }
 
     const generationDecks = normalizeGenerationDecks((user as any).tcgDecksByGeneration)
-    const targetGenerationDecks = generationDecks[generation] || {}
-    targetGenerationDecks[format] = {
+    const targetGenerationDeck = {
       cards: generationCards,
       energy: energyType || undefined,
     }
-    generationDecks[generation] = targetGenerationDecks
+    generationDecks[generation] = targetGenerationDeck
 
     await payload.update({
       collection: 'users',
@@ -238,11 +222,11 @@ export async function saveTcgDeck(
       ok: true,
       generationDecks,
       generation,
-      deck: targetGenerationDecks[format]?.cards,
+      deck: targetGenerationDeck.cards,
       cards: validation.cards,
       totalCost: validation.totalCost,
-      costLimit: TCG_BATTLE_FORMATS[format].deckCostLimit,
-      startingEnergy: TCG_BATTLE_FORMATS[format].startingEnergy,
+      costLimit: TCG_BATTLE_FORMATS.standard.deckCostLimit,
+      startingEnergy: TCG_BATTLE_FORMATS.standard.startingEnergy,
     }
   } catch (error) {
     console.error('[TCG Decks] Failed to save deck.', error)
@@ -252,13 +236,10 @@ export async function saveTcgDeck(
 
 export async function autoBuildTcgDeck(
   generationInput: string,
-  formatInput: string,
 ): Promise<TcgDeckActionResult> {
   try {
     const generation = ensureGeneration(generationInput)
     if (!generation) return { ok: false, error: 'Invalid generation.' }
-    const format = normalizeTcgDeckFormat(formatInput)
-    if (!format) return { ok: false, error: 'Invalid deck format.' }
 
     const { payload, user } = await getAuthedUserForDecks()
     if (!user) return { ok: false, error: 'You must be logged in.' }
@@ -271,16 +252,15 @@ export async function autoBuildTcgDeck(
     const generationCollection = Object.fromEntries(
       Object.entries(collection).filter(([cardId, qty]) => qty > 0 && getTcgCardSeriesById(cardId) === generation),
     )
-    const result = await autoBuildTcgBattleDeck(generationCollection, format)
+    const result = await autoBuildTcgBattleDeck(generationCollection)
     if (!result.valid) return { ok: false, error: result.errors.join(' '), ...result }
 
     const generationDecks = normalizeGenerationDecks((user as any).tcgDecksByGeneration)
-    const targetGenerationDecks = generationDecks[generation] || {}
-    targetGenerationDecks[format] = {
+    const targetGenerationDeck = {
       cards: result.cards.map((card) => card.id),
-      energy: targetGenerationDecks[format]?.energy,
+      energy: generationDecks[generation]?.energy,
     }
-    generationDecks[generation] = targetGenerationDecks
+    generationDecks[generation] = targetGenerationDeck
 
     await payload.update({
       collection: 'users',
@@ -294,11 +274,11 @@ export async function autoBuildTcgDeck(
       ok: true,
       generationDecks,
       generation,
-      deck: targetGenerationDecks[format]?.cards,
+      deck: targetGenerationDeck.cards,
       cards: result.cards,
       totalCost: result.totalCost,
-      costLimit: TCG_BATTLE_FORMATS[format].deckCostLimit,
-      startingEnergy: TCG_BATTLE_FORMATS[format].startingEnergy,
+      costLimit: TCG_BATTLE_FORMATS.standard.deckCostLimit,
+      startingEnergy: TCG_BATTLE_FORMATS.standard.startingEnergy,
     }
   } catch (error) {
     console.error('[TCG Decks] Failed to auto-build deck.', error)

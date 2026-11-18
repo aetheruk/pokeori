@@ -1,8 +1,10 @@
-import type { TcgCardAttack, TcgCardDetail } from '@/data/tcg/types'
+import type { TcgCardAbility, TcgCardAttack, TcgCardDetail } from '@/data/tcg/types'
 import { getTcgCardDetailById } from '@/data/tcg/details'
 import { inferRecentTcgBattleAttackEffect } from '@/utilities/tcg/tcg-battle-recent-sets'
 
-export type TcgBattleDeckFormat = 'baby' | 'champions' | 'masters'
+export type TcgBattleDeckFormat = 'standard'
+type LegacyTcgBattleDeckFormat = 'baby' | 'champions' | 'masters'
+type TcgBattleRules = { label: string; deckCostLimit: number; startingEnergy: number; energyCap: number; chargeGain: number }
 export type TcgBattleSide = 'player' | 'opponent'
 export type TcgBattlePhase = 'arranging' | 'battle' | 'promotion' | 'finished'
 export type TcgBattleMode = 'pve' | 'pvp'
@@ -409,13 +411,13 @@ export type TcgBattleSpecialRule =
   | { kind: 'copyAttack'; coinGate?: TcgBattleCoinCondition; preserveExtraCosts: boolean }
 
 export type TcgBattleStatusResolution = {
-  target: 'self' | 'opponent'
+  target: 'self' | 'opponent' | 'ownActive'
   statuses: TcgBattleStatusCondition[]
 }
 
 export type TcgBattleIncomingAttackModifier =
   | { kind: 'preventAll'; remainingOpponentTurns: number }
-  | { kind: 'preventAllEffects'; remainingOpponentTurns: number }
+  | { kind: 'preventAllEffects'; remainingOpponentTurns: number; activeOnly?: boolean }
   | { kind: 'reduce'; amount: number; remainingOpponentTurns: number; attackerId?: string }
   | { kind: 'preventAtMost'; amount: number; remainingOpponentTurns: number }
   | { kind: 'preventAtLeast'; amount: number; remainingOpponentTurns: number }
@@ -423,6 +425,8 @@ export type TcgBattleIncomingAttackModifier =
   | { kind: 'coinPreventDamage'; preventOn: TcgBattleCoinResult; remainingOpponentTurns: number; persistent?: boolean; reflectDamage?: number }
 
 export interface TcgBattleTemporaryEffects {
+  imprisonMarker?: true
+  pokemonPowerSuppression?: { remainingTurns: number }
   disabledAttack?: { attackIndex: number; remainingTurns: number }
   cannotAttack?: { remainingTurns: number }
   cannotRetreat?: { remainingTurns: number; sourceId?: string; untilSourceLeaves?: boolean; untilTargetLeaves?: boolean }
@@ -432,21 +436,32 @@ export interface TcgBattleTemporaryEffects {
   attackFailsOnTails?: true
   cannotTarget?: { targetId: string; remainingTurns: number }
   nextAttackBuff?: { attackName: string; attackNames?: string[]; baseDamage?: number; damageBonus?: number; damageMultiplier?: number; selfDamageMultiplier?: number; remainingTurns: number }
-  attackBaseDamageOverrides?: { attackName: string; baseDamage: number }[]
+  attackBaseDamageOverrides?: { attackName: string; baseDamage: number; turnNumber?: number }[]
   originalMaxHp?: number
+  abilityHpBonus?: number
   healedTurnNumber?: number
+  lastAttackTurnNumber?: number
   healedBySide?: TcgBattleSide
   weaknessType?: TcgBattleEnergyType
   resistanceType?: TcgBattleEnergyType
   battleType?: TcgBattleEnergyType
+  typeOverride?: string
+  typeOverrides?: string[]
+  typeOverrideOwner?: TcgBattleSide
+  typeOverrideActiveOnly?: boolean
   destinyBond?: { remainingTurns: number }
   reflectDamage?: { remainingTurns: number; damageMultiplier?: number; reflectFixedDamage?: number; preventIncomingOnHeads?: boolean; coinGate?: TcgBattleCoinCondition }
   weaknessValue?: string | null
   discardEnergyOnKnockout?: { remainingTurns: number }
+  lostZoneOnKnockout?: true
+  returnToHandOnKnockout?: true
+  rescueEvolutionStackToHandOnKnockout?: true
   lastIncomingAttackDamage?: number
   lastNightEyesAttackBySide?: Partial<Record<TcgBattleSide, number>>
   lastAttackHitBySide?: Partial<Record<TcgBattleSide, number>>
   attackDamageTakenBuff?: { sourceSide: TcgBattleSide; damageBonus: number; remainingTurns: number }
+  poisonCheckupBonus?: number
+  burnCheckupBonus?: number
 }
 
 export interface TcgBattleAttackEffect {
@@ -504,13 +519,15 @@ export type TcgBattleAttack = TcgCardAttack & {
   battleEffect?: TcgBattleAttackEffect
 }
 
-export const TCG_BATTLE_FORMATS: Record<
-  TcgBattleDeckFormat,
-  { label: string; deckCostLimit: number; startingEnergy: number; energyCap: number; chargeGain: number }
-> = {
-  baby: { label: 'Baby', deckCostLimit: 30, startingEnergy: 5, energyCap: 12, chargeGain: 2 },
-  champions: { label: 'Champions', deckCostLimit: 55, startingEnergy: 5, energyCap: 16, chargeGain: 2 },
-  masters: { label: 'Masters', deckCostLimit: 85, startingEnergy: 6, energyCap: 22, chargeGain: 2 },
+export const TCG_BATTLE_RULES: TcgBattleRules = {
+  label: 'Standard', deckCostLimit: 60, startingEnergy: 5, energyCap: 12, chargeGain: 2,
+}
+/** Legacy keys keep battles already in Redis compatible until their short TTL expires. */
+export const TCG_BATTLE_FORMATS: Record<TcgBattleDeckFormat | LegacyTcgBattleDeckFormat, TcgBattleRules> = {
+  standard: TCG_BATTLE_RULES,
+  baby: TCG_BATTLE_RULES,
+  champions: TCG_BATTLE_RULES,
+  masters: TCG_BATTLE_RULES,
 }
 
 export interface TcgBattleCardSummary {
@@ -525,6 +542,8 @@ export interface TcgBattleCardSummary {
   cost: number
   convertedRetreatCost: number
   attacks: TcgBattleAttack[]
+  /** Printed Pokémon abilities carried into battle for supported passive rules. */
+  abilities?: TcgCardAbility[]
   weaknesses: { type: string; value: string }[]
   resistances: { type: string; value: string }[]
 }
@@ -532,11 +551,18 @@ export interface TcgBattleCardSummary {
 export interface TcgBattleCardState extends TcgBattleCardSummary {
   instanceId: string
   currentHp: number
+  /** Turn on which this Basic Pokémon entered the Bench from hand. */
+  playedToBenchTurn?: number
+  /** Turn on which this Basic Pokémon entered a front-row slot from hand. */
+  playedToFrontTurn?: number
+  transformOriginal?: Pick<TcgBattleCardSummary, 'hp' | 'types' | 'weaknesses' | 'resistances' | 'convertedRetreatCost' | 'attacks'>
   evolutionStack?: TcgBattleCardSummary[]
   statusConditions?: TcgBattleStatusCondition[]
   incomingAttackModifier?: TcgBattleIncomingAttackModifier
   temporaryEffects?: TcgBattleTemporaryEffects
   markers?: Array<'lightningRod' | 'shockWave'>
+  /** Turn number of each optional once-per-turn ability already used by this card. */
+  abilityUses?: Record<string, number>
 }
 
 export interface TcgBattleSideState {
@@ -545,8 +571,535 @@ export interface TcgBattleSideState {
   front: TcgBattleCardState[]
   back: TcgBattleCardState[]
   discard: TcgBattleCardState[]
+  /** Pokémon knocked out during this battle; reaching six loses the match. */
+  knockoutCount?: number
+  /** Pokémon cards permanently removed from play by Lost Zone effects. */
+  lostZone?: TcgBattleCardSummary[]
   energy: number
   selectedEnergy?: TcgBattleEnergyType
+  /** Side-wide attack damage boosts active during the recorded turn. */
+  temporaryAttackDamageBoosts?: Array<{ type?: TcgBattleEnergyType; subtype?: string; cardName?: string; damageBonus: number; turnNumber: number; targetActiveOnly?: boolean }>
+  /** Side-wide damage reduction for the specified defending turn. */
+  temporaryAttackDamageReduction?: { damageReduction: number; turnNumber: number }
+  /** A VSTAR Power has been used by this side during the current battle. */
+  usedVstarPower?: boolean
+  /** Per-card Ability use records for cards whose effects resolve from deck/discard zones. */
+  abilityUses?: Record<string, number>
+}
+
+/** Resolve passive Retreat Cost rules, approximating printed Energy attachments through the shared pool. */
+function tcgBattleRetreatScopeMatches(card: TcgBattleCardState, scopeText: string): boolean | null {
+  const scope = normalizeTcgBattleAbilityText(scopeText)
+  const subtypes = card.subtypes.map(normalizeTcgBattleAbilityText)
+  const types = card.types.map(normalizeTcgBattleAbilityText)
+  let recognized = false
+  for (const [label, subtype] of [['basic', 'basic'], ['stage 1', 'stage 1'], ['stage 2', 'stage 2'], ['team plasma', 'team plasma'], ['single strike', 'single strike'], ['rapid strike', 'rapid strike'], ['fusion strike', 'fusion strike'], ['ultra beast', 'ultra beast'], ['pokemon-ex', 'ex'], ['pokemon ex', 'ex'], ['pokemon-gx', 'gx'], ['pokemon gx', 'gx'], ['pokemon vstar', 'vstar'], ['pokemon v', 'v']] as const) {
+    if (!scope.includes(label)) continue
+    recognized = true
+    if (!subtypes.includes(subtype)) return false
+  }
+  for (const type of ['grass', 'fire', 'water', 'lightning', 'psychic', 'fighting', 'metal', 'darkness', 'dragon', 'fairy', 'colorless']) {
+    if (!new RegExp(`\\b${type}\\b`).test(scope)) continue
+    recognized = true
+    if (!types.includes(type)) return false
+  }
+  const excludes = scope.match(/excluding (?:pokemon-)?([a-z -]+)/)
+  if (excludes) {
+    recognized = true
+    const excluded = excludes[1].trim()
+    if (excluded === 'pokemon-ex' && subtypes.includes('ex')) return false
+    if (excluded === 'pokemon-gx' && subtypes.includes('gx')) return false
+    if (excluded === 'basic pokemon' && subtypes.includes('basic')) return false
+  }
+  if (/\bpokemon\b/.test(scope) && !recognized) return true
+  return recognized ? true : null
+}
+
+export function getTcgBattleAbilityRetreatCost(side: TcgBattleSideState, card: TcgBattleCardState, opposingSide?: TcgBattleSideState, turnNumber?: number): number {
+  let cost = card.convertedRetreatCost ?? 1
+  const board = [...side.front, ...side.back].filter((pokemon) => pokemon.currentHp > 0)
+  const abilityBoards = opposingSide ? [side, opposingSide] : [side]
+  const allBoardCards = abilityBoards.flatMap((owner) => [...owner.front, ...owner.back].filter((pokemon) => pokemon.currentHp > 0))
+  const normalizedCardName = normalizeTcgBattleAbilityText(card.name)
+  const legendaryBirdRetreatText = new Map<string, { companions: [string, string]; group: [string, string, string] }>([
+    ["as long as you have zapdos ex and moltres ex in play, the retreat cost for articuno ex is 0.", { companions: ['zapdos ex', 'moltres ex'], group: ['articuno ex', 'zapdos ex', 'moltres ex'] }],
+    ["as long as you have articuno ex and moltres ex in play, the retreat cost for zapdos ex is 0.", { companions: ['articuno ex', 'moltres ex'], group: ['articuno ex', 'zapdos ex', 'moltres ex'] }],
+    ["as long as you have articuno ex and zapdos ex in play, the retreat cost for moltres ex is 0.", { companions: ['articuno ex', 'zapdos ex'], group: ['articuno ex', 'zapdos ex', 'moltres ex'] }],
+  ])
+  if (opposingSide && ['articuno ex', 'zapdos ex', 'moltres ex'].includes(normalizedCardName)) {
+    for (const provider of allBoardCards) {
+      if (isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards)) continue
+      const providerOwner = [...side.front, ...side.back].some((pokemon) => pokemon.instanceId === provider.instanceId) ? side : opposingSide
+      if (providerOwner !== side) continue
+      const ownerNames = [...providerOwner.front, ...providerOwner.back].filter((pokemon) => pokemon.currentHp > 0).map((pokemon) => normalizeTcgBattleAbilityText(pokemon.name))
+      for (const ability of provider.abilities || []) {
+        const effect = legendaryBirdRetreatText.get(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim())
+        if (effect && effect.group.includes(normalizedCardName) && effect.companions.every((name) => ownerNames.includes(name))) cost = 0
+      }
+    }
+  }
+  const activeDodrioRetreatAidText = "as long as dodrio is on your bench, your active pokemon's retreat cost is colorlesscolorless less."
+  if (side.front.some((pokemon) => pokemon.instanceId === card.instanceId) && board.some((provider) =>
+    normalizeTcgBattleAbilityText(provider.name) === 'dodrio' && side.back.some((benched) => benched.instanceId === provider.instanceId) &&
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === activeDodrioRetreatAidText),
+  )) cost = Math.max(0, cost - 2)
+  if (normalizedCardName === 'hoppip' && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'grass' && board.some((provider) =>
+    provider.instanceId === card.instanceId && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'if hoppip has any grass energy attached to it, the retreat cost for hoppip is 0.'),
+  )) cost = 0
+  for (const provider of allBoardCards) {
+    if (isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards)) continue
+    for (const ability of provider.abilities || []) {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      if (text === 'as long as wobbuffet is an evolved pokemon, your opponent pays colorless more to retreat his or her active pokemon.' &&
+        normalizeTcgBattleAbilityText(provider.name) === 'wobbuffet' && Boolean(provider.evolutionStack?.length) &&
+        opposingSide && [...opposingSide.front, ...opposingSide.back].some((pokemon) => pokemon.instanceId === provider.instanceId) &&
+        side.front.some((pokemon) => pokemon.instanceId === card.instanceId)) cost += 1
+      if (text === 'if you have uxie and azelf in play, the retreat cost for each uxie, mesprit, and azelf (both yours and your opponent\'s) is 0.' &&
+        ['uxie', 'mesprit', 'azelf'].includes(normalizedCardName)) {
+        const providerOwner = [...side.front, ...side.back].some((pokemon) => pokemon.instanceId === provider.instanceId) ? side : opposingSide
+        const ownerBoard = providerOwner ? [...providerOwner.front, ...providerOwner.back].filter((pokemon) => pokemon.currentHp > 0) : []
+        if (providerOwner && ownerBoard.some((pokemon) => normalizeTcgBattleAbilityText(pokemon.name) === 'uxie') &&
+          ownerBoard.some((pokemon) => normalizeTcgBattleAbilityText(pokemon.name) === 'azelf')) cost = 0
+      }
+      const namedEnergyRetreat = text.replace(/["']+$/g, '').match(/^(?:if|as long as) (this pokemon|[a-z0-9 '’-]+) has any (?:(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) )?energy attached to it, (.+)\.$/)
+      if (provider.instanceId === card.instanceId && namedEnergyRetreat &&
+        (namedEnergyRetreat[1] === 'this pokemon' || normalizeTcgBattleAbilityText(provider.name) === namedEnergyRetreat[1]) &&
+        (namedEnergyRetreat[2] ? side.energy > 0 && side.selectedEnergy?.toLowerCase() === namedEnergyRetreat[2] : side.energy > 0)) {
+        const retreatTarget = normalizeTcgBattleAbilityText(provider.name)
+        const outcome = namedEnergyRetreat[3]
+        if (outcome === 'this pokemon has no retreat cost' || outcome === `the retreat cost for ${retreatTarget} is 0` || outcome === `retreat cost for ${retreatTarget} is 0` || outcome === `${retreatTarget}'s retreat cost is 0`) cost = 0
+      }
+      if (provider.instanceId === card.instanceId && normalizedCardName === 'magnemite' &&
+        (text === 'as long as this pokemon is your active pokemon, its retreat cost is colorless less for each magnemite on your bench.' ||
+          text === 'you pay colorless less to retreat magnemite for each magnemite on your bench.') &&
+        side.front.some((pokemon) => pokemon.instanceId === provider.instanceId)) {
+        const magnemiteCount = side.back.filter((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) === 'magnemite').length
+        cost = Math.max(0, cost - magnemiteCount)
+        continue
+      }
+      if (provider.instanceId === card.instanceId && normalizedCardName === 'beldum' &&
+        (text === 'as long as this pokemon is your active pokemon, its retreat cost is colorless less for each beldum on your bench.' ||
+          text === 'you pay colorless to retreat beldum for each beldum on your bench.') &&
+        side.front.some((pokemon) => pokemon.instanceId === provider.instanceId)) {
+        const beldumCount = side.back.filter((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) === 'beldum').length
+        cost = Math.max(0, cost - beldumCount)
+        continue
+      }
+      if (text === 'if any basic energy card attached to flygon is the same type as any of your pokemon, the retreat cost for those pokemon is 0.' && normalizedCardName === 'flygon' && board.some((pokemon) => pokemon.instanceId === provider.instanceId)) {
+        const matchingType = side.energy > 0 ? side.selectedEnergy?.toLowerCase() : undefined
+        if (matchingType && board.some((pokemon) => pokemon.types.some((type) => normalizeTcgBattleAbilityText(type) === matchingType)) && card.types.some((type) => normalizeTcgBattleAbilityText(type) === matchingType)) cost = 0
+        continue
+      }
+      if (text === "as long as victreebel is your active pokemon, your opponent's active pokemon's retreat cost is colorlesscolorless more." &&
+        opposingSide?.front.some((pokemon) => pokemon.instanceId === provider.instanceId) && side.front.some((pokemon) => pokemon.instanceId === card.instanceId)) cost += 2
+      if (text === 'if pupitar has any energy attached to it, the retreat cost of pupitar is 0.' && normalizeTcgBattleAbilityText(card.name) === 'pupitar' && provider.instanceId === card.instanceId && side.energy > 0) cost = 0
+      if (normalizedCardName === 'muk' && provider.instanceId === card.instanceId && text === 'as long as there is a grass energy attached to muk, you must pay an additional colorlesscolorless to retreat it.' && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'grass') cost += 2
+      if (text === 'if this pokemon has any grass energy attached to it, this pokemon has no retreat cost.' && provider.instanceId === card.instanceId && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'grass') cost = 0
+      if (provider.instanceId === card.instanceId && normalizedCardName === 'vibrava' && side.energy > 0 &&
+        ((text === "if vibrava has any basic energy cards attached to it, vibrava's retreat cost is 0." && Boolean(side.selectedEnergy)) ||
+          (text === 'if vibrava has any psychic energy attached to it, the retreat cost for vibrava is 0.' && side.selectedEnergy?.toLowerCase() === 'psychic'))) cost = 0
+      if (text === 'if you have any psychic energy attached to your active pokemon, the retreat cost for that pokemon is 0.' && side.front.some((pokemon) => pokemon.instanceId === card.instanceId) && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'psychic') cost = 0
+      if (text === 'each of your pokemon that evolves from eevee has no weakness, and that pokemon\'s retreat cost is 0.' &&
+        side.front.concat(side.back).some((pokemon) => pokemon.instanceId === provider.instanceId) && isTcgBattleEeveeEvolution(card)) cost = 0
+      if (provider.instanceId === card.instanceId && normalizeTcgBattleAbilityText(card.name) === 'arcanine g' &&
+        text.replace(/\s+/g, ' ').trim() === "arcanine g's retreat cost is colorless less for each fire energy attached to arcanine g." &&
+        side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'fire') cost = Math.max(0, cost - side.energy)
+      if (provider.instanceId === card.instanceId && normalizedCardName === 'arcanine' &&
+        text.replace(/\s+/g, ' ').trim() === 'you pay colorless less to retreat arcanine for each energy attached to it.' && side.energy > 0) {
+        cost = Math.max(0, cost - side.energy)
+      }
+      const allPlayersRetreatIncrease = text.match(/^the retreat cost for each player's pokemon \(excluding ([^)]+)\) is ((?:colorless|\{c\})+) more\.?$/)
+      const allInPlayRetreatIncrease = text.match(/^the retreat cost of each pokemon in play \(except for (.+?) pokemon\) is ((?:colorless|\{c\})+) more\.?$/)
+      if (allPlayersRetreatIncrease) {
+        const excludedName = normalizeTcgBattleAbilityText(allPlayersRetreatIncrease[1]).replace(/^pokemon[- ]?/, '')
+        if (normalizedCardName.includes(excludedName)) continue
+        cost += allPlayersRetreatIncrease[2].match(/colorless|\{c\}/g)?.length || 0
+      } else if (allInPlayRetreatIncrease) {
+        const excludedGroup = normalizeTcgBattleAbilityText(allInPlayRetreatIncrease[1])
+        const isExcluded = excludedGroup === 'team aqua' && normalizedCardName.startsWith("team aqua's ")
+        if (isExcluded) continue
+        cost += allInPlayRetreatIncrease[2].match(/colorless|\{c\}/g)?.length || 0
+      }
+    }
+  }
+  const familyBondsText = 'as long as nidoqueen is in play, the retreat cost for nidoran ♀, nidorina, nidoran ♂, nidorino and nidoking is 0.'
+  const familyBondsTargets = ['nidoran ♀', 'nidorina', 'nidoran ♂', 'nidorino', 'nidoking']
+  if (familyBondsTargets.includes(normalizeTcgBattleAbilityText(card.name)) && abilityBoards.some((owner) =>
+    [...owner.front, ...owner.back].some((provider) =>
+      provider.currentHp > 0 &&
+      normalizeTcgBattleAbilityText(provider.name) === 'nidoqueen' &&
+      !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text) === familyBondsText),
+    ),
+  )) cost = 0
+  if (normalizedCardName === 'latios' && board.some((provider) =>
+    normalizeTcgBattleAbilityText(provider.name) === 'latias' &&
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === 'your latios in play have no retreat cost.' || text === 'if you have latias in play, the retreat cost for latios is 0.'
+    }),
+  )) cost = 0
+  const cardIsBasic = card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')
+  for (const provider of board) {
+    if (isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards)) continue
+    const providerIsBenched = side.back.some((pokemon) => pokemon.instanceId === provider.instanceId)
+    for (const ability of provider.abilities || []) {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      if (/once during your turn|during your next turn|during this turn|when you play .* from your hand|you may use this (?:ability|power)/.test(text)) continue
+      if (text === 'the retreat cost of each of your pokemon that has any {r} energy attached is {c}{c} less.' &&
+        side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'fire' && board.some((pokemon) => pokemon.instanceId === card.instanceId)) cost = Math.max(0, cost - 2)
+      const energyTypeSymbols: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+      const attachedEnergyCondition = text.match(/(?:this pokemon|it|each of your pokemon(?: that)?|your pokemon(?: that)?) has any (?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless)) energy attached/)
+      const attachedEnergyType = attachedEnergyCondition?.[1] ? energyTypeSymbols[attachedEnergyCondition[1]] : attachedEnergyCondition?.[2]
+      const genericAttachedEnergyCondition = /(?:this pokemon|it) has any energy attached/.test(text)
+      const genericNoAttachedEnergyCondition = /(?:this pokemon|it) has no energy attached/.test(text)
+      const psychicTeamRetreat = text === 'all of your pokemon that have {p} energy attached have no retreat cost.' && board.some((pokemon) => pokemon.instanceId === card.instanceId)
+      const lowEnergySelfRetreat = text.match(/^if this pokemon has (\d+) or fewer energy attached to it, it has no retreat cost\.$/)
+      const lowEnergySelfRetreatApplies = Boolean(lowEnergySelfRetreat && provider.instanceId === card.instanceId)
+      const abraPsychicEnergyRetreat = normalizeTcgBattleAbilityText(provider.name) === 'abra' && normalizeTcgBattleAbilityText(card.name) === 'abra' && provider.instanceId === card.instanceId && text === 'as long as there is a psychic energy card attached to abra, its retreat cost is 0.'
+      const kyogreLowEnergyRetreat = text === 'as long as kyogre ex has 1 energy or less attached to it, the retreat cost for each of your kyogre ex is 0.' && normalizeTcgBattleAbilityText(card.name) === 'kyogre ex'
+      const yanmaNoEnergyRetreat = text === "if yanma has no energy attached to it, yanma's retreat cost is 0." && normalizeTcgBattleAbilityText(card.name) === 'yanma' && provider.instanceId === card.instanceId
+      const swellowNoEnergyRetreat = text === 'if swellow has no energy attached to it, swellow\'s retreat cost is 0.' && normalizeTcgBattleAbilityText(card.name) === 'swellow' && provider.instanceId === card.instanceId
+      const selfNoEnergyRetreat = text === 'if this pokemon has no energy attached to it, this pokemon has no retreat cost.' && provider.instanceId === card.instanceId
+      const namedEnergyRetreat = text.match(/^(?:if|as long as) ([a-z0-9 '’-]+) has (any|no) energy attached to it, (?:(?:the )?retreat cost (?:for|of) ([a-z0-9 '’-]+)|([a-z0-9 '’-]+)'s retreat cost) is 0\.?$/)
+      const namedEnergyRetreatTarget = namedEnergyRetreat?.[3] || namedEnergyRetreat?.[4]
+      const namedEnergyRetreatApplies = Boolean(namedEnergyRetreat && namedEnergyRetreat[1].trim() === namedEnergyRetreatTarget?.trim() && normalizeTcgBattleAbilityText(card.name) === namedEnergyRetreat[1].trim())
+      const activeMetalEnergyRetreat = /^if you have any (?:\{m\}|metal) energy attached to your active pokemon, the retreat cost for that pokemon is 0\.$/.test(text)
+      const metalTeamRetreat = /all of your pokemon that have \{m\} energy attached have no retreat cost/.test(text)
+      if (/energy attached/.test(text) && !metalTeamRetreat && !psychicTeamRetreat && !namedEnergyRetreatApplies && !activeMetalEnergyRetreat && !yanmaNoEnergyRetreat && !swellowNoEnergyRetreat && !selfNoEnergyRetreat && !lowEnergySelfRetreatApplies && !abraPsychicEnergyRetreat && !kyogreLowEnergyRetreat && (genericAttachedEnergyCondition ? side.energy < 1 : genericNoAttachedEnergyCondition ? side.energy > 0 : !attachedEnergyType || side.energy < 1 || side.selectedEnergy?.toLowerCase() !== attachedEnergyType)) continue
+      if (/stadium|pokemon tool|special condition/.test(text)) continue
+
+      const ownPresence = text.match(/(?:if|as long as) you have (.+?) in play/)
+      const namedPresence = text.match(/as long as ([a-z0-9 '’-]+) is in play/)
+      const opponentActiveExRetreat = /as long as your opponent has any pokemon-ex as his or her active pokemon, the retreat cost for rattata is 0/.test(text)
+      const opponentHasActiveEx = Boolean(opposingSide?.front.some((pokemon) => pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => /^(?:pokemon[- ]?)?ex$/i.test(normalizeTcgBattleAbilityText(subtype)))))
+      const opponentHasExOrGxNoRetreat = /^(?:if|as long as) your opponent has any pokemon-gx or pokemon-ex in play, this pokemon has no retreat cost\.?$/.test(text)
+      const opponentHasExOrGx = Boolean(opposingSide && [...opposingSide.front, ...opposingSide.back].some((pokemon) =>
+        pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => ['ex', 'pokemon-ex', 'gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype))),
+      ))
+      const dunsparceVsEvolutionRetreat = text === "as long as the defending pokemon is an evolved pokemon, dunsparce's retreat cost is 0." &&
+        normalizeTcgBattleAbilityText(card.name) === 'dunsparce' && provider.instanceId === card.instanceId &&
+        side.front.some((pokemon) => pokemon.instanceId === card.instanceId) &&
+        Boolean(opposingSide?.front.some((pokemon) => pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => ['stage 1', 'stage 2'].includes(normalizeTcgBattleAbilityText(subtype)))))
+      const ownPresencePasses = ownPresence ? (() => {
+        const clauses = ownPresence[1].split(/,\s*and\s+|\s+and\s+/).map((clause) => clause.trim())
+        return clauses.every((clause) => {
+          const alternatives = clause.split(/\s+or\s+/).map((entry) => entry.replace(/^any\s+/, '').trim())
+          return alternatives.some((entry) => {
+            const type = entry.match(/^(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) pokemon$/)?.[1]
+            return type
+              ? board.some((pokemon) => pokemon.types.some((pokemonType) => normalizeTcgBattleAbilityText(pokemonType) === type))
+              : board.some((pokemon) => normalizeTcgBattleAbilityText(pokemon.name).includes(entry))
+          })
+        })
+      })() : true
+      const opponentPresence = text.match(/if your opponent has any (.+?) in play/)
+      const opponentPresencePasses = opponentPresence ? (() => {
+        if (!opposingSide) return false
+        const opponentBoard = [...opposingSide.front, ...opposingSide.back].filter((pokemon) => pokemon.currentHp > 0)
+        const alternatives = opponentPresence[1].split(/\s+or\s+/).map((entry) => normalizeTcgBattleAbilityText(entry.trim()))
+        return alternatives.some((entry) => opponentBoard.some((pokemon) => pokemon.subtypes.some((subtype) => {
+          const normalizedSubtype = normalizeTcgBattleAbilityText(subtype)
+          if (/pokemon-(?:ex|gx)|pokemon (?:ex|gx)/.test(entry)) return /\b(?:ex|gx)\b/.test(normalizedSubtype)
+          if (/pokemon v\b/.test(entry)) return /\b(?:v|vmax|vstar)\b/.test(normalizedSubtype)
+          return normalizedSubtype === entry
+        })))
+      })() : true
+      const namedPresencePasses = namedPresence
+        ? board.some((pokemon) => normalizeTcgBattleAbilityText(pokemon.name).includes(namedPresence[1].trim()))
+        : true
+      const damageCounterGate = /if this pokemon has any damage counters?/.test(text)
+      const hasDamageCounters = card.currentHp < card.hp
+      if (ownPresence && !ownPresencePasses || opponentPresence && !opponentPresencePasses || !namedPresencePasses) continue
+      if (text.includes("dunsparce's retreat cost is 0") && !dunsparceVsEvolutionRetreat) continue
+      if (/opponent has/.test(text) && !opponentPresence && !opponentActiveExRetreat && !opponentHasExOrGxNoRetreat) continue
+      if (opponentHasExOrGxNoRetreat && provider.instanceId === card.instanceId && opponentHasExOrGx) cost = 0
+      if (opponentActiveExRetreat && (normalizeTcgBattleAbilityText(card.name) !== 'rattata' || !opponentHasActiveEx)) continue
+      if (/damage counters?/.test(text) && (!damageCounterGate || !hasDamageCounters)) continue
+      if (/\bif\b|during your first turn/.test(text) && !ownPresence && !opponentPresence && !opponentActiveExRetreat && !opponentHasExOrGxNoRetreat && !activeMetalEnergyRetreat && !damageCounterGate && !yanmaNoEnergyRetreat && !swellowNoEnergyRetreat && !selfNoEnergyRetreat && !lowEnergySelfRetreatApplies && !/as long as .* on your bench, your active pokemon's retreat cost is/.test(text)) continue
+
+      const noRetreat = text.match(/(?:your|each of your) (basic )?pokemon in play have no retreat cost|your active pokemon has no retreat cost|your active dondozo has no retreat cost|this pokemon has no retreat cost|it has no retreat cost/)
+      if (noRetreat) {
+        const appliesToSelf = /(?:this pokemon|it) has no retreat cost/.test(text) && provider.instanceId === card.instanceId
+        const appliesToBasic = Boolean(noRetreat[1]) && cardIsBasic
+        const appliesToBoard = !noRetreat[1] && /(?:your|each of your) pokemon in play have no retreat cost/.test(text)
+        const appliesToActive = /your active pokemon has no retreat cost/.test(text) && side.front.some((pokemon) => pokemon.instanceId === card.instanceId)
+        const appliesToDondozo = /your active dondozo has no retreat cost/.test(text) && side.front.some((pokemon) => pokemon.instanceId === card.instanceId) && normalizeTcgBattleAbilityText(card.name).includes('dondozo')
+        const excluded = text.match(/except (?:pokemon-)?([a-z-]+)/)
+        const excludedCard = excluded && card.subtypes.some((subtype) => subtype.toLowerCase().replace(/[^a-z]/g, '') === excluded[1].replace(/[^a-z]/g, ''))
+        if ((appliesToSelf || appliesToBasic || appliesToBoard || appliesToActive || appliesToDondozo) && !excludedCard) cost = 0
+      }
+      if (text.replace(/\s+/g, ' ').trim() === 'each of your pokemon that has any darkness energy attached to it has no retreat cost.' &&
+        side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'darkness' && board.some((pokemon) => pokemon.instanceId === card.instanceId)) cost = 0
+      if (
+        providerIsBenched &&
+        /^as long as unown z is benched, you pay no energy cost to retreat a pokemon with unown in its name\.$/.test(text) &&
+        normalizeTcgBattleAbilityText(card.name).includes('unown')
+      ) cost = 0
+      const benchedRetreatDiscount = text.match(/^as long as ([a-z0-9 '’-]+) is benched, pay (?:(\d+) )?(?:colorless|\{c\}) less to retreat your active pokemon\.?$/)
+      if (providerIsBenched && benchedRetreatDiscount && normalizeTcgBattleAbilityText(provider.name) === benchedRetreatDiscount[1].trim() && side.front.some((pokemon) => pokemon.instanceId === card.instanceId)) {
+        cost = Math.max(0, cost - Number(benchedRetreatDiscount[2] || 1))
+      }
+      if (text === 'as long as dodrio is on your bench, your active pokemon\'s retreat cost is colorlesscolorless less.' && providerIsBenched && normalizeTcgBattleAbilityText(provider.name) === 'dodrio' && side.front.some((pokemon) => pokemon.instanceId === card.instanceId)) cost -= 2
+      if (yanmaNoEnergyRetreat && side.energy === 0) cost = 0
+      if (swellowNoEnergyRetreat && side.energy === 0) cost = 0
+      if (selfNoEnergyRetreat && side.energy === 0) cost = 0
+      if (lowEnergySelfRetreatApplies && lowEnergySelfRetreat && side.energy <= Number(lowEnergySelfRetreat[1])) cost = 0
+      if (dunsparceVsEvolutionRetreat) cost = 0
+      const typedEnergyRetreatDiscount = text.match(/^(suicune|entei|raikou)'s retreat cost is (?:colorless(?: energy)? )?less for each (water|fire|lightning) energy attached to (suicune|entei|raikou)\.$/)
+      if (typedEnergyRetreatDiscount && provider.instanceId === card.instanceId &&
+        normalizeTcgBattleAbilityText(card.name) === typedEnergyRetreatDiscount[1] && typedEnergyRetreatDiscount[1] === typedEnergyRetreatDiscount[3] &&
+        side.selectedEnergy?.toLowerCase() === typedEnergyRetreatDiscount[2]) {
+        cost -= side.energy
+      }
+      const hoppipLineRetreatDiscount = text.match(/^you pay colorless less to retreat (hoppip|skiploom) for each grass energy attached to it\.$/)
+      if (hoppipLineRetreatDiscount && provider.instanceId === card.instanceId && normalizedCardName === hoppipLineRetreatDiscount[1] &&
+        side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'grass') {
+        cost = Math.max(0, cost - side.energy)
+      }
+      const dragoniteTailwind = text === "once during your turn (before your attack), if dragonite is on your bench, you may reduce your active pokemon's retreat cost to 0."
+      const tailwindAbilityIndex = dragoniteTailwind ? (provider.abilities || []).findIndex((candidate) => candidate.name === ability.name && normalizeTcgBattleAbilityText(candidate.text).replace(/\s+/g, ' ').trim() === text) : -1
+      if (providerIsBenched && dragoniteTailwind && normalizeTcgBattleAbilityText(provider.name) === 'dragonite' && side.front.some((pokemon) => pokemon.instanceId === card.instanceId) && tailwindAbilityIndex >= 0 && (turnNumber === undefined || provider.abilityUses?.[`${tailwindAbilityIndex}:${ability.name}`] !== turnNumber)) cost = 0
+      if (turnNumber === 1 && provider.instanceId === card.instanceId && /^during your first turn, this pokemon has no retreat cost\.$/.test(text)) cost = 0
+
+      if (/each of your pokemon that has any (?:\{[grwlpmdycf]\}|grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) energy attached to it has no retreat cost/.test(text) && attachedEnergyType) cost = 0
+      if (metalTeamRetreat && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'metal') cost = 0
+      if (activeMetalEnergyRetreat && side.front.some((pokemon) => pokemon.instanceId === card.instanceId) && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'metal') cost = 0
+      if (namedEnergyRetreatApplies && namedEnergyRetreat && (namedEnergyRetreat[2] === 'any' ? side.energy > 0 : side.energy === 0)) cost = 0
+      if (psychicTeamRetreat && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'psychic') cost = 0
+      if (abraPsychicEnergyRetreat && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'psychic') cost = 0
+      if (kyogreLowEnergyRetreat && side.energy <= 1) cost = 0
+      if (text.replace(/\s+/g, ' ').trim() === 'you pay colorless less to retreat your jigglypuff, wigglytuff, wigglytuff ex, and igglybuff.' &&
+        ['jigglypuff', 'wigglytuff', 'wigglytuff ex', 'igglybuff'].includes(normalizeTcgBattleAbilityText(card.name))) {
+        cost = Math.max(0, cost - 1)
+      }
+
+      const namedNoRetreat = text.match(/retreat cost for (?:each )?(.+?) is 0/) || text.match(/([a-z0-9 '’-]+)'s retreat cost is 0/)
+      if (namedNoRetreat) {
+        const targetNames = (namedNoRetreat[1] || namedNoRetreat[2])
+          .replace(/ \(both yours and your opponent's\)$/, '')
+          .replace(/^each /, '')
+          .replace(/ you have in play$/, '')
+          .split(/,\s*and\s+|,\s*|\s+and\s+/)
+          .map((name) => normalizeTcgBattleAbilityText(name.trim()))
+        if (targetNames.includes(normalizeTcgBattleAbilityText(card.name))) cost = 0
+      }
+
+      const groupNoRetreat = text.match(/(?:your|each of your|all of your) (.+?pokemon(?:-ex| ex| gx| v| vstar)?)(?: \(excluding [^)]+\))? (?:in play )?(?:have|has) no retreat cost/)
+      if (groupNoRetreat && !/^(?:active|defending) pokemon$/.test(groupNoRetreat[1].trim())) {
+        const scopeMatch = tcgBattleRetreatScopeMatches(card, groupNoRetreat[1])
+        const exclusions = text.match(/(?:except|excluding) ([^.]+)/)?.[1] || ''
+        const cardSubtypes = card.subtypes.map(normalizeTcgBattleAbilityText)
+        const excluded = /pokemon-?ex|\bex\b/.test(exclusions) && cardSubtypes.includes('ex') ||
+          /pokemon-?gx|\bgx\b/.test(exclusions) && cardSubtypes.includes('gx') ||
+          /baby pokemon/.test(exclusions) && cardSubtypes.includes('baby')
+        if (scopeMatch && !excluded) cost = 0
+      }
+
+      const groupReduction = text.match(/(?:the )?retreat cost (?:of|for) each of your (.+?pokemon(?:-ex| ex| gx| v| vstar)?)(?: \(excluding [^)]+\))? (?:in play )?is ((?:colorless|\{c\})+) less/)
+      if (groupReduction) {
+        const scopeMatch = tcgBattleRetreatScopeMatches(card, groupReduction[1])
+        if (scopeMatch) cost -= groupReduction[2].match(/colorless|\{c\}/g)?.length || 0
+      }
+      const namedGroupReduction = text.match(/^the retreat cost for each (.+?) you have in play is ((?:colorless|\{c\})+) less\.$/)
+      if (namedGroupReduction && board.some((pokemon) => pokemon.instanceId === card.instanceId)) {
+        const targetNames = namedGroupReduction[1].replace(/\s+and\s+/g, ', ').split(/,\s*/).map((name) => normalizeTcgBattleAbilityText(name.trim()))
+        if (targetNames.includes(normalizeTcgBattleAbilityText(card.name))) {
+          cost = Math.max(0, cost - (namedGroupReduction[2].match(/colorless|\{c\}/g)?.length || 0))
+        }
+      }
+
+      const benchReduction = text.match(/as long as this pokemon is on your bench, your active pokemon's retreat cost is ((?:colorless|\{c\})+) less/)
+      if (benchReduction && providerIsBenched && side.front.some((pokemon) => pokemon.instanceId === card.instanceId)) {
+        cost -= benchReduction[1].match(/colorless|\{c\}/g)?.length || 0
+      }
+      const activeBasicBenchReduction = text.match(/^as long as this pokemon is on your bench, your active basic pokemon's retreat cost is ((?:colorless|\{c\}|\d+)(?:\s+(?:colorless|\{c\}|\d+))*) less\.$/)
+      if (activeBasicBenchReduction && providerIsBenched && side.front.some((pokemon) => pokemon.instanceId === card.instanceId) && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')) {
+        cost -= activeBasicBenchReduction[1].split(/\s+/).reduce((total, unit) => total + (/^\d+$/.test(unit) ? Number(unit) : 1), 0)
+      }
+      const dodrioRetreatAid = text.match(/as long as dodrio is on your bench, you pay ((?:colorless|\{c\})(?:\s+(?:colorless|\{c\}))*) less to retreat your active pokemon \(excluding pokemon-ex and baby pokemon\)/)
+      const targetIsActive = side.front.some((pokemon) => pokemon.instanceId === card.instanceId)
+      const targetIsExcludedFromRetreatAid = card.subtypes.some((subtype) => ['ex', 'pokemon-ex', 'baby'].includes(normalizeTcgBattleAbilityText(subtype)))
+      if (dodrioRetreatAid && providerIsBenched && targetIsActive && !targetIsExcludedFromRetreatAid) {
+        cost -= dodrioRetreatAid[1].match(/colorless|\{c\}/g)?.length || 0
+      }
+      const namedRetreatReduction = text.match(/as long as ([a-z0-9 '-]+) is on your bench, your active pokemon's retreat cost is ((?:colorless|\{c\})+) less/)
+      if (namedRetreatReduction && providerIsBenched && side.front.some((pokemon) => pokemon.instanceId === card.instanceId) &&
+        normalizeTcgBattleAbilityText(provider.name).includes(namedRetreatReduction[1].trim())) {
+        cost -= namedRetreatReduction[2].match(/colorless|\{c\}/g)?.length || 0
+      }
+    }
+  }
+  const activeRetreater = side.front.some((pokemon) => pokemon.instanceId === card.instanceId)
+  const ariadosGlueySlime = [...side.front, ...side.back, ...(opposingSide ? [...opposingSide.front, ...opposingSide.back] : [])]
+    .filter((provider) => provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [side, ...(opposingSide ? [opposingSide] : [])]))
+    .some((provider) => (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === "as long as ariados is in play, each player must pay an additional colorless to retreat his or her active pokemon. gluey slime can't make a player pay more than an additional colorless to retreat a pokemon, even if there is more than 1 ariados in play." &&
+        normalizeTcgBattleAbilityText(provider.name) === 'ariados' && isTcgBattleAbilityEnabled(text, provider, true)
+    }))
+  if (activeRetreater && ariadosGlueySlime) cost += 1
+
+  const ariadosStickyCount = [...side.front, ...side.back, ...(opposingSide ? [...opposingSide.front, ...opposingSide.back] : [])]
+    .filter((provider) => provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'ariados' && !isTcgBattleAbilitySuppressedByShadyTail(provider, [side, ...(opposingSide ? [opposingSide] : [])]))
+    .filter((provider) => (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === "the retreat cost for each player's pokemon (excluding ariados) is colorless more."
+    })).length
+  if (activeRetreater && normalizeTcgBattleAbilityText(card.name) !== 'ariados') cost += ariadosStickyCount
+
+  if (opposingSide) {
+    const targetIsActive = side.front.some((pokemon) => pokemon.instanceId === card.instanceId)
+    const targetIsBasic = card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')
+    const targetIsEvolved = card.subtypes.some((subtype) => ['stage 1', 'stage 2'].includes(subtype.toLowerCase()))
+    const opposingBoard = [...opposingSide.front, ...opposingSide.back].filter((pokemon) => pokemon.currentHp > 0)
+    for (const provider of opposingBoard) {
+      if (isTcgBattleAbilitySuppressedByShadyTail(provider, [side, opposingSide])) continue
+      const providerIsActive = opposingSide.front.some((pokemon) => pokemon.instanceId === provider.instanceId)
+      for (const ability of provider.abilities || []) {
+        const text = normalizeTcgBattleAbilityText(ability.text)
+        if (/energy attached|stadium|pokemon tool|prize cards?|once during your turn|during your next turn|when you play|when you attach/.test(text)) continue
+        if (/if this pokemon is (?:your )?active pokemon|if this pokemon is in the active spot|as long as .*active pokemon|as long as .*in the active spot/.test(text) && !providerIsActive) continue
+        if (text === 'as long as jynx is an evolved pokemon, you pay colorless less to retreat your fire and psychic pokemon.' &&
+          (provider.subtypes.some((subtype) => ['stage 1', 'stage 2'].includes(normalizeTcgBattleAbilityText(subtype))) || (provider.evolutionStack?.length || 0) > 0) &&
+          card.types.some((type) => ['fire', 'psychic'].includes(normalizeTcgBattleAbilityText(type)))) {
+          cost = Math.max(0, cost - 1)
+          continue
+        }
+        const increase = text.match(/(?:the retreat cost of each of your opponent's pokemon in play|your opponent's active pokemon's retreat cost|the retreat cost of your opponent's (poisoned|confused|asleep|paralyzed|burned) pokemon) is ((?:colorless|\{c\})+|\d+) more/)
+        const basicActiveIncrease = text.match(/if your opponent's active pokemon is a basic pokemon, its retreat cost is ((?:colorless|\{c\})+|\d+) more/)
+        const evolvedActiveIncrease = text.match(/your opponent's active evolution pokemon's retreat cost is ((?:colorless|\{c\})+|\d+) more/)
+        const darkMukIncrease = text.match(/your opponent pays ((?:(?:colorless|\{c\})\s*)+|\d+) more to retreat (?:his or her|their) active pokemon/)
+        if (!increase && !basicActiveIncrease && !evolvedActiveIncrease && !darkMukIncrease) continue
+        if (basicActiveIncrease && (!targetIsActive || !targetIsBasic)) continue
+        if (evolvedActiveIncrease && (!targetIsActive || !targetIsEvolved)) continue
+        if (/opponent's active pokemon's retreat cost/.test(text) && !targetIsActive) continue
+        if (darkMukIncrease && !targetIsActive) continue
+        if (darkMukIncrease && /stops working while dark muk is asleep, confused, or paralyzed/.test(text) && provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) continue
+        const statusTarget = text.match(/retreat cost of your opponent's (poisoned|confused|asleep|paralyzed|burned) pokemon/)
+        if (statusTarget && !card.statusConditions?.includes(statusTarget[1] as TcgBattleStatusCondition)) continue
+        if (/if your opponent's active pokemon is a basic pokemon/.test(text) && !targetIsBasic) continue
+        if (/if your opponent's active pokemon is an evolved pokemon/.test(text) && !targetIsEvolved) continue
+        const increaseText = increase?.[2] || increase?.[1] || basicActiveIncrease?.[1] || evolvedActiveIncrease?.[1]
+        cost += darkMukIncrease
+          ? /^\d+$/.test(darkMukIncrease[1]) ? Number(darkMukIncrease[1]) : darkMukIncrease[1].match(/colorless|\{c\}/g)?.length || 0
+          : increaseText
+            ? /^\d+$/.test(increaseText) ? Number(increaseText) : increaseText.match(/colorless|\{c\}/g)?.length || 0
+            : 0
+      }
+    }
+  }
+  return Math.max(0, cost)
+}
+
+/** Resolve passive retreat locks supplied by an opposing Pokémon ability. */
+export function isTcgBattleAbilityRetreatBlocked(
+  state: TcgBattleState,
+  sideKey: TcgBattleSide,
+  retreating: TcgBattleCardState,
+): boolean {
+  const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+  const retreatingSide = state[sideKey]
+  const opponentSide = state[opponentKey]
+  for (const provider of [...opponentSide.front, ...opponentSide.back].filter((card) => card.currentHp > 0)) {
+    if (isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
+    const providerIsActive = opponentSide.front.some((card) => card.instanceId === provider.instanceId)
+    for (const ability of provider.abilities || []) {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      if (!/can't retreat|cannot retreat/.test(text)) continue
+      if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) continue
+      if (/stops working while .*affected by a special condition/.test(text) && provider.statusConditions?.length) continue
+      if (/stops working when .*affected by a special condition/.test(text) && provider.statusConditions?.length) continue
+      if (/as long as .* is asleep/.test(text) && !provider.statusConditions?.includes('asleep')) continue
+      if (/as long as .* is confused/.test(text) && !provider.statusConditions?.includes('confused')) continue
+      if (/your opponent's poisoned pokemon can't retreat/.test(text) && !retreating.statusConditions?.includes('poisoned')) continue
+      if (/your opponent's confused pokemon can't retreat/.test(text) && !retreating.statusConditions?.includes('confused')) continue
+      if (/your opponent's pokemon that are affected by special conditions can't retreat/.test(text) && !retreating.statusConditions?.length) continue
+      if (/pokemon can't retreat/.test(text) && !/opponent's (?:active )?pokemon can't retreat|opponent's pokemon that|opponent's poisoned pokemon|opponent's confused pokemon/.test(text)) continue
+      if (/opponent's active pokemon|defending pokemon/.test(text) && !retreatingSide.front.some((card) => card.instanceId === retreating.instanceId)) continue
+      if (!/your opponent's|defending pokemon/.test(text)) continue
+      return true
+    }
+  }
+  return false
+}
+
+/** Asleep and Paralyzed Pokémon cannot retreat unless Dodrio's Fast Feet is active. */
+export function isTcgBattleRetreatBlockedByStatus(
+  side: TcgBattleSideState,
+  retreating: TcgBattleCardState,
+  sides: TcgBattleSideState[],
+): boolean {
+  if (!retreating.statusConditions?.some((status) => status === 'asleep' || status === 'paralyzed')) return false
+  const fastFeet = (retreating.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'dodrio can retreat even when it is asleep or paralyzed.',
+  )
+  if (!fastFeet || isTcgBattleAbilitySuppressedByShadyTail(retreating, sides)) return true
+  return ![...side.front, ...side.back].some((card) => card.instanceId === retreating.instanceId && card.currentHp > 0)
+}
+
+/** Apply passive healing multipliers printed on the Pokémon being healed. */
+export function getTcgBattleAbilityHealingAmount(card: TcgBattleCardState, amount: number): number {
+  const doublesHealing = (card.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).includes('when this pokemon is healed, double the amount healed'),
+  )
+  return doublesHealing ? amount * 2 : amount
+}
+
+/** Global effects such as Abomasnow's Frigid Room prevent all healing while the source is in play. */
+export function isTcgBattleHealingPrevented(state: TcgBattleState): boolean {
+  const cards = [...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back]
+  return cards.some((card) => {
+    if (card.currentHp <= 0 || isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent])) return false
+    const hasLunatone = [...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back]
+      .some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattlePokemonName(pokemon.name) === 'lunatone')
+    const hasSolrock = [...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back]
+      .some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattlePokemonName(pokemon.name) === 'solrock')
+    return (card.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === "pokemon (both yours and your opponent's) can't be healed." ||
+        text === "damage can't be healed from any pokemon (both yours and your opponent's). (damage counters can still be moved.)" ||
+        hasSolrock && text === "if you have solrock in play, pokemon (both yours and your opponent's) can't be healed." ||
+        hasLunatone && text === "if you have lunatone in play, damage counters can't be removed from any pokemon (both yours and your opponent's). (damage counters can still be moved.)"
+    })
+  })
+}
+
+/** Target-specific healing blocks, including Yveltal's Active and Mimikyu's Bench locks. */
+export function isTcgBattleHealingPreventedForTarget(
+  state: TcgBattleState,
+  targetSide: TcgBattleSide,
+  target: TcgBattleCardState,
+): boolean {
+  if (isTcgBattleHealingPrevented(state)) return true
+  if (target.currentHp <= 0) return false
+  const targetIsActive = state[targetSide].front.some((card) => card.instanceId === target.instanceId)
+  const targetIsBenched = state[targetSide].back.some((card) => card.instanceId === target.instanceId)
+  if (!targetIsActive && !targetIsBenched) return false
+  const abilityOwner: TcgBattleSide = targetSide === 'player' ? 'opponent' : 'player'
+  return [...state[abilityOwner].front, ...state[abilityOwner].back].some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return targetIsActive && text === "your opponent's active pokemon can't be healed." ||
+        targetIsBenched && text === "your opponent's benched pokemon can't be healed."
+    }),
+  )
+}
+
+/** Patrat's Lockdown prevents damage counters from moving between Pokémon. */
+export function isTcgBattleDamageCounterMovementBlocked(state: TcgBattleState): boolean {
+  const sides = [state.player, state.opponent]
+  return sides.some((side) => [...side.front, ...side.back].some((provider) =>
+    provider.currentHp > 0 &&
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, sides) &&
+    (provider.abilities || []).some((ability) =>
+      normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "damage counters on each pokemon (both yours and your opponent's) can't be moved to other pokemon.",
+    ),
+  ))
 }
 
 export interface TcgBattleTrainerCard {
@@ -571,9 +1124,11 @@ export type TcgBattleLastAction = {
     | 'arrange'
     | 'attack'
     | 'evolve'
+    | 'bench'
     | 'retreat'
     | 'charge'
     | 'promote'
+    | 'ability'
     | 'surrender'
     | 'timeout'
   attackerId?: string
@@ -583,6 +1138,15 @@ export type TcgBattleLastAction = {
   backId?: string
   cardId?: string
   evolutionCardId?: string
+  abilityName?: string
+  abilityIndex?: number
+  abilityEffect?: 'heal' | 'draw' | 'discardDraw' | 'discardHandDraw' | 'refillDraw' | 'search' | 'energySearch' | 'energyAttach' | 'energyDiscard' | 'benchSearch' | 'deckSwap' | 'deckOrder' | 'deckOrderPending' | 'handBottomPending' | 'moonGuidancePending' | 'regidragoVstarPending' | 'turnEnd' | 'pokemonSwap' | 'counterDamage' | 'switch' | 'status' | 'typeChange' | 'damageBoost' | 'teamDamageReduction' | 'reveal' | 'deckDiscard' | 'deckShuffle' | 'deckBottom' | 'evolution' | 'handReturn' | 'abilitySuppression' | 'directDamage'
+  abilityStatus?: TcgBattleStatusCondition
+  /** Card seen by the acting player through a private deck inspection Ability. */
+  privateRevealedCardName?: string
+  /** Cards and identifiers privately shown during an in-progress deck-order Ability. */
+  privateRevealedCardNames?: string[]
+  privateRevealedCardIds?: string[]
 }
 
 export interface TcgBattleState {
@@ -591,16 +1155,24 @@ export interface TcgBattleState {
   /** Parent research-session identity prevents a finished paid battle from being replayed for free. */
   activityStartTime?: number
   battleMode?: TcgBattleMode
+  /** PvP perspective flag for first-turn abilities gated on going second. */
+  playerGoesSecond?: boolean
   matchId?: string
-  format: TcgBattleDeckFormat
+  format: TcgBattleDeckFormat | LegacyTcgBattleDeckFormat
   phase: TcgBattlePhase
   turnNumber: number
   activeSide: TcgBattleSide
+  /** Side and turn during which Emperor Aura prevents the normal Energy charge. */
+  energyChargeBlocked?: { side: TcgBattleSide; turnNumber: number }
   player: TcgBattleSideState
   opponent: TcgBattleSideState
   pendingPromotion?: TcgBattleSide
+  resumeSideAfterPromotion?: TcgBattleSide
+  resumeTurnAfterPromotion?: boolean
+  /** One additional attack is available to this Pokémon after its Ability grants it. */
+  extraAttackPending?: { side: TcgBattleSide; attackerId: string }
   consecutivePasses: number
-  lastOpponentAttackKnockout?: Partial<Record<TcgBattleSide, { turnNumber: number; knockedOut: boolean; knockedOutNames?: string[] }>>
+  lastOpponentAttackKnockout?: Partial<Record<TcgBattleSide, { turnNumber: number; knockedOut: boolean; knockedOutNames?: string[]; knockedOutRuleBox?: boolean; knockedOutGrassPokemon?: boolean }>>
   winner?: TcgBattleSide | 'tie'
   lastDamageEvent?: {
     id: string
@@ -608,7 +1180,8 @@ export interface TcgBattleState {
     targetId: string
     targetSide: TcgBattleSide
     damage: number
-    reason?: 'attack' | 'self' | 'confusion' | 'status'
+    reason?: 'attack' | 'self' | 'confusion' | 'status' | 'ability'
+    targetHadFullHp?: boolean
   }
   lastDamageEvents?: {
     id: string
@@ -616,7 +1189,19 @@ export interface TcgBattleState {
     targetId: string
     targetSide: TcgBattleSide
     damage: number
-    reason?: 'attack' | 'self' | 'confusion' | 'status'
+    reason?: 'attack' | 'self' | 'confusion' | 'status' | 'ability'
+    targetHadFullHp?: boolean
+  }[]
+  /** Attack damage events for the current turn, retained for next-turn attack Abilities. */
+  lastAttackDamageEventsTurnNumber?: number
+  lastAttackDamageEvents?: {
+    sourceId: string
+    targetId: string
+    targetSide: TcgBattleSide
+    attackingSide: TcgBattleSide
+    turnNumber: number
+    damage: number
+    targetWasActive: boolean
   }[]
   lastCoinFlipEvent?: {
     id: string
@@ -657,9 +1242,9 @@ export interface TcgBattleState {
   ready?: Record<TcgBattleSide, boolean>
   revision?: number
   lastAction?: TcgBattleLastAction
+  lastReactiveAbilityId?: string
   deadlineAt?: number
   pendingPromotions?: TcgBattleSide[]
-  resumeSideAfterPromotion?: TcgBattleSide
   outcomeReason?: 'knockout' | 'stall' | 'surrender' | 'timeout'
   noContest?: boolean
   startedAt: number
@@ -703,6 +1288,9 @@ function cloneTcgBattlePerspectiveSide(
     front: side.front.map(cloneCard),
     back: side.back.map(cloneCard),
     discard: side.discard.map(cloneCard),
+    lostZone: side.lostZone?.map((card) => ({ ...card, attacks: [...card.attacks], abilities: card.abilities ? [...card.abilities] : undefined, weaknesses: [...card.weaknesses], resistances: [...card.resistances] })),
+    temporaryAttackDamageBoosts: side.temporaryAttackDamageBoosts?.map((boost) => ({ ...boost })),
+    temporaryAttackDamageReduction: side.temporaryAttackDamageReduction ? { ...side.temporaryAttackDamageReduction } : undefined,
   }
 }
 
@@ -734,7 +1322,17 @@ export function toTcgPvpPerspectiveState(
   // The opponent's unused deck, private arrangement, and selected Energy remain
   // server-only until the relevant public battle state makes them visible.
   opposingSide.deck = []
-  opposingSide.hand = []
+  const clairvoyanceActive = [...ownSide.front, ...ownSide.back].some((provider) =>
+    provider.currentHp > 0 &&
+    !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) &&
+    !isTcgBattleAbilitySuppressed(provider, [ownSide, opposingSide]) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      if (text === 'your opponent plays with his or her hand face up. this power stops working while omanyte is affected by a special condition.') return !provider.statusConditions?.length
+      return text === 'your opponent plays with his or her hand face up. this power stops working while omanyte is asleep, confused, or paralyzed.' && !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))
+    }),
+  )
+  if (!clairvoyanceActive) opposingSide.hand = []
   if (shared.phase === 'arranging') {
     opposingSide.front = []
     opposingSide.back = []
@@ -754,16 +1352,21 @@ export function toTcgPvpPerspectiveState(
   return {
     ...publicState,
     userId: viewerUserId,
+    playerGoesSecond: shouldFlip,
     player: ownSide,
     opponent: opposingSide,
     activeSide: flipSide(shared.activeSide),
     pendingPromotion: shared.pendingPromotion
       ? flipSide(shared.pendingPromotion)
       : undefined,
+    extraAttackPending: shared.extraAttackPending
+      ? { ...shared.extraAttackPending, side: flipSide(shared.extraAttackPending.side) }
+      : undefined,
     pendingPromotions: shared.pendingPromotions?.map(flipSide),
     resumeSideAfterPromotion: shared.resumeSideAfterPromotion
       ? flipSide(shared.resumeSideAfterPromotion)
       : undefined,
+    resumeTurnAfterPromotion: shared.resumeTurnAfterPromotion,
     lastOpponentAttackKnockout,
     winner:
       shared.winner === 'tie' || !shared.winner
@@ -776,7 +1379,15 @@ export function toTcgPvpPerspectiveState(
     playerTrainer: shouldFlip ? shared.enemyTrainer : shared.playerTrainer,
     enemyTrainer: shouldFlip ? shared.playerTrainer : shared.enemyTrainer,
     lastAction: shared.lastAction
-      ? { ...shared.lastAction, side: flipSide(shared.lastAction.side) }
+      ? (() => {
+          const lastAction = { ...shared.lastAction, side: flipSide(shared.lastAction.side) }
+          if (lastAction.side !== 'player') {
+            delete lastAction.privateRevealedCardName
+            delete lastAction.privateRevealedCardNames
+            delete lastAction.privateRevealedCardIds
+          }
+          return lastAction
+        })()
       : undefined,
     lastDamageEvent: shared.lastDamageEvent
       ? {
@@ -787,6 +1398,12 @@ export function toTcgPvpPerspectiveState(
     lastDamageEvents: shared.lastDamageEvents?.map((event) => ({
       ...event,
       targetSide: flipSide(event.targetSide),
+    })),
+    lastAttackDamageEventsTurnNumber: shared.lastAttackDamageEventsTurnNumber,
+    lastAttackDamageEvents: shared.lastAttackDamageEvents?.map((event) => ({
+      ...event,
+      targetSide: flipSide(event.targetSide),
+      attackingSide: flipSide(event.attackingSide),
     })),
     lastCoinFlipEvent: shared.lastCoinFlipEvent
       ? {
@@ -845,12 +1462,233 @@ function getTcgBattleGlobalEnergyReductions(state: TcgBattleState): Partial<Reco
   return reductions
 }
 
-export function getEffectiveTcgBattleAttackCost(state: TcgBattleState, attack: TcgBattleAttack): number {
+export function getEffectiveTcgBattleAttackCost(
+  state: TcgBattleState,
+  attack: TcgBattleAttack,
+  attacker?: TcgBattleCardState,
+  sideKey?: TcgBattleSide,
+): number {
   const costs = attack.cost || []
-  if (costs.length === 0) return attack.convertedEnergyCost ?? 0
+  const baseCost = costs.length > 0 ? costs.length : attack.convertedEnergyCost ?? 0
+
+  let abilityCostIncrease = 0
+  let abilityCostReduction = 0
+  let abilityEnergyMultiplier = 1
+  if (attacker && sideKey) {
+    const ownSide = state[sideKey]
+    const ownBoard = [...ownSide.front, ...ownSide.back].filter((card) => card.currentHp > 0)
+    const colorlessCost = costs.filter((cost) => normalizeTcgBattleEnergyType(cost) === 'Colorless').length
+    const fairyCost = costs.filter((cost) => normalizeTcgBattleEnergyType(cost) === 'Fairy').length
+    const attackerAbilities = isTcgBattleAbilitySuppressedByShadyTail(attacker, [state.player, state.opponent]) ? [] : attacker.abilities || []
+    const opponentSide = state[sideKey === 'player' ? 'opponent' : 'player']
+    const opponentBoard = [...opponentSide.front, ...opponentSide.back].filter((card) => card.currentHp > 0)
+      const opponentBenchedPokemonCount = opponentSide.back.filter((card) => card.currentHp > 0).length
+    const selectedEnergyType = ownSide.selectedEnergy?.toLowerCase()
+    const hasEnergyDoublingAbility = (expectedText: string) => ownBoard.some((provider) =>
+      !isTcgBattleAbilitySuppressed(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === expectedText && (!text.includes('this power stops working while') || !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)))
+      }),
+    )
+    const grassAttacker = attacker.types.some((type) => normalizeTcgBattleAbilityText(type) === 'grass')
+    const psychicAttacker = attacker.types.some((type) => normalizeTcgBattleAbilityText(type) === 'psychic')
+    const darknessWeezingAttacker = normalizeTcgBattleAbilityText(attacker.name).includes('weezing')
+    if (selectedEnergyType === 'grass' && grassAttacker && (
+      hasEnergyDoublingAbility("each {g} energy attached to your {g} pokemon provides 2 {g} energy. this effect doesn't stack.") ||
+      hasEnergyDoublingAbility('each basic grass energy card attached to your grass pokemon provides grass grass energy instead. you can\'t use more than 1 wild growth poke-body each turn.') ||
+      hasEnergyDoublingAbility('as long as meganium is in play, each grass energy card attached to your grass pokemon instead provides grassgrass. this power stops working while meganium is asleep, confused, or paralyzed.')
+    )) abilityEnergyMultiplier = 2
+    if (selectedEnergyType === 'grass' && (
+      hasEnergyDoublingAbility("each basic {g} energy attached to all of your pokemon provides {g}{g} energy. the effect of wild growth doesn't stack.") ||
+      hasEnergyDoublingAbility("each basic grass energy attached to your pokemon provides grassgrass energy. you can't apply more than 1 jungle totem ability at a time.")
+    )) abilityEnergyMultiplier = 2
+    if (selectedEnergyType === 'psychic' && psychicAttacker && (
+      hasEnergyDoublingAbility("each basic psychic energy attached to your psychic pokemon provides psychicpsychic energy. you can't apply more than 1 psychic mirage ability at a time.") ||
+      hasEnergyDoublingAbility("each basic psychic energy attached to your psychic pokemon provides psychicpsychic energy. you can't apply more than 1 psychic mirage ability at a time.")
+    )) abilityEnergyMultiplier = 2
+    if (selectedEnergyType === 'darkness' && darknessWeezingAttacker && hasEnergyDoublingAbility("each basic darkness energy attached to your pokemon that have 'weezing' in their name provides darknessdarkness energy. you can't apply more than 1 energy factory ability at a time.")) abilityEnergyMultiplier = 2
+    if (selectedEnergyType === 'fire' && hasEnergyDoublingAbility("each basic fire energy attached to your pokemon provides firefire energy. you can't apply more than 1 burn brightly ability at a time.")) abilityEnergyMultiplier = 2
+    if (fairyCost > 0 && ownBoard.some((provider) => !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) && (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/[’]/g, "'").replace(/\s+/g, ' ').trim() === "each of your pokemon's attacks costs fairy less."))) {
+      abilityCostReduction = Math.max(abilityCostReduction, 1)
+    }
+    const speedCheerText = "the attacks of your pokemon-gx in play that evolve from eevee cost colorless less. you can't apply more than 1 speed cheer ability at a time."
+    if (colorlessCost > 0 && isTcgBattleEeveeEvolution(attacker) && attacker.subtypes.some((subtype) => ['gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype))) &&
+      ownBoard.some((provider) => !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+        (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === speedCheerText))) {
+      abilityCostReduction = Math.max(abilityCostReduction, 1)
+    }
+    const kingsSongText = "ignore all colorless energy in the attack cost of each of your poliwag, poliwhirl, and poliwrath's attacks."
+    const kingsSongAttacker = ['poliwag', 'poliwhirl', 'poliwrath'].some((name) => normalizeTcgBattleAbilityText(attacker.name).includes(name))
+    if (kingsSongAttacker && ownBoard.some((provider) => !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/[’]/g, "'").replace(/\s+/g, ' ').trim() === kingsSongText))) {
+      abilityCostReduction = Math.max(abilityCostReduction, colorlessCost)
+    }
+    const caturdayAttacker = attacker.attacks.some((candidate) => normalizeTcgBattleAbilityText(candidate.name) === 'caturday')
+    if (caturdayAttacker && ownBoard.some((provider) => !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'ignore all energy in the attack costs of each of your pokemon in play that has the caturday attack.'))) {
+      abilityCostReduction = Math.max(abilityCostReduction, baseCost)
+    }
+    const nidorFamilyAttackerName = normalizeTcgBattleAbilityText(attacker.name).replace(/[^a-z]/g, '')
+    if (['nidoran', 'nidorina', 'nidorino', 'nidoking'].includes(nidorFamilyAttackerName) && colorlessCost > 0 && ownBoard.some((provider) =>
+      !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "the attack cost of your nidoran ♀, nidorina, nidoran ♂, nidorino, and nidoking's attack is colorless less."),
+    )) abilityCostReduction = Math.max(abilityCostReduction, 1)
+    for (const ability of attackerAbilities) {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      if (normalizeTcgBattleAbilityText(attacker.name) === 'noivern' && normalizeTcgBattleAbilityText(attack.name) === 'frightening howl' && text.replace(/\s+/g, ' ').trim() === 'if you have the same number of cards in your hand as your opponent, ignore all energy in the cost of frightening howl used by this pokemon.' && ownSide.hand.length === opponentSide.hand.length) {
+        abilityCostReduction = Math.max(abilityCostReduction, baseCost)
+        continue
+      }
+      if (text === "if you have 9 or more pokemon tool cards in your discard pile, ignore all energy in the attack cost of each of this pokemon's attacks." &&
+        ownSide.discard.filter((card) => card.subtypes.some((subtype) => ['pokemon tool', 'tool'].includes(normalizeTcgBattleAbilityText(subtype)))).length >= 9) {
+        abilityCostReduction = Math.max(abilityCostReduction, baseCost)
+        continue
+      }
+      if (normalizeTcgBattleAbilityText(attacker.name) === 'jirachi ex' &&
+        text.replace(/\s+/g, ' ').trim() === 'as long as your opponent has any pokemon-ex or stage 2 evolved pokemon in play, jirachi ex pays colorless less energy to use shield beam or super psy bolt.' &&
+        ['shield beam', 'super psy bolt'].includes(normalizeTcgBattleAbilityText(attack.name)) &&
+        opponentBoard.some((pokemon) => pokemon.subtypes.some((subtype) => ['ex', 'pokemon-ex'].includes(normalizeTcgBattleAbilityText(subtype)) || normalizeTcgBattleAbilityText(subtype) === 'stage 2'))) {
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, 1))
+        continue
+      }
+      if (normalizeTcgBattleAbilityText(attacker.name) === 'yanmega' && text.replace(/\s+/g, ' ').trim() === "if you have the same number of cards in your hand as your opponent, the attack cost of each of yanmega's attacks is 0." && ownSide.hand.length === opponentSide.hand.length) {
+        abilityCostReduction = Math.max(abilityCostReduction, baseCost)
+        continue
+      }
+      const opponentExOrGxCostReduction = text.match(/^if your opponent has any pokemon-gx or pokemon-ex in play, this pokemon's attacks cost ((?:colorless|\{c\})+) less\.$/)
+      if (opponentExOrGxCostReduction && opponentBoard.some((card) => card.subtypes.some((subtype) => ['ex', 'pokemon-ex', 'gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype))))) {
+        const reduction = opponentExOrGxCostReduction[1].match(/colorless|\{c\}/g)?.length || 0
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, reduction))
+        continue
+      }
+      if (text === "if you have arceus or arceus ex in play, attacks used by this pokemon cost 1 less {c} energy." &&
+        ownBoard.some((card) => ['arceus', 'arceus ex'].includes(normalizeTcgBattleAbilityText(card.name)))) {
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, 1))
+        continue
+      }
+      const opponentVmaxCostReduction = text.match(/^if your opponent has any pokemon vmax in play, this pokemon's attacks cost ((?:colorless|\{c\})+) less\.$/)
+      if (opponentVmaxCostReduction && opponentBoard.some((card) => card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'vmax'))) {
+        const reduction = opponentVmaxCostReduction[1].match(/colorless|\{c\}/g)?.length || 0
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, reduction))
+        continue
+      }
+      const opponentBenchCostReduction = text.match(/^attacks used by this pokemon cost ((?:colorless|\{c\})+) less for each of your opponent's benched pokemon\.$/)
+      if (opponentBenchCostReduction) {
+        const reductionPerPokemon = opponentBenchCostReduction[1].match(/colorless|\{c\}/g)?.length || 0
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, reductionPerPokemon * opponentBenchedPokemonCount))
+        continue
+      }
+      if (text === "if mightyena is affected by a special condition, ignore all energy necessary to use mightyena's attacks." && attacker.statusConditions?.length) {
+        abilityCostReduction = Math.max(abilityCostReduction, baseCost)
+        continue
+      }
+      if (normalizeTcgBattleAbilityText(attacker.name) === 'regigigas' &&
+        text === "if you have regirock, regice, and registeel in play, the attack cost of regigigas's attacks is colorless less." &&
+        ['regirock', 'regice', 'registeel'].every((name) => ownBoard.some((card) => normalizeTcgBattleAbilityText(card.name).includes(name)))) {
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, 1))
+      }
+      if (normalizeTcgBattleAbilityText(attacker.name) === 'salamence' &&
+        text === "if your opponent has any pokemon in play that has maximum hp of 120 or more, ignore all colorless energy necessary to use salamence's attacks." &&
+        opponentBoard.some((card) => card.hp >= 120)) {
+        abilityCostReduction = Math.max(abilityCostReduction, colorlessCost)
+      }
+      if (text === "if you have exactly 4 cards in your hand, ignore all energy in the attack cost of each of this pokemon's attacks." && ownSide.hand.length === 4) {
+        abilityCostReduction = Math.max(abilityCostReduction, baseCost)
+        continue
+      }
+      if (normalizeTcgBattleAbilityText(attacker.name) === 'medicham' && text.replace(/\s+/g, ' ').trim() === "if you have exactly 4 cards in your hand, this pokemon's attacks cost colorlesscolorlesscolorless less." && ownSide.hand.length === 4) {
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, 3))
+        continue
+      }
+      if (normalizeTcgBattleAbilityText(attacker.name) === 'cramorant' && text.replace(/\s+/g, ' ').trim() === "if you have 4 or more cards in the lost zone, ignore all energy in this pokemon's attack costs." && (ownSide.lostZone?.length || 0) >= 4) {
+        abilityCostReduction = Math.max(abilityCostReduction, baseCost)
+        continue
+      }
+      const exactOpponentHandColorlessReduction = text.match(/^if your opponent has exactly (\d+) cards in their hand, ignore all \{c\} energy in the costs of attacks used by this pokemon\.$/)
+      if (exactOpponentHandColorlessReduction && opponentSide.hand.length === Number(exactOpponentHandColorlessReduction[1])) {
+        abilityCostReduction = Math.max(abilityCostReduction, colorlessCost)
+        continue
+      }
+      const kofuReduction = text.match(/attacks used by this pokemon cost ((?:colorless|\{c\})+) less for each kofu card in your discard pile/)
+      if (kofuReduction) {
+        const kofuCount = ownSide.discard.filter((card) => normalizeTcgBattleAbilityText(card.name) === 'kofu').length
+        const reductionPerKofu = kofuReduction[1].match(/colorless|\{c\}/g)?.length || 0
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, reductionPerKofu * kofuCount))
+      }
+      const opponentVReduction = text.match(/this pokemon's attacks cost ((?:colorless|\{c\})+) less for each of your opponent's pokemon v in play/)
+      if (opponentVReduction) {
+        const opponentVCount = opponentBoard.filter((card) => card.subtypes.some((subtype) => ['v', 'vmax', 'vstar'].includes(normalizeTcgBattleAbilityText(subtype)))).length
+        const reductionPerV = opponentVReduction[1].match(/colorless|\{c\}/g)?.length || 0
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, reductionPerV * opponentVCount))
+      }
+      const opponentPlasmaReduction = text.match(/^this pokemon's attacks cost ((?:colorless|\{c\})+) less for each of your opponent's team plasma pokemon in play\.$/)
+      if (opponentPlasmaReduction) {
+        const opponentPlasmaCount = opponentBoard.filter((card) => card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'team plasma')).length
+        const reductionPerPokemon = opponentPlasmaReduction[1].match(/colorless|\{c\}/g)?.length || 0
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, reductionPerPokemon * opponentPlasmaCount))
+      }
+      const opponentStrikeReduction = text.match(/this pokemon's attacks cost ((?:colorless|\{c\})+) less for each of your opponent's single strike, rapid strike, and fusion strike pokemon in play/)
+      if (opponentStrikeReduction) {
+        const opponentStrikeCount = opponentBoard.filter((card) => card.subtypes.some((subtype) => ['single strike', 'rapid strike', 'fusion strike'].includes(normalizeTcgBattleAbilityText(subtype)))).length
+        const reductionPerStrikePokemon = opponentStrikeReduction[1].match(/colorless|\{c\}/g)?.length || 0
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, reductionPerStrikePokemon * opponentStrikeCount))
+      }
+      const costRule = text.match(/if you have (.+?) in play, ignore all (?:(?:\{c\}|colorless) )?energy in the costs of attacks used by this pokemon/)
+      if (!costRule) continue
+      const requiredCards = costRule[1].split(/,\s*and\s+|\s+and\s+|,\s*/).map((name) => name.trim())
+      const hasRequiredCards = requiredCards.every((name) => ownBoard.some((card) => normalizeTcgBattleAbilityText(card.name).includes(name)))
+      if (!hasRequiredCards) continue
+      const reduction = /ignore all (?:\{c\}|colorless) energy in the costs/.test(text) ? colorlessCost : baseCost
+      abilityCostReduction = Math.max(abilityCostReduction, reduction)
+    }
+    const attackerIsBasic = attacker.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')
+    const attackerIsVstar = attacker.subtypes.some((subtype) => subtype.toLowerCase() === 'vstar' || subtype.toLowerCase() === 'pokémon vstar' || subtype.toLowerCase() === 'pokemon vstar')
+    const attackerIsSingleStrike = attacker.subtypes.some((subtype) => subtype.toLowerCase() === 'single strike')
+    const hasUxieAndMesprit = ['uxie', 'mesprit'].every((name) => opponentBoard.some((card) => normalizeTcgBattleAbilityText(card.name).includes(name)))
+    const singleStackAbilities = new Set<string>()
+    for (const provider of opponentBoard) {
+      if (isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
+      const providerIsActive = opponentSide.front.some((card) => card.instanceId === provider.instanceId)
+      for (const ability of provider.abilities || []) {
+        const text = normalizeTcgBattleAbilityText(ability.text)
+        if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) continue
+        const basicIncrease = text.match(/(?:your opponent's basic pokemon's attacks|attacks used by your opponent's basic pokemon) cost (?:colorless|\{c\})+ more/)
+        const activeIncrease = text.match(/(?:attacks used by your opponent's active pokemon|your opponent's active pokemon's attacks) cost (?:\d+\s*)?(?:colorless|\{c\})+ more/)
+        const opponentIncrease = text.match(/your opponent's pokemon's attacks cost (?:colorless|\{c\})+ more/)
+        const vstarIncrease = text.match(/your opponent's pokemon vstar's attacks cost (?:colorless|\{c\})+ more/)
+        const singleStrikeIncrease = text.match(/your opponent's single strike pokemon's attacks cost (?:colorless|\{c\})+ more/)
+        const downerMaterial = text.includes("the attack cost of each of your opponent's basic pokemon's attack is colorless more") &&
+          hasUxieAndMesprit && attackerIsBasic
+        const applies = Boolean(basicIncrease && attackerIsBasic || activeIncrease || opponentIncrease || vstarIncrease && attackerIsVstar || singleStrikeIncrease && attackerIsSingleStrike || downerMaterial)
+        const singleStack = /can't apply more than 1|cannot apply more than 1|can't use more than 1|cannot use more than 1/.test(text)
+        if (!applies || singleStack && singleStackAbilities.has(ability.name)) continue
+        if (applies) {
+          abilityCostIncrease += text.match(/colorless|\{c\}/g)?.length || 0
+          if (singleStack) singleStackAbilities.add(ability.name)
+        }
+      }
+    }
+    const claydolPowerText = "as long as claydol is your active pokemon, each player's evolved pokemon pays colorless more energy to use its attacks."
+    if (attacker.subtypes.some((subtype) => ['stage 1', 'stage 2'].includes(normalizeTcgBattleAbilityText(subtype)))) {
+      for (const providerSideKey of ['player', 'opponent'] as const) {
+        const providerSide = state[providerSideKey]
+        for (const provider of providerSide.front.filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]))) {
+          if ((provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text) === claydolPowerText)) abilityCostIncrease += 1
+        }
+      }
+    }
+    const attackerIsPokemonEx = attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype).replace(/[^a-z]/g, '').includes('ex'))
+    if (attackerIsPokemonEx && [...ownBoard, ...opponentBoard].some((provider) =>
+      normalizeTcgBattleAbilityText(provider.name).replace(/[^a-z0-9]/g, '') === 'sceptileex' &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "each player's pokemon-ex can't use any poke-powers and pays colorless more energy to use its attacks. each pokemon can't be affected by more than 1 extra liquid poke-body.") &&
+      !isTcgBattleAbilitySuppressed(provider, [state.player, state.opponent]),
+    )) abilityCostIncrease += 1
+  }
+  if (costs.length === 0) return Math.ceil(Math.max(0, baseCost - abilityCostReduction + abilityCostIncrease) / abilityEnergyMultiplier)
 
   const reductions = getTcgBattleGlobalEnergyReductions(state)
-  if (Object.keys(reductions).length === 0) return costs.length
+  if (Object.keys(reductions).length === 0) return Math.ceil(Math.max(0, costs.length - abilityCostReduction + abilityCostIncrease) / abilityEnergyMultiplier)
 
   let reduced = 0
   const used = {} as Partial<Record<TcgBattleEnergyType, number>>
@@ -865,7 +1703,97 @@ export function getEffectiveTcgBattleAttackCost(state: TcgBattleState, attack: T
     }
   }
 
-  return Math.max(0, costs.length - reduced)
+  return Math.ceil(Math.max(0, costs.length - reduced - abilityCostReduction + abilityCostIncrease) / abilityEnergyMultiplier)
+}
+
+/** Checks supported passive attack requirements printed on the attacking Pokémon. */
+export function isTcgBattleAbilityAttackAllowed(
+  state: TcgBattleState,
+  sideKey: TcgBattleSide,
+  attacker: TcgBattleCardState,
+): boolean {
+  const ownBoard = [...state[sideKey].front, ...state[sideKey].back].filter((card) => card.currentHp > 0)
+  const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+  const opponentBoard = [...state[opponentKey].front, ...state[opponentKey].back].filter((card) => card.currentHp > 0)
+  const allBoard = [...ownBoard, ...opponentBoard]
+  const countTeam = (team: 'rocket' | 'aqua' | 'magma', board = allBoard) => board.filter((card) =>
+    new RegExp(`^team ${team}'s\\b`).test(normalizeTcgBattleAbilityText(card.name)),
+  ).length
+  const attackerIsPrismStar = attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'prism star')
+  if (attackerIsPrismStar && allBoard.some((provider) => {
+    const providerIsBenched = state[sideKey === 'player' ? 'player' : 'opponent'].back.some((card) => card.instanceId === provider.instanceId) ||
+      state[sideKey === 'player' ? 'opponent' : 'player'].back.some((card) => card.instanceId === provider.instanceId)
+    return providerIsBenched && (provider.abilities || []).some((ability) =>
+      /as long as this pokemon is on your bench, \{\*\}\s*\(prism star\) pokemon in play \(both yours and your opponent's\) can't attack and have no abilities/.test(normalizeTcgBattleAbilityText(ability.text)),
+    )
+  })) return false
+
+  const attackerAbilities = isTcgBattleAbilitySuppressedByShadyTail(attacker, [state.player, state.opponent]) ? [] : attacker.abilities || []
+  for (const ability of attackerAbilities) {
+    const text = normalizeTcgBattleAbilityText(ability.text)
+    if (normalizeTcgBattleAbilityText(attacker.name) === 'slaking' && text === "if slaking used any attacks during your last turn, slaking can't attack." && attacker.temporaryEffects?.lastAttackTurnNumber === state.turnNumber - 1) return false
+    const rocketRequirement = text.match(/this pokemon can't attack unless you have (\d+) or more team rocket's pokemon in play/)
+    if (rocketRequirement && countTeam('rocket', ownBoard) < Number(rocketRequirement[1])) return false
+
+    const ownBoardMaximum = text.match(/if you have (\d+) or fewer pokemon in play, this pokemon can't attack/)
+    if (ownBoardMaximum && ownBoard.length <= Number(ownBoardMaximum[1])) return false
+
+    const namedTeamMaximum = text.match(/if there are (\d+) or fewer team (aqua|magma)(?:'s)? pokemon in play, this pokemon can't attack/)
+    if (namedTeamMaximum && countTeam(namedTeamMaximum[2] as 'aqua' | 'magma') <= Number(namedTeamMaximum[1])) return false
+
+    const teamBoardMaximum = text.match(/as long as the number of pokemon in play \(both yours and your opponent's\) that has team (aqua|magma) in its name is (\d+) or less/)
+    if (teamBoardMaximum && countTeam(teamBoardMaximum[1] as 'aqua' | 'magma') <= Number(teamBoardMaximum[2])) return false
+
+    if (/this pokemon can't attack unless regirock, regice, and registeel are on your bench/.test(text))
+      if (!['regirock', 'regice', 'registeel'].every((name) => ownBoard.some((card) =>
+        state[sideKey].back.some((benchCard) => benchCard.instanceId === card.instanceId) && normalizeTcgBattleAbilityText(card.name).includes(name),
+      ))) return false
+
+    if (/if your opponent has no pokemon ex or pokemon v in play, this pokemon can't attack/.test(text))
+      if (!opponentBoard.some((card) => card.subtypes.some((subtype) => /(?:^|\b)(?:ex|pokemon-ex|pokemon ex|v|pokemon v|vmax|vstar)(?:\b|$)/.test(normalizeTcgBattleAbilityText(subtype))))) return false
+
+    if (/if your opponent's active pokemon is a basic pokemon, this pokemon can't attack/.test(text))
+      if (!state[opponentKey].front.some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic'))) return false
+  }
+
+  for (const provider of allBoard) {
+    const providerIsActive = state.player.front.some((card) => card.instanceId === provider.instanceId) ||
+      state.opponent.front.some((card) => card.instanceId === provider.instanceId)
+    if (!providerIsActive || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
+    for (const ability of provider.abilities || []) {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      const namedLock = text.match(/as long as [a-z0-9 '’-]+ is your active pokemon, each player's ([a-z0-9 '’-]+) and ([a-z0-9 '’-]+) can't attack/)
+      if (!namedLock || !isTcgBattleAbilityEnabled(text, provider, true)) continue
+      const attackerName = normalizeTcgBattleAbilityText(attacker.name)
+      if (attackerName === namedLock[1].trim() || attackerName === namedLock[2].trim()) return false
+    }
+  }
+
+  for (const provider of opponentBoard) {
+    if (isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
+    const providerIsActive = state[opponentKey].front.some((card) => card.instanceId === provider.instanceId)
+    for (const ability of provider.abilities || []) {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      const invisibleTentaclesUsed = opponentBoard.some((card) => card.abilityUses?.['shared:invisible tentacles'] === state.turnNumber)
+      if (normalizeTcgBattleCardName(provider.name) === 'giratinalvx' && text === "whenever your opponent's pokemon tries to attack, your opponent discards 1 card from his or her hand. (if your opponent can't discard 1 card, your opponent's pokemon can't attack.) you can't use more than 1 invisible tentacles poke-body each turn." && !invisibleTentaclesUsed && state[sideKey].hand.length === 0) return false
+      if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) continue
+      const activeBasicLock = /as long as [a-z0-9 '’-]+ is your active pokemon, your opponent's basic pokemon can't attack/.test(text)
+      if (activeBasicLock && providerIsActive && attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')) return false
+
+      const soloBasicLock = /as long as [a-z0-9 '’-]+ is the only pokemon you have in play, your opponent's basic pokemon can't attack/.test(text)
+      if (soloBasicLock && opponentBoard.length === 1 && attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')) return false
+
+      const activeBabyLock = /as long as [a-z0-9 '’-]+ is your active pokemon, .*opponent's baby pokemon can't attack/.test(text)
+      if (activeBabyLock && providerIsActive && attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'baby')) return false
+
+      const activeNamedLock = text.match(/as long as [a-z0-9 '’-]+ is your active pokemon, your opponent's ([a-z0-9 '’-]+) can't attack/)
+      if (activeNamedLock && providerIsActive && normalizeTcgBattleAbilityText(attacker.name) === activeNamedLock[1].trim()) return false
+
+      const remainingHpLock = text.match(/your opponent's pokemon that have (\d+) hp or less remaining can't attack/)
+      if (remainingHpLock && attacker.currentHp <= Number(remainingHpLock[1])) return false
+    }
+  }
+  return true
 }
 
 export interface TcgBattleDeckValidation {
@@ -876,7 +1804,7 @@ export interface TcgBattleDeckValidation {
 }
 
 export function normalizeTcgDeckFormat(value: unknown): TcgBattleDeckFormat | null {
-  return value === 'baby' || value === 'champions' || value === 'masters' ? value : null
+  return value === 'standard' || value === 'baby' || value === 'champions' || value === 'masters' ? 'standard' : null
 }
 
 export async function buildTcgBattleCardSummary(cardId: string): Promise<TcgBattleCardSummary | null> {
@@ -897,6 +1825,7 @@ export async function buildTcgBattleCardSummary(cardId: string): Promise<TcgBatt
     cost: calculateTcgBattleCardCost(card),
     convertedRetreatCost: card.convertedRetreatCost ?? 1,
     attacks,
+    abilities: card.abilities || [],
     weaknesses: card.weaknesses || [],
     resistances: card.resistances || [],
   }
@@ -951,8 +1880,8 @@ function isTcgBattleBasic(card: Pick<TcgBattleCardSummary, 'subtypes'>): boolean
 export function getTcgBattleDeckLineErrors(cards: TcgBattleCardSummary[]): string[] {
   const errors: string[] = []
   const basics = cards.filter(isTcgBattleBasic)
-  if (basics.length < 6) {
-    errors.push('Deck must include at least 6 Basic Pokémon for the opening line-up.')
+  if (basics.length < 1) {
+    errors.push('Deck must include at least 1 Basic Pokémon for the opening hand.')
   }
   const countMatching = (name: string, stage: 0 | 1) => cards.filter((candidate) =>
     normalizeTcgBattlePokemonName(candidate.name) === name &&
@@ -988,7 +1917,7 @@ export function getTcgBattleDeckLineErrors(cards: TcgBattleCardSummary[]): strin
 export async function validateTcgBattleDeck(
   cardIds: string[],
   collection: Record<string, number>,
-  format: TcgBattleDeckFormat,
+  _legacyFormat?: string,
 ): Promise<TcgBattleDeckValidation> {
   const errors: string[] = []
   const uniqueIds = Array.from(new Set(cardIds.filter(Boolean)))
@@ -1011,9 +1940,10 @@ export async function validateTcgBattleDeck(
   }
 
   const totalCost = cards.reduce((sum, card) => sum + card.cost, 0)
-  const limit = TCG_BATTLE_FORMATS[format].deckCostLimit
+  if (!cards.some(isTcgBattleBasic)) errors.push('Deck must contain at least one Basic Pokémon for the opening hand.')
+  const limit = TCG_BATTLE_RULES.deckCostLimit
   if (totalCost > limit) {
-    errors.push(`Deck cost ${totalCost} exceeds the ${limit} ${TCG_BATTLE_FORMATS[format].label} limit.`)
+    errors.push(`Deck cost ${totalCost} exceeds the ${limit} ${TCG_BATTLE_RULES.label} limit.`)
   }
   errors.push(...getTcgBattleDeckLineErrors(cards))
 
@@ -1022,7 +1952,7 @@ export async function validateTcgBattleDeck(
 
 export async function autoBuildTcgBattleDeck(
   collection: Record<string, number>,
-  format: TcgBattleDeckFormat,
+  _legacyFormat?: string,
 ): Promise<TcgBattleDeckValidation> {
   const candidates: TcgBattleCardSummary[] = []
   for (const [cardId, qty] of Object.entries(collection)) {
@@ -1031,7 +1961,7 @@ export async function autoBuildTcgBattleDeck(
     if (summary) candidates.push(summary)
   }
 
-  const limit = TCG_BATTLE_FORMATS[format].deckCostLimit
+  const limit = TCG_BATTLE_RULES.deckCostLimit
   const candidatesByCost = new Map<number, TcgBattleCardSummary[]>()
   for (const card of candidates) {
     const cardsAtCost = candidatesByCost.get(card.cost) || []
@@ -1109,7 +2039,7 @@ export async function autoBuildTcgBattleDeck(
     const eligible = candidatePool.filter((card) => {
       if (selectedIds.has(card.id) || totalCost + card.cost > limit) return false
       if (selected.length === 0 && evolutionRootIds.size > 0 && !evolutionRootIds.has(card.id)) return false
-      if (basicCount < 6 && !isTcgBattleBasic(card)) return false
+      if (basicCount < 3 && !isTcgBattleBasic(card)) return false
       const stage = getTcgBattleEvolutionStage(card)
       if (stage > 0) {
         const predecessorName = normalizeTcgBattlePokemonName(card.evolvesFrom)
@@ -1128,7 +2058,7 @@ export async function autoBuildTcgBattleDeck(
       return canCompleteDeck([...selected, card], totalCost + card.cost)
     })
     const shouldStartAnEvolutionLine =
-      basicCount >= 6 && !selected.some((card) => getTcgBattleEvolutionStage(card) === 1)
+      basicCount >= 3 && !selected.some((card) => getTcgBattleEvolutionStage(card) === 1)
     const lineCards = shouldStartAnEvolutionLine
       ? eligible.filter((card) => getTcgBattleEvolutionStage(card) === 1)
       : []
@@ -1148,7 +2078,7 @@ export async function autoBuildTcgBattleDeck(
   }
 
   // Spend any remaining format budget through a one-card upgrade, keeping all
-  // evolution prerequisites and the six-Basic opening rule intact.
+  // evolution prerequisites and the opening Basic requirement intact.
   let improved = true
   while (selected.length === 15 && totalCost < limit && improved) {
     improved = false
@@ -1211,9 +2141,38 @@ export function drawTcgBattleOpeningCards(cards: TcgBattleCardSummary[], count =
   return drawTcgBattleCards(basics, count)
 }
 
+export function dealTcgBattleOpeningHand(cards: TcgBattleCardSummary[], count = 3): { hand: TcgBattleCardState[]; deck: TcgBattleCardSummary[]; mulligans: number } {
+  const shuffle = (items: TcgBattleCardSummary[]) => {
+    const shuffled = [...items]
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1))
+      ;[shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]]
+    }
+    return shuffled
+  }
+  if (!cards.some(isTcgBattleBasic)) return { hand: [], deck: shuffle(cards), mulligans: 0 }
+  let deck = shuffle(cards)
+  let mulligans = 0
+  while (true) {
+    const opening = deck.splice(0, count)
+    if (opening.some(isTcgBattleBasic)) {
+      return { hand: opening.map((card, index) => createTcgBattleCardState(card, index)), deck, mulligans }
+    }
+    mulligans += 1
+    deck = shuffle([...deck, ...opening])
+  }
+}
+
 export function arrangeOpponentTcgBattleCards(cards: TcgBattleCardState[]) {
   const sorted = [...cards].sort((a, b) => getOpponentOpeningScore(b) - getOpponentOpeningScore(a) || a.name.localeCompare(b.name))
   return { front: sorted.slice(0, 3), back: sorted.slice(3, 6) }
+}
+
+export function arrangeOpponentOpeningCards(cards: TcgBattleCardState[]) {
+  const basics = cards.filter(isTcgBattleBasic).sort((a, b) => getOpponentOpeningScore(b) - getOpponentOpeningScore(a) || a.name.localeCompare(b.name))
+  const front = basics.slice(0, 3)
+  const frontIds = new Set(front.map((card) => card.instanceId))
+  return { front, hand: cards.filter((card) => !frontIds.has(card.instanceId)) }
 }
 
 function getOpponentOpeningScore(card: TcgBattleCardState): number {
@@ -25323,6 +26282,7 @@ function inferNeoTcgBattleAttackEffect(
 export interface TcgBattleAttackResolution {
   targetDamage: number
   targetDamageBeforeModifiers: number
+  targetShuffledOnSurvival?: boolean
   incomingReflectedDamage?: number
   selfDamage: number
   selfKnockOut: boolean
@@ -25356,6 +26316,12 @@ export interface TcgBattleAttackResolution {
     heads: number
     tails: number
   }
+  abilityCoinFlips?: {
+    results: TcgBattleCoinResult[]
+    heads: number
+    tails: number
+  }
+  unownXProviderIds?: string[]
 }
 
 export interface TcgBattleStatusAttackCheck {
@@ -25381,8 +26347,8 @@ export function resolveTcgBattleAttack(params: {
   random?: () => number
 }): TcgBattleAttackResolution {
   const { state, sideKey, attacker, attack, target, paidAttackCost, choice, random = Math.random } = params
-  const effect = getTcgBattleAttackEffect(attack)
-  if (!effect) {
+  const printedEffect = getTcgBattleAttackEffect(attack)
+  if (!printedEffect) {
     return {
       targetDamage: 0,
       targetDamageBeforeModifiers: 0,
@@ -25390,6 +26356,18 @@ export function resolveTcgBattleAttack(params: {
       selfKnockOut: false,
     }
   }
+  const opponentKey: TcgBattleSide = sideKey === 'player' ? 'opponent' : 'player'
+  const targetIsActive = state[opponentKey].front.some((card) => card.instanceId === target.instanceId)
+  const attackerAbilityBoard = [state.player, state.opponent]
+  const ignoresActiveTargetEffects = targetIsActive && !isTcgBattleAbilitySuppressedByShadyTail(attacker, attackerAbilityBoard) &&
+    attacker.abilities?.some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      return /(?:damage from attacks used by this pokemon|damage from this pokemon's attacks|damage from attacks of your lightning pokemon) isn't affected by any effects on your opponent's active pokemon/.test(text) &&
+        isTcgBattleAbilityEnabled(text, attacker, state[sideKey].front.some((card) => card.instanceId === attacker.instanceId))
+    })
+  const effect = ignoresActiveTargetEffects
+    ? { ...printedEffect, ignoreTargetDamageModifiers: true }
+    : printedEffect
 
   const optionalCoinDisabled = effect.damage.kind === 'optionalCoinDamage' &&
     choice?.kind === 'optionalBonus' && !choice.enabled
@@ -25417,7 +26395,7 @@ export function resolveTcgBattleAttack(params: {
     doesTcgBattleConditionPass(copyRule.coinGate, coinFlips) &&
     choice?.kind === 'copiedAttack'
   ) {
-    const copiedAttack = target.attacks[choice.attackIndex]
+    const copiedAttack = getTcgBattleAvailableAttacks(state, sideKey === 'player' ? 'opponent' : 'player', target)[choice.attackIndex]
     const copiedEffect = copiedAttack && getTcgBattleAttackEffect(copiedAttack)
     if (copiedAttack && copiedEffect && !copiedEffect.special?.some((rule) => rule.kind === 'copyAttack')) {
       const copiedResolution = resolveTcgBattleAttack({
@@ -25450,33 +26428,82 @@ export function resolveTcgBattleAttack(params: {
     choice,
     coinMode: 'actual',
   })
-  targetDamageBeforeModifiers = applyTcgBattleTemporaryAttackBoost(attacker, attack, targetDamageBeforeModifiers)
+  targetDamageBeforeModifiers = applyTcgBattleTemporaryAttackBoost(attacker, attack, targetDamageBeforeModifiers, state, sideKey, target)
+  const abilityDamage = getTcgBattleAbilityDamageModifiers(
+    attacker,
+    target,
+    targetDamageBeforeModifiers,
+    state,
+    sideKey,
+    effect.ignoreTargetDamageModifiers,
+    attack.name,
+    random,
+  )
+  targetDamageBeforeModifiers += abilityDamage.beforeWeaknessResistance
+  const targetIsBenched = state[opponentKey].back.some((card) => card.instanceId === target.instanceId)
   const targetDamageAfterType = applyTcgWeaknessAndResistance(attacker, target, targetDamageBeforeModifiers, {
     ignoreWeakness: effect.ignoreWeakness,
     ignoreResistance: effect.ignoreResistance,
+    targetIsActive: !targetIsBenched,
+    state,
+    targetSide: opponentKey,
   })
-  const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
-  const targetIsBenched = state[opponentKey].back.some((card) => card.instanceId === target.instanceId)
   const ignoresTargetTypeModifiers = effect.ignoreWeaknessResistance ||
     (effect.ignoreWeaknessResistanceOnBench && targetIsBenched)
   const typedDamageBase = ignoresTargetTypeModifiers ? targetDamageBeforeModifiers : targetDamageAfterType
   const damageTakenBuff = effect.ignoreTargetDamageModifiers
     ? undefined
     : target.temporaryEffects?.attackDamageTakenBuff
-  const typedDamage = typedDamageBase > 0 && damageTakenBuff?.sourceSide === sideKey
+  let typedDamage = typedDamageBase > 0 && damageTakenBuff?.sourceSide === sideKey
     ? typedDamageBase + damageTakenBuff.damageBonus
     : typedDamageBase
+  if (!effect.ignoreTargetDamageModifiers) {
+    typedDamage = Math.max(0, typedDamage + abilityDamage.afterWeaknessResistance)
+    const teamReduction = state[opponentKey].temporaryAttackDamageReduction
+    if (teamReduction?.turnNumber === state.turnNumber) typedDamage = Math.max(0, typedDamage - teamReduction.damageReduction)
+    if (abilityDamage.capDamageAfterWeaknessResistance !== undefined && typedDamage >= 20) typedDamage = Math.min(typedDamage, abilityDamage.capDamageAfterWeaknessResistance)
+    if (abilityDamage.hardShell && typedDamage > 10 && typedDamage <= 40) typedDamage = 10
+    if (abilityDamage.preventAllDamage || (abilityDamage.preventAtOrAbove !== undefined && typedDamage >= abilityDamage.preventAtOrAbove) || (abilityDamage.preventAtOrBelow !== undefined && typedDamage > 0 && typedDamage <= abilityDamage.preventAtOrBelow) || abilityDamage.preventDamageAmounts?.includes(typedDamage)) typedDamage = 0
+    else if (abilityDamage.halveDamage) typedDamage = abilityDamage.halveDamageRoundsUp ? Math.ceil(typedDamage / 20) * 10 : Math.floor(typedDamage / 20) * 10
+  }
+  if (!effect.ignoreTargetDamageModifiers && abilityDamage.preventFirstAttackDamage && typedDamage > 0) {
+    target.abilityUses = { ...target.abilityUses, 'first-attack-damage-after-play': state.turnNumber }
+  }
+  const abilityProtectionCoinFlips = !effect.ignoreTargetDamageModifiers && Boolean(random) &&
+    (abilityDamage.coinPreventOnHeads || abilityDamage.coinDamageReduction > 0) && typedDamage > 0
+    ? abilityDamage.coinDamageReductionFlipUntilTails ? rollTcgBattleCoinsUntilTails(random) : rollTcgBattleCoins(1, random)
+    : undefined
+  const abilitySurvivalCoinFlips = !effect.ignoreTargetDamageModifiers && abilityDamage.coinSurviveKnockout &&
+    typedDamage >= target.currentHp && typedDamage > 0
+    ? rollTcgBattleCoins(1, random)
+    : undefined
+  const abilitySurvivesKnockout = !effect.ignoreTargetDamageModifiers && abilityDamage.knockoutSurvivalHp !== undefined &&
+    typedDamage >= target.currentHp && typedDamage > 0
   const incomingCoinFlips = !effect.ignoreTargetDamageModifiers &&
     target.incomingAttackModifier?.kind === 'coinPreventDamage' && typedDamage > 0
     ? rollTcgBattleCoins(1, random)
     : undefined
   let targetDamage = effect.ignoreTargetDamageModifiers
     ? Math.max(0, typedDamage)
-    : incomingCoinFlips && target.incomingAttackModifier?.kind === 'coinPreventDamage'
+    : abilityDamage.preventFirstAttackDamage && typedDamage > 0
+      ? 0
+    : abilityProtectionCoinFlips?.results[0] === 'heads' && abilityDamage.coinPreventOnHeads
+      ? 0
+      : abilitySurvivalCoinFlips?.results[0] === 'heads'
+        ? abilityDamage.shuffleTargetOnSurvival
+          ? target.currentHp
+          : Math.max(0, target.currentHp - 10)
+      : abilitySurvivesKnockout
+        ? Math.max(0, target.currentHp - (abilityDamage.knockoutSurvivalHp || 10))
+      : abilityDamage.coinDamageReductionFlipUntilTails && (abilityProtectionCoinFlips?.heads || 0) > 0
+      ? Math.max(0, typedDamage - (abilityProtectionCoinFlips?.heads || 0) * abilityDamage.coinDamageReduction)
+      : abilityProtectionCoinFlips?.results[0] === 'heads'
+      ? Math.max(0, typedDamage - abilityDamage.coinDamageReduction)
+      : incomingCoinFlips && target.incomingAttackModifier?.kind === 'coinPreventDamage'
     ? incomingCoinFlips.results[0] === target.incomingAttackModifier.preventOn
       ? 0
-      : applyTcgBattleIncomingAttackModifier(target, typedDamage, attacker.instanceId)
-    : applyTcgBattleIncomingAttackModifier(target, typedDamage, attacker.instanceId)
+      : applyTcgBattleIncomingAttackModifier(target, typedDamage, attacker.instanceId, targetIsActive)
+    : applyTcgBattleIncomingAttackModifier(target, typedDamage, attacker.instanceId, targetIsActive)
   const incomingReflectedDamage = !effect.ignoreTargetDamageModifiers &&
     target.incomingAttackModifier?.kind === 'coinPreventDamage' &&
     incomingCoinFlips?.results[0] === target.incomingAttackModifier.preventOn
@@ -25549,15 +26576,26 @@ export function resolveTcgBattleAttack(params: {
     choice,
   )
   const protection = calculateTcgBattleProtection(effect.protection || [], sideKey, attacker, target, coinFlips)
+  const skullStoneText = "during your opponent's turn, if skull fossil would be knocked out by damage from an opponent's attack, flip a coin until you get tails. for each heads, put 1 damage counter on the attacking pokemon."
+  const skullStoneCoins = targetDamage >= target.currentHp && targetDamage > 0 && !isTcgBattleAbilitySuppressedByShadyTail(target, [state.player, state.opponent]) &&
+    normalizeTcgBattleAbilityText(target.name) === 'skull fossil' && (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === skullStoneText)
+    ? rollTcgBattleCoinsUntilTails(random)
+    : undefined
+  const skullStoneCounterDamage = skullStoneCoins && skullStoneCoins.heads > 0
+    ? { targetSide: sideKey, targetId: attacker.instanceId, damage: skullStoneCoins.heads * 10 }
+    : undefined
 
   return {
     targetDamage,
     targetDamageBeforeModifiers,
+    targetShuffledOnSurvival: Boolean(abilityDamage.shuffleTargetOnSurvival && abilitySurvivalCoinFlips?.results[0] === 'heads') || undefined,
     incomingReflectedDamage: incomingReflectedDamage || undefined,
     selfDamage: boostedSelfDamage,
+    abilityCoinFlips: abilityDamage.unownXCoinFlips,
+    unownXProviderIds: abilityDamage.unownXProviderIds,
     selfKnockOut: Boolean(effect.selfKnockOut),
     benchDamage: benchDamage.length > 0 ? benchDamage : undefined,
-    counterDamage: counterDamage.length > 0 ? counterDamage : undefined,
+    counterDamage: [...counterDamage, ...(skullStoneCounterDamage ? [skullStoneCounterDamage] : [])].length > 0 ? [...counterDamage, ...(skullStoneCounterDamage ? [skullStoneCounterDamage] : [])] : undefined,
     healing: healing.length > 0 ? healing : undefined,
     energyGains: effect.energyGain
       ?.filter((gain) =>
@@ -25585,7 +26623,7 @@ export function resolveTcgBattleAttack(params: {
       if (rule.kind === 'copyAttack') return false
       return doesTcgBattleConditionPass('condition' in rule ? rule.condition : undefined, coinFlips)
     }),
-    coinFlips: combineTcgBattleCoinFlips(coinFlips, incomingCoinFlips),
+    coinFlips: combineTcgBattleCoinFlips(coinFlips, combineTcgBattleCoinFlips(abilityProtectionCoinFlips, combineTcgBattleCoinFlips(abilitySurvivalCoinFlips, combineTcgBattleCoinFlips(incomingCoinFlips, skullStoneCoins)))),
   }
 }
 
@@ -25603,11 +26641,14 @@ function applyTcgBattleTemporaryAttackBoost(
   attacker: TcgBattleCardState,
   attack: TcgBattleAttack,
   damage: number,
+  state?: TcgBattleState,
+  sideKey?: TcgBattleSide,
+  target?: TcgBattleCardState,
 ): number {
   let boostedDamage = damage
   const name = attack.name.toLowerCase()
   const override = attacker.temporaryEffects?.attackBaseDamageOverrides?.find(
-    (entry) => entry.attackName.toLowerCase() === name,
+    (entry) => entry.attackName.toLowerCase() === name && (entry.turnNumber === undefined || !state || entry.turnNumber === state.turnNumber),
   )
   if (override) boostedDamage = Math.max(boostedDamage, override.baseDamage)
 
@@ -25623,6 +26664,17 @@ function applyTcgBattleTemporaryAttackBoost(
     if (typeof buff.damageBonus === 'number') boostedDamage += buff.damageBonus
     if (buff.damageMultiplier && buff.damageMultiplier > 1) {
       boostedDamage = Math.round((boostedDamage * buff.damageMultiplier) / 10) * 10
+    }
+  }
+  if (state && sideKey) {
+    for (const boost of state[sideKey].temporaryAttackDamageBoosts || []) {
+      if (boost.turnNumber !== state.turnNumber) continue
+      if (boost.type && !attacker.types.some((type) => type.toLowerCase() === boost.type!.toLowerCase())) continue
+      if (boost.subtype && !attacker.subtypes.some((subtype) => subtype.toLowerCase() === boost.subtype!.toLowerCase())) continue
+      if (boost.cardName && normalizeTcgBattleCardName(attacker.name) !== normalizeTcgBattleCardName(boost.cardName)) continue
+      const defendingSide = sideKey === 'player' ? 'opponent' : 'player'
+      if (boost.targetActiveOnly && (!target || !state[defendingSide].front.some((card) => card.instanceId === target.instanceId))) continue
+      boostedDamage += boost.damageBonus
     }
   }
   return Math.max(0, boostedDamage)
@@ -25647,18 +26699,41 @@ export function applyTcgBattleStatusConditions(
   sourceId: string,
   attackTargetId: string,
   statusConditions: TcgBattleStatusResolution[] | undefined,
+  sourceIsAbilityEffect = false,
 ) {
   if (!statusConditions || statusConditions.length === 0) return []
 
   const applied: NonNullable<TcgBattleState['lastStatusEvents']> = []
   for (const statusCondition of statusConditions) {
-    const targetSideKey = statusCondition.target === 'self' ? sideKey : sideKey === 'player' ? 'opponent' : 'player'
+    const targetSideKey = statusCondition.target === 'self' || statusCondition.target === 'ownActive' ? sideKey : sideKey === 'player' ? 'opponent' : 'player'
     const targetId = statusCondition.target === 'self' ? sourceId : attackTargetId
     const target = state[targetSideKey].front.find((card) => card.instanceId === targetId && card.currentHp > 0)
     if (!target) continue
 
-    const statuses = applyTcgBattleCardStatuses(target, statusCondition.statuses)
+    const attacker = statusCondition.target === 'ownActive'
+      ? state[sideKey].front.find((card) => card.instanceId === attackTargetId)
+      : state[sideKey].front.find((card) => card.instanceId === sourceId)
+    const blockedByAbilityEffect = sourceIsAbilityEffect && targetSideKey !== sideKey && (isTcgBattleAbilityEffectBlockedByTeamAbility(target, targetSideKey, state) || !isTcgBattleAbilitySuppressedByShadyTail(target, [state.player, state.opponent]) && (target.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      return isTcgBattleAbilityEnabled(text, target, true) &&
+        /prevent all effects of your opponent's pokemon's abilities done to this pokemon|prevent all effects of your opponent's pokemon's attacks and abilities done to this pokemon/.test(text)
+    }))
+    const statuses = applyTcgBattleCardStatuses(target, statusCondition.statuses.filter((status) =>
+      !blockedByAbilityEffect && !isTcgBattleStatusBlockedByAbility(target, status, attacker, state, targetSideKey),
+    ))
     if (statuses.length === 0) continue
+
+    const lanturnSubmerge = (target.abilities || []).some((ability) =>
+      normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "once during your turn (before your attack), you may change lanturn's type to water until the end of your turn. this power can't be used if lanturn is asleep, confused, or paralyzed. if lanturn becomes asleep, confused, or paralyzed after you have used this power, its type changes back to lightning.",
+    )
+    if (
+      lanturnSubmerge &&
+      statuses.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) &&
+      target.temporaryEffects?.typeOverride === 'Water'
+    ) {
+      delete target.temporaryEffects.typeOverride
+      delete target.temporaryEffects.typeOverrideOwner
+    }
 
     applied.push({
       id: '',
@@ -25677,22 +26752,29 @@ export function clearTcgBattleControlStatus(
   status: Extract<TcgBattleStatusCondition, 'asleep' | 'paralyzed' | 'confused'>,
 ) {
   card.statusConditions = (card.statusConditions || []).filter((condition) => condition !== status)
+  if (!card.statusConditions.includes('poisoned') && card.temporaryEffects) delete card.temporaryEffects.poisonCheckupBonus
+  if (!card.statusConditions.includes('burned') && card.temporaryEffects) delete card.temporaryEffects.burnCheckupBonus
   if (card.statusConditions.length === 0) card.statusConditions = undefined
 }
 
 export function clearTcgBattleStatuses(card: TcgBattleCardState) {
   card.statusConditions = undefined
+  if (card.temporaryEffects) {
+    delete card.temporaryEffects.poisonCheckupBonus
+    delete card.temporaryEffects.burnCheckupBonus
+  }
 }
 
 export function applyTcgBattleIncomingAttackModifier(
   card: TcgBattleCardState,
   damage: number,
   attackerId?: string,
+  targetIsActive = true,
 ): number {
   const modifier = card.incomingAttackModifier
   if (!modifier || damage <= 0) return Math.max(0, damage)
   if (modifier.kind === 'preventAll') return 0
-  if (modifier.kind === 'preventAllEffects') return 0
+  if (modifier.kind === 'preventAllEffects') return modifier.activeOnly && !targetIsActive ? Math.max(0, damage) : 0
   if (modifier.kind === 'preventAtMost') return damage <= modifier.amount ? 0 : damage
   if (modifier.kind === 'preventAtLeast') return damage >= modifier.amount ? 0 : damage
   if (modifier.kind === 'halve') return Math.floor(damage / 20) * 10
@@ -25718,7 +26800,7 @@ export function tickTcgBattleIncomingAttackModifiers(state: TcgBattleState, side
 
     const effects = card.temporaryEffects
     if (!effects) continue
-    for (const key of ['disabledAttack', 'cannotAttack', 'cannotRetreat', 'cannotSwitch', 'endure', 'preventStatusConditions', 'cannotTarget', 'nextAttackBuff', 'destinyBond', 'discardEnergyOnKnockout', 'reflectDamage'] as const) {
+    for (const key of ['disabledAttack', 'cannotAttack', 'cannotRetreat', 'cannotSwitch', 'endure', 'preventStatusConditions', 'cannotTarget', 'nextAttackBuff', 'destinyBond', 'discardEnergyOnKnockout', 'reflectDamage', 'pokemonPowerSuppression'] as const) {
       const effect = effects[key]
       if (!effect) continue
       if (key === 'cannotRetreat' && (effects.cannotRetreat?.untilSourceLeaves || effects.cannotRetreat?.untilTargetLeaves)) continue
@@ -25771,7 +26853,7 @@ export function calculateTcgBattleDamage(
         attacker,
         attack,
         target,
-        paidAttackCost: getEffectiveTcgBattleAttackCost(state, attack),
+        paidAttackCost: getEffectiveTcgBattleAttackCost(state, attack, attacker, sideKey),
       })
     : undefined
 
@@ -25808,19 +26890,2027 @@ export function calculateTcgBattleDamage(
     coinFlips: projectedCoins,
     coinMode: 'max',
   })
-  damage = applyTcgBattleTemporaryAttackBoost(attacker, attack, damage)
+  damage = applyTcgBattleTemporaryAttackBoost(attacker, attack, damage, state, sideKey, target)
+  const abilityDamage = getTcgBattleAbilityDamageModifiers(
+    attacker,
+    target,
+    damage,
+    state,
+    sideKey,
+    effect.ignoreTargetDamageModifiers,
+    attack.name,
+  )
+  damage += abilityDamage.beforeWeaknessResistance
   const targetIsBenched = state && sideKey
     ? state[sideKey === 'player' ? 'opponent' : 'player'].back.some((card) => card.instanceId === target.instanceId)
     : false
-  return effect.ignoreWeaknessResistance || (effect.ignoreWeaknessResistanceOnBench && targetIsBenched)
+  const damageAfterTypeRules = effect.ignoreWeaknessResistance || (effect.ignoreWeaknessResistanceOnBench && targetIsBenched)
     ? damage
     : applyTcgWeaknessAndResistance(attacker, target, damage, {
         ignoreWeakness: effect.ignoreWeakness,
         ignoreResistance: effect.ignoreResistance,
+        targetIsActive: !targetIsBenched,
+        state,
+        targetSide: sideKey && (sideKey === 'player' ? 'opponent' : 'player'),
       })
+  let adjustedDamage = Math.max(0, damageAfterTypeRules + abilityDamage.afterWeaknessResistance)
+  if (abilityDamage.capDamageAfterWeaknessResistance !== undefined && adjustedDamage >= 20) adjustedDamage = Math.min(adjustedDamage, abilityDamage.capDamageAfterWeaknessResistance)
+  if (abilityDamage.hardShell && adjustedDamage > 10 && adjustedDamage <= 40) adjustedDamage = 10
+  if (abilityDamage.preventAllDamage || (abilityDamage.preventAtOrAbove !== undefined && adjustedDamage >= abilityDamage.preventAtOrAbove) || (abilityDamage.preventAtOrBelow !== undefined && adjustedDamage > 0 && adjustedDamage <= abilityDamage.preventAtOrBelow) || abilityDamage.preventDamageAmounts?.includes(adjustedDamage)) return 0
+  if (abilityDamage.halveDamage) adjustedDamage = abilityDamage.halveDamageRoundsUp ? Math.ceil(adjustedDamage / 20) * 10 : Math.floor(adjustedDamage / 20) * 10
+  return adjustedDamage
+}
+
+/** Applies the subset of printed Pokémon abilities represented by the single-front battle engine. */
+function getTcgBattleAbilityDamageModifiers(
+  attacker: TcgBattleCardState,
+  target: TcgBattleCardState,
+  damage: number,
+  state?: TcgBattleState,
+  sideKey?: TcgBattleSide,
+  ignoreTargetModifiers = false,
+  attackName?: string,
+  random?: () => number,
+): {
+  beforeWeaknessResistance: number
+  afterWeaknessResistance: number
+  preventAllDamage: boolean
+  preventFirstAttackDamage: boolean
+  preventAtOrAbove?: number
+  preventAtOrBelow?: number
+  preventDamageAmounts?: number[]
+  capDamageAfterWeaknessResistance?: number
+  hardShell: boolean
+  halveDamage: boolean
+  halveDamageRoundsUp: boolean
+  coinPreventOnHeads: boolean
+  coinDamageReduction: number
+  coinDamageReductionFlipUntilTails: boolean
+  coinSurviveKnockout: boolean
+  knockoutSurvivalHp?: number
+  shuffleTargetOnSurvival: boolean
+  unownXCoinFlips?: NonNullable<TcgBattleAttackResolution['coinFlips']>
+  unownXProviderIds?: string[]
+} {
+  if (damage <= 0) return { beforeWeaknessResistance: 0, afterWeaknessResistance: 0, preventAllDamage: false, preventFirstAttackDamage: false, halveDamage: false, halveDamageRoundsUp: false, coinPreventOnHeads: false, coinDamageReduction: 0, coinDamageReductionFlipUntilTails: false, coinSurviveKnockout: false, hardShell: false, shuffleTargetOnSurvival: false }
+  const targetSide = sideKey === 'player' ? 'opponent' : 'player'
+  const attackerIsActive = !state || !sideKey || state[sideKey].front.some((card) => card.instanceId === attacker.instanceId)
+  const targetIsActive = !state || !sideKey || state[targetSide].front.some((card) => card.instanceId === target.instanceId)
+  let beforeWeaknessResistance = 0
+  let afterWeaknessResistance = 0
+  let preventAllDamage = false
+  let preventFirstAttackDamage = false
+  let preventAtOrAbove: number | undefined
+  let preventAtOrBelow: number | undefined
+  let capDamageAfterWeaknessResistance: number | undefined
+  let hardShell = false
+  const preventDamageAmounts = new Set<number>()
+  let halveDamage = false
+  let halveDamageRoundsUp = false
+  let coinPreventOnHeads = false
+  let coinDamageReduction = 0
+  let coinDamageReductionFlipUntilTails = false
+  let coinSurviveKnockout = false
+  let knockoutSurvivalHp: number | undefined
+  let shuffleTargetOnSurvival = false
+  const abilityBoards = state ? [state.player, state.opponent] : []
+  const attackerSideCards = state && sideKey
+    ? [...state[sideKey].front, ...state[sideKey].back].filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, abilityBoards))
+    : [attacker]
+  const targetSideCards = state && sideKey
+    ? [...state[targetSide].front, ...state[targetSide].back].filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, abilityBoards))
+    : [target]
+  const masquerainIntimidatingPatternText = "as long as masquerain is your active pokemon, any damage done by an opponent's attack is reduced by 20 (before applying weakness and resistance)."
+  if (!ignoreTargetModifiers && state && sideKey && targetSideCards.some((provider) =>
+    normalizeTcgBattleAbilityText(provider.name) === 'masquerain' &&
+    state[targetSide].front.some((pokemon) => pokemon.instanceId === provider.instanceId) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === masquerainIntimidatingPatternText && isTcgBattleAbilityEnabled(text, provider, true)
+    }),
+  )) beforeWeaknessResistance -= 20
+  const luxrayActiveDamageReductionText = 'as long as this pokemon is in the active spot, attacks used by your opponent\'s active pokemon do −20 damage.'
+  if (!ignoreTargetModifiers && state && sideKey && attackerIsActive && state[targetSide].front.some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === luxrayActiveDamageReductionText && isTcgBattleAbilityEnabled(text, provider, true)
+    }),
+  )) beforeWeaknessResistance -= 20
+  const damageTargetOwner = state && (['player', 'opponent'] as const).find((owner) =>
+    [...state[owner].front, ...state[owner].back].some((pokemon) => pokemon.instanceId === target.instanceId),
+  )
+  const hasOtherUnownAbility = (owner: TcgBattleSide, providerId: string, abilityName: string) =>
+    [...state![owner].front, ...state![owner].back].some((pokemon) => pokemon.currentHp > 0 && pokemon.instanceId !== providerId &&
+      normalizeTcgBattleAbilityText(pokemon.name).startsWith('unown') && !isTcgBattleAbilitySuppressedByShadyTail(pokemon, abilityBoards) &&
+      (pokemon.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.name) !== normalizeTcgBattleAbilityText(abilityName)))
+  const targetIsBenchedByOwner = Boolean(damageTargetOwner && state?.[damageTargetOwner].back.some((pokemon) => pokemon.instanceId === target.instanceId))
+  const unownGuardText = "this ability works if you have any unown in play with an ability other than . all of your pokemon take −10 damage from attacks from your opponent's pokemon."
+  if (!ignoreTargetModifiers && state && damageTargetOwner) {
+    const guardCount = [...state[damageTargetOwner].front, ...state[damageTargetOwner].back].filter((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === unownGuardText && hasOtherUnownAbility(damageTargetOwner, provider.instanceId, ability.name)
+      }),
+    ).length
+    afterWeaknessResistance -= 10 * guardCount
+  }
+  const vespiquenDefenseSignText = 'prevent all damage done to your benched grass pokemon by attacks.'
+  if (!ignoreTargetModifiers && targetIsBenchedByOwner && target.types.some((type) => normalizeTcgBattleAbilityText(type) === 'grass') && damageTargetOwner &&
+    [...state![damageTargetOwner].front, ...state![damageTargetOwner].back].some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        const providerIsActive = state![damageTargetOwner].front.some((pokemon) => pokemon.instanceId === provider.instanceId)
+        return text === vespiquenDefenseSignText && isTcgBattleAbilityEnabled(text, provider, providerIsActive)
+      }),
+    )) preventAllDamage = true
+  const ninjaskFastProtectionText = "prevent all effects, including damage, done to ninjask by your opponent's attacks from his or her basic pokemon."
+  if (!ignoreTargetModifiers && normalizeTcgBattleAbilityText(target.name) === 'ninjask' && attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') &&
+    targetSideCards.some((provider) => provider.instanceId === target.instanceId && (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === ninjaskFastProtectionText))) preventAllDamage = true
+  const cherrimCloudySkyText = 'if any of your grass pokemon or fire pokemon would be damaged by an attack, reduce that damage by 10 (after applying weakness and resistance).'
+  if (!ignoreTargetModifiers && state) {
+    const targetOwner = (['player', 'opponent'] as const).find((owner) =>
+      [...state[owner].front, ...state[owner].back].some((pokemon) => pokemon.instanceId === target.instanceId),
+    )
+    const targetType = target.types.map(normalizeTcgBattleAbilityText)
+    const cherrimCloudySkyCount = targetOwner && (targetType.includes('grass') || targetType.includes('fire'))
+      ? [...state[targetOwner].front, ...state[targetOwner].back].filter((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        const providerIsActive = state[targetOwner].front.some((pokemon) => pokemon.instanceId === provider.instanceId)
+        return text === cherrimCloudySkyText && isTcgBattleAbilityEnabled(text, provider, providerIsActive)
+      }),
+      ).length
+      : 0
+    afterWeaknessResistance -= 10 * cherrimCloudySkyCount
+  }
+  const aurorusWaterGuardText = "any damage done by an opponent's attack to each of your water pokemon that has any water energy attached to it is reduced by 20 (after applying weakness and resistance)."
+  if (!ignoreTargetModifiers && state && sideKey && state[targetSide].energy > 0 && state[targetSide].selectedEnergy?.toLowerCase() === 'water' &&
+    getTcgBattleEffectiveTypes(target, state).some((type) => normalizeTcgBattleAbilityText(type) === 'water')) {
+    const aurorusWaterGuardCount = targetSideCards.filter((provider) =>
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === aurorusWaterGuardText),
+    ).length
+    afterWeaknessResistance -= 20 * aurorusWaterGuardCount
+  }
+  const aurorusTundraWallText = "all of your pokemon that have any {w} energy attached take 50 less damage from attacks from your opponent's pokemon (after applying weakness and resistance). the effect of tundra wall doesn't stack."
+  if (!ignoreTargetModifiers && state && sideKey && state[targetSide].energy > 0 && state[targetSide].selectedEnergy?.toLowerCase() === 'water' &&
+    getTcgBattleEffectiveTypes(target, state).some((type) => normalizeTcgBattleAbilityText(type) === 'water') &&
+    targetSideCards.some((provider) => (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === aurorusTundraWallText))) {
+    afterWeaknessResistance -= 50
+  }
+  const klinklangGearCoatingText = "all of your pokemon that have any {m} energy attached take 20 less damage from attacks from your opponent's pokemon (after applying weakness and resistance)."
+  if (!ignoreTargetModifiers && state && sideKey && state[targetSide].energy > 0 && state[targetSide].selectedEnergy?.toLowerCase() === 'metal') {
+    const gearCoatingCount = targetSideCards.filter((provider) =>
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === klinklangGearCoatingText),
+    ).length
+    afterWeaknessResistance -= 20 * gearCoatingCount
+  }
+  const unownWallText = "as long as unown w is your active pokemon, any damage done to your pokemon by an opponent's attack is reduced by 10 (after applying weakness and resistance)."
+  if (!ignoreTargetModifiers && state && (targetSideCards.some((provider) =>
+    normalizeTcgBattleAbilityText(provider.name).replace(/[^a-z]/g, '') === 'unownw' &&
+    state[targetSide].front.some((pokemon) => pokemon.instanceId === provider.instanceId) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === unownWallText && isTcgBattleAbilityEnabled(text, provider, true)
+    }),
+  ))) afterWeaknessResistance -= 10
+  const hippowdonSandArmorText = 'if hippowdon e4 has any fighting energy attached to it, any damage done to hippowdon e4 by attacks is reduced by 10 (after applying weakness and resistance).'
+  if (!ignoreTargetModifiers && state && normalizeTcgBattleAbilityText(target.name) === 'hippowdon e4' && state[targetSide].energy > 0 && state[targetSide].selectedEnergy?.toLowerCase() === 'fighting' && targetSideCards.some((provider) =>
+    provider.instanceId === target.instanceId && (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === hippowdonSandArmorText),
+  )) afterWeaknessResistance -= 10
+  const skiploomCottonweedText = 'if skiploom has any grass energy attached to it, any damage done to skiploom by attacks from your opponent\'s evolved pokemon is reduced by 20 (after applying weakness and resistance).'
+  if (!ignoreTargetModifiers && state && normalizeTcgBattleAbilityText(target.name) === 'skiploom' &&
+    state[targetSide].energy > 0 && state[targetSide].selectedEnergy?.toLowerCase() === 'grass' &&
+    attacker.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)) &&
+    targetSideCards.some((provider) => provider.instanceId === target.instanceId &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === skiploomCottonweedText))) {
+    afterWeaknessResistance -= 20
+  }
+  const unownBenchProtectionText = "as long as unown u is on your bench, prevent all effects of attacks, including damage, done by your opponent's pokemon to any unown on your bench."
+  const targetIsBenched = Boolean(state && state[targetSide].back.some((card) => card.instanceId === target.instanceId))
+  const manectricBenchProtectionText = 'prevent all damage done to your benched pokemon (excluding any manectric) by attacks.'
+  const jewelArmorText = "as long as this pokemon is on your bench, prevent all damage done to this pokemon by attacks (both yours and your opponent's)."
+  if (!ignoreTargetModifiers && targetIsBenched && (target.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === jewelArmorText &&
+    isTcgBattleAbilityEnabled(jewelArmorText, target, false),
+  )) preventAllDamage = true
+  if (!ignoreTargetModifiers && targetIsBenched && normalizeTcgBattleAbilityText(target.name) !== 'manectric' && targetSideCards.some((provider) =>
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === manectricBenchProtectionText),
+  )) preventAllDamage = true
+  if (!ignoreTargetModifiers && targetIsBenched && normalizeTcgBattleAbilityText(target.name).includes('unown') && targetSideCards.some((provider) =>
+    state?.[targetSide].back.some((card) => card.instanceId === provider.instanceId) &&
+    normalizeTcgBattleAbilityText(provider.name).replace(/[^a-z]/g, '') === 'unownu' &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === unownBenchProtectionText),
+  )) preventAllDamage = true
+  const cloysterDeltaBenchShieldText = "prevent all of effects of attacks, including damage, done by your opponent's pokemon to each of your benched pokemon that has δ on its card."
+  const targetHasDeltaMarker = target.name.includes('δ') || normalizeTcgBattleAbilityText(target.name).includes('delta')
+  if (!ignoreTargetModifiers && targetIsBenched && targetHasDeltaMarker && state && sideKey && sideKey !== targetSide && targetSideCards.some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === cloysterDeltaBenchShieldText),
+  )) preventAllDamage = true
+  const machokeDauntingPoseText = "prevent all damage done to your benched pokemon by your opponent's attacks. your opponent's attacks and abilities can't put damage counters on your benched pokemon."
+  if (!ignoreTargetModifiers && targetIsBenched && targetSideCards.some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === machokeDauntingPoseText),
+  )) preventAllDamage = true
+  const bronzongMetalFortressText = "prevent all effects of your opponent's attacks, including damage, done to your benched pokemon."
+  if (!ignoreTargetModifiers && targetIsBenched && targetSideCards.some((provider) =>
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === bronzongMetalFortressText),
+  )) preventAllDamage = true
+  const articunoBenchProtectionText = 'as long as articuno is your active pokemon, you benched pokemon are not affected by attacks. this power cannot be used if articuno is affected by a special condition.'
+  if (!ignoreTargetModifiers && targetIsBenched && state?.[targetSide].front.some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'articuno' && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === articunoBenchProtectionText && isTcgBattleAbilityEnabled(text, provider, true)
+    }),
+  )) preventAllDamage = true
+  const relaxingScentText = "as long as erika's ivysaur is your active pokemon, whenever an attack (even your own) does damage to any pokemon (after applying weakness and resistance), that attack only does half the damage to that pokemon (rounded up to the nearest 10). (any other effects of attacks still happen.) this power stops working while erika's ivysaur is asleep, confused, or paralyzed."
+  const activeRelaxingScent = !ignoreTargetModifiers && Boolean(state && [state.player, state.opponent].some((owner) => owner.front.some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === relaxingScentText && isTcgBattleAbilityEnabled(text, provider, true)
+    }),
+  )))
+  if (activeRelaxingScent) {
+    halveDamage = true
+    halveDamageRoundsUp = true
+  }
+  const targetBlocksOpponentAbilityEffects = !ignoreTargetModifiers && (Boolean(state && isTcgBattleAbilityEffectBlockedByTeamAbility(target, targetSide, state)) || !isTcgBattleAbilitySuppressedByShadyTail(target, abilityBoards) && (target.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text)
+    return isTcgBattleAbilityEnabled(text, target, targetIsActive) &&
+      /prevent all effects of your opponent's pokemon's abilities done to this pokemon|prevent all effects of your opponent's pokemon's attacks and abilities done to this pokemon/.test(text)
+  }))
+  const burningSpiritText = "any damage done by attacks to a burned pokemon (both yours and your opponent's) is increased by 40 (after applying weakness and resistance). no more than 40 damage can be added by all burning spirit poke-bodies."
+  if (!ignoreTargetModifiers && target.statusConditions?.includes('burned') && state && (['player', 'opponent'] as const).some((providerSideKey) => {
+    if (providerSideKey !== targetSide && targetBlocksOpponentAbilityEffects) return false
+    return [...state[providerSideKey].front, ...state[providerSideKey].back].some((provider) =>
+      provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'blaziken fb lv.x' &&
+      !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        const providerIsActive = state[providerSideKey].front.some((pokemon) => pokemon.instanceId === provider.instanceId)
+        return text === burningSpiritText && isTcgBattleAbilityEnabled(text, provider, providerIsActive)
+      }),
+    )
+  })) afterWeaknessResistance += 40
+  if (state && sideKey && attackerIsActive && targetIsActive) {
+    for (const providerSideKey of ['player', 'opponent'] as const) {
+      const providerSide = state[providerSideKey]
+      for (const provider of providerSide.front.filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, abilityBoards))) {
+        if (providerSideKey !== targetSide && targetBlocksOpponentAbilityEffects) continue
+        for (const ability of provider.abilities || []) {
+          const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+          const luxrayRivalryText = "if your opponent has any pokemon lv.x in play, each of luxray's attacks does 50 more damage to the active pokemon (before applying weakness and resistance)."
+          const opponentHasLevelUpPokemon = [...state[targetSide].front, ...state[targetSide].back].some((pokemon) =>
+            pokemon.currentHp > 0 && (pokemon.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'level-up') || normalizeTcgBattleAbilityText(pokemon.name).includes('lv.x')),
+          )
+          if (providerSideKey === sideKey && provider.instanceId === attacker.instanceId &&
+            normalizeTcgBattleAbilityText(provider.name) === 'luxray' && text === luxrayRivalryText && opponentHasLevelUpPokemon &&
+            isTcgBattleAbilityEnabled(text, provider, true)) {
+            beforeWeaknessResistance += 50
+          }
+          const activeAura = text.match(/^as long as (vigoroth|medicham) is your active pokemon, attacks by each player's active pokemon(?: \(both if there are 2\))? do 10 more damage to any active pokemon \(before applying weakness and resistance\)\.$/)
+          if (activeAura && normalizeTcgBattleAbilityText(provider.name) === activeAura[1] && isTcgBattleAbilityEnabled(text, provider, true)) {
+            beforeWeaknessResistance += 10
+          }
+        }
+      }
+    }
+  }
+  const gxAttack = /\bgx\b/i.test(attackName || '') && attacker.subtypes.some((subtype) => ['gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype)))
+  const teamGxDamageProtection = gxAttack && Boolean(state?.[targetSide].front.some((provider) =>
+    provider.currentHp > 0 &&
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === "as long as this pokemon is your active pokemon, prevent all effects of your opponent's gx attacks, including damage, done to your pokemon." &&
+        isTcgBattleAbilityEnabled(text, provider, true)
+    }),
+  ))
+  if (teamGxDamageProtection) preventAllDamage = true
+  const singleStackReductions = new Set<string>()
+  const abomasnowSnowVeilText = "as long as abomasnow is your active pokemon, any damage done to your pokemon by an opponent's attack is reduced by 20 (after applying weakness and resistance)."
+  const glaceonFrostWindText = "as long as glaceon is your active pokemon, any damage done to your pokemon by your opponent's attacks is reduced by 10 (after applying weakness and resistance)."
+  const kabutoAncientProtectionText = 'whenever an attack (even your own) does damage to kabuto (after applying weakness and resistance), that attack does only half the damage to kabuto (rounded down to the nearest 10). (any other effects of attacks still happen.) this power stops working while kabuto is affected by a special condition.'
+  for (const provider of targetSideCards) {
+    const providerIsActive = !state || !sideKey || state[targetSide].front.some((card) => card.instanceId === provider.instanceId)
+    const providerIsBenched = Boolean(state && sideKey && state[targetSide].back.some((card) => card.instanceId === provider.instanceId))
+    for (const ability of ignoreTargetModifiers ? [] : provider.abilities || []) {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) continue
+      if (text.replace(/\s+/g, ' ').trim() === kabutoAncientProtectionText && provider.instanceId === target.instanceId &&
+        normalizeTcgBattleAbilityText(target.name) === 'kabuto' && !provider.statusConditions?.length) {
+        halveDamage = true
+        halveDamageRoundsUp = false
+        continue
+      }
+      if (provider.instanceId === target.instanceId && attackerIsActive &&
+        text.replace(/\s+/g, ' ').trim() === "any damage done to this pokemon by an opponent's attack is reduced by 10 for each colorless in your opponent's active pokemon's retreat cost (after applying weakness and resistance).") {
+        afterWeaknessResistance -= 10 * Math.max(0, attacker.convertedRetreatCost ?? 1)
+        continue
+      }
+      if (provider.instanceId === target.instanceId && providerIsActive &&
+        text.replace(/\s+/g, ' ').trim() === "as long as slaking is your active pokemon, any damage done by attacks from your opponent's pokemon-ex is reduced by 30 (before applying weakness and resistance)." &&
+        attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'ex')) {
+        beforeWeaknessResistance -= 30
+        continue
+      }
+      if (provider.instanceId === target.instanceId && providerIsActive &&
+        text.replace(/\s+/g, ' ').trim() === "as long as glalie is your active pokemon, any damage done by attacks from your opponent's stage 2 evolved pokemon is reduced by 20 (before applying weakness and resistance)." &&
+        attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'stage 2')) {
+        beforeWeaknessResistance -= 20
+        continue
+      }
+      if (text.replace(/\s+/g, ' ').trim() === "any damage done to your stage 2 pokemon-ex by your opponent's attacks is reduced by 10 (before applying weakness and resistance)." &&
+        target.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'stage 2') &&
+        target.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'ex')) {
+        beforeWeaknessResistance -= 10
+        continue
+      }
+      const selfDamageReduction = text.replace(/\s+/g, ' ').trim().match(/^any damage done to (this pokemon|[a-z0-9 '’-]+) by attacks is reduced by (\d+) \(after applying weakness and resistance\)\.$/)
+      const reductionTargetMatches = selfDamageReduction && (selfDamageReduction[1] === 'this pokemon' || normalizeTcgBattleAbilityText(target.name) === selfDamageReduction[1].trim())
+      if (selfDamageReduction && provider.instanceId === target.instanceId && reductionTargetMatches) {
+        afterWeaknessResistance -= Number(selfDamageReduction[2])
+        continue
+      }
+      const allDamageToNamedPokemonReduction = text.replace(/\s+/g, ' ').trim().match(/^all damage by attacks to ([a-z0-9 '’-]+) is reduced by (\d+) \(after applying weakness and resistance\)\.$/)
+      if (allDamageToNamedPokemonReduction && provider.instanceId === target.instanceId && normalizeTcgBattleAbilityText(provider.name) === allDamageToNamedPokemonReduction[1].trim() && normalizeTcgBattleAbilityText(target.name) === allDamageToNamedPokemonReduction[1].trim()) {
+        afterWeaknessResistance -= Number(allDamageToNamedPokemonReduction[2])
+        continue
+      }
+      if (provider.instanceId === target.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'phanpy' &&
+        text.replace(/\s+/g, ' ').trim() === 'as long as phanpy has any energy attached to it, any damage done to phanpy by attacks is reduced by 10 (after applying weakness and resistance).' &&
+        (state?.[targetSide].energy || 0) > 0) {
+        afterWeaknessResistance -= 10
+        continue
+      }
+      const energyGuard = text.replace(/\s+/g, ' ').trim().match(/^any damage done to ([a-z0-9 '’-]+) by (?:(your opponent's) )?attacks is reduced by (\d+) for each (?:(darkness|metal) )?energy attached to ([a-z0-9 '’-]+) \(after applying weakness and resistance\)\. you can't reduce more than (\d+) damage in this way\.$/)
+      const guardEnergyType = energyGuard?.[4]
+      if (energyGuard && provider.instanceId === target.instanceId &&
+        normalizeTcgBattleAbilityText(provider.name) === energyGuard[1].trim() && normalizeTcgBattleAbilityText(target.name) === energyGuard[5].trim() &&
+        (!energyGuard[2] || sideKey !== undefined && sideKey !== targetSide) &&
+        (!guardEnergyType || state?.[targetSide].selectedEnergy?.toLowerCase() === guardEnergyType)) {
+        afterWeaknessResistance -= Math.min(Number(energyGuard[6]), (state?.[targetSide].energy || 0) * Number(energyGuard[3]))
+        continue
+      }
+      const dewgongThickFatText = 'any damage done to dewgong by attacks from fire pokemon and water pokemon is reduced by 30 (after applying weakness and resistance).'
+      if (provider.instanceId === target.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'dewgong' &&
+        text.replace(/\s+/g, ' ').trim() === dewgongThickFatText &&
+        attacker.types.some((type) => ['fire', 'water'].includes(normalizeTcgBattleAbilityText(type)))) {
+        afterWeaknessResistance -= 30
+        continue
+      }
+      const swampertRootProtectorText = "any damage done to swampert by attacks from your opponent's pokemon that isn't an evolved pokemon is reduced by 20 (after applying weakness and resistance)."
+      if (provider.instanceId === target.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'swampert' &&
+        text.replace(/\s+/g, ' ').trim() === swampertRootProtectorText && sideKey !== targetSide &&
+        attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')) {
+        afterWeaknessResistance -= 20
+        continue
+      }
+      const mrMimeEnergyShieldText = "if your opponent's pokemon that has 2 or less energy cards attached to it attacks mr. mime, prevent all damage done to mr. mime from that attack. if mime jr. is anywhere under mr. mime, prevent all effects of that attack, including damage, done to mr. mime."
+      if (provider.instanceId === target.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'mr. mime' &&
+        text.replace(/\s+/g, ' ').trim() === mrMimeEnergyShieldText && state && sideKey && sideKey !== targetSide && state[sideKey].energy <= 2) {
+        preventAllDamage = true
+        continue
+      }
+      if (provider.instanceId === target.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'armaldo' &&
+        text.replace(/\s+/g, ' ').trim() === "if armaldo would be damaged by an attack, prevent that attack's damage done to armaldo if that damage is 60 or less.") {
+        preventAtOrBelow = Math.max(preventAtOrBelow || 0, 60)
+        continue
+      }
+      if (provider.instanceId === target.instanceId && text.replace(/\s+/g, ' ').trim() === "if you have no cards in your hand, prevent all damage done to milotic by attacks from your opponent's pokemon." && state?.[targetSide].hand.length === 0) {
+        preventAllDamage = true
+        continue
+      }
+      if (text.replace(/\s+/g, ' ').trim() === abomasnowSnowVeilText && providerIsActive &&
+        state?.[targetSide].front.concat(state[targetSide].back).some((pokemon) => pokemon.instanceId === target.instanceId)) {
+        afterWeaknessResistance -= 20
+        continue
+      }
+      if (text.replace(/\s+/g, ' ').trim() === glaceonFrostWindText && providerIsActive &&
+        state?.[targetSide].front.concat(state[targetSide].back).some((pokemon) => pokemon.instanceId === target.instanceId)) {
+        afterWeaknessResistance -= 10
+        continue
+      }
+      const staraptorProtectWingText = "as long as staraptor is your active pokemon, any damage done by attacks from your opponent's stage 2 evolved pokemon is reduced by 20 (after applying weakness and resistance)."
+      if (text.replace(/\s+/g, ' ').trim() === staraptorProtectWingText &&
+        normalizeTcgBattleAbilityText(provider.name) === 'staraptor' && providerIsActive &&
+        attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'stage 2')) {
+        afterWeaknessResistance -= 20
+        continue
+      }
+      const solgaleoArmorOfTheSunneText = "if you have lunala in play, your solgaleo and lunala take 50 less damage from your opponent's attacks (after applying weakness and resistance). you can't apply more than 1 armor of the sunne ability at a time."
+      if (normalizeTcgBattleAbilityText(provider.name) === 'solgaleo' && text.replace(/\s+/g, ' ').trim() === solgaleoArmorOfTheSunneText &&
+        targetSideCards.some((card) => card.currentHp > 0 && card.instanceId !== provider.instanceId && normalizeTcgBattleAbilityText(card.name) === 'lunala') &&
+        ['solgaleo', 'lunala'].includes(normalizeTcgBattleAbilityText(target.name))) {
+        afterWeaknessResistance -= 50
+        continue
+      }
+      if (provider.instanceId === target.instanceId && text.replace(/\s+/g, ' ').trim() === "whenever an attack (including your own) does 30 or more damage to mr. mime (after applying weakness and resistance), prevent that damage. (any other effects of attacks still happen.) this power can't be used if mr. mime is asleep, confused, or paralyzed.") {
+        preventAtOrAbove = Math.max(preventAtOrAbove || 0, 30)
+        continue
+      }
+      const unownTypeReduction = text.match(/^whenever a (darkness|metal|colorless) pokemon damages 1 of your pokemon, reduce that damage by (\d+) \(after applying weakness and resistance\)\. this power stops working if you have more than 1 unown \[([dmn])\] in play\. \(this power (?:(?:even )?works(?: even)? if) unown \[([dmn])\] is asleep, confused, or paralyzed\)\.$/)
+      if (unownTypeReduction && state && sideKey) {
+        const unownLetter = unownTypeReduction[3]
+        if (unownLetter !== unownTypeReduction[4]) continue
+        const sameUnownCount = [...state[targetSide].front, ...state[targetSide].back].filter((card) => card.currentHp > 0 && normalizeTcgBattleAbilityText(card.name).replace(/[^a-z]/g, '') === `unown${unownLetter}`).length
+        const attackerType = unownTypeReduction[1]
+        if (sameUnownCount <= 1 && attacker.types.some((type) => normalizeTcgBattleAbilityText(type) === attackerType)) {
+          afterWeaknessResistance -= Number(unownTypeReduction[2])
+        }
+        continue
+      }
+      if (/once during your turn|during your next turn|during this turn|when you play|energy attached|stadium|pokemon tool|prize cards?|pokemon lv\.?x/.test(text)) continue
+      const teamReduction = text.match(/(?:all(?: of)? your|each of your)\s+(?:(.*?)\s+)?pokemon(?: that have "([^"]+)" in their name)?\s+take(?:s)?\s+(\d+)\s+less damage from/) ||
+        text.match(/your\s+(.+?)\s+pokemon(?: that have "([^"]+)" in their name)?\s+take(?:s)?\s+(\d+)\s+less damage from/) ||
+        (() => {
+          const reduction = text.match(/your\s+(.+?)\s+take(?:s)?\s+(\d+)\s+less damage from/)
+          return reduction ? [reduction[0], reduction[1], '', reduction[2]] as RegExpMatchArray : null
+        })()
+      if (!teamReduction) continue
+      if (/\bif\b/.test(text) && !/if you have at least 1 other [a-z0-9 '-]+ in play/.test(text)) continue
+      const namedCompanionGate = text.match(/as long as you have at least 1 other ([a-z0-9 '-]+) in play/)
+      if (/as long as/.test(text) && !/as long as this pokemon is (?:your active pokemon|in the active spot|on your bench)/.test(text) && !namedCompanionGate) continue
+      if (/as long as this pokemon is on your bench/.test(text) && !providerIsBenched) continue
+      const restriction = text.match(/(?:if|as long as) you have at least 1 other ([a-z0-9 '-]+) in play/)
+      if (restriction && !targetSideCards.some((card) => card.instanceId !== provider.instanceId && normalizeTcgBattleAbilityText(card.name).includes(restriction[1].trim()))) continue
+      const targetGroup = (teamReduction[1] || '').trim()
+      const requiredTargetName = teamReduction[2]
+      if (!isTcgBattleTeamReductionTargetEligible(target, targetGroup, requiredTargetName)) continue
+      if (!isTcgBattleTeamReductionAttackerEligible(attacker, text)) continue
+      const singleStack = /can't apply more than 1|cannot apply more than 1|doesn't stack|does not stack|the effect of .* doesn't stack|the effect of .* does not stack/.test(text)
+      if (singleStack && singleStackReductions.has(ability.name)) continue
+      const amount = Number(teamReduction[3])
+      if (text.includes('after applying weakness and resistance')) afterWeaknessResistance -= amount
+      else beforeWeaknessResistance -= amount
+      if (singleStack) singleStackReductions.add(ability.name)
+    }
+  }
+  const singleStackDamageBoosts = new Set<string>()
+  const politoedFrogSongText = "whenever politoed's attack damages the defending pokemon (after applying weakness and resistance), if there are more than 3 poliwags, poliwhirls, poliwraths, and/or politoeds in play (including your opponent's), that attack does 40 more damage (no matter how many heads you get). this power stops working while politoed is asleep, confused, or paralyzed."
+  const politoedFrogSongActive = Boolean(state && sideKey && normalizeTcgBattleAbilityText(attacker.name).endsWith('politoed') && attackerIsActive && targetIsActive && attacker.currentHp > 0 &&
+    !isTcgBattleAbilitySuppressedByShadyTail(attacker, abilityBoards) &&
+    (attacker.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === politoedFrogSongText && isTcgBattleAbilityEnabled(politoedFrogSongText, attacker, true)))
+  if (politoedFrogSongActive && state && sideKey) {
+    const frogSpecies = new Set(['poliwag', 'poliwhirl', 'poliwrath', 'politoed'])
+    const speciesCount = [state.player, state.opponent].flatMap((owner) => [...owner.front, ...owner.back])
+      .filter((card) => card.currentHp > 0 && [...frogSpecies].some((species) => {
+        const name = normalizeTcgBattleAbilityText(card.name)
+        return name.endsWith(species) || name.startsWith(species)
+      })).length
+    if (speciesCount > 3) afterWeaknessResistance += 40
+  }
+  const unownPowerText = "this ability works if you have any unown in play with an ability other than . attacks used by your pokemon do +10 damage to your opponent's active pokemon."
+  if (state && sideKey && targetIsActive && !targetBlocksOpponentAbilityEffects) {
+    const powerCount = attackerSideCards.filter((provider) =>
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === unownPowerText && hasOtherUnownAbility(sideKey, provider.instanceId, ability.name)
+      }),
+    ).length
+    beforeWeaknessResistance += 10 * powerCount
+  }
+  const stellarCrownPrimalKnowledgeText = "attacks used by your pokemon do 30 more damage to your opponent's active evolution pokemon (before applying weakness and resistance)."
+  if (state && sideKey && targetIsActive && !target.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') && !targetBlocksOpponentAbilityEffects) {
+    for (const provider of attackerSideCards) {
+      if ((provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === stellarCrownPrimalKnowledgeText)) {
+        beforeWeaknessResistance += 30
+      }
+    }
+  }
+  const crawdauntSwirlingCurrentText = 'as long as crawdaunt is your active pokemon, when any of your active pokemon does damage to the defending pokemon, the attack does 10 more damage (before applying weakness and resistance).'
+  if (state && sideKey && targetIsActive && !targetBlocksOpponentAbilityEffects) {
+    const crawdauntBoostCount = attackerSideCards.filter((provider) =>
+      normalizeTcgBattleAbilityText(provider.name) === 'crawdaunt' &&
+      state[sideKey].front.some((pokemon) => pokemon.instanceId === provider.instanceId) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === crawdauntSwirlingCurrentText && isTcgBattleAbilityEnabled(text, provider, true)
+      }),
+    ).length
+    beforeWeaknessResistance += 10 * crawdauntBoostCount
+  }
+  const politoedLordlyCheeringText = 'as long as this pokemon is on your bench, attacks used by your pokemon that evolve from poliwhirl do +40 damage to your opponent\'s active pokemon.'
+  if (state && sideKey && targetIsActive && normalizeTcgBattleAbilityText(attacker.evolvesFrom || '') === 'poliwhirl' && !targetBlocksOpponentAbilityEffects) {
+    const lordlyCheeringCount = attackerSideCards.filter((provider) =>
+      normalizeTcgBattleAbilityText(provider.name) === 'politoed' &&
+      state[sideKey].back.some((card) => card.instanceId === provider.instanceId) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === politoedLordlyCheeringText && isTcgBattleAbilityEnabled(text, provider, false)
+      }),
+    ).length
+    beforeWeaknessResistance += 40 * lordlyCheeringCount
+  }
+  const passimianPowerHuddleText = "as long as this pokemon is on your bench, your passimian's attacks do 30 more damage to your opponent's active evolution pokemon (before applying weakness and resistance)."
+  if (state && sideKey && targetIsActive && normalizeTcgBattleAbilityText(attacker.name) === 'passimian' &&
+    !target.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') && !targetBlocksOpponentAbilityEffects) {
+    const powerHuddleCount = attackerSideCards.filter((provider) =>
+      normalizeTcgBattleAbilityText(provider.name) === 'passimian' &&
+      state[sideKey].back.some((card) => card.instanceId === provider.instanceId) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === passimianPowerHuddleText && isTcgBattleAbilityEnabled(text, provider, false)
+      }),
+    ).length
+    beforeWeaknessResistance += 30 * powerHuddleCount
+  }
+  const altariaFightSongText = "your dragon pokemon's attacks do 20 more damage to the active pokemon (before applying weakness and resistance)."
+  if (state && sideKey && targetIsActive && attacker.types.some((type) => normalizeTcgBattleAbilityText(type) === 'dragon') && !targetBlocksOpponentAbilityEffects) {
+    const fightSongCount = attackerSideCards.filter((provider) =>
+      normalizeTcgBattleAbilityText(provider.name) === 'altaria' &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        const providerIsActive = state[sideKey].front.some((card) => card.instanceId === provider.instanceId)
+        return text === altariaFightSongText && isTcgBattleAbilityEnabled(text, provider, providerIsActive)
+      }),
+    ).length
+    beforeWeaknessResistance += 20 * fightSongCount
+  }
+  const deoxysPowerConnectText = "your team plasma pokemon's attacks (excluding deoxys-ex) do 10 more damage to the active pokemon (before applying weakness and resistance)."
+  if (state && sideKey && targetIsActive && attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'team plasma') &&
+    normalizeTcgBattleAbilityText(attacker.name) !== 'deoxys-ex' && !targetBlocksOpponentAbilityEffects) {
+    const powerConnectCount = attackerSideCards.filter((provider) =>
+      normalizeTcgBattleAbilityText(provider.name) === 'deoxys-ex' &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        const providerIsActive = state[sideKey].front.some((card) => card.instanceId === provider.instanceId)
+        return text === deoxysPowerConnectText && isTcgBattleAbilityEnabled(text, provider, providerIsActive)
+      }),
+    ).length
+    beforeWeaknessResistance += 10 * powerConnectCount
+  }
+  const tyrannicalHeartText = "as long as you don't have more pokemon in play than your opponent, this pokemon's attacks do 60 more damage (before applying weakness and resistance), and it takes 30 less damage from attacks (after applying weakness and resistance)."
+  if (state && sideKey && !targetBlocksOpponentAbilityEffects && normalizeTcgBattleAbilityText(attacker.name) === 'tyrantrum') {
+    const ownBoardCount = [...state[sideKey].front, ...state[sideKey].back].filter((card) => card.currentHp > 0).length
+    const opponentBoardCount = [...state[targetSide].front, ...state[targetSide].back].filter((card) => card.currentHp > 0).length
+    if (ownBoardCount <= opponentBoardCount && (attacker.abilities || []).some((ability) =>
+      normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === tyrannicalHeartText,
+    ) && !isTcgBattleAbilitySuppressedByShadyTail(attacker, abilityBoards)) beforeWeaknessResistance += 60
+  }
+  const unownAngerText = 'whenever 1 of your pokemon with unown in its name uses its hidden power attack, that attack does 10 more damage for each damage counter on unown [a]. if you have more than 1 unown [a] in play, use only 1 [anger] for each attack.'
+  const unownAngerDamageCounters = state && sideKey && normalizeTcgBattleAbilityText(attacker.name).includes('unown') && normalizeTcgBattleAbilityText(attackName || '') === 'hidden power'
+    ? attackerSideCards.flatMap((provider) => (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === unownAngerText) && normalizeTcgBattleAbilityText(provider.name).replace(/[^a-z]/g, '') === 'unowna' ? [Math.max(0, Math.floor((provider.hp - provider.currentHp) / 10))] : []).reduce((max, count) => Math.max(max, count), 0)
+    : 0
+  if (unownAngerDamageCounters > 0) beforeWeaknessResistance += unownAngerDamageCounters * 10
+  const unownPerformText = "if an attack damaged unown [p] during your opponent's last turn and unown [p] was your active pokemon, unown [p]'s hidden power attack does that much more damage to the defending pokemon. this power can be used even if unown [p] is confused."
+  const previousTurnUnownDamage = state && sideKey
+    ? (state.lastAttackDamageEvents || []).filter((event) => event.targetId === attacker.instanceId && event.targetSide === sideKey && event.attackingSide !== sideKey && event.turnNumber + 1 === state.turnNumber && event.targetWasActive).at(-1)
+    : undefined
+  const unownPerformDamage = state && sideKey && attackName?.toLowerCase() === 'hidden power' &&
+    normalizeTcgBattleAbilityText(attacker.name).replace(/[^a-z]/g, '') === 'unownp' &&
+    (attacker.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === unownPerformText) &&
+    !isTcgBattleAbilitySuppressedByShadyTail(attacker, [state.player, state.opponent]) &&
+    previousTurnUnownDamage
+    ? previousTurnUnownDamage.damage
+    : 0
+  if (unownPerformDamage > 0) beforeWeaknessResistance += unownPerformDamage
+  const unownXText = 'whenever 1 of your pokemon with unown in its name uses its hidden power attack, flip a coin until you get tails. that attack does 10 more damage for each heads. if you have more than 1 unown x in play, use only 1 [xxxxx] per turn.'
+  let unownXCoinFlips: NonNullable<TcgBattleAttackResolution['coinFlips']> | undefined
+  let unownXProviderIds: string[] | undefined
+  if (state && sideKey && normalizeTcgBattleAbilityText(attacker.name).includes('unown') && normalizeTcgBattleAbilityText(attackName || '') === 'hidden power') {
+    const sideCards = [...state[sideKey].front, ...state[sideKey].back]
+    const alreadyUsedThisTurn = sideCards.some((provider) => provider.abilityUses?.['shared:xxxxx'] === state.turnNumber)
+    const availableUnownX = alreadyUsedThisTurn ? [] : attackerSideCards.filter((provider) =>
+      normalizeTcgBattleAbilityText(provider.name).replace(/[^a-z]/g, '') === 'unownx' &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === unownXText),
+    )
+    if (availableUnownX.length > 0) {
+      unownXProviderIds = availableUnownX.map((provider) => provider.instanceId)
+      unownXCoinFlips = random ? rollTcgBattleCoinsUntilTails(random) : undefined
+      beforeWeaknessResistance += (unownXCoinFlips?.heads ?? 1) * 10
+    }
+  }
+  const kingsPalaceText = "your nidoqueen's attacks do 20 more damage to your opponent's active pokemon."
+  if (state && sideKey && targetIsActive && normalizeTcgBattleAbilityText(attacker.name) === 'nidoqueen' && !targetBlocksOpponentAbilityEffects) {
+    for (const provider of attackerSideCards) {
+      if (normalizeTcgBattleAbilityText(provider.name) !== 'nidoking') continue
+      const providerIsActive = state[sideKey].front.some((card) => card.instanceId === provider.instanceId)
+      if ((provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text) === kingsPalaceText && isTcgBattleAbilityEnabled(kingsPalaceText, provider, providerIsActive))) {
+        beforeWeaknessResistance += 20
+      }
+    }
+  }
+  const charizardBattleAuraText = "each of charizard's attacks does 10 more damage for each fire pokemon on your bench to your opponent's active pokemon (before applying weakness and resistance)."
+  if (state && sideKey && targetIsActive && normalizeTcgBattleAbilityText(attacker.name) === 'charizard' && !targetBlocksOpponentAbilityEffects &&
+    !isTcgBattleAbilitySuppressedByShadyTail(attacker, abilityBoards) && (attacker.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === charizardBattleAuraText)) {
+    const fireBenchCount = state[sideKey].back.filter((pokemon) => pokemon.currentHp > 0 && pokemon.types.some((type) => normalizeTcgBattleAbilityText(type) === 'fire')).length
+    beforeWeaknessResistance += 10 * fireBenchCount
+  }
+  const garchompRainbowScaleText = "if an active pokemon has weakness to any of the types of energy attached to garchomp, garchomp's attacks do 40 more damage to that pokemon (before applying weakness and resistance). rainbow scale poke-body can't be used if garchomp has any special energy cards attached to it."
+  const selectedEnergyWeakness = state && sideKey && state[sideKey].energy > 0 ? state[sideKey].selectedEnergy?.toLowerCase() : undefined
+  if (state && sideKey && targetIsActive && normalizeTcgBattleAbilityText(attacker.name) === 'garchomp' && selectedEnergyWeakness &&
+    target.weaknesses.some((weakness) => normalizeTcgBattleAbilityText(weakness.type) === selectedEnergyWeakness) &&
+    !isTcgBattleAbilitySuppressedByShadyTail(attacker, abilityBoards) && (attacker.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === garchompRainbowScaleText)) {
+    beforeWeaknessResistance += 40
+  }
+  for (const provider of targetBlocksOpponentAbilityEffects ? [] : attackerSideCards) {
+    const providerIsActive = !state || !sideKey || state[sideKey].front.some((card) => card.instanceId === provider.instanceId)
+    for (const ability of provider.abilities || []) {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) continue
+      const butterfreeCompoundEyesText = "if your opponent's active pokemon has any poke-bodies, each of butterfree fb's attacks does 30 more damage to the active pokemon (before applying weakness and resistance)."
+      if (provider.instanceId === attacker.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'butterfree fb' &&
+        text.replace(/\s+/g, ' ').trim() === butterfreeCompoundEyesText && targetIsActive &&
+        (target.abilities || []).some((targetAbility) => ['pokebody', 'pokemonbody'].includes(normalizeTcgBattleAbilityText(targetAbility.type).replace(/[^a-z]/g, '')))) {
+        beforeWeaknessResistance += 30
+        continue
+      }
+      if (provider.instanceId === attacker.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'shaymin lv.x' &&
+        text === "if any of your grass pokemon were knocked out by damage from an opponent's attack during his or her last turn, each of shaymin's attacks does 60 more damage to the active pokemon (before applying weakness and resistance). this power stops working while shaymin is asleep, confused, or paralyzed." &&
+        targetIsActive && !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) && state && sideKey) {
+        const knockout = state.lastOpponentAttackKnockout?.[sideKey]
+        if (knockout?.knockedOutGrassPokemon && knockout.turnNumber === state.turnNumber) beforeWeaknessResistance += 60
+        continue
+      }
+      const heracrossFinalBlow = text === "if heracross's remaining hp are 20 or less, you may make its megahorn attack's base damage 120 instead of 60. this power can't be used if heracross is asleep, confused, or paralyzed."
+      if (heracrossFinalBlow) {
+        if (provider.instanceId === attacker.instanceId && normalizeTcgBattleAbilityText(attacker.name) === 'heracross' && normalizeTcgBattleAbilityText(attackName || '') === 'megahorn' && provider.currentHp <= 20 && !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) beforeWeaknessResistance += 60
+        continue
+      }
+      if (/once during your turn|during your next turn|during this turn|when you play .* from your hand|you may use this (?:ability|power)/.test(text)) continue
+      const darknessEnergyGate = /if this pokemon has any \{d\} energy attached/.test(text)
+      if (/prize cards?|energy attached|basic energy|special energy|stadium|supporter card|tool card|knocked out|pokemon lv\.?x/.test(text) && !darknessEnergyGate) continue
+      if (darknessEnergyGate && (!state || !sideKey || provider.instanceId !== attacker.instanceId || state[sideKey].energy < 1 || state[sideKey].selectedEnergy?.toLowerCase() !== 'darkness')) continue
+      const personalBoost = text.match(/((?:the attacks it uses|this pokemon(?:'s)? attacks?|its attacks?|\b[a-z' -]+(?:'s)? attacks?))\s+(?:do|does)\s+(\d+)\s+more damage/)
+      const personalPlusBoost = text.match(/^(?:if this pokemon's remaining hp is (\d+) or less, )?attacks used by this pokemon do \+?(\d+) damage to your opponent's active pokemon\.$/)
+      const directBoost = text.match(/((?:this pokemon|\b[a-z' -]+))\s+(?:does|do)\s+(\d+)\s+more damage to (?:(?:the|your opponent's) )?(?:defending|active) pokemon/)
+      const houndoomRevengeFang = text.replace(/\s+/g, ' ').trim() === "if you have less benched pokemon than your opponent, each of houndoom's attacks does 40 more damage to the active pokemon (before applying weakness and resistance)."
+      const teamBoost = text.match(/(?:your|each of your|attacks used by your|the attacks of your)\s+(?:(.+?)\s+)?pokemon'?s attacks?\s+(?:do|does)\s+(\d+)\s+more damage/) ||
+        text.match(/^your\s+(.+?)\s+pokemon'?s attacks? \(excluding [^)]+\) do(?:es)?\s+(\d+)\s+more damage/) ||
+        text.match(/^your\s+(.+?)\s+pokemon'?s attacks, except any [^.]+, do(?:es)?\s+(\d+)\s+more damage/) ||
+        text.match(/^the attacks of your (.+?) pokemon \(excluding [^)]+\) do(?:es)? (\d+) more damage to your opponent's active pokemon/)
+        ||
+        text.match(/attacks used by your\s+(.+?)\s+pokemon(?:, except any [^.]+)?, do(?:es)?\s+(\d+)\s+more damage/) ||
+        text.match(/^attacks used by your\s+((?:\{[grwlpmdycf]\})\s+pokemon(?:\s+and\s+\{[grwlpmdycf]\}\s+pokemon)*)\s+do\s+\+?(\d+)\s+damage to your opponent's active pokemon\.$/) ||
+        (houndoomRevengeFang ? ['', 'houndoom', '40'] as unknown as RegExpMatchArray : null)
+      const subject = personalBoost?.[1] || directBoost?.[1]
+      const subjectName = subject?.replace(/(?:'s)? attacks?$/, '').replace(/\beach of\b/g, '').replace(/[^a-z0-9]/g, '')
+      const providerName = normalizeTcgBattleAbilityText(provider.name).replace(/[^a-z0-9]/g, '')
+      const subjectMatchesProvider = subject
+        ? subject.startsWith('this pokemon') || (subject === 'its' || subject === 'the attacks it uses') && provider.instanceId === attacker.instanceId || subjectName?.includes(providerName) || providerName.includes(subjectName || '')
+        : false
+      const singleStack = /can't apply more than 1|cannot apply more than 1|doesn't stack|does not stack/.test(text)
+      if (singleStack && singleStackDamageBoosts.has(ability.name)) continue
+      const passimianThrowingCoach = normalizeTcgBattleAbilityText(provider.name) === 'passimian' && text.replace(/\s+/g, ' ').trim() === "your rapid strike pokemon's attacks do 30 more damage to your opponent's benched pokemon v and benched pokemon-gx (before applying weakness and resistance). you can't apply more than 1 throwing coach ability at a time."
+      const hasEligibleBoost = passimianThrowingCoach
+        ? attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'rapid strike') && targetIsBenchedByOwner && target.subtypes.some((subtype) => ['v', 'pokemon v', 'gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype)))
+        : teamBoost
+        ? isTcgBattleAbilityBoostEligible(teamBoost[1], text, provider, attacker, target, state, sideKey)
+        : provider.instanceId === attacker.instanceId && (subjectMatchesProvider || Boolean(personalPlusBoost)) &&
+          isTcgBattleAbilityBoostEligible(undefined, text, provider, attacker, target, state, sideKey)
+      const boostAmount = hasEligibleBoost
+        ? Number(teamBoost?.[2] || directBoost?.[2] || personalBoost?.[2] || personalPlusBoost?.[2] || 0)
+        : 0
+      if (boostAmount <= 0) continue
+      if (singleStack) singleStackDamageBoosts.add(ability.name)
+      if (/as long as .*active pokemon/.test(text) && !providerIsActive) continue
+      if (/remaining hp|damage counters?/.test(text)) {
+        const hpThreshold = text.match(/remaining hp (?:is|of) (\d+) or less/)
+        const counterThreshold = text.match(/(?:has|have) (\d+) or more damage counters?|(?:(\d+) or more damage counters? on (?:this pokemon|[a-z' -]+))/)
+        if (hpThreshold && provider.currentHp > Number(hpThreshold[1])) continue
+        if (counterThreshold && provider.hp - provider.currentHp < Number(counterThreshold[1] || counterThreshold[2]) * 10) continue
+        if (!hpThreshold && !counterThreshold && /any damage counters?/.test(text) && provider.hp === provider.currentHp) continue
+      }
+      if (/is confused/.test(text) && !provider.statusConditions?.includes('confused')) continue
+      if (/affected by a special condition/.test(text) && !provider.statusConditions?.length) continue
+      const evolvedAbility = /evolved pokemon|evolved pokemon's/.test(text)
+      if (evolvedAbility && provider.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) continue
+      const opponentCards = state ? [...state[targetSide].front, ...state[targetSide].back] : []
+      if (/opponent has any pokemon-ex in play/.test(text) && !opponentCards.some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ex'))) continue
+      const requiredName = text.match(/if you have ([^.]+?) in play/)
+      const requiredNames = requiredName?.[1].split(/\s+or\s+/).map((name) => name.trim().replace(/^pokemon[- ]?/, ''))
+      if (requiredNames?.length && !attackerSideCards.some((card) => requiredNames.some((name) => normalizeTcgBattleAbilityText(card.name).includes(normalizeTcgBattleAbilityText(name))))) continue
+      if (/if you have the same number of cards in your hand as your opponent/.test(text) && state && sideKey &&
+        state[sideKey].hand.length !== state[targetSide].hand.length) continue
+      if (/more benched pokemon than your opponent|less benched pokemon than your opponent/.test(text) && state && sideKey) {
+        const ownBench = state[sideKey].back.filter((card) => card.currentHp > 0).length
+        const opponentBench = state[targetSide].back.filter((card) => card.currentHp > 0).length
+        if (/less benched pokemon/.test(text) ? ownBench >= opponentBench : ownBench <= opponentBench) continue
+      }
+      const perType = text.match(/more damage for each (grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) pokemon on your bench/)
+      const perTypeCount = perType
+        ? (state && sideKey ? state[sideKey].back : []).filter((card) => card.currentHp > 0 && card.types.some((type) => normalizeTcgBattleAbilityText(type) === perType[1])).length
+        : 1
+      const perOpponentExOrGx = /for each of their pokemon-gx and pokemon-ex in play|for each of your opponent's pokemon-gx and pokemon-ex in play/.test(text)
+      const perOpponentExOrGxCount = perOpponentExOrGx
+        ? targetSideCards.filter((card) => card.subtypes.some((subtype) => /(?:^|\b)(?:ex|gx|pokemon-ex|pokemon-gx)(?:\b|$)/.test(normalizeTcgBattleAbilityText(subtype)))).length
+        : 1
+      if (targetIsActive || !/active pokemon/.test(text)) beforeWeaknessResistance += boostAmount * perTypeCount * perOpponentExOrGxCount
+    }
+  }
+  const zapZoneText = "damage from the attacks of your lightning pokemon isn't affected by any effects on your opponent's active pokemon."
+  const zapZoneApplies = Boolean(state && sideKey && !ignoreTargetModifiers && targetIsActive &&
+    attacker.types.some((type) => normalizeTcgBattleAbilityText(type) === 'lightning') &&
+    state[sideKey].front.concat(state[sideKey].back).some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, abilityBoards) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === zapZoneText && isTcgBattleAbilityEnabled(text, provider, state[sideKey!].front.some((card) => card.instanceId === provider.instanceId))
+      }),
+    ))
+  for (const ability of ignoreTargetModifiers || zapZoneApplies || state && isTcgBattleAbilitySuppressedByShadyTail(target, abilityBoards) ? [] : target.abilities || []) {
+    const text = ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+    if (!isTcgBattleAbilityEnabled(text, target, targetIsActive)) continue
+    if (text.replace(/\s+/g, ' ').trim() === relaxingScentText) continue
+    const normalizedText = text.replace(/\s+/g, ' ').trim()
+    if (normalizeTcgBattlePokemonName(target.name) === 'pinsir' &&
+      normalizedText === "if your opponent has 5 or more cards in his or her hand, any damage done to pinsir by attacks is reduced by 30 (after applying weakness and resistance)." &&
+      state && sideKey && state[sideKey].hand.length >= 5) {
+      afterWeaknessResistance -= 30
+      continue
+    }
+    const attachedEnergyReduction = normalizedText.match(/^if this pokemon has any (?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless|basic)) )?energy attached(?: to it)?, it takes (\d+) less damage from attacks \(after applying weakness and resistance\)\.$/)
+    if (attachedEnergyReduction) {
+      const symbolTypes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+      const requiredType = attachedEnergyReduction[1] ? symbolTypes[attachedEnergyReduction[1]] : attachedEnergyReduction[2]
+      if (state && state[targetSide].energy > 0 && (!requiredType || requiredType === 'basic' || state[targetSide].selectedEnergy?.toLowerCase() === requiredType)) afterWeaknessResistance -= Number(attachedEnergyReduction[3])
+      continue
+    }
+    const asleepDamageShield = /^as long as (?:this pokemon|[a-z0-9 '’-]+) is asleep, prevents? all damage done to (?:this pokemon|[a-z0-9 '’-]+) by attacks\.$/.test(normalizedText)
+    if (asleepDamageShield && target.statusConditions?.includes('asleep')) {
+      preventAllDamage = true
+      continue
+    }
+    if (state && normalizeTcgBattleAbilityText(target.name) === 'tyrantrum' && normalizedText === "as long as you don't have more pokemon in play than your opponent, this pokemon's attacks do 60 more damage (before applying weakness and resistance), and it takes 30 less damage from attacks (after applying weakness and resistance).") {
+      const ownerCount = [...state[targetSide].front, ...state[targetSide].back].filter((card) => card.currentHp > 0).length
+      const opponentCount = [...state[targetSide === 'player' ? 'opponent' : 'player'].front, ...state[targetSide === 'player' ? 'opponent' : 'player'].back].filter((card) => card.currentHp > 0).length
+      if (ownerCount <= opponentCount) afterWeaknessResistance -= 30
+      continue
+    }
+    if (state && isTcgBattleRegiceIcebergShieldActive(target, attacker, state, targetSide)) {
+      preventAllDamage = true
+      continue
+    }
+    if (normalizeTcgBattleAbilityText(target.name) === 'armor fossil' && normalizedText === "whenever armor fossil would be damaged by your opponent's attack, flip a coin until you get tails. for each heads, reduce that damage by 10.") {
+      coinDamageReduction = Math.max(coinDamageReduction, 10)
+      coinDamageReductionFlipUntilTails = true
+      continue
+    }
+    const feebasBenchProtection = normalizedText === "as long as feebas is on your bench, prevent all damage done to feebas by attacks (both yours and your opponent's)."
+    const swabluBenchProtection = normalizedText === "as long as swablu is on your bench, prevent all damage done to swablu by opponent's attacks."
+    if (feebasBenchProtection || swabluBenchProtection) {
+      if (targetIsBenched && normalizeTcgBattleAbilityText(target.name) === (feebasBenchProtection ? 'feebas' : 'swablu')) preventAllDamage = true
+      continue
+    }
+    if (text.replace(/\s+/g, ' ').trim() === 'when this pokemon is first damaged by an attack after coming into play, prevent that damage.' && target.abilityUses?.['first-attack-damage-after-play'] === undefined && damage > 0) {
+      preventFirstAttackDamage = true
+      continue
+    }
+    if (normalizeTcgBattleAbilityText(target.name).endsWith('celebi') && state && sideKey && ![...state[sideKey].front, ...state[sideKey].back].some((card) => card.instanceId === target.instanceId) &&
+      text.replace(/\s+/g, ' ').trim() === "if an opponent's attack would knock out celebi, flip a coin. if heads, celebi is not knocked out and you shuffle it and all cards attached to it into your deck. this power doesn't work if celebi is already asleep, confused, or paralyzed." &&
+      !target.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) {
+      coinSurviveKnockout = true
+      shuffleTargetOnSurvival = true
+      continue
+    }
+    if (normalizeTcgBattleAbilityText(target.name).includes('shuckle') && text.replace(/\s+/g, ' ').trim() === 'whenever an attack (including your own) does 40 or less damage to shuckle (after applying weakness and resistance), reduce that damage to 10. (any other effects of attacks still happen.) this power stops working while shuckle is asleep, confused, or paralyzed.') {
+      hardShell = true
+      continue
+    }
+    if (normalizeTcgBattleAbilityText(target.name) === "erika's dratini" && text.replace(/\s+/g, ' ').trim() === "whenever an attack by a basic pokemon (including your own) does 20 or more damage to erika's dratini (after applying weakness and resistance), reduce that damage to 10. (any other effects of attacks still happen.) this power stops working while erika's dratini is asleep, confused, or paralyzed." && attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')) {
+      capDamageAfterWeaknessResistance = 10
+      continue
+    }
+    const attachedEnergyDamageGuard = normalizedText.match(/^(?:as long as |if )(?:this pokemon|([a-z0-9 '’-]+)) has any (lightning|psychic) energy attached to it, (?:any )?damage done to (?:this pokemon|([a-z0-9 '’-]+)) by (?:any )?attacks? is reduced by (\d+) \(after applying weakness and resistance\)\.$/)
+    const energyGuardName = attachedEnergyDamageGuard?.[1]?.trim() || normalizeTcgBattleAbilityText(target.name)
+    const energyGuardTarget = attachedEnergyDamageGuard?.[3]?.trim() || normalizeTcgBattleAbilityText(target.name)
+    if (attachedEnergyDamageGuard && energyGuardName === normalizeTcgBattleAbilityText(target.name) &&
+      energyGuardTarget === normalizeTcgBattleAbilityText(target.name) && state && state[targetSide].energy > 0 &&
+      state[targetSide].selectedEnergy?.toLowerCase() === attachedEnergyDamageGuard[2]) {
+      afterWeaknessResistance -= Number(attachedEnergyDamageGuard[4])
+      continue
+    }
+    const namedAttachedEnergyReduction = normalizedText.match(/^as long as ([a-z0-9 '’-]+) has (?:(any|basic|darkness) )?(?:(basic|darkness) )?energy(?: cards?)? attached to it, (?:any )?damage done to ([a-z0-9 '’-]+) by (?:(?:an|your) opponent's )?attacks? is reduced by (\d+) \(after applying weakness and resistance\)\.["']?$/)
+    if (namedAttachedEnergyReduction &&
+      normalizeTcgBattleAbilityText(namedAttachedEnergyReduction[1]) === normalizeTcgBattleAbilityText(target.name) &&
+      normalizeTcgBattleAbilityText(namedAttachedEnergyReduction[4]) === normalizeTcgBattleAbilityText(target.name) &&
+      state && state[targetSide].energy > 0 &&
+      (namedAttachedEnergyReduction[3] !== 'darkness' || state[targetSide].selectedEnergy?.toLowerCase() === 'darkness')) {
+      afterWeaknessResistance -= Number(namedAttachedEnergyReduction[5])
+      continue
+    }
+    if (normalizeTcgBattleAbilityText(target.name) === 'bewear' &&
+      normalizedText === "this pokemon takes 30 less damage from the attacks of your opponent's non-fire pokemon (after applying weakness and resistance)." &&
+      sideKey && sideKey !== targetSide && !attacker.types.some((type) => normalizeTcgBattleAbilityText(type) === 'fire')) {
+      afterWeaknessResistance -= 30
+      continue
+    }
+    if (normalizeTcgBattleAbilityText(target.name) === 'klinklang' &&
+      normalizedText === "any damage done to this pokemon by an opponent's attack is reduced by 10 for each colorless in your opponent's active pokemon's retreat cost (after applying weakness and resistance)." &&
+      state && sideKey && sideKey !== targetSide) {
+      const opposingActive = state[sideKey].front.find((card) => card.currentHp > 0)
+      if (opposingActive) afterWeaknessResistance -= 10 * Math.max(0, opposingActive.convertedRetreatCost ?? 0)
+      continue
+    }
+    if (/energy attached|basic energy|special energy|pokemon tool|stadium|prize cards?/.test(text)) continue
+    const kecleonCamouflageText = "if any basic energy card attached to kecleon is the same type as the attacking pokemon's type, any damage done by attacks from that pokemon to kecleon is reduced by 40 (after applying weakness and resistance)."
+    if (normalizeTcgBattleAbilityText(target.name) === 'kecleon' && normalizedText === kecleonCamouflageText && state && state[targetSide].energy > 0 &&
+      attacker.types.some((type) => normalizeTcgBattleAbilityText(type) === state[targetSide].selectedEnergy?.toLowerCase())) {
+      afterWeaknessResistance -= 40
+      continue
+    }
+    if (/if this pokemon has full hp|if this pokemon has no damage counters/.test(text) && target.currentHp < target.hp) continue
+    if (/if this pokemon has any damage counters/.test(text) && target.currentHp === target.hp) continue
+    const counterThreshold = text.match(/if (?:this pokemon|[a-z' -]+) has (\d+) or more damage counters? on it/)
+    if (counterThreshold && target.hp - target.currentHp < Number(counterThreshold[1]) * 10) continue
+    const asleepGate = text.match(/as long as (?:this pokemon|[a-z' -]+) is (asleep|confused|paralyzed|poisoned|burned)/)
+    if (asleepGate && !target.statusConditions?.includes(asleepGate[1] as TcgBattleStatusCondition)) continue
+    if (/in (?:his or her|their|your opponent's) hand|in your opponent's hand/.test(text)) continue
+    const mistyCloysterReduction = text.match(/^you may reduce all damage done by attacks to misty's cloyster by (\d+) \(after applying weakness and resistance\)\. \(any other effects of attacks still happen\)\. this power can't be used if misty's cloyster is asleep, confused, or paralyzed\.$/)
+    if (mistyCloysterReduction) {
+      afterWeaknessResistance -= Number(mistyCloysterReduction[1])
+      continue
+    }
+    const illumiseGlowingScreen = text === "as long as volbeat is in play, any damage done to illumise by attacks from fighting pokemon and darkness pokemon is reduced by 30. you can't reduce more than 30 damage even if there is more than 1 volbeat in play."
+    const volbeatInPlay = state
+      ? [state.player, state.opponent].some((owner) => [...owner.front, ...owner.back].some((pokemon) =>
+          pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) === 'volbeat'))
+      : targetSideCards.some((pokemon) => normalizeTcgBattleAbilityText(pokemon.name) === 'volbeat')
+    if (illumiseGlowingScreen && normalizeTcgBattleAbilityText(target.name) === 'illumise' && volbeatInPlay &&
+      attacker.types.some((type) => ['fighting', 'darkness'].includes(normalizeTcgBattleAbilityText(type)))) {
+      afterWeaknessResistance -= 30
+      continue
+    }
+    const ownPresence = text.match(/if you have (?:another )?(.+?) in play/)
+    if (ownPresence) {
+      const condition = ownPresence[1].replace(/^(?:any|at least 1 other)\s+/, '').trim()
+      const conditionClauses = condition.split(/,\s*and\s+|\s+and\s+/).map((clause) => clause.trim())
+      const ownBoardHasCondition = conditionClauses.every((clause) => clause.split(/\s+or\s+/).map((entry) => entry.trim()).some((entry) => {
+        const requiredType = entry.match(/^(?:any )?(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) pokemon$/)?.[1]
+        return requiredType
+          ? targetSideCards.some((card) => card.types.some((type) => normalizeTcgBattleAbilityText(type) === requiredType))
+          : targetSideCards.some((card) => (card.instanceId !== target.instanceId || !/another/.test(text)) && normalizeTcgBattleAbilityText(card.name).includes(entry))
+      }))
+      if (!ownBoardHasCondition) continue
+    }
+    const reduction = text.match(/(?:damage done to (?:this pokemon|[a-z' -]+)(?: by attacks?(?: from [^.]+?)?)?|damage done by attacks? to (?:this pokemon|[a-z' -]+)|damage done by an opponent's attacks?)\s+is reduced by\s+(\d+)|this pokemon takes (\d+) less damage from (?:your opponent's )?attacks?(?: from your opponent's pokemon)?|this pokemon takes [-\u2212\u2013\u2014\u2015](\d+) damage from attacks?|if this pokemon has full hp, it takes (\d+) less damage from attacks from your opponent's pokemon|if this pokemon has full hp, it takes (\d+) less damage from your opponent's attacks/)
+    if (reduction && isTcgBattleHolderReductionAttackerEligible(attacker, text)) {
+      const arceusGate = /if you have arceus(?: or arceus ex)? in play/.test(text)
+      const falinksGate = /if you have another falinks in play/.test(text)
+      const namedGatePasses = !arceusGate || targetSideCards.some((card) => /\barceus(?: ex)?\b/.test(normalizeTcgBattleAbilityText(card.name)))
+      const falinksGatePasses = !falinksGate || targetSideCards.some((card) => card.instanceId !== target.instanceId && /\bfalinks\b/.test(normalizeTcgBattleAbilityText(card.name)))
+      if (namedGatePasses && falinksGatePasses && (!/as long as .*active pokemon|as long as .*in the active spot/.test(text) || targetIsActive)) {
+        const perDiscard = text.match(/reduced by (\d+) for each ([a-z' -]+) in your discard pile/)
+        const discardCount = perDiscard && state && sideKey
+          ? state[targetSide].discard.filter((card) => normalizeTcgBattleAbilityText(card.name).includes(perDiscard[2].trim())).length
+          : 1
+        const reductionCap = text.match(/can't reduce more than (\d+) damage in this way/)
+        const reductionAmount = Math.min(
+          reductionCap ? Number(reductionCap[1]) : Number.POSITIVE_INFINITY,
+          Number(perDiscard?.[1] || reduction[1] || reduction[2] || reduction[3] || reduction[4] || reduction[5]) * discardCount,
+        )
+        if (/after applying weakness and resistance/.test(text)) afterWeaknessResistance -= reductionAmount
+        else beforeWeaknessResistance -= reductionAmount
+      }
+    }
+    const activeAttackReduction = text.match(/(?:attacks used by your opponent's active pokemon|your opponent's active pokemon's attacks) do (\d+) less damage/)
+    if (activeAttackReduction && targetIsActive && attackerIsActive) {
+      if (/after applying weakness and resistance/.test(text)) afterWeaknessResistance -= Number(activeAttackReduction[1])
+      else beforeWeaknessResistance -= Number(activeAttackReduction[1])
+    }
+    const attackerIsStage2 = attacker.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2')
+    const staraptorProtectWing = text.match(/^as long as staraptor is your active pokemon, any damage done by attacks from your opponent's stage 2 evolved pokemon is reduced by (\d+) \(after applying weakness and resistance\)\.$/)
+    if (staraptorProtectWing && normalizeTcgBattleAbilityText(target.name) === 'staraptor' && targetIsActive && attackerIsStage2) {
+      afterWeaknessResistance -= Number(staraptorProtectWing[1])
+    }
+    const activeAttackerDamageReduction = text.match(/^as long as this pokemon is your active pokemon, any damage done by attacks from your opponent's active pokemon is reduced by (\d+) \(before applying weakness and resistance\)\.$/)
+    if (activeAttackerDamageReduction && targetIsActive && attackerIsActive) {
+      beforeWeaknessResistance -= Number(activeAttackerDamageReduction[1])
+    }
+    const attackerIsEx = attacker.subtypes.some((subtype) => subtype.toLowerCase() === 'ex')
+    const sourceRestrictionMatches = doesTcgBattleAbilityAttackSourceMatch(text, attacker) &&
+      (!/stage 2 evolved pokemon|stage 2 pokemon/.test(text) || attackerIsStage2)
+    if (!sourceRestrictionMatches) continue
+    const rabscaBenchShieldText = "prevent all damage from and effects of attacks from your opponent's pokemon done to your benched pokemon."
+    if (text === rabscaBenchShieldText) {
+      if (sideKey !== targetSide && !targetIsActive) preventAllDamage = true
+      continue
+    }
+    if (text === "prevent all damage done to your metal pokemon by attacks from your opponent's pokemon-ex.") {
+      const targetHasMetal = getTcgBattleEffectiveTypes(target, state).some((type) => normalizeTcgBattleAbilityText(type) === 'metal')
+      if (attackerIsEx && targetHasMetal) preventAllDamage = true
+      continue
+    }
+    const benchOnlySelfProtection = /as long as this pokemon is on your bench, prevent all damage done to this pokemon by attacks|as long as this pokemon is on your bench, prevent all damage from and effects of attacks from your opponent's pokemon done to this pokemon/.test(text)
+    const protectsBench = /prevent all damage done to your benched pokemon by your opponent's attacks|prevent all damage done by attacks to all of your benched pokemon/.test(text)
+    const listedDamageProtection = /prevent that attack's damage done to (?:this pokemon|[a-z0-9 .'-]+) if that damage is \d/.test(text)
+    if (benchOnlySelfProtection && targetIsActive) continue
+    if (protectsBench && targetIsActive) continue
+    if (/prevent all damage done to (?:this pokemon|[a-z' -]+) (?:by|from) (?:your opponent's |opponent's )?attacks?(?: from (?:your )?opponent's (?:(?:poisoned )?(?:grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) |poisoned )?pokemon(?:-ex| ex| v| vmax| vstar)?(?: and pokemon (?:ex|v))?)?/.test(text) || protectsBench || benchOnlySelfProtection || listedDamageProtection) {
+      const minimumDamage = text.match(/if that damage is (\d+) or more/)
+    const exactDamage = text.match(/if that damage is exactly ([^.]+)/) || text.match(/if that damage is (\d+(?:, \d+)*(?:, or \d+)?)\./)
+      if (minimumDamage) preventAtOrAbove = Math.max(preventAtOrAbove || 0, Number(minimumDamage[1]))
+      else if (exactDamage) exactDamage[1].match(/\d+/g)?.forEach((amount) => preventDamageAmounts.add(Number(amount)))
+      else preventAllDamage = true
+    }
+    if (/if any damage is done to this pokemon by attacks?, flip a coin\. if heads, prevent that damage/.test(text) || /^whenever jumpluff would be damaged by your opponent's attack, flip a coin\. if heads, prevent all damage done to jumpluff by that attack\.$/.test(text)) coinPreventOnHeads = true
+    if (normalizeTcgBattleAbilityText(target.name) === 'jumpluff' && target.currentHp < target.hp && text === 'during your opponent\'s turn, if jumpluff would be damaged or affected by an opponent\'s attack and it already has at least 1 damage counter on it, flip a coin. if heads, prevent all effects of that attack (including damage).') coinPreventOnHeads = true
+    if (normalizeTcgBattleAbilityText(target.name) === 'swablu' && target.currentHp < target.hp && text === 'whenever swablu would be damaged or affected by an opponent\'s attack and already has at least 1 damage counter on it, flip a coin. if heads, prevent all effects of that attack, including damage, done to swablu.') coinPreventOnHeads = true
+    if (text === 'if this pokemon is confused and is damaged by an attack, flip a coin. if heads, prevent that damage.' && target.statusConditions?.includes('confused')) coinPreventOnHeads = true
+    if (/if this pokemon has any \{d\} energy attached and is damaged by an attack, flip a coin\. if heads, prevent that damage/.test(text) &&
+      state && state[targetSide].energy > 0 && state[targetSide].selectedEnergy?.toLowerCase() === 'darkness') coinPreventOnHeads = true
+    if (/if this pokemon would be knocked out by damage from an attack, flip a coin\. if heads, this pokemon is not knocked out(?:,| and) (?:its )?remaining hp becomes 10(?: instead)?/.test(text) ||
+      /if this pokemon would be knocked out by damage from an attack, flip a coin\. if heads, this pokemon is not knocked out, and its remaining hp becomes 10(?: instead)?/.test(text)) coinSurviveKnockout = true
+    const namedFortitude = text.match(/^if (.+?) would be knocked out by an opponent's attack, flip a coin\. if heads, (.+?) is not knocked out and its remaining hp become 10 instead\. this power can't be used if (.+?) is already asleep, confused, or paralyzed\.$/)
+    const normalizeFortitudeName = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '')
+    if (namedFortitude && normalizeFortitudeName(namedFortitude[1]) === normalizeFortitudeName(target.name) && normalizeFortitudeName(namedFortitude[2]) === normalizeFortitudeName(target.name) && normalizeFortitudeName(namedFortitude[3]) === normalizeFortitudeName(target.name)) coinSurviveKnockout = true
+    const namedBufferSurvival = text.match(/^if ([a-z0-9' -]+) would be knocked out by an opponent's attack, flip a coin\. if heads, ([a-z0-9' -]+) is not knocked out and its remaining hp becomes 10 instead\.$/)
+    if (namedBufferSurvival && normalizeFortitudeName(namedBufferSurvival[1]) === normalizeFortitudeName(target.name) && normalizeFortitudeName(namedBufferSurvival[2]) === normalizeFortitudeName(target.name)) coinSurviveKnockout = true
+    const deterministicSurvival = text.match(/if this pokemon has full hp and would be knocked out by damage from an attack, (?:this pokemon|it) is not knocked out,? and its remaining hp becomes (\d+)(?: instead)?/)
+    if (deterministicSurvival) knockoutSurvivalHp = Math.max(knockoutSurvivalHp || 0, Number(deterministicSurvival[1]))
+    const opponentAttackCoinReduction = text.match(/^whenever (?:this pokemon|([a-z0-9 '’-]+)) would be damaged by your opponent's attack \(after applying weakness and resistance\), flip a coin\. if heads, reduce that damage by (\d+)\.$/)
+    if (opponentAttackCoinReduction &&
+      (!opponentAttackCoinReduction[1] || normalizeTcgBattleAbilityText(target.name) === normalizeTcgBattleAbilityText(opponentAttackCoinReduction[1]))) {
+      coinDamageReduction = Math.max(coinDamageReduction, Number(opponentAttackCoinReduction[2]))
+    }
+    const opponentTurnAttackReduction = text.match(/^during your opponent's turn, if (?:this pokemon|([a-z0-9 '’-]+)) would be damaged by an opponent's attack \(after applying weakness and resistance\), flip a coin\. if heads, reduce that damage by (\d+)\.$/)
+    if (opponentTurnAttackReduction &&
+      (!opponentTurnAttackReduction[1] || normalizeTcgBattleAbilityText(target.name) === normalizeTcgBattleAbilityText(opponentTurnAttackReduction[1]))) {
+      coinDamageReduction = Math.max(coinDamageReduction, Number(opponentTurnAttackReduction[2]))
+    }
+    const coinReduction = text.match(/if any damage is done to this pokemon by attacks?, flip a coin\. if heads, this pokemon takes (?:[−-])?(\d+) (?:less damage from|damage from) that attack/)
+    if (coinReduction) coinDamageReduction = Math.max(coinDamageReduction, Number(coinReduction[1]))
+    if (normalizeTcgBattleAbilityText(target.name) === 'carracosta' &&
+      text.replace(/\s+/g, ' ').trim() === 'if any damage is done to this pokemon by attacks, flip a coin. if heads, reduce that damage by 50 (after applying weakness and resistance).') {
+      coinDamageReduction = Math.max(coinDamageReduction, 50)
+    }
+    const alolanPersianGxProtection = text.replace(/\s+/g, ' ').trim() === "prevent all effects of attacks, including damage, done to this pokemon by your opponent's tag team pokemon and ultra beasts, and by your opponent's pokemon that have any special energy attached to them."
+    if (alolanPersianGxProtection && (attacker.subtypes.some((subtype) => ['tag team', 'ultra beast'].includes(normalizeTcgBattleAbilityText(subtype))))) {
+      preventAllDamage = true
+      continue
+    }
+    if (isTcgBattlePassiveAttackProtection(text) && (/prevent all effects of attacks, including damage, done to (?:this pokemon|[a-z' -]+) by|prevent all damage from and effects of attacks from your opponent's tera pokemon/.test(text)) && doesTcgBattleAbilityAttackSourceMatch(text, attacker)) preventAllDamage = true
+    if (/only does half the damage|half the damage done to/.test(text) && text.replace(/\s+/g, ' ').trim() !== kabutoAncientProtectionText) halveDamage = true
+    const threshold = text.match(/(?:does|do)\s+(\d+)\s+or more damage to (?:this pokemon|[a-z' -]+)[^.]*prevent that damage/)
+    if (threshold) preventAtOrAbove = Math.max(preventAtOrAbove || 0, Number(threshold[1]))
+  }
+  return {
+    beforeWeaknessResistance: Math.max(-damage, beforeWeaknessResistance),
+    afterWeaknessResistance,
+    preventAllDamage,
+    preventFirstAttackDamage,
+    preventAtOrAbove,
+    preventAtOrBelow,
+    preventDamageAmounts: [...preventDamageAmounts],
+    capDamageAfterWeaknessResistance,
+    hardShell,
+    halveDamage,
+    halveDamageRoundsUp,
+    coinPreventOnHeads,
+    coinDamageReduction,
+    coinDamageReductionFlipUntilTails,
+    coinSurviveKnockout,
+    knockoutSurvivalHp,
+    shuffleTargetOnSurvival,
+    unownXCoinFlips,
+    unownXProviderIds,
+  }
+}
+
+function isTcgBattleAbilityEnabled(text: string, card: TcgBattleCardState, isActive: boolean): boolean {
+  if (/as long as .*active pokemon|as long as .*in the active spot/.test(text) && !isActive) return false
+  if (/(?:can't|cannot) be used if .*affected by a special condition|stops working while .*affected by a special condition/.test(text) && Boolean(card.statusConditions?.length)) return false
+  if (/can't be used if .*asleep, confused, (?:or|and) paralyzed|stops working while .*asleep, confused, (?:or|and) paralyzed/.test(text) &&
+    card.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) return false
+  return true
+}
+
+function isTcgBattleHolderReductionAttackerEligible(attacker: TcgBattleCardState, text: string): boolean {
+  if (/energy attached|basic energy|special energy|pokemon tool|stadium|prize cards?|delta on its card/.test(text)) return false
+  const group = text.match(/attacks? from (.+?)(?:\s+is reduced by|\s+are reduced by|\s+\(|\.|$)/)?.[1]
+  if (!group) return true
+  const normalizedGroup = normalizeTcgBattleAbilityText(group)
+  const subtypes = attacker.subtypes.map(normalizeTcgBattleAbilityText)
+  const types = attacker.types.map(normalizeTcgBattleAbilityText)
+  if (/\bbasic\b/.test(normalizedGroup) && !subtypes.includes('basic')) return false
+  if (/excluding baby pokemon|except baby pokemon/.test(normalizedGroup) && subtypes.includes('baby')) return false
+  if (/evolved|evolution/.test(normalizedGroup) && !subtypes.some((subtype) => subtype === 'stage 1' || subtype === 'stage 2')) return false
+  const requiredStage = normalizedGroup.match(/stage ([12])(?: evolved)? pokemon/)
+  if (requiredStage && !subtypes.includes(`stage ${requiredStage[1]}`)) return false
+  if (/isn't an evolved pokemon|is not an evolved pokemon|that isn't an evolved pokemon|not an evolved pokemon/.test(normalizedGroup) && !subtypes.includes('basic')) return false
+  if (/pokemon-ex|pokemon ex/.test(normalizedGroup) && !subtypes.some((subtype) => subtype === 'ex' || subtype === 'pokemon-ex')) return false
+  if (/pokemon vstar/.test(normalizedGroup) && !subtypes.some((subtype) => subtype.includes('vstar'))) return false
+  if (/pokemon vmax/.test(normalizedGroup) && !subtypes.some((subtype) => subtype.includes('vmax'))) return false
+  if (/pokemon v\b/.test(normalizedGroup) && !subtypes.some((subtype) => subtype === 'v' || subtype === 'pokemon v' || subtype.includes('vmax') || subtype.includes('vstar'))) return false
+  if (/pokemon with abilities|pokemon that has any poke-powers or poke-bodies/.test(normalizedGroup) && !attacker.abilities?.length) return false
+  if (/pokemon that has an owner in its name/.test(normalizedGroup) && !/\b[a-z][a-z .'-]*['’]s\b/i.test(attacker.name)) return false
+  if (/opponent's poisoned pokemon/.test(normalizedGroup) && !attacker.statusConditions?.includes('poisoned')) return false
+  const typeNames: Array<[string, string]> = [
+    ['grass', 'grass'], ['fire', 'fire'], ['water', 'water'], ['lightning', 'lightning'],
+    ['psychic', 'psychic'], ['fighting', 'fighting'], ['metal', 'metal'], ['darkness', 'darkness'],
+    ['dragon', 'dragon'], ['fairy', 'fairy'], ['colorless', 'colorless'],
+    ['{g}', 'grass'], ['{r}', 'fire'], ['{w}', 'water'], ['{l}', 'lightning'],
+    ['{p}', 'psychic'], ['{f}', 'fighting'], ['{m}', 'metal'], ['{d}', 'darkness'],
+    ['{y}', 'fairy'], ['{c}', 'colorless'],
+  ]
+  const requiredTypes = typeNames.filter(([word]) => normalizedGroup.includes(word)).map(([, type]) => type)
+  const negativeType = normalizedGroup.match(/non-(fire|water|grass|lightning|psychic|fighting|metal|darkness|fairy|dragon|colorless)/)
+  if (negativeType && types.includes(negativeType[1])) return false
+  if (requiredTypes.length > 0 && !requiredTypes.some((type) => types.includes(type))) return false
+  return true
+}
+
+function isTcgBattleTeamReductionTargetEligible(
+  target: TcgBattleCardState,
+  group: string,
+  requiredName?: string,
+): boolean {
+  const normalizedGroup = normalizeTcgBattleAbilityText(group)
+  const subtypes = target.subtypes.map(normalizeTcgBattleAbilityText)
+  const types = target.types.map(normalizeTcgBattleAbilityText)
+  if (requiredName && !normalizeTcgBattleAbilityText(target.name).includes(normalizeTcgBattleAbilityText(requiredName))) return false
+  if (/\bbasic\b/.test(normalizedGroup) && !subtypes.includes('basic')) return false
+  for (const stage of ['stage 1', 'stage 2']) {
+    if (normalizedGroup.includes(stage) && !subtypes.includes(stage)) return false
+  }
+  const typeNames = ['grass', 'fire', 'water', 'lightning', 'psychic', 'fighting', 'metal', 'darkness', 'dragon', 'fairy', 'colorless']
+  for (const printedName of typeNames) {
+    if (normalizedGroup.includes(printedName) && !types.includes(printedName)) return false
+  }
+  const energyType = normalizedGroup.match(/\{([grwlpmdycf])\}/)?.[1]
+  const energyTypeNames: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+  if (energyType && energyTypeNames[energyType] && !types.includes(energyTypeNames[energyType])) return false
+  const subtypeScopes = ['fusion strike', 'single strike', 'rapid strike', 'tag team', 'ultra beast', 'radiant', 'pokemon v', 'pokemon vmax', 'pokemon vstar']
+  for (const subtype of subtypeScopes) {
+    if (normalizedGroup.includes(subtype) && !subtypes.some((value) => value.includes(subtype))) return false
+  }
+  if (normalizedGroup && !/\b(pokemon|basic|stage 1|stage 2|grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless|fusion strike|single strike|rapid strike|tag team|ultra beasts?|radiant|pokemon v|pokemon vmax|pokemon vstar)\b|\{[grwlpmdycf]\}/.test(normalizedGroup) && !normalizeTcgBattleAbilityText(target.name).includes(normalizedGroup)) return false
+  return true
+}
+
+function isTcgBattleTeamReductionAttackerEligible(attacker: TcgBattleCardState, text: string): boolean {
+  const subtypes = attacker.subtypes.map(normalizeTcgBattleAbilityText)
+  const types = attacker.types.map(normalizeTcgBattleAbilityText)
+  if (/from attacks from your opponent's pokemon vstar/.test(text) && !subtypes.some((value) => value.includes('vstar'))) return false
+  if (/from attacks from your opponent's pokemon vmax/.test(text) && !subtypes.some((value) => value.includes('vmax'))) return false
+  if (/from attacks from your opponent's pokemon v\b/.test(text) && !subtypes.some((value) => value === 'v' || value === 'pokemon v' || value.includes('vmax') || value.includes('vstar'))) return false
+  const sourceGroup = text.match(/from attacks from your opponent's (.+?) pokemon/)?.[1]
+  if (sourceGroup && !/^(?:pokemon|pokemon that|pokemon with|non-)/.test(sourceGroup)) {
+    const requiredSubtypes = ['fusion strike', 'single strike', 'rapid strike', 'tag team', 'ultra beast', 'vstar', 'vmax']
+      .filter((subtype) => sourceGroup.includes(subtype))
+    if (requiredSubtypes.some((subtype) => !subtypes.some((value) => value.includes(subtype)))) return false
+    const requiredTypes = ['grass', 'fire', 'water', 'lightning', 'psychic', 'fighting', 'metal', 'darkness', 'dragon', 'fairy', 'colorless']
+      .filter((type) => new RegExp(`\\b${type}\\b`).test(sourceGroup))
+    const sourceEnergyType = sourceGroup.match(/\{([grwlpmdycf])\}/)?.[1]
+    const energyTypeNames: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+    if (sourceEnergyType && energyTypeNames[sourceEnergyType]) requiredTypes.push(energyTypeNames[sourceEnergyType])
+    if (requiredTypes.length > 0 && !requiredTypes.some((type) => types.includes(type))) return false
+  }
+  const nonType = text.match(/from attacks from your opponent's non-(fire|water|grass|lightning|psychic|fighting|metal|darkness|fairy|dragon) pokemon/)
+  if (nonType && types.includes(nonType[1])) return false
+  if (/from attacks from your opponent's pokemon vstar|from attacks from your opponent's pokemon vmax|from attacks from your opponent's pokemon v\b|from attacks from your opponent's (?:dragon|fire|water|grass|lightning|psychic|fighting|metal|darkness|fairy) pokemon|from attacks from your opponent's non-/.test(text)) return true
+  if (/from attacks from your opponent's pokemon|from your opponent's attacks|from attacks by your opponent/.test(text)) return true
+  if (/from attacks from your opponent's pokemon-ex/.test(text) && !subtypes.some((value) => value === 'ex' || value === 'pokemon-ex')) return false
+  if (/from attacks from your opponent's pokemon with abilities/.test(text) && !(attacker.abilities || []).length) return false
+  return true
+}
+
+/** Whether a Pokémon's passive Ability prevents an opponent's attack effects, but leaves damage intact. */
+export function isTcgBattleAttackEffectBlockedByAbility(
+  target: TcgBattleCardState,
+  attacker: TcgBattleCardState,
+  state: TcgBattleState,
+  attackerSide: TcgBattleSide,
+  attackName?: string,
+  ignoreTargetOnlyEffects = false,
+): boolean {
+  const targetSide: TcgBattleSide = attackerSide === 'player' ? 'opponent' : 'player'
+  const targetIsActive = state[targetSide].front.some((card) => card.instanceId === target.instanceId)
+  if (!ignoreTargetOnlyEffects && normalizeTcgBattleAbilityText(target.name) === 'ninjask' && attackerSide !== targetSide && attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') &&
+    !isTcgBattleAbilitySuppressed(target, [state.player, state.opponent]) &&
+    (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "prevent all effects, including damage, done to ninjask by your opponent's attacks from his or her basic pokemon.")) return true
+  if (!ignoreTargetOnlyEffects && normalizeTcgBattleAbilityText(target.name) === 'wormadam sandy cloak' &&
+    !isTcgBattleAbilitySuppressed(target, [state.player, state.opponent]) &&
+    (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'prevent all effects, excluding damage, done to wormadam sandy cloak.')) return true
+  const targetName = normalizeTcgBattleAbilityText(target.name)
+  const darkNamedAttacker = /\bdark\b/.test(normalizeTcgBattleAbilityText(attacker.name))
+  const pokemonExAttacker = attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype).replace(/[^a-z]/g, '').includes('ex'))
+  const partnerProtection = !ignoreTargetOnlyEffects && state[targetSide].front.concat(state[targetSide].back).some((provider) => {
+    if (provider.currentHp <= 0 || isTcgBattleAbilitySuppressed(provider, [state.player, state.opponent])) return false
+    if (targetName === 'volbeat' && pokemonExAttacker && normalizeTcgBattleAbilityText(provider.name) === 'illumise' &&
+      state[targetSide].front.concat(state[targetSide].back).some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) === 'volbeat')) {
+      return (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as you have illumise in play, prevent all effects, including damage, done to volbeat by attacks from your opponent's pokemon-ex.")
+    }
+    if (targetName === 'illumise' && darkNamedAttacker && normalizeTcgBattleAbilityText(provider.name) === 'volbeat' &&
+      state[targetSide].front.concat(state[targetSide].back).some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) === 'illumise')) {
+      return (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as you have volbeat in play, prevent all effects, including damage, done to illumise by attacks from your opponent's pokemon that has dark in its name.")
+    }
+    return false
+  })
+  if (partnerProtection) return true
+  const mewEvolutionProtectionText = 'mew is not affected by attacks made by evolved pokemon. this power turns off if mew is asleep, confused, or paralyzed.'
+  const attackerIsEvolved = attacker.subtypes.some((subtype) => ['stage 1', 'stage 2'].includes(normalizeTcgBattleAbilityText(subtype)))
+  if (!ignoreTargetOnlyEffects && normalizeTcgBattleAbilityText(target.name) === 'mew' && attackerIsEvolved &&
+    !isTcgBattleAbilitySuppressedByShadyTail(target, [state.player, state.opponent]) &&
+    !(target.statusConditions || []).some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) &&
+    (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === mewEvolutionProtectionText)) return true
+  if (!ignoreTargetOnlyEffects && isTcgBattleRegiceIcebergShieldActive(target, attacker, state, targetSide)) return true
+  const marvelEyesText = "if you have solrock in play, prevent all effects of attacks, including damage, done to any of your lunatone or solrock by your opponent's pokemon lv.x."
+  const attackerIsLevelUp = attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'level-up') || normalizeTcgBattleAbilityText(attacker.name).includes('lv.x')
+  const marvelEyesProviderActive = state[targetSide].front.concat(state[targetSide].back).some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'lunatone' &&
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === marvelEyesText &&
+      isTcgBattleAbilityEnabled(marvelEyesText, provider, state[targetSide].front.some((pokemon) => pokemon.instanceId === provider.instanceId))),
+  )
+  if (!ignoreTargetOnlyEffects && attackerIsLevelUp && marvelEyesProviderActive &&
+    ['lunatone', 'solrock'].includes(normalizeTcgBattleAbilityText(target.name)) &&
+    [...state[targetSide].front, ...state[targetSide].back].some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) === 'solrock')) return true
+  const marowakBodyguardText = "prevent all effects of attacks done to you or your hand by your opponent's pokemon. remove any existing effects."
+  if (!ignoreTargetOnlyEffects && normalizeTcgBattleAbilityText(target.name) === 'marowak' && !isTcgBattleAbilitySuppressedByShadyTail(target, [state.player, state.opponent]) &&
+    (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === marowakBodyguardText)) return true
+  const torkoalBenchProtectionText = "as long as torkoal is your active pokemon, prevent all effects, including damage, done to your benched pokemon by your opponent's attacks."
+  const bronzongMetalFortressText = "prevent all effects of your opponent's attacks, including damage, done to your benched pokemon."
+  const articunoBenchProtectionText = 'as long as articuno is your active pokemon, you benched pokemon are not affected by attacks. this power cannot be used if articuno is affected by a special condition.'
+  if (!targetIsActive && state[targetSide].back.some((benched) => benched.instanceId === target.instanceId) && [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === bronzongMetalFortressText),
+  )) return true
+  if (!targetIsActive && state[targetSide].front.some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'torkoal' &&
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === torkoalBenchProtectionText),
+  )) return true
+  if (!ignoreTargetOnlyEffects && !targetIsActive && state[targetSide].back.some((benched) => benched.instanceId === target.instanceId) && state[targetSide].front.some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'articuno' && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === articunoBenchProtectionText && isTcgBattleAbilityEnabled(text, provider, true)
+    }),
+  )) return true
+  if (/\bgx\b/i.test(attackName || '') && attacker.subtypes.some((subtype) => ['gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype)))) {
+    const teamGxProtection = state[targetSide].front.some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === "as long as this pokemon is your active pokemon, prevent all effects of your opponent's gx attacks, including damage, done to your pokemon." &&
+          isTcgBattleAbilityEnabled(text, provider, true)
+      }),
+    )
+    if (teamGxProtection) return true
+  }
+  const toedscruelTeamProtection = state[targetSide].energy > 0 &&
+    [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return /^prevent all effects of attacks (?:used by|from) your opponent's pokemon done to all of your pokemon that have energy attached\. ?\(existing effects are not removed\. damage is not an effect\.\)$/.test(text)
+      }),
+    )
+  if (toedscruelTeamProtection) return true
+  const solarRevelationProtection = state[targetSide].energy > 0 &&
+    [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) =>
+        normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "prevent all effects of your opponent's attacks, except damage, done to each of your pokemon that has any energy attached to it.",
+      ),
+    )
+  if (solarRevelationProtection) return true
+  const galarianMrRimeEnergyShieldText = "prevent all effects of your opponent's attacks, except damage, done to all of your pokemon that have energy attached. (existing effects are not removed.)"
+  const galarianMrRimeEnergyShield = state[targetSide].energy > 0 &&
+    [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === galarianMrRimeEnergyShieldText),
+    )
+  if (galarianMrRimeEnergyShield) return true
+  const windCharmText = "as long as this pokemon is your active pokemon, prevent all effects of your opponent's attacks, except damage, done to each of your pokemon. (existing effects are not removed.)"
+  const windCharmProtection = state[targetSide].front.some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === windCharmText && isTcgBattleAbilityEnabled(text, provider, true)
+    }),
+  )
+  if (windCharmProtection) return true
+  const rocketRepellingVeilText = "prevent all effects of attacks used by your opponent's pokemon done to your basic team rocket's pokemon. (existing effects are not removed. damage is not an effect.)"
+  const rocketRepellingVeilProtection = attackerSide !== targetSide &&
+    target.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') &&
+    normalizeTcgBattleAbilityText(target.name).startsWith("team rocket's ") &&
+    [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === rocketRepellingVeilText),
+    )
+  if (rocketRepellingVeilProtection) return true
+  const magearnaMysticHeartText = "prevent all effects of your opponent's attacks, except damage, done to each of your pokemon that has any metal energy attached to it. (existing effects are not removed.)"
+  const magearnaMysticHeartProtection = state[targetSide].energy > 0 && state[targetSide].selectedEnergy?.toLowerCase() === 'metal' &&
+    [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === magearnaMysticHeartText),
+    )
+  if (magearnaMysticHeartProtection) return true
+  const unownBenchProtectionText = "as long as unown u is on your bench, prevent all effects of attacks, including damage, done by your opponent's pokemon to any unown on your bench."
+  const unownBenchProtection = !isTcgBattleAbilitySuppressedByShadyTail(target, [state.player, state.opponent]) &&
+    !targetIsActive && normalizeTcgBattleAbilityText(target.name).includes('unown') &&
+    state[targetSide].back.some((provider) => provider.currentHp > 0 &&
+      normalizeTcgBattleAbilityText(provider.name).replace(/[^a-z]/g, '') === 'unownu' &&
+      !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === unownBenchProtectionText),
+    )
+  if (unownBenchProtection) return true
+  const cloysterDeltaBenchShieldText = "prevent all of effects of attacks, including damage, done by your opponent's pokemon to each of your benched pokemon that has δ on its card."
+  const targetHasDeltaMarker = target.name.includes('δ') || normalizeTcgBattleAbilityText(target.name).includes('delta')
+  const cloysterDeltaBenchProtection = !targetIsActive && targetHasDeltaMarker && attackerSide !== targetSide &&
+    state[targetSide].back.some((pokemon) => pokemon.instanceId === target.instanceId) &&
+    [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === cloysterDeltaBenchShieldText),
+    )
+  if (cloysterDeltaBenchProtection) return true
+  const flygonPowerOfAlchemyText = "prevent all effects of your opponent's attacks, except damage, done to your dragon pokemon. (existing effects are not removed.)"
+  const flygonDragonProtection = attackerSide !== targetSide && target.types.some((type) => normalizeTcgBattleAbilityText(type) === 'dragon') && [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'flygon' && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === flygonPowerOfAlchemyText && isTcgBattleAbilityEnabled(text, provider, state[targetSide].front.some((card) => card.instanceId === provider.instanceId))
+    }),
+  )
+  if (flygonDragonProtection) return true
+  const mrMimeEnergyShieldText = "if your opponent's pokemon that has 2 or less energy cards attached to it attacks mr. mime, prevent all damage done to mr. mime from that attack. if mime jr. is anywhere under mr. mime, prevent all effects of that attack, including damage, done to mr. mime."
+  if (!ignoreTargetOnlyEffects && attackerSide !== targetSide && normalizeTcgBattleAbilityText(target.name) === 'mr. mime' &&
+    target.evolutionStack?.some((card) => normalizeTcgBattleAbilityText(card.name) === 'mime jr.') &&
+    !isTcgBattleAbilitySuppressedByShadyTail(target, [state.player, state.opponent]) &&
+    (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === mrMimeEnergyShieldText)) return true
+  if (ignoreTargetOnlyEffects || isTcgBattleAbilitySuppressedByShadyTail(target, [state.player, state.opponent])) return false
+  return (target.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text)
+    if (!isTcgBattleAbilityEnabled(text, target, targetIsActive)) return false
+    if (text.replace(/\s+/g, ' ').trim() === "prevent all effects of attacks, including damage, done to milotic by your opponent's pokemon lv.x." && doesTcgBattleAbilityAttackSourceMatch(text, attacker)) return true
+    if (text.replace(/\s+/g, ' ').trim() === "prevent all damage from and effects of attacks from your opponent's pokemon done to your benched pokemon." && attackerSide !== targetSide && !targetIsActive) return true
+    if (/as long as this pokemon is on your bench, prevent all damage from and effects of attacks from your opponent's pokemon done to this pokemon/.test(text) && targetIsActive) return false
+    const namedAttackEffectProtection = text.match(/^prevent all effects of attacks, except damage, done to ([a-z0-9 '’-]+) by the attacking pokemon\.?$/)
+    const protectsNamedTarget = Boolean(namedAttackEffectProtection && normalizeTcgBattleAbilityText(target.name) === namedAttackEffectProtection[1].trim())
+    return protectsNamedTarget || isTcgBattlePassiveAttackProtection(text) && doesTcgBattleAbilityAttackSourceMatch(text, attacker)
+  })
+}
+
+/** Enamorus V's team protection; shared Energy approximates attached Psychic Energy. */
+export function isTcgBattleAbilityEffectBlockedByTeamAbility(
+  target: TcgBattleCardState,
+  targetSide: TcgBattleSide,
+  state: TcgBattleState,
+): boolean {
+  if (normalizeTcgBattleAbilityText(target.name).replace(/[^a-z0-9]/g, '') === 'enamorusv') return false
+  const side = state[targetSide]
+  if (side.energy < 1 || side.selectedEnergy?.toLowerCase() !== 'psychic') return false
+  return [...side.front, ...side.back].some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) =>
+      normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "prevent all effects of your opponent's pokemon's abilities done to each of your pokemon that has any psychic energy attached, except any enamorus v."
+    ),
+  )
+}
+
+export function isTcgBattleBenchDamageCounterBlockedByAbility(
+  target: TcgBattleCardState,
+  targetSide: TcgBattleSide,
+  state: TcgBattleState,
+  attacker?: TcgBattleCardState,
+): boolean {
+  if (!state[targetSide].back.some((card) => card.instanceId === target.instanceId)) return false
+  const machokeText = "prevent all damage done to your benched pokemon by your opponent's attacks. your opponent's attacks and abilities can't put damage counters on your benched pokemon."
+  const jirachiBasicAttackerText = "prevent all damage counters from being placed on your benched pokemon by effects of attacks used by your opponent's basic pokemon."
+  const hasProtectionAbility = [...state[targetSide].front, ...state[targetSide].back].some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === machokeText || Boolean(attacker && attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') && text === jirachiBasicAttackerText)
+    }),
+  )
+  return hasProtectionAbility
+}
+
+function isTcgBattlePassiveAttackProtection(text: string): boolean {
+  if (/^as long as (?:feebas|swablu) is on your bench, prevent all damage done to (?:feebas by attacks \(both yours and your opponent's\)|swablu by opponent's attacks)\.$/.test(text.replace(/\s+/g, ' ').trim())) return false
+  const alolanPersianGxProtection = /prevent all effects of attacks, including damage, done to this pokemon by your opponent's tag team pokemon and ultra beasts, and by your opponent's pokemon that have any special energy attached to them/.test(text)
+  if (/when you play this pokemon|during your opponent's next turn|once during your turn|you may prevent|if you have .* in play|special energy attached|pokemon lv\.?x/.test(text) && !alolanPersianGxProtection) return false
+  return /prevent all effects of attacks? (?:used by|from) your opponent's pokemon done to this pokemon(?:\. \(damage is not an effect\.?\))?\.?|prevent all effects of your opponent's attacks done to (?:this pokemon|[a-z' -]+)\.?|prevent all effects of your opponent's attacks, (?:except|other than) damage, done to (?:this pokemon|[a-z' -]+)\.?|prevent all effects of attacks, excluding damage, done to (?:wormadam sandy cloak|this pokemon|[a-z0-9 '’-]+)\.?|prevent all effects of your opponent's pokemon's attacks and abilities done to this pokemon\. \(damage is not an effect\.?\)|prevent all effects of attacks, including damage, done to (?:this pokemon|[a-z' -]+) by|prevent all effects of attacks, including damage, done to this pokemon by your opponent's tag team pokemon and ultra beasts, and by your opponent's pokemon that have any special energy attached to them|prevent all damage from and effects of attacks from your opponent's tera pokemon done to this pokemon|prevent all damage (?:done to this pokemon|from attacks done to this pokemon) by attacks from your opponent's pokemon(?:-ex| ex| v| vmax| vstar)?(?: and pokemon (?:ex|v))?|prevent all damage done to this pokemon by attacks from your opponent's (?:poisoned |(?:grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) )?pokemon|prevent all effects of attacks, including damage, done to budew by your opponent's poisoned pokemon|prevent all damage done by attacks to all of your benched pokemon|as long as this pokemon is on your bench, prevent all damage from and effects of attacks from your opponent's pokemon done to this pokemon/.test(text)
+}
+
+function isTcgBattleRegiceIcebergShieldActive(target: TcgBattleCardState, attacker: TcgBattleCardState, state: TcgBattleState, targetSide: TcgBattleSide): boolean {
+  const text = "if you have regirock in play, prevent all effects of attacks, including damage, done to this pokemon by your opponent's stage 2 pokemon."
+  return normalizeTcgBattleAbilityText(target.name) === 'regice' &&
+    attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'stage 2') &&
+    [...state[targetSide].front, ...state[targetSide].back].some((provider) => provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'regirock') &&
+    !isTcgBattleAbilitySuppressedByShadyTail(target, [state.player, state.opponent]) &&
+    (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === text)
+}
+
+function doesTcgBattleAbilityAttackSourceMatch(text: string, attacker: TcgBattleCardState): boolean {
+  if (/by your opponent's poisoned pokemon/.test(text)) return attacker.statusConditions?.includes('poisoned') || false
+  const subtypes = attacker.subtypes.map((subtype) => subtype.toLowerCase())
+  const types = attacker.types.map((type) => normalizeTcgBattleAbilityText(type))
+  const isEx = subtypes.some((subtype) => subtype === 'ex' || subtype === 'pokemon-ex')
+  const isGx = subtypes.some((subtype) => subtype === 'gx' || subtype === 'pokemon-gx')
+  const isV = subtypes.some((subtype) => /^(?:v|vmax|vstar|pokemon v|pokemon vmax|pokemon vstar)$/.test(subtype))
+  const isTera = subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'tera')
+  const combinedExGx = /pokemon-gx or pokemon-ex|pokemon-ex or pokemon-gx|pokemon gx and pokemon-ex/.test(text)
+  const combinedExV = /pokemon(?:-| )ex and pokemon v|pokemon v and pokemon(?:-| )gx/.test(text)
+  const typeName = text.match(/attacks? from (?:your )?(?:opponent's )?(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) pokemon/)?.[1]
+  const typeSymbol = text.match(/attacks? from (?:your )?(?:opponent's )?\{([grwlpmdycf])\} pokemon/)?.[1]
+  const energyTypeBySymbol: Record<string, string> = {
+    g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting',
+    m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless',
+  }
+  const restrictedType = typeName || (typeSymbol ? energyTypeBySymbol[typeSymbol] : undefined)
+  if (restrictedType && !types.includes(restrictedType)) return false
+  if (/tera pokemon/.test(text) && !isTera) return false
+  if (/tag team pokemon and ultra beasts/.test(text) && !subtypes.some((subtype) => ['tag team', 'ultra beast'].includes(normalizeTcgBattleAbilityText(subtype)))) return false
+  if (/basic pokemon(?:-| )ex/.test(text) && !subtypes.includes('basic')) return false
+  if (combinedExGx) {
+    if (!isEx && !isGx) return false
+  } else if (combinedExV) {
+    if (!isEx && !isV && !isGx) return false
+  } else {
+    if (/pokemon(?:-| )ex/.test(text) && !isEx) return false
+    if (/pokemon(?:-| )gx/.test(text) && !isGx) return false
+    if (/pokemon v(?:max|star)?/.test(text) && !isV) return false
+  }
+  if (/pokemon with abilities|pokemon that have an ability|pokemon that has an ability|pokemon with an ability/.test(text) && !attacker.abilities?.length) return false
+  if (/pokemon that has any poke-powers or poke-bodies/.test(text) && !attacker.abilities?.length) return false
+  if (/isn't an evolved pokemon|is not an evolved pokemon|that isn't evolved/.test(text) && !subtypes.includes('basic')) return false
+  if (/evolved pokemon/.test(text) && !/isn't an evolved pokemon|is not an evolved pokemon|that isn't evolved/.test(text) && subtypes.includes('basic')) return false
+  const requiredStage = text.match(/stage ([12]) pokemon/)
+  if (requiredStage && !subtypes.some((subtype) => subtype === `stage ${requiredStage[1]}`)) return false
+  if (/pokemon that has dark in its name/.test(text) && !normalizeTcgBattleAbilityText(attacker.name).includes('dark')) return false
+  if (/mega evolution pokemon/.test(text) && !subtypes.some((subtype) => subtype.includes('mega'))) return false
+  if (/pokemon sp\b/.test(text) && !subtypes.some((subtype) => subtype === 'sp' || subtype.includes('pokemon sp'))) return false
+  if (/pokemon lv\.?x/.test(text) && !subtypes.some((subtype) => subtype.includes('lv. x') || subtype.includes('lv.x')) && !normalizeTcgBattleAbilityText(attacker.name).includes('lv.x')) return false
+  if (/pokemon that is affected by (\d+) or more special conditions/.test(text)) {
+    const required = Number(text.match(/pokemon that is affected by (\d+) or more special conditions/)?.[1])
+    if ((attacker.statusConditions?.length || 0) < required) return false
+  }
+  if (/opponent's poisoned pokemon/.test(text) && !attacker.statusConditions?.includes('poisoned')) return false
+  if (/pokemon that has any special energy cards attached|pokemon that have any special energy attached/.test(text) && !/tag team pokemon and ultra beasts/.test(text)) return false
+  return true
+}
+
+function isTcgBattleAbilityBoostEligible(
+  group: string | undefined,
+  text: string,
+  provider: TcgBattleCardState,
+  attacker: TcgBattleCardState,
+  target: TcgBattleCardState,
+  state?: TcgBattleState,
+  sideKey?: TcgBattleSide,
+): boolean {
+  if (group) {
+    const normalizedGroup = normalizeTcgBattleAbilityText(group)
+    if (/team plasma/.test(normalizedGroup) && !attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'team plasma')) return false
+    if (/excluding deoxys[- ]?ex/.test(text) && normalizeTcgBattleAbilityText(attacker.name).replace(/[^a-z0-9]/g, '') === 'deoxysex') return false
+    if (/rapid strike/.test(normalizedGroup) && !attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'rapid strike')) return false
+    if (/\bfuture\b/.test(normalizedGroup) && !attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'future')) return false
+    if (/\bbasic\b/.test(normalizedGroup) && !attacker.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) return false
+    if (/\b(?:evolution|evolved|stage 1|stage 2)\b/.test(normalizedGroup) && attacker.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) return false
+    const typeNames: Array<[string, string]> = [
+      ['grass', 'grass'], ['fire', 'fire'], ['water', 'water'], ['lightning', 'lightning'],
+      ['psychic', 'psychic'], ['fighting', 'fighting'], ['metal', 'metal'], ['darkness', 'darkness'],
+      ['dragon', 'dragon'], ['fairy', 'fairy'], ['colorless', 'colorless'],
+      ['{g}', 'grass'], ['{r}', 'fire'], ['{w}', 'water'], ['{l}', 'lightning'],
+      ['{p}', 'psychic'], ['{f}', 'fighting'], ['{m}', 'metal'], ['{d}', 'darkness'],
+      ['{y}', 'fairy'], ['{c}', 'colorless'],
+    ]
+    const requiredTypes = typeNames.filter(([word]) => normalizedGroup.includes(word)).map(([, type]) => type)
+    if (requiredTypes.length > 0 && !attacker.types.some((type) => requiredTypes.includes(normalizeTcgBattleAbilityText(type)))) return false
+    if (requiredTypes.length === 0 && !/\bbasic\b|\bevolution\b|\bevolved\b|\bstage [12]\b|\bfuture\b/.test(normalizedGroup)) {
+      const normalizedName = attacker.name.toLowerCase().replace(/[^a-z0-9]/g, '')
+      if (!normalizedName.includes(normalizedGroup.replace(/[^a-z0-9]/g, ''))) return false
+    }
+  }
+
+  const excludedName = text.match(/(?:excluding (?:any )?|except any )([a-z0-9 '’-]+)/)
+  if (excludedName) {
+    const excluded = excludedName[1].toLowerCase().replace(/[^a-z0-9]/g, '')
+    if (attacker.name.toLowerCase().replace(/[^a-z0-9]/g, '').includes(excluded)) return false
+  }
+
+  const targetRule = text.match(/more damage to (?:the )?(?:(?:your )?opponent's )?(?:active )?([a-z{} '’-]+?) pokemon/)
+  if (targetRule) {
+    const normalizedTargetRule = targetRule[1].toLowerCase()
+    const targetTypeNames: Array<[string, string]> = [
+      ['grass', 'grass'], ['fire', 'fire'], ['water', 'water'], ['lightning', 'lightning'],
+      ['psychic', 'psychic'], ['fighting', 'fighting'], ['metal', 'metal'], ['darkness', 'darkness'],
+      ['dragon', 'dragon'], ['fairy', 'fairy'], ['colorless', 'colorless'],
+      ['{g}', 'grass'], ['{r}', 'fire'], ['{w}', 'water'], ['{l}', 'lightning'],
+      ['{p}', 'psychic'], ['{f}', 'fighting'], ['{m}', 'metal'], ['{d}', 'darkness'], ['{y}', 'fairy'], ['{c}', 'colorless'],
+    ]
+    const targetTypes = targetTypeNames.filter(([word]) => normalizedTargetRule.includes(word)).map(([, type]) => type)
+    if (targetTypes.length > 0 && !target.types.some((type) => targetTypes.includes(normalizeTcgBattleAbilityText(type)))) return false
+    if (/\bvmax\b/.test(normalizedTargetRule) && !target.subtypes.some((subtype) => subtype.toLowerCase() === 'vmax')) return false
+    if (/\bevolved\b|\bevolution\b/.test(normalizedTargetRule) && target.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) return false
+    if (/with an ability/.test(text) && !target.abilities?.length) return false
+  }
+  const namedTargetSubtype = text.match(/more damage to (?:the )?(?:opponent's )?(?:active )?pokemon[- ]?(vmax|vmx|gx|ex|v)\b/)
+  if (namedTargetSubtype && !target.subtypes.some((subtype) => subtype.toLowerCase().replace(/[^a-z]/g, '') === namedTargetSubtype[1].replace(/[^a-z]/g, ''))) return false
+  if (/more damage to .*active evolution pokemon/.test(text) && target.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) return false
+  if (/active pokemon/.test(text) && state && sideKey) {
+    const targetSide = sideKey === 'player' ? 'opponent' : 'player'
+    if (!state[targetSide].front.some((card) => card.instanceId === target.instanceId)) return false
+  }
+  if (/as long as .*bench|on your bench/.test(text) && state && sideKey &&
+    !state[sideKey].back.some((card) => card.instanceId === provider.instanceId)) return false
+  return true
+}
+
+export function normalizeTcgBattleAbilityText(text: string): string {
+  return text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+}
+
+export function getTcgBattleCoinFlipStatusPower(text: string): TcgBattleStatusCondition | null {
+  const normalized = normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim()
+  if (normalized === "once during your turn (before your attack), you may flip a coin. if heads, your opponent's active pokemon is now asleep. if you use this ability, your turn ends.") return 'asleep'
+  if (normalized === "once during your turn (before your attack), you may flip a coin. if heads, choose 1 of the defending pokemon. that pokemon is now poisoned. put 3 damage counters instead of 1 on that pokemon between turns. this power can't be used if drapion is affected by a special condition.") return 'poisoned'
+  if (normalized === "during your turn, you may make your opponent's active pokemon paralyzed and poisoned. during pokemon checkup, put 3 damage counters on that pokemon instead of 1. (you can't use more than 1 vstar power in a game.)") return 'poisoned'
+  const activeStatusMatch = normalized.match(/^once during your turn, you may flip a coin\. if heads, your opponent's active pokemon is now (asleep|confused|paralyzed|poisoned|burned)\.$/)
+  if (activeStatusMatch?.[1]) return activeStatusMatch[1] as TcgBattleStatusCondition
+  if (/^once during your turn, if this pokemon is in the active spot, you may flip a coin\. if heads, your opponent's active pokemon is now (asleep|confused|paralyzed|poisoned|burned)\.$/.test(normalized)) {
+    return normalized.endsWith('paralyzed.') ? 'paralyzed' : normalized.endsWith('poisoned.') ? 'poisoned' : normalized.endsWith('burned.') ? 'burned' : normalized.endsWith('confused.') ? 'confused' : 'asleep'
+  }
+  if (normalized === "once during your turn (before your attack), you may flip a coin. if heads, the defending pokemon is now burned. this power can't be used if houndoom is affected by a special condition.") return 'burned'
+  const match = normalized.match(/^(?:distance hypnosis - )?once during your turn \(before your attack\), you may flip a coin\. if heads, (?:the defending pokemon|your opponent's active pokemon) is now (asleep|confused|paralyzed|poisoned|burned)(?:;|\.) if tails, your active pokemon is now \1\.(?: (?:this|the) power can't be used if [a-z '-]+ (?:is affected by a special condition|is asleep, confused, or paralyzed)\.)?$/)
+  if (match?.[1]) return match[1] as TcgBattleStatusCondition
+  if (/^once during your turn \(before your attack\), you may flip a coin\. if heads, the defending pokemon is now asleep\. this power can't be used if hypno is affected by a special condition\.$/.test(normalized)) return 'asleep'
+  if (/^once during your turn \(before your attack\), you may flip a coin\. if heads, the defending pokemon is now poisoned\. this power can't be used if vileplume is affected by a special condition\.$/.test(normalized)) return 'poisoned'
+  if (normalized === "once during your turn (before your attack), you may flip a coin. if heads, choose 1 of the defending pokemon. that pokemon is now poisoned. this power can't be used if vileplume is affected by a special condition.") return 'poisoned'
+  if (normalized === "once during your turn (before your attack), if golduck is your active pokemon, you may flip a coin. if heads, the defending pokemon (choose 1 if there are 2) is now confused. this power can't be used if golduck is affected by a special condition.") return 'confused'
+  return null
+}
+
+export function isTcgBattleCradilySelectiveSlime(text: string): boolean {
+  return normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim() === "once during your turn, you may flip a coin. if heads, choose burned, confused, or poisoned. your opponent's active pokemon is now affected by that special condition."
+}
+
+export function isTcgBattleVileplumeChoiceStatus(text: string): boolean {
+  return normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim() === "once during your turn (before your attack), you may flip a coin. if heads, choose asleep, burned, confused, or poisoned. your opponent's active pokemon is now affected by that special condition."
+}
+
+export function hasTcgBattleKlinklangEmergencyRotation(card: TcgBattleCardSummary): boolean {
+  return normalizeTcgBattleAbilityText(card.name) === 'klinklang' && (card.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'once during your turn, if this pokemon is in your hand and your opponent has any stage 2 pokemon in play, you may put this pokemon onto your bench.',
+  )
+}
+
+export function isTcgBattleDarkCrobatPoison(text: string): boolean {
+  return normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim() === "once during your turn (before your attack), if dark crobat is your active pokemon, you may choose 1 of the defending pokemon. that pokemon is now poisoned. this power can't be used if dark crobat is affected by a special condition."
+}
+
+export function isTcgBattleDarkHoundoomFireBreath(text: string): boolean {
+  return normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim() === "once during your turn (before your attack), if dark houndoom is your active pokemon, you may flip a coin. if heads, the defending pokemon (choose 1 if there are 2) is now burned. this power can't be used if dark houndoom is affected by a special condition."
+}
+
+export function isTcgBattleVenusaurMiracleAroma(text: string): boolean {
+  return normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim() === 'once during your turn (before your attack), you may flip a coin. if heads, choose either asleep, burned, or poisoned. the defending pokemon is now affected by that special condition. this power can\'t be used if venusaur is affected by a special condition.'
+}
+
+export function isTcgBattleXatuPsychicShift(text: string): boolean {
+  return normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim() === 'once during your turn, if xatu is on your bench, you may choose 1 special condition from 1 of your active pokemon and remove that special condition. then, 1 of the defending pokemon is now affected by that special condition.'
+}
+
+export function isTcgBattleTentacoolCowardice(text: string): boolean {
+  return normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim() === "at any time during your turn (before your attack), you may return tentacool to your hand. (discard all cards attached to tentacool.) this power can't be used the turn you put tentacool into play or if tentacool is asleep, confused, or paralyzed."
+}
+
+export function isTcgBattleLopunnyBigJump(text: string): boolean {
+  return normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim() === 'once during your turn (before your attack), you may return this pokemon and all cards attached to it to your hand.'
+}
+
+export function isTcgBattleAbilitySuppressed(card: TcgBattleCardState, sides: TcgBattleSideState[], skipSelfKnockoutSuppressor = false, skipToxicGasSuppressor = false, skipDarkFeraligatrSuppressor = false, skipSlakingSuppressor = false, skipWobbuffetSuppressor = false, skipPowerOfAlchemySuppressor = false, skipRapidStrikeSuppressor = false, skipKlefkiSuppressor = false, skipDualAuraSuppressor = false, skipFeraligatrExSuppressor = false): boolean {
+  const cardAbilityKinds = (card.abilities || []).map((ability) => normalizeTcgBattleAbilityText(ability.type).replace(/[^a-z]/g, ''))
+  const hasPokePower = cardAbilityKinds.includes('pokepower')
+  const hasPokeBody = cardAbilityKinds.includes('pokebody')
+  const isBasic = card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')
+  const hasPokemonExSubtype = card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype).replace(/[^a-z]/g, '').includes('ex'))
+  const isPokemonSp = card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype).replace(/[^a-z]/g, '') === 'sp') || normalizeTcgBattleAbilityText(card.name).includes(' sp')
+  const cardIsInPlay = sides.some((side) => [...side.front, ...side.back].some((pokemon) => pokemon.instanceId === card.instanceId))
+  if (card.temporaryEffects?.imprisonMarker && (hasPokePower || hasPokeBody)) return true
+  const activeBasicPowerLock = hasPokePower && isBasic && !hasPokemonExSubtype && sides.some((side) => side.front.some((active) => active.instanceId === card.instanceId)) && sides.some((side) =>
+    [...side.front, ...side.back].some((provider) => provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'girafarig' &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "each player's active basic pokemon (excluding pokemon-ex) can't use any poke-powers.") &&
+      !isTcgBattleAbilitySuppressed(provider, sides)),
+  )
+  if (activeBasicPowerLock) return true
+  if (!skipFeraligatrExSuppressor && (hasPokePower || hasPokeBody) && !hasPokemonExSubtype && cardIsInPlay) {
+    const feraligatrExActive = sides.some((side) => side.front.some((provider) =>
+      provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'feraligatr ex' &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as feraligatr ex is your active pokemon, each player's pokemon (excluding pokemon-ex) can't use any poke-powers or poke-bodies.") &&
+      !isTcgBattleAbilitySuppressed(provider, sides, false, false, false, false, false, false, false, false, false, true),
+    ))
+    if (feraligatrExActive) return true
+  }
+  const legacyBodyLock = hasPokeBody && !isPokemonSp && sides.some((side) => [...side.front, ...side.back].some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'dialga g lv.x' &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "each pokemon (both yours and your opponent's) (excluding pokemon sp) can't use any poke-bodies.") &&
+    !isTcgBattleAbilitySuppressed(provider, sides),
+  ))
+  if (legacyBodyLock) return true
+  const cardIsEvolved = Boolean(card.evolutionStack?.length) || card.subtypes.some((subtype) => ['stage 1', 'stage 2'].includes(normalizeTcgBattleAbilityText(subtype)))
+  if (!skipDualAuraSuppressor && cardIsInPlay && hasPokeBody && cardIsEvolved && !hasPokemonExSubtype) {
+    const dualAuraRules = [
+      { text: "as long as you have latias or latias ex in play, each player's evolved pokemon (excluding pokemon-ex) can't use any poke-bodies.", source: 'latios', partners: ['latias', 'latias ex'] },
+      { text: "as long as you have latios or latios ex in play, each player's evolved pokemon (excluding pokemon-ex) can't use any poke-bodies.", source: 'latias', partners: ['latios', 'latios ex'] },
+    ]
+    const dualAuraSuppressor = sides.some((owner) => {
+      const ownerBoard = [...owner.front, ...owner.back].filter((pokemon) => pokemon.currentHp > 0)
+      return ownerBoard.some((provider) => {
+        const rule = dualAuraRules.find((entry) => (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === entry.text))
+        if (!rule || !normalizeTcgBattleAbilityText(provider.name).startsWith(rule.source)) return false
+        return ownerBoard.some((pokemon) => rule.partners.includes(normalizeTcgBattleAbilityText(pokemon.name))) && !isTcgBattleAbilitySuppressed(provider, sides, false, false, false, false, false, false, false, false, true)
+      })
+    })
+    if (dualAuraSuppressor) return true
+  }
+  const pokemonExPowerLock = hasPokePower && hasPokemonExSubtype && sides.some((side) => [...side.front, ...side.back].some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name).replace(/[^a-z0-9]/g, '') === 'sceptileex' &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "each player's pokemon-ex can't use any poke-powers and pays colorless more energy to use its attacks. each pokemon can't be affected by more than 1 extra liquid poke-body.") &&
+    !isTcgBattleAbilitySuppressed(provider, sides),
+  ))
+  if (pokemonExPowerLock) return true
+
+  const prismStarSuppressed = card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'prism star') &&
+    sides.some((side) => side.back.some((provider) => provider.currentHp > 0 && (provider.abilities || []).some((ability) =>
+      /as long as this pokemon is on your bench, \{\*\} \(prism star\) pokemon in play \(both yours and your opponent's\) can't attack and have no abilities/.test(normalizeTcgBattleAbilityText(ability.text)),
+    )))
+  if (prismStarSuppressed) return true
+
+  const isPsychicPokemon = card.types.some((type) => normalizeTcgBattleAbilityText(type) === 'psychic')
+  if (!skipWobbuffetSuppressor && !isPsychicPokemon) {
+    const bideBarricadeText = 'as long as this pokemon is your active pokemon, each pokemon in play, in each player\'s hand, and in each player\'s discard pile has no abilities (except for psychic pokemon).'
+    const activeBideBarricade = sides.some((owner) => owner.front.some((provider) => provider.currentHp > 0 &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === bideBarricadeText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, false, false, false, false, true),
+    ))
+    if (activeBideBarricade) return true
+  }
+
+  if (!skipPowerOfAlchemySuppressor && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')) {
+    const powerOfAlchemyText = 'each basic pokemon in play, in each player\'s hand, and in each player\'s discard pile has no abilities.'
+    const alolanMukSuppressor = sides.flatMap((owner) => [...owner.front, ...owner.back]).some((provider) =>
+      provider.currentHp > 0 && provider.instanceId !== card.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'alolan muk' &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === powerOfAlchemyText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, false, false, false, false, false, true),
+    )
+    if (alolanMukSuppressor) return true
+  }
+
+  if (cardIsInPlay && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')) {
+    const inPlayBasicLockText = 'basic pokemon in play (both yours and your opponent\'s) have no abilities.'
+    const inPlayAlolanMuk = sides.flatMap((owner) => [...owner.front, ...owner.back]).some((provider) =>
+      provider.currentHp > 0 && provider.instanceId !== card.instanceId && normalizeTcgBattleAbilityText(provider.name) === 'alolan muk' &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === inPlayBasicLockText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, false, false, false, false, false, true),
+    )
+    if (inPlayAlolanMuk) return true
+  }
+
+  const cardSubtypes = card.subtypes.map((subtype) => normalizeTcgBattleAbilityText(subtype).replace(/[^a-z]/g, ''))
+  const isBasicPokemonV = cardSubtypes.includes('basic') && (cardSubtypes.includes('v') || cardSubtypes.includes('pokemonv'))
+  if (isBasicPokemonV) {
+    const basicVSuppressionText = 'basic pokemon v in play (both yours and your opponent\'s) have no abilities.'
+    const basicVSuppressor = sides.flatMap((owner) => [...owner.front, ...owner.back]).some((provider) =>
+      provider.currentHp > 0 && provider.instanceId !== card.instanceId &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === basicVSuppressionText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, false, false, false, false, false, true),
+    )
+    if (basicVSuppressor) return true
+  }
+
+  const hasMischievousLock = (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.name) === 'mischievous lock')
+  if (!skipKlefkiSuppressor && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') && !hasMischievousLock) {
+    const mischievousLockText = 'as long as this pokemon is in the active spot, basic pokemon in play (both yours and your opponent\'s) have no abilities, except for mischievous lock.'
+    const activeKlefki = sides.some((owner) => owner.front.some((provider) =>
+      provider.currentHp > 0 && provider.instanceId !== card.instanceId &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === mischievousLockText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, false, false, false, false, false, false, false, true),
+    ))
+    if (activeKlefki) return true
+  }
+
+  const isStage2 = card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype).replace(/[^a-z0-9]/g, '') === 'stage2')
+  if (isStage2) {
+    const benchStage2LockText = 'as long as this pokemon is on your bench, benched stage 2 pokemon (both yours and your opponent\'s) have no abilities.'
+    const benchStage2Suppressor = sides.some((owner) => owner.back.some((provider) =>
+      provider.currentHp > 0 && provider.instanceId !== card.instanceId &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === benchStage2LockText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides),
+    ))
+    if (benchStage2Suppressor) return true
+  }
+
+  const isPokemonGx = cardSubtypes.includes('gx') || cardSubtypes.includes('pokemongx')
+  if (isPokemonGx && card.currentHp < card.hp) {
+    const damagedGxLockText = 'pokemon-gx that have any damage counters on them (both yours and your opponent\'s) have no abilities.'
+    const damagedGxSuppressor = sides.flatMap((owner) => [...owner.front, ...owner.back]).some((provider) =>
+      provider.currentHp > 0 && provider.instanceId !== card.instanceId &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === damagedGxLockText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides),
+    )
+    if (damagedGxSuppressor) return true
+  }
+
+  if (cardSubtypes.some((subtype) => subtype === 'break' || subtype === 'pokemonbreak')) {
+    const breakAbilityLockText = 'each pokemon break has no abilities (this includes abilities of its previous evolution).'
+    const breakAbilitySuppressor = sides.flatMap((owner) => [...owner.front, ...owner.back]).some((provider) =>
+      provider.currentHp > 0 && provider.instanceId !== card.instanceId &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === breakAbilityLockText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides),
+    )
+    if (breakAbilitySuppressor) return true
+  }
+
+  const cardSide = sides.find((side) => [...side.front, ...side.back].some((pokemon) => pokemon.instanceId === card.instanceId))
+  const opposingSide = sides.find((side) => side !== cardSide)
+  if (!cardSide || !opposingSide) return false
+  const hasLazyAbility = (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.name) === 'lazy')
+  if (!skipSlakingSuppressor && !hasLazyAbility) {
+    const slakingAbilityLockText = "as long as this pokemon is your active pokemon, your opponent's pokemon in play have no abilities, except for lazy."
+    const slakingAbilityLock = opposingSide.front.some((provider) =>
+      provider.currentHp > 0 && (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === slakingAbilityLockText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, false, false, skipDarkFeraligatrSuppressor, true),
+    )
+    if (slakingAbilityLock) return true
+  }
+  const isExOrGx = cardSubtypes.some((subtype) => ['ex', 'pokemonex', 'gx', 'pokemongx'].includes(subtype))
+  if (!isExOrGx && card.types.some((type) => normalizeTcgBattleAbilityText(type) === 'fire')) {
+    const lunatoneFireLockText = 'if you have solrock in play, fire pokemon in play (both yours and your opponent\'s) have no abilities, except pokemon-gx and pokemon-ex.'
+    const lunatoneFireLock = sides.some((owner) => {
+      const hasSolrock = [...owner.front, ...owner.back].some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name).includes('solrock'))
+      return hasSolrock && [...owner.front, ...owner.back].some((provider) =>
+        provider.currentHp > 0 && provider.instanceId !== card.instanceId &&
+        (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === lunatoneFireLockText) &&
+        !isTcgBattleAbilitySuppressed(provider, sides),
+      )
+    })
+    if (lunatoneFireLock) return true
+  }
+  if (card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype).replace(/[^a-z]/g, '') === 'rapidstrike')) {
+    const rapidStrikeSuppressionText = "your opponent's rapid strike pokemon in play have no abilities."
+    const rapidStrikeSuppressor = [...opposingSide.front, ...opposingSide.back].some((provider) =>
+      provider.currentHp > 0 && (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === rapidStrikeSuppressionText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, false, false, false, false, false, false, true),
+    )
+    if (rapidStrikeSuppressor) return true
+  }
+  const pokemonPowerType = (type: string) => ['pokepower', 'pokemonpower'].includes(normalizeTcgBattleAbilityText(type).replace(/[^a-z]/g, ''))
+  const pokemonBodyType = (type: string) => ['pokebody', 'pokemonbody'].includes(normalizeTcgBattleAbilityText(type).replace(/[^a-z]/g, ''))
+  const hasPokemonPower = (pokemon: TcgBattleCardState) => (pokemon.abilities || []).some((ability) => pokemonPowerType(ability.type || ''))
+  const hasPokemonBody = (pokemon: TcgBattleCardState) => (pokemon.abilities || []).some((ability) => pokemonBodyType(ability.type || ''))
+  const onlyLegacyPowers = (pokemon: TcgBattleCardState) => Boolean(pokemon.abilities?.length) && pokemon.abilities!.every((ability) => pokemonPowerType(ability.type || ''))
+  const onlyLegacyPowersOrBodies = (pokemon: TcgBattleCardState) => Boolean(pokemon.abilities?.length) && pokemon.abilities!.every((ability) => pokemonPowerType(ability.type || '') || pokemonBodyType(ability.type || ''))
+  const legacySuppressors = sides.flatMap((owner) => [...owner.front, ...owner.back]
+    .filter((provider) => provider.currentHp > 0)
+    .flatMap((provider) => (provider.abilities || []).map((ability) => ({ owner, provider, providerIsActive: owner.front.some((active) => active.instanceId === provider.instanceId), providerName: normalizeTcgBattleAbilityText(provider.name), text: normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim(), name: normalizeTcgBattleAbilityText(ability.name) }))))
+  for (const suppressor of legacySuppressors) {
+    const isMukStench = suppressor.text === "as long as muk is your active pokemon, each player's pokemon can't use any poke-powers."
+    const isUmbreonDarkGaze = suppressor.text === "as long as umbreon is your active pokemon, benched pokemon (yours and your opponent's) can't use poke-powers."
+    const isMedichamWiseAura = suppressor.text === "as long as medicham ex is your active pokemon, each pokemon (excluding pokemon-ex) (both yours and your opponent's) can't use any poke-powers."
+    const isUrsaringIntimidatingRing = suppressor.text === "as long as ursaring is your active pokemon, your opponent's basic pokemon can't attack or use any poke-powers."
+    const isAggronIntimidatingArmor = suppressor.text === "as long as aggron ex is your active pokemon, your opponent's basic pokemon can't attack or use any poke-powers or poke-bodies."
+    const isGlaceonPowerLock = suppressor.text === "as long as glaceon is your active pokemon, your opponent's pokemon can't use any poke-powers."
+    const isMukExToxicGas = suppressor.text === 'as long as muk ex is your active pokemon, ignore all poke-powers and poke-bodies other than toxic gas.'
+    const isPartnerFirePowerLock = suppressor.text === "as long as you have solrock in play, each player's fire pokemon (excluding pokemon-ex) can't use any poke-powers." && suppressor.providerName.includes('lunatone') && [...suppressor.owner.front, ...suppressor.owner.back].some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name).includes('solrock'))
+    const isPartnerColorlessPowerLock = suppressor.text === "as long as you have lunatone in play, each player's colorless pokemon (excluding pokemon-ex) can't use any poke-powers." && suppressor.providerName.includes('solrock') && [...suppressor.owner.front, ...suppressor.owner.back].some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name).includes('lunatone'))
+    const isPokemonEx = card.subtypes.some((subtype) => ['ex', 'pokemon ex', 'pokemon-ex'].includes(normalizeTcgBattleAbilityText(subtype)))
+    if (isMukStench && suppressor.providerIsActive && onlyLegacyPowers(card)) return true
+    if (isUmbreonDarkGaze && suppressor.providerIsActive && cardSide.back.some((pokemon) => pokemon.instanceId === card.instanceId) && onlyLegacyPowers(card)) return true
+    if (isMedichamWiseAura && suppressor.providerIsActive && !isPokemonEx && onlyLegacyPowers(card)) return true
+    if (isUrsaringIntimidatingRing && suppressor.providerIsActive && cardSide !== suppressor.owner && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') && onlyLegacyPowers(card)) return true
+    if (isAggronIntimidatingArmor && suppressor.providerIsActive && cardSide !== suppressor.owner && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') && onlyLegacyPowersOrBodies(card)) return true
+    if (isGlaceonPowerLock && suppressor.providerIsActive && cardSide !== suppressor.owner && onlyLegacyPowers(card)) return true
+    if (isMukExToxicGas && suppressor.providerIsActive && onlyLegacyPowersOrBodies(card) && !card.abilities?.some((ability) => normalizeTcgBattleAbilityText(ability.name) === 'toxic gas')) return true
+    if (isPartnerFirePowerLock && !isPokemonEx && card.types.some((type) => normalizeTcgBattleAbilityText(type) === 'fire') && onlyLegacyPowers(card)) return true
+    if (isPartnerColorlessPowerLock && !isPokemonEx && card.types.some((type) => normalizeTcgBattleAbilityText(type) === 'colorless') && onlyLegacyPowers(card)) return true
+  }
+  if (!skipSlakingSuppressor && hasPokemonPower(card) && !hasPokemonBody(card)) {
+    const lazyText = "as long as slaking is your active pokemon, your opponent's pokemon can't use any poke-powers."
+    const slakingActive = opposingSide.front.some((provider) => provider.currentHp > 0 &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === lazyText) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, true, false, skipDarkFeraligatrSuppressor, true),
+    )
+    if (slakingActive) return true
+  }
+  if ((card.temporaryEffects?.pokemonPowerSuppression?.remainingTurns || 0) > 0 && (card.abilities || []).some((ability) => pokemonPowerType(ability.type || '')) && !(card.abilities || []).some((ability) => pokemonBodyType(ability.type || ''))) return true
+  if (!skipDarkFeraligatrSuppressor && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'baby') &&
+    (card.abilities || []).some((ability) => ['pokepower', 'pokemonpower'].includes(normalizeTcgBattleAbilityText(ability.type || '').replace(/[^a-z]/g, '')))) {
+    const scareText = "as long as dark feraligatr is your active pokemon, all of your opponent's baby pokemon powers stop working and your opponent's baby pokemon can't attack. this power stops working while dark feraligatr is asleep, confused, or paralyzed."
+    const activeScare = opposingSide.front.some((provider) => provider.currentHp > 0 &&
+      !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, true, false, true, skipSlakingSuppressor) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === scareText),
+    )
+    if (activeScare) return true
+  }
+  if (!skipToxicGasSuppressor) {
+    const isPokemonPowerType = (type: string) => ['pokepower', 'pokemonpower'].includes(normalizeTcgBattleAbilityText(type).replace(/[^a-z]/g, ''))
+    const isPokemonBodyType = (type: string) => ['pokebody', 'pokemonbody'].includes(normalizeTcgBattleAbilityText(type).replace(/[^a-z]/g, ''))
+    const hasToxicGas = (provider: TcgBattleCardState) => (provider.abilities || []).some((ability) =>
+      normalizeTcgBattleAbilityText(ability.name) === 'toxic gas' && isPokemonPowerType(ability.type) &&
+      /^ignore all pokemon powers other than toxic gases\. this power stops working while muk is (?:asleep, confused, or paralyzed|affected by a special condition)\.$/.test(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()),
+    )
+    const toxicGasActive = sides.some((side) => [...side.front, ...side.back].some((provider) =>
+      provider.currentHp > 0 &&
+      !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) &&
+      !isTcgBattleAbilitySuppressed(provider, sides, true, true, skipDarkFeraligatrSuppressor, skipSlakingSuppressor) &&
+      hasToxicGas(provider),
+    ))
+    const cardHasToxicGas = hasToxicGas(card)
+    const hasPokemonPower = (card.abilities || []).some((ability) => isPokemonPowerType(ability.type))
+    const hasPokemonBody = (card.abilities || []).some((ability) => isPokemonBodyType(ability.type))
+    if (toxicGasActive && !cardHasToxicGas && hasPokemonPower && !hasPokemonBody) return true
+  }
+  const hasDamageCounters = card.currentHp < card.hp
+  const damageBindText = 'each pokemon that has any damage counters on it (both yours and your opponent\'s) can\'t use any poke-powers.'
+  const damageBindActive = sides.some((owner) => [...owner.front, ...owner.back].some((provider) =>
+    provider.currentHp > 0 && provider.currentHp === provider.hp &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === damageBindText) &&
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, sides),
+  ))
+  if (damageBindActive && hasDamageCounters && hasPokemonPower(card) && !hasPokemonBody(card)) return true
+  const subtypes = card.subtypes.map(normalizeTcgBattleAbilityText)
+  const hasRuleBox = subtypes.some((subtype) => ['ex', 'pokemon-ex', 'gx', 'pokemon-gx', 'v', 'pokemon v', 'vmax', 'pokemon vmax', 'vstar', 'pokemon vstar'].includes(subtype))
+  const isFuturePokemon = subtypes.includes('future')
+  const ironThornsActive = (side: TcgBattleSideState) => side.front.some((provider) => provider.currentHp > 0 && (provider.abilities || []).some((ability) =>
+    /as long as this pokemon is in the active spot, pokemon with a rule box in play \(both yours and your opponent's\) have no abilities, except for future pokemon/.test(normalizeTcgBattleAbilityText(ability.text)),
+  ))
+  if (hasRuleBox && !isFuturePokemon && sides.some(ironThornsActive)) return true
+  const isPokemonEx = subtypes.some((subtype) => subtype === 'ex' || subtype === 'pokemon-ex')
+  const isPokemonExOrGx = isPokemonEx || subtypes.some((subtype) => subtype === 'gx' || subtype === 'pokemon-gx')
+  const hasNeutralizingGas = (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.name) === 'neutralizing gas')
+  const neutralizingGasActive = opposingSide.front.some((provider) => provider.currentHp > 0 && (provider.abilities || []).some((ability) =>
+    /as long as this pokemon is in the active spot, your opponent's pokemon in play have no abilities, except for neutralizing gas/.test(normalizeTcgBattleAbilityText(ability.text)),
+  ))
+  if (!hasNeutralizingGas && neutralizingGasActive) return true
+  const hasMidnightFluttering = (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.name) === 'midnight fluttering')
+  const flutterManeActive = opposingSide.front.some((provider) => provider.currentHp > 0 && (provider.abilities || []).some((ability) =>
+    /as long as this pokemon is in the active spot, your opponent's active pokemon has no abilities, except for midnight fluttering/.test(normalizeTcgBattleAbilityText(ability.text)),
+  ))
+  if (cardSide.front.some((pokemon) => pokemon.instanceId === card.instanceId) && !hasMidnightFluttering && flutterManeActive) return true
+  const hasFreezingGaze = (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.name) === 'freezing gaze')
+  const freezingGazeActive = opposingSide.front.some((provider) => provider.currentHp > 0 && (provider.abilities || []).some((ability) =>
+    /as long as this pokemon is your active pokemon, your opponent's pokemon-gx and pokemon-ex in play, in their hand, and in their discard pile have no abilities, except for freezing gaze/.test(normalizeTcgBattleAbilityText(ability.text)),
+  ))
+  if (isPokemonExOrGx && !hasFreezingGaze && freezingGazeActive) return true
+  const tingLuActive = (side: TcgBattleSideState) => side.front.some((provider) => provider.currentHp > 0 && (provider.abilities || []).some((ability) =>
+    /as long as this pokemon is in the active spot, your opponent's pokemon in play that have any damage counters on them have no abilities, except for pokemon ex/.test(normalizeTcgBattleAbilityText(ability.text)),
+  ))
+  if (hasDamageCounters && !isPokemonEx && tingLuActive(opposingSide)) return true
+
+  if (!skipSelfKnockoutSuppressor) {
+    const selfKnockoutSuppressorText = "pokemon in play (both yours and your opponent's) lose any ability that requires the pokemon using it to knock out itself."
+    const pokemonKnockoutSuppressorText = "pokemon in play (both yours and your opponent's) lose all abilities that require those pokemon to be knocked out."
+    const hasSelfKnockoutSuppressor = sides.flatMap((side) => [...side.front, ...side.back]).some((provider) =>
+      provider.currentHp > 0 &&
+      !isTcgBattleAbilitySuppressed(provider, sides, true, false, skipDarkFeraligatrSuppressor, skipSlakingSuppressor) &&
+      (provider.abilities || []).some((ability) => [selfKnockoutSuppressorText, pokemonKnockoutSuppressorText].includes(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim())),
+    )
+    const hasSelfKnockoutAbility = (card.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return /if you use this ability, this pokemon is knocked out/.test(text) ||
+        /if you searched your deck in this way, this pokemon is knocked out/.test(text) ||
+        /(?:when|if) this pokemon is knocked out/.test(text) ||
+        /if this pokemon would be knocked out/.test(text)
+    })
+    if (hasSelfKnockoutSuppressor && hasSelfKnockoutAbility) return true
+  }
+
+  const empoleonSuppressor = opposingSide.front.find((provider) => provider.currentHp > 0 && (provider.abilities || []).some((ability) =>
+    /as long as this pokemon is in the active spot, your opponent's basic pokemon in play have no abilities, except for pokemon with a rule box/.test(normalizeTcgBattleAbilityText(ability.text)),
+  ))
+  if (!empoleonSuppressor || !subtypes.includes('basic') || hasRuleBox) return false
+  const suppressorSubtypes = empoleonSuppressor.subtypes.map(normalizeTcgBattleAbilityText)
+  const suppressorHasDamage = empoleonSuppressor.currentHp < empoleonSuppressor.hp
+  const suppressorIsEx = suppressorSubtypes.includes('ex') || suppressorSubtypes.includes('pokemon-ex')
+  return !(suppressorHasDamage && !suppressorIsEx && tingLuActive(cardSide))
+}
+
+export function isTcgBattleAbilitySuppressedByShadyTail(card: TcgBattleCardState, sides: TcgBattleSideState[]): boolean {
+  return isTcgBattleAbilitySuppressed(card, sides)
+}
+
+export function getTcgBattleAvailableAttacks(state: TcgBattleState, sideKey: TcgBattleSide, card: TcgBattleCardState): TcgBattleAttack[] {
+  const side = state[sideKey]
+  const grantingAbilityText = 'each of your evolved pokemon can use any attack from its previous evolutions. (you still need the necessary energy to use each attack.)'
+  const aerodactylMemoryText = "whenever an evolved pokemon attacks (even if it's your opponent's), it can use any attack from its basic card or any evolution card attached to it. it still has to pay for that attack's energy cost. this power stops working while aerodactyl is asleep, confused, or paralyzed."
+  const grantingSource = card.evolutionStack?.length ? [...side.front, ...side.back].find((source) =>
+    source.currentHp > 0 && !isTcgBattleAbilitySuppressed(source, [state.player, state.opponent]) &&
+    (source.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === grantingAbilityText),
+  ) : undefined
+  const aerodactylMemoryActive = Boolean(card.evolutionStack?.length && [...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back].some((source) =>
+    source.currentHp > 0 && !source.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) &&
+    !isTcgBattleAbilitySuppressed(source, [state.player, state.opponent]) &&
+    (source.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === aerodactylMemoryText),
+  ))
+  const attacks: TcgBattleAttack[] = [
+    ...card.attacks,
+    ...(grantingSource || aerodactylMemoryActive ? card.evolutionStack!.flatMap((stage) => stage.attacks || []) : []),
+  ]
+  if (isTcgBattleAbilitySuppressed(card, [state.player, state.opponent])) return attacks
+
+  const normalizedAbilities = (card.abilities || []).map((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim())
+  if (normalizedAbilities.includes("this pokemon can't use attacks unless you have 10 or more cards in your hand.") && side.hand.length < 10) return []
+  const copiedSources = new Set<TcgBattleCardState>()
+  const lostZoneCopiedAttacks: TcgBattleAttack[] = []
+  const hasRuleBox = (pokemon: TcgBattleCardSummary) => pokemon.subtypes.some((subtype) =>
+    ['ex', 'pokemon-ex', 'gx', 'pokemon-gx', 'v', 'pokemon v', 'vmax', 'pokemon vmax', 'vstar', 'pokemon vstar'].includes(normalizeTcgBattleAbilityText(subtype)),
+  )
+  const isGxOrEx = (pokemon: TcgBattleCardSummary) => pokemon.subtypes.some((subtype) =>
+    ['gx', 'pokemon-gx', 'ex', 'pokemon-ex'].includes(normalizeTcgBattleAbilityText(subtype)),
+  )
+  for (const text of normalizedAbilities) {
+    if (text === "if this pokemon is your active pokemon, it can use the attacks of your opponent's active pokemon. (you still need the necessary energy to use each attack.)" &&
+      side.front.some((active) => active.instanceId === card.instanceId)) {
+      const defendingPokemon = (sideKey === 'player' ? state.opponent : state.player).front.find((pokemon) => pokemon.currentHp > 0)
+      if (defendingPokemon) copiedSources.add(defendingPokemon)
+    }
+    if (text === "as long as ditto is your active pokemon, its maximum hp is the same as your opponent's active pokemon. ditto can use the attacks of that pokemon as its own. (you still need the necessary energy to use each attack.) if that pokemon is no longer your opponent's active pokemon, choose 1 of your opponent's active pokemon for ditto to copy." &&
+      side.front.some((active) => active.instanceId === card.instanceId)) {
+      const defendingPokemon = (sideKey === 'player' ? state.opponent : state.player).front.find((pokemon) => pokemon.currentHp > 0)
+      if (defendingPokemon) copiedSources.add(defendingPokemon)
+    }
+    if (text === "if ditto is your active pokemon, treat it as if it were the same card as the defending pokemon, including type, hit points, weakness, and so on, except ditto can't evolve, always has this pokemon power, and you may treat any energy attached to ditto as energy of any type. ditto isn't a copy of any other pokemon while ditto is asleep, confused, or paralyzed." &&
+      side.front.some((active) => active.instanceId === card.instanceId) &&
+      !card.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) {
+      const defendingPokemon = (sideKey === 'player' ? state.opponent : state.player).front.find((pokemon) => pokemon.currentHp > 0)
+      if (defendingPokemon) copiedSources.add(defendingPokemon)
+    }
+    if (text === "as long as sudowoodo is your active pokemon, it copies all of the defending pokemon's attacks, including their costs. this power can't be used if sudowoodo is asleep, confused, or paralyzed." &&
+      side.front.some((active) => active.instanceId === card.instanceId) &&
+      !card.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) {
+      const defendingPokemon = (sideKey === 'player' ? state.opponent : state.player).front.find((pokemon) => pokemon.currentHp > 0)
+      if (defendingPokemon) copiedSources.add(defendingPokemon)
+    }
+    if (text === "sabrina's alakazam always has a copy of every attack your psychic pokemon in play have (including their energy costs and anything else required in order to use those attacks, such as discarding energy cards). this power can't be used if sabrina's alakazam is asleep, confused, or paralyzed.") {
+      if (card.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) continue
+      ;[...side.front, ...side.back]
+        .filter((pokemon) => pokemon.currentHp > 0 && pokemon.types.some((type) => normalizeTcgBattleAbilityText(type) === 'psychic'))
+        .forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (/^this pokemon can use the attacks of any pokemon-gx or pokemon-ex on your bench or in your discard pile\./.test(text)) {
+      side.back.filter(isGxOrEx).forEach((pokemon) => copiedSources.add(pokemon))
+      side.discard.filter(isGxOrEx).forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (/^this pokemon can use the attacks of any basic pokemon in your discard pile/.test(text)) {
+      side.discard.filter((pokemon) => pokemon.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic') && (!/except for pokemon with a rule box/.test(text) || !hasRuleBox(pokemon))).forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (/^this pokemon can use the attacks of any of your basic pokemon in play\./.test(text)) {
+      ;[...side.front, ...side.back].filter((pokemon) => pokemon.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'basic')).forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (/^this pokemon can use the attacks of any of your benched pokemon\./.test(text)) side.back.forEach((pokemon) => copiedSources.add(pokemon))
+    if (/^this pokemon can use the attacks of any pokemon in play \(both yours and your opponent's\)\./.test(text)) {
+      ;[...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back].forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (text === "espeon can use the attacks of all pokemon you have in play that evolve from eevee as its own. (you still need the necessary energy to use each attack.)") {
+      ;[...side.front, ...side.back]
+        .filter((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) !== 'eevee' && (
+          normalizeTcgBattleAbilityText(pokemon.evolvesFrom || '') === 'eevee' ||
+          (pokemon.evolutionStack || []).some((stage) => normalizeTcgBattleAbilityText(stage.name) === 'eevee')
+        ))
+        .forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (text === "mew ex can use the attacks of all pokemon in play as its own. (you still need the necessary energy to use each attack.)") {
+      ;[...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back]
+        .filter((pokemon) => pokemon.currentHp > 0)
+        .forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (text === 'bellossom can use the attacks of all oddish, gloom, vileplume, vileplume ex, or other bellossom you have in play as its own. (you still need the necessary energy to use each attack.)') {
+      const sourceNames = new Set(['oddish', 'gloom', 'vileplume', 'vileplume ex', 'bellossom'])
+      ;[...side.front, ...side.back]
+        .filter((pokemon) => pokemon.currentHp > 0 && sourceNames.has(normalizeTcgBattleAbilityText(pokemon.name)))
+        .forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (text === "unown l can use any attack from any unown in play (both yours and your opponent's). (you still have to pay for that attack's energy cost.)") {
+      ;[...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back]
+        .filter((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattlePokemonName(pokemon.name).startsWith('unown'))
+        .forEach((pokemon) => copiedSources.add(pokemon))
+    }
+    if (text === "mew can use the attacks of all pokemon in the lost zone (both yours and your opponent's). (you still need the necessary energy to use each attack.)" &&
+      [...side.front, ...side.back].some((pokemon) => pokemon.instanceId === card.instanceId)) {
+      lostZoneCopiedAttacks.push(...(state.player.lostZone || []).flatMap((pokemon) => pokemon.attacks || []))
+      lostZoneCopiedAttacks.push(...(state.opponent.lostZone || []).flatMap((pokemon) => pokemon.attacks || []))
+    }
+  }
+
+  const copiedAttacks = [...copiedSources]
+    .filter((source) => source.instanceId !== card.instanceId)
+    .flatMap((source) => source.attacks)
+    .concat(lostZoneCopiedAttacks)
+  const honchkrowEnergyCopyText = "as long as honchkrow has the energy necessary to use its attack, each of your murkrow can use honchkrow's attack as its own without the necessary energy to use that attack."
+  const honchkrowCopiedAttacks = normalizeTcgBattlePokemonName(card.name) === 'murkrow'
+    ? [...side.front, ...side.back].filter((source) => source.currentHp > 0 && normalizeTcgBattlePokemonName(source.name) === 'honchkrow' && !isTcgBattleAbilitySuppressed(source, [state.player, state.opponent]) &&
+      (source.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === honchkrowEnergyCopyText),
+    ).flatMap((source) => source.attacks.flatMap((attack) => {
+      const selectedEnergy = normalizeTcgBattleEnergyType(side.selectedEnergy || '')
+      const requiredTypes = (attack.cost || []).map(normalizeTcgBattleEnergyType).filter((type) => type !== 'Colorless')
+      const cost = getEffectiveTcgBattleAttackCost(state, attack, source, sideKey)
+      if (side.energy < cost || requiredTypes.some((type) => type !== selectedEnergy)) return []
+      return [{ ...attack, cost: [], convertedEnergyCost: 0 }]
+    }))
+    : []
+  const seen = new Set(attacks.map((attack) => `${attack.name}|${attack.damage}|${attack.text}|${attack.cost.join(',')}`))
+  for (const attack of [...copiedAttacks, ...honchkrowCopiedAttacks]) {
+    const key = `${attack.name}|${attack.damage}|${attack.text}|${attack.cost.join(',')}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    attacks.push(attack)
+  }
+  return attacks
+}
+
+export function isTcgBattleStatusBlockedByAbility(
+  card: TcgBattleCardState,
+  status: TcgBattleStatusCondition,
+  attacker?: TcgBattleCardState,
+  state?: TcgBattleState,
+  sideKey?: TcgBattleSide,
+  abilityTextFilter?: RegExp,
+): boolean {
+  const statusWord = status === 'asleep' ? 'asleep' : status === 'paralyzed' ? 'paralyzed' : status
+  if (state && sideKey && clearTcgBattleMetalSymbolConditions(state[sideKey], state[sideKey === 'player' ? 'opponent' : 'player']) &&
+    card.types.some((type) => normalizeTcgBattleAbilityText(type) === 'metal')) return true
+  const cardAbilities = state && isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]) ? [] : card.abilities || []
+  const selfBlocked = cardAbilities.some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text)
+    if (abilityTextFilter && !abilityTextFilter.test(text)) return false
+    if (!isTcgBattleAbilityEnabled(text, card, true)) return false
+    const attachedEnergy = text.match(/(?:this pokemon|each of your pokemon(?: that)?|your pokemon(?: that)?) has any (?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless)) energy attached/)
+    if (attachedEnergy) {
+      const symbolType: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+      const requiredType = attachedEnergy[1] ? symbolType[attachedEnergy[1]] : attachedEnergy[2]
+      if (!state || !sideKey || state[sideKey].energy < 1 || state[sideKey].selectedEnergy?.toLowerCase() !== requiredType) return false
+    }
+    if (/prevent all effects of attacks, including damage, done to (?:this pokemon|[a-z' -]+) by pokemon-ex/.test(text) &&
+      attacker?.subtypes.some((subtype) => subtype.toLowerCase() === 'ex')) return true
+    if (/can't be affected by any special conditions|cannot be affected by any special conditions|can't become affected by a special condition/.test(text)) return true
+    if (/can't be asleep or paralyzed/.test(text) && (status === 'asleep' || status === 'paralyzed')) return true
+    return new RegExp(`(?:can't|cannot) become ${statusWord}|(?:can't|cannot) be ${statusWord}|no ${statusWord}`).test(text)
+  })
+  if (selfBlocked || !state || !sideKey) return selfBlocked
+
+  const targetTypes = card.types.map(normalizeTcgBattleAbilityText)
+  const targetSubtypes = card.subtypes.map(normalizeTcgBattleAbilityText)
+  const statusWords = status === 'asleep' ? ['asleep'] : status === 'paralyzed' ? ['paralyzed'] : [status]
+  const board = [...state[sideKey].front, ...state[sideKey].back].filter((pokemon) => pokemon.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(pokemon, [state.player, state.opponent]))
+  return board.some((provider) => {
+    const providerIsActive = state[sideKey].front.some((pokemon) => pokemon.instanceId === provider.instanceId)
+    return (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      if (abilityTextFilter && !abilityTextFilter.test(text)) return false
+      if (/stadium|pokemon tool|prize cards?|during your next turn/.test(text)) return false
+      const attachedEnergy = text.match(/(?:this pokemon|each of your pokemon(?: that)?|your pokemon(?: that)?) has any (?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless)) energy attached/)
+      if (attachedEnergy) {
+        const symbolType: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+        const requiredType = attachedEnergy[1] ? symbolType[attachedEnergy[1]] : attachedEnergy[2]
+        if (state[sideKey].energy < 1 || state[sideKey].selectedEnergy?.toLowerCase() !== requiredType) return false
+      }
+      if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) return false
+      const teamScope = text.match(/(?:each of your|all of your|your) (?:basic |stage [12] |grass |water |fire |lightning |psychic |fighting |metal |darkness |dragon |fairy |colorless |\{[grwlpmdycf]\} )?pokemon/)
+      if (!teamScope) return false
+      const hasStatusImmunity = /can't be affected by any special conditions|cannot be affected by any special conditions|can't be affected by special conditions/.test(text)
+      const hasStatusSpecificImmunity = statusWords.some((word) => new RegExp(`(?:can't|cannot) (?:become|be) ${word}|no ${word}`).test(text))
+      if (!hasStatusImmunity && !hasStatusSpecificImmunity) return false
+      const group = teamScope[0]
+      if (/\bbasic pokemon/.test(group) && !targetSubtypes.includes('basic')) return false
+      if (/\bstage 1 pokemon/.test(group) && !targetSubtypes.includes('stage 1')) return false
+      if (/\bstage 2 pokemon/.test(group) && !targetSubtypes.includes('stage 2')) return false
+      for (const type of ['grass', 'water', 'fire', 'lightning', 'psychic', 'fighting', 'metal', 'darkness', 'dragon', 'fairy', 'colorless']) {
+        if (new RegExp(`\\b${type} pokemon`).test(group) && !targetTypes.includes(type)) return false
+      }
+      const energySymbol = group.match(/\{([grwlpmdycf])\}/)?.[1]
+      const symbolType: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+      if (energySymbol && !targetTypes.includes(symbolType[energySymbol])) return false
+      return true
+    })
+  })
+}
+
+function clearTcgBattleMetalSymbolConditions(side: TcgBattleSideState, opposingSide: TcgBattleSideState): boolean {
+  if (side.energy <= 0 || side.selectedEnergy?.toLowerCase() !== 'metal') return false
+  const board = [...side.front, ...side.back].filter((pokemon) => pokemon.currentHp > 0)
+  const hasMetalSymbol = board.some((provider) =>
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, [side, opposingSide]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "each of your pokemon that has any metal energy attached to it can't be affected by any special conditions. remove any special conditions affecting those pokemon."),
+  )
+  if (!hasMetalSymbol) return false
+  for (const pokemon of board) {
+    if (pokemon.types.some((type) => normalizeTcgBattleAbilityText(type) === 'metal')) pokemon.statusConditions = undefined
+  }
+  return true
 }
 
 export function getTcgBattleWinner(state: TcgBattleState): TcgBattleSide | 'tie' | null {
+  const playerReachedKnockoutLimit = (state.player.knockoutCount || 0) >= 6
+  const opponentReachedKnockoutLimit = (state.opponent.knockoutCount || 0) >= 6
+  if (playerReachedKnockoutLimit && opponentReachedKnockoutLimit) return 'tie'
+  if (playerReachedKnockoutLimit) return 'opponent'
+  if (opponentReachedKnockoutLimit) return 'player'
+
   const playerLiving = getLivingTcgBattleCards(state.player).length
   const opponentLiving = getLivingTcgBattleCards(state.opponent).length
   if (playerLiving === 0 && opponentLiving === 0) return 'tie'
@@ -25846,16 +28936,628 @@ export function getLivingTcgBattleCards(side: TcgBattleSideState): TcgBattleCard
   return [...side.front, ...side.back].filter((card) => card.currentHp > 0)
 }
 
+export function hasTcgBattleEternatusBenchExpansion(side: TcgBattleSideState): boolean {
+  const living = [...side.front, ...side.back].filter((card) => card.currentHp > 0)
+  if (!living.length || living.some((card) => !card.types.some((type) => type.toLowerCase() === 'darkness'))) return false
+  return living.some((card) => (card.abilities || []).some((ability) =>
+    /^if all of your pokemon in play are darkness type, you can have up to 8 pokemon on your bench, and you can't put non-darkness pokemon into play\./.test(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()),
+  ))
+}
+
+export function canTcgBattleUseElectricStart(card: Pick<TcgBattleCardSummary, 'name' | 'abilities'>, goesSecond?: boolean): boolean {
+  return goesSecond === true && normalizeTcgBattleCardName(card.name) === 'manectric' && (card.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'if you go second, and if this pokemon is in your hand when you are setting up to play, you may put it face down as your active pokemon or on your bench.',
+  )
+}
+
+export function canTcgBattlePutPokemonOnBench(side: TcgBattleSideState, card: Pick<TcgBattleCardSummary, 'types'>): boolean {
+  return !hasTcgBattleEternatusBenchExpansion(side) || card.types.some((type) => type.toLowerCase() === 'darkness')
+}
+
 export function getOpenTcgBattleBenchSlots(side: TcgBattleSideState): number {
+  if (side.front.filter((card) => card.currentHp > 0).length < 3) return 0
   const livingBench = side.back.filter((card) => card.currentHp > 0).length
   const livingPokemon = getLivingTcgBattleCards(side).length
-  return Math.max(0, Math.min(3 - livingBench, 6 - livingPokemon))
+  const benchLimit = hasTcgBattleEternatusBenchExpansion(side) ? 8 : 3
+  const playLimit = hasTcgBattleEternatusBenchExpansion(side) ? 9 : 6
+  return Math.max(0, Math.min(benchLimit - livingBench, playLimit - livingPokemon))
+}
+
+export function hasTcgBattleRecentRuleBoxKnockout(state: TcgBattleState, sideKey: TcgBattleSide): boolean {
+  const knockout = state.lastOpponentAttackKnockout?.[sideKey]
+  return Boolean(knockout?.knockedOut && knockout.knockedOutRuleBox && knockout.turnNumber === state.turnNumber)
 }
 
 export interface TcgBattleEvolutionOption {
   targetId: string
   targetName: string
   card: TcgBattleCardSummary
+  effect?: 'pichuHeal' | 'eeveeHeal' | 'babyHeal' | 'azumarillFroth' | 'meganiumStage2' | 'dittoPrismStage1' | 'phantumpDamageEvolve'
+  abilityIndex?: number
+  abilityName?: string
+  abilitySourceId?: string
+}
+
+export function getTcgBattleEvolutionDamageEffect(card: TcgBattleCardSummary): { amount: number; targetCount: number; counters: boolean; applyWeaknessResistance: boolean; activeAmount?: number; benchAmount?: number; allOpposing?: boolean; coinSpreadCount?: number; targetRule?: 'pokemonExOrGx' } | null {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text)
+    if (normalizeTcgBattlePokemonName(card.name).replace(/[^a-z0-9]/g, '') === 'garchomplvx' && text === "once during your turn (before your attack), when you put garchomp lv.x from your hand onto your active garchomp, you may flip 3 coins. for each heads, put 1 damage counter on each of your opponent's benched pokemon.") {
+      return { amount: 10, targetCount: 0, counters: true, applyWeaknessResistance: false, allOpposing: true, coinSpreadCount: 3 }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'malakazamex' && text === "when you play m alakazam-ex from your hand to evolve this pokemon, before it evolves, you may put 2 damage counters on your opponent's active pokemon and 3 damage counters on 1 of your opponent's benched pokemon.") {
+      return { amount: 20, targetCount: 2, counters: true, applyWeaknessResistance: false, activeAmount: 20, benchAmount: 30 }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'dark crobat' && text === "when you play dark crobat from your hand, you may choose 1 of your opponent's pokemon. this power does 20 damage do that pokemon. (don't apply weakness and resistance.)") {
+      return { amount: 20, targetCount: 1, counters: false, applyWeaknessResistance: false }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'forretress' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon, you may put 1 damage counter on each of your opponent\'s pokemon.') {
+      return { amount: 10, targetCount: 0, counters: true, applyWeaknessResistance: false, allOpposing: true }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'jolteon ex' && text === "once during your turn, when you play jolteon ex from your hand to evolve 1 of your pokemon, you may put 1 damage counter on each of your opponent's pokemon.") {
+      return { amount: 10, targetCount: 0, counters: true, applyWeaknessResistance: false, allOpposing: true }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'gengar' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put 6 damage counters on your opponent\'s pokemon-gx and pokemon-ex in any way you like.') {
+      return { amount: 60, targetCount: 1, counters: true, applyWeaknessResistance: false, targetRule: 'pokemonExOrGx' }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'galladee4lvx' && (text === "once during your turn, when you put gallade e4 lv.x from your hand onto your active gallade e4, you may put 1 damage counter on each of your opponent's pokemon." || text === "once during your turn (before your attack), when you put gallade e4 lv.x from your hand onto your active gallade e4, you may put 1 damage counter on each of your opponent's pokemon.")) {
+      return { amount: 10, targetCount: 0, counters: true, applyWeaknessResistance: false, allOpposing: true }
+    }
+    const match = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put (\d+) damage counters? on 1 of your opponent's pokemon\.?$/)
+    if (match) return { amount: Number(match[1]) * 10, targetCount: 1, counters: true, applyWeaknessResistance: false }
+    const multiTargetMatch = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may choose (\d+) of your opponent's pokemon and put (\d+) damage counters? on each of them\.?$/)
+    if (multiTargetMatch) return { amount: Number(multiTargetMatch[2]) * 10, targetCount: Number(multiTargetMatch[1]), counters: true, applyWeaknessResistance: false }
+    const directDamage = text.match(/^when you play (.+?) from your hand, you may choose 1 of your opponent's pokemon\. if you do, (.+?) does (\d+) damage to that pokemon\. apply weakness and resistance\.$/)
+    const normalizeName = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '')
+    if (directDamage && normalizeName(directDamage[1]) === normalizeName(card.name) && normalizeName(directDamage[2]) === normalizeName(card.name)) {
+      return { amount: Number(directDamage[3]), targetCount: 1, counters: false, applyWeaknessResistance: true }
+    }
+  }
+  return null
+}
+
+export function getTcgBattleEvolutionStatusEffect(card: TcgBattleCardSummary): { statuses: TcgBattleStatusCondition[]; abilityName: string; bothActive?: boolean; mandatory?: boolean; coinFlip?: boolean; poisonBonus?: number; chooseDefending?: boolean } | null {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (normalizeTcgBattlePokemonName(card.name) === 'gliscorlvx' && text === "once during your turn (before your attack), when you put gliscor lv.x from your hand onto your active gliscor, you may choose 1 of the defending pokemon. that pokemon is now paralyzed and poisoned.") {
+      return { statuses: ['paralyzed', 'poisoned'], abilityName: ability.name }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'magmortar' && text === "once during your turn, when you play magmortar from your hand to evolve 1 of your pokemon, you may use this power. your opponent's active pokemon is now burned and confused.") {
+      return { statuses: ['burned', 'confused'], abilityName: ability.name }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'ivysaur' && text === "once during your turn, when you play ivysaur from your hand to evolve 1 of your pokemon, you may use this power. your opponent's active pokemon is now asleep.") {
+      return { statuses: ['asleep'], abilityName: ability.name }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'haunter' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon, you may leave both active pokemon confused.') {
+      return { statuses: ['confused'], abilityName: ability.name, bothActive: true }
+    }
+    const bothActiveStatus = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may make both active pokemon ((?:asleep|burned|confused|paralyzed|poisoned)(?: and (?:asleep|burned|confused|paralyzed|poisoned))*)\.$/)
+    if (bothActiveStatus || normalizeTcgBattlePokemonName(card.name) === 'haunter' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may leave both active pokemon confused.') {
+      const statusText = bothActiveStatus?.[1] || 'confused'
+      const statuses = statusText.match(/asleep|burned|confused|paralyzed|poisoned/g) as TcgBattleStatusCondition[]
+      return { statuses, abilityName: ability.name, bothActive: true }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'brambleghast' && text === "once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability. make your opponent's active pokemon confused.") {
+      return { statuses: ['confused'], abilityName: ability.name }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'flareon ex' && text === "once during your turn, when you play flareon ex from your hand to evolve 1 of your pokemon, you may choose 1 of the defending pokemon. that pokemon is now burned and confused.") {
+      return { statuses: ['burned', 'confused'], abilityName: ability.name }
+    }
+    if (/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may flip a coin\. if heads, your opponent's active pokemon is now (?:asleep|burned|confused|paralyzed|poisoned)\.$/.test(text)) {
+      const status = text.match(/your opponent's active pokemon is now (asleep|burned|confused|paralyzed|poisoned)\.$/)?.[1] as TcgBattleStatusCondition | undefined
+      if (status) return { statuses: [status], abilityName: ability.name, coinFlip: true }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'beedrill' && text === 'when you play beedrill from your hand to evolve your active pokemon, the defending pokemon is now paralyzed and poisoned.') {
+      return { statuses: ['paralyzed', 'poisoned'], abilityName: ability.name, mandatory: true }
+    }
+    const opponentActiveStatus = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may leave your opponent's active pokemon (?:now )?((?:asleep|burned|confused|paralyzed|poisoned)(?: and (?:asleep|burned|confused|paralyzed|poisoned))*)\.$/)
+    if (opponentActiveStatus) {
+      const statuses = opponentActiveStatus[1].match(/asleep|burned|confused|paralyzed|poisoned/g) as TcgBattleStatusCondition[]
+      return { statuses, abilityName: ability.name }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'dustox' && text === "when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may leave your opponent's active pokemon paralyzed and poisoned. if you do, put 3 damage counters instead of 1 on that pokemon between turns.") {
+      return { statuses: ['paralyzed', 'poisoned'], abilityName: ability.name, poisonBonus: 20 }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'crobat' && text === 'once during your turn, when you play crobat from your hand to evolve 1 of your pokemon, you may choose 1 of the defending pokemon. that pokemon is now poisoned. put 2 damage counters instead of 1 on that pokemon between turns.') {
+      return { statuses: ['poisoned'], abilityName: ability.name, poisonBonus: 10, chooseDefending: true }
+    }
+    const evolutionStatus = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may (?:make|leave) your opponent's active pokemon ((?:asleep|burned|confused|paralyzed|poisoned)(?: and (?:asleep|burned|confused|paralyzed|poisoned))*)\.$/)
+    if (evolutionStatus) {
+      const statuses = evolutionStatus[1].match(/asleep|burned|confused|paralyzed|poisoned/g) as TcgBattleStatusCondition[]
+      return { statuses, abilityName: ability.name }
+    }
+    const multiStatus = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may make your opponent's active pokemon ((?:asleep|burned|confused|paralyzed|poisoned)(?:(?:, |, and | and )(?:asleep|burned|confused|paralyzed|poisoned))*)\.$/)
+    if (multiStatus) {
+      const statuses = multiStatus[1].match(/asleep|burned|confused|paralyzed|poisoned/g) as TcgBattleStatusCondition[]
+      return { statuses, abilityName: ability.name }
+    }
+    const defendingPokemonStatus = text.match(/^when you play ([a-z0-9 '’-]+) from your hand to evolve your active pokemon, the defending pokemon is now ((?:asleep|burned|confused|paralyzed|poisoned)(?: and (?:asleep|burned|confused|paralyzed|poisoned))*)\.$/)
+    if (defendingPokemonStatus && normalizeTcgBattlePokemonName(defendingPokemonStatus[1]) === normalizeTcgBattlePokemonName(card.name)) {
+      const statuses = defendingPokemonStatus[2].match(/asleep|burned|confused|paralyzed|poisoned/g) as TcgBattleStatusCondition[]
+      return { statuses, abilityName: ability.name }
+    }
+  }
+  return null
+}
+
+export function getTcgBattleEvolutionAttackProtectionEffect(card: TcgBattleCardSummary): { abilityName: string; activeOnly?: boolean } | null {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may prevent all effects of your opponent's attacks, including damage, done to this pokemon until the end of your opponent's next turn\.$/.test(text) ||
+      /^when you play this pokemon from your hand to evolve 1 of your pokemon, you may prevent all effects of attacks, including damage, done to this pokemon by your opponent's pokemon during your opponent's next turn\.$/.test(text) ||
+      /^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may prevent all damage from and effects of attacks from your opponent's pokemon done to this pokemon until the end of your opponent's next turn\.$/.test(text)) {
+      return { abilityName: ability.name }
+    }
+    if (normalizeTcgBattlePokemonName(card.name) === 'lucariolvx' &&
+      text === "once during your turn (before your attack), when you put lucario lv. x from your hand onto your active lucario, you may use this power. prevent all effects of an attack, including damage, done to lucario during your opponent's next turn. (if lucario is no longer your active pokemon, this effect ends).") {
+      return { abilityName: ability.name, activeOnly: true }
+    }
+  }
+  return null
+}
+
+export function getTcgBattleEvolutionDevolutionEffect(card: TcgBattleCardSummary): { abilityName: string } | null {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may devolve each of your opponent's evolved pokemon by putting the highest stage evolution card on it into your opponent's hand\.$/.test(text)) {
+      return { abilityName: ability.name }
+    }
+  }
+  return null
+}
+
+export function getTcgBattleEvolutionShuffleEffect(card: TcgBattleCardSummary): { abilityName: string } | null {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (normalizeTcgBattlePokemonName(card.name) === 'shiftry' && text === "when you play this pokemon from your hand to evolve 1 of your pokemon, you may flip a coin. if heads, choose 1 of your opponent's pokemon. your opponent shuffles that pokemon and all cards attached to it into his or her deck.") return { abilityName: ability.name }
+  }
+  return null
+}
+
+export function getTcgBattleEvolutionDiscardEffect(card: TcgBattleCardSummary): { abilityName: string } | null {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (normalizeTcgBattlePokemonName(card.name) === 'walrein' && text === "once during your turn, when you play walrein from your hand to evolve 1 of your pokemon, you may flip 2 coins. if both are heads, discard 1 of the defending pokemon and all cards attached to it. (this doesn't count as a knocked out pokemon.)") return { abilityName: ability.name }
+  }
+  return null
+}
+
+export function getTcgBattleEvolutionDamageCounters(card: TcgBattleCardSummary): number {
+  const effect = getTcgBattleEvolutionDamageEffect(card)
+  return effect?.counters ? effect.amount / 10 : 0
+}
+
+export function getTcgBattleEvolutionDamageTargetCount(card: TcgBattleCardSummary): number {
+  const effect = getTcgBattleEvolutionDamageEffect(card)
+  if (effect) return effect.targetCount
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text)
+    const multiTargetMatch = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may choose (\d+) of your opponent's pokemon and put \d+ damage counters? on each of them\.?$/)
+    if (multiTargetMatch) return Number(multiTargetMatch[1])
+    if (/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put \d+ damage counters? on 1 of your opponent's pokemon\.?$/.test(text)) return 1
+  }
+  return 0
+}
+
+export function getTcgBattleEvolutionDrawCount(card: TcgBattleCardSummary): number {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text)
+    if (normalizeTcgBattlePokemonName(card.name) === 'vaporeonex' && text.replace(/\s+/g, ' ').trim() === 'once during your turn, when you play vaporeon ex from your hand to evolve 1 of your pokemon, you may have your opponent shuffle his or her hand into his or her deck. then, your opponent draws up to 4 cards.') return 4
+    if (normalizeTcgBattlePokemonName(card.name) === 'thievul' && text.replace(/\s+/g, ' ').trim() === "when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may have each player shuffle their hand and put it on the bottom of their deck. if either player put any cards on the bottom of their deck in this way, each player draws 4 cards.") return 4
+    if (normalizeTcgBattlePokemonName(card.name) === 'alcremie' && text.replace(/\s+/g, ' ').trim() === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may have each player draw a card.') return 1
+    const match = text.match(/^(?:once during your turn, )?when you play this pokemon from your hand to evolve 1 of your pokemon, you may draw (\d+) cards?\.?$/)
+    if (match) return Number(match[1])
+    const useAbilityMatch = text.match(/^once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability\. draw (\d+) cards?\.?$/)
+    if (useAbilityMatch) return Number(useAbilityMatch[1])
+  }
+  return 0
+}
+
+export function getTcgBattleEvolutionAttackBoost(card: TcgBattleCardSummary): { subtype: string; damageBonus: number; targetActiveOnly: boolean } | null {
+  if (normalizeTcgBattlePokemonName(card.name) !== 'ludicolo') return null
+  const supportedText = "when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may use this ability. during this turn, your basic pokemon's attacks do 100 more damage to your opponent's active pokemon (before applying weakness and resistance)."
+  return (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === supportedText)
+    ? { subtype: 'Basic', damageBonus: 100, targetActiveOnly: true }
+    : null
+}
+
+export function getTcgBattleEvolutionDiscardRecoveryCount(card: TcgBattleCardSummary): number {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (normalizeTcgBattlePokemonName(card.name) === 'milotic' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon, you may put a card from your discard pile into your hand.') return 1
+    const match = text.match(/^when you play (?:this pokemon|dark slowbro) from your hand, choose up to (\d+) basic pokemon and\/or evolution cards from your discard pile and put them into your hand\.$/)
+    if (match) return Number(match[1])
+  }
+  return 0
+}
+
+export function getTcgBattleEvolutionBenchSearchCount(card: TcgBattleCardSummary): number {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (normalizeTcgBattlePokemonName(card.name) === 'banette' && text === "when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put a basic pokemon from your opponent's discard pile onto their bench.") return 1
+    if (normalizeTcgBattlePokemonName(card.name) === 'silcoon' && text === 'once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability. search your deck for a silcoon or a cascoon and put it onto your bench. then, shuffle your deck.') return 1
+    if (normalizeTcgBattlePokemonName(card.name) === 'ninjask' && (text === 'once during your turn, when you play ninjask from your hand to evolve 1 of your pokemon, you may search your deck for shedinja and put it onto your bench. treat the new benched pokemon as a basic pokemon. shuffle your deck afterward.' || text === 'when you play this pokemon from your hand to evolve 1 of your pokemon, you may search your deck for shedinja and put it onto your bench. shuffle your deck afterward.')) return 1
+    if (normalizeTcgBattlePokemonName(card.name) === 'ninjask' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may search your deck for a shedinja and put it onto your bench. then, shuffle your deck.') return 1
+    if (normalizeTcgBattlePokemonName(card.name) === 'ninjask' && text === "once during your turn, when you play ninjask from your hand to evolve 1 of your pokemon and if your bench isn't full, you may put shedinja onto your bench as a basic pokemon from your hand or your discard pile.") return 1
+    if (normalizeTcgBattlePokemonName(card.name) === 'ninjask' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put a shedinja from your discard pile onto your bench.') return 1
+    const match = text.match(/^when you play (.+?) from your hand, search your deck for up to (\d+) basic pokemon and put them onto your bench\. shuffle your deck afterward\.$/)
+    const normalizeName = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '')
+    if (match && normalizeName(match[1]) === normalizeName(card.name)) return Number(match[2])
+  }
+  return 0
+}
+
+export function hasTcgBattleEvolutionOpponentDiscardBenchSearch(card: TcgBattleCardSummary): boolean {
+  return normalizeTcgBattlePokemonName(card.name) === 'banette' && (card.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put a basic pokemon from your opponent's discard pile onto their bench.",
+  )
+}
+
+export function getTcgBattleEvolutionNamedBenchSearchNames(card: TcgBattleCardSummary): string[] {
+  const name = normalizeTcgBattlePokemonName(card.name)
+  const texts = (card.abilities || []).map((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim())
+  if (name === 'silcoon' && texts.includes('once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability. search your deck for a silcoon or a cascoon and put it onto your bench. then, shuffle your deck.')) return ['silcoon', 'cascoon']
+  return []
+}
+
+export function hasTcgBattleEvolutionShedinjaSearch(card: TcgBattleCardSummary): boolean {
+  return normalizeTcgBattlePokemonName(card.name) === 'ninjask' && (card.abilities || []).some((ability) =>
+    ['once during your turn, when you play ninjask from your hand to evolve 1 of your pokemon, you may search your deck for shedinja and put it onto your bench. treat the new benched pokemon as a basic pokemon. shuffle your deck afterward.', 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may search your deck for shedinja and put it onto your bench. shuffle your deck afterward.', 'when you play this pokemon from your hand to evolve 1 of your pokemon, you may search your deck for shedinja and put it onto your bench. shuffle your deck afterward.', 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may search your deck for a shedinja and put it onto your bench. then, shuffle your deck.', "once during your turn, when you play ninjask from your hand to evolve 1 of your pokemon and if your bench isn't full, you may put shedinja onto your bench as a basic pokemon from your hand or your discard pile.", 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put a shedinja from your discard pile onto your bench.', 'once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability. search your deck for a shedinja and put it onto your bench. then, shuffle your deck.'].includes(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()),
+  )
+}
+
+export function hasTcgBattleEvolutionShedinjaDiscardSearch(card: TcgBattleCardSummary): boolean {
+  return normalizeTcgBattlePokemonName(card.name) === 'ninjask' && (card.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put a shedinja from your discard pile onto your bench.',
+  )
+}
+
+export function hasTcgBattleEvolutionShedinjaHandDiscard(card: TcgBattleCardSummary): boolean {
+  return normalizeTcgBattlePokemonName(card.name) === 'ninjask' && (card.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "once during your turn, when you play ninjask from your hand to evolve 1 of your pokemon and if your bench isn't full, you may put shedinja onto your bench as a basic pokemon from your hand or your discard pile.",
+  )
+}
+
+export function hasTcgBattleEvolutionFullHealEffect(card: TcgBattleCardSummary): boolean {
+  return (card.abilities || []).some((ability) => /^(?:[^:]+:\s*)?when 1 of your pokemon becomes this pokemon, heal all damage from it\.$/.test(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()))
+}
+
+export function hasTcgBattleEvolutionTargetedFullHealEffect(card: TcgBattleCardSummary): boolean {
+  return (card.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    return text === 'when you play this pokemon from your hand to evolve 1 of your pokemon, you may heal all damage from 1 of your pokemon.' ||
+      /^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may heal all damage from 1 of your pokemon\.$/.test(text) ||
+      text === 'once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability. heal all damage from 1 of your pokemon.' ||
+      text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may heal all damage from your active {g} pokemon. if you healed any damage in this way, discard all energy from that pokemon.' ||
+      text === 'once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may heal 60 damage from 1 of your {w} pokemon.'
+  })
+}
+
+export function hasTcgBattleEvolutionMassHealEffect(card: TcgBattleCardSummary): boolean {
+  const cardName = normalizeTcgBattlePokemonName(card.name)
+  return (cardName === 'milotic' || cardName === 'garchompclvx' || cardName === 'dachsbunex' || cardName === 'blissey' || cardName === 'blissey ex') && (card.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').replace(/\s+([.,])/g, '$1').trim()
+    return cardName === 'dachsbunex'
+      ? text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may heal all damage from each of your evolution pokemon. if you healed any damage in this way, discard all energy from those pokemon.'
+      : cardName === 'blissey ex'
+      ? text === 'once during your turn, when you play blissey ex from your hand to evolve 1 of your pokemon, you may discard all energy cards attached to any number of your pokemon and remove all damage counters from those pokemon.'
+      : cardName === 'blissey'
+      ? text === 'once during your turn, when you play blissey from your hand to evolve 1 of your pokemon, you may remove all damage counters from all of your pokemon. if you do, discard all energy attached to those pokemon that had any damage counters on them.'
+      : cardName === 'milotic'
+      ? text === "once during your turn, when you play milotic from your hand to evolve 1 of your pokemon, you may remove all damage counters from all of your pokemon and your opponent's pokemon (excluding pokemon-ex)."
+      : text === 'once during your turn (before your attack), when you put garchomp c lv.x from your hand onto your active garchomp c, you may remove all damage counters from each of your pokemon sp.' || text === 'once during your turn (before your attack), when you put garchomp lv.x from your hand onto your active garchomp, you may remove all damage counters from each of your pokemon sp.'
+  })
+}
+
+export function getTcgBattleEvolutionEnergyEffect(card: TcgBattleCardSummary): { count: number; energyType: string; coinFlip?: boolean; discardOpponentActive?: boolean; discardPile?: boolean; coinFlipDiscard?: boolean; searchDeck?: boolean; topDeckCount?: number; topDeckBasicEnergy?: boolean } | null {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (text === 'when you play typhlosion from your hand, you may flip a coin. if heads, search your deck for up to 4 fire energy cards and attach them to typhlosion. shuffle your deck afterward.') return { count: 4, energyType: 'r', coinFlip: true, searchDeck: true }
+    if (text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may attach a water energy card from your discard pile to 1 of your pokemon.') return { count: 1, energyType: 'w', discardPile: true }
+    if (normalizeTcgBattlePokemonName(card.name) === 'abomasnow' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may attach a grass energy card from your discard pile to 1 of your pokemon.') return { count: 1, energyType: 'g', discardPile: true }
+    if (text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may attach up to 2 basic {m} energy cards from your discard pile to your {m} pokemon in any way you like.') return { count: 2, energyType: 'y', discardPile: true }
+    if (/^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may discard an energy attached to your opponent's active pokemon(?:\. if this pokemon is your active pokemon and is knocked out by damage from an opponent's attack, you may discard an energy from your opponent's active pokemon)?\.$/.test(text)) return { count: 1, energyType: '', discardOpponentActive: true }
+    if (text === "once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability. flip a coin. if heads, discard an energy from your opponent's active pokemon.") return { count: 1, energyType: '', coinFlip: true, discardOpponentActive: true, coinFlipDiscard: true }
+    const match = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards and attach them to your pokemon in any way you like\. then, shuffle your deck\.$/)
+    if (match) return { count: Number(match[1]), energyType: match[2], searchDeck: true }
+    const anyBasicEnergy = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may search your deck for up to (\d+) basic energy cards and attach them to your pokemon in any way you like\. then, shuffle your deck\.$/)
+    if (anyBasicEnergy) return { count: Number(anyBasicEnergy[1]), energyType: 'any', searchDeck: true }
+    const topDeckGeneric = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may look at the top (\d+) cards of your deck(?:\. choose any)? and attach any number of basic energy cards? you find there to your pokemon in any way you like\. shuffle the other cards back into your deck\.$/)
+    if (topDeckGeneric) return { count: Number(topDeckGeneric[1]), energyType: 'any', topDeckCount: Number(topDeckGeneric[1]), topDeckBasicEnergy: true }
+    const topDeckChooseBasic = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon, you may look at the top (\d+) cards of your deck\. choose any basic energy cards you find there and attach them to your pokemon in any way you like\. shuffle the other cards back into your deck\.$/)
+    if (topDeckChooseBasic) return { count: Number(topDeckChooseBasic[1]), energyType: 'any', topDeckCount: Number(topDeckChooseBasic[1]), topDeckBasicEnergy: true }
+    const topDeckTyped = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may look at the top (\d+) cards of your deck and attach any number of (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)) energy cards? you find there to (?:this pokemon|your pokemon in any way you like)\. shuffle the other cards back into your deck\.$/)
+    if (topDeckTyped) {
+      const type = topDeckTyped[2] || ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', fighting: 'f', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c' } as Record<string, string>)[topDeckTyped[3]]
+      return { count: Number(topDeckTyped[1]), energyType: type, topDeckCount: Number(topDeckTyped[1]), topDeckBasicEnergy: true }
+    }
+  }
+  return null
+}
+
+export function getTcgBattleEvolutionCoinHealingEffect(card: TcgBattleCardSummary): { headsCounters: number; tailsCounters: number } | null {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    const match = text.match(/^when you play blissey from your hand, you may flip a coin\. if heads, remove (\d+) damage counters from blissey\. if tails, remove (\d+) damage counters from blissey\. either way, if blissey has fewer damage counters than that, remove all of them\.$/)
+    if (match) return { headsCounters: Number(match[1]), tailsCounters: Number(match[2]) }
+  }
+  return null
+}
+
+export function getTcgBattleEvolutionActiveHealAmount(card: TcgBattleCardSummary): number {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    const amount = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may heal (\d+) damage from your active pokemon\.$/)?.[1]
+    if (amount) return Number(amount)
+  }
+  return 0
+}
+
+export function hasTcgBattleEvolutionSwitchEffect(card: TcgBattleCardSummary): boolean {
+  return (card.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    return /^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may switch 1 of your opponent's benched (?:evolution )?pokemon(?:-ex)? with (?:their|his or her) active pokemon\.?$/.test(text) || /^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may switch in 1 of your opponent's benched pokemon to the active spot\.$/.test(text) || text === "once during your turn (before your attack), when you put luxray gl lv.x from your hand onto your active luxray gl, you may switch the defending pokemon with 1 of your opponent's benched pokemon." || getTcgBattleEvolutionSwitchMaxRemainingHp(card) !== undefined
+  })
+}
+
+export function hasTcgBattleEvolutionReturnPokemonEffect(card: TcgBattleCardSummary): boolean {
+  return (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may put 1 of your pokemon, except any corviknight, and all attached cards into your hand.")
+}
+
+export function hasTcgBattleEvolutionOnlySwitchEffect(card: TcgBattleCardSummary): boolean {
+  return (card.abilities || []).some((ability) => /^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may switch 1 of your opponent's benched evolution pokemon with their active pokemon\.$/.test(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()))
+}
+
+export function getTcgBattleEvolutionSwitchMaxRemainingHp(card: TcgBattleCardSummary): number | undefined {
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    const maximum = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may switch in 1 of your opponent's benched pokemon that has (\d+) hp or less remaining to the active spot\.$/)?.[1]
+    if (maximum) return Number(maximum)
+  }
+  return undefined
+}
+
+export function hasTcgBattleEvolutionExSwitchEffect(card: TcgBattleCardSummary): boolean {
+  return (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "once during your turn (before your attack), you may switch 1 of your opponent's benched pokemon-ex with his or her active pokemon.")
+}
+
+export function hasTcgBattleEvolutionCardSearchEffect(card: TcgBattleCardSummary): boolean {
+  const cardName = normalizeTcgBattleAbilityText(card.name)
+  return (card.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    return /^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may search your deck for a card and put it into your hand\. then, shuffle your deck\.$/.test(text) ||
+      /^when you play this pokemon from your hand to evolve 1 of your pokemon, you may search your deck for any card and put it into your hand\. shuffle your deck afterward\.$/.test(text) ||
+      /^once during your turn, when you play .+ from your hand to evolve 1 of your pokemon, you may search your deck for any 1 card and put it into your hand\. shuffle your deck afterward\.$/.test(text) ||
+      cardName === 'froslass' && text === 'once during your turn, when you play froslass from your hand to evolve 1 of your pokemon, you may search your deck for any 1 card and put it into your hand. shuffle your deck afterward.'
+  })
+}
+
+export function hasTcgBattleEvolutionSelfSwitchEffect(card: TcgBattleCardSummary): boolean {
+  return normalizeTcgBattleAbilityText(card.name) === 'arcanine' && (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'once during your turn, when you play arcanine from your hand to evolve 1 of your benched pokemon, you may switch arcanine with 1 of your active pokemon. if you do, you may move any number of energy cards attached to that pokemon to arcanine.')
+}
+
+export function getTcgBattlePokemonSwapPower(text: string): { pokemonName: string; powerName: string; allowedNames?: string[]; sourceName?: string; replacementZone?: 'deck' | 'discard' | 'hand'; basicOnly?: boolean; stage1Only?: boolean; pokemonVOnly?: boolean; excludePokemonEx?: boolean; excludedNames?: string[]; discardSource?: boolean; resetReplacement?: boolean; activeOnly?: boolean; firstTurnOnly?: boolean; afterRetreat?: boolean; sharedUse?: boolean } | null {
+  const normalized = normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim()
+  if (normalized === "once during your turn, when this pokemon moves from the active spot to the bench, you may search your deck for a palafin ex and switch it with this pokemon. any attached cards, damage counters, special conditions, turns in play, and any other effects remain on the new pokemon. if you switched a pokemon in this way, put this card into your deck. then, shuffle your deck.") {
+    return { pokemonName: 'palafin ex', powerName: 'zero to hero', sourceName: 'palafin', replacementZone: 'deck', afterRetreat: true, sharedUse: false }
+  }
+  if (normalized === 'once during your turn, you may switch this pokemon with an aegislash in your hand. any attached cards, damage counters, special conditions, turns in play, and any other effects remain on the new pokemon.') {
+    return { pokemonName: 'aegislash', powerName: 'stance change', sourceName: 'aegislash', replacementZone: 'hand', sharedUse: false }
+  }
+  if (normalized === 'once during your turn (before your attack), you may switch this pokemon with a wishiwashi gx in your hand. any attached cards, damage counters, special conditions, turns in play, and any other effects remain on the new pokemon.') {
+    return { pokemonName: 'wishiwashi gx', powerName: 'schooling', sourceName: 'wishiwashi', replacementZone: 'hand', sharedUse: false }
+  }
+  if (normalized === 'once during your turn (before your attack), you may search your discard pile for a basic pokemon (excluding pokemon-ex and ditto) and switch it with ditto. (any cards attached to ditto, damage counters, special conditions, and effects on it are now on the new pokemon.) place ditto in the discard pile.') {
+    return { pokemonName: 'ditto', powerName: 'form variation', sourceName: 'ditto', replacementZone: 'discard', basicOnly: true, excludePokemonEx: true, excludedNames: ['ditto'], discardSource: true, sharedUse: false }
+  }
+  if (normalized === "once during your first turn, if this pokemon is in the active spot, you may search your deck and choose a basic pokemon you find there, except any ditto. if you do, discard this pokemon and all attached cards, and put the chosen pokemon in its place. then, shuffle your deck.") {
+    return { pokemonName: 'ditto', powerName: 'transform', sourceName: 'ditto', replacementZone: 'deck', basicOnly: true, excludedNames: ['ditto'], discardSource: true, resetReplacement: true, activeOnly: true, firstTurnOnly: true, sharedUse: false }
+  }
+  if (normalized === 'once during your turn, you may choose a basic pokemon v from your discard pile and switch it with this pokemon. any attached cards, damage counters, special conditions, turns in play, and any other effects remain on the new pokemon.') {
+    return { pokemonName: 'ditto v', powerName: 'v transformation', sourceName: 'ditto v', replacementZone: 'discard', basicOnly: true, pokemonVOnly: true, discardSource: true, sharedUse: false }
+  }
+  if (normalized === 'once during your turn, you may choose a stage 1 pokemon, except any zoroark, from your discard pile. if you do, discard this pokemon and all attached cards, and put the chosen pokemon in its place.') {
+    return { pokemonName: 'zoroark', powerName: 'phantom transformation', sourceName: 'zoroark', replacementZone: 'discard', stage1Only: true, excludedNames: ['zoroark'], discardSource: true, resetReplacement: true, sharedUse: false }
+  }
+  const deoxysFormChange = normalized.match(/^once during your turn \(before your attack\), you may search your deck for any deoxys and switch it with deoxys (normal|attack|defense|speed) forme\. \(any cards attached to deoxys (?:normal|attack|defense|speed) forme, damage counters, special conditions, and effects on it are now on the new pokemon\.\) if you do, put deoxys (?:normal|attack|defense|speed) forme on top of your deck\. shuffle your deck afterward\. you can't use more than 1 form change pok[eé]-power each turn\.$/)
+  if (deoxysFormChange) {
+    const forms = ['Deoxys Normal Forme', 'Deoxys Attack Forme', 'Deoxys Defense Forme', 'Deoxys Speed Forme']
+    return { pokemonName: 'deoxys', powerName: 'form change', allowedNames: forms, sourceName: `Deoxys ${deoxysFormChange[1]} Forme`, sharedUse: true }
+  }
+  const temperament = normalized.match(/^once during your turn \(before your attack\), you may search your deck for any castform and switch it with (castform|castform rain form|castform sunny form|castform snow-cloud form)\. \(any cards attached to (?:castform|castform rain form|castform sunny form|castform snow-cloud form), damage counters, special conditions, and effects on it are now on the new pokemon\.\) (?:if you do, put (?:castform|castform rain form|castform sunny form|castform snow-cloud form) on top of your deck\. shuffle your deck afterward\.|shuffle (?:castform|castform rain form|castform sunny form|castform snow-cloud form) back into your deck\.) you can't use more than 1 temperament pok[eé]-power each turn\.$/)
+  if (temperament) {
+    const forms = ['Castform', 'Castform Rain Form', 'Castform Snow-Cloud Form', 'Castform Sunny Form']
+    const sourceName = forms.find((name) => normalizeTcgBattleAbilityText(name) === temperament[1])
+    if (sourceName) return { pokemonName: 'castform', powerName: 'temperament', allowedNames: forms, sourceName, sharedUse: true }
+  }
+  const weatherSwap = normalized.match(/^once during your turn \(before your attack\), you may search your deck for (.+?) and switch it with (castform|rain castform|sunny castform|snow-cloud castform)\. \(any cards attached to (?:castform|rain castform|sunny castform|snow-cloud castform), damage counters, special conditions, and effects on it are now on the new pokemon\.\) shuffle (?:castform|rain castform|sunny castform|snow-cloud castform) back into your deck\. you can't use more than 1 temperamental weather pok[eé]-power each turn\.$/)
+  if (weatherSwap) {
+    const formNames = new Set(['castform', 'rain castform', 'sunny castform', 'snow-cloud castform'])
+    const allowedNames = weatherSwap[1].replace(/,\s*or\s+/g, ',').replace(/\s+or\s+/g, ',').split(',').map((name) => name.trim())
+    if (allowedNames.length === 3 && allowedNames.every((name) => formNames.has(name)) && formNames.has(weatherSwap[2])) {
+      return { pokemonName: 'castform', powerName: 'temperamental weather', allowedNames, sourceName: weatherSwap[2], sharedUse: true }
+    }
+  }
+  const pokemonName = normalized.match(/search your deck for another (.+?) and switch (?:it|this pokemon) with /)?.[1]?.trim()
+  const powerName = normalized.match(/you can't use more than 1 (.+?) pok[eé]-power each turn\.$/)?.[1]?.trim()
+  if (!pokemonName || !powerName || !/^once during your turn(?: \(before your attack\))?, you may search your deck for another /.test(normalized)) return null
+  if (!/\(any cards attached to .+?, damage counters, special conditions, and effects on it are now on the new pokemon\.\) if you do, put .+? on top of your deck\. shuffle your deck afterward\./.test(normalized)) return null
+  return { pokemonName, powerName }
+}
+
+export function getTcgBattleAbilityDamageCounterEffect(text: string): { count: number; energyType?: string; activeOnly: boolean; benchOnly: boolean; vstar: boolean; benchToActiveOnly: boolean; shuffleSource?: boolean; spreadToAllOpponents?: boolean; distributeCounters?: boolean; fixedTargetCount?: number; fixedCountersPerTarget?: number; selfKnockout?: boolean; directDamage?: number; coinFlip?: boolean; endsTurn?: boolean; specialConditionGate?: boolean; requiresOtherActiveName?: string; counterRemoval?: boolean; defendingOnly?: boolean; discardOpposingEnergy?: boolean; returnOpposingEnergy?: boolean; requiredTargetSubtype?: string; requiredTargetMarker?: 'delta'; ownTargets?: boolean; sourceBenchOnly?: boolean; excludedTargetName?: string; discardHandForSelfCounters?: boolean; discardSingleCardFromHand?: boolean; mysteriousPotion?: boolean; damagedTargetOnly?: boolean } | null {
+  const normalized = normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim()
+  if (normalized === "you must discard a {w} energy card from your hand in order to use this ability. once during your turn, you may choose 2 of your opponent's benched pokemon and put 2 damage counters on each of them.") {
+    return { count: 4, energyType: 'w', activeOnly: false, benchOnly: true, vstar: false, benchToActiveOnly: false, distributeCounters: true, fixedTargetCount: 2, fixedCountersPerTarget: 2 }
+  }
+  if (/^once during your turn \(before your attack\)\s*, if this pokemon is your active pokemon, you may discard a water energy card from your hand\. if you do, put 6 damage counters on 1 of your opp+p+onent's pokemon\.$/.test(normalized)) {
+    return { count: 6, energyType: 'w', activeOnly: true, benchOnly: false, vstar: false, benchToActiveOnly: false }
+  }
+  if (normalized === "once during your turn (before your attack), if this pokemon is your active pokemon, you may put 3 damage counters on your opponent's pokemon in any way you like.") {
+    return { count: 3, activeOnly: true, benchOnly: false, vstar: false, benchToActiveOnly: false, distributeCounters: true }
+  }
+  if (normalized === "once during your turn (before your attack), you may knock out this pokemon. if you do, put 3 damage counters on your opponent's pokemon in any way you like.") {
+    return { count: 3, activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false, distributeCounters: true, selfKnockout: true }
+  }
+  if (normalized === "once during your turn (before your attack), if cacturne is your active pokemon, you may put 1 damage counter on 1 of your opponent's pokemon that already has any damage counters on it. this power can't be used if cacturne is affected by a special condition.") {
+    return { count: 1, activeOnly: true, benchOnly: false, vstar: false, benchToActiveOnly: false, specialConditionGate: true, damagedTargetOnly: true }
+  }
+  if (normalized === "once during your turn (before your attack), if crobat ex is your active pokemon, you may put 1 damage counter on 1 of your opponent's pokemon. this power can't be used if crobat ex is affected by a special condition.") {
+    return { count: 1, activeOnly: true, benchOnly: false, vstar: false, benchToActiveOnly: false, specialConditionGate: true }
+  }
+  if (normalized === 'once during your turn, you may choose 1 of your pokemon and flip a coin. if heads, heal 90 damage from that pokemon. if tails, put 3 damage counters on that pokemon.') {
+    return { count: 3, activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false, ownTargets: true, mysteriousPotion: true }
+  }
+  const nidokingEarthRage = normalized === "once during your turn (before your attack), if nidoking is your active pokemon, you may flip a coin. if heads, put a damage counter on each of your opponent's benched pokemon. this power can't be used if nidoking is affected by a special condition."
+  const tyrogueBrattyKick = normalized.match(/^once during your turn \(before your attack\), you may flip a coin\. if heads, put (\d+) damage counters? on 1 of your opponent's pokemon\. if you use this ability, your turn ends\.$/)
+  const genericOpponentCounterPower = normalized.match(/^once during your turn(?: \(before your attack\))?, you may put (\d+) damage counters? on 1 of your opponent's pokemon\.$/)
+  if (genericOpponentCounterPower) {
+    return { count: Number(genericOpponentCounterPower[1]), activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false }
+  }
+  if (normalized === "once during your turn (before your attack), you may put 1 damage counter on 1 of your opponent's pokemon. this power can't be used if kingdra is affected by a special condition.") {
+    return { count: 1, activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false, specialConditionGate: true }
+  }
+  if (normalized === "once during your turn (before your attack), if kingdra is your active pokemon, you may put 2 damage counters on 1 of your opponent's pokemon with δ on its card. this power can't be used if kingdra is affected by a special condition.") {
+    return { count: 2, activeOnly: true, benchOnly: false, vstar: false, benchToActiveOnly: false, specialConditionGate: true, requiredTargetMarker: 'delta' }
+  }
+  if (normalized === "once during your turn (before your attack), if unown t is your active pokemon, you may discard a card from your hand. then, flip a coin. if heads, put 2 damage counters on 1 of your opponent's benched pokemon. this power can't be used if unown t is affected by a special condition.") {
+    return { count: 2, activeOnly: true, benchOnly: true, vstar: false, benchToActiveOnly: false, coinFlip: true, specialConditionGate: true, discardSingleCardFromHand: true }
+  }
+  if (normalized === "once during your turn (before your attack), you may discard as many cards as you like from your hand. if you do, put that many damage counters on banette. this power can't be used if banette is affected by a special condition.") {
+    return { count: 0, activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false, ownTargets: true, specialConditionGate: true, discardHandForSelfCounters: true }
+  }
+  if (normalized === 'once during your turn (before your attack), if unown p is on your bench, you may put 1 damage counter on 1 of your pokemon (excluding any unown).') {
+    return { count: 1, activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false, ownTargets: true, sourceBenchOnly: true, excludedTargetName: 'unown' }
+  }
+  if (normalized === "once during your turn (before your attack), you may put 3 damage counters on 1 of your opponent's pokemon-ex.") {
+    return { count: 3, activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false, requiredTargetSubtype: 'ex' }
+  }
+  if (normalized === "once during your turn (before your attack), if this pokemon is your active pokemon, you may flip a coin. if heads, discard an energy attached to your opponent's active pokemon. this power can't be used if krookodile is affected by a special condition.") {
+    return { count: 0, activeOnly: true, benchOnly: false, vstar: false, benchToActiveOnly: false, coinFlip: true, specialConditionGate: true, defendingOnly: true, discardOpposingEnergy: true }
+  }
+  if (normalized === "once during your turn, you may use this ability. flip a coin. if heads, put an energy attached to your opponent's active pokemon into their hand.") {
+    return { count: 0, activeOnly: true, benchOnly: false, vstar: false, benchToActiveOnly: false, coinFlip: true, defendingOnly: true, discardOpposingEnergy: true, returnOpposingEnergy: true }
+  }
+  if (/^once during your turn \(before your attack\), you may remove 2 damage counters? from 1 of the defending pokemon\.$/.test(normalized)) {
+    return { count: 2, activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false, counterRemoval: true, defendingOnly: true }
+  }
+  const directDamage = normalized.match(/^once during your turn, you may do (\d+) damage to 1 of your opponent's pokemon\.$/)
+  const energyType = normalized.match(/discard a (?:basic )?\{([grwlpmdycf])\} energy card from your hand/)?.[1] || (/discard a fire energy card from your hand/.test(normalized) ? 'r' : /discard a water energy card from your hand/.test(normalized) ? 'w' : undefined)
+  const counters = normalized.match(/(?:put|place) (\d+) damage counters? on 1 of your opponent's (benched )?pokemon/)?.[1]
+  const freeCounterAbility = /^once during your turn(?: \(before your attack\))?, you may put \d+ damage counters? on 1 of your opponent's pokemon\.?$/.test(normalized)
+  const switchCounterAbility = /^once during your turn, when this pokemon moves from your bench to the active spot, you may put \d+ damage counters? on 1 of your opponent's pokemon\.$/.test(normalized)
+  const vstarCounterPower = /^during your turn, you may put \d+ damage counters? on 1 of your opponent's pokemon\. \(you can't use more than 1 vstar power in a game\.\)$/.test(normalized)
+  const shuffleSourceAbility = /^once during your turn, you may put \d+ damage counters? on 1 of your opponent's pokemon\. if you placed any damage counters in this way, shuffle this pokemon and all attached cards into your deck\.$/.test(normalized)
+  const spreadAbility = /^once during your turn, if this pokemon is in the active spot, you may put (\d+) damage counters? on each of your opponent's pokemon\.$/.exec(normalized)
+  const selfKnockoutAbility = /^once during your turn, you may put (\d+) damage counters? on 1 of your opponent's pokemon\. if (?:you use this ability, this pokemon is knocked out|you placed any damage counters in this way, discard this pokemon and all attached cards)\.$/.exec(normalized)
+  const misdreavusDarkSpell = normalized === "once during your turn (before your attack), if misdreavus is your active pokemon, you may flip a coin. if heads, put 1 damage counter on 1 of your opponent's pokemon. this power can't be used if misdreavus is affected by a special condition or if your other active pokemon is not misdreavus."
+  if ((!energyType && !freeCounterAbility && !switchCounterAbility && !vstarCounterPower && !shuffleSourceAbility && !spreadAbility && !selfKnockoutAbility && !directDamage && !misdreavusDarkSpell && !nidokingEarthRage && !tyrogueBrattyKick) || (!counters && !spreadAbility && !selfKnockoutAbility && !directDamage && !misdreavusDarkSpell && !nidokingEarthRage && !tyrogueBrattyKick)) return null
+  return {
+    count: nidokingEarthRage ? 1 : tyrogueBrattyKick ? Number(tyrogueBrattyKick[1]) : directDamage ? Math.floor(Number(directDamage[1]) / 10) : Number(spreadAbility?.[1] || selfKnockoutAbility?.[1] || counters),
+    energyType,
+    activeOnly: nidokingEarthRage || /if this pokemon is in the active spot|if this pokemon is your active pokemon/.test(normalized),
+    benchOnly: nidokingEarthRage || Boolean(normalized.match(/(?:put|place) \d+ damage counters? on 1 of your opponent's benched pokemon/)),
+    vstar: vstarCounterPower,
+    benchToActiveOnly: switchCounterAbility,
+    shuffleSource: shuffleSourceAbility,
+    spreadToAllOpponents: Boolean(spreadAbility || nidokingEarthRage),
+    selfKnockout: Boolean(selfKnockoutAbility),
+    directDamage: directDamage ? Number(directDamage[1]) : undefined,
+    coinFlip: misdreavusDarkSpell || nidokingEarthRage,
+    endsTurn: Boolean(tyrogueBrattyKick),
+    specialConditionGate: misdreavusDarkSpell || nidokingEarthRage,
+    requiresOtherActiveName: misdreavusDarkSpell ? 'misdreavus' : undefined,
+  }
+}
+
+export function getTcgBattleAbilityDamageCounterMoveEffect(text: string): { maxCounters: number; activeOnly: boolean; ownToOpponent: boolean; ownToOwn?: boolean; opponentToOpponent?: boolean; requiresDarknessEnergy: boolean; benchPlayOnly?: boolean; repeatable?: boolean; allCounters?: boolean; blockedBySpecialCondition?: boolean; blockedStatuses?: TcgBattleStatusCondition[]; preventKnockout?: boolean; targetSelf?: boolean; targetActiveOnly?: boolean; sourceNameContains?: string; targetNameContains?: string; requiredName?: string; sourceSelf?: boolean; minimumSourceHp?: number; pokemonSpOnly?: boolean; pokemonType?: string } | null {
+  const normalized = normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim()
+  if (normalized === "once during your turn (before your attack), if banette ex is your active pokemon, you may move 1 damage counter from either player's pokemon to another pokemon (yours or your opponent's). this power can't be used if banette ex is affected by a special condition." ||
+    normalized === "once during your turn (before your attack), if typhlosion is your active pokemon, you may move 1 damage counter from either player's pokemon to another pokemon (yours or your opponent's). this power can't be used if typhlosion is affected by a special condition.") {
+    return { maxCounters: 1, activeOnly: true, ownToOpponent: false, ownToOwn: false, requiresDarknessEnergy: false, blockedBySpecialCondition: true }
+  }
+  if (normalized === "once during your turn (before your attack), you may move 1 damage counter from either player's pokemon to another pokemon (yours or your opponent's). this power can't be used if cresselia is affected by a special condition.") {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: false, requiresDarknessEnergy: false, blockedBySpecialCondition: true }
+  }
+  if (normalized === "once during your turn (before your attack), you may move 1 damage counter from 1 of your opponent's pokemon to another of your opponent's pokemon. this power can't be used if gengar is affected by a special condition.") {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: false, opponentToOpponent: true, requiresDarknessEnergy: false, blockedBySpecialCondition: true }
+  }
+  if (/^once during your turn \(before your attack\), you may move 1 damage counter from 1 of your opponent's pokemon to another \(even if it would knock out the other pokemon\)\. this power can't be used if gengar is affected by a special condition\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: false, opponentToOpponent: true, requiresDarknessEnergy: false, blockedBySpecialCondition: true }
+  }
+  if (normalized === "once during your turn, you may move up to 2 damage counters from your pokemon to your opponent's active pokemon.") {
+    return { maxCounters: 2, activeOnly: false, ownToOpponent: true, targetActiveOnly: true, requiresDarknessEnergy: false }
+  }
+  if (normalized === "once during your turn, you may move up to 2 damage counters from 1 of your opponent's pokemon to another of their pokemon.") {
+    return { maxCounters: 2, activeOnly: false, ownToOpponent: false, ownToOwn: false, opponentToOpponent: true, requiresDarknessEnergy: false }
+  }
+  if (normalized === 'as often as you like during your turn, you may move 1 damage counter from 1 of your other pokemon to this pokemon.') {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, targetSelf: true }
+  }
+  if (normalized === "when you play this pokemon from your hand onto your bench, you may move 3 damage counters from 1 of your opponent's pokemon to another of his or her pokemon." || normalized === "once during your turn, when you put absol ex from your hand onto your bench, you may move 3 damage counters from 1 of your opponent's pokemon to another of his or her pokemon.") {
+    return { maxCounters: 3, activeOnly: false, ownToOpponent: false, ownToOwn: false, opponentToOpponent: true, requiresDarknessEnergy: false, benchPlayOnly: true }
+  }
+  if (/^once during your turn \(before your attack\), if you have gastrodon west sea in play, you may move up to 3 damage counters from gastrodon east sea to 1 of your gastrodon west sea\.$/.test(normalized)) {
+    return { maxCounters: 3, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, sourceNameContains: 'gastrodon east sea', targetNameContains: 'gastrodon west sea', requiredName: 'gastrodon west sea', sourceSelf: true }
+  }
+  if (normalized === 'as often as you like during your turn (before your attack), you may move 1 damage counter from 1 of your wormadam to another of your pokemon.') {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, sourceNameContains: 'wormadam' }
+  }
+  if (normalized === 'as often as you like during your turn (before your attack), you may move 1 damage counter from 1 of your pokemon to this pokemon.') {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, targetSelf: true }
+  }
+  if (normalized === 'as often as you like during your turn, you may choose 1 of your pokemon that has damage on it, and move all of its damage to this pokemon.') {
+    return { maxCounters: 999, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, targetSelf: true, allCounters: true }
+  }
+  if (/^as often as you like during your turn \(before your attack\), you may move 1 damage counter from 1 of your pokemon to another of your pokemon\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true }
+  }
+  if (/^as often as you like during your turn, you may move 1 damage counter from 1 of your (?:\{p\}|psychic) pokemon to another of your (?:\{p\}|psychic) pokemon\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, pokemonType: 'psychic' }
+  }
+  if (normalized === "as often as you like during your turn, you may move 1 damage counter from 1 of your team rocket's pokemon to another of your pokemon.") {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, sourceNameContains: "team rocket's" }
+  }
+  if (normalized === "as often as you like during your turn (before your attack), you may move 1 damage counter from 1 of your pokemon sp to another of your pokemon sp. this power can't be used if alakazam e4 is affected by a special condition.") {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, blockedBySpecialCondition: true, pokemonSpOnly: true }
+  }
+  if (/^once during your turn \(before your attack\), you may move 1 damage counter from 1 of your opponent's pokemon to another \(even if it would knock out the other pokemon\)\. this power can't be used if gengar is asleep, confused, or paralyzed\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: false, opponentToOpponent: true, requiresDarknessEnergy: false, blockedBySpecialCondition: true }
+  }
+  if (/^as often as you like during your turn \(before your attack\), you may move 1 damage counter from 1 of your opponent's pokemon to another of your opponent's pokemon\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: false, opponentToOpponent: true, requiresDarknessEnergy: false, repeatable: true }
+  }
+  if (/^once during your turn \(before your attack\), you may move 1 damage counter from 1 of your pokemon with unown in its name to unown \. this power can't be used if unown has 10 hp left\. this power can be used even if unown is asleep, confused, or paralyzed\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, targetSelf: true, sourceNameContains: 'unown', minimumSourceHp: 20 }
+  }
+  if (/^as often as you like during your turn \(before your attack\), you may move 1 damage counter from 1 of your pokemon to another as long as you don't knock out that pokemon\. this power can't be used if alakazam is affected by a special condition\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, blockedBySpecialCondition: true, preventKnockout: true }
+  }
+  if (/^as often as you like during your turn \(before your attack\), you may move 1 damage counter from 1 of your pokemon to another as long as you don't knock out that pokemon\. this power can't be used if alakazam is asleep, confused, or paralyzed\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, blockedStatuses: ['asleep', 'confused', 'paralyzed'], preventKnockout: true }
+  }
+  if (/^as often as you like during your turn \(before your attack\), you may move 1 damage counter from 1 of your pokemon to slowbro as long as you don't knock out slowbro\. this power can't be used if slowbro is affected by a special condition\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, blockedBySpecialCondition: true, preventKnockout: true, targetSelf: true }
+  }
+  if (/^as often as you like during your turn \(before your attack\), you may move 1 damage counter from 1 of your pokemon to slowbro as long as you don't knock out slowbro\. this power can't be used if slowbro is asleep, confused, or paralyzed\.$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false, repeatable: true, blockedBySpecialCondition: true, preventKnockout: true, targetSelf: true }
+  }
+  if (/^once during your turn(?: \(before your attack\))?, if this pokemon is your active pokemon, you may move 1 damage counter from 1 pokemon to another pokemon\.?$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: true, ownToOpponent: false, requiresDarknessEnergy: false }
+  }
+  if (/^once during your turn \(before your attack\), you may move 1 damage counter from 1 pokemon to another pokemon\.?$/.test(normalized)) {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false }
+  }
+  if (normalized === 'once during your turn (before your attack), you may move 1 damage counter from 1 of your pokemon to another of your pokemon.') {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: true, requiresDarknessEnergy: false }
+  }
+  if (normalized === "once during your turn (before your attack), if this pokemon is your active pokemon, you may move 1 damage counter from 1 of your pokemon to 1 of your opponent's pokemon.") {
+    return { maxCounters: 1, activeOnly: true, ownToOpponent: true, requiresDarknessEnergy: false }
+  }
+  if (normalized === "once during your turn, you may move 1 damage counter from 1 of your pokemon to 1 of your opponent's pokemon.") {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: true, requiresDarknessEnergy: false }
+  }
+  const munkidori = normalized.match(/^once during your turn, if this pokemon has any \{d\} energy attached, you may move up to (\d+) damage counters? from 1 of your pokemon to 1 of your opponent's pokemon\.?$/)
+  return munkidori ? { maxCounters: Number(munkidori[1]), activeOnly: false, ownToOpponent: true, requiresDarknessEnergy: true } : null
 }
 
 function getTcgBattleUsedDeckCardIds(side: TcgBattleSideState): Set<string> {
@@ -25864,6 +29566,7 @@ function getTcgBattleUsedDeckCardIds(side: TcgBattleSideState): Set<string> {
     ...side.front,
     ...side.back,
     ...side.discard,
+    ...(side.lostZone || []),
   ]
   const usedIds = new Set(cardsInBattle.map((card) => card.id))
   for (const card of [...side.front, ...side.back, ...side.discard]) {
@@ -25875,19 +29578,190 @@ function getTcgBattleUsedDeckCardIds(side: TcgBattleSideState): Set<string> {
 export function getTcgBattleEvolutionOptions(
   side: TcgBattleSideState,
   turnNumber: number,
+  sideKey: TcgBattleSide = 'player',
+  opposingSide?: TcgBattleSideState,
+  playerGoesSecond?: boolean,
 ): TcgBattleEvolutionOption[] {
-  const usedIds = getTcgBattleUsedDeckCardIds(side)
   const options: TcgBattleEvolutionOption[] = []
+  const globalEvolutionLock = Boolean(opposingSide && [...opposingSide.front, ...opposingSide.back].some((provider) =>
+    provider.currentHp > 0 &&
+    !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) &&
+    !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'no more evolution cards can be played. this power stops working while aerodactyl is asleep, confused, or paralyzed.'),
+  ))
+  const ancientPowerEvolutionLock = Boolean(opposingSide && [side, opposingSide].some((boardSide) =>
+    [...boardSide.front, ...boardSide.back].some((provider) =>
+      provider.currentHp > 0 &&
+      !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "each player can't play any pokemon from his or her hand to evolve his or her pokemon."),
+    ),
+  ))
+  const activeKabutopsBenchEvolutionLock = Boolean(opposingSide && [side, opposingSide].some((boardSide) =>
+    boardSide.front.some((provider) =>
+      provider.currentHp > 0 &&
+      normalizeTcgBattleCardName(provider.name) === 'kabutops' &&
+      !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() ===
+        'as long as kabutops is your active pokemon, neither player can play basic pokemon or evolution cards from his or her hand to evolve benched pokemon.'),
+    ),
+  ))
+  if (globalEvolutionLock || ancientPowerEvolutionLock) return options
+  const asleepEvolutionLock = Boolean(opposingSide && [...opposingSide.front, ...opposingSide.back].some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "your opponent can't play any basic pokemon or evolution cards from his or her hand to evolve an asleep pokemon and can't attach any energy cards from his or her hand to an asleep pokemon."),
+  ))
   for (const target of [...side.front, ...side.back]) {
     if (target.currentHp <= 0) continue
+    if (asleepEvolutionLock && target.statusConditions?.includes('asleep')) continue
+    if ((target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).includes("ditto can't evolve"))) continue
     const targetStage = getTcgBattleEvolutionStage(target)
-    if (!isTcgBattleBasic(target) && targetStage !== 1) continue
+    const targetIsActive = side.front.some((pokemon) => pokemon.instanceId === target.instanceId)
+    if (activeKabutopsBenchEvolutionLock && !targetIsActive) continue
+    const isGalladeLvXTarget = targetIsActive && normalizeTcgBattlePokemonName(target.name) === 'galladee4' && side.hand.some((card) =>
+      normalizeTcgBattlePokemonName(card.name) === 'galladee4lvx' && normalizeTcgBattlePokemonName(card.evolvesFrom) === 'galladee4' && card.subtypes.some((subtype) => normalizeTcgBattlePokemonName(subtype) === 'levelup'),
+    )
+    if (!isTcgBattleBasic(target) && targetStage !== 1 && !isGalladeLvXTarget) continue
     const nextStage = targetStage + 1
-    for (const card of side.deck) {
-      if (usedIds.has(card.id) || getTcgBattleEvolutionStage(card) !== nextStage) continue
-      if (normalizeTcgBattlePokemonName(card.evolvesFrom) !== normalizeTcgBattlePokemonName(target.name)) continue
-      if (turnNumber < getTcgBattleCardUnlockTurnForCard(card)) continue
-      options.push({ targetId: target.instanceId, targetName: target.name, card })
+    const activeEvolutionLock = targetIsActive && opposingSide?.front.some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
+      (provider.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return text === 'your opponent can\'t play any pokemon from their hand to evolve their active pokemon.' ||
+          normalizeTcgBattleCardName(provider.name) === 'dialga' && text === "as long as dialga is your active pokemon, your opponent can't play any pokemon from his or her hand to evolve his or her active pokemon." ||
+          normalizeTcgBattleCardName(provider.name) === 'cradilyex' && text === "as long as cradily ex is your active pokemon, your opponent can't play a pokemon from his or her hand to evolve his or her active pokemon." ||
+          ['kabutops', 'omastar'].includes(normalizeTcgBattleCardName(provider.name)) && (
+            text === `as long as ${normalizeTcgBattleCardName(provider.name)} is your active pokemon, your opponent can't play any basic pokemon or evolution cards from his or her hand to evolve his or her active pokemon.` ||
+            text === `as long as omastar is your active pokemon, your opponent can't play basic pokemon or evolution cards from his or her hand to evolve his or her active pokemon.`
+          )
+      }),
+    )
+    const dracovishPrimalLaw = opposingSide?.front.some((provider) =>
+      provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as this pokemon is in the active spot, your opponent can't play any pokemon from their hand to evolve their pokemon."),
+    )
+    if (activeEvolutionLock || dracovishPrimalLaw) continue
+    const pichuPower = target.name.toLowerCase().includes('pichu')
+      ? (target.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex })).find(({ ability, abilityIndex }) => {
+          const text = normalizeTcgBattleAbilityText(ability.text)
+          const usageKey = `${abilityIndex}:${ability.name}`
+          return /^once during your turn(?: \(before your attack\))?, you may put pikachu from your hand onto pichu \(this counts as evolving pichu\) and remove all damage counters from pichu\.$/.test(text) && target.abilityUses?.[usageKey] !== turnNumber
+        })
+      : undefined
+    const eeveePower = turnNumber > 1 && normalizeTcgBattlePokemonName(target.name).startsWith('eevee')
+      ? (target.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex })).find(({ ability, abilityIndex }) => {
+          const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+          const usageKey = `${abilityIndex}:${ability.name}`
+          return /^once during your turn \(before your attack\), if you have a pokemon in your hand that evolves from eevee, you may put that card onto this pokemon to evolve it\. before evolving, heal all damage from this pokemon\. you can't use this ability during your first turn or the turn this pokemon was put into play\.$/.test(text) && target.abilityUses?.[usageKey] !== turnNumber
+        })
+      : undefined
+    const eeveeAlternateEvolution = turnNumber > 1 && normalizeTcgBattlePokemonName(target.name) === 'eeveeex' &&
+      target.playedToBenchTurn !== turnNumber && target.playedToFrontTurn !== turnNumber &&
+      !isTcgBattleAbilitySuppressed(target, [side, opposingSide || side]) &&
+      (target.abilities || []).some((ability) => {
+        const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+        return /^this pokemon can evolve into any pokemon(?: ex)? that evolves from eevee if you play it from your hand onto this pokemon\. \(this pokemon can't evolve during your first turn or the turn you play it\.\)$/.test(text)
+      })
+    const babyEvolutionPower = (target.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex, text: normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() })).find(({ ability, abilityIndex, text }) => {
+      const match = text.match(/^once during your turn \(before your attack\), you may put ([a-z0-9 .,\u2019'-]+) from your hand onto ([a-z0-9 .\u2019'-]+) \(this counts as evolving [a-z0-9 .\u2019'-]+\),? and remove all damage counters from [a-z0-9 .\u2019'-]+\.$/)
+      return Boolean(match && normalizeTcgBattlePokemonName(match[2]) === normalizeTcgBattlePokemonName(target.name) && target.abilityUses?.[`${abilityIndex}:${ability.name}`] !== turnNumber)
+    })
+    for (const card of side.hand) {
+      if ((card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "put this pokemon into play only with the effect of palafin's zero to hero ability.")) continue
+      if (normalizeTcgBattlePokemonName(card.name) === 'galladee4lvx') {
+        if (!targetIsActive || normalizeTcgBattlePokemonName(target.name) !== 'galladee4' || normalizeTcgBattlePokemonName(card.evolvesFrom) !== 'galladee4' || !card.subtypes.some((subtype) => normalizeTcgBattlePokemonName(subtype) === 'levelup')) continue
+        options.push({ targetId: target.instanceId, targetName: target.name, card })
+        continue
+      }
+      if (babyEvolutionPower) {
+        const text = normalizeTcgBattleAbilityText(babyEvolutionPower.ability.text).replace(/\s+/g, ' ').trim()
+        const evolutionNames = text.match(/^once during your turn \(before your attack\), you may put ([a-z0-9 .,\u2019'-]+) from your hand onto/)?.[1]
+        const matchingEvolutionNames = evolutionNames?.split(/,\s*or\s+|,\s*|\s+or\s+/).map(normalizeTcgBattlePokemonName)
+        if (matchingEvolutionNames?.includes(normalizeTcgBattlePokemonName(card.name))) {
+          options.push({ targetId: target.instanceId, targetName: target.name, card, effect: 'babyHeal', abilityIndex: babyEvolutionPower.abilityIndex, abilityName: babyEvolutionPower.ability.name })
+          continue
+        }
+      }
+      if (eeveePower && getTcgBattleEvolutionStage(card) === nextStage && normalizeTcgBattlePokemonName(card.evolvesFrom) === 'eevee') {
+        options.push({ targetId: target.instanceId, targetName: target.name, card, effect: 'eeveeHeal', abilityIndex: eeveePower.abilityIndex, abilityName: eeveePower.ability.name })
+        continue
+      }
+      if (eeveeAlternateEvolution && getTcgBattleEvolutionStage(card) === nextStage && normalizeTcgBattlePokemonName(card.evolvesFrom) === 'eevee') {
+        const abilityText = (target.abilities || []).map((ability) => normalizeTcgBattleAbilityText(ability.text)).join(' ')
+        const requiresEx = /evolve into any pokemon ex that evolves from eevee/.test(abilityText)
+        if (!requiresEx || card.subtypes.some((subtype) => normalizeTcgBattlePokemonName(subtype) === 'ex')) {
+          options.push({ targetId: target.instanceId, targetName: target.name, card })
+          continue
+        }
+      }
+      const normalizedBasicTargetName = normalizeTcgBattlePokemonName(target.name)
+      const dittoPrismPower = normalizedBasicTargetName === 'ditto' && getTcgBattleEvolutionStage(card) === 1 && turnNumber > 1 && target.playedToBenchTurn !== turnNumber && target.playedToFrontTurn !== turnNumber
+        ? (target.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex })).find(({ ability, abilityIndex }) =>
+            normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "once during your turn (before your attack), you may put any stage 1 card from your hand onto this pokemon to evolve it. you can't use this ability during your first turn or the turn this pokemon was put into play." &&
+            target.abilityUses?.[`${abilityIndex}:${ability.name}`] !== turnNumber && !isTcgBattleAbilitySuppressed(target, [side, opposingSide || side]),
+          )
+        : undefined
+      if (dittoPrismPower) {
+        options.push({ targetId: target.instanceId, targetName: target.name, card, effect: 'dittoPrismStage1', abilityIndex: dittoPrismPower.abilityIndex, abilityName: dittoPrismPower.ability.name, abilitySourceId: target.instanceId })
+        continue
+      }
+      const meganiumPower = isTcgBattleBasic(target) && getTcgBattleEvolutionStage(card) === 2
+        ? [...side.front, ...side.back].flatMap((provider) => (provider.abilities || []).map((ability, abilityIndex) => ({ provider, ability, abilityIndex }))).find(({ provider, ability, abilityIndex }) =>
+            provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [side, opposingSide || side]) &&
+            normalizeTcgBattlePokemonName(provider.name) === 'meganium' &&
+            normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'once during your turn (before your attack), you may use this ability. choose 1 of your basic pokemon in play. if you have a stage 2 card in your hand that evolves from that pokemon, put that card onto the basic pokemon to evolve it. you can use this ability during your first turn or on a pokemon that was put into play this turn.' &&
+            provider.abilityUses?.[`${abilityIndex}:${ability.name}`] !== turnNumber &&
+            ([...side.hand, ...side.deck, ...side.discard].some((stage1) => getTcgBattleEvolutionStage(stage1) === 1 && normalizeTcgBattlePokemonName(stage1.evolvesFrom) === normalizedBasicTargetName && normalizeTcgBattlePokemonName(card.evolvesFrom) === normalizeTcgBattlePokemonName(stage1.name)) || normalizeTcgBattlePokemonName(card.evolvesFrom) === normalizedBasicTargetName),
+          )
+        : undefined
+      if (meganiumPower) {
+        options.push({ targetId: target.instanceId, targetName: target.name, card, effect: 'meganiumStage2', abilityIndex: meganiumPower.abilityIndex, abilityName: meganiumPower.ability.name, abilitySourceId: meganiumPower.provider.instanceId })
+        continue
+      }
+      const phantumpPower = normalizedBasicTargetName === 'phantump' && turnNumber > 1 &&
+        card.hp - Math.max(0, target.hp - target.currentHp) > 20 &&
+        !isTcgBattleAbilitySuppressed(target, [side, opposingSide || side])
+        ? (target.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex })).find(({ ability, abilityIndex }) =>
+            normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "once during your turn, you may use this ability. choose a card in your hand that evolves from this pokemon and put it onto this pokemon to evolve it. if you do, place 2 damage counters on the pokemon you evolved in this way. you can't use this ability during your first turn." &&
+            target.abilityUses?.[`${abilityIndex}:${ability.name}`] !== turnNumber,
+          )
+        : undefined
+      if (phantumpPower && getTcgBattleEvolutionStage(card) === 1 && normalizeTcgBattlePokemonName(card.evolvesFrom) === 'phantump') {
+        options.push({ targetId: target.instanceId, targetName: target.name, card, effect: 'phantumpDamageEvolve', abilityIndex: phantumpPower.abilityIndex, abilityName: phantumpPower.ability.name, abilitySourceId: target.instanceId })
+        continue
+      }
+      if (getTcgBattleEvolutionStage(card) !== nextStage) continue
+      const normalizedTargetName = normalizeTcgBattlePokemonName(target.name)
+      const trainerPokemonBaseName = normalizeTcgBattlePokemonName(target.name.replace(/^[^']+'s\s+/i, ''))
+      if (normalizeTcgBattlePokemonName(card.evolvesFrom) !== normalizedTargetName && normalizeTcgBattlePokemonName(card.evolvesFrom) !== trainerPokemonBaseName) continue
+      if (pichuPower && normalizeTcgBattlePokemonName(card.name).startsWith('pikachu')) {
+        options.push({ targetId: target.instanceId, targetName: target.name, card, effect: 'pichuHeal', abilityIndex: pichuPower.abilityIndex, abilityName: pichuPower.ability.name })
+        continue
+      }
+      const subtypeSet = new Set((card.subtypes || []).map((entry) => entry.toUpperCase()))
+      const stageUnlockTurn = subtypeSet.has('STAGE 2') ? 5 : subtypeSet.has('STAGE 1') ? 3 : 1
+      const costUnlockTurn = getTcgBattleCardUnlockTurn(card.cost)
+      const hasEarlyEvolutionPermission = (abilities: TcgCardAbility[] | undefined, isActive: boolean) =>
+        (abilities || []).some((ability) => {
+          const text = normalizeTcgBattleAbilityText(ability.text)
+          if (/as long as this pokemon is in the active spot/.test(text) && !isActive) return false
+          return /this pokemon can evolve during your first turn or the turn you play it|(?:as long as this pokemon is in the active spot, )?it can evolve during your first turn or the turn you play it|you may play this card from your hand to evolve a pokemon during your first turn or the turn you play that pokemon|burmy (?:plant|sandy|trash) cloak can evolve during the turn you play it/.test(text)
+        })
+      const hasOpponentActiveExEvolutionPermission = (card.abilities || []).some((ability) =>
+        normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "if your opponent's active pokemon is a pokemon-gx or pokemon-ex, this pokemon can evolve during the turn you play it.",
+      ) && Boolean(opposingSide?.front.some((pokemon) => pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => ['ex', 'pokemon-ex', 'gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype)))))
+      const canEvolveOnPlayTurn = (target.playedToBenchTurn === turnNumber || target.playedToFrontTurn === turnNumber) &&
+        (hasEarlyEvolutionPermission(target.abilities, targetIsActive) || hasEarlyEvolutionPermission(card.abilities, false) || hasOpponentActiveExEvolutionPermission)
+      const sideGoesSecond = sideKey === 'player' ? playerGoesSecond === true : playerGoesSecond === undefined || playerGoesSecond === false
+      const secondPlayerEvolutionPermission = sideGoesSecond && !isTcgBattleAbilitySuppressedByShadyTail(target, [side, opposingSide || side]) && (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'if you go second, this pokemon can evolve during your first turn.')
+      const canEvolveOnFirstTurn = turnNumber === 1 && (
+        hasEarlyEvolutionPermission(card.abilities, false) || hasEarlyEvolutionPermission(target.abilities, targetIsActive)
+        || secondPlayerEvolutionPermission
+      )
+      if ((turnNumber < costUnlockTurn || turnNumber < stageUnlockTurn) && !canEvolveOnFirstTurn && !canEvolveOnPlayTurn) continue
+      const frothAbility = targetIsActive && normalizeTcgBattlePokemonName(card.name) === 'azumarill'
+        ? (card.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex })).find(({ ability }) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "once during your turn, when you play azumarill from your hand to evolve 1 of your active pokemon, you may use this power. each defending pokemon is now paralyzed.")
+        : undefined
+      options.push({ targetId: target.instanceId, targetName: target.name, card, ...(frothAbility ? { effect: 'azumarillFroth' as const, abilityIndex: frothAbility.abilityIndex, abilityName: frothAbility.ability.name } : {}) })
     }
   }
   return options
@@ -25898,17 +29772,42 @@ export function applyTcgBattleEvolution(
   targetId: string,
   evolutionCardId: string,
   turnNumber: number,
+  sideKey: TcgBattleSide = 'player',
+  opposingSide?: TcgBattleSideState,
+  playerGoesSecond?: boolean,
+  battleState?: TcgBattleState,
 ): { target: TcgBattleCardState; evolution: TcgBattleCardSummary; previousName: string } | null {
-  const option = getTcgBattleEvolutionOptions(side, turnNumber).find(
+  const option = getTcgBattleEvolutionOptions(side, turnNumber, sideKey, opposingSide, playerGoesSecond).find(
     (candidate) => candidate.targetId === targetId && candidate.card.id === evolutionCardId,
   )
   if (!option) return null
   const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId)
   if (!target) return null
-  const evolutionDeckIndex = side.deck.findIndex((card) => card.id === option.card.id)
-  if (evolutionDeckIndex < 0) return null
-  side.deck.splice(evolutionDeckIndex, 1)
+  const evolutionHandIndex = side.hand.findIndex((card) => card.id === option.card.id)
+  if (evolutionHandIndex < 0) return null
+  if ((option.effect === 'meganiumStage2' || option.effect === 'dittoPrismStage1') && option.abilitySourceId !== undefined && option.abilityIndex !== undefined && option.abilityName) {
+    const provider = [...side.front, ...side.back].find((card) => card.instanceId === option.abilitySourceId)
+    if (!provider) return null
+    provider.abilityUses = { ...provider.abilityUses, [`${option.abilityIndex}:${option.abilityName}`]: turnNumber }
+  }
+  if ((option.effect === 'pichuHeal' || option.effect === 'eeveeHeal' || option.effect === 'babyHeal') && option.abilityIndex !== undefined && option.abilityName) {
+    target.abilityUses = { ...target.abilityUses, [`${option.abilityIndex}:${option.abilityName}`]: turnNumber }
+  }
+  const [evolutionCard] = side.hand.splice(evolutionHandIndex, 1)
 
+  const {
+    instanceId: _evolutionInstanceId,
+    currentHp: _evolutionCurrentHp,
+    playedToBenchTurn: _evolutionPlayedToBenchTurn,
+    playedToFrontTurn: _evolutionPlayedToFrontTurn,
+    abilityUses: _evolutionAbilityUses,
+    evolutionStack: _evolutionStack,
+    statusConditions: _evolutionStatusConditions,
+    incomingAttackModifier: _evolutionIncomingAttackModifier,
+    temporaryEffects: _evolutionTemporaryEffects,
+    markers: _evolutionMarkers,
+    ...evolutionSummary
+  } = evolutionCard
   const damageCounters = Math.max(0, target.hp - target.currentHp)
   const previousName = target.name
   const {
@@ -25922,16 +29821,53 @@ export function applyTcgBattleEvolution(
     ...previousSummary
   } = target
   const stack = [...(evolutionStack || []).map((card) => ({ ...card })), previousSummary]
-  Object.assign(target, option.card, {
+  previousSummary.hp = Math.max(1, previousSummary.hp - (target.temporaryEffects?.abilityHpBonus || 0))
+  const poisonSacsPreservesPoison = target.statusConditions?.includes('poisoned') && Boolean(opposingSide && [...opposingSide.front, ...opposingSide.back].some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
+    (provider.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === "the special condition poisoned is not removed when your opponent's pokemon evolve or devolve." ||
+        text === "your opponent's poisoned pokemon don't recover from that special condition when they evolve or devolve." ||
+        text === "your opponent can't remove the special condition poisoned by evolving or devolving his or her poisoned pokemon. (this also includes putting a pokemon level-up card onto the poisoned pokemon.)"
+    }),
+  ))
+  const gliscorStopsConditionRemoval = Boolean(opposingSide?.front.some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattleAbilityText(provider.name) === 'gliscor' &&
+    !isTcgBattleAbilitySuppressedByShadyTail(provider, [side, opposingSide]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as gliscor is your active pokemon, your opponent can't remove any special conditions by evolving or devolving his or her pokemon. (this also includes putting a pokemon level-up card onto that pokemon)."),
+  ))
+  const heatranStopsBurnRemoval = Boolean(target.statusConditions?.includes('burned') && opposingSide && [...opposingSide.front, ...opposingSide.back].some((provider) =>
+    provider.currentHp > 0 && normalizeTcgBattlePokemonName(provider.name) === 'heatranlvx' &&
+    !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "your opponent can't remove the special condition burned by evolving or devolving his or her burned pokemon. (this also includes putting a pokemon level-up card onto the burned pokemon.) whenever your opponent flips a coin for the special condition burned between turns, treat it as tails."),
+  ))
+  Object.assign(target, evolutionSummary, {
     instanceId,
-    currentHp: Math.max(0, option.card.hp - damageCounters),
+    currentHp: Math.max(0, evolutionSummary.hp - damageCounters),
     evolutionStack: stack,
-    statusConditions: undefined,
+    statusConditions: gliscorStopsConditionRemoval ? target.statusConditions : heatranStopsBurnRemoval ? ['burned'] : poisonSacsPreservesPoison ? ['poisoned'] : undefined,
     incomingAttackModifier: undefined,
     temporaryEffects: undefined,
     markers: undefined,
   })
-  return { target, evolution: option.card, previousName }
+  if (option.effect === 'phantumpDamageEvolve' && option.abilityIndex !== undefined && option.abilityName) {
+    const usageKey = `${option.abilityIndex}:${option.abilityName}`
+    target.abilityUses = { ...target.abilityUses, [usageKey]: turnNumber }
+    target.currentHp = Math.max(1, target.currentHp - 20)
+    if (battleState) battleState.log.unshift(`${previousName}'s ${option.abilityName} evolved it into ${target.name} and placed 2 damage counters on it.`)
+  }
+  const activeHealAmount = getTcgBattleEvolutionActiveHealAmount(evolutionSummary)
+  if (activeHealAmount > 0 && battleState && !isTcgBattleAbilitySuppressed(target, [battleState.player, battleState.opponent])) {
+    const active = battleState[sideKey].front.find((card) => card.currentHp > 0 && card.currentHp < card.hp)
+    if (active && !isTcgBattleHealingPreventedForTarget(battleState, sideKey, active)) {
+      const healed = Math.min(active.hp - active.currentHp, getTcgBattleAbilityHealingAmount(active, activeHealAmount))
+      active.currentHp += healed
+      if (healed > 0) battleState.log.unshift(`${evolutionSummary.name}'s Ability healed ${healed} damage from ${active.name} as it evolved.`)
+    }
+  }
+  compactTcgBattleBoard(side)
+  clearTcgBattleMetalSymbolConditions(side, opposingSide || side)
+  return { target, evolution: evolutionSummary, previousName }
 }
 
 export function getTcgBattleDeckSearchMaxCount(params: {
@@ -25985,10 +29921,183 @@ export function getAvailableTcgBattleDeckPokemon(
   })
 }
 
+/** Reconciles Flashfire Floette's team HP aura while preserving existing damage counters. */
+export function syncTcgBattleFloetteFlowerVeil(state: TcgBattleState): boolean {
+  let causedKnockout = false
+  const gravitationText = "each pokemon in play (both yours and your opponent's) gets -20 hp. no more than 20 hp can be reduced by all gravitation poke-bodies."
+  const gravitationActive = [state.player, state.opponent].some((owner) => [...owner.front, ...owner.back].some((provider) =>
+    provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [state.player, state.opponent]) &&
+    (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === gravitationText),
+  ))
+  for (const sideKey of ['player', 'opponent'] as const) {
+    const side = state[sideKey]
+    const board = [...side.front, ...side.back]
+    const activeIds = new Set(side.front.map((card) => card.instanceId))
+    const opposingSide = state[sideKey === 'player' ? 'opponent' : 'player']
+    const opposingBoard = [...opposingSide.front, ...opposingSide.back].filter((pokemon) => pokemon.currentHp > 0)
+    const allOpposingPokemonAreFusionStrike = opposingBoard.length > 0 && opposingBoard.every((pokemon) => pokemon.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'fusion strike'))
+    const toxtricityMaxHpPenaltyCount = allOpposingPokemonAreFusionStrike
+      ? opposingBoard.filter((provider) => !isTcgBattleAbilitySuppressed(provider, [state.player, state.opponent]) &&
+        (provider.abilities || []).some((ability) => {
+          const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+          return text === "if all your pokemon in play are fusion strike pokemon, your opponent's pokemon vmax in play get -30 hp." && isTcgBattleAbilityEnabled(text, provider, false)
+        }),
+      ).length
+      : 0
+    const providers = board.flatMap((provider) => provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [state.player, state.opponent])
+      ? (provider.abilities || []).flatMap((ability) => {
+          const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+          const typeNames: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+          const typeMatch = text.match(/^each of your (?:\{([grwlpfmdyc])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless)) pokemon(?: in play)? gets \+(\d+) hp\.$/)
+          const allMatch = text.match(/^(?:all|each) of your pokemon(?: in play)? (?:get|gets) \+(\d+) hp\.(?: the effect of [^.]+ doesn't stack\.)?$/)
+          const plasmaMatch = text.match(/^each of your team plasma pokemon in play gets \+(\d+) hp\.$/)
+          const subtypeMatch = text.match(/^your (single strike|grass) pokemon in play, except any ([a-z0-9 '’-]+), get \+(\d+) hp\. you can't apply more than 1 [^.]+ ability at a time\.$/)
+          const eeveeMatch = text.match(/^each of your pokemon that evolves from eevee gets \+(\d+) hp\.(?: you can't use more than 1 [^.]+ poke-body each turn\.)?$/)
+          const eeveeGxMatch = text.match(/^your pokemon-gx in play that evolve from eevee get \+(\d+) hp\. you can't apply more than 1 vitality cheer ability at a time\.$/)
+          const gratefulShaymin = text.match(/^each of your grass pokemon \(excluding any shaymin\) gets \+(\d+) hp\. you can't use more than 1 thankfulness poke-body each turn\.$/)
+          const lunatoneMaxHp = normalizeTcgBattlePokemonName(provider.name) === 'solrock'
+            ? text.match(/^the maximum hp (?:for each|of each of your) lunatone(?: you have)? in play is (?:now )?(80|130)\.$/)
+            : null
+          if (!isTcgBattleAbilityEnabled(text, provider, activeIds.has(provider.instanceId))) return []
+          const amount = Number(typeMatch?.[3] || allMatch?.[1] || plasmaMatch?.[1] || subtypeMatch?.[3] || eeveeMatch?.[1] || eeveeGxMatch?.[1] || gratefulShaymin?.[1] || lunatoneMaxHp?.[1] || 0)
+          if (!amount) return []
+          const scope = typeMatch ? 'type' : allMatch ? 'all' : plasmaMatch ? 'plasma' : subtypeMatch ? 'subtype' : eeveeMatch ? 'eevee' : eeveeGxMatch ? 'eeveeGx' : lunatoneMaxHp ? 'lunatoneMaxHp' : 'grass'
+          const type = typeMatch ? typeMatch[1] ? typeNames[typeMatch[1]] : typeMatch[2] : 'grass'
+          const subtype = subtypeMatch?.[1].toLowerCase()
+          const excludeName = subtypeMatch?.[2].toLowerCase()
+          const nonStacking = Boolean(allMatch || subtypeMatch || eeveeMatch || eeveeGxMatch || gratefulShaymin || lunatoneMaxHp)
+          return [{ provider, text, type, amount, scope, subtype, excludeName, nonStacking }]
+        })
+      : [],
+    )
+    for (const card of [...board, ...side.hand, ...side.discard]) {
+      const isOnBoard = board.some((pokemon) => pokemon.instanceId === card.instanceId)
+      const isInHand = side.hand.some((pokemon) => pokemon.instanceId === card.instanceId)
+      const previousBonus = card.temporaryEffects?.abilityHpBonus || 0
+      const baseHp = card.hp - previousBonus
+      const isGourgeist = normalizeTcgBattleAbilityText(card.name) === 'gourgeist' &&
+        (card.abilities || []).some((ability) => {
+          const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+          return text === 'if this pokemon has any grass energy attached to it, its maximum hp is 200.' &&
+            isTcgBattleAbilityEnabled(text, card, activeIds.has(card.instanceId))
+        })
+      const gourgeistBonus = isOnBoard && isGourgeist && side.energy > 0 && side.selectedEnergy?.toLowerCase() === 'grass'
+        ? Math.max(0, 200 - baseHp)
+        : 0
+      const selfAbilityHpBonus = isOnBoard && !isTcgBattleAbilitySuppressed(card, [state.player, state.opponent])
+        ? (card.abilities || []).reduce((bonus, ability) => {
+            const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim().replace(/ this power works even if .+\.$/, '')
+            if (!isTcgBattleAbilityEnabled(text, card, activeIds.has(card.instanceId))) return bonus
+            if (text === 'as long as hitmonchan is an evolved pokemon, hitmonchan gets +30 hp.' && normalizeTcgBattleAbilityText(card.name) === 'hitmonchan' && card.evolutionStack?.length) return bonus + 30
+            const activeBenchHp = text.match(/^if this pokemon is your active pokemon, it gets \+(\d+) hp for each of your benched pokemon\.$/)
+            if (activeBenchHp && activeIds.has(card.instanceId)) return bonus + Number(activeBenchHp[1]) * side.back.filter((pokemon) => pokemon.currentHp > 0).length
+            const namedBoardHp = text.match(/^([a-z0-9 '’-]+) gets \+(\d+) hp for each ([a-z0-9 '’-]+) you have in play\.$/)
+            if (namedBoardHp && normalizeTcgBattleAbilityText(card.name) === namedBoardHp[1]) {
+              const count = board.filter((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) === namedBoardHp[3]).length
+              return bonus + Number(namedBoardHp[2]) * count
+            }
+            const energyTypeNames: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+            const thresholdHp = text.match(/^if (this pokemon|[a-z0-9 '’-]+) has (\d+) or more (?:\{([grwlpfmdyc])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless)) energy attached(?: to (it|[a-z0-9 '’-]+))?, (it|this pokemon|[a-z0-9 '’-]+) gets \+(\d+) hp\.$/)
+            const energyPerHp = text.match(/^(this pokemon|[a-z0-9 '’-]+) gets \+(\d+) hp for each (?:\{([grwlpfmdyc])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless)) energy cards? attached to (it|[a-z0-9 '’-]+)\.$/)
+            const thresholdMatchesCard = Boolean(thresholdHp && (thresholdHp[1] === 'this pokemon' || normalizeTcgBattleAbilityText(thresholdHp[1]) === normalizeTcgBattleAbilityText(card.name)) && (!thresholdHp[5] || thresholdHp[5] === 'it' || normalizeTcgBattleAbilityText(thresholdHp[5]) === normalizeTcgBattleAbilityText(card.name)) && (thresholdHp[6] === 'it' || thresholdHp[6] === 'this pokemon' || normalizeTcgBattleAbilityText(thresholdHp[6]) === normalizeTcgBattleAbilityText(card.name)))
+            const energyPerMatchesCard = Boolean(energyPerHp && (energyPerHp[1] === 'this pokemon' || normalizeTcgBattleAbilityText(energyPerHp[1]) === normalizeTcgBattleAbilityText(card.name)) && (energyPerHp[5] === 'it' || normalizeTcgBattleAbilityText(energyPerHp[5]) === normalizeTcgBattleAbilityText(card.name)))
+            const energySymbol = thresholdHp?.[3] || energyPerHp?.[3]
+            const energyName = thresholdHp?.[4] || energyPerHp?.[4]
+            const energyType = energySymbol ? energyTypeNames[energySymbol] : energyName
+            const energyCount = side.selectedEnergy?.toLowerCase() === energyType ? side.energy : 0
+            if (thresholdMatchesCard && energyCount >= Number(thresholdHp?.[2])) return bonus + Number(thresholdHp?.[7])
+            if (energyPerMatchesCard && energyCount > 0) return bonus + Number(energyPerHp?.[2]) * energyCount
+            return bonus
+          }, 0)
+        : 0
+      const matchingHpProviders = isOnBoard ? providers.filter((provider) =>
+        provider.scope === 'all' || provider.scope === 'plasma' && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'team plasma') ||
+        provider.scope === 'subtype' && card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === provider.subtype) && normalizeTcgBattleAbilityText(card.name) !== provider.excludeName ||
+        provider.scope === 'eevee' && isTcgBattleEeveeEvolution(card) || provider.scope === 'eeveeGx' && isTcgBattleEeveeEvolution(card) && card.subtypes.some((subtype) => ['gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype))) || provider.scope === 'grass' && card.types.some((type) => normalizeTcgBattleAbilityText(type) === 'grass' && !normalizeTcgBattleAbilityText(card.name).includes('shaymin')) ||
+        provider.scope === 'type' && card.types.some((type) => normalizeTcgBattleAbilityText(type) === provider.type) ||
+        provider.scope === 'lunatoneMaxHp' && normalizeTcgBattlePokemonName(card.name) === 'lunatone',
+      ) : []
+      const stackedHpProviders = new Map<string, number>()
+      for (const provider of matchingHpProviders) {
+        if (provider.scope === 'lunatoneMaxHp') continue
+        const key = provider.nonStacking ? `${provider.scope}:${provider.text}` : provider.provider.instanceId
+        if (!stackedHpProviders.has(key)) stackedHpProviders.set(key, provider.amount)
+      }
+      const lunatoneMaximumHp = matchingHpProviders.filter((provider) => provider.scope === 'lunatoneMaxHp').reduce((maximum, provider) => Math.max(maximum, provider.amount), 0)
+      const lunatoneMaximumHpBonus = lunatoneMaximumHp ? lunatoneMaximumHp - baseHp : 0
+      const teamHpBonus = [...stackedHpProviders.values()].reduce((total, amount) => total + amount, 0) + lunatoneMaximumHpBonus
+      const opponentMaxHpPenalty = isOnBoard && card.subtypes.some((subtype) => ['vmax', 'pokemon vmax'].includes(normalizeTcgBattleAbilityText(subtype)))
+        ? -30 * toxtricityMaxHpPenaltyCount
+        : 0
+      const gravitationHpPenalty = isOnBoard && gravitationActive ? -20 : 0
+      const nextBonus = gourgeistBonus + selfAbilityHpBonus + teamHpBonus + opponentMaxHpPenalty + gravitationHpPenalty
+      const delta = nextBonus - previousBonus
+      if (delta === 0) continue
+      card.hp += delta
+      if (isInHand) card.currentHp += delta
+      else if (isOnBoard && card.currentHp > 0) {
+        card.currentHp += delta
+        if (card.currentHp <= 0) causedKnockout = true
+      }
+      if (nextBonus !== 0) {
+        card.temporaryEffects ||= {}
+        card.temporaryEffects.abilityHpBonus = nextBonus
+      } else if (card.temporaryEffects) {
+        delete card.temporaryEffects.abilityHpBonus
+        if (Object.keys(card.temporaryEffects).length === 0) delete card.temporaryEffects
+      }
+    }
+  }
+  return causedKnockout
+}
+
 export function compactTcgBattleBoard(side: TcgBattleSideState): void {
   const faintedFront = side.front.filter((card) => card.currentHp <= 0)
   const faintedBack = side.back.filter((card) => card.currentHp <= 0)
+  side.knockoutCount = (side.knockoutCount || 0) + faintedFront.length + faintedBack.length
   for (const card of [...faintedFront, ...faintedBack]) {
+    if (card.temporaryEffects?.abilityHpBonus) {
+      card.hp = Math.max(1, card.hp - card.temporaryEffects.abilityHpBonus)
+      delete card.temporaryEffects.abilityHpBonus
+    }
+    if (card.transformOriginal) {
+      const original = card.transformOriginal
+      card.hp = original.hp
+      card.currentHp = 0
+      card.types = [...original.types]
+      card.weaknesses = original.weaknesses.map((entry) => ({ ...entry }))
+      card.resistances = original.resistances.map((entry) => ({ ...entry }))
+      card.convertedRetreatCost = original.convertedRetreatCost
+      card.attacks = original.attacks.map((attack) => ({ ...attack, cost: [...attack.cost] }))
+      delete card.transformOriginal
+    }
+    if (card.temporaryEffects?.rescueEvolutionStackToHandOnKnockout) {
+      for (const [index, summary] of (card.evolutionStack || []).entries()) {
+        side.hand.push({ ...summary, instanceId: `${summary.id}:hand:${card.instanceId}:${index}`, currentHp: summary.hp })
+      }
+      const { evolutionStack: _stack, instanceId: _instanceId, currentHp: _currentHp, playedToBenchTurn: _playedToBenchTurn, abilityUses: _abilityUses, statusConditions: _statusConditions, incomingAttackModifier: _incomingAttackModifier, temporaryEffects: _temporaryEffects, markers: _markers, ...returnedCard } = card
+      side.hand.push({ ...returnedCard, instanceId: `${returnedCard.id}:hand:${card.instanceId}`, currentHp: returnedCard.hp })
+      continue
+    }
+    if (card.temporaryEffects?.returnToHandOnKnockout) {
+      for (const [index, summary] of (card.evolutionStack || []).entries()) {
+        side.discard.push({
+          ...summary,
+          instanceId: `${summary.id}:discard:${card.instanceId}:${index}`,
+          currentHp: 0,
+        })
+      }
+      const { evolutionStack: _stack, instanceId: _instanceId, currentHp: _currentHp, playedToBenchTurn: _playedToBenchTurn, abilityUses: _abilityUses, statusConditions: _statusConditions, incomingAttackModifier: _incomingAttackModifier, temporaryEffects: _temporaryEffects, markers: _markers, ...returnedCard } = card
+      side.hand.push({ ...returnedCard, instanceId: `${returnedCard.id}:hand:${card.instanceId}`, currentHp: returnedCard.hp })
+      continue
+    }
+    if (card.temporaryEffects?.lostZoneOnKnockout) {
+      side.lostZone ||= []
+      side.lostZone.push(...(card.evolutionStack || []).map((summary) => ({ ...summary })))
+      const { evolutionStack: _stack, instanceId: _instanceId, currentHp: _currentHp, playedToBenchTurn: _playedToBenchTurn, abilityUses: _abilityUses, statusConditions: _statusConditions, incomingAttackModifier: _incomingAttackModifier, temporaryEffects: _temporaryEffects, markers: _markers, ...summary } = card
+      side.lostZone.push(summary)
+      continue
+    }
     for (const [index, summary] of (card.evolutionStack || []).entries()) {
       side.discard.push({
         ...summary,
@@ -26001,6 +30110,16 @@ export function compactTcgBattleBoard(side: TcgBattleSideState): void {
   }
   side.front = side.front.filter((card) => card.currentHp > 0)
   side.back = side.back.filter((card) => card.currentHp > 0)
+  if (!hasTcgBattleEternatusBenchExpansion(side) && side.back.length > 5) {
+    const excess = side.back.splice(5)
+    for (const card of excess) {
+      for (const [index, summary] of (card.evolutionStack || []).entries()) {
+        side.discard.push({ ...summary, instanceId: `${summary.id}:discard:${card.instanceId}:${index}`, currentHp: 0 })
+      }
+      const { evolutionStack: _evolutionStack, ...discardedCard } = card
+      side.discard.push(discardedCard)
+    }
+  }
 }
 
 type OpponentTcgBattleAttackOption = {
@@ -26215,8 +30334,8 @@ function scoreOpponentAttackOption(
   attackIndex: number,
   choice?: TcgBattleAttackChoice,
 ): OpponentTcgBattleAttackOption {
-  const attack = attacker.attacks[attackIndex]
-  const energyCost = getEffectiveTcgBattleAttackCost(state, attack)
+  const attack = getTcgBattleAvailableAttacks(state, 'opponent', attacker)[attackIndex]
+  const energyCost = getEffectiveTcgBattleAttackCost(state, attack, attacker, 'opponent')
   const sampleScores: number[] = []
   let knockoutSamples = 0
   let expectedDamage = 0
@@ -26280,10 +30399,11 @@ function getOpponentAttackOptions(state: TcgBattleState, attackerFilter?: string
 
   for (const attacker of state.opponent.front.filter((card) => card.currentHp > 0)) {
     if (attackerFilter && attacker.instanceId !== attackerFilter) continue
+    if (!isTcgBattleAbilityAttackAllowed(state, 'opponent', attacker)) continue
     if (!isTcgBattleSummaryUnlocked(attacker, state.turnNumber)) continue
-    for (const [attackIndex, attack] of attacker.attacks.entries()) {
+    for (const [attackIndex, attack] of getTcgBattleAvailableAttacks(state, 'opponent', attacker).entries()) {
       if (isTcgBattleAttackDisabled(attacker, attackIndex)) continue
-      const cost = getEffectiveTcgBattleAttackCost(state, attack)
+      const cost = getEffectiveTcgBattleAttackCost(state, attack, attacker, 'opponent')
       if (cost > maxCost || cost > state.opponent.energy) continue
       for (const target of getValidTcgBattleTargets(state, 'opponent', attacker, attack)) {
         const choice = chooseTcgBattleAttackChoice({
@@ -26314,8 +30434,8 @@ function compareOpponentAttackOptions(a: OpponentTcgBattleAttackOption, b: Oppon
     a.target.name.localeCompare(b.target.name)
 }
 
-export function chooseOpponentTcgBattleAttack(state: TcgBattleState) {
-  return getOpponentAttackOptions(state).sort(compareOpponentAttackOptions)[0] || null
+export function chooseOpponentTcgBattleAttack(state: TcgBattleState, attackerFilter?: string) {
+  return getOpponentAttackOptions(state, attackerFilter).sort(compareOpponentAttackOptions)[0] || null
 }
 
 function getProjectedOpponentAttackerScore(
@@ -26359,6 +30479,7 @@ function getOpponentEvolutionValue(
     opponent: {
       ...state.opponent,
       deck: [...state.opponent.deck],
+      hand: state.opponent.hand.map((card) => ({ ...card })),
       front: state.opponent.front.map((card) => ({ ...card })),
       back: state.opponent.back.map((card) => ({ ...card })),
     },
@@ -26372,8 +30493,12 @@ function getOpponentEvolutionValue(
     evolution.targetId,
     evolution.card.id,
     state.turnNumber,
+    'opponent',
+    projection.player,
+    state.playerGoesSecond,
   )
   if (!evolved) return Number.NEGATIVE_INFINITY
+  if (!isTcgBattleHealingPrevented(projection) && (evolution.effect === 'pichuHeal' || evolution.effect === 'eeveeHeal' || evolution.effect === 'babyHeal')) evolved.target.currentHp = evolved.target.hp
   const evolvedPotential = getProjectedOpponentAttackerScore(
     projection,
     evolution.targetId,
@@ -26385,11 +30510,11 @@ function getOpponentEvolutionValue(
     .reduce((sum, status) => sum + getOpponentStatusValue(status) * (status === 'poisoned' || status === 'burned' ? 0.75 : 0.55), 0)
   const defensiveEffectLoss = current.incomingAttackModifier ? 5 : 0
   const futureValue = (evolvedPotential - currentPotential) * (isFront ? 0.85 : 0.45)
-  return futureValue + extraHp * (isFront ? 0.7 : 0.45) + clearedStatusValue - defensiveEffectLoss
+  return futureValue + extraHp * (isFront ? 0.7 : 0.45) + clearedStatusValue - defensiveEffectLoss + (evolution.effect === 'pichuHeal' || evolution.effect === 'eeveeHeal' || evolution.effect === 'babyHeal' ? extraHp * (isFront ? 0.5 : 0.3) : 0)
 }
 
 function getBestOpponentEvolution(state: TcgBattleState): { option: TcgBattleEvolutionOption; value: number } | null {
-  return getTcgBattleEvolutionOptions(state.opponent, state.turnNumber)
+  return getTcgBattleEvolutionOptions(state.opponent, state.turnNumber, 'opponent', state.player, state.playerGoesSecond)
     .map((option) => ({ option, value: getOpponentEvolutionValue(state, option) }))
     .sort((a, b) => b.value - a.value || b.option.card.cost - a.option.card.cost || a.option.card.name.localeCompare(b.option.card.name))[0] || null
 }
@@ -26443,11 +30568,11 @@ export function canSideTakeTcgBattleAction(state: TcgBattleState, sideKey: TcgBa
   const maxCost = getAllowedTcgBattleAttackCost(state.turnNumber)
   return side.front.some((card) =>
     card.currentHp > 0 &&
+    isTcgBattleAbilityAttackAllowed(state, sideKey, card) &&
     isTcgBattleSummaryUnlocked(card, state.turnNumber) &&
-    card.attacks.some((attack) => {
-      const attackIndex = card.attacks.indexOf(attack)
+    getTcgBattleAvailableAttacks(state, sideKey, card).some((attack, attackIndex) => {
       if (isTcgBattleAttackDisabled(card, attackIndex)) return false
-      const cost = getEffectiveTcgBattleAttackCost(state, attack)
+      const cost = getEffectiveTcgBattleAttackCost(state, attack, card, sideKey)
       if (cost > maxCost || cost > side.energy) return false
       return getValidTcgBattleTargets(state, sideKey, card, attack).some((target) => {
         const required = getTcgBattleAttackEffect(attack)?.choiceRequirement
@@ -26482,6 +30607,37 @@ function isOptionalBenchChoiceSatisfied(
 
 export function canSideChargeEnergy(state: TcgBattleState, sideKey: TcgBattleSide): boolean {
   return state[sideKey].energy < TCG_BATTLE_FORMATS[state.format].energyCap
+}
+
+/** Approximate Ancient Trait α Growth when the shared-pool charge represents attaching to its holder. */
+export function getTcgBattleEnergyChargeBonus(state: TcgBattleState, sideKey: TcgBattleSide): number {
+  const side = state[sideKey]
+  const board = [...side.front, ...side.back].filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]))
+  const alphaGrowth = board.filter((card) =>
+    card.types.some((type) => normalizeTcgBattleAbilityText(type) === normalizeTcgBattleAbilityText(side.selectedEnergy || '')) &&
+    (card.abilities || []).some((ability) => /^when you attach an energy card from your hand to this pokemon \(except with an attack, ability, or trainer card\), you may attach 2 energy cards\.$/.test(normalizeTcgBattleAbilityText(ability.text))),
+  ).length
+  const harmonics = board.some((card) => (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'whenever you attach an energy card from your hand to 1 of your pokemon, except with an attack, ability, or trainer card, attach up to 2 energy cards to that pokemon instead of 1.'))
+  const venusaurGrowth = board.reduce((total, card) => {
+    if (normalizeTcgBattleAbilityText(card.name) !== 'venusaur' || card.statusConditions?.length) return total
+    return total + (card.abilities || []).filter((ability, abilityIndex) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === "once during your turn (before your attack), if you attach an energy card to your active pokemon as part of your turn, you may attach an additional energy card to that pokemon at the same time. this power can't be used if venusaur is affected by a special condition." && card.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber
+    }).length
+  }, 0)
+  return alphaGrowth + Number(harmonics) + venusaurGrowth
+}
+
+export function markTcgBattleEnergyChargeBonusUsed(state: TcgBattleState, sideKey: TcgBattleSide): void {
+  const side = state[sideKey]
+  for (const card of [...side.front, ...side.back]) {
+    if (card.currentHp <= 0 || card.statusConditions?.length || isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]) || normalizeTcgBattleAbilityText(card.name) !== 'venusaur') continue
+    for (const [abilityIndex, ability] of (card.abilities || []).entries()) {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      if (text !== "once during your turn (before your attack), if you attach an energy card to your active pokemon as part of your turn, you may attach an additional energy card to that pokemon at the same time. this power can't be used if venusaur is affected by a special condition.") continue
+      card.abilityUses = { ...card.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
+    }
+  }
 }
 
 export function canTcgBattleEndByPassStall(state: TcgBattleState): boolean {
@@ -27588,7 +31744,7 @@ function calculateTcgBattleBenchDamage(
         ? !rule.ignoreWeaknessResistance
         : Boolean(rule.applyWeaknessResistanceOnBench) && !rule.ignoreWeaknessResistanceOnBench
       const damage = targetSide !== sideKey && appliesWeaknessResistance
-        ? applyTcgWeaknessAndResistance(attacker, card, amount)
+        ? applyTcgWeaknessAndResistance(attacker, card, amount, { targetIsActive: isFront, state, targetSide })
         : amount
       if (rule.perTargetCoinFlip) {
         const result = coinFlips?.results[perTargetCoinIndex]
@@ -28563,7 +32719,7 @@ export function validateTcgBattleAttackChoice(params: {
     if (choice.kind !== 'deckPokemon') return 'Choose Pokémon from your deck.'
     const rule = effect.special?.find((entry) => entry.kind === 'searchDeckPokemon')
     if (rule?.kind !== 'searchDeckPokemon') return 'That attack cannot search the deck.'
-    const available = getAvailableTcgBattleDeckPokemon(own, rule)
+    const available = getAvailableTcgBattleDeckPokemon(own, rule).filter((card) => rule.destination === 'hand' || canTcgBattlePutPokemonOnBench(own, card))
     const eligibleIds = new Set(available.map((card) => card.id))
     const maxCount = Math.min(
       getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }),
@@ -28621,7 +32777,7 @@ export function validateTcgBattleAttackChoice(params: {
 
   if (required === 'copyAttack') {
     if (choice.kind !== 'copiedAttack') return 'Choose an attack to copy.'
-    const copied = target.attacks[choice.attackIndex]
+    const copied = getTcgBattleAvailableAttacks(state, sideKey === 'player' ? 'opponent' : 'player', target)[choice.attackIndex]
     const copiedEffect = copied && getTcgBattleAttackEffect(copied)
     if (!copied || !copiedEffect || copiedEffect.special?.some((rule) => rule.kind === 'copyAttack')) {
       return 'That attack cannot be copied.'
@@ -28641,7 +32797,7 @@ export function validateTcgBattleAttackChoice(params: {
     return null
   }
   if (required === 'disableAttack') {
-    return choice.kind === 'disabledAttack' && target.attacks[choice.attackIndex]
+    return choice.kind === 'disabledAttack' && getTcgBattleAvailableAttacks(state, sideKey === 'player' ? 'opponent' : 'player', target)[choice.attackIndex]
       ? null
       : 'Choose a valid opposing attack.'
   }
@@ -28805,7 +32961,7 @@ export function chooseTcgBattleAttackChoice(params: {
       getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }),
       rule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(side),
     )
-    const available = getAvailableTcgBattleDeckPokemon(side, rule)
+    const available = getAvailableTcgBattleDeckPokemon(side, rule).filter((card) => rule.destination === 'hand' || canTcgBattlePutPokemonOnBench(side, card))
       .sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a) || a.name.localeCompare(b.name))
     const selected: typeof available = []
     const selectedNames = new Set<string>()
@@ -30091,42 +34247,358 @@ export function doesTcgBattleConditionPass(
   return condition === 'heads' ? coinFlips.heads > 0 : coinFlips.tails > 0
 }
 
-function applyTcgWeaknessAndResistance(
+function isTcgBattleWeaknessRemovedByBoardAbility(
+  state: TcgBattleState,
+  targetSide: TcgBattleSide,
+  target: TcgBattleCardState,
+): boolean {
+  const targetTypes = target.types.map(normalizeTcgBattleAbilityText)
+  const targetSubtypes = target.subtypes.map(normalizeTcgBattleAbilityText)
+  for (const providerSide of ['player', 'opponent'] as const) {
+    const providerIsTargetSide = providerSide === targetSide
+    const board = [...state[providerSide].front, ...state[providerSide].back].filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]))
+    for (const provider of board) {
+      const providerIsActive = state[providerSide].front.some((card) => card.instanceId === provider.instanceId)
+      for (const ability of provider.abilities || []) {
+        const text = normalizeTcgBattleAbilityText(ability.text)
+        if (providerIsTargetSide && text.replace(/\s+/g, ' ').trim() === 'each of your pokemon that has any energy attached to it has no weakness.' && state[targetSide].energy > 0 && isTcgBattleAbilityEnabled(text, provider, providerIsActive)) return true
+        if (providerIsTargetSide && text.replace(/\s+/g, ' ').trim() === 'each of your pokemon has no weakness.' && isTcgBattleAbilityEnabled(text, provider, providerIsActive)) return true
+        if (providerIsTargetSide && text.replace(/\s+/g, ' ').trim() === 'each of your pokemon that evolves from eevee has no weakness, and that pokemon\'s retreat cost is 0.' && isTcgBattleEeveeEvolution(target) && isTcgBattleAbilityEnabled(text, provider, providerIsActive)) return true
+        if (providerIsTargetSide && normalizeTcgBattleAbilityText(provider.name) === 'kabuto' && !isTcgBattleAbilitySuppressed(provider, [state.player, state.opponent]) &&
+          text === 'each of your omanyte, omastar, kabuto, kabutops, and kabutops ex has no weakness.' &&
+          ['omanyte', 'omastar', 'kabuto', 'kabutops', 'kabutops ex'].some((name) => normalizeTcgBattleAbilityText(target.name).replace(/\s+δ$/, '') === name)) return true
+        if (!/(?:has|have) no weakness|weakness is removed|has no weakness to/.test(text)) continue
+        if (/energy attached|special condition|stadium|pokemon tool/.test(text)) continue
+        if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) continue
+        if (!providerIsTargetSide && !/both yours and your opponent's|both your and your opponent's/.test(text)) continue
+        if (/if you have uxie and azelf in play/.test(text) && !board.some((card) => /uxie/i.test(card.name))) continue
+        if (/if you have uxie and azelf in play/.test(text) && !board.some((card) => /azelf/i.test(card.name))) continue
+
+        const activePokemonScope = /(?:your|each of your|all of your) active pokemon/.test(text)
+        if (activePokemonScope && !state[targetSide].front.some((card) => card.instanceId === target.instanceId)) continue
+        const scoped = activePokemonScope || /(?:your|each of your|all of your) (?:(?:basic|stage [12]|restored|grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) |\{[grwlpmdycf]\} )?pokemon/.test(text)
+        const explicitlyGlobal = /both yours and your opponent's|both your and your opponent's/.test(text)
+        if (!scoped && !explicitlyGlobal) continue
+        if (/\bbasic pokemon/.test(text) && !targetSubtypes.includes('basic')) continue
+        if (/\bstage 1 pokemon/.test(text) && !targetSubtypes.includes('stage 1')) continue
+        if (/\bstage 2 pokemon/.test(text) && !targetSubtypes.includes('stage 2')) continue
+        if (/\brestored pokemon/.test(text) && !targetSubtypes.includes('restored')) continue
+        const typedPokemonScope = text.match(/(?:your|each of your|all of your) (grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) pokemon/)
+        if (typedPokemonScope && !targetTypes.includes(typedPokemonScope[1])) continue
+        if (/colorless pokemon|\{c\} pokemon/.test(text) && !targetTypes.includes('colorless')) continue
+        if (/except pokemon-ex|except pokemon ex/.test(text) && targetSubtypes.some((subtype) => subtype === 'ex' || subtype === 'pokemon-ex')) continue
+        return true
+      }
+    }
+  }
+  return false
+}
+
+function isTcgBattleEeveeEvolution(card: TcgBattleCardState): boolean {
+  return normalizeTcgBattleAbilityText(card.evolvesFrom || '') === 'eevee' ||
+    (card.evolutionStack || []).some((evolution) => normalizeTcgBattleAbilityText(evolution.name) === 'eevee')
+}
+
+function getTcgBattleAbilityWeaknessRule(
+  state: TcgBattleState,
+  targetSide: TcgBattleSide,
+  target: TcgBattleCardState,
+  attackType: string,
+  weaknessType?: string,
+): { multiplier?: number; replacementType?: string; ignoresWeakness: boolean } {
+  const targetTypes = target.types.map(normalizeTcgBattleAbilityText)
+  for (const providerSide of ['player', 'opponent'] as const) {
+    const board = [...state[providerSide].front, ...state[providerSide].back].filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]))
+    for (const provider of board) {
+      const providerIsActive = state[providerSide].front.some((card) => card.instanceId === provider.instanceId)
+      const providerIsBenched = state[providerSide].back.some((card) => card.instanceId === provider.instanceId)
+      for (const ability of provider.abilities || []) {
+        const text = normalizeTcgBattleAbilityText(ability.text)
+        if (/energy attached|stadium|pokemon tool|prize cards?|once during your turn|during your next turn/.test(text) &&
+          (/energy attached/.test(text) && !/stadium|pokemon tool|prize cards?/.test(text))) {
+          const energyNoWeakness = /^(?:each of your pokemon that has any energy attached to it|all of your pokemon that have energy attached) has no weakness\.?$/.test(text)
+          if (energyNoWeakness && providerSide === targetSide && state[targetSide].energy > 0) return { ignoresWeakness: true }
+
+          const specificEnergyNoWeakness = text.match(/^(?:if this pokemon|as long as (.+?)) has any (grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) energy attached to it, (?:this pokemon|(.+?)) has no weakness\.?$/)
+          if (specificEnergyNoWeakness && providerSide === targetSide && provider.instanceId === target.instanceId && state[targetSide].energy > 0 && state[targetSide].selectedEnergy?.toLowerCase() === specificEnergyNoWeakness[2] && (!specificEnergyNoWeakness[1] || normalizeTcgBattleAbilityText(provider.name) === specificEnergyNoWeakness[1]) && (!specificEnergyNoWeakness[3] || normalizeTcgBattleAbilityText(provider.name) === specificEnergyNoWeakness[3])) {
+            return { ignoresWeakness: true }
+          }
+        }
+        if (/energy attached|stadium|pokemon tool|prize cards?|once during your turn|during your next turn/.test(text)) continue
+        if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) continue
+        if (/if you have mesprit and azelf in play/.test(text) &&
+          (!board.some((card) => /mesprit/i.test(card.name)) || !board.some((card) => /azelf/i.test(card.name)))) continue
+        if (/if you have volbeat in play/.test(text) && !board.some((card) => /volbeat/i.test(card.name))) continue
+
+        const allYourPokemonHaveNoWeakness = /^(?:your|each of your|all of your) pokemon in play have no weakness\.?$/.test(text)
+        if (allYourPokemonHaveNoWeakness && providerSide === targetSide) return { ignoresWeakness: true }
+
+        const typedPokemonNoWeakness = text.match(/^(?:each of your )?(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) pokemon(?: in play)? (?:have|has) no weakness\.?$/)
+        if (typedPokemonNoWeakness && targetTypes.includes(typedPokemonNoWeakness[1]) && (providerSide === targetSide || /both yours and your opponent's/.test(text))) {
+          return { ignoresWeakness: true }
+        }
+
+        if (/^(?:as long as kingdra is in play, )?each of your active pokemon has no weakness\.?$/.test(text) && providerSide === targetSide && (!text.startsWith('as long as kingdra') || board.some((card) => normalizeTcgBattleAbilityText(card.name) === 'kingdra')) && optionsTargetIsActive(state, targetSide, target)) {
+          return { ignoresWeakness: true }
+        }
+
+        const globalTypedPokemonNoWeakness = text.match(/^((?:grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) pokemon)(?: and ((?:grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless) pokemon))? \(both yours and your opponent's\) have no weakness\.?$/)
+        if (globalTypedPokemonNoWeakness && (targetTypes.includes(globalTypedPokemonNoWeakness[1].replace(' pokemon', '')) || Boolean(globalTypedPokemonNoWeakness[2] && targetTypes.includes(globalTypedPokemonNoWeakness[2].replace(' pokemon', ''))))) {
+          return { ignoresWeakness: true }
+        }
+
+        if (/don't apply psychic weakness|do not apply psychic weakness/.test(text) &&
+          /both yours and your opponent's/.test(text) && normalizeTcgBattleAbilityText(weaknessType || '') === 'psychic') {
+          return { ignoresWeakness: true }
+        }
+        if (/don't apply darkness weakness|do not apply darkness weakness/.test(text) &&
+          providerSide === targetSide && providerIsBenched && /your pokemon in play/.test(text) &&
+          normalizeTcgBattleAbilityText(weaknessType || '') === 'darkness') {
+          return { ignoresWeakness: true }
+        }
+
+        const multiplier = text.match(/apply weakness for (?:each pokemon \(both yours and your opponent's\)|both active pokemon) as [x×]?(2|3|4)(?: instead)?/)
+        if (multiplier && (providerSide === targetSide || /both yours and your opponent's|both active pokemon/.test(text))) {
+          return { multiplier: Number(multiplier[1]), ignoresWeakness: false }
+        }
+        if (/apply weakness for your opponent's active pokemon as x4 instead/.test(text) &&
+          providerSide !== targetSide && optionsTargetIsActive(state, targetSide, target)) {
+          return { multiplier: 4, ignoresWeakness: false }
+        }
+        if (/the weakness of each of your opponent's \{n\} pokemon in play is now \{p\}/.test(text) &&
+          providerSide !== targetSide && targetTypes.includes('colorless') && normalizeTcgBattleAbilityText(attackType) === 'psychic') {
+          return { replacementType: 'Psychic', multiplier: 2, ignoresWeakness: false }
+        }
+      }
+    }
+  }
+  return { ignoresWeakness: false }
+}
+
+function optionsTargetIsActive(state: TcgBattleState, sideKey: TcgBattleSide, target: TcgBattleCardState): boolean {
+  return state[sideKey].front.some((card) => card.instanceId === target.instanceId)
+}
+
+function isTcgBattleResistanceIgnoredByAbility(
+  state: TcgBattleState,
+  targetSide: TcgBattleSide,
+  attacker: TcgBattleCardState,
+  target: TcgBattleCardState,
+): boolean {
+  const attackerSide = targetSide === 'player' ? 'opponent' : 'player'
+  const board = [...state[attackerSide].front, ...state[attackerSide].back].filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]))
+  const attackerTypes = attacker.types.map(normalizeTcgBattleAbilityText)
+  const attackerSubtypes = attacker.subtypes.map(normalizeTcgBattleAbilityText)
+  const targetIsActive = optionsTargetIsActive(state, targetSide, target)
+  for (const provider of board) {
+    const providerIsActive = state[attackerSide].front.some((card) => card.instanceId === provider.instanceId)
+    for (const ability of provider.abilities || []) {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      if (!/isn't affected by resistance|is not affected by resistance|don't apply .* resistance|do not apply .* resistance/.test(text)) continue
+      if (/energy attached|stadium|pokemon tool|prize cards?|once during your turn|during your next turn/.test(text)) continue
+      if (!isTcgBattleAbilityEnabled(text, provider, providerIsActive)) continue
+      if (text.replace(/\s+/g, ' ').trim() === 'as long as beautifly is in play, do not apply resistance for all active pokemon.' && targetIsActive) return true
+      if (/as long as tropius is your active pokemon, your opponent's pokemon have no resistance/.test(text) && providerIsActive) return true
+      if (text === "if you have azelf in play, your opponent's pokemon in play have no resistance" && board.some((card) => normalizeTcgBattleAbilityText(card.name).includes('azelf'))) return true
+      if (/this pokemon's attacks|damage from this pokemon's attacks/.test(text) && provider.instanceId === attacker.instanceId) return true
+      if (/your fighting pokemon/.test(text) && attackerTypes.includes('fighting')) return true
+      if (/your psychic or fighting pokemon/.test(text) &&
+        (attackerTypes.includes('psychic') || attackerTypes.includes('fighting')) && board.some((card) => /lunatone/i.test(card.name))) return true
+      if (/your pokemon's attacks|attacks from your pokemon/.test(text) && /defending pokemon|opponent's pokemon/.test(text)) return true
+      if (/your single strike pokemon/.test(text) && attackerSubtypes.some((subtype) => subtype.includes('single strike')) && targetIsActive) return true
+      const namedAttacker = text.match(/your (?:damage done to your opponent's pokemon by your )?([a-z ,'-]+?)'s attacks? (?:isn't|is not) affected by resistance/)
+      if (namedAttacker && normalizeTcgBattleAbilityText(attacker.name).includes(namedAttacker[1].trim())) return true
+      const namedList = text.match(/by your (.+?) isn't affected by resistance/)
+      if (namedList) {
+        const names = namedList[1].replace(/\bor\b/g, ',').split(',').map((name) => name.trim().replace(/\bpokemon\b/g, ''))
+        if (names.some((name) => name && normalizeTcgBattleAbilityText(attacker.name).includes(normalizeTcgBattleAbilityText(name)))) return true
+      }
+    }
+  }
+  return false
+}
+
+export function applyTcgWeaknessAndResistance(
   attacker: TcgBattleCardState,
   target: TcgBattleCardState,
   damage: number,
-  options: { ignoreWeakness?: boolean; ignoreResistance?: boolean } = {},
+  options: { ignoreWeakness?: boolean; ignoreResistance?: boolean; targetIsActive?: boolean; state?: TcgBattleState; targetSide?: TcgBattleSide } = {},
 ): number {
-  const attackType = attacker.temporaryEffects?.battleType || attacker.types[0]
-  if (!attackType) return damage
+  const attackTypes = attacker.temporaryEffects?.battleType
+    ? [attacker.temporaryEffects.battleType]
+    : getTcgBattleEffectiveTypes(attacker, options.state)
+  if (attackTypes.length === 0) return damage
+  const attackerIgnoresWeaknessAndResistance = (attacker.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+    if (text !== "damage from this pokemon's attacks isn't affected by weakness or resistance.") return false
+    if (!options.state) return true
+    return !isTcgBattleAbilitySuppressed(attacker, [options.state.player, options.state.opponent]) && isTcgBattleAbilityEnabled(text, attacker, [...options.state.player.front, ...options.state.opponent.front].some((pokemon) => pokemon.instanceId === attacker.instanceId))
+  })
 
   let modifiedDamage = damage
-  if (!options.ignoreWeakness) {
-    const weaknessType = target.temporaryEffects?.weaknessType
-    const weakness = weaknessType
-      ? weaknessType === attackType
-        ? target.temporaryEffects?.weaknessValue === null
-          ? undefined
-          : { type: weaknessType, value: target.temporaryEffects?.weaknessValue || '×2' }
+  if (!options.ignoreWeakness && !attackerIgnoresWeaknessAndResistance) {
+    const weakness = target.temporaryEffects?.weaknessType
+      ? attackTypes.includes(target.temporaryEffects.weaknessType) && target.temporaryEffects.weaknessValue !== null
+        ? { type: target.temporaryEffects.weaknessType, value: target.temporaryEffects.weaknessValue || '×2' }
         : undefined
-      : target.weaknesses.find((entry) => entry.type === attackType)
-    if (weakness) {
-      if (normalizeTcgDamageText(weakness.value).includes('x2')) modifiedDamage *= 2
-      else modifiedDamage += parseSignedModifier(weakness.value)
+      : target.weaknesses.find((entry) => attackTypes.includes(entry.type))
+    const weaknessType = weakness?.type
+    const abilityRemovesWeakness = target.abilities?.some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text)
+      if (/energy attached|stadium|pokemon tool|prize cards?|(?:your|each of your|all of your) active pokemon/.test(text)) return false
+      return isTcgBattleAbilityEnabled(text, target, options.targetIsActive !== false) && /(?:has|have) no weakness|weakness is removed|has no weakness to/.test(text)
+    }) || (options.state && options.targetSide
+      ? isTcgBattleWeaknessRemovedByBoardAbility(options.state, options.targetSide, target)
+      : false)
+    const weaknessRule = options.state && options.targetSide
+      ? getTcgBattleAbilityWeaknessRule(options.state, options.targetSide, target, attackTypes[0], weaknessType)
+      : { ignoresWeakness: false as const }
+    const effectiveWeakness = abilityRemovesWeakness
+      ? undefined
+      : weaknessRule.replacementType
+      ? attackTypes.includes(weaknessRule.replacementType)
+        ? { type: weaknessRule.replacementType, value: '×2' }
+        : undefined
+      : weaknessRule.ignoresWeakness
+      ? undefined
+      : weakness
+    if (effectiveWeakness) {
+      if (weaknessRule.multiplier) modifiedDamage *= weaknessRule.multiplier
+      else if (normalizeTcgDamageText(effectiveWeakness.value).includes('x2')) modifiedDamage *= 2
+      else modifiedDamage += parseSignedModifier(effectiveWeakness.value)
     }
   }
 
-  if (!options.ignoreResistance) {
+  if (!options.ignoreResistance && !attackerIgnoresWeaknessAndResistance) {
     const resistanceType = target.temporaryEffects?.resistanceType
-    const resistance = resistanceType
-      ? resistanceType === attackType
+    const printedResistance = resistanceType
+        ? attackTypes.includes(resistanceType)
         ? { type: resistanceType, value: '-30' }
         : undefined
-      : target.resistances.find((entry) => entry.type === attackType)
-    if (resistance) modifiedDamage = Math.max(0, modifiedDamage + parseSignedModifier(resistance.value))
+      : target.resistances.find((entry) => attackTypes.includes(entry.type))
+    const teamResistanceTextByType = new Map([
+      ['metal', "each of your metal pokemon's resistance is now -40."],
+      ['fairy', "each of your fairy pokemon's resistance is now -40."],
+    ])
+    const boostedResistanceType = [...teamResistanceTextByType].find(([type]) =>
+      getTcgBattleEffectiveTypes(target, options.state).some((targetType) => normalizeTcgBattleAbilityText(targetType) === type),
+    )
+    const teamResistanceBoost = Boolean(options.state && options.targetSide && boostedResistanceType &&
+      [...options.state[options.targetSide].front, ...options.state[options.targetSide].back].some((provider) =>
+        provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [options.state!.player, options.state!.opponent]) &&
+        (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === boostedResistanceType[1]),
+      ),
+    )
+    const resistance = printedResistance && teamResistanceBoost ? { ...printedResistance, value: '-40' } : printedResistance
+    const abilityIgnoresResistance = options.state && options.targetSide
+      ? isTcgBattleResistanceIgnoredByAbility(options.state, options.targetSide, attacker, target)
+      : false
+    const gloomLimitsActiveResistance = Boolean(resistance && options.targetIsActive !== false && options.state &&
+      [...options.state.player.front, ...options.state.player.back, ...options.state.opponent.front, ...options.state.opponent.back].some((provider) =>
+        provider.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [options.state!.player, options.state!.opponent]) &&
+        (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as gloom is in play, resistance on each player's active pokemon only reduces damage by 10."),
+      ),
+    )
+    if (resistance && !abilityIgnoresResistance) modifiedDamage = Math.max(0, modifiedDamage + (gloomLimitsActiveResistance ? -10 : parseSignedModifier(resistance.value)))
   }
 
   return modifiedDamage
+}
+
+export function getTcgBattleEffectiveTypes(card: TcgBattleCardState, state?: TcgBattleState): string[] {
+  const types = new Set(card.types)
+  if (!state || isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent])) return [...types]
+  const inPlay = [...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back]
+    .some((pokemon) => pokemon.instanceId === card.instanceId && pokemon.currentHp > 0)
+  if (!inPlay) return [...types]
+  const usesPreviousLevelType = (card.abilities || []).some((ability) =>
+    /^arceus lv\. ?x's type is the same (?:type )?as its previous level\.$/.test(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()),
+  )
+  const previousLevelTypes = usesPreviousLevelType ? card.evolutionStack?.at(-1)?.types : undefined
+  if (previousLevelTypes?.length) {
+    types.clear()
+    previousLevelTypes.forEach((type) => types.add(type))
+  }
+  if (card.temporaryEffects?.typeOverrides?.length) {
+    types.clear()
+    card.temporaryEffects.typeOverrides.forEach((type) => types.add(type))
+  } else if (card.temporaryEffects?.typeOverride) {
+    types.clear()
+    types.add(card.temporaryEffects.typeOverride)
+  }
+  const cardOwner = [state.player, state.opponent].find((side) => [...side.front, ...side.back].some((pokemon) => pokemon.instanceId === card.instanceId))
+  const isStage1 = card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'stage 1')
+  if (cardOwner && isStage1) {
+    const typeAuras = new Map<string, string>([
+      ['each of your stage 1 pokemon in play is now a fire pokemon in addition to its existing types.', 'Fire'],
+      ['each of your stage 1 pokemon in play is now a water pokemon in addition to its existing types.', 'Water'],
+      ['each of your stage 1 pokemon in play is now a lightning pokemon in addition to its existing types.', 'Lightning'],
+    ])
+    for (const provider of [...cardOwner.front, ...cardOwner.back]) {
+      if (provider.currentHp <= 0 || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
+      for (const ability of provider.abilities || []) {
+        const addedType = typeAuras.get(normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim())
+        if (addedType) types.add(addedType)
+      }
+    }
+  }
+  const kecleonCopiesOpponentType = normalizeTcgBattlePokemonName(card.name) === 'kecleon' &&
+    cardOwner?.front.some((pokemon) => pokemon.instanceId === card.instanceId) &&
+    (card.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as this pokemon is your active pokemon, this pokemon is the same type as your opponent's active pokemon.")
+  if (kecleonCopiesOpponentType && cardOwner) {
+    const opposingSide = cardOwner === state.player ? state.opponent : state.player
+    const opposingActive = opposingSide.front.find((pokemon) => pokemon.currentHp > 0)
+    if (opposingActive) {
+      types.clear()
+      opposingActive.types.forEach((type) => types.add(type))
+    }
+  }
+  const kecleonEnergyVariation = normalizeTcgBattlePokemonName(card.name) === 'kecleon' && cardOwner &&
+    (card.abilities || []).some((ability) => {
+      const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
+      return text === "kecleon's type is the same as every type of basic energy card attached to kecleon." ||
+        text === 'this pokemon is the same type as any basic energy attached to it. (if it has 2 or more different types of basic energy attached, this pokemon is each of those types.)'
+    })
+  if (kecleonEnergyVariation && cardOwner.energy > 0 && cardOwner.selectedEnergy) {
+    types.clear()
+    types.add(cardOwner.selectedEnergy[0].toUpperCase() + cardOwner.selectedEnergy.slice(1))
+  }
+  const typeSymbols: Record<string, string> = { g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', m: 'Metal', d: 'Darkness', y: 'Fairy', c: 'Colorless' }
+  const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', colorless: 'Colorless', dragon: 'Dragon' }
+  for (const ability of card.abilities || []) {
+    const text = normalizeTcgBattleAbilityText(ability.text)
+    const attachedEnergyDualType = text.match(/^(?:as long as|if) (?:this pokemon|([a-z0-9 '’-]+)) has any (grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless) energy(?: cards)? attached to it, (?:this pokemon|([a-z0-9 '’-]+)) is both (grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless|dragon) and (grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless|dragon) type\.$/)
+    if (attachedEnergyDualType) {
+      const owner = [state.player, state.opponent].find((side) => [...side.front, ...side.back].some((pokemon) => pokemon.instanceId === card.instanceId))
+      const cardName = normalizeTcgBattleAbilityText(card.name)
+      if (owner?.energy && owner.selectedEnergy?.toLowerCase() === attachedEnergyDualType[2] &&
+        (!attachedEnergyDualType[1] || attachedEnergyDualType[1].trim() === cardName) &&
+        (!attachedEnergyDualType[3] || attachedEnergyDualType[3].trim() === cardName)) {
+        types.add(attachedEnergyDualType[4][0].toUpperCase() + attachedEnergyDualType[4].slice(1))
+        types.add(attachedEnergyDualType[5][0].toUpperCase() + attachedEnergyDualType[5].slice(1))
+      }
+      continue
+    }
+    if (text === 'if this pokemon has any metal energy attached to it, this pokemon’s type is both fighting and metal.' || text === "if this pokemon has any metal energy attached to it, this pokemon's type is both fighting and metal.") {
+      const owner = [state.player, state.opponent].find((side) => [...side.front, ...side.back].some((pokemon) => pokemon.instanceId === card.instanceId))
+      if (owner?.energy && owner.selectedEnergy?.toLowerCase() === 'metal') {
+        types.add('Fighting')
+        types.add('Metal')
+      }
+      continue
+    }
+    const typeChange = text.match(/^as long as this pokemon is in play, it is (.+?) type\.$/) ||
+      (normalizeTcgBattleAbilityText(card.name) === 'kecleon' ? text.match(/^kecleon's type is (.+?)\.$/) : null)
+    if (!typeChange) continue
+    const typeMatches = [...typeChange[1].matchAll(/\{([grwlpmdycf])\}|\b(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless|dragon)\b/g)]
+    const unparsedTypes = typeChange[1].replace(/\{[grwlpmdycf]\}|\b(?:grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless|dragon)\b/gi, '').replace(/\band\b/gi, '').replace(/[\s,]/g, '')
+    if (typeMatches.length < 2 || unparsedTypes) continue
+    for (const [, symbol, typeName] of typeMatches) {
+      const type = symbol ? typeSymbols[symbol] : typeNames[typeName]
+      if (type) types.add(type)
+    }
+  }
+  return [...types]
 }
 
 function parseSignedModifier(value: string): number {

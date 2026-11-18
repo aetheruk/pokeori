@@ -180,7 +180,7 @@ export function TcgPvpModal({
             Underground TCG PVP
           </DialogTitle>
           <DialogDescription>
-            Base cards · Champions deck · no entry stake
+            Base cards · 60-point deck · no entry stake
           </DialogDescription>
         </DialogHeader>
 

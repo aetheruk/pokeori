@@ -223,12 +223,6 @@ export interface VoyageStats {
   totalCompleted?: number
 }
 
-export interface TcgDecksData {
-  baby?: string[]
-  champions?: string[]
-  masters?: string[]
-}
-
 /**
  * Extended User type with all embedded data properly typed.
  * Note: Doesn't extend User to avoid conflicts with payload-types.ts JSON field types.
@@ -241,7 +235,6 @@ export interface ExtendedUser {
   completedTasks?: CompletedTasksData
   stats?: UserStats
   tcg?: TCGData
-  tcgDecks?: TcgDecksData
   currency?: CurrencyData
   skills?: SkillsData
   guilds?: GuildsData

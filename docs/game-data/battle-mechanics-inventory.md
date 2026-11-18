@@ -1,4 +1,74 @@
+Sandstorm Golduck — Psyduck Step flips a coin once per turn while Golduck is Active and free of Special Conditions; on heads, the opposing Active Pokémon becomes Confused. PvE/PvP supported.
+Holon Phantoms Vileplume — Poison Pollen flips a coin once per turn while Vileplume is free of Special Conditions; on heads, the opposing Active Pokémon becomes Poisoned. PvE/PvP supported.
+Legend Collection Gengar — moves one damage counter between two opposing Pokémon once per turn while free of Special Conditions, including a Knock Out. PvE/PvP supported.
+Unified Minds Jynx — Ominous Posture moves one damage counter between two of its controller’s Pokémon once per turn. PvE/PvP supported.
+Generations Meowstic-EX — Shadow Ear moves one damage counter from one of its controller’s Pokémon to an opposing Pokémon once per turn while Active. PvE/PvP supported.
+Sandstorm Xatu — once per turn, heals one damage counter from each of its controller’s Active Pokémon while free of Special Conditions. PvE/PvP supported.
+Great Encounters Wigglytuff — Good Night Melody makes both players’ Active Pokémon Asleep once per turn while Wigglytuff is free of Special Conditions. PvE/PvP supported.
+Holon Phantoms Mew ex — Psychic Vision inspects the opponent’s hand once per turn from the Bench. PvE/PvP supported.
+Skyridge Snorlax — once per turn while Active and free of Special Conditions, heal one damage counter from itself, then become Asleep. PvE/PvP supported.
+Silver Tempest Radiant Alakazam — Painful Spoons moves up to two damage counters from one opposing Pokémon to another once per turn. PvE/PvP supported.
+Legend Maker Banette ex / Dragon Frontiers Typhlosion δ / Great Encounters Cresselia LV.X — once per turn, move one damage counter between any two Pokémon on either side; Banette ex and Typhlosion δ must be Active, all are blocked by Special Conditions. PvE/PvP supported.
+Paldea Evolved Shinx — once per turn while Active, switch the opponent’s Active Pokémon to the Bench; the opponent chooses the replacement. PvE/PvP supported.
+Deoxys Ninjask — Fast Protection prevents all attack effects, including damage, from opposing Basic Pokémon. PvE/PvP supported.
+POP Series 7 Wormadam Sandy Cloak — Sandy Cloak prevents attack effects, excluding damage, to Wormadam Sandy Cloak. PvE/PvP supported.
+Delta Species Volbeat/Illumise — partner-dependent attack protection: Illumise blocks all effects and damage to Volbeat from Pokémon-ex attacks; Volbeat blocks all effects and damage to Illumise from Dark-named Pokémon attacks. PvE/PvP supported.
+Legend Maker Latias δ/Latios δ — Dual Aura suppresses Poké-Bodies on evolved non-Pokémon-ex on both sides while the matching Latias/Latios partner is in play. PvE/PvP supported.
+Legend Maker Wobbuffet — while evolved, adds one Colorless to the opposing Active Pokémon’s Retreat Cost. PvE/PvP supported.
+Energy-conditioned no-Weakness rules use the shared Energy count and selected Energy type as the current format’s approximation for individual attached Energy; Special Energy, Tool, Stadium, Prize, and delayed-turn conditions remain unsupported.
+Passive no-Weakness effects are supported for your board, your Active Pokémon, selected Pokémon types, and Fire/Metal Pokémon across both sides; Kingdra can protect your Active Pokémon while it remains in play. Stadium, Tool, attached-Energy, and delayed-turn conditions remain unsupported here.
+Dragon Frontiers Electabuzz δ — once per turn, while evolved and free of Special Conditions, draw the bottom card of your deck. PvE/PvP supported.
+Deoxys Claydol — Cosmic Power shuffles your hand into your deck, then draws up to the opponent's hand size once per turn; requires Claydol Active and free of Special Conditions. PvE/PvP supported.
+White Flare and SV Black Star Promos Gothitelle — Active-only, once per turn, opponent shuffles hand into deck and draws up to 3. PvE/PvP supported.
+Diamond & Pearl Unown [D] — once per turn from the Bench, flip a coin; on heads, both players draw one card, with the player's draw first. PvE and PvP supported.
+Unbroken Bonds Salazzle and Ninetales — pay one Fire Energy from the shared pool to draw 3 cards once per turn; Ninetales also retains its Special Condition restriction. Player and PvP actions validate the selected pool type and Energy count.
+Astral Radiance Radiant Greninja — Concealed Cards pays one Energy from the shared pool to draw 2 cards once per turn. Player and PvP actions validate and spend the pool unit instead of requiring a hand Energy card.
+Lost Origin Drapion VSTAR — Venomous Vortex applies Paralysis and Poison to a selected opposing Active Pokémon and raises its Poison checkup damage to 30; it uses the shared once-per-game VSTAR Power limit in PvE and PvP.
+Trainer-card searches are not supported by the Pokémon-only battle deck. Supporter, Item, Stadium, and Pokémon Tool searches remain unmatched in the Ability audit and are not offered as usable battle Abilities.
+
 # Battle Mechanics Inventory
+
+Secret Wonders Unown [Z] can use ZERO from the Bench once per turn when its deck is empty, putting Unown Z on top of the deck in PvE and PvP.
+
+Deoxys Jirachi's Wish Maker picks one of the top five cards, shuffles the rest back into the deck, and makes all living friendly Active Pokémon Asleep. Jirachi must be Active and free of Special Conditions in PvE and PvP.
+
+Deoxys Sableye can inspect the opponent's hand once per turn while Active and free of Special Conditions in PvE and PvP.
+
+Diamond & Pearl Unown [C] flips once per turn while on the Bench; heads searches a Basic Unown from the deck to the Bench. PvE and PvP are supported.
+
+Diamond & Pearl Unown [A] reorders the top two cards of its owner's deck once per turn while on the Bench in PvE and PvP.
+
+BW Black Star Promos Mew's Psyscan reveals the opponent's hand once per turn while Mew is Active, in PvE and PvP.
+
+Astral Radiance/Crown Zenith Darkrai VSTAR — recover up to two Item cards from discard to hand once per game using the shared VSTAR Power limit, with Ability suppression and discard membership checked in PvE and PvP.
+
+151/Paldean Fates Snorlax — Voraciousness recovers up to two available Leftovers cards from discard to hand once per turn, with Ability suppression and discard membership checked in PvE and PvP.
+
+Rebel Clash Eldegoss V — on Bench entry from hand, return a chosen Supporter from discard to hand. PvE and PvP validate that the selected card is a Supporter and check Ability suppression.
+
+Rising Rivals Starmie adds one Water Energy to the shared pool once per turn as the engine's approximation for returning a Basic Water Energy card from discard to hand. Player, PvP, and NPC paths enforce its Special Condition restriction, Ability suppression, pool cap, and usage limit.
+
+Supreme Victors Solrock can rearrange the top three cards of its controller's deck once per turn when Lunatone is in play. Its Power is unavailable under Special Conditions.
+
+Supreme Victors Garchomp C LV.X can heal all damage from its owner's Pokémon SP with Healing Breath when played onto Active Garchomp C. Healing prevention and Ability suppression disable it.
+
+Arceus Lopunny's Hustle Step discards an Energy card from hand to heal 10 damage from each of its owner's Pokémon once per turn. Special Conditions and healing prevention disable it.
+
+Arceus Gengar can move one damage counter between opposing Pokémon once per turn. Its Special Condition restriction and damage-counter movement prevention are enforced.
+
+Arceus Salamence's Top Entry reveals the top card of its deck once per turn, adding Basic Energy to the shared Energy pool and discarding other cards. Special Conditions prevent use.
+
+Arceus Gengar LV.X can remove an opposing Pokémon LV.X and shuffle that card into its owner's deck once per turn. The Pokémon beneath is restored, with existing damage and status preserved; Special Conditions and Ability suppression disable the Power.
+
+Platinum Drapion LV.X's Poké-Power flips once per turn to Poison an opposing Active Pokémon; heads sets its Poison checkup to 30 damage. Target selection, Special Condition limits, Ability suppression, and NPC use are supported.
+
+Stormfront Raichu LV.X's Link Lightning grants one additional attack after Voltage Shoot. Player, PvP, and NPC attack flows enforce the named-attack trigger, same-attacker follow-up, Special Conditions, and Ability suppression.
+
+Legends Awakened Unown J's Bench-entry Power flips once and returns a chosen Trainer from the discard pile to hand on heads. Player, PvP, and NPC paths track the flip, once-per-turn use, and Ability suppression.
+
+Majestic Dawn Garchomp LV.X's Dragon Pulse flips three coins when played from hand onto Active Garchomp. Each heads places one damage counter on every opposing Benched Pokémon; the coin results are recorded.
+
+Great Encounters Unown H's HEAL removes all Special Conditions from one friendly Active Pokémon once per turn when Unown H, E, A, and L are on the Bench. Player, PvP, and NPC use respect Ability suppression.
 
 - Unreleased: Rock Tunnel's Hidden Chamber now uses Underground Mining, with an independent 0.1% chance to bury a Metal Coat evolution item in each wall. The existing 12% Rusty Coat held-item recipe unlock remains a reward for clearing the wall. Fully uncovered Metal Coats are retained on collapse under this encounter's `complete: false` policy.
 
@@ -291,9 +361,96 @@ Player battle item use checks item `skillRequirements` before consumption. Train
 
 Owned Pokemon lose 1 friendship, clamped at 0, whenever they faint in PVE or PVP battles. NPC trainer and wild enemy Pokemon do not persist friendship changes.
 
+## TCG Battle Pokémon Ability Update
+
+Board-wide Weakness removal is also resolved for the target's side when a live provider's passive ability grants it to all, Basic, Stage, Restored, or Colorless Pokémon in play. The Uxie/Azelf gate requires both named Pokémon on that side's board. Abilities gated by attached Energy or other untracked board conditions are skipped.
+
+Passive retreat locks now block retreat when an opposing live Ability provider restricts the Active Pokémon or restricts Pokémon with the target's matching Special Condition. Active-provider and provider-status requirements are honored. The ability audit recognizes 38 retreat rules across 29 sets, including retreat-cost modifiers and locks.
+
+Weakness resolution now supports board-wide ×2/×3/×4 multipliers, Volbeat and Mesprit/Azelf requirements, opponent Active Pokémon ×4 effects, Colorless-to-Psychic Weakness changes, and Psychic/Darkness Weakness exceptions when the required board and target scopes are represented. The audit recognizes 47 Weakness-rule texts across 35 sets; conditions requiring Stadiums, attached Energy, or unrepresented card zones are skipped.
+
+Resistance-ignore Abilities now support attacker-specific, team/type, Single Strike, and named Pokémon scopes when the board conditions can be verified. The Lunatone partner gate is checked on the attacker's side. Five matching ability records appear across five sets.
+
+Conditional attack damage bonuses also check equal hand sizes across both sides and count opposing Pokémon-GX and Pokémon-ex for per-card bonus formulas.
+
+Reactive passive abilities can now inflict their supported status or damage-counter effect on the attacking Active Pokémon after an opposing attack damages the holder. Active/evolved-holder, knockout, named-team-count, and Special Condition requirements are enforced. Coin-flip retaliation and attached-Energy formulas remain unsupported. The set audit recognizes 71 matching retaliation records across 49 sets.
+
+Team-wide passive Special Condition immunities are checked against the provider side's live board for all-team and supported type/subtype scopes. Team abilities that explicitly recover eligible Pokémon from existing conditions clear those conditions before checkup damage.
+
+Passive between-turn counter damage now supports board scopes for active, benched, asleep/poisoned, Basic, Pokémon-ex/LV.X, and Pokémon with Powers/Bodies targets. Provider activity, status, target exclusions, and non-stacking clauses are checked; attached-Energy and Stadium requirements are skipped. Nineteen matching records appear across 14 sets.
+Activated status Powers now support all five Special Conditions on the opponent's Active Pokémon, extending the previous Poison/Burn handling to Asleep, Confused, and Paralyzed when the printed once-per-turn Active-provider clause matches. The set audit recognizes 8 matching records across 4 sets.
+Direct once-per-turn draw Powers now support fixed counts of one or more cards from the Pokémon-only deck, including source Active Spot conditions. Composite effects such as energy attachment plus draw, hand/deck shuffles, conditional bonuses, and end-turn choices remain separate patterns. The audit recognizes 21 direct draw Powers across 15 sets; 829 records currently match at least one implemented family, while 3,725 remain unmatched.
+Draw-to-hand-size Powers now parse the printed hand target, supporting sizes beyond three. The audit recognizes 10 such Powers across 7 sets; 833 records match at least one implemented family and 3,721 remain unmatched.
+Activated healing Powers now support fixed healing of the Active Pokémon and fixed healing across all eligible friendly Pokémon, including supported type scopes. Healing is capped at each Pokémon's missing HP. The audit recognizes 29 activated healing Powers across 18 sets; 850 records match at least one implemented family and 3,704 remain unmatched.
+Simple once-per-turn “each player draws a card” Powers now draw one card for each side from its Pokémon-only deck. The audit recognizes 23 activated draw Powers across 17 sets; overall 852 records match an implemented family and 3,702 remain unmatched.
+Fixed healing Powers may now target one chosen friendly Pokémon from the front or bench, with supported type filters, alongside Active-only and all-eligible-Pokémon scopes. Healing is capped at missing HP. The audit recognizes 34 activated healing Powers across 23 sets; 857 records match at least one implemented family and 3,697 remain unmatched.
+Healing Powers expressed as damage-counter removal convert each counter to 10 HP. Supported “only one named Power per turn” and source Special Condition gates are enforced. The set audit now recognizes 40 activated healing Powers across 29 sets; 863 records match an implemented family and 3,691 remain unmatched.
+Bench-to-Active switch Powers accept self-named provider conditions and verify the name against the actual Pokémon card before using the existing swap action. The audit recognizes 35 switch Powers across 18 sets; overall 865 records match an implemented family and 3,689 remain unmatched.
+Passive opponent Retreat Cost increases now add their Colorless amount to the opposing Active Pokémon's retreat payment for supported Active-target, opponent-board, and status-specific scopes. Ability provider activity and Basic/Evolved target gates are checked. The UI and server compute retreat cost through the same utility. The audit recognizes 50 retreat rules across 37 sets; 877 records match an implemented family and 3,677 remain unmatched.
+Friendly passive Retreat Cost effects now cover supported type and subtype scopes for fixed reductions and no-cost rules, while continuing to omit Energy-, Stadium-, Tool-, and turn-dependent clauses. The generated set audit recognizes 52 retreat rules across 39 sets; 879 records match an implemented family and 3,675 remain unmatched.
+Draw Powers can check the saved prior-opponent-turn knockout record, apply once-per-turn limits shared across same-named copies, and enforce source Special Condition clauses. The audit recognizes 40 activated draw Powers across 25 sets; 896 records match an implemented family and 3,658 remain unmatched.
+Coin-flip passive protection now supports an on-head fixed damage reduction in addition to preventing all damage. It also supports saving the holder from attack damage that would Knock it Out, leaving 10 HP on heads. Reduction applies after Weakness and Resistance. The audit recognizes 25 coin-protection and survival Abilities across 16 sets; 898 records match an implemented family and 3,656 remain unmatched.
+
+Passive survival now also supports printed full-HP clauses that prevent a damage knockout and leave the holder at the specified remaining HP. The audit finds 10 such records within fixed damage protection; total recognized records rise to 908 of 4,554, with 3,646 unmatched.
+
+Holder damage modifiers now also recognize the Pocket-style “takes −N damage from attacks” wording, including attacker type restrictions and the supported Arceus-in-play and other-Falinks-in-play gates. The inventory finds 163 holder damage modifier texts across 90 sets; 931 records match at least one family and 3,623 remain unmatched.
+
+Evolution options honor first-turn evolution Abilities, including “If you go second” for the second participant in PvP and PvE opponents. These permissions bypass stage and card-cost timing locks for turn one. The “turn you play it” clause remains unavailable because Basic Pokémon are not played from hand mid-battle.
+
+Skyridge Kabutops's Ancient Power blocks hand evolution of Benched Pokémon for both players while Kabutops is Active. Active Pokémon remain eligible, and suppression disables the lock.
+
+Skyridge Beedrill's evolution effect applies both Paralysis and Poison to the opponent's Active Pokémon; the status prevention rules resolve each condition.
+
+Lost Origin Parasect's Lethargy Spores applies Asleep and Poisoned to both Active Pokémon when it evolves. Evolution status effects also recognize Haunter's both-Active Confusion wording.
+
+Zacian LV.X and Tyrantrum-EX ignore effects on the opponent's Active Pokémon when calculating attack damage. Weakness and Resistance still apply.
+
+Crown Zenith Hatterene VMAX moves up to two damage counters from one of your Pokémon to the opponent's Active Pokémon once per turn, subject to counter-movement prevention and Ability suppression.
+
+HS—Triumphant and 30th Celebration Gengar's Active Ability sends opposing Pokémon Knocked Out by an attack to the Lost Zone instead of the discard pile. Ability suppression disables this replacement.
+
+Attacks are now gated by supported conditional Abilities in UI selection, server validation, AI selection, and legal-action checks. Implemented conditions include Team Rocket/Aqua/Magma counts, own board size, named Regi Pokémon on the Bench, opposing Active Pokémon subtype/presence, and opposing Ability locks by Basic/Baby subtype, named Pokémon, or remaining HP. Active-provider and single-Pokémon-board requirements are checked. The audit recognizes 30 such records across 18 sets; total recognized records are 974, with 3,580 unmatched.
+
+Attack cost calculation now supports named-board Abilities that ignore all Colorless Energy or all Energy in the provider's attacks. Implemented board gates include the three Simis, Tornadus/Thundurus/Landorus/Enamorus, and Nidoqueen. The adjusted cost is shared by the client preview and payment playback, server validation, and opponent AI. The audit finds 10 such records across 3 sets; total recognized records are 984, with 3,570 unmatched.
+
+Passive healing also recognizes “During Pokémon Checkup” wording and applies it after Poison/Burn checkup damage. The audit now recognizes 31 passive healing Abilities across 24 sets; 986 records match a supported family and 3,568 remain unmatched.
+
+Passive Retreat Cost handling now includes board-presence checks for Latias, Arceus, Fairy Pokémon, opposing Pokémon-ex/V, and the Legendary birds; Active Dondozo's no-cost rule; and a damaged-Pokémon no-cost rule. Stadium and attached-Energy requirements are still excluded. The audit recognizes 63 retreat rules across 44 sets; total recognized records are 997, with 3,557 unmatched.
+
+Direct damage boosts now also parse abilities that say attacks do more damage to the opponent's Active Pokémon, including the pronoun “its” and remaining-HP gates. The pre-Weakness/Resistance placement follows printed text. The scan recognizes 226 holder/direct damage modifier texts across 102 sets; total recognized records rise to 1,040, with 3,514 unmatched.
+
+Damage reduction now supports the “damage done to [Pokémon] by attacks is reduced by N” pattern plus supported full-HP, damage-counter threshold, asleep, named-board, and named-discard-count gates. The set audit excludes this family's Energy-, Tool-, Stadium-, Prize-, and opponent-hand-dependent variants because the required state is not represented. It recognizes 256 holder damage modifier texts across 115 sets; 1,070 records match a family and 3,484 remain unmatched.
+
+Attack damage prevention now applies Pokémon ex, V, VMAX, and VSTAR attacker restrictions using the source card subtype, including combined ex/V and Basic Pokémon ex restrictions. Directly named attacker types such as Fire and Colorless and requirements for an Ability are checked against the attacker card. Damage-threshold protection such as “if that damage is 200 or more” is applied after type modifiers. The generated family count is unchanged because these clauses already matched the broad damage-protection text pattern; the runtime now checks their attacker class and threshold rather than treating the prefix as universal protection.
+
+Protection clauses that list exact damage values are now checked against the final post-Weakness/Resistance damage amount. This supports Mr. Mime-GX's even- and odd-damage prevention rules; the scan count remains part of the existing damage-protection family.
+
+First-turn evolution now checks permission on both the Pokémon in play and the evolution card, honoring Active Spot gates on the target. The refreshed set scan recognizes 17 matching texts across 11 sets; 1,074 of 4,554 ability records match at least one family, with 3,480 unmatched.
+
+Holder text preventing opposing Pokémon Abilities from affecting that Pokémon now blocks represented incoming damage boosts supplied by the attacking side and status conditions inflicted by opposing activated Abilities. The set scan counts 13 matching texts across 6 sets, including Lustrous Body variants; Energy-dependent board-wide variants remain unimplemented. Total recognized records are now 1,087 of 4,554, with 3,467 unmatched.
+
+Shady Tail prevents a Prism Star Pokémon on either side from attacking and suppresses its modeled Abilities while Wobbuffet with that Ability remains on the Bench. Ting-Lu ex suppresses opposing damaged Pokémon’s Abilities while Active, except Pokémon ex. Empoleon V suppresses opposing Basic Pokémon’s Abilities while Active, except Pokémon with a Rule Box. These suppression rules cover modeled passive effects, supported activated actions, and attack eligibility. Reactive Abilities support fixed damage to the attacking Active Pokémon after a supported attack hit, including Active Spot conditions. Knockout protection recognizes the “not Knocked Out, and its remaining HP becomes 10” wording variant. Iron Crown ex’s Cobalt Command boosts attacks from Future Pokémon except Iron Crown ex before Weakness and Resistance. Walking Wake ex’s attacks bypass represented damage effects on the opponent’s Active Pokémon. Galarian Zapdos V reduces Colorless attack costs for opposing Pokémon V in play. Glaceon ex’s Snowy Terrain deals direct Ability damage to the opposing Active Pokémon during Pokémon Checkup. Supported dual-type abilities add their granted types during attack Weakness/Resistance calculations. Bench-only attack protection prevents damage and effects on its holder while Benched. Activated draw Powers support choosing and discarding the printed number of cards from hand before drawing the printed count, including discard-two draw-one. Team damage-reduction matching handles a provider Active condition followed by a team scope. The ability scan matches 1,164 of 4,554 records across 217 sets; 3,390 remain unmatched.
+Automatic end-of-turn healing supports fixed healing on the provider when it is Active, including the mandatory 20-damage clause on Entei ex (`tcgp_a4a`). Optional end-of-turn healing abilities are not triggered automatically.
+
+Between-turn healing now resolves named allied Pokémon targets in addition to the provider and board-wide groups. Supported presence and provider activity/sleep/special-condition gates are checked.
+
+Activated discard-and-draw Powers now accept the printed discard count, including Abilities that require discarding two cards from hand to draw one. Discard-hand draw Powers use their printed count and enforce modeled first-turn, shared-use, once-per-game VSTAR, and turn-ending conditions. Arceus VSTAR searches up to two selected Pokémon cards from the modeled deck into hand, shuffles afterward, and shares the side’s once-per-game VSTAR limit. The refreshed audit recognizes 38 discard-and-draw texts across 24 sets, 22 discard-hand draw texts across 10 sets, and 6 activated search texts across 4 sets, matching 1,185 of 4,554 Ability records (3,369 unmatched); this supersedes the earlier set-scan totals above.
+
+Double-attack Abilities now grant the same attacking Pokémon one additional attack in the current turn. PvE opponent turns and both player turns support the continuation; knockout promotions resolve before the second attack, and end-of-turn draws, healing, status damage, and turn advancement are deferred until it completes. The audit recognizes five matching Ability records in one set; total recognized records are now 1,190 of 4,554 (3,364 unmatched), superseding the previous totals.
+
+Evolution-triggered Abilities that place a fixed number of damage counters on one opposing Pokémon now resolve for both player and PvE evolutions. The player chooses a living target or declines the optional Ability; the PvE opponent targets the player's Active Pokémon. Knockouts are handled by the normal action settlement and promotion flow. The set audit recognizes 12 such records across 8 sets, bringing the total to 1,202 of 4,554 (3,352 unmatched).
+
+Chien-Pao ex's once-per-turn Active Ability to search for up to two Basic Water Energy is represented as up to two additions to the shared Energy pool, respecting the battle format's Energy cap. This approximation matches the engine's existing treatment of Energy searches and attachments. The audit now recognizes 12 activated deck-search Ability records across 7 sets and 1,208 of 4,554 overall (3,346 unmatched).
+
+Same-name deck-swap Poké-Powers support selecting a matching Pokémon from the deck, transferring existing damage, Special Conditions, and temporary effects, returning the outgoing Pokémon to the deck, and shuffling. A shared per-turn limit is tracked by Power name, and PvE opponents select the first matching form that survives carried damage. A replacement that would be Knocked Out is excluded because the battle does not yet preserve the Power action across the resulting promotion. The audit finds 81 such records across 8 sets; 1,289 of 4,554 Ability records are now matched (3,265 unmatched).
+
+Miraidon ex's once-per-turn Bench-search Ability lets the player choose up to two Basic Lightning Pokémon from the deck and put them on the Bench, with the count limited by open slots. PvE opponents take the first eligible cards in deck order. The battle validates the selected cards on the server, removes them from the deck, and shuffles afterward. The audit now counts 18 activated deck-search Abilities across 8 sets, including six Bench-search texts, and matches 1,295 of 4,554 records (3,259 unmatched).
+
 ## TCG Battle Attack Effects
 
 TCG Battle has a separate, simplified attack interpreter in `src/utilities/tcg/tcg-battle.ts`; it does not use the main Pokemon battle move registry. The Base-series audit covers all 406 Pokemon cards in Base Set, Jungle, Fossil, Base Set 2, Team Rocket, and Wizards Black Star Promos. Supported mechanics include dynamic and until-tails coin sequences, conditional damage/healing/recoil, board and shared-energy formulas, scoped targets and switches, shared-energy mutation, temporary attack locks/buffs/protection/type overrides, Destiny Bond and reflected damage, Lightning Rod markers, and Metronome-style attack copying. Player choices are server-validated and opponent choices are generated server-side.
+
+Printed Pokémon-card abilities are copied into each TCG Battle card summary and interpreted when the current engine can represent them. Supported text patterns include holder and team-wide attack damage boosts and reductions, fixed reductions (including “takes N less damage from attacks” and reductions against the opponent’s Active Pokémon’s attacks), fixed and coin-flip damage prevention and halving, bench-position-gated damage prevention, attack-effect prevention that leaves damage intact, attacker-restricted prevention of attack damage and effects, Special Condition immunity, Poison/Burn checkup damage boosts, Weakness removal, passive between-turn healing and healing multipliers, passive Retreat Cost rules, opponent attack-cost increases, fixed end-of-turn card draws for an Active Pokémon, and explicitly activated once-per-turn Active Pokémon healing (including discarding a Pokémon from hand), draw/search, discard-and-draw, discard-hand-and-draw, draw-to-hand-size, Poison/Burn, and switching Powers. Team boosts recognize common type/stage scopes, attack target types and single-stack limits. Retreat rules cover unconditional own-board or active no-cost effects and bench-provided active retreat reductions; Energy-, Stadium-, and turn-dependent clauses are excluded. Switching Powers support a benched source switching itself Active or an Active source choosing a benched Pokémon. Fan Call searches up to three Colorless Pokémon with 100 HP or less during its owner's first turn, with a shared once-per-turn cap across copies. The Dark-type Subjugating Chains Power excludes Pecharunt ex, poisons the incoming Active Pokémon subject to status prevention, and shares its once-per-turn use across copies. Attack-cost increases currently cover an opposing active ability that raises costs for the opponent’s Active Pokémon, Basic Pokémon, Pokémon VSTAR, or Single Strike Pokémon; Downer Material adds its Basic Pokémon increase when Uxie and Mesprit are in play. Optional draw-until effects and other one-time turn activations are excluded until the engine can represent their activation state. Active-only and Pokémon-ex attacker gates are applied where recognized. Modifiers marked before Weakness/Resistance are applied before type rules; reductions explicitly marked after them are applied afterward. A set-by-set scan of the 217 catalogued sets found 4,554 ability records: 265 passive holder damage modifier texts across 116 sets, 36 passive team damage boosts across 26 sets, 27 passive team damage reductions across 17 sets, 154 fixed protection clauses across 83 sets, 33 coin-flip protection clauses across 22 sets, 24 attack-effect protection texts across 16 sets, 36 attacker-restricted attack damage/effect protection clauses across 29 sets, 86 Special Condition protection and Energy-triggered status records across 50 sets, 9 status checkup damage boosts across 8 sets, 47 Weakness-rule clauses across 35 sets, 32 between-turn healing abilities across 25 sets, 5 healing multipliers across 1 set, 105 retreat rules, including passive retreat locks, across 65 sets, 16 opponent attack-cost increases across 12 sets, 12 end-of-turn draw abilities across 2 sets, 57 activated healing Powers across 36 sets, 78 activated draw Powers across 39 sets, 112 activated search or Energy acceleration Powers across 41 sets, 38 single-card discard-and-draw Powers across 24 sets, 22 discard-hand-and-draw Powers across 10 sets, 27 activated draw-to-hand-size Powers across 17 sets, 8 activated Poison/Burn Powers across 4 sets, 49 activated switch Powers across 26 sets, 5 Resistance-ignoring attack abilities across 5 sets, 97 attack-damage retaliation Abilities across 62 sets, 26 passive between-turn damage abilities across 18 sets. Categories overlap; 1,758 records match at least one current family and 2,796 do not. The per-set table is in `docs/game-data/tcg-ability-support-audit.md`, generated by `scripts/audit-tcg-battle-abilities.ts`. The implementation is shared across sets and matches printed text at runtime. Other activated Poké-Powers, most Ancient Traits, and other unsupported passive rules remain unimplemented. Source texts come from each set detail record; battle resolution is in `src/utilities/tcg/tcg-battle.ts` and end-of-round healing is in `src/app/(frontend)/game/research/games/tcg-battle.ts`.
 
 Attacks whose effects exist only in the physical game's deck, hand, prize-card, discard-pile, Trainer-card, or evolution systems remain filtered. The audit test fixes that boundary at 31 unsupported attack occurrences across 19 attack names; `base3-3`, `base3-18`, `basep-31`, and `basep-35` are the only audited cards with no mechanics-compatible attack.
 
@@ -314,6 +471,11 @@ Sandstorm (`ex2`) covers 92 Pokemon cards and 154 attacks: 139 are supported and
 Dragon (`ex3`) covers 93 Pokemon cards and 161 attacks: 154 are supported and 7 remain filtered. Its mappings add shared-Energy acceleration and scaling, Energy-spend damage, retreat-cost damage, damage-counter effects, coin attacks, multi-front hits, any-target attacks, healing, and status/control effects. Call for Family searches for Magikarp and Call for Friends searches for Grass Basic Pokemon to put on the Bench. Bad News and Prize Count depend on hand or Prize cards; Dragon Dance needs a conditional next-turn team buff; Synchronized Search and Quick Charge need deck-to-hand operations; Pick On inspects and discards from the opponent's hand; and Genetic Memory needs evolution-line attack copying. These effects remain filtered. Rainbow Burn counts up to three shared Energy as a type proxy; Special Circuit omits its Poke-Power/Body bonus, and Dragon Dew heals Dragonite itself rather than choosing another friendly Pokemon.
 
 Team Magma vs Team Aqua (`ex4`) covers 77 Pokemon cards and 143 attacks: 139 are supported and 4 remain filtered. Its mappings add Special Condition and damage-counter thresholds, coin attacks, damage based on shared Energy or named Team Magma Pokemon, any-target attacks and counters, multi-front damage, team healing, status clearing, protection, switching, and eligible deck-to-Bench searches. The two Call for Family attacks search for the matching type of Basic Pokemon or Basic Pokemon with the corresponding team name; selected cards enter play as Basic. Power Blow and Crush use the shared Energy pool as a proxy for Energy attached to the attacker. Hydro Reverse, Land Stream, and Reverse Stream let the player choose how much shared Energy to spend for their damage bonus. Kerzap approximates discarding attached Lightning Energy by discarding the shared pool on heads. Green Heal heals all of your Pokemon rather than checking for attached Grass Energy; Clay Curse places both counters on one selected target instead of distributing them; Energy Flip omits moving attached Energy. Dark Hand and Aqua Call need meaningful hand state, Magma Spurt needs Energy cards in deck discards, and Collect draws a card; these four attacks remain filtered.
+
+Team Magma Mightyena's Call for Help searches the Pokémon-only deck for one Team Magma Pokémon into hand once per turn while Mightyena is Active and has no Special Condition. Hidden Legends Milotic's optional Healing Shower triggers when evolved from hand and heals all Pokémon on both sides except Pokémon-ex; healing prevention and Ability suppression are respected. Beldum's Magnetic Call flips once per turn to search for a Metal Basic Pokémon and put it onto the Bench; the player selects the card, and the NPC chooses the first eligible one. Castform's Temperamental Weather switches among its four forms by selecting another matching card from the Pokémon deck, carrying over damage, Special Conditions, and temporary effects; copies share a once-per-turn limit. Rhydon's Power Diffusion prevents attack damage to all of its owner's Benched Pokémon while it is Active. Active Relicanth's Deep Sleep flips twice for each sleeping Pokémon at the end of a turn; only two heads wake the Pokémon, and Ability suppression or Special Conditions on Relicanth disable the effect. Groudon ex and Kyogre ex's Mark of Antiquity prevents attacks by either player's specified Pokémon while its holder is Active; Ability suppression disables the lock. Individual Energy attachment requirements in Hidden Legends, including Walrein's Crush Draw and Glalie's Ice Wall, remain outside the shared Energy model.
+Claydol's Primal Pull adds one to the attack cost of each evolved Pokémon on both sides while Claydol is Active. Regice ex's Crystal Body prevents attack effects while leaving damage intact.
+Levitate on Beldum and Metang, and Tentacool's Freefloating, set their Retreat Cost to zero when the side-wide Energy pool indicates the printed attached-Energy condition; this is an approximation because attachments are not tracked individually. Igglybuff's Baby Evolution can evolve it with a matching Jigglypuff in hand and remove all damage counters.
+FireRed & LeafGreen Nidoqueen's Family Bonds sets the Retreat Cost of Nidoran♀, Nidorina, Nidoran♂, Nidorino, and Nidoking to zero while Nidoqueen is in play. Victreebel's Acid Sampler puts one damage counter on each opposing front-row Pokémon between turns while Victreebel is Active, unless another of its owner's front-row Pokémon is not a Victreebel. Haunter's Head Trip can be used from the Bench once per turn to Confuse one of its owner's Active Pokémon. Slowbro's Strange Behavior repeatedly moves one damage counter from one of its owner's Pokémon to Slowbro, cannot be used under a Special Condition, and cannot Knock Out Slowbro. Benched Wigglytuff's Assistance removes one Special Condition from a chosen Active Pokémon once per turn. Dodrio's Retreat Aid reduces the Active Pokémon's retreat cost by two while Dodrio is Benched, excluding Pokémon-ex and Baby Pokémon. Venomoth's Protective Dust blocks effects from opposing attacks, not damage. Mr. Mime ex's Magic Odds and Magic Evens prevent attack damage for the listed odd or even damage values.
 
 Hidden Legends (`ex5`) covers 93 Pokemon cards and 161 attacks: 145 are supported and 16 remain filtered. Its mappings add discard-Pokemon counter placement, shared-Energy damage formulas, Pokemon-ex and type-count bonuses, remaining-HP comparisons, optional damage/recoil choices, attack locks, status-based bonuses, healing, eligible Basic deck-to-Bench searches, multi-front damage, and next-turn attack buffs. Extra Draw checks for opposing Pokemon-ex and gains up to two shared Energy; Darkness Chant counts eligible Pokemon in your discard pile, capped at six. Muddy Eye, Psychic Boom, Mystic Water, Rainbow Star, and Super Tidal Wave use shared Energy as a proxy for attached, typed, or held Energy. Plus Energy and Metal Load approximate typed Energy attachments as generic gains; Crushing Mantle spends shared Energy for Energy cards that would come from hand. Mass Destruction knocks out the selected target and Electrode; its Special Energy restriction cannot occur because this battle does not track Special Energy cards. Sweet Temptation uses the player's bench selection where card text gives that choice to the opponent. Tonnage lets the player opt into its extra 20 damage and 30 recoil, while Extra Comet Punch boosts its next use. Shadow Steal needs Special Energy in the discard; evolution search, hand-size/draw/inspection effects, Supporter or Stadium handling, and Poké-Power/Body checks are not represented. These mechanics remain filtered.
 
@@ -357,37 +519,38 @@ Platinum (`pl1`) covers 115 Pokemon cards and 221 attacks: 210 are supported and
 
 Rising Rivals (`pl2`) covers 104 Pokemon cards and 187 attacks: 173 are supported and 14 remain filtered. It adds damage based on evolved Bench counts, shared Energy, the target's damage/retreat cost, damage taken during the opponent's last turn, and the player's hand size; it also supports conditional status, attack/retreat restrictions, selected targets, board damage, healing, and deck-to-Bench searches. Calling Wave treats Gastrodon as Basic and places two damage counters on each searched copy. Combo Throw, Psywave, Save Sand, Leaf Needle, Heavy Metal, and Energy Cyclone approximate per-card Energy with the shared pool. Find Ice, Stoke, Warm Up, Pickup Power, and Mend approximate Energy search/recovery with shared Energy; Mend also heals 10 HP. Grudge counts the owner's discarded Pokemon as a proxy for prizes taken. Crushing Ice uses total converted Retreat Cost for its Colorless-symbol check. Multi-target attacks such as Split Bomb and Thunder Throw choose targets randomly, and Magic Heal applies its heads-based healing to one randomly selected injured Pokemon. Evolving Flare and Evolving Aqua use base damage without their this-turn evolution bonus. Trainer/Supporter, hand/deck, discard-pile, Prize-card, and card-return effects remain unsupported. Incite, Detour, Hand Refresh, Payback, Pick and Collect, Brush Off, Energy Typhoon, Collect, Tail Code, Signs of Evolution, Errand-Running, Offer Help, Cosmic Draw, and Rescue String remain filtered.
 
-Supreme Victors (`pl3`) covers 146 Pokemon cards and 254 attacks: 238 are supported and 16 remain filtered. It adds distinct-type counts for SP Pokemon, target-side shared-Energy counters, opponent-hand-size damage, damage-history formulas, conditional statuses, Stage 2/Level-Up target bonuses, board damage/healing, target selection, switching, attack failure, and next-attack buffs shared across named attacks. Rainbow Lariat counts distinct types among the player's SP Pokemon. Super Psywave approximates attached Energy on the selected target with that side's shared pool; Trash Burst and Wind Return let the player spend chosen shared Energy for their hand-Energy effects. Antique Magic places its three counters on one selected Pokemon instead of distributing them. Energy discard/attachment effects use the shared pool, and Grudge counts the owner's discarded Pokemon SP as a prize-count proxy. Doom News, Top Drop, and delayed effects remain filtered; card hand/deck/discard, Supporter/Trainer/Tool/Stadium, typed attached-Energy, and card-return operations are not represented. The 16 filtered attacks are Doom News, Dump and Draw, Escort, Top Drop, Synchro Removal, Search and Escape, Switcheroo, Greedy Draw, Find, Grand Swell, Collect (Togekiss C and Drifloon), Pit Search, Chime, Count and Draw, and Darkness Slugger.
+Supreme Victors (`pl3`) covers 146 Pokemon cards and 254 attacks: 238 are supported and 16 remain filtered. It adds distinct-type counts for SP Pokemon, target-side shared-Energy counters, opponent-hand-size damage, damage-history formulas, conditional statuses, Stage 2/Level-Up target bonuses, board damage/healing, target selection, switching, attack failure, and next-attack buffs shared across named attacks. Rainbow Lariat counts distinct types among the player's SP Pokemon. Super Psywave approximates attached Energy on the selected target with that side's shared pool; Trash Burst and Wind Return let the player spend chosen shared Energy for their hand-Energy effects. Antique Magic places its three counters on one selected Pokemon instead of distributing them. Energy discard/attachment effects use the shared pool, and Grudge counts the owner's discarded Pokemon SP as a prize-count proxy. Masquerain's Intimidating Pattern reduces opposing attack damage to its owner's Pokemon by 20 before Weakness and Resistance while Masquerain is Active. Dewgong's Thick Fat reduces damage from Fire- and Water-type attackers by 30 after Weakness and Resistance; Swampert's Root Protector reduces damage to Swampert by 20 after Weakness and Resistance from an opposing Basic attacker. Butterfree FB's Compound Eyes adds 30 damage to its attacks against an Active Pokémon with a Poké-Body before Weakness and Resistance. Lunatone's Marvel Eyes protects its owner's Lunatone and Solrock from all attack effects, including damage, from opposing LV.X Pokémon while Solrock is in play. Arcanine G's Extreme Speed subtracts the selected shared Fire Energy count from its Retreat Cost as an approximation of attached Fire Energy. Blaziken FB LV.X's Burning Spirit adds 40 post-type damage to attacks against Burned Pokémon, with a single shared cap across copies. Yanmega's Speed Boost adds one shared Grass Energy from the discard pile to Active Yanmega once per turn; Special Conditions and Ability suppression disable it. Doom News, Top Drop, and delayed effects remain filtered; card hand/deck/discard, Supporter/Trainer/Tool/Stadium, typed attached-Energy, and card-return operations are not represented. The 16 filtered attacks are Doom News, Dump and Draw, Escort, Top Drop, Synchro Removal, Search and Escape, Switcheroo, Greedy Draw, Find, Grand Swell, Collect (Togekiss C and Drifloon), Pit Search, Chime, Count and Draw, and Darkness Slugger.
 
-Arceus (`pl4`) covers 99 Pokemon cards and 164 attacks: 144 are supported and 20 remain filtered. It adds selected-target hits, damage-counter and remaining-HP formulas, board damage/healing, named-Pokemon bonuses, chosen shared-Energy spending, and coin-gated protection/endure. Attached typed Energy is approximated by each side's shared Energy pool; Entangle Tackle applies its optional recoil to Swalot because only the attacking Active Pokemon can receive recoil in this battle mode. Wreck uses its printed base damage without a Stadium check, and Extend Fang uses its base damage without a Tool check. Magma Mantle, Primal Scythe, Cloak Party, Convert Blow, Time Spiral, Primal Tentacles, Baby Steps, Recruit, Darkness Grace, Ascension, Call for Friends, Astonish, Collect attacks, Fast Evolution, Tangrowth LV.X's Big Growth, Prize Count, Ripple Swell, and Payback remain filtered because they require card-zone, typed-Energy, evolution, or Prize-card state. The filtered attacks are Magma Mantle, Primal Scythe, Cloak Party, Convert Blow, Time Spiral, Primal Tentacles, Baby Steps, Recruit, Darkness Grace, Ascension, Call for Friends, Astonish, Gulpin's Collect, Fast Evolution, Omanyte's Collect, Tangela's Collect, Big Growth, Prize Count, Ripple Swell, and Payback.
+Arceus (`pl4`) covers 99 Pokemon cards and 164 attacks: 144 are supported and 20 remain filtered. It adds selected-target hits, damage-counter and remaining-HP formulas, board damage/healing, named-Pokemon bonuses, chosen shared-Energy spending, and coin-gated protection/endure. Attached typed Energy is approximated by each side's shared Energy pool; Entangle Tackle applies its optional recoil to Swalot because only the attacking Active Pokemon can receive recoil in this battle mode. Wreck uses its printed base damage without a Stadium check, and Extend Fang uses its base damage without a Tool check. Burmy Plant, Sandy, and Trash Cloak can evolve on the turn played through their Cloak Evolution Poké-Bodies; Froslass's Snow Gift searches the Pokémon-only deck for one Pokémon card and adds it to hand on evolution. Magma Mantle, Primal Scythe, Cloak Party, Convert Blow, Time Spiral, Primal Tentacles, Baby Steps, Recruit, Darkness Grace, Ascension, Call for Friends, Astonish, Collect attacks, Fast Evolution, Tangrowth LV.X's Big Growth, Prize Count, Ripple Swell, and Payback remain filtered because they require card-zone, typed-Energy, evolution, or Prize-card state. The filtered attacks are Magma Mantle, Primal Scythe, Cloak Party, Convert Blow, Time Spiral, Primal Tentacles, Baby Steps, Recruit, Darkness Grace, Ascension, Call for Friends, Astonish, Gulpin's Collect, Fast Evolution, Omanyte's Collect, Tangela's Collect, Big Growth, Prize Count, Ripple Swell, and Payback.
 
-HeartGold & SoulSilver (`hgss1`) covers 99 Pokemon cards and 163 attacks: 148 are supported and 15 remain filtered. It adds board-count and damage-counter formulas, until-tails and multi-coin attacks, board-wide damage/healing, selected-target hits, shared-Energy bonuses, and attack/retreat control. Energy attached to a specific Pokemon is approximated with the shared pool; Cosmic Cyclone spends chosen shared Energy to stand in for returning the selected Water Energy to the deck. Cure Kernels randomly heals one injured friendly Pokemon because the engine cannot select any own Pokemon for healing. The filtered attacks are Fairy Power, Eeeeeeek, Farfetch'd Collect, Find a Friend, Sharpen Claws, Playground, Energy Antics, Snowy Present, Green Draw, Graffiti, Group Swim, Moomoo Squeeze, Show Off, Mimic, and Scout; they require Pokemon/card returns, drawing or searching to hand, card-specific Energy movement, or hand inspection.
+HeartGold & SoulSilver (`hgss1`) covers 99 Pokemon cards and 163 attacks: 148 are supported and 15 remain filtered. It adds board-count and damage-counter formulas, until-tails and multi-coin attacks, board-wide damage/healing, selected-target hits, shared-Energy bonuses, and attack/retreat control. Energy attached to a specific Pokemon is approximated with the shared pool; Cosmic Cyclone spends chosen shared Energy to stand in for returning the selected Water Energy to the deck. Cure Kernels randomly heals one injured friendly Pokemon because the engine cannot select any own Pokemon for healing. Hypno's Sleep Pendulum uses the coin-flip status Ability flow to make the opposing Active Pokémon Asleep on heads. Sunflora's Sunshine Grace searches the Pokémon-only deck for a Grass Pokémon and adds it to hand once per turn. The filtered attacks are Fairy Power, Eeeeeeek, Farfetch'd Collect, Find a Friend, Sharpen Claws, Playground, Energy Antics, Snowy Present, Green Draw, Graffiti, Group Swim, Moomoo Squeeze, Show Off, Mimic, and Scout; they require Pokemon/card returns, drawing or searching to hand, card-specific Energy movement, or hand inspection.
 
-HS—Unleashed (`hgss2`) covers 82 Pokemon cards and 142 attacks: 130 are supported and 12 remain filtered. It adds selected and multi-target damage, Energy-count formulas, coin-scaled attacks, deck-to-Bench searches, and shared-Energy recovery/spending. Double Leg Hammer and Double Attack randomly select their additional targets. Push Over, Power Blow, Psywave, and Energy formulas use shared Energy; Hydro Launcher and Torrent Blade spend two shared Energy beyond attack cost. Heat Acceleration and Energy Crane approximate discard-pile Energy recovery as shared-Energy gains. The filtered attacks are Time Hollow, Hard Crush, Deep Sea Swirl, Speed Evolution (Kakuna and Weedle), Flare Bonus, Collect, Tail Code, Drawup Power, Green Call, and Thunder Fall (both LEGEND prints); these require card-zone, hand/draw, evolution, or Poké-Power state.
+HS—Unleashed (`hgss2`) covers 82 Pokemon cards and 142 attacks: 130 are supported and 12 remain filtered. It adds selected and multi-target damage, Energy-count formulas, coin-scaled attacks, deck-to-Bench searches, and shared-Energy recovery/spending. Double Leg Hammer and Double Attack randomly select their additional targets. Push Over, Power Blow, Psywave, and Energy formulas use shared Energy; Hydro Launcher and Torrent Blade spend two shared Energy beyond attack cost. Heat Acceleration and Energy Crane approximate discard-pile Energy recovery as shared-Energy gains. Politoed's Leap Frog switches a chosen Benched Water Pokémon with its owner's Active once per turn; Kingdra's Spray Splash places one damage counter on an opposing Pokémon once per turn; both are blocked by Special Conditions and Ability suppression. Lanturn's Underwater Dive uses the existing temporary type-change mechanic. The filtered attacks are Time Hollow, Hard Crush, Deep Sea Swirl, Speed Evolution (Kakuna and Weedle), Flare Bonus, Collect, Tail Code, Drawup Power, Green Call, and Thunder Fall (both LEGEND prints); these require card-zone, hand/draw, evolution, or Poké-Power state.
+HS—Unleashed Lanturn's manual type-change Poké-Power is supported by the same temporary Water override as Neo Revelation Submerge; its broader “any Special Condition” restriction is enforced in PvE and PvP.
 
-HS—Undaunted (`hgss3`) covers 80 Pokemon cards and 131 attacks: 115 are supported and 16 remain filtered. It adds named-Pokemon board counts, status-count damage, damage-counter scaling, selected and multi-target hits, shared-Energy formulas, healing, optional bonus/recoil choices, and coin-gated control. Backward Belt Throw offers its 20-damage bonus at the cost of 20 self-damage. Everyone Explode Now counts Pineco/Forretress and damages those friendly Pokemon; Beautiful Wings heals the team but omits returning Togekiss to the deck. Plasma Arrow approximates target-attached Energy with the opponent's shared pool; Metal Scissors and other specific-Energy attacks use the player's shared pool. Dark Hand compares hand sizes, and Evoblast counts Pokemon that evolve from Eevee. The filtered attacks are Solar Suggestion, Take Away, Vengeance, Poltergeist, Pull Out, Chase Up, Sticky Liquid, Selfish Draw, Dual Draw, Find a Friend, Rambunctious Party, Plead, Mega Tidal Wave (both LEGEND prints), and Massive Eruption (both LEGEND prints); they require counter redistribution, hand/deck/discard access, or card-zone counts.
+HS—Undaunted (`hgss3`) covers 80 Pokemon cards and 131 attacks: 115 are supported and 16 remain filtered. It adds named-Pokemon board counts, status-count damage, damage-counter scaling, selected and multi-target hits, shared-Energy formulas, healing, optional bonus/recoil choices, and coin-gated control. Houndoom's Fire Breath flips once per turn and Burns the opposing Active Pokémon on heads; Special Conditions and Ability suppression prevent its use. Backward Belt Throw offers its 20-damage bonus at the cost of 20 self-damage. Everyone Explode Now counts Pineco/Forretress and damages those friendly Pokemon; Beautiful Wings heals the team but omits returning Togekiss to the deck. Plasma Arrow approximates target-attached Energy with the opponent's shared pool; Metal Scissors and other specific-Energy attacks use the player's shared pool. Dark Hand compares hand sizes, and Evoblast counts Pokemon that evolve from Eevee. The filtered attacks are Solar Suggestion, Take Away, Vengeance, Poltergeist, Pull Out, Chase Up, Sticky Liquid, Selfish Draw, Dual Draw, Find a Friend, Rambunctious Party, Plead, Mega Tidal Wave (both LEGEND prints), and Massive Eruption (both LEGEND prints); they require counter redistribution, hand/deck/discard access, or card-zone counts.
 
-HS—Triumphant (`hgss4`) covers 96 Pokemon cards and 163 attacks: 140 are supported and 23 remain filtered. It adds hand-size-based counter damage, shared-Energy formulas, coin tables, board damage/healing, selected-target hits, protection, and control. Focus Energy buffs Bite, Bone Rush uses until-tails damage, Vital Throw offers its optional bonus/recoil, and Stadium Power/Bone Impact use base damage without Stadiums. Multi-target attacks may randomly select targets; the LEGEND Lost Burn lets the player choose shared Energy to spend. Mountain Eater keeps its healing while omitting deck discard, and Lightning Strike uses base damage because the optional Energy cost cannot be linked to its bonus. The filtered attacks are Future Sight, Color Tag, Lost Crush, Legend Ceremony, Thunder Shot, Top Burner, Prize Count, Search and Invite, Rendezvous Draw, Eruption, Imitate, Friend Search, Messenger, Disable, Hurl into Darkness, Cursed Drop, See Off, Moon's Invite (both LEGEND prints), and Sudden Delete/Time Control (both LEGEND prints); they require deck/hand/Prize/Lost Zone access, Poké-Power checks, selected-type targeting, or counter movement.
+HS—Triumphant (`hgss4`) covers 96 Pokemon cards and 163 attacks: 140 are supported and 23 remain filtered. It adds hand-size-based counter damage, shared-Energy formulas, coin tables, board damage/healing, selected-target hits, protection, and control. Spiritomb's Spooky Whirlpool, when played from hand to the Bench, makes the opponent shuffle their hand into the Pokémon-only deck and draw up to six cards. Venomoth's Poison Moth Wind flips once per turn: heads Poisons the opponent's Active Pokémon and tails Poisons its owner's Active Pokémon; Special Conditions and Ability suppression block use. Focus Energy buffs Bite, Bone Rush uses until-tails damage, Vital Throw offers its optional bonus/recoil, and Stadium Power/Bone Impact use base damage without Stadiums. Multi-target attacks may randomly select targets; the LEGEND Lost Burn lets the player choose shared Energy to spend. Mountain Eater keeps its healing while omitting deck discard, and Lightning Strike uses base damage because the optional Energy cost cannot be linked to its bonus. The filtered attacks are Future Sight, Color Tag, Lost Crush, Legend Ceremony, Thunder Shot, Top Burner, Prize Count, Search and Invite, Rendezvous Draw, Eruption, Imitate, Friend Search, Messenger, Disable, Hurl into Darkness, Cursed Drop, See Off, Moon's Invite (both LEGEND prints), and Sudden Delete/Time Control (both LEGEND prints); they require deck/hand/Prize/Lost Zone access, Poké-Power checks, selected-type targeting, or counter movement.
 
-Call of Legends (`col1`) covers 86 Pokemon cards and 138 attacks: 128 are supported and 10 remain filtered. It adds conditional board sweeps, status-count and damage-counter formulas, selected-target hits, self-status effects, healing/protection, attack locks/buffs, and shared-Energy approximations. Cell Storm heals 60 HP after its shared-Energy cost; Acceleration Bolt gains two shared Energy; attached-Energy discards/recovery use the side pool. Eeeeeeek and Sleepy Lost retain their self-Asleep effects but omit hand/deck actions. Wormhole switches Palkia but omits the opponent's forced switch because the choice model cannot select both benches. The filtered attacks are Fairy Power, Solar Suggestion, Time Hollow, Dimension Sphere, Hard Crush, Poltergeist, Selfish Draw, Dual Draw, Messenger, and Prehistoric Wisdom; they depend on returning cards, moving counters, evolving cards in battle, or hand/deck/Lost Zone state.
+Call of Legends (`col1`) covers 86 Pokemon cards and 138 attacks: 128 are supported and 10 remain filtered. It adds conditional board sweeps, status-count and damage-counter formulas, selected-target hits, self-status effects, healing/protection, attack locks/buffs, and shared-Energy approximations. Phanpy's Ultra-Thick Skin reduces attack damage by 10 after Weakness and Resistance while its owner's shared Energy pool is nonempty, approximating Energy attached to Phanpy. Suicune, Entei, and Raikou's Extreme Speed subtract the selected matching-type shared Energy count from their Retreat Costs, approximating matching Energy attached to themselves. Cell Storm heals 60 HP after its shared-Energy cost; Acceleration Bolt gains two shared Energy; attached-Energy discards/recovery use the side pool. Eeeeeeek and Sleepy Lost retain their self-Asleep effects but omit hand/deck actions. Wormhole switches Palkia but omits the opponent's forced switch because the choice model cannot select both benches. The filtered attacks are Fairy Power, Solar Suggestion, Time Hollow, Dimension Sphere, Hard Crush, Poltergeist, Selfish Draw, Dual Draw, Messenger, and Prehistoric Wisdom; they depend on returning cards, moving counters, evolving cards in battle, or hand/deck/Lost Zone state.
 
 Black & White (`bw1`) covers 94 Pokemon cards and 160 attacks: 155 are supported and five remain filtered. It adds damage-counter and shared-Energy formulas, coin-table damage, next-turn attack buffs, attack-failure control, deck-to-Bench search, forced switching, attack copying, damaged-target selection, Stage 2 bonuses, and a previous-turn knockout check for Revenge. Flame Charge and Energize become shared-Energy gains; typed attached Energy and Psywave's target Energy use the relevant side's shared pool. Nasty Plot, Pickup, both Collect attacks, and Odor Sleuth remain filtered because searching, drawing, or returning cards to hand and Item recovery do not fit the in-battle card flow.
 
 Black & White—Emerging Powers (`bw2`) covers 91 Pokemon cards and 164 attacks: 156 are supported and eight remain filtered. It adds selected-target and board-wide coin-scaled damage, optional bonus/recoil, poison and Resistance checks, damage-counter and shared-Energy formulas, next-turn attack buffs/protection, forced switching, and healing. Helping Hand, Charge, and Tailwind become shared-Energy gains; Energy attached to a specific Pokemon uses the shared pool. Phat Sound applies the same three-coin damage total to every opposing Pokemon while applying Weakness/Resistance only to the active target. Heal Pulse randomly heals one injured friendly Pokemon because the engine cannot choose any own target. Collect, Nurturing, Shear, Watcheck, and both Energy Wheel prints remain filtered for hand/draw, evolution, deck composition/order, and individual-Pokemon Energy movement.
 
-Black & White—Noble Victories (`bw3`) covers 94 Pokemon cards and 153 attacks: 145 are supported and eight remain filtered. It adds attack-name and Bench-type counts, selected-Bench healing, target-type bonuses, forced switches, board damage, previous-turn knockout bonuses, and until-tails coin attacks. Hydro Pump and Metal Scissors approximate typed attached Energy with the player's shared Energy pool; Core Cannon and Energy Press likewise use shared pools for Energy attached to an individual Pokemon. Abundant Harvest becomes one shared Energy gain. The two Mysterious Evolution attacks, Double Draw (both prints), Damagriiigus, Garbage Collection, Future Sight, and Devour remain filtered because evolution, hand/deck flow, chosen-counter transfer, and deck discard are not represented.
+Black & White—Noble Victories (`bw3`) covers 94 Pokemon cards and 153 attacks: 145 are supported and eight remain filtered. It adds attack-name and Bench-type counts, selected-Bench healing, target-type bonuses, forced switches, board damage, previous-turn knockout bonuses, and until-tails coin attacks. Carracosta's Solid Rock flips when attack damage hits and reduces that damage by 50 after Weakness and Resistance on heads. Hydro Pump and Metal Scissors approximate typed attached Energy with the player's shared Energy pool; Core Cannon and Energy Press likewise use shared pools for Energy attached to an individual Pokemon. Abundant Harvest becomes one shared Energy gain. The two Mysterious Evolution attacks, Double Draw (both prints), Damagriiigus, Garbage Collection, Future Sight, and Devour remain filtered because evolution, hand/deck flow, chosen-counter transfer, and deck discard are not represented.
 
-Black & White—Next Destinies (`bw4`) covers 95 Pokemon cards and 161 attacks: 149 are supported and twelve remain filtered. It adds shared-Energy damage formulas, dynamic and fixed coin attacks, damage-counter bonuses, selected-target attacks, deck-to-Bench searches, next-turn attack buffs, attack copying, hand-size and remaining-HP comparisons, and optional damage/recoil. Synthesis and Stoke become shared-Energy gains; Energy attached to individual Pokemon uses the shared pool. Water Arrow, Random Spark, and Lightning Crash can target a Benched Pokemon, with Lightning Crash spending all remaining shared Energy. Stadium Burn and Stadium Wave use printed base damage because Stadium cards are not in the battle mode. Both Revenge Blast prints, all three Collect attacks, Find a Friend, Synchrodraw, Brain Control, Haul In, both Nasty Plot attacks, and Scout remain filtered because Prize cards, drawing, hand inspection, and deck-to-hand searches are not represented.
+Black & White—Next Destinies (`bw4`) covers 95 Pokemon cards and 161 attacks: 149 are supported and twelve remain filtered. It adds shared-Energy damage formulas, dynamic and fixed coin attacks, damage-counter bonuses, selected-target attacks, deck-to-Bench searches, next-turn attack buffs, attack copying, hand-size and remaining-HP comparisons, and optional damage/recoil. Musharna's Forewarn lets the player choose one of the top two Pokémon-only deck cards for hand and puts the other card back on top. Synthesis and Stoke become shared-Energy gains; Energy attached to individual Pokemon uses the shared pool. Water Arrow, Random Spark, and Lightning Crash can target a Benched Pokemon, with Lightning Crash spending all remaining shared Energy. Stadium Burn and Stadium Wave use printed base damage because Stadium cards are not in the battle mode. Both Revenge Blast prints, all three Collect attacks, Find a Friend, Synchrodraw, Brain Control, Haul In, both Nasty Plot attacks, and Scout remain filtered because Prize cards, drawing, hand inspection, and deck-to-hand searches are not represented.
 
-Black & White—Dark Explorers (`bw5`) covers 98 Pokemon cards and 166 attacks: 160 are supported and six remain filtered. It adds optional shared-Energy discards for damage bonuses, two-target and play-wide damage, team healing, until-tails attacks, retreat-cost and damage-counter formulas, dynamic attack buffs, and forced switches. Flareon’s Fire Slash and Jolteon’s Electrigun allow choosing zero or one shared Energy to discard for their damage bonus. Dual Splash randomly chooses two opposing Pokemon; play-wide effects can include active Pokemon and the Bench. Volt Bolt discards all remaining shared Energy. Reinforced Drill and Special Fang use printed base damage without their unavailable Tool and Special Energy checks; Blow Through likewise omits its Stadium bonus. Spit Squall, Tag Draw, Chuck, Junk Hunt, Bombast, and Ascension remain filtered for card return, draw/hand/discard flow, Prize counts, or in-battle evolution.
+Black & White—Dark Explorers (`bw5`) covers 98 Pokemon cards and 166 attacks: 160 are supported and six remain filtered. It adds optional shared-Energy discards for damage bonuses, two-target and play-wide damage, team healing, until-tails attacks, retreat-cost and damage-counter formulas, dynamic attack buffs, and forced switches. Blissey's Softboiled flips once per turn and heals 30 damage from its owner's Active Pokémon on heads. Flareon’s Fire Slash and Jolteon’s Electrigun allow choosing zero or one shared Energy to discard for their damage bonus. Dual Splash randomly chooses two opposing Pokemon; play-wide effects can include active Pokemon and the Bench. Volt Bolt discards all remaining shared Energy. Reinforced Drill and Special Fang use printed base damage without their unavailable Tool and Special Energy checks; Blow Through likewise omits its Stadium bonus. Spit Squall, Tag Draw, Chuck, Junk Hunt, Bombast, and Ascension remain filtered for card return, draw/hand/discard flow, Prize counts, or in-battle evolution.
 
 Black & White—Dragons Exalted (`bw6`) covers 122 Pokemon cards and 200 attacks: 190 are supported and ten remain filtered. It adds exact two-coin damage/knockouts, until-tails attacks, status-count and Resistance bonuses, Bench damage-counter scaling, shared-Energy formulas/gains, healing/status clearing, temporary damage reduction, forced switches, selected counter placement, and multi-Pokemon hits. Triple Laser hits the selected Pokemon and up to two random additional opposing Pokemon because the attack choice supports one manually selected target. Add-a-Dash and Reverse Spin draw from the Pokemon-only deck; Reverse Spin first returns the opponent's hand to that randomized draw pool. Clear Search and Chirp let the player select eligible Pokemon into hand. Triple Energy, Energy Assist, Draw In, and type-specific attached Energy use the shared Energy pool; Reinforced Needle keeps its base damage without a Pokemon Tool check. Replace (both prints), Shadow Steal, Future Sight, Pull Out, Celestial Roar (both prints), Dragon Burst (both prints), and Bombast remain filtered for card-specific Energy movement, Special Energy cards, deck ordering/top-card manipulation, or Prize-card counts.
 
-Black & White—Boundaries Crossed (`bw7`) covers 135 Pokemon cards and 216 attacks: 213 are supported and three remain filtered. It adds retreat-cost and damage-counter formulas, until-tails attacks, shared-Energy scaling/gains, conditional Basic searches, hand draws/shuffles/reveals, opponent deck milling, hand-size comparisons, previous-turn knockout bonuses, status checks, healing, forced switches, and a selected-target plus random additional target attack. Fluffy Tag switches to a chosen friendly Benched Pokemon and buffs that Pokemon's next attack. Present randomly searches a Pokemon into the modeled hand on heads; Jet Woofer mills a random number of cards from the opponent's Pokémon-only deck pool based on shared Energy. Stadium bonuses are omitted and typed or individually attached Energy use the shared pool. Liepard's Assist remains filtered because the engine cannot choose an attack from a friendly Benched Pokemon; Raticate's Gnaw Through needs Pokemon Tool state, and Patrat's Patrol needs deck ordering.
+Black & White—Boundaries Crossed (`bw7`) covers 135 Pokemon cards and 216 attacks: 213 are supported and three remain filtered. It adds retreat-cost and damage-counter formulas, until-tails attacks, shared-Energy scaling/gains, conditional Basic searches, hand draws/shuffles/reveals, opponent deck milling, hand-size comparisons, previous-turn knockout bonuses, status checks, healing, forced switches, and a selected-target plus random additional target attack. Crustle's Sturdy survives an attack-damage knockout at full HP and leaves it at 10 HP; Dusknoir's Sinister Hand repeatedly moves one damage counter between opposing Pokémon. Fluffy Tag switches to a chosen friendly Benched Pokemon and buffs that Pokemon's next attack. Present randomly searches a Pokemon into the modeled hand on heads; Jet Woofer mills a random number of cards from the opponent's Pokémon-only deck pool based on shared Energy. Stadium bonuses are omitted and typed or individually attached Energy use the shared pool. Liepard's Assist remains filtered because the engine cannot choose an attack from a friendly Benched Pokemon; Raticate's Gnaw Through needs Pokemon Tool state, and Patrat's Patrol needs deck ordering.
 
 Black & White—Plasma Storm (`bw8`) covers 122 Pokemon cards and 194 attacks: 181 are supported and thirteen remain filtered. It adds until-tails damage, Combee and Pokémon searches, random hand discards, status/retreat-cost/damage-counter formulas, Team Plasma and Round counts, shared-Energy scaling/gains, board-wide damage, temporary damage reduction, forced switches, and selected damage-counter transfers. Gather Order selects Combee onto the Bench and Call for Backup selects a Pokemon into hand. Astonish shuffles a random opposing hand card into the modeled deck on heads; Shout discards one at random on heads, and Fast Swipe discards one unconditionally. Damakinesis selects one damaged friendly Pokemon, moves up to six of its counters to the Defending Pokemon, and heals the source by the same amount. Turbo Energize, Seafaring, and attacks that count individual attached Energy use the shared Energy pool. Wreck keeps its base damage because Stadium cards are absent. Power Flame and Powervolt need Plasma Energy; Fiery Licks, Electribonus, Poltergeist, Pile Up, Tool Drop, Silent Claw, Reinforced Headbutt, Cargo Jet, Destructive Sound, and Tool Breaker need Energy, Trainer, or Tool card state; Hurricane Kick needs Prize counts.
 
-Black & White—Plasma Freeze (`bw9`) covers 108 Pokemon cards and 175 attacks: 165 are supported and ten remain filtered. It adds full-HP and Special Condition checks, Energy/discard/Bench/attack-name scaling, named Bench checks, typed searches into hand, all-board healing/damage, any-target attacks, selected damage-counter transfers, forced switching, hand refill, and shuffling the opposing active Pokemon into the Pokémon-only deck pool. Signs of Evolution selects up to three Eevee evolutions into hand, but the picker does not enforce distinct types. Imittack copies a selected opposing attack without checking that the attacker has its Energy; Max Milk heals a chosen own Pokemon and discards the remaining shared Energy pool. Transfer Junk returns a selected Team Plasma Pokemon from discard to hand, omitting Trainer and Energy cards absent from this format. Dynamite Press, Helix Force, and Jet Blast require Plasma Energy; Special Tackle needs Special Energy; Minor Errand-Running and Dragon Vortex need Energy cards in deck/discard; Calculate needs deck ordering.
+Black & White—Plasma Freeze (`bw9`) covers 108 Pokemon cards and 175 attacks: 165 are supported and ten remain filtered. It adds full-HP and Special Condition checks, Energy/discard/Bench/attack-name scaling, named Bench checks, typed searches into hand, all-board healing/damage, any-target attacks, selected damage-counter transfers, forced switching, hand refill, and shuffling the opposing active Pokemon into the Pokémon-only deck pool. Kecleon's Color Change makes Active Kecleon the same type as the opponent's first living Active Pokémon; suppression disables it. Signs of Evolution selects up to three Eevee evolutions into hand, but the picker does not enforce distinct types. Imittack copies a selected opposing attack without checking that the attacker has its Energy; Max Milk heals a chosen own Pokemon and discards the remaining shared Energy pool. Transfer Junk returns a selected Team Plasma Pokemon from discard to hand, omitting Trainer and Energy cards absent from this format. Dynamite Press, Helix Force, and Jet Blast require Plasma Energy; Special Tackle needs Special Energy; Minor Errand-Running and Dragon Vortex need Energy cards in deck/discard; Calculate needs deck ordering.
 
 Black & White—Plasma Blast (`bw10`) covers 85 Pokemon cards and 137 attacks: 131 are supported and six remain filtered. It adds selected-Pokemon healing, Stage 2 searches scaled by shared Energy, Energy and damage-counter formulas, selected-target attacks, user-assigned distribution of three damage counters, switches, conditional status/knockouts, coin-until-tails damage, and Pokémon-only draws. Solar Transporter samples five available Pokemon from the unordered Pokémon-only deck, adding Team Plasma cards to hand and discarding the rest. Typed and individually attached Energy are approximated with the shared pool. Fossil Hunt and Fossil Clutch need Item cards, Psyjamming moves Special Energy, Reinforced Lariat and Misinformation need Pokémon Tools, and Strong Bond searches for a Supporter.
 
@@ -423,6 +586,62 @@ Pitch Black (`me5`) covers 95 Pokémon cards and 139 attacks: 131 are supported 
 
 ## Reserved Future Content
 
+Damage-counter Abilities are supported for Mega Greninja ex, Meowscarada ex, Decidueye-GX, and Hisuian Samurott VSTAR. The first two pay matching typed Energy through the shared Energy pool as an approximation because individual Energy cards in hand/discard are not modeled; targets follow printed Active/Bench restrictions. Feather Arrow and the VSTAR Power are target-selected and use their per-turn/per-game limits. Counter placement bypasses Weakness and Resistance.
+
+Draw-to-hand-size Abilities support the optional “before your attack” timing clause, using the modeled Pokémon deck and current hand-size state.
+
+Evolution-triggered Ability handling includes Sylveon ex's optional two-card draw, including the newer “Once during your turn” wording, with an explicit choice to draw or evolve without using it.
+
+Evolution-triggered effects also support Lycanroc-GX and Umbreon VMAX, letting a player choose an opposing Benched Pokémon to switch into the Active Spot or decline the optional effect.
+
+Previous-evolution attack access is supported for Celebi-EX, Shining Celebi, and Relicanth. Evolved Pokémon expose attacks from their recorded evolution stack while a granting Ability remains in play and unsuppressed; attack costs remain unchanged.
+
+Banette-GX's once-per-turn Active Ability moves one damage counter from any damaged Pokémon in play to another Pokémon. A resulting Knock Out is processed through promotion while the turn stays with the Ability user.
+
+Munkidori's Adrena-Brain moves up to three counters from one of its owner's damaged Pokémon to an opposing Pokémon once per turn. The battle model checks for Darkness as the selected shared Energy type and at least one shared Energy; it cannot verify an attachment to Munkidori specifically. PvE opponents consider the same effect and prioritize Knock Outs.
+
+Passive free-Retreat effects conditioned on attached Energy are supported for the holder and the board-wide Darkness wording. The battle model approximates attachment by requiring a nonzero shared Energy pool whose selected type matches the printed Energy type.
+
+Glaceon-GX's Freezing Gaze suppresses the Abilities of opposing Pokémon-GX and Pokémon-EX in play while Glaceon-GX is Active, with Freezing Gaze itself exempted. Hand and discard-pile suppression cannot apply because those zones are not represented as Ability-bearing Pokémon in battle.
+
+Gholdengo ex's Coin Bonus can draw one card once per turn, or two while Gholdengo ex is Active. The draw amount is calculated from its current battle position in both PvE and PvP resolution.
+
+Top-deck selection draw Abilities let the player choose one of the top two or three Pokémon cards for hand. The other cards go to the bottom of the deck or discard pile according to the printed text; these flows do not shuffle afterward.
+
+Direct-draw Abilities that say the turn ends after use, including Rotom V's draw three, now keep the turn open in PvE and PvP. The AI may continue to attack or charge after using the Ability.
+
+Pidgeot ex's Quick Search finds one Pokémon card from the modeled deck into hand, shuffles, and uses a once-per-turn shared ability key across copies. It remains separate from the VSTAR Power allowance.
+
+FireRed & LeafGreen Pidgeot's Quick Search finds one Pokémon card from the modeled deck, shuffles, and shares its once-per-turn limit across copies. Pidgeot cannot use it while affected by a Special Condition. “Any card” is limited to Pokémon because the battle deck has no other card types.
+FireRed & LeafGreen Ditto's Form Variation replaces Ditto with a Basic Pokémon from its owner's discard pile, excluding Pokémon-ex and Ditto, then discards Ditto. Damage counters, Special Conditions, temporary attack modifiers, effects, and markers transfer to the replacement; individual attached Energy cards are unavailable in the shared-pool engine.
+Team Rocket Returns Dark Crobat's Black Beam applies Poison to the opposing Active Pokémon once per turn while Dark Crobat is Active and free of Special Conditions. The effect honors Poison immunity and Ability suppression, and PvE opponents use it automatically when applicable.
+Team Rocket Returns Dark Houndoom's Fire Breath flips once per turn while Dark Houndoom is Active and free of Special Conditions. Heads Burns the opposing Active Pokémon; tails applies no condition. PvE opponents use it automatically.
+Team Rocket Returns Azumarill's Froth can be selected when evolving Azumarill from hand onto an Active Pokémon. It Paralyzes each living opposing front-row Pokémon, subject to status immunity; the NPC opponent uses it automatically.
+Team Rocket Returns Misdreavus's Dark Spell flips once per turn while Misdreavus is Active, free of Special Conditions, and has another living Active Misdreavus. Heads places one damage counter on a selected opposing Pokémon; tails places none. PvE selects a target automatically.
+Team Rocket Returns Mantine's Ripples heals 10 damage from a selected friendly Pokémon other than Mantine once per turn. Special Conditions on Mantine prevent activation; NPCs choose their most injured eligible Pokémon.
+Team Rocket Returns Hoppip, Skiploom, and Jumpluff's Buffer can each flip to survive an opponent's attack Knockout at 10 HP on heads; the passive protection check matches the named holder on either side.
+Team Rocket Returns Dark Ampharos's Darkest Impulse places 2 damage counters on an opponent's Pokémon whenever it evolves from hand, once per turn across all copies. The trigger applies in PvE and PvP and resolves Knockouts normally.
+
+FireRed & LeafGreen Rapidash's Fiery Aura raises Burn checkup damage to 40 while Rapidash is Active. It does not stack across multiple copies and is disabled by Ability suppression.
+
+Octillery's Rapid Strike Search is restricted to cards with the Rapid Strike subtype in the Pokémon-only deck. The selected card is revealed, put into hand, and the deck is shuffled; uses share a once-per-turn key across copies.
+
+Umbreon ex's once-per-turn Active Ability can force one damaged opposing Benched Pokémon into the Active Spot. The server validates the target and uses the existing forced-switch resolution; the PvE opponent chooses the first eligible target.
+
+Galarian Moltres V's Direflame Wings can add one Darkness Energy unit to its owner's shared pool once per turn, with a shared use key across copies. This approximates attaching Darkness Energy from the discard pile because Energy cards and discard zones are not modeled; the selected Energy type must be Darkness and the pool must be below its format cap.
+
+Teal Mask Ogerpon ex's once-per-turn Ability adds one Grass unit to its owner's shared Energy pool and draws one Pokémon card in player and PvE resolution. The selected type and pool cap are validated; the battle cannot verify an Energy card in hand or track attachment to the individual Pokémon.
+
+Koraidon ex's once-per-turn Ability adds up to two Fighting units to its owner's shared Energy pool and leaves the turn open. The player and PvE action require Fighting selected and a Basic Fighting Pokémon in play; the battle cannot verify discard Energy cards or track which Pokémon receives each attachment.
+
+Gardevoir ex's repeatable Psychic Energy acceleration adds one unit to the shared pool and puts two damage counters on the chosen Psychic Pokémon per use. A target that would be Knocked Out is not legal. PvE uses the effect once per turn on its healthiest eligible Psychic Pokémon; the battle cannot verify Energy in discard or track per-Pokémon attachment.
+
+Active-only healing Abilities that select one friendly Pokémon now support “if this Pokémon is in the Active Spot” timing. The Active requirement is checked by both the player UI and server, while existing healing amount, target eligibility, and usage-limit rules remain in effect.
+
+Iono's Bellibolt ex's repeatable Ability attaches one Lightning unit from the hand abstraction to a chosen Iono's Pokémon. The selected shared type and Energy cap are validated in PvE and PvP; card availability in hand and per-Pokémon attachment are not represented.
+
+Flapple's once-per-turn Ability places two damage counters on an opposing Pokémon, then moves Flapple and its modeled evolution stack into its owner's deck and shuffles. PvE and PvP handle the removed source, target Knock Out, board compaction, and promotion; attached Energy and Tools are not modeled as cards.
+
 The following are defined in data or engine support but not yet naturally obtainable through authored progression:
 
 - Surf HM rewards, including the already-gated `tm-surf`.
@@ -431,3 +650,1406 @@ The following are defined in data or engine support but not yet naturally obtain
 - Mega Stones/Primal orbs as normal progression rewards.
 - Ability patches are no longer authored as drops or task, battle, expedition, or Game Corner prize rewards. The Let's Go Ability Patch is the only currently obtainable patch and remains a paid Viridian City Poké Mart purchase; distribution for other patches is reserved for future content.
 - Ability config types `timer`, `shiny`, `encounter`, and `level`.
+- Oranguru's once-per-turn hand/deck swap Ability exchanges a chosen hand Pokémon with the top Pokémon card of the modeled deck in PvE and PvP; the PvE opponent picks a low-cost Pokémon. Hand and deck zones in TCG Battle contain Pokémon cards only.
+- Mabosstiff and Pidgeot's once-per-turn forced-switch Ability sends the opposing Active Pokémon to the Bench. The first living Benched Pokémon is promoted automatically; PvP replacement choice is not handed to the affected player. The PvE opponent chooses a healthy replacement when using the effect.
+- Passive no-Retreat-Cost Abilities gated on having any Energy attached now accept untyped Energy wording. The check uses the side-wide pool and requires at least one Energy; per-Pokémon Energy attachment ownership remains unmodeled.
+- Passive no-Retreat-Cost Abilities gated on having no Energy attached use the shared pool as well and pass when the side has zero Energy; per-Pokémon attachment ownership remains unmodeled.
+- Evolution cards that grant permission to evolve during the first turn or the turn the target Pokémon was played are recognized by the first-turn evolution eligibility check.
+- Pichu's once-per-turn Pikachu evolution Power is selectable from the evolution flow, clears all damage from Pichu, and can be used by PvE opponents. The evolution card is selected from the modeled deck in place of a hand zone.
+- Iron Valiant ex's switch-triggered counter Ability is available once per turn after it moves from Bench to Active via switch or retreat. Players select the opposing target; PvE opponents choose automatically.
+- Charizard ex's evolution Ability searches for up to three Basic Fire Energy when selected after evolution; the battle approximates them as shared Fire Energy gain up to the format cap because Energy cards and per-Pokémon attachments are not tracked.
+- Surging Sparks Archaludon ex recovers up to two Basic Metal Energy cards from the discard pile into the shared pool when evolved. The cards are consumed; Metal must be the selected Energy type because individual attachments are not tracked.
+- Eelektrik and Team Rocket's Spidops can use once-per-turn Abilities to attach Basic Energy from the discard pile. The game applies one shared Energy; typed attachments require the matching type selection, while generic Basic Energy uses the selected type. PvE uses the same effect when below the Energy cap. Together with Solrock's matching Lunatone-gated Psychic attachment, Greninja's Water Shuriken, and Neo Revelation Lanturn's Submerge, the set audit recognizes 2,069 of 4,554 Ability records overall.
+- Neo Destiny Dark Crobat's Surprise Bite can deal 20 direct Ability damage to one selected opposing Pokémon when evolved from hand. Weakness and Resistance do not apply; PvE chooses a target automatically, and the regular knockout flow handles defeated targets. The audit now recognizes 2,071 of 4,554 Ability records overall.
+- Neo Destiny Unown [Z]'s Zoom makes retreat free for Pokémon with Unown in their name while Unown [Z] remains Benched. The player and NPC retreat calculations share this passive cost rule.
+- Neo Destiny Dark Magcargo's Hot Plate deals 10 damage to a Baby or Basic Pokémon played from hand onto the Bench, regardless of which player played it. It ignores Weakness and Resistance and requires an Active Dark Magcargo without Asleep, Confused, or Paralyzed; the set audit recognizes 2,072 of 4,554 Ability records overall.
+- Neo Destiny Dark Feraligatr's Scare suppresses opposing Baby Pokémon Powers and blocks Baby Pokémon attacks while Active, except while Dark Feraligatr has Asleep, Confused, or Paralyzed. The existing audit text family already counted its printed record; this adds runtime enforcement to both Ability and attack legality.
+- Neo Destiny Light Machamp's Tag Team automatically heals up to 30 damage from its owner's Active Pokémon and switches Light Machamp from Bench to Active when evolved there. Healing prevention blocks healing; Ability suppression blocks the Power.
+- Solrock's once-per-turn Psychic attachment Power now requires a living Lunatone and adds one shared Psychic Energy. The effect is available to player and PvE flows, and the set audit counts its three printings.
+- Greninja's Water Shuriken now deals 20 direct Ability damage to one opposing Pokémon once per turn. Players choose an Active or Benched target; the PvE opponent chooses automatically. The effect uses existing damage and knockout handling without treating the damage as an attack or as counters.
+- Leafeon-GX can use its once-per-turn Active Ability to heal 50 from a chosen Pokémon; the engine approximates the target's attached Energy requirement with at least one Energy in the side-wide pool.
+- Knockout-triggered search Abilities resolve after attack damage, drawing one random Pokémon into the affected side's hand as an approximation of searching for any card; non-Pokémon cards and user-selected search are unsupported.
+- Eternatus VMAX's Darkness-only Bench Ability permits up to eight Benched Pokémon while all owned Pokémon in play are Darkness type. Deck search and revival paths block non-Darkness entries; when the Ability stops applying, the excess Bench is discarded down to five.
+- Eevee-GX's evolution Ability can evolve into an Eevee-line card from the modeled deck and clear all damage beforehand, starting on turn two. The engine cannot enforce the restriction based on the turn the Eevee-GX entered play because it does not track that timestamp.
+- Flareon ex's once-per-turn Ability adds one Fire unit from the modeled discard abstraction to the shared Energy pool and deals 20 damage to itself. The self-damage may Knock Out the source and is settled through the standard compaction and promotion flow. This brings the set audit to 1,547 of 4,554 recognized Ability records, with 3,007 unmatched.
+- Frosmoth's repeatable Ability adds one Water unit to the shared Energy pool when a Benched Water Pokémon is chosen, supported for players and PvE opponents. Individual Energy attachments remain unmodeled. The audit now recognizes 1,552 of 4,554 records, with 3,002 unmatched.
+- Baxcalibur's repeatable Water Energy Ability adds one unit to the shared pool for a selected friendly Pokémon, for both players and PvE opponents. Energy cards in hand and per-Pokémon attachments are unmodeled. The set audit recognizes 1,556 of 4,554 Ability records, with 2,998 unmatched.
+- Origin Forme Palkia VSTAR's VSTAR Power adds up to three Water units to the shared pool after selecting a Water Pokémon and amount. It marks the side's shared once-per-game VSTAR limit; discard Energy and per-Pokémon attachment distribution remain unmodeled. The audit now recognizes 1,561 of 4,554 Ability records, with 2,993 unmatched.
+- Electrode-GX's once-per-turn Ability adds five shared Energy units to a chosen Pokémon other than Pokémon-GX or Pokémon-EX, then Knocks Out Electrode-GX. PvE and PvP flows settle the self-Knockout with standard compaction and promotion. The refreshed audit recognizes 1,565 of 4,554 Ability records, with 2,989 unmatched.
+- Darkrai-GX's once-per-turn Ability can return it from the discard pile to an open Bench slot at full HP and add one Darkness unit to the shared pool. The audit recognizes 1,570 of 4,554 Ability records, with 2,984 unmatched; discard Energy cards remain unmodeled.
+- Emboar's repeatable Fire attachment Ability adds one unit to the shared Energy pool for a chosen friendly Pokémon, for both players and PvE opponents. The set audit recognizes 1,574 of 4,554 Ability records, with 2,980 unmatched.
+- Gardevoir-GX's once-per-turn Fairy Energy Ability adds one unit to the shared pool for a chosen friendly Pokémon, supported for player and PvE turns. The audit recognizes 1,578 of 4,554 Ability records, with 2,976 unmatched.
+- Passive Abilities that place two damage counters when the opponent attaches Energy now trigger on PvE and PvP shared-pool charges. The charging side's Active Pokémon takes the counters as the attachment target approximation, with normal knockout settlement. The set scan recognizes 1,584 of 4,554 records, with 2,970 unmatched.
+- Dragon Ampharos ex — Conductivity places one damage counter on the opponent's Active Pokémon when an Energy is attached from hand. The shared charge flow triggers it in PvE and PvP; duplicate Ampharos ex do not stack.
+- Rising Rivals Leafeon and Crimson Invasion Miltank — their Active-only Energy attachment Abilities heal 20 and 90 damage, respectively. The shared Charge action triggers the effects, with the owner's Active Pokémon used as the untracked attachment-target approximation.
+- Journey Together Magearna — its Active Ability heals 90 damage after a hand Energy attachment. The shared Charge action triggers it, using the owner's Active Pokémon as the attachment-target approximation.
+- Volcanion-EX's once-per-turn Ability spends one shared Fire Energy unit and grants Basic Fire attacks +30 damage for that turn, before Weakness and Resistance. This approximates discarding Fire Energy from hand; the set audit recognizes 1,588 of 4,554 records, with 2,966 unmatched.
+- Ancient Trait α Growth grants one bonus shared Energy unit during a matching-type Energy charge when its holder is in play; this approximates attaching two Energy cards to that Pokémon. The audit recognizes seven such records across two sets, and the attachment target/card zones remain abstracted.
+- Shadow Rider Calyrex VMAX and Xatu's once-per-turn Abilities add one shared Psychic Energy unit and draw up to two cards. Shadow Rider Calyrex VMAX needs a Benched Psychic Pokémon; Xatu can target any Benched Pokémon. The first eligible Bench target approximates the individual attachment; PvE and PvP actions respect Ability suppression and the per-turn use limit. The refreshed audit recognizes 1,604 of 4,554 Ability records, with 2,950 unmatched.
+- Darkrai ex's Nightmare Aura deals 20 Ability damage to the opponent's Active Pokémon per Darkness unit gained through a modeled Energy Zone charge while Darkrai ex is Active. The active source approximates the attachment target; normal knockout settlement applies. The audit recognizes 1,608 of 4,554 records, with 2,946 unmatched.
+- Active Pokémon with Abilities that recover them from all Special Conditions after an Energy attachment clear modeled conditions after a shared Energy charge. The Active Pokémon is the attachment approximation; Ability suppression is checked. The updated status family recognizes 83 records across 50 sets, and 1,612 records overall.
+- Pawmot's once-per-turn Basic Lightning Energy search and attachment adds one unit to the shared pool when Lightning is selected, from either position. The engine abstracts the searched Energy card and attachment onto Pawmot; PvE and PvP validate use limits, capacity, and Ability suppression. The audit recognizes 1,616 of 4,554 records, with 2,938 unmatched.
+- Iono's Kilowattrel and Revavroom discard one shared Energy unit and refill the modeled hand to six cards once per turn. Kilowattrel requires Lightning selected to approximate attached Basic Lightning Energy; Revavroom accepts any Energy type to approximate a hand discard. The refreshed audit recognizes 1,624 of 4,554 Ability records, with 2,930 unmatched.
+- Stakataka-GX's team damage reduction applies to Ultra Beast targets on its side, reducing attack damage by 10 after Weakness and Resistance. The audit now recognizes 1,628 of 4,554 records, with 2,926 unmatched; team damage reduction matches 27 records across 17 sets.
+- Fan Call searches up to three Colorless Pokémon with 100 HP or less on the first turn, with a shared once-per-turn cap across copies. PvE opponents automatically select up to three eligible Pokémon. The audit now recognizes 1,632 of 4,554 records, with 2,922 unmatched; activated search covers 98 records across 34 sets.
+
+- Komala and Slaking become Asleep after a modeled Energy Zone attachment while Active, in PvE and PvP; Ability suppression is respected. Since individual attachments are not tracked, the Active Pokémon is the attachment target approximation. The audit now recognizes 1,635 of 4,554 records, with 2,919 unmatched; the broadened status family covers 86 records across 50 sets.
+- Opposing Active attack-cost increases now parse explicit numerals before Colorless Energy symbols, including “cost 1 {C} more,” and remain gated by the provider being Active. The audit now recognizes 1,638 of 4,554 Ability records, with 2,916 unmatched; attack-cost increases cover 16 records across 12 sets.
+- Ability text that makes a Pokémon multiple types while in play now adds all printed types to Weakness and Resistance calculations, while respecting Ability suppression. The audit recognizes 1,644 of 4,554 records, with 2,910 unmatched; Ability type changes cover 14 records across 11 sets.
+- The Active-only Energy Zone Grass attachment Power adds one Grass unit to the shared Energy pool in PvE and PvP when a living Grass Pokémon is in play. The target attachment is abstracted because per-Pokémon Energy is not tracked. The audit recognizes 1,648 of 4,554 records, with 2,906 unmatched; activated search and Energy acceleration cover 102 records across 36 sets.
+Shining Revelry Giratina ex's Broken-Space Bellow spends the selected Psychic Energy Zone unit, adds it to the shared Energy pool, and ends the turn. Player, PvP, and NPC resolution are supported.
+Celestial Guardians Gardevoir's Psy Shadow adds a selected Psychic Energy Zone unit to the shared Energy pool once per turn when a Psychic Pokémon is Active. Gardevoir can use it from either row in player, PvP, and NPC battles.
+- Zeraora's end-of-first-turn Energy Zone trigger adds one Lightning unit per eligible Zeraora in play in PvE and PvP, requiring Lightning selected and room under the shared cap. The PvP charge path now also applies Komala/Slaking's Energy-triggered Sleep. The audit recognizes 1,651 of 4,554 records, with 2,903 unmatched; activated search and Energy acceleration cover 105 records across 39 sets.
+- Jolteon ex deals 20 Ability damage when the opponent attaches Energy from the Energy Zone while Jolteon ex is Active. Regular charges and supported Energy Zone Abilities trigger it; the opponent's Active Pokémon approximates the attachment target. The audit recognizes 1,654 of 4,554 records, with 2,900 unmatched; Energy-attachment damage effects cover 13 records across 8 sets.
+
+- Naganadel & Guzzlord-GX can discard one Pokémon from hand to heal 60 damage from itself, once per turn. Player/PvP actions require a hand choice; PvE opponents choose automatically. The audit recognizes 1,664 of 4,554 records, with 2,890 unmatched; activated healing covers 57 records across 36 sets.
+
+
+Froslass deals one damage counter during Pokémon Checkup to each Pokémon with an Ability on either side, excluding Froslass. The effect is resolved by the existing end-of-round Ability damage pass.
+
+An Active Galarian Weezing suppresses opposing Pokémon's Abilities in play, except Neutralizing Gas. The set audit recognizes 17 conditional Ability suppression texts across 10 sets.
+
+Evolution Abilities now recognize Primal Kyogre-EX, Primal Groudon-EX, and M Rayquaza-EX healing all damage when the Pokémon becomes that form. The player and opponent evolution paths resolve this automatically and check Ability suppression. Evolution-triggered effects cover 58 records across 31 sets.
+
+Iron Thorns ex suppresses Abilities on Rule Box Pokémon on both sides while Active, except Future Pokémon. Flutter Mane suppresses the opposing Active Pokémon's Ability, except Midnight Fluttering. The audit recognizes 23 conditional Ability suppression texts across 14 sets.
+
+Passive wording that prevents all effects of the opponent's attacks except damage uses the attack-effect protection resolver, which blocks supported attack effects without preventing damage. Combined attack-and-Ability protection also blocks supported opposing Ability effects. The audit recognizes 24 attack-effect protection texts across 16 sets and 17 opposing Ability-effect protection texts across 7 sets.
+
+Copied-attack Abilities expose printed attacks from eligible Benched Pokémon, Basic Pokémon in the discard pile, Pokémon-GX/EX on the Bench or in the discard pile, or any Pokémon in play on either side. The existing attack resolver handles copied attacks, with Energy requirements approximated by the shared pool. This family includes previous-evolution attack access and covers 24 Ability texts across 13 sets.
+
+Arceus LV.X's Multi-type Poké-Body uses the type of its previous Level in the evolution stack; the existing effective-type resolver applies it to attack typing and Weakness/Resistance.
+
+An Active Aerodactyl ex locks the opposing Active Pokémon from evolution. Player and AI evolution options respect the restriction, and the server revalidates it. The action restriction family recognizes 39 texts across 24 sets.
+
+Wimpod has no Retreat Cost during its owner's first turn. Both the player UI and server retreat action pass the current turn into the retreat resolver. The audit counts 105 retreat rules across 65 sets.
+
+Energy attachment triggers now include Natural Cure/Water Veil Special Condition recovery and Virizion's Earthen Awakening, which heals 20 damage. They resolve for qualifying holders in play on each modeled Energy charge, including PvE opponent and PvP turns. Per-Pokémon attachment targeting is not represented by the shared Energy pool.
+
+The audit includes the Black & White promo trio's 50-damage bonus against Darkness Pokémon. The existing shared attack-damage Ability resolver already applies the bonus only when the defending Pokémon has the printed type.
+
+Full-HP reduction now recognizes Armarouge ex's wording that it takes 80 less damage from the opponent's attacks after Weakness and Resistance. The defender must have full HP, and the reduction applies only to the opposing attacker.
+
+Metagross-GX's once-per-turn Psychic-or-Metal discard attachment is available to the player and PvE opponent, targets the Active Pokémon, and adds one unit to the shared Energy pool. The audit recognizes 109 activated search or Energy acceleration Ability texts across 40 sets.
+
+Retaliation Abilities now support both “put” and “place” damage-counter wording on the attacking Pokémon. The hook applies after attack damage resolves, including when the holder was Knocked Out, and the audit recognizes 86 retaliation texts across 58 sets.
+
+Bench-entry Abilities that heal a printed amount from the player's Active Pokémon can now be used in player and PvP battles; effects that also recover from Special Conditions clear them, and PvE opponents use these triggers automatically when useful. The audit recognizes 60 activated healing Powers across 39 sets, including this hand-to-Bench trigger family.
+
+Sudden Shearing now discards the top card of the opponent's modeled Pokémon deck when played onto the Bench, in both player and PvP actions and automatically for the PvE opponent. The set audit recognizes this effect on three printed records in one set.
+
+Hand-reveal Powers with “before your attack” timing now use the existing reveal action and once-per-turn tracking. This adds the Gumshoos-GX text variant; the audit recognizes seven hand-reveal Powers across two sets.
+
+Pidgeot's Active Ability returns a selected Benched Pokémon and its modeled Evolution stack to the Pokémon deck; Suicune-GX can return itself from the Bench. Both paths shuffle the deck and track once-per-turn use. Individual Tool and Energy attachments are unavailable in the battle model. The audit recognizes six such Abilities across three sets.
+
+Full-HP damage reduction also supports “takes N less damage from your opponent's attacks” and applies the reduction after Weakness and Resistance. This covers the repeated wording in Sword & Shield and Shining Fates.
+
+Greninja V-UNION's once-per-turn hand reveal runs through the activated Ability control and shows the opposing modeled hand in the battle log. The audit recognizes 4 hand-reveal texts across 1 set.
+
+Attack damage events retain the target's pre-hit full-HP state so reactive Abilities that trigger on a full-HP Knock Out can check that condition. Knock Out retaliation also supports fixed damage and damage counters against the attacker, including Active Spot requirements. Sigilyph-GX's formula retaliation uses damage received from Pokémon-GX or Pokémon-EX, even if the holder is Knocked Out. Silver Tempest's 8-counter retaliation is supported; the audit counts 97 retaliation texts across 62 sets. Lugia VSTAR's Summoning Star puts up to two eligible Colorless Pokémon from the discard pile onto the Bench and observes the once-per-game VSTAR limit. Leafeon VSTAR's once-per-game Power switches in a selected opposing Benched Pokémon. Team Rocket's Crobat ex can select two distinct opposing Pokémon for two damage counters each when it evolves. Fezandipiti's Adrena-Pheromones uses the coin-protection flow when Darkness is selected and present in the shared Energy pool, an approximation because per-Pokémon attachments are not tracked. Okidogi's Ability adds 100 attack damage under the same shared Darkness Energy approximation; its HP bonus is not modeled. Persian-GX's Cat Walk searches up to two Pokémon into hand after a Pokémon-GX or Pokémon-EX Knock Out on the prior opposing turn; the search is limited to the modeled Pokémon deck. Lucario searches for one Pokémon from the modeled deck once per turn while Garchomp is in play; multiple Lucario are tracked independently. Sylveon V's Dream Gift searches one Pokémon from the modeled deck and leaves the turn open, approximating its printed Item search. Wailord and Blissey V recover from Special Conditions when Energy is attached from hand to the Active Pokémon; this existing effect is now recognized. Archaludon's Metal Bridge removes Retreat Cost from all Pokémon while Metal is selected in the shared Energy pool, approximating its printed individual attachments. Basic Pokémon can be played from hand onto the Bench, Crobat V's Dark Asset draws to six when played, and Dedenne-GX's Dedechange discards the hand and draws six when played; both shared limits are enforced. Nihilego-GX can Confuse and Poison both Active Pokémon when played onto the Bench, with status protections checked. Baby Pokémon with a once-per-turn evolve-and-heal Power can evolve into the named Pokémon, including text that allows multiple evolution choices, and clear all damage counters. Coin-flip damage prevention covers 36 Ability records across 25 sets. The audit counts 97 evolution-triggered Ability texts across 45 sets, 123 activated search or Energy-acceleration Powers across 45 sets, and 49 activated switch Powers across 26 sets. Overall, 1,831 of 4,554 Ability records match an implemented family and 2,723 remain unmatched.
+
+Once-per-turn discard-pile Abilities that recover their own Pokémon to the bottom of the deck are supported, along with Plasma Blast's Exeggcute Propagation, which returns Exeggcute to its owner's hand. Usage is tracked for the turn by card instance after it leaves the discard pile; player/PvP activation and automatic PvE use are implemented.
+
+Malamar's once-per-turn Psychic Energy recovery Power supports a chosen Benched Pokémon target. The recovered Energy is approximated with one shared Psychic Energy, and the per-Malamar turn limit is enforced for player, PvP, and PvE use.
+Infernape LV.X and matching top-deck draw Powers can select one of the looked-at cards for hand and discard the remaining cards using the existing deck-choice flow.
+Unbroken Bonds Spiritomb's Building Spite can put one damage counter on itself once per turn. PvE and PvP resolve the self-Knockout through their regular board compaction and promotion flow.
+Unbroken Bonds Caterpie and Metapod have a once-per-turn coin flip that can evolve them directly from the deck. The shared evolution Ability action handles the printed no-Active and no-Special-Condition-gate wording.
+Paldea Evolved Gothitelle can look at the top two cards of the opponent’s deck and choose which stays on top; the other is put on the bottom. PvE and PvP retain the inspected names privately to the activating player, and NPC use resolves without disclosing them in the public log.
+Lost Origin Kingdra's activated hand shuffle puts the chosen player's shuffled hand on the bottom of their deck, then draws up to four when cards were moved. PvE, PvP, and NPC paths use the shared hand/deck state.
+
+Snorlax's Active Spot refill Ability draws to seven cards and leaves the turn open. Active status is checked, and both player/PvP actions and PvE automation use the same hand-size target.
+
+Crobat's Active Spot search Power can choose a Pokémon from the modeled deck, shuffle the remaining deck, then place the chosen card on top. Player selection, automated PvE selection, Active status, and once-per-turn usage are supported.
+
+Orbeetle VMAX's Active Spot spread Ability places the printed damage counters on every living opposing Pokémon, including the Bench. The once-per-turn restriction applies, and damage events are emitted per target for player, PvP, and automated PvE resolution.
+
+Gengar's discard revival Ability restores it to the Bench and places three damage counters on itself. The battle model checks Bench legality, persists the turn use onto the revived card, and resolves self-Knock Out and promotion behavior.
+
+Volcarona-GX's activated Ability spends one shared Fire Energy as an approximation of discarding a Fire Energy card from hand, then places two damage counters on a selected opposing Pokémon. PvE chooses a target automatically.
+
+Lunar Cycle spends one shared Fighting Energy as an approximation of its Basic Fighting Energy hand discard, requires Solrock in play, draws three cards, and shares its once-per-turn limit across Lunatone copies.
+
+Delcatty's draw Power spends one shared Energy, draws up to three cards, and is unavailable while Delcatty has a Special Condition. PvE resolves the same cost and condition checks automatically.
+# TCG Ability audit update
+
+The audit and battle engine now include Shiinotic’s once-per-turn search for a Grass Pokémon, matching its subtype requirement and per-turn limit.
+
+Naganadel’s Ultra Conversion is now recognized across its three printings. It discards one Ultra Beast from hand and draws three cards, with the required subtype checked by the server.
+
+Charizard’s Fire Energy Power is recognized across its three printings. It places two damage counters on Charizard, searches up to two Basic Fire Energy cards from the deck, and represents the attachment as shared Energy.
+
+Alakazam’s once-per-turn evolution Ability now recognizes its extra “you may use this Ability” wording and draws three cards. Three records across Mega Evolution and MEP Black Star Promos are recognized.
+
+
+Crabominable’s and Veluza’s Kofu discard-pile Ability lowers each attack’s Colorless cost by one per Kofu, up to the attack’s Colorless Energy requirement.
+
+Kricketune V's Exciting Stage is supported across three records in Battle Styles and the Trainer Gallery. It draws to three Pokémon cards in hand, or four with Kricketune V Active, and shares its once-per-turn limit across copies.
+
+The turn-start self-bench Ability is supported for Lombre, Lampent, and Luxio: when drawn at the beginning of a turn, the Pokémon goes directly onto the Bench if legal space is available, in both PvE and PvP.
+
+Genesect V's Fusion System draws to a hand size equal to the number of Fusion Strike Pokémon in play. The player and PvP server validate the current count, and the PvE opponent uses the same target.
+
+Comfey's Flower Selecting is supported in its Sword & Shield—Lost Origin and promo prints. The Active Comfey selects one of the top two Pokémon cards for hand; the other enters the new Lost Zone collection and cannot be recovered from the discard pile.
+
+Tyranitar-GX's Lost Thunder Ability moves a Pokémon Knocked Out by damage from its attacks, plus its modeled evolution stack, into the Lost Zone. Attached Energy cards are not tracked individually and therefore are not moved separately.
+
+Iron Bundle's Paradox Rift and promo Bench Ability forces the opponent to switch their Active Pokémon with a Benched Pokémon, then discards Iron Bundle. The replacement is selected deterministically by the engine; attached cards are not tracked individually.
+
+Rillaboom's Sword & Shield Grass Energy Acceleration can add up to two Grass units to the shared Energy pool once per turn. The ability requires Grass to be selected and respects the format's Energy cap; PvE opponent use is supported.
+
+Forretress ex's Paldea Evolved Grass Energy Acceleration adds up to five Grass units to the shared pool, then Knocks Out Forretress ex. PvE and PvP paths resolve promotion or victory after board compaction. The represented Energy is pool-wide rather than attached to individual Pokémon.
+
+Hydrapple ex's Stellar Crown Ability attaches one Grass Energy from hand and heals 30 damage from that Pokémon. The battle mode represents the Energy in its shared pool and supports choosing a damaged target in PvE and PvP.
+
+Houndoom's Battle Styles Single Strike Energy Ability adds one selected Darkness or Fighting unit to the shared pool, then puts two damage counters on a chosen Single Strike Pokémon. PvE and PvP resolve resulting Knock Outs and promotions; individual Energy attachments remain unmodeled.
+
+Dusknoir and Dusclops' Shrouded Fable and Prismatic Evolutions Abilities deal 13 or 5 damage counters to a chosen opposing Pokémon, respectively, then Knock Out their source. PvE and PvP resolve the self-Knockout alongside target knockouts, winner checks, and promotions.
+Holon Phantoms Crawdaunt ex's Splash Back returns a chosen opposing Benched Pokémon and its Evolution cards to the opponent's hand once per turn when they have at least four Benched Pokémon. The source must be free of Special Conditions; player, PvP, and automatic NPC paths enforce the condition and usage limit.
+Supreme Victors Yanmega's Active-only Power recovers Grass Energy from the discard pile once per turn while Yanmega is free of Special Conditions. The battle model represents the attachment as one Grass Energy in the shared pool rather than an attachment on Yanmega; player, PvP, and automatic NPC paths use the existing Energy recovery flow.
+Unseen Forces Aipom's Snappy Move draws one card from the Bench and puts Aipom on the bottom of its owner's deck. A shared per-turn limit is enforced in player, PvP, and NPC paths. Individual attached cards are not tracked by this battle format, so their discard is not separately represented.
+Brilliant Stars Empoleon can return itself from the discard pile to an open Bench slot when its owner has no cards in hand, then draw up to three cards. Player and PvP actions enforce the hand and Bench conditions; NPCs use the same recovery automatically.
+Cosmic Eclipse Aipom's deck-bottom Ability shifts the opponent's top Pokémon deck card to the bottom without revealing it. Player, PvP, and NPC actions enforce the once-per-turn limit while preserving deck order.
+Mega Evolution Gumshoos's Evidence Gathering swaps one selected hand card with the top card of its owner's deck. The existing hand/deck swap action enforces the once-per-turn limit for player and PvP; automatic NPC use chooses its lowest-cost hand card.
+Twilight Masquerade Morpeko may inspect and optionally discard its own deck's top card once per turn. Player, PvP, and NPC paths reuse top-deck discard handling, without applying Sableye's Special Condition restriction.
+
+Skwovet's Scarlet & Violet and Paldean Fates Ability shuffles the hand into the bottom of the Pokémon-only deck and draws one card. Player and NPC opponent flows are supported; the hand must contain at least one card.
+
+Genesect ex's Metallic Signal in Perfect Order searches for up to two Metal Evolution Pokémon from the Pokémon-only deck into hand. PvE and PvP enforce both filters and shuffle after the selection.
+
+Iron Leaves ex's Temporal Forces/Prismatic Evolutions Bench-entry Ability and Articuno-GX's Celestial Storm Bench-entry Ability switch themselves into the Active Spot. Their printed Energy-transfer riders are not represented because Energy is shared across the side rather than attached to individual Pokémon.
+
+Venomoth's Shift Pokémon Power is supported in player, PvP, and automated PvE battles. The player chooses another Pokémon in play and one of its non-Colorless types; Venomoth's type override lasts through the user's turn and feeds attack Weakness and Resistance calculations. The Power is once per turn and cannot be used while Venomoth is Asleep, Confused, or Paralyzed.
+
+Abomasnow's Frigid Room prevents modeled healing on both sides while an unsuppressed Abomasnow remains in play. The restriction covers shared attack, passive Ability, activated Ability, Energy-triggered, evolution, and Bench-entry healing paths in PvE and PvP; recovery from Special Conditions remains unaffected.
+
+Psyduck and Golduck's Damp suppresses modeled Abilities that require the Pokémon using them to Knock Out itself. The global rule is active while Damp is unsuppressed and in play on either side; it disables eligible self-Knockout Powers before PvE automation or player/PvP activation.
+
+Mr. Mime-GX's Celestial Storm Toolbox is recognized as exact-damage prevention from the opponent's attacks. The existing damage protection calculation reads all listed values and prevents damage when the adjusted hit equals one of them.
+
+Greninja ex's Mega Rising Power switches its Active Water Pokémon with a selected Benched Pokémon once per turn. Player and PvP actions enforce the Active Water restriction; the PvE opponent uses it when its Active cannot attack and a Benched Pokémon has a legal attack.
+
+Celesteela-GX's Force Canceler protects all allied Pokémon from the damage and effects of attacks marked GX in the attack name, as long as Celesteela-GX is Active. The target row's attack-effect resolver and incoming damage calculation both enforce the source's active position and Ability suppression.
+
+Aegislash's Durable Blade, Reuniclus's Persistent Cells, and Gengar's Infinite Shadow return the Pokémon card to hand when attack damage Knocks it Out. Modeled evolution cards are discarded during the normal Knockout cleanup; non-attack Knockouts do not trigger the replacement.
+
+Energy-triggered self-healing Abilities now parse printed healing values and optional Energy types, including older Poké-Powers worded as removing damage counters. The charge action stands in for attaching Energy to the Ability holder, so effects requiring a different attachment target are not inferred.
+
+Roserade's Energy Signal and Vileplume's Energy Reaction convert a matching Grass or Psychic Energy charge into the printed Special Condition on the opposing Active Pokémon. The Powers are once per turn and shut off while their holder has a Special Condition.
+
+Fossil Aerodactyl's Prehistoric Power prevents evolution for both sides while an unsuppressed, unaffected Aerodactyl is in play. Its own Asleep, Confused, or Paralyzed condition disables the lock.
+
+Fossil Muk's Toxic Gas suppresses Poké-Powers globally while Muk is in play and unaffected, preserving Toxic Gas and Poké-Bodies. The card-level Ability suppression path cannot isolate one Power on a card that also has a Poké-Body, so mixed Power/Body cards are excluded from this suppression rule.
+
+Jungle Vileplume's Heal Power uses a recorded coin flip to remove one damage counter from a selected Pokémon on heads; tails does not heal, and either outcome spends its once-per-turn use. The PvE opponent targets its most damaged Pokémon. Legacy Toxic Gas detection handles both “Pokémon Power” and “Poké-Power” card type labels.
+
+Team Rocket Dark Primeape's Frenzy adds 30 damage to the self-hit when a Confused attacker's status check returns tails. This uses the same shared resolution path for player and PvE attacks and honors Ability suppression.
+
+Team Rocket Dark Slowbro's Reel In recovers up to three selected Basic or Evolution Pokémon from the owner's discard pile to hand when it evolves from hand. The evolution choice sheet collects the selection; PvE and PvP server actions validate the targets before resolving.
+
+Dark Dragonair's Evolutionary Light searches for one Evolution Pokémon from the deck and puts it into hand. The once-per-turn Power is blocked by Asleep, Confused, or Paralyzed and can be used by the PvE opponent, which chooses a matching card automatically.
+
+Dark Kadabra's Matter Exchange uses the selected-card discard-and-draw flow to discard one hand card and draw one. It is once per turn and blocked by Asleep, Confused, or Paralyzed; the PvE opponent discards its lowest-cost hand Pokémon.
+
+Dark Muk's Sticky Goo increases the opponent's Active retreat cost by two while Dark Muk is Active. Asleep, Confused, or Paralyzed Dark Muk and Ability suppression disable the increase; retreat cost previews and server validation share the modifier.
+
+Dark Gloom's Pollen Stench is an optional once-per-turn coin-flip Power usable from the Bench or front line: heads Confuses the opponent's Active Pokémon, while tails Confuses your Active Pokémon. It is blocked by Asleep, Confused, or Paralyzed and records the coin and status events.
+
+Drowzee's Long Distance Hypnosis applies Asleep using the same heads-to-opponent, tails-to-own-Active coin flow. It is once per turn and blocked while Drowzee is Asleep, Confused, or Paralyzed.
+
+Team Rocket Dark Dugtrio's Sinkhole flips when the opposing Active Pokémon retreats; tails deals 20 damage to that Pokémon after it moves to the Bench, with no Weakness or Resistance. The Power stops while Dark Dugtrio is Asleep, Confused, or Paralyzed and respects Ability suppression.
+
+Team Rocket Dark Golbat's Sneak Attack is an optional evolution-from-hand effect. It deals 10 damage to a player-selected opposing Pokémon, applying Weakness and Resistance; PvE selects the opponent's most damaged target.
+
+Team Rocket Dark Dragonite's Summon Minions searches for up to two Basic Pokémon from the deck to place on the Bench when it evolves from hand. Selection is validated against front-row completion, available Bench space, and Basic subtype, then the deck is shuffled.
+
+Alakazam's Damage Swap moves one damage counter from one of its owner's Pokémon to another without Knocking Out the receiving Pokémon. It can be repeated during the turn, is disabled by Special Conditions on Alakazam, and honors Ability suppression.
+
+Giovanni's Machamp's Fortitude uses the coin-flip Knockout protection flow: heads leaves Machamp at 10 HP when an opponent's attack would Knock it Out. Its Special Condition restriction and Ability suppression apply.
+
+Erika's Vileplume's Pollen Defense records a coin flip after attack damage while Vileplume is Active; heads Confuses the opposing Active Pokémon. It can trigger while Vileplume is affected by a Special Condition or is Knocked Out.
+
+Misty's Cloyster reduces attack damage to itself by 10 after Weakness and Resistance, unless Asleep, Confused, or Paralyzed or its Ability is suppressed.
+
+Rocket's Snorlax's Restless Sleep deals 20 Ability damage to the attacking Pokémon when an opponent's attack damages Snorlax while it is Asleep, including when the attack Knocks Snorlax Out. Ability suppression is respected.
+
+Erika's Victreebel's Fragrance Trap flips once per turn; heads lets the owner select an opposing Benched Pokémon and switch it with the Active Pokémon. The Power works from the front line or Bench and is blocked while Victreebel is Asleep, Confused, or Paralyzed. Player, PvP, and automatic PvE use are supported.
+
+Blaine's Vulpix's Natural Healing removes one damage counter from Vulpix once per turn. It is blocked by Asleep, Confused, or Paralyzed and honors healing prevention and Ability suppression; player, PvP, and automatic PvE use are supported.
+
+Erika's Dratini's Strange Barrier reduces a Basic Pokémon attack's damage to 10 if it would deal at least 20 after Weakness and Resistance. Own Basic attacks are included; Special Conditions and Ability suppression disable the Power.
+
+Rocket's Moltres's Rebirth returns the Knocked Out card to its owner's hand for attack-caused Knockouts when it has no blocking Special Condition. Its evolution stack is discarded. Ability suppression prevents Rebirth.
+
+Misty's Tentacruel's Flee switches it with the living Benched Pokémon that has the most HP after an attack damages Tentacruel in the Active Spot. The remaining attack effects on Tentacruel are prevented. Asleep, Confused, or Paralyzed Tentacruel cannot flee, and Ability suppression applies.
+
+Brock's Rhydon's Bench Guard redirects 10 points from each eligible attack damage event on one of its owner's Benched Pokémon to a living Brock's Rhydon on the Bench. Ability suppression disables the redirect. Multiple Rhydons resolve through the first eligible provider.
+
+Misty's Gyarados's Rebellion flips two coins whenever it attempts an attack, including while Confused. If both are tails, the attack is canceled and Gyarados with its modeled evolution stack is shuffled into its owner's deck; attached Energy cards are outside the current model.
+
+Blaine's Ninetales's Healing Fire removes one damage counter after a Fire Energy attachment represented by charging. It works on the Bench, honors the printed Special Condition restriction and Ability suppression, and is disabled by healing prevention.
+
+Erika's Ivysaur's Relaxing Scent halves attack damage to any Pokémon after Weakness and Resistance, rounding up to the nearest 10 while Ivysaur is Active. The effect includes the owner's attacks and honors Special Condition and Ability-suppression gates.
+
+Sabrina's Alakazam's Psylink copies attacks from the owner's living Psychic Pokémon in play, preserving printed Energy costs and supported extra attack requirements. Asleep, Confused, or Paralyzed and Ability suppression disable the Power.
+
+Lt. Surge's Electrode's Shock Blast flips after attack damage in the Active Spot, even if Electrode is Knocked Out or affected by a Special Condition. Tails deals 20 Ability damage to each surviving Active Pokémon on both sides. Ability suppression disables the Power.
+
+Brock's Primeape's Scram shuffles Primeape and its modeled Evolution stack into its owner's deck when damage leaves it at exactly 10 HP. Asleep, Confused, Paralyzed, or Ability suppression disables the Power; the shared damage-event handler applies it to PvE and PvP. Attached Energy cards are not individually tracked.
+
+Koga's Kakuna's Emerge flips once per turn and, on heads, searches the Pokémon deck for Koga's Beedrill and evolves Kakuna directly into it. Normal Stage timing and the Special Condition/Ability-suppression restrictions apply; the turn stays open. NPC opponents can use the Power automatically.
+
+Great Encounters Caterpie and Metapod, and Legend Maker Cascoon, can flip once per turn while Active to search the deck for a matching Evolution and evolve directly on heads. Special Conditions and Ability suppression disable these Powers; PvE and PvP use the shared resolver.
+
+Neo Genesis Heracross's Final Blow changes Megahorn's base damage from 60 to 120 at 20 HP or less. Asleep, Confused, Paralyzed, or Ability suppression disables the Power. The damage increase is applied before Weakness and Resistance in PvE and PvP.
+
+Neo Genesis Meganium's Herbal Scent flips a coin on evolution from hand; heads heals all living Grass Pokémon on both sides. Healing prevention and Ability suppression apply, and PvE, PvP, and NPC evolution paths resolve it.
+
+Neo Genesis Feraligatr's Berserk flips on evolution from hand. Heads discards up to five cards from the opponent's deck; tails discards up to five from its owner's deck. The decks contain Pokémon cards only in this battle model.
+
+Neo Genesis Typhlosion's Fire Boost flips when played from hand; heads adds up to four Fire Energy to the shared pool, subject to the Energy cap, while tails adds none. Ability suppression applies and the deck is shuffled. Individual Energy cards and attachments are not modeled.
+
+Neo Genesis Elekid's Playful Punch is usable once per turn while it is not Asleep, Confused, or Paralyzed. It flips a coin; heads deals 20 damage to the opposing Active Pokémon after Weakness and Resistance. The NPC can use it automatically; player, PvE, and PvP paths record the coin result and damage without ending the turn.
+
+Neo Discovery Unown [D], [M], and [N] reduce damage from Darkness, Metal, and Colorless Pokémon respectively by 30 after Weakness and Resistance. These Powers work through Special Conditions and stop if more than one copy of the matching Unown is in play. Forretress's Spikes deals 10 damage without Weakness or Resistance when an opponent's Benched Pokémon becomes Active during its owner's opponent's turn; attack and Ability switches plus manual retreat trigger it, subject to Special Condition and Ability suppression gates. Unown [I]'s Increase lets the player choose a Basic Unown from the Pokémon deck to put onto the Bench when Unown [I] is played from hand; the NPC chooses the first eligible card.
+Kabuto's Revive Friends flips once per turn and, on heads, searches a Kabuto card from the deck and puts it on the Bench with Basic status. The Power is unavailable while Kabuto is Asleep, Confused, or Paralyzed, or when the Bench is full. The NPC uses the Power automatically and selects the first eligible Kabuto.
+Omanyte's Fossil flips once per turn and, on heads, searches for a Pokémon that evolves from Mysterious Fossil and puts it on the Bench with Basic status. Its Evolution subtype remains intact. The Power is unavailable while Omanyte is Asleep, Confused, or Paralyzed, or when the Bench is full. The NPC uses the Power automatically and selects the first eligible card.
+Igglybuff's Gaze selects an opposing Benched Pokémon whose modeled Abilities are Poké-Powers, then suppresses those Powers through the end of the current turn. The effect ends if the Pokémon leaves the Bench. Mixed Poké-Power/Poké-Body or modern Ability cards are excluded because suppression is tracked per Pokémon in the battle engine.
+
+Neo Discovery Politoed's Frog Song adds 40 after Weakness and Resistance when its attack damages the Defending Pokémon and more than three Poliwag, Poliwhirl, Poliwrath, or Politoed are in play across both sides. Unown [A]'s Anger adds 10 damage per damage counter on Unown [A] to Unown Hidden Power attacks; the engine chooses the largest single-copy bonus if there are multiple Unown [A].
+
+Neo Revelation Shuckle's Hard Shell reduces attack damage of 40 or less after Weakness and Resistance to 10, including damage from its owner's attacks. It preserves other attack effects and is disabled by Asleep, Confused, or Paralyzed.
+
+Neo Revelation Blissey's optional Softboiled flips on evolution from hand; heads heals up to 80 damage and tails up to 40, limited to damage Blissey has. Ability suppression and healing prevention apply; PvE, PvP, and NPC evolution paths are supported.
+
+Neo Revelation Celebi's Time Travel flips when an opponent's attack would Knock it Out; heads shuffles Celebi and its modeled Evolution stack into its owner's deck so it is not counted as a Knockout. The Power is disabled while Celebi is Asleep, Confused, or Paralyzed. Individual Energy attachments are not modeled.
+
+Neo Revelation Unown [B]'s [Bear] moves one damage counter from a damaged Pokémon with Unown in its name to the holder once per turn. It works through Special Conditions and requires the holder to have more than 10 HP remaining.
+
+Neo Revelation Suicune's Crystal Body prevents effects from opposing attacks while leaving damage intact. The protection stops while Suicune is Asleep, Confused, or Paralyzed.
+
+Neo Revelation Aerodactyl's Prehistoric Memory adds attacks from each evolved Pokémon's own Evolution stack to its options, including opposing Pokémon. Attack Energy costs still apply; Aerodactyl's Power is disabled by Asleep, Confused, or Paralyzed.
+
+Neo Revelation Sudowoodo's Mimic copies attacks from the opposing Active Pokémon while Sudowoodo is Active. Copied attacks retain their costs and use the shared Energy pool and normal attack effect handling; Asleep, Confused, Paralyzed, or Ability suppression disables Mimic.
+
+Ruby & Sapphire Beautifly's Withering Dust prevents Resistance from reducing damage to any Active Pokémon while Beautifly is in play. It applies to both sides and stops when Beautifly leaves play or its Ability is suppressed.
+
+Sandstorm Lunatone's Lunar Eclipse changes Lunatone to Darkness type through the end of the turn while Solrock is in play. Solrock's Solar Eclipse changes Solrock to Fire type while Lunatone is in play. Each Power is once per turn and blocked by Special Conditions or Ability suppression; the player UI and NPC logic both support them.
+
+Dragon Ninjask's Loose Shell searches the Pokémon deck for Shedinja when Ninjask evolves from hand, then puts it onto the Bench as a Basic Pokémon. Player selection and NPC selection are supported; the Bench legality check and deck shuffle apply.
+Dragons Exalted Ninjask's Cast-off Shell uses the same evolution search and Bench placement for Shedinja, including player/NPC choice and deck shuffle.
+Legends Awakened Ninjask's Loose Shell puts a selected Shedinja from the hand or discard pile onto the Bench as a Basic Pokémon when Ninjask evolves. The player chooses the source and copy; the NPC takes the first eligible copy. The Ability is skipped when the Bench is full.
+Legends Awakened Ditto's Ditto DNA copies the first living opposing Active Pokémon's maximum HP while Ditto is Active, preserving existing damage, and provides that Pokémon's attacks at their normal shared-Energy costs. It updates as the opposing front changes and restores Ditto's printed HP when it leaves the Active Spot. With multiple front slots, the first living slot stands in for the unmodeled choice prompt.
+Legends Awakened Delcatty's Attracting Body reacts when Active Delcatty takes damage from an opponent's attack, even if that damage Knocks it Out. It flips a coin and Confuses the attacking Pokémon on heads.
+Legends Awakened Deoxys's Form Change swaps an in-play form with a selected Deoxys form from the deck, transferring damage and modeled effects. The outgoing form goes back into the deck and the deck is shuffled. All forms share a once-per-turn use limit; the NPC selects its first eligible replacement.
+Legends Awakened Castform's Temperament swaps an in-play Castform with a selected Castform, Rain Form, Snow-Cloud Form, or Sunny Form from the deck, transferring damage and modeled effects before shuffling. The shared Temperament limit applies across all forms; the NPC selects its first eligible replacement.
+Legends Awakened Metagross's Magnetic Reversal flips once per turn and, on heads, switches a selected opposing Active Pokémon with a selected opposing Benched Pokémon. Special Conditions block the Power. The NPC targets the lowest-HP Active Pokémon and healthiest Benched Pokémon.
+
+Neo Destiny Unown [T]'s Tell flips once per turn and, on heads, reveals both Pokémon-only hands. It works through Asleep, Confused, or Paralyzed; the flip is recorded for player, PvP, and NPC use.
+
+Neo Destiny Unown [L]'s Laugh flips once per turn and, on heads, shuffles both Pokémon-only decks. It works through Asleep, Confused, or Paralyzed; the flip is recorded for player, PvP, and NPC use.
+
+Neo Destiny Unown [H]'s Help shuffles its owner's hand into the Pokémon deck, then draws an equal number of cards, limited by cards remaining in the deck. It requires Unown H, E, L, and P on the Bench and is once per turn.
+
+Neo Destiny Unown [Q]'s Quicken is once per turn across all copies. On heads, it prevents opposing attack damage and effects to every friendly Pokémon with Unown in its name for the opponent's next turn. It works through Special Conditions; the coin flip and temporary protection are recorded.
+
+Neo Destiny Unown [C]'s Chase triggers when an opposing Active Pokémon retreats while Unown C is Active. Heads deals 10 damage to the retreating Pokémon with Weakness and Resistance applied; the flip is recorded and Ability suppression disables Chase.
+
+Neo Destiny Unown [X]'s XXXXX flips until tails when a Pokémon with Unown in its name uses Hidden Power, adding 10 damage per heads before Weakness and Resistance. Its once-per-turn use is shared across Unown X copies, including copies played later in the turn; the flips are recorded with the attack.
+
+Neo Destiny Unown [G]'s Give requires Unown G, I, V, and E on the Bench, then flips once to add one selected-type Energy to the shared pool on heads. Physical Energy cards and individual attached Pokémon are not represented in the current deck/energy model.
+
+Neo Destiny Dark Slowking's Cunning flips once per turn; heads reveals the top opposing Pokémon-deck card. The player chooses whether to shuffle that deck, while the NPC opponent always chooses to shuffle. Asleep, Confused, and Paralyzed disable the Power. Team Rocket Returns' no-flip printing reveals the top opposing deck card and offers the same optional shuffle; PvP privately exposes the card only to the user who activated it, while the shared battle log omits its name. Any Special Condition disables it.
+
+Neo Destiny Unown [V]'s Vanish is a play-from-hand Power. A heads flip returns a different friendly Unown Pokémon and its Evolution stack to hand; tails leaves it in play. Energy attachments are not tracked individually. Player target selection and NPC low-HP target selection are supported.
+
+Neo Discovery Unown [O]'s Observe reveals up to five cards from the opponent's Pokémon-only deck once per turn and preserves their deck order. Player, PvP, and NPC paths are supported.
+
+Neo Destiny Dark Gengar's Deep Sleep checks each sleeping Pokémon on the side whose turn just ended. It flips twice per sleeping Pokémon; two heads remove Asleep, and any tails leave it Asleep. The effect requires a live, unsuppressed Dark Gengar that is not Asleep, Confused, or Paralyzed.
+
+Team Rocket Returns Delibird's Gift Exchange shuffles one selected hand card into its owner's Pokémon deck and draws one card. It requires Delibird to be Active and free of Special Conditions and is limited to once per turn.
+
+Team Rocket Returns Magby's Baby Evolution can play Magmar from hand onto Magby as a free evolution and remove all damage counters. Its card-text matcher accepts the comma in the printed “, and remove” clause.
+
+Team Rocket Returns Qwilfish's Spiny flips until tails when an opponent's attack damages Active Qwilfish, even if Qwilfish is Knocked Out. Each heads places one Ability damage counter on the attacker, and the coin sequence is recorded.
+
+Team Rocket Returns Dark Dragonair's Evolutionary Light searches the Pokémon deck for an Evolution while Dark Dragonair is Active and free of Special Conditions. Dark Muk's Sticky Goo adds two Colorless to the opponent's Active retreat cost. Rattata's Scramble removes its retreat cost while the opponent has a Pokémon-ex Active. These passive checks use the shared retreat-cost validator.
+
+Team Rocket Returns Quagsire and Wooper's Saturation clear all Special Conditions and remove two or one damage counters, respectively, after matching Water Energy attachment events. The effect uses the shared-pool Energy attachment approximation, and healing prevention blocks only the counter removal.
+
+Team Rocket Returns Koffing's Knockout Gas applies Confused and Poisoned to the attacking Pokémon when Active Koffing is Knocked Out by an opponent's attack. Status-immunity Abilities apply as usual. Dark Sandslash's Poison Payback applies Poisoned to the attacker when an attack damages Active Dark Sandslash, including when Sandslash is Knocked Out. Dark Weezing adds one damage counter to each Poisoned Pokémon during between-turn checkup while Active. Kingdra's Dragon Veil removes Weakness from its owner's Active Pokémon while Kingdra is in play; the effect covers all three front slots and excludes the Bench.
+
+Jungle Dodrio's Retreat Aid reduces its owner's Active Pokémon's retreat cost by one Colorless while Dodrio is Benched, to a minimum of zero.
+Jungle Mr. Mime's Invisible Wall prevents attack damage of 30 or more after Weakness and Resistance, including damage from its owner's attacks; other attack effects still resolve. Asleep, Confused, Paralyzed, or Ability suppression disables it.
+Base Set 2 Alakazam's Damage Swap repeatedly moves one damage counter between friendly Pokémon, provided the recipient will not be Knocked Out. Asleep, Confused, Paralyzed, and Ability suppression prevent use.
+Base Set 2 Blastoise's Rain Dance adds one shared Water Energy per activation for a friendly Water Pokémon. It is a repeatable free action and does not consume the regular charge; individual attachments are not tracked. Its listed Special Conditions and Ability suppression disable Rain Dance.
+Base Set and Base Set 2 Electrode's Buzzap Knock Out Electrode and add two units of the selected Energy type to the shared pool, approximating the Energy card it becomes. The player chooses another friendly Pokémon as the attachment target. Asleep, Confused, Paralyzed, and Ability suppression prevent use. Both catalog wordings are supported.
+
+Prismatic Evolutions Eevee ex can evolve from hand into an ex Pokémon that evolves from Eevee. Eevee Grove Eevee ex can evolve into any Pokémon that evolves from Eevee. The shared evolution option list validates the Stage 1 card in hand and blocks evolution on turn one and the turn Eevee ex entered play.
+
+Hawlucha's Bench-entry Ability places one damage counter on each of two chosen opposing Benched Pokémon in Scarlet & Violet, Paldean Fates, and the Scarlet & Violet Black Star Promos. Both PvE and PvP validate two distinct Bench targets; PvE opponents choose two eligible targets automatically.
+Team Rocket Dark Gyarados's Final Beam flips when attack damage Knocks it Out; heads deals 20 damage per remaining shared Water Energy to the attacker after Weakness and Resistance. The shared pool approximates Energy attached to Dark Gyarados and may not reflect its individual attachments. Its listed Special Conditions and Ability suppression disable Final Beam.
+Neo Discovery Unown [U]'s Undo returns a chosen friendly Active Pokémon and its evolution stack to hand once per turn if Unown U, N, D, and O are on the Bench. A Bench promotion follows, Ability suppression applies, and individual attached Energy is outside the model. The PvE opponent uses Undo to rescue its lowest-HP Active Pokémon.
+
+Neo Destiny Light Arcanine's Drive Off switches an opposing Benched Pokémon with the Defending Pokémon once per turn while Light Arcanine is Active and not Asleep, Confused, or Paralyzed. Ability suppression applies. The engine uses its existing forced-switch replacement handling.
+
+Ruby & Sapphire Slaking's Lazy suppresses opposing Pokémon Powers while Slaking is Active. Poké-Bodies and modern Abilities are excluded from this restriction.
+
+Ruby & Sapphire Blaziken's Firestarter adds one shared Fire Energy when its owner has a Benched Pokémon, has Fire selected, and Blaziken is free of Special Conditions. The opponent Energy-attachment reaction path is applied; individual Energy cards and attachment targets are not modeled.
+
+Secret Wonders Unown [K]'s KIND removes up to two damage counters from a selected damaged opposing Active Pokémon once per turn. NPC opponents leave this opponent-healing Power unused.
+Secret Wonders Unown [O]'s ONE draws up to seven cards total when Unown O, N, and E are on the Bench and the user has exactly one card in hand. Player, PvP, and NPC paths enforce both conditions; drawing stops at deck exhaustion.
+Secret Wonders Unown [X]'s X-RAY inspects the top opposing Pokémon deck card once per turn when the user also has an Unown X on the Bench. Player, PvP, and NPC paths are supported.
+Secret Wonders Electivire's Motor Drive uses the shared discard-pile Energy attachment action to add Lightning once per turn. Electivire must be in play and free of Special Conditions; individual Energy attachment is abstracted.
+Secret Wonders Venusaur's Miracle Aroma supports a selected Asleep, Burned, or Poisoned effect on heads against the opposing Active Pokémon. All Special Conditions prevent activation; player, PvP, and NPC paths are handled.
+Secret Wonders Xatu's Psychic Shift transfers one selected Special Condition from a friendly Active Pokémon to the opposing Active Pokémon. It is once per turn and works through player, PvP, and NPC paths.
+Secret Wonders Jumpluff's Cotton Spore flips on incoming attack damage and prevents that attack's damage on heads through the shared passive protection resolver.
+Secret Wonders Gastrodon East Sea's Osmosis uses the shared counter-movement controls to move up to three counters from itself to a Gastrodon West Sea once per turn. The named partner must be in play.
+Secret Wonders Wormadam Sandy Cloak's Sandy Cloak blocks attack effects other than damage through the passive attack protection resolver.
+Secret Wonders Arcanine's Flame Dash offers a friendly Active switch after it evolves from hand onto the Bench. The optional transfer of attached Energy is omitted because attachments are not modeled individually.
+
+McDonald's Collection 2023 Blissey's Busybody Nurse clears all Special Conditions from its owner's Active Pokémon once per turn. Player selection and NPC automatic target selection are supported.
+
+Jungle Mankey's Peek can inspect either Pokémon deck's top card or one random card from the opponent's Pokémon hand once per turn. The card name is shown privately to the inspecting player; Prize cards are outside the current battle model.
+
+Fossil Gengar's Curse transfers one damage counter between opposing Pokémon once per turn, including a transfer that Knocks Out the recipient. Asleep, Confused, Paralyzed, and Ability suppression block the effect.
+Fossil Haunter's Transparency is supported as attack damage and effect prevention: it flips when an attack affects Haunter, blocks all attack effects and damage on heads, and is disabled while Asleep or Ability-suppressed.
+Fossil and Legendary Collection Omanyte Clairvoyance show the opposing Pokémon hand face up while enabled. PvP perspective serialization reveals those cards only to Omanyte's owner; PvE renders the NPC's modeled hand. Fossil blocks while Asleep, Confused, or Paralyzed; Legendary Collection blocks for any Special Condition. Both are disabled by Ability suppression.
+Fossil Slowbro's Strange Behavior uses the damage-counter movement action repeatedly during its owner's turn, is blocked by its three listed Special Conditions or Ability suppression, and prevents self-Knockout.
+Fossil Tentacool's Cowardice returns itself from either front or Bench to its owner's hand, with entry-turn and Special Condition restrictions. A resulting open front slot follows the normal promotion flow; PvE uses it to rescue damaged Tentacool when it can maintain its field.
+Fossil Ditto's Transform copies the Defending Pokémon's attacks, HP, type, Weakness, Resistance, and Retreat Cost while Active. Damage counters carry across changes to the copied Pokémon; Asleep, Confused, Paralyzed, or Ability suppression restores Ditto's own stats. Ditto cannot evolve. The shared Energy pool cannot distinguish attached Energy types.
+
+Secret Wonders Gardevoir LV.X's Teleportation switches it with a selected friendly Pokémon in the opposite Active/Bench row once per turn, unless Gardevoir has a Special Condition. The standard switch action and PvP validation handle the swap.
+
+Shining Fates Manaphy's Ocean Search selects one Pokémon from the top six cards of the Pokémon-only battle deck while Manaphy is Active; the remaining cards are shuffled back.
+
+Shining Fates Shiny Vault Appletun's Delicious Aroma flips once per turn and, on heads, switches a selected opposing Benched Basic Pokémon with the Active Pokémon. The existing coin and switch event handling applies.
+
+Shining Fates Shiny Vault Dracovish's Primal Law prevents the opponent from evolving any Pokémon from hand while Dracovish is Active; shared evolution validation applies the rule and respects Ability suppression.
+
+Shining Fates Shiny Vault Polteageist's Tea Break requires discarding a hand Pokémon with the Mad Party attack, then draws up to two cards. Server validation checks the selected card's printed attack.
+
+Shining Fates Shiny Vault Galarian Zigzagoon's Headbutt Tantrum puts one damage counter on a selected opposing Pokémon when Zigzagoon is played from hand onto the Bench. The server validates the target and settles Knock Outs and promotions without ending the turn.
+
+Shining Fates Shiny Vault Galarian Meowth's Evolution Roar requires discarding two cards from hand before searching for Galarian Perrserker. The server validates both the discard count and named search target.
+
+Shining Fates Shiny Vault Hatterene's Mind Hat selects one card from the player's hand and randomly discards one from the opponent's hand. Both are placed in their owners' discard piles; the effect requires both hands to contain a card and does not consume the turn.
+
+Shining Fates Shiny Vault Galarian Cursola's Perish Body flips when Active Cursola is Knocked Out by attack damage. Heads Knocks Out the attacker; Ability suppression disables the effect.
+
+Shining Fates Shiny Vault Grimmsnarl's Dark Oath adds one Colorless to the opponent Active Pokémon's attack costs while Grimmsnarl is Active. The shared attack-cost calculation applies the surcharge.
+
+Shining Fates Shiny Vault Galarian Stunfisk's Snap Trap removes one Energy from the attacker's shared pool when Active Stunfisk takes attack damage, even if it is Knocked Out. This is the model's approximation for discarding one attached Energy.
+
+Coalossal's Tar Generator can add up to two shared Energy units per turn when Fire or Fighting is selected, approximating up to two Fire/Fighting attachments from discard. Individual Energy cards and Pokémon attachment destinations are not modeled.
+
+Shining Fates Cinderace's Libero uses the switch event to allow up to two shared Fire Energy when it moves from Bench to Active. Player, PvP, and automatic PvE paths enforce the switch trigger and once-per-turn limit; the modeled pool cannot validate the discard pile or individual attachment target.
+
+Shining Fates Shiny Vault Ditto V's V Transformation replaces it with a Basic Pokémon V from discard while carrying over modeled battle state. Eligibility checks require both the Basic and Pokémon V subtypes; player and PvP select the replacement, and PvE picks the first legal card. Individual Energy attachments remain unmodeled.
+
+Shining Fates Orbeetle's Bug's Radar can inspect and reorder the opponent's top three Pokémon-deck cards in PvE and PvP. In PvP, only the acting player sees the inspected card names, and the game pauses further actions until that player chooses an order.
+
+Toedscruel ex's Protective Mycelium blocks attack effects (but not damage) from opposing Pokémon for your Pokémon when you have Energy in the shared pool. The engine does not track attached Energy per Pokémon, so the Energy condition uses the side-wide pool as its approximation; Ability suppression disables the protection.
+Espeon VMAX's Solar Revelation uses the same team shield for the alternate “attacks from your opponent's Pokémon” wording, including the source text's missing space before its reminder. It blocks attack effects other than damage while the shared pool is nonempty; Ability suppression disables the protection.
+Abomasnow's Toughness Boost adds 50 maximum HP to friendly Single Strike Pokémon except Abomasnow; Kricketune's Swelling Tune adds 40 maximum HP to friendly Grass Pokémon except Kricketune. Each provider's Ability is nonstacking, and the shared max-HP update path recalculates active Pokémon when the provider effect changes.
+
+Mega Golurk ex's Heavy Impact blocks its attacks until its owner has at least 10 cards in hand. The shared available-attacks calculation enforces this for player and AI attacks and stops enforcing it while the Ability is suppressed.
+
+Milotic ex's Sparkling Scales prevents all damage and effects of attacks from opposing Tera Pokémon. The attacker-subtype check is shared by damage protection and attack-effect blocking, and Ability suppression disables the protection.
+
+Enamorus V's Guardian of Love blocks modeled opposing Ability effects against your Pokémon while the shared Energy pool is set to Psychic and contains Energy; it excludes Enamorus V itself and is disabled by Ability suppression. This approximates Psychic Energy attached to individual Pokémon, which the engine does not track. Coverage currently includes Ability based attack damage modifiers, status effects, damage-counter placement, and damage-counter movement.
+
+Paldean Wonders Armarouge's Armor reduces attack damage by 30. The damage-reduction parser now recognizes the set's en dash minus glyph as well as the minus characters used by other sets.
+
+Drapion V's Strike Down reduces its Colorless attack costs by one for each opposing Single Strike, Rapid Strike, and Fusion Strike Pokémon in play. The attack-cost calculation counts those modeled Pokémon subtypes, caps the reduction at the attack's Colorless cost, and honors Ability suppression.
+
+Fantastical Parade Mimikyu ex prevents the first positive attack damage it would take after entering play. The protection is consumed only when damage would actually be dealt and is skipped if the attack ignores target damage modifiers.
+
+Alolan Persian-GX's Smug Face now prevents attack damage and effects from opposing TAG TEAM Pokémon and Ultra Beasts. Its separate clause for Pokémon with Special Energy attached is not modeled because attached Special Energy cards are not tracked.
+
+Fates Collide M Alakazam-EX's evolution Ability can choose the opposing Active Pokémon for 2 damage counters and a different Benched Pokémon for 3 counters. The target chooser and server validation enforce one target from each position.
+
+Base Set Machamp's Strikes Back deals 10 damage to the attacking Pokémon when Machamp is damaged by an opponent's attack, including when the attack Knocks Machamp Out. The handler accounts for the “Knoced Out” spelling in the catalog text.
+
+Paldean Fates Great Tusk ex's Quaking Demolition discards the top five cards of its owner's deck when it is Active at normal turn end. PvE, PvP, and player turn settlement share the effect, and it waits until additional attacks finish. The audit's end-of-turn family now includes deck discard text and recognizes 14 matching records across four sets; total recognized records are 2,276 of 4,554.
+
+Black Bolt Alomomola's Gentle Fin lets an Active Alomomola put one Basic Pokémon with 70 HP or less from its discard pile onto the Bench. Player and PvP actions enforce its Active source, HP and Basic filters, and open Bench slot; the PvE opponent picks an eligible target automatically.
+
+XY Black Star Promos Absol's Lamentation discards a random opponent hand card when Active Absol takes attack damage, even if Absol is Knocked Out. The shared reactive Ability hook resolves the effect in PvE and PvP, and the retaliation family recognizes this hand-discard clause.
+
+SWSH Black Star Promos Polteageist's Teapot of Surprises reveals a random opponent hand card and places it on the bottom of that opponent's deck when Polteageist is Active and takes attack damage, even if Knocked Out. The reactive Ability handler supports this hand-to-deck effect in PvE and PvP.
+
+Dragon Vault Rayquaza's Commotion puts two damage counters on each of its owner's Benched Pokémon when Active Rayquaza takes attack damage, even if Knocked Out. The reactive Ability records counter damage for normal knockout cleanup in PvE and PvP.
+
+Rebel Clash Toxtricity V's Counterattack Kerzap flips three coins after attack damage while it is Active, even if Knocked Out, and puts three damage counters on the attacking Pokémon per heads. The coin results are recorded and attack damage counters resolve through the shared reactive handler.
+
+Black & White and Dragons Exalted Reuniclus's Damage Swap can repeatedly move one damage counter between two of its owner's Pokémon. The shared counter-move action enforces same-side targets and permits repeated use during the turn.
+
+Next Destinies Bronzong's Heal Block prevents all Pokémon healing, while HeartGold & SoulSilver Triumphant Solrock's Heal Block prevents healing while a living Lunatone is in play. Both are enforced through the shared healing prevention check.
+
+Ariados's Poké-Body increases each player's Pokémon retreat cost by one, except Ariados. Team Aqua's Muk applies a one-Energy retreat increase to Pokémon in play except Team Aqua Pokémon. The shared retreat-cost resolver checks these effects from both sides.
+
+Deoxys Tropius's active Ability makes the opponent's Pokémon have no Resistance. The battle damage resolver now checks the attacker's side for this rule and omits the target's Resistance modifier.
+
+Legacy suppression supports Legend Maker Muk's Stench (both players' Poké-Powers), Majestic Dawn Glaceon LV.X (opponent's Poké-Powers while Active), and Dragon Muk ex's Toxic Gas (Poké-Powers and Poké-Bodies, except Toxic Gas). Legendary Collection Muk's Special Condition wording is included for Toxic Gas.
+
+Chaos Rising Patrat's Lockdown blocks all damage-counter movement Abilities while Patrat is in play. The shared server action enforces the rule, and both the client selector and PvE Ability loop account for it.
+
+Hidden Legends Dodrio's Fast Feet overrides the ordinary retreat restriction for Asleep and Paralyzed status. The battle UI and PvE/PvP server actions share the check; retreat removes the status conditions after switching.
+
+Jynx's Victory Kiss (Generations and Furious Fists) can heal 10 damage from an Active Pokémon once per turn while Jynx is Benched. The normal healing prevention and suppression checks still apply.
+
+Legend Maker Lunatone's partner lock suppresses Poké-Powers on each player's non-ex Fire Pokémon while Solrock is in play. Solrock's lock suppresses non-ex Colorless Pokémon's Poké-Powers while Lunatone is in play. Neither rule disables Poké-Bodies.
+
+Legends Awakened Unown U prevents the opponent's attack damage and effects on its owner's Benched Unown while Unown U remains Benched. The battle engine checks the team protection in both damage and attack-effect resolution.
+
+Aquapolis Gloom's Enervating Pollen limits Resistance on each player's Active Pokémon to a 10 damage reduction. The attack damage calculation checks for an unsuppressed Gloom in play; Benched Pokémon retain normal Resistance handling.
+
+Burning Shadows Lunatone blocks all Pokémon healing while its owner has a living Solrock in play. This conditional Heal Block is enforced by the same shared prevention check as the other healing lock Abilities.
+
+Forbidden Light Mesprit's Silent Waves removes Resistance from the opponent's Pokémon while its owner has Azelf in play. The attack damage resolver checks the partner condition on the attacking side.
+
+Sandstorm Volbeat's Retreat Cost is 0 while Illumise is in play. Deoxys Lunatone makes the Retreat Cost of each Solrock in play 0; the shared passive retreat resolver checks these named conditions.
+
+Black Bolt Meloetta ex may attack during its first turn when going first. First-turn attacks are already legal in this custom battle engine.
+
+Ability coverage reporting counts only records with nonempty text. The report separately lists missing ability-text placeholders so missing card data is not misclassified as an unsupported effect. Neo Destiny's Light Piloswine Fluffy Wool can put an attacking Pokémon Asleep on heads after it damages Active Light Piloswine; Unown [P]'s Perform adds damage it took while Active during the opponent's previous turn to Hidden Power. Team Rocket Returns Dark Gyarados's Dark Scale puts 30 damage on an opponent's attacker when Active Dark Gyarados is Knocked Out by an attack. Expedition Base Set Golem's Rock Body and Metapod's Exoskeleton reduce attack damage by 10 and 20; Vileplume's Poison Pollen can Poison the opposing Active Pokémon on heads; Butterfree's Miraculous Powder clears all Special Conditions from the owner's Active Pokémon; Meganium's Soothing Aroma heals each friendly Pokémon on heads; Machamp's Terraforming reorders up to four cards from the top of its owner's deck; Dragonite's Tailwind grants one free retreat per turn while Dragonite is Benched. Aquapolis Ariados's Gluey Slime adds one retreat cost to either player's Active Pokémon, capped across copies. Skyridge Umbreon's Dark Gaze suppresses legacy Poké-Powers on Benched Pokémon on both sides while Umbreon is Active. Ruby & Sapphire Cascoon and Silcoon's Hard Cocoon reduce damage from incoming opponent attacks by 30 on heads. Dragon Flygon's Sand Guard reduces incoming attack damage by 20 on heads. Team Magma vs Team Aqua's Power Saver blocks the holder's attack while its matching team has three or fewer Pokémon in play. FireRed & LeafGreen Mr. Mime ex's Magic Odds and Magic Evens prevent listed damage totals after Weakness and Resistance. Deoxys Vigoroth's Vigorous Aura adds 10 before Weakness and Resistance to attacks from Active Pokémon hitting Active targets. Emerald Medicham ex's Wise Aura suppresses legacy Poké-Powers on non-ex Pokémon on both sides while Active. Delta Species Espeon δ's Delta Heal removes one damage counter from each friendly Pokémon whose card name bears the δ mark. Legend Maker Kabuto's Ancient Protection removes Weakness from the listed Omanyte, Omastar, Kabuto, and Kabutops family while Kabuto is in play, and respects Ability suppression. Holon Phantoms Walrein ex's Icy Aura puts one damage counter on each Active Pokémon between turns, except Water Pokémon. Crystal Guardians Aggron ex's Intimidating Armor prevents opposing Basic Pokémon from attacking or using legacy Poké-Powers and Poké-Bodies while Aggron ex is Active. Dragon Frontiers Tropius δ's Tropical Heal removes all Special Conditions from your Pokémon when played from hand onto the Bench; Imprison and Shock-wave markers are not represented in battle state. Power Keepers Skarmory ex's Metal Gravity places 3 damage counters on an opponent's retreating Pokémon that has 40 or more HP remaining, once per turn across copies. The refreshed audit recognizes 2,340 of 4,537 abilities with printed text and lists 17 blank source records.
+
+Expedition Base Set Golem's Rock Body and Metapod's Exoskeleton reduce damage from attacks to the holder by 10 and 20, respectively, after Weakness and Resistance. The audit recognizes their printed text through the passive damage modifier family.
+
+Aquapolis Ariados's Gluey Slime adds one Colorless to either player's Active Pokémon retreat cost while Ariados is in play, with multiple copies capped at one additional Energy. The shared retreat cost resolver applies the increase and checks Ability suppression.
+
+Skyridge Umbreon's Dark Gaze suppresses Benched cards whose abilities consist only of legacy Poké-Powers on both sides while Umbreon is Active. Poké-Bodies and modern Abilities remain available; mixed ability cards need per-ability suppression state for exact handling.
+
+Ruby & Sapphire Cascoon and Silcoon’s Hard Cocoon each flip a coin against incoming opponent attacks; heads reduces damage by 30 after Weakness and Resistance.
+
+Sandstorm Illumise’s Glowing Screen reduces attack damage to Illumise by 30 after Weakness and Resistance when Volbeat is in play and the attacker is Fighting or Darkness type; the reduction is capped at 30.
+
+Dragon Flygon’s Sand Guard flips a coin for each incoming opponent attack; heads reduces damage by 20 after Weakness and Resistance.
+
+Team Magma vs Team Aqua’s Groudon and Kyogre Power Saver block attacks while three or fewer Pokémon with the corresponding Team Magma or Team Aqua name are in play across both sides.
+
+FireRed & LeafGreen Mr. Mime ex’s Magic Odds and Magic Evens block attacks whose damage after Weakness and Resistance matches the printed odd or even values, through exact-damage protection.
+
+Deoxys Vigoroth’s Vigorous Aura adds 10 damage before Weakness and Resistance when either side’s Active Pokémon attacks an Active target. The damage resolver respects suppression and opposing Ability effect protection.
+
+Emerald Medicham ex’s Wise Aura disables legacy Poké-Powers on non-ex Pokémon on both sides while Active. Feebas and Swablu Bench protection is position-gated, so it stops working when either Pokémon becomes Active.
+
+Unseen Forces Ursaring’s Intimidating Ring blocks attacks and suppresses legacy Poké-Powers on the opponent’s Basic Pokémon while Ursaring is Active.
+
+
+Diamond & Pearl Rhyperior's Earth Fissure discards up to three cards from the opponent's deck when Rhyperior evolves; this uses the existing evolution-triggered deck discard flow.
+
+
+Mysterious Treasures Ariados’s Sticky adds one Colorless to either player’s Active Pokémon retreat cost for each Ariados in play, excluding Ariados itself; this is separate from Aquapolis Ariados’s Active-only Gluey Slime.
+
+Secret Wonders Hoppip's Cottonweed grants free retreat while Grass Energy is selected in the shared Energy pool, approximating the printed attached-Grass-Energy requirement.
+
+Great Encounters Magcargo's Magma Armor prevents Asleep and Paralyzed conditions through the shared status-immunity check.
+
+Great Encounters Milotic's Marvel Scale prevents effects, including damage, from attacks by opposing Pokémon LV.X.
+
+Majestic Dawn Umbreon's Moonlight Veil removes Weakness and Retreat Cost from the owner's Eevee evolutions while Umbreon is in play, respecting Ability suppression.
+
+Legends Awakened Torkoal's White Smoke prevents opposing attacks from damaging or applying effects to its owner's Benched Pokémon while Torkoal is Active.
+
+Stormfront Abomasnow's Snow Veil reduces opposing attack damage to its owner's Pokémon by 20 after Weakness and Resistance while Abomasnow is Active.
+
+Platinum Manectric prevents attack damage to its owner's Benched Pokémon, excluding Manectric itself.
+
+Supreme Victors Milotic's Aqua Mirage prevents damage to Milotic from opposing Pokémon's attacks while its owner's hand is empty.
+
+Supreme Victors Magmortar's Evolutionary Flame may Burn and Confuse the opposing Active Pokémon when Magmortar evolves from hand. Ivysaur's Evolutionary Pollen may make the opposing Active Pokémon Asleep when Ivysaur evolves. The optional evolution effects support player and PvE opponent turns.
+
+Supreme Victors Mr. Mime's Focus Wall leaves Mr. Mime at 10 HP instead of Knocked Out when an attack would deal at least 70 damage after Weakness and Resistance. Ability suppression disables the effect.
+
+Supreme Victors Exploud's Erasing Sound removes Weakness from each of its owner's Pokémon while Exploud is in play. Ability suppression disables it.
+
+Arceus Cherrim's Cloudy Sky reduces attack damage to its owner's Grass and Fire Pokémon by 10 after Weakness and Resistance, including damage from its owner's attacks.
+
+HeartGold & SoulSilver Donphan's Exoskeleton reduces damage from attacks to Donphan by 20 after Weakness and Resistance.
+
+HS—Unleashed Metagross's Psychic Float and Pupitar's Boost Gas grant free retreat when the shared Energy pool matches their Energy conditions.
+
+HS—Undaunted Vespiquen's Defense Sign prevents attack damage to its owner's Benched Grass Pokémon.
+
+Call of Legends Phanpy's Ultra-Thick Skin reduces attack damage by 10 after Weakness and Resistance while its owner's shared Energy pool is nonempty, approximating attached Energy. Suicune, Entei, and Raikou's Extreme Speed retreat discounts use the shared count of matching-type Energy, approximating Energy attached to the individual Pokémon.
+
+HS—Triumphant Victreebel's Tangling Tendrils adds two Colorless to the opponent's Active Pokémon's retreat cost while Victreebel is Active.
+
+HS—Triumphant Dodrio's Retreat Aid discounts the owner's Active retreat by two Colorless while Dodrio is Benched. Yanma's Free Flight grants free retreat with an empty shared Energy pool.
+
+Black & White Samurott's Shell Armor reduces attack damage to Samurott by 20 after Weakness and Resistance.
+
+Emerging Powers Krookodile's Black Eyes discards one Energy from the opponent's shared pool on heads, once per turn while Krookodile is Active.
+Noble Victories Leavanny's Leaf Tailor removes Weakness from its owner's Pokémon while that side has Energy in the shared pool, approximating the attached-Energy condition. It applies to the Active and Bench and is disabled by Ability suppression.
+Next Destinies Vanilluxe's Slippery Soles uses the shared switch resolver to switch its owner's Active Pokémon with a selected Benched Pokémon, then switch the opponent's Active Pokémon with a Benched Pokémon.
+Dark Explorers Darkrai-EX's Dark Cloak removes the Retreat Cost of its owner's Pokémon while Darkness is selected in the non-empty shared Energy pool, approximating attached Darkness Energy. The shared validator applies it to Active and Benched Pokémon and respects Ability suppression.
+Dragons Exalted Altaria's Fight Song adds 20 damage to each of its owner's Dragon Pokémon's attacks against the opponent's Active Pokémon before Weakness and Resistance. Multiple unsuppressed Altaria stack.
+Plasma Freeze Deoxys-EX's Power Connect adds 10 damage per unsuppressed Deoxys-EX to its owner's Team Plasma Pokémon's attacks, excluding Deoxys-EX, against the opponent's Active Pokémon before Weakness and Resistance.
+Flashfire Shiftry's Leaf Draw spends one shared Grass Energy and draws three cards, approximating the printed discard of a Grass Energy card from hand.
+Flashfire Floette's Flower Veil adds 20 maximum and current HP to each of its owner's Grass Pokémon while Floette remains in play and unsuppressed. Multiple Floette stack; HP deltas preserve existing damage, and losing the bonus can Knock Out a Pokémon.
+Furious Fists Klefki's Secret Key changes the Resistance of its owner's Fairy Pokémon to −40. The shared Resistance resolver applies this to damage and respects Ability suppression.
+Phantom Forces Gourgeist's Gourgantic sets its maximum HP to 200 while Grass is selected in the non-empty shared Energy pool, approximating an attached Grass Energy. Damage counters are preserved as the condition changes.
+
+Noble Victories Carracosta's Solid Rock flips after attack damage and reduces that damage by 50 after Weakness and Resistance on heads. Druddigon's Rough Skin puts two damage counters on the attacking Pokémon after Active Druddigon takes attack damage, including if Druddigon is Knocked Out.
+
+Rising Rivals Glaceon's Frost Wind reduces opposing attack damage to its owner's Pokémon by 10 after Weakness and Resistance while Glaceon is Active.
+
+Next Destinies Amoonguss's Sporprise applies Confusion and Poison to the opponent's Active Pokémon after Amoonguss evolves from hand.
+
+Dark Explorers Archeops's Ancient Power prevents both players from evolving from hand while Archeops is in play.
+
+Dark Explorers Espeon's Solar Revelation blocks opposing attack effects other than damage while its owner has Energy in the shared pool.
+
+Dark Explorers Volcarona's Scorching Scales raises between-turn damage on opposing Burned Pokémon to four counters while Volcarona is in play.
+
+Dark Explorers Venusaur's Floral Scent searches the deck for one Pokémon and puts it into hand once per turn.
+
+Dragons Exalted Ninetales's Bright Look switches an opposing Benched Pokémon into the Active Spot when Ninetales evolves from hand.
+
+Dragons Exalted Gabite's Dragon Call searches for one Dragon Pokémon and adds it to hand once per turn.
+
+Dragons Exalted Serperior's Royal Heal heals each of its owner's Pokémon by 10 between turns and is disabled by Ability suppression.
+
+Dragons Exalted Roserade's Le Parfum searches any one card from the deck on evolution and shuffles afterward.
+
+Dragons Exalted Jumpluff's Leave It to the Wind returns Jumpluff and its Evolution cards to hand once per turn; individual Energy and Tool attachments are not modeled.
+
+Boundaries Crossed Venipede, Whirlipede, and Scolipede Poison Point Poison the attacking Pokémon after Active Pokémon take attack damage, including damage that Knocks them Out.
+
+Boundaries Crossed Munna's Long-Distance Hypnosis puts the opponent's Active Pokémon Asleep on heads or the owner's Active Pokémon Asleep on tails.
+
+Boundaries Crossed Crustle's Sturdy survives an attack-damage knockout at full HP and sets its remaining HP to 10. Ability suppression prevents the effect. Dusknoir's Sinister Hand can repeatedly move one damage counter between opposing Pokémon; the shared counter-move action restricts both choices to the opponent's board.
+
+Boundaries Crossed Audino's Busybody heals 10 damage and removes one Special Condition from an Active Pokémon when used from hand; Audino is then discarded.
+
+Plasma Storm Jellicent's Spiteful Spirit Confuses and Poisons the attacker when Active Jellicent is Knocked Out by attack damage.
+
+Plasma Storm Sharpedo's Rough Skin places two damage counters on the attacker when Active Sharpedo takes attack damage, even if Sharpedo is Knocked Out. Weezing's Aftermath discards up to three cards from the opponent's deck when Weezing is Knocked Out by attack damage; Ability suppression applies to both.
+
+Plasma Storm Blastoise's Deluge can repeatedly attach shared Water Energy to a selected friendly Pokémon during its owner's turn. The attached Energy is represented in the shared pool.
+
+Plasma Storm Cherrim's Fair-Weather Heal can heal 20 damage from a selected friendly Pokémon when the shared Energy type is Grass. This approximates its printed attached-Energy condition because individual attachments are not modeled.
+
+Plasma Storm Lucario's Dual Armor adds Fighting and Metal to its effective types while its owner has Metal selected in the shared Energy pool. This approximates its printed attached-Energy condition.
+
+Plasma Storm Klinklang's Plasma Steel prevents damage to Metal Pokémon from opposing Pokémon-EX attacks. Metal eligibility uses the shared Energy selection, and Ability suppression disables the protection.
+
+Plasma Storm Braviary's Big Wing lets its owner select an opposing Benched Pokémon to switch into the Active Spot once per turn while Braviary is Active.
+
+Plasma Storm Lunatone's Premonition lets its owner reorder the top two deck cards once per turn in PvE and PvP. Ability suppression applies.
+
+Plasma Storm Clefable's Moon Guidance flips once per turn before revealing deck cards. On heads, the owner chooses an eligible Pokémon and a matching Evolution from the deck, then shuffles; tails does not evolve. Standard evolution eligibility checks and Ability suppression apply.
+
+Plasma Freeze Kecleon's Color Change copies the printed type of the opponent's first living Active Pokémon while Kecleon is Active; Ability suppression disables the copy.
+
+XY Slurpuff's Sweet Veil prevents Special Conditions for its owner's Pokémon while Fairy is selected in the shared Energy pool and the side has Energy. This approximates individual Fairy Energy attachments, and Ability suppression disables the protection.
+
+XY Base Greninja's Water Shuriken places three damage counters on a player-selected opposing Pokémon once per turn. Its Water Energy hand-discard cost is represented by spending one shared Energy while Water is selected; Ability suppression applies.
+
+XY Base Swellow's Drive Off uses existing opponent Active switch handling once per turn. The first living opposing Benched Pokémon is selected deterministically, and Ability suppression applies.
+
+Flashfire Dusknoir's Shadow Void repeatedly moves one damage counter from another friendly Pokémon onto Dusknoir. It can Knock Out Dusknoir, respects Patrat's damage-counter movement lock, and is disabled by Ability suppression.
+
+Flashfire Shiftry's Leaf Draw spends one shared Grass Energy and draws three cards. Energy cards are not represented in hand, so this approximates discarding a Grass Energy card; Ability suppression applies.
+
+Furious Fists Hawlucha's Shining Spirit bypasses Weakness and Resistance for its attacks. Ability suppression disables the effect.
+
+Furious Fists Ludicolo's Captivating Rhythm can bring a selected opposing Benched Pokémon Active on a once-per-turn coin flip heads. Bouffalant's Sap Sipper adds 40 damage to attacks against opposing Grass Pokémon before Weakness and Resistance. Ability suppression applies to both.
+
+Roaring Skies Shaymin-EX's Set Up is supported as a Bench-entry draw until the player's hand reaches six cards. The effect is limited to the turn Shaymin-EX entered the Bench and respects Ability suppression.
+
+Ancient Origins Ariados's Poisonous Nest applies Poison to each non-Grass Active Pokémon. The owner may use it once per turn; status protection and Ability suppression apply.
+
+Ancient Origins Metagross's Magnetic Warp moves a selected friendly Benched Pokémon into the Active Spot and forces the opponent to switch their Active Pokémon with a living Benched Pokémon. The ability is once per turn and uses the shared switch resolver.
+
+Ancient Origins Flare Effect, Aqua Effect, and Electric Effect add Fire, Water, and Lightning types to their owner's Stage 1 Pokémon. The existing effective-type resolver applies these auras, and Ability suppression disables each aura.
+
+BREAKthrough Gallade's Premonition uses the validated deck-order action to rearrange the top five cards of its owner's deck once per turn. Ability suppression applies.
+
+Furious Fists Politoed's King's Song ignores all Colorless Energy in friendly Poliwag, Poliwhirl, and Poliwrath attack costs while Politoed is in play. Ability suppression disables the effect.
+
+XY Inkay's Upside-Down Evolution lets a Confused Inkay evolve into a matching card chosen from the deck, subject to normal Evolution eligibility and its once-per-turn limit. The deck is shuffled afterward; Ability suppression applies.
+
+XY Voltorb's Destiny Burst flips on an attack-damage Knock Out while Active and puts five counters on the attacker on heads. Ability damage can Knock Out the attacker.
+
+XY Aegislash's Stance Change swaps its in-play card for a selected Aegislash in hand once per turn. The outgoing card returns to hand while damage, Special Conditions, Evolution cards, and temporary effects stay with the board Pokémon. Individual Energy and Tool attachments are not represented, so the shared Energy pool is unchanged. PvE and PvP support Ability suppression.
+
+Flashfire Goodra's Gooey Regeneration repeatedly spends one shared Energy to heal 60 damage from Goodra. The simplified engine cannot distinguish an Energy attached to Goodra from the side-wide pool. Ability suppression and healing prevention apply.
+
+Flashfire Forretress's Thorn Tempest can place one damage counter on each living opposing Pokémon when it evolves. The owner may decline the Ability; suppression disables it.
+
+Flashfire Lopunny's Big Jump returns itself and its Evolution stack from the field to hand once per turn. Individual Energy and Tool attachments are not tracked; Ability suppression applies.
+
+Phantom Forces Wobbuffet's Bide Barricade suppresses Abilities on non-Psychic Pokémon across play, hand, and discard while Active. It can itself be disabled by another Ability suppressor.
+
+Phantom Forces Malamar-EX's Hyper Hypnosis makes the opposing Active Pokémon Asleep after an Energy charge. This approximates attaching an Energy from hand with the shared pool; suppression and status immunity apply.
+
+Primal Clash Milotic's Sparkling Ripples returns one Pokémon from discard to hand when it evolves. Energy and Trainer cards are not represented in the discard zone.
+
+Primal Clash Swampert's Diving Search selects one Pokémon from the deck and puts it on top once per turn. This reflects the Pokémon-only battle deck.
+
+Primal Clash Crawdaunt's Unruly Claw discards one Energy from the opponent's Active Pokémon when Crawdaunt evolves. The engine approximates attached Energy with one unit from the opponent's shared pool.
+
+Primal Clash Flygon's Sand Flap lets its owner choose either player to shuffle their hand into their deck and draw up to four Pokémon cards.
+
+Primal Clash Sceptile's Nurture and Heal adds one Grass unit to the shared Energy pool and heals 30 damage from one friendly Pokémon. It requires Grass selected and room in the pool, approximating an Energy attachment because individual Energy cards and hand Energy cards are not represented.
+
+Roaring Skies Absol's Cursed Eyes moves up to three damage counters from one opposing Pokémon to another when Absol is played onto the Bench. Shared damage-counter movement prevention and Ability target protection apply.
+
+Roaring Skies Dragonite's Max Wind heals all damage from one chosen friendly Pokémon when Dragonite evolves from hand. The optional target must be damaged and alive; healing prevention and Ability suppression apply.
+
+Roaring Skies Reshiram's Turboblaze adds one Fire Energy to the shared pool once per turn while Reshiram is Active and a Dragon Pokémon is in play. Fire must be selected and the pool must have capacity; individual Energy attachments are not represented.
+
+Ancient Origins Unown's Farewell Letter discards it from the Bench and draws one Pokémon card. The ability does not count as a Knock Out and is supported for players, PvP, and the PvE opponent.
+
+Roaring Skies Ninjask's Wing Buzz can be used once per turn while Ninjask is Active by discarding a card from hand to discard the top card of the opponent's deck.
+
+Roaring Skies Carbink's Jewel Armor prevents all attack damage to Carbink while it is Benched, including its owner's attack damage. Ability suppression disables the protection.
+
+BREAKthrough Florges BREAK's Floral Breeze heals 30 damage from its owner's Active Pokémon and removes one Special Condition once per turn.
+
+BREAKthrough Florges's Calming Aroma reduces attack cost by one when the attack includes Fairy Energy. The custom energy model tracks total cost rather than attachment types; Ability suppression disables the reduction.
+
+BREAKthrough Vivillon's Energy Color flips once per turn; heads adds one selected Energy type to the shared pool if it has capacity. This approximates searching the Pokémon-only deck for an Energy card; the flip is recorded for player, PvP, and PvE use.
+
+BREAKpoint Ho-Oh-EX's Purifying Fire heals 50 damage from itself once per turn. Since individual Energy attachments are not tracked, Fire must be the selected shared Energy type and at least one Energy must be in the pool.
+
+BREAKpoint Hypno's Goodnight, Babies makes both Active Pokémon Asleep once per turn.
+
+Fates Collide Mothim's Wormadam First repeatedly moves one damage counter from a damaged friendly Wormadam to another friendly Pokémon. Shared movement prevention and Ability target protection apply.
+
+Fates Collide Omastar BREAK's Dangerous Tentacle switches an opposing Benched Pokémon-EX into the Active Spot when Omastar BREAK evolves from hand.
+
+Fates Collide Omastar's Restoring Beam searches the deck for one Restored Pokémon and puts it onto the Bench once per turn.
+
+Fates Collide Servine's Serpentine Strangle flips a coin on evolution and Paralyzes the opponent's Active Pokémon on heads, subject to status protection. Fates Collide Mew's Memories of Dawn copies attacks from friendly Basic Pokémon in play.
+
+Fates Collide Regirock-EX's Regi Power adds 10 damage to friendly Fighting Pokémon's attacks against the opponent's Active Pokémon, excluding Regirock-EX itself. Multiple copies stack.
+
+Fates Collide Bronzong's Metal Fortress prevents damage and effects from opposing attacks to all friendly Benched Pokémon. Ability suppression disables it.
+
+Fates Collide Lugia's Pressure reduces attack damage to itself by 20 before Weakness and Resistance when both Lugia and the attacking Pokémon are Active.
+
+Fates Collide Delphox BREAK's Flare Witch consumes a Fire Energy card from the deck and adds one shared Energy per turn when Fire is selected. Individual attachments are not tracked.
+
+Fates Collide Marowak's Bodyguard blocks attack effects targeting Marowak from opposing Pokémon. Hand-target effects and clearing existing attack effects are not represented by the current battle state.
+
+Steam Siege Magearna-EX's Mystic Heart blocks opposing attack effects, excluding damage, to all friendly Pokémon when Metal is the selected shared Energy type and the pool is nonempty.
+
+Steam Siege Ampharos's Shocking Light places 3 damage counters on a chosen opposing Pokémon-EX once per turn. Both player and opponent actions validate the target subtype.
+
+Steam Siege Toxicroak's Poison Enzyme prevents damage to Toxicroak from attacks made by an opposing Poisoned Pokémon.
+
+Steam Siege Klinklang's Heavy Bumper reduces attack damage to Klinklang by 10 after Weakness and Resistance for each Colorless in the opposing Active Pokémon's Retreat Cost.
+
+Steam Siege Yanmega's Sonic Vision removes its attack Energy costs while the owner's hand has exactly four cards.
+
+Steam Siege Nidoking's King's Palace adds 20 damage before Weakness and Resistance to Nidoqueen's attacks against the opposing Active Pokémon while Nidoking is in play. Multiple providers stack.
+
+Steam Siege Hawlucha's Sudden Cyclone switches the opponent's Active Pokémon with a chosen Benched Pokémon when Hawlucha is played from hand onto the Bench.
+
+Stellar Crown Ledian's Glittering Star Pattern switches in an opposing Benched Pokémon with 90 or less HP remaining when Ledian evolves from hand. The client filters targets and the server validates the remaining HP threshold.
+
+Stellar Crown Orthworm ex's Pummeling Payback puts 2 damage counters on the attacker per shared Metal Energy when an opposing attack damages Orthworm ex, including a Knock Out. Shared Energy approximates individual attached cards.
+
+Stellar Crown Bouffalant's Curly Wall reduces damage to Basic Colorless Pokémon by 60 after Weakness and Resistance while another Bouffalant is in play; multiple copies do not stack.
+
+Stellar Crown Carracosta's Primal Knowledge adds 30 damage before Weakness and Resistance to friendly attacks against the opponent's Active Evolution Pokémon. Multiple providers stack.
+
+Stellar Crown Cradily's Selective Slime lets the player choose Burned, Confused, or Poisoned and flip a coin to inflict that status on the opponent's Active Pokémon on heads. It can be used from either row.
+Stellar Crown Klinklang's Emergency Rotation can be activated from the hand once per turn while the opponent has a Stage 2 Pokémon in play, putting Klinklang directly onto the Bench when all three front slots are occupied and a legal Bench slot is open.
+Stormfront Staraptor's Protect Wing reduces damage by 20 after Weakness and Resistance from attacks by opposing Stage 2 Pokémon while Staraptor is Active. Ability suppression disables the effect.
+Platinum Ampharos's Damage Bind prevents damaged Pokémon with Poké-Powers from using those Powers while Ampharos is healthy and in play. The effect applies on both sides of the board.
+Platinum Crobat G's Flash Bite places one damage counter on a chosen opposing Pokémon when Crobat G is played from hand onto the Bench. PvE selects the opposing Pokémon with the lowest remaining HP.
+Platinum Blissey's Nurse Call discards one hand card to heal 20 damage from a chosen friendly Pokémon once per turn. A Special Condition blocks its use; PvE chooses the most damaged eligible target.
+Platinum Blaziken's Fire Breath Burns the opposing Active Pokémon once per turn. It is blocked by Special Conditions and is used automatically by the PvE opponent.
+Platinum Dugtrio's Sinkhole puts 2 damage counters on an opposing Active Pokémon when it retreats. PvE and PvP resolve the trigger.
+Platinum Dialga's Time Aura blocks the opponent from evolving their Active Pokémon while Dialga is Active. Ability suppression disables the lock.
+Stormfront Regigigas's Regi Form reduces its attack cost by one Colorless Energy when Regirock, Regice, and Registeel are in play.
+Stormfront Roserade's Hidden Poison poisons the attacking Pokémon when an opponent's attack damages Active Roserade, even if Roserade is Knocked Out. Ability suppression disables the effect.
+Stormfront Salamence's Battle Rush ignores all Colorless Energy in its attack costs while the opponent has a Pokémon with at least 120 maximum HP in play. Ability suppression disables the effect.
+Stormfront Bibarel's Unaware prevents attack effects other than damage from affecting Bibarel. Ability suppression disables the protection.
+Stormfront Rapidash's Ability Burns the attacking Pokémon when an opponent's attack damages Active Rapidash, even if Rapidash is Knocked Out. Ability suppression disables the effect.
+Stormfront Electrode's Radiance places 1 damage counter on each opposing Pokémon when an opponent's attack damages Active Electrode, even if Electrode is Knocked Out. Ability suppression disables the effect.
+Stormfront Sableye's Overeager makes its player go first when that player alone opens with an Active Sableye. If both sides open with Overeager, the effect does nothing.
+Stormfront Gengar's Fainting Spell flips a coin when Active Gengar is Knocked Out by attack damage during the opponent's turn. Heads Knocks Out the attacking Pokémon as well; the reactive effect is disabled by Ability suppression.
+Stormfront Dusknoir's Shadow Command draws two cards, discards down to six when the hand has seven or more cards, then places two damage counters on Dusknoir. It is blocked by Special Conditions. Hand trimming currently discards lowest-cost cards automatically.
+Stormfront Magnezone's Magnetic Search finds one Lightning or Metal Pokémon from the deck and adds it to hand; Special Conditions prevent use.
+Stormfront Empoleon's Emperor Aura blocks the opponent's next shared Energy charge when Empoleon evolves from hand onto the Active Pokémon. Ability suppression disables the trigger.
+Stormfront Skuntank's Evolutionary Gas prevents the opposing Active Pokémon from attacking on its next turn when Skuntank evolves onto the Active Pokémon; it targets the first opposing Active Pokémon under the current no-choice evolution flow.
+Stormfront Budew prevents all attack effects, including damage, when the attacker is Poisoned. Ability suppression disables this protection.
+Legends Awakened Uxie's Set Up draws to seven cards when Uxie is played from hand onto the Bench; it is usable once per Uxie on its Bench-entry turn.
+Legends Awakened Houndoom's Revenge Fang increases its attacks' damage to the Active Pokémon by 40 while its owner has fewer Benched Pokémon than the opponent. Ability suppression disables the effect.
+Legends Awakened Mesprit's Psychic Bind suppresses opposing Poke-Powers during the opponent's next turn after Mesprit is played from hand onto the Bench.
+Legends Awakened Unown [W]'s WALL reduces opponent attack damage to all friendly Pokémon by 10 after Weakness and Resistance while Unown [W] is Active.
+Legends Awakened Swellow has zero Retreat Cost when it has no Energy; the shared Energy pool approximates attached Energy for this condition.
+Legends Awakened Luxray's Rivalry adds 50 damage to its attacks before Weakness and Resistance while the opponent has a Pokémon LV.X in play.
+Legends Awakened Azelf LV.X removes Weakness from all friendly Psychic Pokémon while it is in play.
+Legends Awakened Armaldo prevents attack damage of 60 or less to itself after Weakness and Resistance.
+Legends Awakened Regigigas clears its Special Conditions when Energy is attached from hand to it. The shared Energy charge represents the attachment.
+Legends Awakened Delcatty's Feline Grace Confuses the attacker on heads when an opposing attack damages Active Delcatty, even if the attack Knocks it Out.
+Legends Awakened Shedinja's Soul Beat puts 4 damage counters on the attacker and all opposing Pokémon with the same name when an attack Knocks Out Active Shedinja.
+Legends Awakened Spiritomb's Curse Breath puts 1 damage counter on each already-damaged Pokémon on both sides when Spiritomb is played from hand onto the Bench, with a shared once-per-turn limit.
+Legends Awakened Unown [Y]'s Hidden Power removes 1 damage counter from a damaged Active Unown and makes it Asleep, once per turn from the Bench. Healing Prevention blocks the healing, and normal Sleep protection applies.
+Legends Awakened Unown [!]'s Bench-entry Power flips a coin and places 2 damage counters on a selected Pokémon; heads targets the opponent's side and tails its owner's side. The UI captures one target for each outcome, and the server records the flip and applies the counters.
+Legends Awakened Unown [R]'s once-per-turn Bench Power discards Unown [R] and draws one card. Attached cards are not represented in the battle state.
+Legends Awakened Unown [V]'s Power removes 2 damage counters from each damaged friendly Pokémon and ends its owner's turn. It is blocked by Special Conditions and Healing Prevention; the PvE opponent uses it when useful.
+Legends Awakened Uxie LV.X's once-per-turn Trade Off chooses one of the top 2 cards of the deck for the hand and puts the other on the bottom. Special Conditions block it; PvE selects the card with higher HP.
+Legends Awakened Registeel's Regi Heal discards two chosen cards from hand to heal 30 damage from Registeel once per turn. Special Conditions block the Power; PvE discards the first two hand cards when it can heal damage.
+Legends Awakened Regice's Regi Move discards two chosen cards from hand and switches an opposing Active Pokémon that is not evolved with the first available Benched Pokémon. Special Conditions block the Power; PvE chooses the first eligible targets.
+Legends Awakened Forretress's Iron Shell rolls once per charged Energy unit. On tails it places 2 damage counters on every living Pokémon except Forretress, on both sides. The shared Energy model cannot confirm an attachment to Forretress, so the optional trigger resolves automatically on charge.
+Legends Awakened Beldum's Metal Chain searches for Beldum and benches the first eligible copy for each charged Metal Energy unit. It requires an eligible Beldum in play and an open Bench; Special Conditions and Ability suppression block the trigger. Attachment target and player choice are not represented by the shared Energy charge.
+Legends Awakened Tyrogue's Baby Evolution can put Hitmonlee, Hitmonchan, or Hitmontop from hand onto Tyrogue as an evolution and remove all damage counters. The existing hand-evolution action enforces the once-per-turn use.
+Majestic Dawn Unown [P]'s PUT places 1 damage counter on one chosen friendly Pokémon other than Unown, once per turn from the Bench. PvE chooses its healthiest eligible target.
+Majestic Dawn Darkrai's Darkness Shade makes one selected opposing Active Pokémon Asleep when Darkrai is played from hand onto the Bench, once per Darkrai. PvE chooses the first eligible opposing Active Pokémon; normal Sleep protection applies.
+Majestic Dawn Articuno's Freezing Screech flips a coin when Articuno is played from hand onto the Bench; heads makes one selected opposing Active Pokémon Paralyzed. PvE chooses the first eligible Active Pokémon and normal Paralysis protection applies.
+Majestic Dawn Zapdos's Sheet Lightning flips a coin when Zapdos is played from hand onto the Bench; heads places one damage counter on each opposing Pokémon. PvE resolves the flip automatically.
+
+Platinum Banette's Temper Tantrum discards any number of chosen hand cards (at least one) and places one damage counter on Banette for each discarded card. It is once per turn, blocked by Special Conditions, and may Knock Out Banette.
+
+Platinum Mightyena's Cold Feet ignores the complete attack Energy cost while Mightyena has a Special Condition; ability suppression still removes the discount.
+
+Platinum Slaking's Lazy Paunch blocks Slaking from attacking if it attacked during its previous turn. The attack turn is recorded on the card for PvE and PvP validation.
+
+Platinum Shaymin LV.X's Revenge Seed adds 60 damage to its attacks against the opposing Active Pokémon after one of its owner's Grass Pokémon is Knocked Out by attack damage during the opponent's previous turn. The trigger tracks Grass-type Knockouts separately from other attack Knockouts.
+
+Platinum Armor Fossil's Armor Stone reduces damage from an opponent's attack by 10 per heads, flipping until tails whenever the attack would damage Armor Fossil.
+
+Platinum Skull Fossil's Skull Stone places one damage counter on the attacking Pokémon for every heads when an opponent's attack would Knock Skull Fossil Out by damage.
+
+Platinum Giratina's Let Loose shuffles both hands into their owners' decks, then each player draws up to four cards with Giratina's owner drawing first. It is once per Giratina played from hand onto the Bench that turn.
+
+Platinum Ludicolo's Cheerful Voice ends the current turn and boosts only Ludicolo's attacks by 60 during its owner's following turn. The boost lasts for that full turn; Special Conditions and opposing Ability suppression block activation. PvE uses it instead of an ineffective charge at the Energy cap.
+
+Platinum Giratina LV.X's Invisible Tentacles discards a random card from the attacking side's hand when it attempts an attack. The Body can trigger once per turn; attacks are blocked when the attacker has no card to discard. Attack validation and resolution enforce it in PvE and PvP.
+
+Rising Rivals Rotom's five Shift Powers temporarily set Fan Rotom to Colorless, Frost and Wash Rotom to Water, Heat Rotom to Fire, and Mow Rotom to Grass. Each is a once-per-turn self type change through turn end, supported in PvE and PvP.
+
+Rising Rivals Alakazam E4 LV.X's Damage Switch repeatedly moves one damage counter among the owner's Pokémon SP. Special Conditions block the Power; source and target must both be Pokémon SP.
+
+Rising Rivals Flygon LV.X's Wind Erosion discards one card from the opponent's deck at each between-turn check while Flygon is Active. Ability suppression disables the effect.
+
+Rising Rivals Beedrill's Flutter Wings searches its owner's deck for a Grass Pokémon once per turn and adds it to hand. Special Conditions block use; PvE and PvP are supported.
+
+Rising Rivals Kecleon's Colorful Body adds Grass, Fire, Water, Lightning, Psychic, Fighting, Darkness, Metal, and Colorless to Kecleon's effective types while in play. Weakness and Resistance resolution uses these types; Ability suppression disables them.
+
+Rising Rivals Snorlax's Big Appetite refills its owner's hand to six while Snorlax is Active and makes it Asleep if cards were drawn. Special Conditions block the Power; PvE and PvP use the same resolution.
+
+Rising Rivals Flygon's Rainbow Float removes Retreat Cost from friendly Pokémon of the selected shared Energy type while Flygon is in play. Selected Energy approximates the required Basic Energy attached to Flygon; Ability suppression disables the effect.
+
+Rising Rivals Hippowdon E4's Sand Armor reduces damage from attacks to Hippowdon E4 by 10 after Weakness and Resistance when Fighting is selected in the shared Energy pool. This approximates attached Fighting Energy; Ability suppression disables it.
+
+Rising Rivals Gallade E4 LV.X's Blade Storm optionally puts one damage counter on each opposing Pokémon when it evolves from hand onto the Active Gallade E4. Player and PvP actions use the evolution Ability flow; the PvE opponent resolves it automatically. Knock Outs settle normally.
+
+Rising Rivals Floatzel GL LV.X's Water Rescue returns Water Pokémon Knocked Out by opposing attack damage and their modeled Evolution stacks to their owner's hand. Individual Energy and Tool attachments remain untracked.
+
+Rising Rivals Trapinch's Gather Sand recovers one Fighting Energy as shared Energy once per turn while Trapinch is Active. The battle model does not track individual Energy cards in the discard pile.
+
+Rising Rivals Infernape E4 LV.X's Intimidating Roar switches the opponent's Active Pokémon with a Benched Pokémon once per turn. The Power requires Infernape to be Active and free of Special Conditions.
+
+Rising Rivals Luxray GL LV.X's Bright Look switches the opponent's Active Pokémon with a chosen Benched Pokémon when Luxray GL LV.X evolves the owner's Active Luxray GL. The optional effect uses the evolution switch flow.
+
+Rising Rivals Active Sharpedo's Energy Shark flips when damaged by an opponent's attack, including a Knock Out; heads removes one Energy from the attacker's shared pool. This approximates discarding one attached Energy card.
+
+Rising Rivals Flareon, Jolteon, and Vaporeon use Undevelop to return the current Evolution to hand and restore the prior stage. Damage and Special Conditions remain; Knock Outs from the inherited damage settle normally.
+XY9 Suicune's Wind Charm prevents opponent attack effects against the owner's entire field while Suicune is Active; damage still applies. Existing effects are not removed, and Ability suppression disables the protection.
+XY9 Zebstrika's Zap Zone bypasses damage-modifying Abilities on the opposing Active Pokémon for attacks by friendly Lightning Pokémon. Any unsuppressed Zebstrika with Zap Zone can provide the effect from the Bench.
+XY8 Haunter's Gothic Fear optionally Confuses both Active Pokémon when Haunter evolves from hand. The shared status rules apply, including immunity and Ability suppression.
+XY8 Raikou's Shining Body reduces attack damage to Raikou by 20 after Weakness and Resistance while Lightning is selected in the owner's shared Energy pool. This approximates an attached Lightning Energy; Ability suppression disables the effect.
+XY11 Klinklang's Heavy Bumper reduces attack damage by 10 for each Colorless in the opposing Active Pokémon's Retreat Cost, after Weakness and Resistance. It uses the engine's modeled Retreat Cost value.
+XY8 Magnemite's Sparkling Induction reduces its Active Retreat Cost by one per living Magnemite on its owner's Bench. Ability suppression disables the reduction.
+XY12 Dragonite-EX's Pull Up returns up to two player-selected Basic Pokémon other than Dragonite-EX from the owner's discard pile to hand when it is played from hand onto the Bench. PvP and solo actions validate unique legal discard selections.
+SM1 Toxapex's Toxic Spikes Poison the opponent's new Active Pokémon after a Retreat. Forced switches do not trigger the Ability; Poison immunity and Ability suppression apply.
+SM1 Decidueye-GX's Feather Arrow places two damage counters on a chosen opposing Pokémon once per turn. The shared activated counter action supports the player and PvE opponent and honors Ability suppression.
+SV3.5 and SV4.5 Starmie's once-per-turn counter ability can target an opposing Pokémon, then Knocks Out Starmie after counters are placed. Normal Knock Out cleanup handles Starmie's removal; individual attached cards are not modeled by this battle engine.
+151 Weezing and Secluded Springs Galarian Cursola share the Perish Body coin-flip retaliation: if either is Active and Knocked Out by an opponent's attack, heads Knocks Out the attacker. Ability suppression disables it.
+30th Celebration Gengar ex's Fainting Spell uses the same coin-flip Knock Out effect without an Active Spot requirement; the shared handler applies Ability suppression to all three cards.
+Mega Rising Jellicent's Bouncy Body adds one Water Energy to the shared pool when Active Jellicent takes attack damage, survives, and has a Benched Pokémon to receive it. Energy attachment Abilities are applied, and Ability suppression disables Bouncy Body.
+Destined Rivals Team Rocket's Koffing searches up to two Koffing-name Pokémon from its owner's deck onto the Bench whenever Active Koffing takes attack damage, even if Knocked Out. Bench capacity and Eternatus expansion rules apply, and the Pokémon-only deck is shuffled afterward.
+Chaos Rising Chesnaught's Needly Armor places three damage counters on the attacker per Grass Energy represented in its owner's shared Energy pool when Active Chesnaught takes attack damage, even if Knocked Out. Ability suppression disables it.
+Chaos Rising Delphox's Flaring Magic spends one Fire Energy from the shared pool, then draws until the hand contains seven cards. It is once per turn and does not require a Fire Energy card in hand.
+Journey Together Mamoswine ex's Mammoth Hauler searches one Pokémon from its owner's Pokémon deck into hand once per turn, then shuffles the deck. The player chooses the card; the opponent selects the first eligible card automatically.
+Ascended Heroes and Destined Rivals Cynthia's Gabite and Ascended Heroes Erika's Tangela can search one Pokémon whose name contains the printed Trainer name, add it to hand, and shuffle. Both use the common named-Pokémon search flow.
+Genetic Apex Porygon's once-per-turn top-deck peek uses the private information action and reveals only the owner's top card to that player.
+Fantastical Parade Spiritomb's Final Scream deals 10 damage to every opposing Pokémon when Spiritomb is Knocked Out by attack damage while Active. The effect uses the attack-damage event and normal damage cleanup; Ability suppression disables it.
+SM2 Machoke's Daunting Pose prevents opposing attack damage and opposing attack or Ability damage-counter placement on the owner's Bench. Ability suppression disables the protection.
+SM2 Chandelure's Shady Move moves one damage counter between its owner's Pokémon once per turn; Ability suppression disables it.
+SM1 Alolan Muk's Power of Alchemy suppresses Abilities on Basic Pokémon in play and uses the shared suppression check, so other suppression effects can disable it.
+SM3 Raichu's Evoshock applies Paralyze to the opponent's Active Pokémon when it evolves from hand, subject to status immunity and Ability suppression.
+SM3 Rhyperior's Toppling Wind discards the top three cards of the opponent's deck when it evolves from hand.
+SM3 Lucario's Stance prevents all effects, including damage, from the opponent's attacks until the end of their next turn when Lucario evolves from hand.
+SM3 Porygon-Z's Initialize returns each opposing evolved Pokémon's top Evolution card to its owner's hand and keeps the Pokémon's damage counters.
+SM4 Starmie's Escape shuffles Starmie and its Evolution stack from either position into its owner's deck once per turn; it cannot leave that side without a Pokémon in play.
+SM4 Gogoat's Sap Sipper adds 80 damage to Gogoat's attacks against opposing Grass Pokémon before Weakness and Resistance.
+SM4 Regice's Iceberg Shield prevents all damage and attack effects from opposing Stage 2 Pokémon while Regirock is in play; Ability suppression disables it.
+SM4 Bewear's Fluffy reduces damage from attacks by opposing non-Fire Pokémon by 30 after Weakness and Resistance; Ability suppression disables it.
+SM5 Infernape's Flaming Fighter changes between-turn damage to the opponent's Burned Pokémon from 20 to 60; Ability suppression disables it.
+SM5 Passimian's Power Huddle adds 30 damage per unsuppressed Benched Passimian to Passimian's attacks against the opposing Active Evolution Pokémon.
+
+Chilling Reign Passimian's Throwing Coach adds 30 pre-Weakness/Resistance damage to Rapid Strike attacks against opposing Benched Pokémon V and Pokémon-GX; it does not stack.
+
+Chilling Reign Galarian Slowking's Mysterious Potion selects any friendly Pokémon and flips once per turn, healing up to 90 on heads or placing 3 damage counters on tails. Tail damage uses normal Ability KO resolution.
+
+Chilling Reign Froslass recovers a Basic Water Energy from discard on evolution, represented in the shared Energy pool because per-Pokémon attachments are not tracked.
+
+Evolving Skies Flaaffy's Dynamotor recovers a Basic Lightning Energy from discard once per turn for a chosen Benched Pokémon; the card moves out of discard and the shared pool gains one Lightning Energy.
+
+Evolving Skies Thievul shuffles both players' hands to the bottom of their respective decks on evolution; if either hand had cards, both players draw up to four.
+Evolving Skies Salamence can once per turn make the opponent switch their Active Pokémon with a Benched Pokémon; the existing switch flow resolves the opponent's choice.
+Evolving Skies Jumpluff can attack twice in a turn only if its first attack Knocks Out the opposing Active Pokémon; the replacement Active Pokémon is promoted before the second attack.
+Evolving Skies Ludicolo's Enthusiastic Dance gives Basic Pokémon's attacks +100 damage against the opponent's Active Pokémon for the current turn after evolving; it applies before Weakness and Resistance.
+Evolving Skies Pinsir's Ability removes the opponent Active's Resistance when a Single Strike Pokémon attacks it.
+Evolving Skies Zoroark can use Phantom Transformation once per turn to replace itself with a Stage 1 other than Zoroark from discard. The replacement does not inherit damage, conditions, effects, or prior evolution state.
+Muk's Ability keeps the opponent's Poisoned Pokémon Poisoned through evolution or devolution; Ability suppression disables the effect.
+Spiritomb removes Abilities from Basic Pokémon V on both sides while it is in play.
+Gorebyss prevents the opponent's Rapid Strike Pokémon in play from using Abilities.
+Active Klefki suppresses Abilities on all Basic Pokémon in play except Mischievous Lock.
+Benched Gastrodon suppresses Abilities on Benched Stage 2 Pokémon on both sides.
+Mimikyu disables Abilities on any damaged Pokémon-GX on either side.
+Lunatone suppresses Abilities on Fire Pokémon on both sides while its owner has Solrock in play, excluding Pokémon-GX and Pokémon-EX.
+Giratina suppresses Abilities on Pokémon BREAK, including those inherited from earlier evolutions.
+Active Slaking suppresses the opponent's Pokémon Abilities, except Lazy.
+Alolan Muk suppresses Abilities on Basic Pokémon currently in play on both sides.
+Paldea Evolved Oricorio heals 20 damage from the owner's Active Evolution Pokémon once per turn.
+Fusion Strike Pyukumuku's Pitch a Pyukumuku moves itself from hand to the bottom of the Pokémon deck, then draws one card, once per turn.
+Cosmic Eclipse Victini heals 20 damage from one of its owner's Benched Pokémon once per turn.
+Vaporeon-GX heals 30 damage from its owner's Active Water Pokémon once per turn.
+Unbroken Bonds Melmetal can discard a Metal Pokémon from its owner's hand to heal 100 damage from itself once per turn.
+Space-Time Smackdown Lucario gives friendly Fighting Pokémon attacks +20 damage against the opposing Active Pokémon before Weakness and Resistance; Ability suppression disables the aura.
+Triumphant Light Shaymin reduces the Retreat Cost of its owner's Active Basic Pokémon by one while Shaymin is Benched.
+Triumphant Light Carnivine and Tyranitar gain +30 attack damage against the opponent's Active Pokémon while Arceus or Arceus ex is in play on their side.
+Triumphant Light Abomasnow's attacks cost one fewer Colorless Energy while its owner has Arceus or Arceus ex in play.
+Genetic Apex and Mega Rising Victreebel can switch an opposing Benched Basic Pokémon into the Active Spot once per turn while Victreebel is Active.
+Triumphant Light Unown can inspect the top card of either player's deck once per turn.
+Genetic Apex and Mega Rising Hypno can flip a coin once per turn to make the opponent's Active Pokémon Asleep on heads.
+Mega Rising Rillaboom can flip a coin once per turn to switch an opposing Benched Pokémon into the Active Spot on heads.
+Astral Radiance Mightyena's attacks cost three fewer Colorless Energy while the opponent has a Pokémon VMAX in play.
+Wisdom of Sea and Sky Politoed gives Pokémon that evolve from Poliwhirl +40 attack damage against the opponent's Active Pokémon while Politoed is Benched.
+Paldean Wonders Quaquaval's attacks get +60 damage against the opponent's Active Pokémon while it has 50 HP or less.
+HS—Unleashed Ursaring's attacks deal +60 damage while it has any damage counters.
+HS—Undaunted Dodrio's Retreat Aid reduces its owner's Active Pokémon's retreat cost by two Colorless while Dodrio is Benched, down to zero. The shared retreat-cost resolver applies it in previews and server validation; Ability suppression disables it.
+HS—Triumphant Rapidash's Fiery Spirit prevents Confusion through the shared status-immunity resolver; Ability suppression disables the protection.
+Call of Legends Sleep Shield now applies to any Pokémon with an enabled Ability that prevents attack damage while that Pokémon is Asleep, covering Cleffa, Tyrogue, Magby, and Mime Jr. Ability suppression disables the shield.
+30th Celebration Snorlax heals all damage from itself during Checkup if it remains Asleep.
+Unseen Forces Hitmonlee's attacks get +20 damage while it is an Evolved Pokémon.
+SM5 Shiinotic's Illuminate searches the Pokémon deck for a Fairy Pokémon into hand once per turn; the deck is shuffled afterward and Ability suppression applies.
+SM6 Delphox's Mystical Torch Burns the opposing Active Pokémon once per turn from either position; status immunity and Ability suppression apply.
+SM6 Tyrantrum's Tyrannical Heart adds 60 attack damage and reduces attack damage to Tyrantrum by 30 while its owner's Pokémon count is no greater than the opponent's; Ability suppression disables both effects.
+SM7 Magcargo's Smooth Over searches one Pokémon card from the deck, shuffles, and places it on top once per turn for the player and PvE opponent.
+SM7 Beldum's Conductive Body lowers its Active Retreat Cost by one per living Benched Beldum; Ability suppression applies.
+SM7 Salamence's Dragon Wind can once per turn switch a chosen opposing Benched Pokémon into the Active Spot while Salamence is Active; PvP and PvE support uses the existing switch rules and Ability suppression.
+SM8 Grovyle's Sunshine Grace searches the deck for a Grass Pokémon into hand once per turn; both player and PvE opponent use the shared deck-search Ability flow.
+SM8 Shaymin's Floral Heal heals 20 damage from the Active Grass Pokémon once per turn; the healing action enforces the target's Active position and type.
+SM8 Blissey's Happiness Supplement removes one Special Condition from its owner's Active Pokémon once per turn.
+SM8 Mareep's Fluffy Pillow puts the opposing Active Pokémon to Sleep once per turn while Mareep is Active; Ability suppression and status application rules apply.
+SM8 Lapras's Go for a Swim lets its owner reorder the top two deck cards once per turn.
+SM8 Zebstrika's Sprint discards the hand and draws four cards once per turn, with the PvE opponent using it when its hand is small.
+SM8 Naganadel's Charging Up attaches one Basic Energy from the discard pile to itself once per turn, represented as a shared Energy gain.
+SM8 Suicune's Frozen Flow can force an opposing Active-to-Bench switch once per turn while Suicune is Active; opponent replacement choice is handled by the existing forced-switch resolver.
+SM9 Emolga's Nuzzly Gathering searches for a Pokémon with a Nuzzle attack once per turn and adds it to hand; player, PvP, and PvE search validation filter by the printed attack name.
+SM9 Nidoqueen's Queen's Call searches for one Pokémon without a Rule Box once per turn; the server validates the restriction and PvE chooses a legal card.
+SM9 Pidgeotto's Air Mail selects one of the top two deck cards for hand and puts the other on the bottom once per turn; PvE chooses the higher-HP option.
+SM9 Absol's Dark Ambition adds one Colorless to the opposing Active Basic Pokémon's Retreat Cost; the normal retreat calculation applies the condition and Ability suppression.
+SM9 Parasect's Panic Spores places two damage counters on each opposing Confused Pokémon between turns using the shared checkup resolver.
+SM9 Muk's Poison Sacs keeps Poisoned on an opponent's Pokémon through evolution; devolution remains unavailable in this battle model.
+
+Mysterious Treasures Toxicroak also keeps the opponent's Pokémon Poisoned through evolution, including Level-Up cards; devolution is not modeled.
+
+Delta Species Hypno blocks hand evolution of the opponent's Asleep Pokémon. Its Energy attachment restriction remains outside the shared Energy pool model.
+
+Wizards Black Star Promos Entei flips after taking attack damage; if it survives and is not Asleep, Confused, or Paralyzed, heads shuffles it and its evolution stack into its owner's deck.
+
+Legendary Collection Kabuto halves attack damage to itself after Weakness and Resistance, rounding down to the nearest 10; any Special Condition disables Ancient Protection.
+
+Forbidden Light Scatterbug searches the Pokémon deck for exactly one Spewpa and one Vivillon on its owner's first turn when going second.
+SM9 Bronzong's Heatproof prevents damage from attacks made by opposing Fire Pokémon.
+SM9 Bronzor's Evolutionary Advantage permits first-turn evolution when its owner goes second; PvP state determines the player's permission and the PvE opponent is treated as the second player.
+SM9 Kakuna's Grass Cushion reduces incoming attack damage by 30 after Weakness and Resistance when the owning side has Grass selected in its shared Energy pool.
+SM9 Klefki's Key of Secrets sets each friendly Metal Pokémon's applicable Resistance to -40 during attack damage calculation.
+SM9 Cobalion-GX's Metal Symbol blocks new and clears existing Special Conditions for friendly Metal Pokémon while the shared Energy pool has Metal selected.
+SM9 Lycanroc-GX's Twilight Eyes discards one shared Energy when it evolves, approximating the Energy attached to the opponent's Active Pokémon.
+SM10 Mismagius's Mysterious Message draws until its owner's hand has seven cards; if any cards were drawn, Mismagius is Knocked Out. Both player and PvE ability resolution apply the draw-dependent Knock Out.
+SM11 Mawile-GX's Captivating Wink reveals the opposing hand and automatically benches all Basic Pokémon found there, limited to available Bench slots. PvP checks the source's hand-to-Bench play and validates hand membership and Basic status; the PvE opponent follows the same all-legal-Basics choice. The separate choice of how many Basics to take is not represented.
+SWSH7 Leafeon V's Greening Cells adds one Grass Energy to the shared Energy pool and ends the turn. This approximates searching the deck for an Energy card and attaching it to one Pokémon; card-specific Energy attachments are not represented.
+SV2 Flamigo's Insta-Flock searches up to three Flamigo from deck into hand when played from hand onto the Bench, then shuffles. PvP and PvE enforce the trigger and matching name.
+XY7 Hoopa-EX's Scoundrel Ring searches up to three Pokémon-EX other than Hoopa-EX into hand when played from hand onto the Bench. PvP and PvE enforce the trigger, subtype, exclusion, and limit.
+SWSH10 Bastiodon's Primal Fortress reduces damage to each friendly Pokémon by 30 after Weakness and Resistance when hit by a Pokémon V attack; PvP and PvE share the same V/VMAX/VSTAR attacker check.
+EX15 Kingdra ex δ's Extra Smoke reduces damage to friendly Stage 2 Pokémon-ex by 10 before Weakness and Resistance in both battle modes.
+SWSH4 Diancie's Sparkle Veil reduces damage to all friendly Pokémon by 30 after Weakness and Resistance while Diancie is Active.
+SV10 Steven's Carbink's Stone Palace reduces damage to Steven's Pokémon by 30 while Carbink is on the Bench; its effect does not stack.
+Skyridge Kakuna's Exoskeleton reduces all attack damage to Kakuna by 10 after Weakness and Resistance.
+EX8 Slaking's Lazy Aura reduces damage to itself by 30 before Weakness and Resistance when attacked by a Pokémon-ex while Active.
+DP2 Glalie's Craggy Face reduces damage to itself by 20 before Weakness and Resistance when attacked by a Stage 2 Pokémon while Active.
+SWSH Black Star Promo Hydreigon's Dark Trance repeatedly adds one Darkness unit to the shared Energy pool, up to the format cap, without consuming the turn. PvP, PvE, player, and opponent paths require Darkness selected. Energy cards in hand and per-Pokémon attachments are outside the model.
+Champion's Path Galarian Obstagoon's Wicked Ruler discards the excess opponent Pokémon hand until four cards remain. The player and PvE opponent can activate it once per turn; Trainer cards do not exist in the modeled hand.
+Battle Styles Cherrim's Spring Bloom repeatedly adds one Grass unit to the shared Energy pool while the player has a living Pokémon without a Rule Box in play. Player and PvE actions validate Grass selection and the Energy cap; specific Energy cards and attachment targets are not modeled.
+Battle Styles Meowstic's Ear Moves moves one damage counter from a friendly Pokémon to an opposing Pokémon once per turn. Player target selection and PvE legal-target selection use the shared counter-movement resolver.
+Battle Styles Aegislash's Stance Change swaps it with an Aegislash from hand once per turn in player, PvP, and PvE battles. The outgoing Aegislash returns to hand, while the replacement inherits damage, Special Conditions, ongoing effects, and the modeled Evolution stack.
+Burned Active Pokémon now flip for recovery after taking Checkup damage. Heads removes Burn and tails retains it; Battle Styles Centiskorch's Overheater blocks the opponent's heads recovery while its Ability remains active.
+30th Celebration Yveltal's Life-Locked prevents healing the opposing Active Pokémon, with Bench healing remaining legal.
+SWSH3 Mimikyu's Heal Block prevents healing the opponent's Benched Pokémon, while leaving Active healing legal.
+SWSH3 Dunsparce discards the top two cards of the opponent's Pokémon deck when attack damage Knocks it Out; Ability suppression disables the trigger.
+SWSH3 Ariados's evolution Ability switches an opposing Benched Evolution Pokémon into the Active Spot, with legal target selection in PvP and automatic target selection in PvE.
+SWSH3 Darkrai's Dark Cloak reduces attack damage by 20 after Weakness and Resistance when the shared pool has Darkness selected and available, approximating attached Darkness Energy.
+SWSH3 Vanilluxe's Bitter Cold flips once per turn while Active to Paralyze the opponent's Active Pokémon on heads; Ability suppression and status protection are checked.
+SWSH3 Corviknight's evolution Ability returns one friendly Pokémon except Corviknight, along with its Evolution stack, to hand. The engine validates target legality and Active replacement; individual attached cards are outside this format's state.
+XY Black Star Promos Vibrava's retreat Ability sets its Retreat Cost to zero when shared Energy represents attached Basic Energy; the Psychic variant requires Psychic selected. Individual Energy attachments are not tracked.
+Dragon Vibrava's Levitate also sets its Retreat Cost to zero while the shared Energy pool is nonempty, approximating an attached Basic Energy.
+Phantasmal Flames Mismagius ex Confuses the opposing new Active Pokémon whenever their Active Pokémon moves to the Bench during their turn; status protection and Ability suppression apply.
+Temporal Forces Magcargo Burns the opposing new Active Pokémon whenever their Active Pokémon moves to the Bench during their turn; status protection and Ability suppression apply, and Magcargo can be Active or Benched.
+Phantasmal Flames Brambleghast's evolution Ability Confuses the opposing Active Pokémon, with status protection and server validation applied through the shared evolution status effect.
+Chilling Reign Porygon-Z's Energy attachment Ability Confuses the opposing Active Pokémon after an Energy charge. The shared pool does not track which Pokémon received the Energy, so the trigger is approximated whenever Porygon-Z is in play.
+Destined Rivals Team Rocket's Ampharos places 4 damage counters on a Pokémon when the opponent evolves it from hand. Duplicate Darkest Impulse effects do not stack; the engine runs the trigger through its existing evolution Knock Out handling.
+Mega Evolution Tinkatuff's evolution Ability flips a coin and discards one shared opposing Energy on heads, representing Energy on the opponent's Active Pokémon; tails discards nothing.
+Arboliva can heal all damage from one chosen friendly Pokémon when evolved, using the shared targeted evolution-healing flow and respecting healing prevention.
+Wisdom of Sea and Sky Porygon2 evolves into a random matching card from the Pokémon deck after an Energy charge. The shared Energy pool cannot identify the attached Pokémon, so any charge while Porygon2 is in play acts as the trigger; the normal evolution validator is applied.
+Wizards Black Star Promos Articuno prevents attacks from affecting Benched Pokémon while it is Active and free of Special Conditions; the rule blocks both damage and attack effects.
+Dragon Crawdaunt's Swirling Current adds 10 damage before Weakness and Resistance when one of your Active Pokémon hits the Defending Pokémon; Crawdaunt must be Active and Ability protection checks apply.
+Mysterious Treasures Honchkrow lets Murkrow use its attacks for free while Honchkrow can meet their Energy costs. Since Energy isn't attached to individual Pokémon, the shared pool and selected type stand in for Honchkrow's attachments.
+Pokémon GO Moltres, Zapdos, and Articuno add 10 pre-Weakness damage to other Basic Pokémon of the same type, excluding the matching bird from its own boost.
+Legendary Collection Dodrio reduces the Active Pokémon's Retreat Cost by one Colorless Energy while Dodrio is Benched. The engine treats “Colorless less” without a numeral as a one-Energy discount and floors the result at zero.
+Twilight Masquerade Ariados increases the opponent's Active Evolution Pokémon's Retreat Cost by one Colorless Energy while Ariados is in play; the passive rule uses the same Ability suppression checks as other retreat modifiers.
+SM and HGSS Black Star Promos Latias remove Retreat Cost from its owner's Latios while the Latias Ability is active; opponent-owned Latias does not affect the player's Latios.
+Aquapolis Arcanine reduces its own Retreat Cost by available shared Energy, regardless of type. The shared pool approximates Energy attached to Arcanine; individual card attachments are not tracked.
+Fusion Strike Ninetales reduces a friendly Pokémon's Retreat Cost by two while the selected shared Energy type is Fire; without individual attachments, each friendly Pokémon is treated as meeting the printed attached-Fire condition. The Dragon Frontiers named Latias/Latios zero-retreat clause is handled by the existing named-target rule and is now counted by the audit.
+Deoxys Crawdaunt reduces opposing attack damage by 10 per shared Darkness Energy, capped at 20, after Weakness and Resistance. The shared pool and selected type approximate attached Darkness Energy; suppression and target Ability-effect protection are honored.
+Legends Awakened Probopass reduces opponent attack damage by 10 per shared Metal Energy, capped at 20. Stormfront Pupitar reduces damage from any attack by 10 per shared Energy, capped at 30. Both follow the same after-Weakness-and-Resistance, suppressed-aware resolver and approximate attachments with the shared Energy pool.
+Deoxys Starmie and Hidden Legends Staryu reduce damage after Weakness and Resistance when their owner has Psychic selected in the shared pool. The common typed attached-Energy guard also covers BREAKthrough Raikou's Lightning Energy text; individual attachments remain unmodeled.
+Stormfront Dusknoir places one damage counter on each opposing Pokémon between turns while Active when the opponent's shared Energy pool is nonempty. The resolver approximates individual attached Energy with that side-wide count, and damage is recorded through the existing Ability damage path.
+HS—Triumphant Magby and Call of Legends Mime Jr. prevent all attack damage while Asleep. Their effects remain enabled during the required Asleep condition and do not prevent non-damage attack effects.
+Energy-gated dual-type effects on Lanturn, Magcargo, Medicham, and Slowbro add both printed types when the owner's selected shared Energy matches the attachment requirement. The effective types feed Weakness, Resistance, and type checks; per-Pokémon attachments remain abstracted.
+Sandstorm Kecleon's Energy Variation sets its effective type to the owner's selected shared Energy type when Energy is available. The model can represent one selected Basic Energy type at a time, not multiple attached types.
+Dragon Frontiers Pinsir reduces attack damage by 30 after Weakness and Resistance when the attacking player's tracked hand contains at least five cards. The current hand model includes Pokémon cards, not Trainers.
+Furious Fists Aurorus reduces damage from opponent attacks to friendly Water Pokémon by 20 after Weakness and Resistance when the shared Energy type is Water. The shared selection approximates individual Water attachments on those targets; suppression and attack modifier bypass are honored.
+Team Rocket Returns Rocket's Snorlax ex removes one damage counter from itself between turns when Darkness is selected in its owner's shared Energy pool. This approximates attached Darkness Energy; the regular Ability suppression and healing-prevention checks apply.
+Dragon Majesty Shelgon takes 20 less attack damage after Weakness and Resistance when its owner's shared Energy pool is nonempty. The generic attached-Basic-Energy clause is approximated because individual attachments are not modeled.
+Crystal Guardians Igglybuff reduces the Retreat Cost by one for its owner's Jigglypuff, Wigglytuff, Wigglytuff ex, and Igglybuff while its Ability is active; the result floors at zero.
+Aquapolis Magnemite reduces its own Retreat Cost by one Colorless Energy per living Magnemite on its owner's Bench. Its legacy text shares the existing Magnemite bench-count rule.
+Aquapolis Hoppip and Skiploom each reduce their own Retreat Cost by one per shared Grass Energy, floored at zero. The shared pool approximates individual Grass attachments.
+Delta Species Beldum reduces its own Retreat Cost by one Colorless Energy per living Beldum on its owner's Bench, including the older Poké-Body wording.
+HS—Triumphant Absol's Intimidating Ring places two damage counters on an opponent's Basic Pokémon when it is played from hand onto the Bench. The entry trigger runs in both player and PvE bench-play paths and respects Ability suppression.
+Power Keepers Medicham's Vigorous Aura adds 10 damage before Weakness and Resistance to attacks from either player's Active Pokémon against an Active target.
+HS—Triumphant Venomoth's Poison Pollen flips once per turn to Poison the opponent's Active Pokémon on heads or your own Active Pokémon on tails. Special Conditions block its use.
+Generations and Flashfire Snorlax's Stir and Snooze flips two coins during its between-turn check while Snorlax is the Asleep Active Pokémon; it wakes only if both are heads.
+Evolution-triggered protection for Espathra and Garchomp also supports the wording that prevents all damage and effects from the opponent's attacks through the opponent's next turn.
+Deoxys-EX's Power Connect boosts Team Plasma Pokémon attacks by 10 against the Active Pokémon before Weakness and Resistance, excluding Deoxys-EX.
+Black Bolt Klinklang's Gear Coating reduces damage to friendly Pokémon by 20 after Weakness and Resistance while Metal is selected in the shared Energy pool; this approximates individual Metal Energy attachments.
+Perfect Order Aurorus's Tundra Wall reduces attack damage to Water Pokémon by 50 after Weakness and Resistance while Water is selected in the shared Energy pool. Multiple Tundra Wall instances do not stack; selected Water approximates attached Water Energy.
+Journey Together Regirock and Crown Zenith Zamazenta each reduce attack damage to themselves by 30 after Weakness and Resistance while their owner's shared Energy pool is nonempty, approximating any Energy attached to that Pokémon.
+Mega Rising and Black Bolt Eiscue's Ice Face reduces damage from opponent attacks by 40 while Eiscue has full HP.
+Secret Wonders Kecleon's Camouflage reduces damage by 40 after Weakness and Resistance when the selected shared Energy type matches the attacking Pokémon's type, approximating a matching Basic Energy attachment to Kecleon.
+
+Plasma Storm Lampent and Zubat have no Retreat Cost while the shared Energy pool is empty. The shared pool approximates whether the Pokémon has Energy attached.
+
+Noble Victories Carracosta flips a coin when attack damage is dealt; heads reduces that damage by 50 after Weakness and Resistance. This rule is implemented in the battle damage resolver and counted in the generated audit.
+
+Paradox Rift Spinda, while Confused, flips a coin when attack damage is dealt; heads prevents that damage. The damage shield checks Spinda's current Special Condition and uses the standard incoming-damage coin resolution.
+
+Aquapolis Jumpluff and Deoxys Swablu flip when they already have damage counters and would take attack damage; heads prevents that damage. Their additional printed prevention of non-damage attack effects is not handled by the damage shield.
+
+Temporal Forces Incineroar ex's attacks cost one fewer Colorless Energy for each living Pokémon on the opponent's Bench. Reduction is capped at the attack's printed Colorless cost.
+
+Plasma Blast Drifblim's attacks cost one fewer Colorless Energy for each living opposing Team Plasma Pokémon in play, capped at the printed Colorless cost. The count includes the opposing Active and Benched Pokémon.
+
+HGSS Black Star Promos Porygon2 reduces the Retreat Cost of each of your Porygon, Porygon2, and Porygon-Z in play by one Colorless Energy.
+
+Skyridge Dunsparce has no Retreat Cost while the opponent's Active Pokémon is a Stage 1 or Stage 2 Pokémon.
+
+Supreme Victors Arcanine G and Entei reduce their Retreat Cost by the count of Fire Energy in the shared pool; Call of Legends Raikou and Suicune use Lightning and Water Energy, respectively. The selected Energy type gates each rule, and the pool approximates attached Energy.
+
+Unified Minds Golisopod has no Retreat Cost when the shared Energy pool has two or fewer Energy, approximating its attached-Energy threshold.
+
+Fantastical Parade Meloetta, when Active at turn start, selects a random Psychic Pokémon from its deck and adds it to its hand. It uses the modeled Pokémon-only deck and hand.
+
+During Pokémon Checkup, Active Obsidian Flames Trevenant places one damage counter on the opponent's Active Pokémon. Active Destined Rivals Team Rocket's Tyranitar places two damage counters on each opposing Basic Pokémon.
+
+Lost Origin Pyroar increases Pokémon Checkup damage to the opponent's Burned Pokémon from two damage counters to four.
+
+Legend Maker Misdreavus, while Active, makes each player flip two coins for each of their Asleep Pokémon during recovery. A Pokémon wakes only if both coins are heads.
+
+Paldea Evolved Slaking, while Asleep, flips two coins instead of one during Pokémon Checkup and wakes only if both are heads. When a global two-coin sleep Ability is also active, its single roll handles Slaking.
+
+Obsidian Flames Togekiss draws to 8 cards and Pokémon GO Radiant Venusaur draws to 4 cards after their player attacks, before the turn changes. These effects use the modeled deck and hand and do not trigger when the turn ends by charging.
+
+Silver Tempest Metagross may move from the top of the deck to the Bench when drawn at turn start, then draws up to 3 more cards. The extra draw stops when the deck is empty.
+
+Extradimensional Crisis Nihilego increases Poison damage to the opponent's Active Pokémon by 10 during Pokémon Checkup.
+
+Secluded Springs Zoroark gains one opponent-turn of attack damage and effect protection after its attack damage Knocks Out the opponent's Active Pokémon.
+
+Crimson Blaze Ariados adds 1 to the opponent's Active Pokémon's Retreat Cost while in play.
+
+Plasma Blast and Boundaries Crossed Dusknoir can move one damage counter between the opponent's Pokémon repeatedly during the turn.
+
+Emerald Claydol and POP Series 4 Flygon have no Retreat Cost when the shared Energy pool is non-empty, approximating Energy attached to those Pokémon.
+
+Skyridge Vaporeon, Flareon, and Jolteon recover from all Special Conditions when a matching Water, Fire, or Lightning Energy is attached from hand.
+
+Cosmic Eclipse Wishiwashi flips at the end of the opponent's turn while damaged; tails shuffles Wishiwashi and its Evolution cards into its owner's deck.
+
+Call of Legends Phanpy and Dragon Shelgon each reduce attack damage by 10 when the shared Energy pool indicates Energy attached. Team Rocket Returns Rocket's Zapdos ex also reduces attack damage by 10 when Darkness is selected.
+
+Skyridge Abra has no Retreat Cost with Psychic Energy selected in a non-empty shared pool. Crystal Guardians Kyogre ex has no Retreat Cost when the pool has 1 or less Energy. These model attached Energy thresholds with the shared pool.
+
+Dragon Frontiers Jynx reduces the Retreat Cost of your Fire and Psychic Pokémon by one while it is evolved.
+
+Obsidian Flames Clefable ex removes the Retreat Cost of your Pokémon when Psychic Energy is selected and available in the shared pool.
+
+Secret Wonders Skiploom's Cottonweed reduces damage from opposing evolved Pokémon's attacks by 20 after Weakness and Resistance when Grass is selected in the shared Energy pool, approximating its attached Grass Energy condition.
+
+Legendary Treasures Serperior has no Retreat Cost when Grass Energy is selected in the non-empty shared Energy pool, approximating its attached Grass Energy condition.
+
+Scarlet & Violet Slowbro can repeatedly move one damage counter from another friendly Pokémon to itself using the shared damage-counter movement controls.
+
+DP Black Star Promos Gliscor prevents the opponent from clearing modeled Special Conditions by evolving while Gliscor is Active; the same effect text also covers Level-Up cards, which use the evolution state transition.
+
+Perfect Order Decidueye ex ignores Colorless attack cost when its opponent has exactly four cards in hand; the condition uses the modeled opponent hand size and printed attack cost.
+
+Unbroken Bonds and SM Black Star Promos Persian remove the full Energy cost from attacks named Caturday used by your Pokémon in play.
+
+Cosmic Eclipse Lycanroc reduces its attacks' Colorless Energy cost by three while the opponent has a Pokémon-GX or Pokémon-EX in play.
+
+Crystal Guardians Cacturne's once-per-turn Power targets an opposing Pokémon that already has damage counters. It requires Cacturne to be Active and free of Special Conditions.
+
+Delta Reign Wishiwashi ex heals 50 damage from itself once per turn while Active.
+
+Plasma Storm Braviary, XY Black Star Promos Flygon-EX, and Lost Thunder Suicune can force the opponent to switch their Active Pokémon with one of their Benched Pokémon once per turn, provided the Ability holder is Active.
+
+Astral Radiance Regidrago's Dragon's Hoard draws until its owner's hand has four cards while Regidrago is Active. The once-per-turn limit is shared across copies.
+
+Delta Species Porygon2 draws to six cards when its owner has fewer than six cards in hand. Its once-per-turn Ability is blocked by Special Conditions.
+
+HS—Triumphant Magnezone draws until its owner's hand has six cards once per turn. Special Conditions block Magnetic Draw.
+
+Hisuian Decidueye VSTAR draws to eight cards using the shared once-per-game VSTAR Power limit.
+
+151 and Paldean Fates Dodrio place one damage counter on themselves with Zooming Draw, then draw a card once per turn.
+
+Shining Legends and SM Black Star Promos Marshadow use Let Loose when benched from hand to shuffle both hands into their Pokémon decks and draw up to four cards.
+
+Aquapolis Nidoking uses Earth Rage once per turn while Active to flip for one damage counter on each opposing Benched Pokémon. Special Conditions block the Power.
+
+Holon Phantoms Kingdra δ places two damage counters on an opposing Pokémon with δ on its card once per turn while Active. Special Conditions block the Power, and the target selector filters to δ Pokémon.
+
+Unbroken Bonds Tyrogue's Bratty Kick flips once per turn for three damage counters on an opposing Pokémon. Using the Ability ends the turn on either coin result.
+
+Unbroken Bonds Poliwag can Confuse the opponent's Active Pokémon on its owner's first turn when going second; the engine checks PvP turn order and uses the Ability automatically for a second-place NPC opponent.
+Mega Rising Chandelure can discard the opponent's top Pokémon card once per turn in PvE and PvP battles. The card enters the opponent's discard pile, and the Ability leaves the turn open.
+Ascended Heroes Silcoon can search for one Silcoon or Cascoon and put it onto the Bench when it evolves from the hand, then shuffle its owner's Pokémon deck.
+Silver Tempest Claydol can once per turn add one Fighting Energy from its discard pile to the shared Energy pool, provided its discard pile has no Supporter cards. Trainer cards are not represented in the current deck zones.
+Unified Minds and SM Black Star Promos Amoonguss inflict Sleep and Poison on the opposing Active Pokémon when its owner plays a Pokémon with the Spore attack from hand. Basic and Evolution plays trigger it, and Ability suppression prevents it.
+Ascended Heroes Team Rocket's Dugtrio places two damage counters on the opposing Active Pokémon when it retreats to the Bench during that Pokémon's turn, without Weakness or Resistance.
+Stormfront and DP Black Star Promos Heatran LV.X preserves Burn when an opponent evolves a Burned Pokémon and makes Burn recovery flips tails during Checkup, while its Ability remains active.
+Aquapolis Porygon2's Mystery Attack draws Pokémon cards until its owner's hand has three cards, once per turn and only when it has two or fewer cards in hand. Special Conditions block the Power.
+Destined Rivals Team Rocket's Orbeetle can repeatedly move one damage counter from a Team Rocket Pokémon to another of its owner's Pokémon. The shared counter-move action enforces the source-name restriction.
+Sword & Shield and SWSH Black Star Promos Gengar can repeatedly move one damage counter between friendly Psychic Pokémon; the counter-move options enforce the type requirement on both Pokémon.
+Unbroken Bonds Vileplume can flip a coin once per turn and, on heads, choose Asleep, Burned, Confused, or Poisoned for the opponent's Active Pokémon. The effect is available to players and the opponent AI.
+Togetic, Blissey, and Togekiss have fixed-amount evolution healing Abilities that heal the damaged Active Pokémon when they evolve from hand. The shared evolution resolver checks Ability suppression and healing prevention.
+Goodra's Slimy Sliding flips once when the opponent attempts to retreat; tails prevents the switch and preserves the Energy. Multiple copies do not stack.
+Vivid Voltage Clefable's once-per-turn Active Pokémon heal and Special Condition recovery is implemented for player and PvP battles. Since Energy is stored as a shared pool, the Psychic attachment requirement is approximated by requiring Psychic Energy to be selected.
+Vivid Voltage Jirachi's once-per-turn Active Stellar Wish is supported for player, PvP, and automated PvE use. The player chooses one of the top two Pokémon cards; PvE selects the higher-HP card. The remaining card stays on top, and the Pokémon-only deck does not represent Energy cards.
+Extradimensional Crisis Luxray's Active damage reduction is applied to attacks from the opposing Active Pokémon before Weakness and Resistance. It is handled by the shared damage resolver and disabled by Ability suppression.
+Several older conditional Retreat Abilities now use shared Energy state: Lombre, Lotad, Relicanth, Metang, Skarmory, Weezing, Team Aqua's Carvanha, and matching variants can retreat for free when the selected Energy matches the specified type. Unrestricted Energy conditions require a non-empty pool. Individual Energy attachment is not tracked.
+Deoxys Natu and Xatu, and POP Series 2 Suicune, copy Burn and Poison status events from an opponent's attack onto the attacker, including when the holder is Knocked Out. Suppressed Abilities do not trigger.
+HS—Triumphant Mew can use attacks from Pokémon in either player's Lost Zone. The attack options preserve their printed costs, and the Ability is disabled when Mew's Abilities are suppressed.
+Deoxys Crobat ex's once-per-turn Shadow Guidance places one damage counter on a chosen opposing Pokémon while Crobat ex is Active and free of Special Conditions.
+Aquapolis Hypno's once-per-turn Sleep Pendulum makes the opposing Active Pokémon Asleep while Hypno is Active and free of Special Conditions.
+Turtonator and Klawf's reactive Ability discards one Energy from the attacking side's shared pool when their Active holder takes attack damage, even if Knocked Out. Individual Energy attachments are not represented.
+Majestic Dawn Aerodactyl and Crystal Guardians Shiftry ex place two damage counters on an opposing Pokémon after it uses a Poké-Power. The resolver distinguishes Poké-Powers from other Ability types and respects suppression.
+Supreme Victors Garchomp and Unseen Forces Lugia ex remove one Energy from the attacking side's shared pool when their Active holder is damaged by an opponent's attack, even if Knocked Out; Lugia ex requires heads. Individual attached Energy is not represented.
+HGSS Black Star Promos Shuckle's Fermenting Liquid draws one card per Energy added to its owner's shared pool while Shuckle is in play. The model does not distinguish Energy attached from hand versus other Energy additions.
+Promos-A Cresselia ex's Lunar Plumage heals 20 damage per Psychic Energy added to its owner's shared pool and obeys healing prevention.
+Legend Maker Arcanine ex's Fire Remedy removes one damage counter and clears all Special Conditions per Fire Energy attachment while Arcanine ex is in play. Healing prevention blocks the damage recovery.
+Ancient Origins Goomy's Water Down searches a Goomy onto the Bench per Water Energy addition while the Ability holder is in play. It respects Bench capacity; the shared Energy pool cannot identify the Pokémon receiving the Energy.
+Aquapolis Muk's Grass Energy condition adds two Colorless to its Retreat Cost when Grass is selected in the shared Energy pool.
+Mysterious Treasures Nidoqueen reduces the Colorless attack cost of your Nidoran, Nidorina, Nidorino, and Nidoking by one while Nidoqueen is in play.
+HS—Triumphant Yanmega's Insight sets the cost of all Yanmega attacks to zero while both players have equal hand sizes.
+Silver Tempest Medicham reduces the Colorless cost of its attacks by three while its owner has exactly four cards in hand.
+Lost Origin Cramorant ignores all Energy in its attack costs when its owner's Lost Zone contains at least four cards.
+Arceus Charizard's Battle Aura adds 10 pre-Weakness damage per living Benched Fire Pokémon to each Charizard attack.
+Mysterious Treasures Garchomp's Rainbow Scale adds 40 pre-Weakness damage when the opposing Active Pokémon's Weakness matches the selected shared Energy type. The engine does not model Special Energy cards.
+Noble Victories Chandelure's Cursed Shadow assigns three damage counters individually among opposing Pokémon while Chandelure is Active; each target is validated against Ability protection and recorded as a separate damage event.
+Plasma Freeze Cofagrigus can Knock Itself Out to distribute three damage counters among opposing Pokémon; assigned targets receive separate damage events.
+Cosmic Eclipse Stoutland's Arf Arf Bark discards one Energy from the opponent's shared pool when it evolves and when Active Stoutland is Knocked Out by an opponent's attack. Individual attached Energy is not modeled.
+Generations Froslass's Drag Along flips a coin when Active Froslass is Knocked Out by an opponent's attack; heads Knocks Out the attacker.
+Sun & Moon Pyukumuku places six damage counters on the attacking Pokémon when Active Pyukumuku is Knocked Out by an opponent's attack.
+Unseen Forces Poliwrath Confuses the attacking Pokémon when Active Poliwrath is Knocked Out by an opponent's attack.
+Paradox Rift Gourgeist and Hidden Fates Arbok discard up to two random cards from the attacking player's hand when Knocked Out by an opponent's attack.
+Silver Tempest Krookodile discards one random card from the opponent's hand when evolved and one from the attacking player's hand if Active Krookodile is Knocked Out.
+Plasma Storm Weezing discards three cards from the opponent's deck when Knocked Out by an opponent's attack. The generic Knockout deck-discard handling follows each card's printed count.
+Diamond & Pearl Rhyperior discards three cards from the opponent's deck when evolved; the evolution Ability matcher accepts named Pokémon text.
+Delta Species Flareon ex's Evolutionary Flame applies Burn and Confusion to the opposing Active Pokémon when it evolves from hand.
+Lost Origin and Crown Zenith Eelektrik flip a coin on evolution and Paralyze the opponent's Active Pokémon on heads.
+Sun & Moon Komala's Comatose makes Active Komala Asleep when Energy is attached from the hand.
+Journey Together Hop's Dubwool can switch an opposing Benched Pokémon into the Active Spot when it evolves from hand.
+Fusion Strike Butterfree applies Burn, Confusion, and Poison to the opponent's Active Pokémon when it evolves from hand.
+XY Black Star Promos Greninja prevents all attack effects, including damage, done to itself during the opponent's next turn when it evolves from hand.
+Lost Thunder Dustox applies Paralysis and Poison when it evolves from hand and raises the affected Pokémon's Poison checkup damage to 30 until its Special Conditions clear.
+Guardians Rising Salazzle applies Burn and Poison to the opposing Active Pokémon when it evolves from hand.
+Ruby & Sapphire and Power Keepers Combusken clear all Special Conditions after a Fire Energy charge, approximated as an attachment to Active Combusken because individual Energy attachments are not tracked.
+Ruby & Sapphire Grovyle and Marshtomp and Deoxys Lombre use the same Active Pokémon charge approximation for their matching Grass or Water Energy recovery Abilities.
+Supreme Victors Roserade C clears all Special Conditions after an Energy charge when Active; individual Energy targets are not tracked.
+Natural Cure and Water Veil wording that clears all Special Conditions on an Energy attachment also resolves when the holder is Active. Individual Energy targets are not tracked.
+Skyridge's named Flareon, Jolteon, and Vaporeon status recovery follows the same active charge approximation and checks the printed Energy type.
+Crown Zenith Radiant Charjabug puts two damage counters on the charging side's Active Pokémon V after either side charges Energy; this models the untracked attachment target as the Active Pokémon V.
+Lost Thunder Primarina's Harmonics increases a normal turn charge by one additional shared Energy while an unsuppressed Primarina is in play. Ability- and Trainer-sourced attachments remain outside this hand-charge approximation.
+Mysterious Treasures Crobat's evolution Ability lets the player choose an opposing Active Pokémon to Poison and increases its Poison Checkup damage to 20 until its Special Conditions clear.
+Mysterious Treasures Magmortar LV.X can use Torrid Wave while Active to Burn a chosen opposing Active Pokémon and increase its Burn Checkup damage to 30 until the condition clears.
+Mysterious Treasures Typhlosion's Firestarter adds one Fire Energy from its discard pile to the shared Energy pool once per turn, if Typhlosion has no Special Conditions and its side has a Benched Pokémon. The individual attachment target is not tracked.
+Mysterious Treasures Mesprit's Upper Material removes retreat costs from Uxie, Mesprit, and Azelf on both sides while its owner has Uxie and Azelf in play. The effect applies through the shared retreat-cost resolver and respects Ability suppression.
+Mysterious Treasures Ninetales can use its once-per-turn Power to copy every type of a chosen opposing Pokémon until the end of the turn. The temporary type override preserves multi-type Pokémon and is cleared when the turn ends; Special Conditions and Ability suppression prevent use.
+Mysterious Treasures Lumineon can switch an opposing Benched Pokémon with 100 or more maximum HP into the Active Spot once per turn. Lumineon must be Active and free of Special Conditions; Ability suppression also applies.
+Mysterious Treasures Unown M can flip once per turn while Active and switch a chosen opposing Benched Pokémon into the Active Spot on heads. The Power is blocked by any Special Condition and Ability suppression.
+Mysterious Treasures Unown T can discard one chosen card and flip once per turn while Active; heads places two damage counters on a chosen opposing Benched Pokémon. The card is discarded before the coin flip, and Special Conditions or Ability suppression prevent use.
+Mysterious Treasures Lucario LV.X can use its evolution Power to prevent all effects of attacks, including damage, during the opponent's next turn. Leaving the Active Spot ends this protection.
+Mysterious Treasures Unown I can search the deck for a Trainer card while Unown I, T, E, and M are on the Bench. The once-per-turn limit is shared across copies.
+Mysterious Treasures Slaking's Lazy Power flips once per turn while Active. Heads sets Lazy Blow's base damage to 130 for the turn; tails prevents attacks and retreat for that turn. Leaving the Active Spot ends the effect.
+Unified Minds Whimsicott searches for any card and adds it to hand when it evolves from hand.
+Fusion Strike Feraligatr flips on evolution, discarding five cards from the opponent's deck on heads or its controller's deck on tails.
+Secret Wonders Entei discards three cards from the opponent's deck after its attack Knocks Out an opposing Pokémon with damage.
+Legendary Collection Haunter's Transparency flips when attacked, preventing damage and attack effects on heads; it is inactive while Haunter has any Special Condition.
+Vivid Voltage Ninjask searches for Shedinja and puts it onto the Bench when it evolves from hand.
+Lost Thunder Ninjask can put a Shedinja from its discard pile onto the Bench as a Basic Pokémon when it evolves from hand.
+151 Gyarados discards the top five cards of its controller's deck when it evolves from hand; the evolution prompt requires the effect.
+Next Destinies Shiftry flips when it evolves and can shuffle a chosen opposing Pokémon and its Evolution cards into its owner's deck on heads. Individual attached cards are not tracked.
+Wizards Black Star Promos Mew is unaffected by attacks from evolved Pokémon while it is not Asleep, Confused, or Paralyzed. The attack resolver blocks damage and other effects, and Ability suppression disables the protection.
+Mysterious Treasures Blissey's Kind Egg returns up to the shared Energy count of chosen hand cards to the deck, shuffles, and draws the same number. It requires Happiny in its Evolution stack and no Special Condition.
+Mysterious Treasures Mr. Mime prevents attack damage while the opposing side has two or fewer shared Energy, approximating the card's individual attached-Energy check. Mime Jr. in its evolution stack upgrades this to full attack-effect prevention. Ability suppression disables both protections.
+Mysterious Treasures Uxie disables the exact attack that damaged it for the attacking Pokémon's next turn, even if that damage Knocks Uxie Out. The reactive Poké-Power triggers once per turn and respects Ability suppression.
+Mysterious Treasures Walrein's evolution Power flips two coins and discards the opponent's Active Pokémon plus its Evolution cards on two heads. The discard bypasses Knock Out and Prize handling; individual attached cards are not represented. PvP players choose whether to use it, while the PvE opponent uses it automatically.
+Secret Wonders Qwilfish's Balloon Sting triggers once per opponent's turn after Active Qwilfish takes attack damage, including a Knock Out. Heads applies Poison to the attacker and sets its Poison checkup damage to 20. Ability suppression is respected.
+Secret Wonders Weavile's Dark Engage temporarily changes all of its owner's Active Pokémon to Darkness type until the end of the turn, using the shared type-override resolver.
+Secret Wonders Muk's Toxic Sludge applies Poison to opposing Active Pokémon between turns while Grass is selected in the opposing shared Energy pool. This approximates the attached-Grass condition, skips targets already Poisoned, and respects status protection.
+Secret Wonders Suicune's Aqua Recovery returns up to three Water Pokémon from the discard pile to hand when Suicune is played from hand onto the Bench. The player activates the Power during that turn; NPC Suicune automatically recovers up to three. Ability suppression and once-per-turn use are enforced.
+HeartGold & SoulSilver—Unleashed Torkoal's Hot Snort flips when played from hand onto the Bench; heads Burns the opposing Active Pokémon.
+HeartGold & SoulSilver—Unleashed Floatzel's Water Acceleration adds one selected Water Energy to the shared Energy pool once per turn when Floatzel is free of Special Conditions.
+HeartGold & SoulSilver—Triumphant Unown removes all Special Conditions from its owner's Active Pokémon when played from hand onto the Bench.
+HeartGold & SoulSilver—Triumphant Celebi adds one selected Grass Energy to the shared Energy pool once per turn while Active and free of Special Conditions.
+Temporal Forces and Prismatic Evolutions Dudunsparce draws up to three cards once per turn, then returns itself and its Evolution cards to the shuffled deck if at least one card was drawn. Individual Energy attachments are not represented.
+Black & White—Next Destinies Musharna's Forewarn lets its player choose one of the top two cards of their deck for their hand and returns the other card to the top of the deck.
+Black & White—Dark Explorers Blissey's Softboiled flips once per turn; heads heals 30 damage from the Active Pokémon.
+Black & White—Dragons Exalted Ninjask's Cast-off Shell can search the deck for Shedinja when Ninjask evolves and put Shedinja onto the Bench as a Basic Pokémon.
+Black & White—Boundaries Crossed Audino's Busybody can be activated from hand once per turn to heal 10 damage and remove a Special Condition from the Active Pokémon, then discard Audino.
+Black & White—Plasma Storm Manaphy's Final Wish triggers when an opponent's attack Knocks it Out and draws one card as an approximation of searching the deck for any card.
+Black & White—Plasma Freeze Cofagrigus's Six Feet Under can Knock Out Cofagrigus to place three damage counters among opposing Pokémon.
+Platinum—Supreme Victors Magmortar's Evolutionary Flame can Burn and Confuse the opposing Active Pokémon when Magmortar evolves.
+Platinum—Arceus Froslass's Snow Gift searches any card from the deck when Froslass evolves. Gengar's Curse moves one damage counter between opposing Pokémon once per turn while Gengar is free of Special Conditions.
+Platinum—Rising Rivals Jirachi's Final Wish triggers when an opponent's attack Knocks it Out. It draws one random card as an approximation of searching for any card.
+HeartGold & SoulSilver Slowking can reorder the top three cards of either player's deck, Hypno can flip to put the Defending Pokémon Asleep, and Sunflora can search for a Grass Pokémon while free of Special Conditions.
+Sun & Moon Wishiwashi's Cowardice returns Wishiwashi from the Active or Bench area to its owner's hand without a Knock Out. It is unavailable on its owner's first turn and the turn Wishiwashi entered play; the owner must have another Pokémon in play. Individual attachments are not modeled, so the shared Energy pool is unchanged.
+
+Guardians Rising Wishiwashi can use Schooling once per turn to switch itself with Wishiwashi-GX from hand. Damage, Special Conditions, turn-in-play state, and modeled effects carry over; individual Energy attachments are not tracked, so the shared Energy pool stays unchanged. The PvE opponent uses the same effect.
+
+Burning Shadows Dusknoir can use Dark Invitation once per turn to reveal the opponent's hand, put a selected Basic Pokémon onto their Bench, and place 3 damage counters on it. Player, PvP, and NPC use are supported; if the counters Knock Out the Pokémon, it is discarded without attack Prize handling.
+
+Shining Legends Volcarona's Heat Cyclone forces the opposing Active Pokémon to switch with a Benched Pokémon once per turn. Marshadow's Let Loose also supports its on-Bench effect, shuffling both hands into their owners' decks and drawing up to four cards each.
+
+Crimson Invasion Karrablast's Shell On discards a Shelmet from hand, then evolves Karrablast with a legal Evolution card selected from the deck and shuffles afterward. It is supported in player and NPC battles without consuming the turn.
+
+Celestial Storm Sableye can inspect its owner's top card and choose whether to discard it once per turn. The card name is shown on the activation control; the opponent AI discards automatically when able.
+
+Celestial Storm Banette's Red Eyes lets its owner choose a Basic Pokémon from the opponent's discard pile and put it onto that opponent's Bench when Banette evolves. The player can decline the optional effect, and the NPC opponent chooses a legal Basic automatically.
+
+Dragon Majesty Flygon's Power of Alchemy prevents attack effects, but not damage, from opposing attacks to its owner's Dragon Pokémon while Flygon is in play. Ability suppression disables the protection.
+Lost Thunder Blissey's Happiness removes one Special Condition from the owner's Active Pokémon once per turn. PvE opponents now use the same recovery effect when their Active Pokémon is affected.
+Lost Thunder Naganadel can add one Basic Energy of the selected shared Energy type from the modeled discard pile to the shared Energy pool once per turn. Player and PvE resolution use the same shared-pool approximation; individual Energy attachments are not tracked.
+Lost Thunder Meganium can evolve a Basic Pokémon directly into a matching Stage 2 from hand once per turn, including on the first turn or the turn the Basic entered play. The Ability is blocked by suppression and its use is tracked on Meganium; a matching Stage 1/Stage 2 chain must be represented in the owner's hand, deck, or discard pile.
+Lost Thunder Ditto Prism can evolve into any Stage 1 card from hand once per turn after its first turn and not on the turn Ditto entered play. The Ability can only offer cards in hand and respects suppression and once-per-turn tracking.
+Team Pokémon HP auras now support typed auras such as Mega Rising Lilligant, all-board auras such as Journey Together Ludicolo, Team Plasma auras such as Plasma Freeze Umbreon, Eevee-evolution auras such as Majestic Dawn Espeon, and Platinum Shaymin LV.X's Grass aura that excludes Shaymin, alongside Flashfire Floette's wording. The aura updates board HP while preserving damage counters and respects suppression and printed non-stacking rules.
+Typed team-healing Abilities now accept Energy-symbol type names such as {W} in addition to spelled-out types. PvE opponents use the same generic single-target and all-matching-Pokémon healing effects, including Primarina's Water team heal.
+Lost Thunder Magcargo-GX's Crushing Charge discards the top card of its deck and adds a Basic Energy card to the shared Energy pool; other cards are discarded. Lapras's Go for a Swim reorders its top two deck cards; Mareep's Fluffy Pillow can Sleep the opponent's Active Pokémon while Mareep is Active; Zebstrika's Sprint discards its hand and draws four cards.
+The battle engine recalculates supported Ability HP bonuses while preserving damage. Self bonuses cover evolution, Active status and Bench count, named Pokémon in play, and Energy threshold or per-Energy text through the shared Energy pool. Existing team HP auras also cover typed, all-board, Team Plasma, Eevee-evolution, and Shaymin-excluding Grass scopes.
+Wormadam Plant Cloak's named Grass Energy threshold and Sabrina's Gastly's named Psychic per-Energy HP Ability are included; Sabrina's Ability remains active under its printed Special Condition exception.
+Fusion Strike Toxtricity applies a -30 HP aura to the opponent's Pokémon VMAX while its owner's board is entirely Fusion Strike; multiple copies stack and HP changes preserve damage.
+Supreme Victors Metagross's Gravitation reduces all Pokémon HP by 20 once across all copies; the aura is suppressed with its Ability and reconciles HP deltas without healing away prior damage.
+Cosmic Eclipse Vaporeon-GX's Vitality Cheer adds a single non-stacking 60 HP bonus to Pokémon-GX that evolve from Eevee.
+Brilliant Stars Shaymin VSTAR heals up to 120 damage from each damaged Benched Grass Pokémon, and Lost Origin Hisuian Goodra VSTAR heals all damage from itself. Both use the shared once-per-game VSTAR Power gate in PvE and PvP.
+Stellar Crown Dachsbun ex heals all damage from the owner's Evolution Pokémon when played to evolve; if at least one target heals, its Ability empties the shared Energy pool to model the printed attached-Energy discard.
+Temporal Forces Whimsicott heals all damage from the Active Grass Pokémon when it evolves; if damage is healed, it empties the shared Energy pool to model the printed Energy discard.
+Space-Time Smackdown Dusknoir can repeatedly move every damage counter from one of your damaged Pokémon to itself. Counter count is validated as the source's full damage total and normal Knock Out handling applies.
+Legend Maker Girafarig disables Poké-Powers of Active Basic Pokémon other than Pokémon-ex, and Platinum Dialga G LV.X disables Poké-Bodies of non-SP Pokémon. These locks are scoped by the stored Power/Body type.
+Crystal Guardians Sceptile ex δ disables Poké-Powers on Pokémon-ex and adds one Colorless unit to Pokémon-ex attack costs. Multiple Extra Liquid copies do not stack.
+HS—Undaunted Espeon copies attacks from your in-play Eeveelutions. Copied attacks preserve their Energy costs and resolve through the normal attack system.
+Legend Maker Mew ex copies attacks from all Pokémon in play, and Holon Phantoms Bellossom δ copies attacks from its named in-play family (Oddish, Gloom, Vileplume, Vileplume ex, and Bellossom). Their copied attacks retain the normal Energy requirements.
+XY Black Star Promos Ditto can copy the opposing Active Pokémon's attacks while Ditto is Active, retaining the copied attack's Energy cost.
+Great Encounters Unown [L] can copy attacks from any Unown in play on either side, retaining the copied attack's Energy cost.
+Space-Time Smackdown Regice prevents attack effects from opposing Pokémon; damage still applies.
+Temporal Forces Rabsca prevents damage and effects from opposing attacks to Benched Pokémon, without blocking damage from your own attacks.
+Temporal Forces Kecleon matches its type to attached Basic Energy using the selected shared Energy type; multiple attached types are not independently tracked.
+Cosmic Eclipse Jolteon's Speed Cheer reduces the Colorless attack cost of your in-play Pokémon-GX that evolve from Eevee by one. Ability suppression disables the reduction.
+Cosmic Eclipse Hakamo-o may evolve during the turn it was played when the opponent's Active Pokémon is Pokémon-GX or Pokémon-EX; this does not grant first-turn evolution.
+Destined Rivals Articuno's Repelling Veil prevents opposing attack effects on your Basic Team Rocket's Pokémon, while attack damage still applies. Ability suppression disables the protection.
+Paradox Rift Jirachi prevents damage counters from being placed on your Bench by opposing Basic Pokémon's attack effects. It does not prevent attack damage or other attack effects.
+Dragon Frontiers Cloyster δ prevents all damage and effects of opposing attacks to Benched Pokémon with δ in the card name. Ability suppression disables the protection.
+Rebel Clash Galarian Mr. Rime prevents attack effects except damage. The engine approximates the attached-Energy condition with a nonempty shared Energy pool and applies the shield to the board.
+Aquapolis Blissey — Softboiled: once per turn, choose a damaged Benched Pokémon and flip; heads heals 10 damage per Energy in the shared pool. Special Conditions prevent use. This approximates Energy attached to Blissey using the shared Energy pool.
+Aquapolis Togetic — Energy Present: once per turn, recycle a selected Basic Energy type from discard by spending one shared Energy and returning one matching Basic Energy card to the pool. Special Conditions prevent use; individual attached Energy and target Pokémon cannot be represented.
+Cosmic Eclipse Solgaleo — Armor of the Sunne: while Lunala is in play, Solgaleo and Lunala take 50 less attack damage after Weakness and Resistance. The effect is disabled by Ability suppression.
+30th Celebration Illumise — while Volbeat is in play, Weakness is ×3 for both Active Pokémon. Ability suppression disables the rule.
+Skyridge Machamp — prevents non-damage effects of the opponent's attacks from affecting Machamp.
+Nintendo Black Star Promos Articuno ex, Zapdos ex, and Moltres ex — each has zero retreat cost while the other two are in play on the same side.
+Supreme Victors Lunatone — Marvel Eyes prevents damage and effects from attacks used by Pokémon LV.X to your Lunatone and Solrock while Solrock is in play; Ability suppression disables the protection.
+Crystal Guardians Jirachi ex — Shield Beam and Super Psy Bolt cost one fewer Colorless Energy while the opponent has a Pokémon-ex or Stage 2 Pokémon in play. The reduction is capped at the attack's Colorless cost and is disabled by Ability suppression.
+Wisdom of Sea and Sky Typhlosion — Fire Breath Burns the opponent's Active Pokémon once per turn, from either the Active Spot or Bench. Status protections and Ability suppression still apply.
+Aquapolis Victreebel — once per turn, flip a coin; on heads, choose an opposing Benched Pokémon and switch it with the Defending Pokémon. Any Special Condition prevents use.
+Aquapolis Electrode — Buzzap: when Active and free of Special Conditions, flip once per turn; on heads, discard a Lightning Energy from discard and add one Lightning Energy to the shared pool.
+Aquapolis Azumarill — Frolic: once per turn from the Bench, flip; heads returns Azumarill and its Evolution cards to hand, tails leaves it in play. Player and NPC use are supported.
+Aquapolis Bellossom — flip once per turn; heads consumes a Basic Energy from hand and adds it to the shared pool. Requires a Benched Pokémon and no Special Condition; NPC use selects an available Energy automatically.
+Aquapolis Furret — return two chosen hand cards to the deck, search an Energy card into hand, then shuffle. Once per turn; Special Conditions block use. The player chooses the cost and target card; NPC Furret chooses automatically.
+Delta Reign Azurill — search an Energy card from deck and add it to the shared Energy pool, requiring a Benched Pokémon. This approximates its individual Bench attachment; NPC use chooses an Energy automatically.
+Magnezone (Forbidden Light/BREAKthrough) and Emboar (White Flare) — repeatable typed Energy-from-hand Powers consume the matching hand card and add one Energy to the shared pool per activation. NPCs choose an available matching Energy automatically.
+White Flare Mandibuzz — Dark Asset Search reveals the opponent's hand and puts one Basic Pokémon with 70 HP or less onto their Bench. Player, PvP, and NPC paths validate hand membership, capacity, Ability suppression, and once-per-turn use.
+Unbroken Bonds Gloom — once per turn, flip a coin; heads reveals the opponent's hand and puts a selected Basic Pokémon from it onto their Bench. The effect records heads/tails, validates Bench capacity and selection, and resolves for PvE and PvP from either board position.
+Diamond & Pearl Dusknoir — once per turn, shuffle one opposing Benched Pokémon and its Evolution cards into the opponent's deck if they have at least four Benched Pokémon. Its Power is blocked by Special Conditions and supported in player, PvP, and NPC paths.
+Deoxys Salamence — Rallying Cry sets friendly Pokémon other than Pokémon-ex and Baby Pokémon to free retreat. Dragon Frontiers Swellow δ — Retreat Aid sets friendly Stage 2 Pokémon-ex to free retreat. Both are passive and respect Ability suppression.
+Cosmic Eclipse Lanturn — repeatedly inspect the top card of the opponent's deck during the owner's turn; the peek is private and does not change deck order.
+Silver Tempest Rapidash — discard a Fire Energy from hand once per turn to boost all friendly Fire Pokémon attacks by 30 for the turn. PvE and PvP use the temporary attack-damage modifier.
+Vivid Voltage Alcremie — when evolved from hand, optionally have each player draw a card; PvE and PvP resolve both draws independently.
+Sandstorm Azurill and Wynaut — once per turn, evolve from Marill or Wobbuffet in hand and remove all damage counters from the baby Pokémon. Player and NPC evolution paths enforce hand membership and record the Power as used.
+Forbidden Light Abomasnow's evolution Ability supports attaching a Basic Grass Energy from discard, represented by one shared Energy gain when Grass is selected and pool capacity allows.
+Delta Reign Pawmot — once per turn, attach a Basic Lightning Energy from discard, represented as one shared Energy; both player and opponent paths validate the card, selected type, and pool cap.
+Journey Together Blaziken ex — once per turn, attach a Basic Energy from discard to a Pokémon, represented by one shared Energy; validates matching type, discard availability, and pool cap.
+Scarlet & Violet Quaquaval — once per turn, attach a Basic Energy from hand to a Pokémon; consumes the selected Energy card and adds one Energy to the shared pool.
+151/Paldean Fates Gloom, Vivid Voltage Trumbeak, Cosmic Eclipse Emboar, and 151/Paldean Fates Vileplume — on evolution, inspect the top 3 or 8 deck cards, remove matching Basic Energy cards into the shared Energy pool, then shuffle the rest of the deck.
+Unbroken Bonds Gengar — on evolution, place six damage counters on one opposing Pokémon-GX or Pokémon-EX; the target filter validates the card subtype in PvE and PvP.
+Skyridge Charizard, Ho-Oh, Golem, Crobat, Celebi, and Kabutops, plus Aquapolis Nidoking and Kingdra — matching Basic Energy attachment triggers a temporary type change through the shared Energy selection; it expires at the end of the turn.
+Paradox Rift Minior — Far-Flying Meteor may switch Minior from the Bench to the Active Spot after a hand Energy charge; resolved through the standard switch path.
+Secluded Springs Milotic — Healing Ripples heals up to 60 damage from a selected damaged Water Pokémon when Milotic evolves; target type, healing prevention, and Ability suppression are validated.
+Aquapolis and 30th Celebration Lugia — matching Basic Energy attachment temporarily changes Lugia's type to the attached Energy type, including the “same as that Energy card type” wording.
+Pitch Black Primarina — Enriching Melody heals all damage from one selected friendly Pokémon on evolution, with healing prevention and Ability suppression checks.
+White Flare Archeops — Ancient Wing returns the top Evolution card from one opposing evolved Pokémon to its owner's hand once per turn while Archeops is Active; devolution retains damage and Special Conditions.
+Secret Wonders/POP Series 7 Burmy Plant Cloak and Sandy Cloak — recover one matching Basic Energy from discard while Active, represented by one shared Energy and validated against the selected type and discard pile.
+Celestial Storm Rayquaza-GX — Stormy Winds discards the top three deck cards when played from hand onto the Bench and recovers a chosen Basic Energy from discard into the shared Energy pool. This approximates attachment to Rayquaza-GX because individual attachments are not modeled.
+Obsidian Flames Malamar's once-per-turn dual deck peek is supported in PvE and PvP. Both top cards are shown only to the activating player; NPC Malamar's inspection stays private.
+Lost Origin Clefairy's Moon-Watching Party grants one Psychic Energy per Benched Clefairy while Active, using the shared Energy pool as an attachment approximation.
+Obsidian Flames Decidueye ex — Total Freedom switches Decidueye with the Active Pokémon if it is Benched, or with a chosen Benched Pokémon if Active, once per turn in PvE and PvP.
+Silver Tempest Mawile VSTAR — Star Rondo switches Mawile from the Bench to Active, then brings a chosen opposing Benched Pokémon Active. It uses the once-per-game VSTAR limit; NPC Mawile targets the opposing Benched Pokémon with the least remaining HP.
+Noble Victories Eelektrik and Silver Tempest Trainer Gallery Flaaffy — Dynamotor consumes a Lightning Energy card from discard and adds one Lightning Energy to the shared pool when a Pokémon is Benched. The player and NPC implementations share this attachment approximation.
+Silver Tempest Klinklang — Triple Gears searches up to three Basic Energy from the deck when evolved from hand, adding Energy matching the currently selected type to the shared pool. Different Energy types and individual Pokémon attachments remain abstracted.
+Silver Tempest Regidrago VSTAR — Legacy Star discards the top seven cards and lets the player return up to two cards from discard to hand; uses the once-per-game VSTAR limit and a pending player choice in PvE/PvP. NPCs choose the two newest discarded cards.
+Silver Tempest Radiant Jirachi — the Active Pokémon's Knockout Ability adds up to three cards after an opponent's attack Knocks it Out. The engine approximates the search by taking the top cards and shuffling the remaining deck because the Knockout flow cannot pause for a selection.
+Silver Tempest Ho-Oh V — Reviving Flame returns Ho-Oh from discard to the Bench, adds up to four Basic Energy matching the shared Energy type from discard to the pool, and ends the turn. It can still return Ho-Oh when no Energy is recovered; individual attachments and mixed types are abstracted.
+Crown Zenith Rotom VSTAR — Conversion Star discards any chosen number of hand cards and draws the same number, once per game. PvE/PvP selections are explicit; NPC chooses up to hand/deck capacity.
+Crown Zenith and Celebrations Zacian V — Roar of the Sword finds a Basic Psychic Energy once per turn, adds one Psychic Energy to the shared pool, and ends the turn. Individual attachment targets are abstracted; player and NPC use are supported.
+Crown Zenith Zamazenta VSTAR — Shield Star reduces attack damage to its owner's Pokémon by 100 after Weakness and Resistance during the opponent's next turn and consumes the once-per-game VSTAR Power. Side-wide duration covers Pokémon entering play during that turn.
+Crown Zenith Galarian Gallery Latias — once per turn, consume a Basic Psychic Energy from hand and add one Psychic Energy to the shared pool while Latios is in play; the specific attachment is abstracted.
+Astral Radiance/Crown Zenith Galarian Gallery Magnezone — once per turn, inspect six deck cards, add Metal Energy among them to the shared pool up to the cap, and shuffle the remaining cards back. The engine takes the maximum it can attach because individual targets and the option to attach fewer are not modeled.
+Paradox Rift Skeledirge ex — discard a Basic Fire Energy from hand once per turn to increase all friendly attacks against the opponent's Active Pokémon by 60 for that turn, before Weakness and Resistance.
+Paradox Rift Porygon-Z — flip once per turn to add up to four Basic Energy of the selected type from discard to the shared pool on heads; on tails, discard one shared Energy when available. This approximates the per-Pokémon attachment.
+Paradox Rift Garganacl — once per turn, recover a Basic Fighting Energy from discard into the shared pool and heal 30 damage from a chosen friendly Pokémon. The Ability remains usable when all friendly Pokémon are at full HP; individual attachments are abstracted.
+Paradox Rift Milotic — optional Recover on evolution puts a Basic Pokémon from each discard pile onto its owner's Bench, opponent first. Player and NPC flows select the highest-HP legal Basic automatically; the player may decline.
+Surging Sparks Quaquaval — once per turn, the player selects a hand card to put on the deck bottom, then draws to five cards; NPC chooses its lowest-cost card.
+Wizards Black Star Promo Dragonite — Active-only Poké-Power draws a card and puts a chosen hand card on deck top; requires no Special Condition. NPC chooses its lowest-cost hand card.
+Paradox Rift Toedscruel — blocks an opponent's supported Ability effects from returning that opponent's discard pile to hand. Applies to Starmie, Suicune, discard-return, and evolution-recovery effects while Toedscruel is in play and unsuppressed.
+Mega Evolution Shuckle — once per turn, heal 30 from a chosen friendly Pokémon if Grass Energy is attached to Shuckle. The shared-pool model approximates this with selected Grass Energy and at least one Energy in the pool; individual attachments are unavailable.
+
+Paldean Wonders Arboliva — once per turn, heal 60 from a damaged Pokémon ex if it has Energy attached, then discard one shared Energy. The battle engine cannot represent which Energy is attached to which Pokémon or choose a random attached card, so the shared Energy pool is used for the requirement and discard.
+
+Delta Species Espeon δ — Delta Heal removes one damage counter from every damaged δ Pokémon once per turn. Special Conditions block the Power, and Delta Heal is tracked as a shared once-per-turn limit.
+
+XY Black Star Promos Shaymin-EX — once per turn, heals 20 damage from each damaged Benched Basic Pokémon. The healing resolver now filters for both Bench position and the Basic subtype.
+
+Plasma Storm Cherrim and Shining Legends Manaphy — once per turn, heal 20 damage from one Pokémon that has Grass or Water Energy attached, respectively. Since Energy attachments are represented as a shared pool, the matching shared Energy type and a nonempty pool approximate that target condition.
+
+Secret Wonders Quagsire — while Active, once per turn it heals 30 damage from itself if the opponent's Active Pokémon has Water Energy attached. The opponent's selected Water Energy type and nonempty shared pool approximate that attachment requirement.
+
+Cosmic Eclipse Igglybuff — once per turn, flip a coin to put the opponent's Active Pokémon to Sleep on heads. Using the Ability ends the turn on either result. It can be used while Igglybuff has Special Conditions; player and NPC turns both honor the turn end.
+
+DP Black Star Promos Garchomp C LV.X — Healing Breath heals all damage from the owner's Pokémon SP when it evolves onto Active Garchomp C. The catalog omits “C” from the ability text; the evolution-heal matcher accepts that source wording as well as the correctly named Supreme Victors printing.
+Phantasmal Flames Ludicolo's Cheerful Voice heals 60 damage from one of its owner's Pokémon once per turn while a Grass Mega Evolution Pokémon ex is in play. The condition and heal are validated in both PvE and PvP.
+Delta Reign Arboliva — Drive Off switches the opponent's Active Pokémon to the Bench once per turn; the opponent chooses its replacement. PvE/PvP supported.
+Fantastical Parade Swellow — Drive Off switches the opponent's Active Basic Pokémon to the Bench once per turn, with the opponent choosing the replacement. Swellow may be in the front row or Bench. PvE/PvP supported.
+Chilling Reign Hatterene — switches both players' Active Pokémon with a Benched Pokémon once per turn. PvE opponents choose their healthiest replacement; player-activated PvE/PvP use the existing switch action.
+Paldean Wonders Skeledirge — Inferno Dance discards one shared Fire Energy unit and gives Fire Pokémon's attacks +50 damage for the turn. Shared Energy approximates the attached Energy cost. PvE/PvP supported.
+Furious Fists Victreebel — once per turn, spend one shared Grass Energy unit to Confuse and Poison the opponent's Active Pokémon. This approximates discarding Energy attached to Victreebel because the engine stores Energy in a side-wide pool.
+Legends Awakened Gliscor LV.X — when played onto Active Gliscor, its evolution Ability can Paralyze and Poison the opponent's Active Pokémon. Player, PvP, and NPC paths use the existing evolution-triggered status resolver.
+Skyridge Wigglytuff — Good Neighbor flips once per turn from the Bench; heads heals up to 20 damage from each Pokémon in both front rows. Duplicate Wigglytuff copies share the turn limit. Player, PvP, and NPC battles are supported.
+Sword & Shield Zacian V — Intrepid Sword checks the top three deck cards, adds any Metal Energy cards to the shared Energy pool, puts the rest into hand, and ends the turn. Player, PvP, and NPC battles are supported; individual attachments are abstracted.
+Great Encounters and Celebrations: Classic Collection Claydol — Cosmic Power puts up to two selected hand cards on the bottom of the deck and draws to six once per turn, while Claydol is free of Special Conditions. The NPC chooses up to two cards automatically.
+Phantasmal Flames Toxtricity — Sinister Surge finds a Basic Darkness Energy, adds it to the shared pool, and places two damage counters on a Benched Darkness Pokémon once per turn. The player selects a target and the NPC chooses the healthiest eligible target; individual attachments are abstracted.
+Expedition Base Set Feraligatr — Major Tsunami switches the opponent's Active Pokémon with its healthiest eligible Benched Pokémon, then switches Feraligatr with a chosen Benched Pokémon if available. Once per turn while Feraligatr is Active and free of Special Conditions; supported in player, PvP, and NPC battles.
+Expedition Base Set Venusaur — its once-per-turn Energy attachment bonus adds one shared Energy unit to the normal Charge action. It works from either row, but is blocked by Special Conditions and opposing Ability suppression.
+DP Black Star Promo Toxicroak G and HS—Undaunted Umbreon — Active-only, once-per-turn coin-flip return Powers work while free of Special Conditions. Heads returns the Pokémon and its modeled Evolution cards to hand; tails leaves it Active. Player, PvP, and NPC battles are supported; individual attachments are not modeled.
+Ultra Prism Rotom forms — ignore all Energy in their own attack costs while at least nine Pokémon Tool cards are in the owner's discard pile. The shared attack-cost resolver applies this Ability in player, PvP, and NPC battle decisions.
+Team Up Incineroar-GX — Scar Charge puts 30 damage on Incineroar-GX and searches up to three Darkness Energy from the deck into the shared Energy pool. This approximates Energy attached to the Pokémon because individual attachments are not tracked. Player-triggered PvE/PvP and NPC turn automation are supported.
+Astral Radiance Hisuian Lilligant VSTAR — its once-per-game VSTAR Power searches up to five Grass Pokémon and Grass Energy cards into hand. Player/PvP selection is server-validated; NPC turns select eligible cards automatically.
+Delta Species Jolteon ex — its evolution Ability places one damage counter on each opposing Pokémon. Supported through the shared evolution damage-counter flow in player, PvP, and NPC battles.
+Unseen Forces Blissey ex and HeartGold & SoulSilver Blissey — their evolution Abilities heal all damage from the owner's damaged Pokémon. If damage is healed, the shared Energy pool is discarded as an approximation of discarding Energy attached to the healed Pokémon.
+Chaos Rising Phantump — Natural Cure permits evolution from a matching hand card after the first turn, outside the normal evolution window, and then puts two damage counters on the evolved Pokémon. The option is omitted when the counters would Knock it Out.
+Deoxys and Celestial Storm Solrock — set each friendly Lunatone's maximum HP to 80 and 130, respectively. The HP aura preserves damage counters and uses normal Knock Out handling when the maximum falls.
+Cosmic Eclipse Floette and Florges — their evolution Abilities reveal and shuffle one or two random cards from the opponent's hand into that opponent's modeled deck.
+Evolving Skies Skiploom and McDonald's Collection 2018/Sun & Moon Eevee — attaching Energy from hand can search the deck for an evolution and evolve in place; Eevee requires a Basic Energy and a matching evolution type. The normal evolution rules and state transfer apply, and the deck is shuffled afterward.
+Cosmic Eclipse Venusaur & Snivy-GX — when Active, a Grass Energy attachment from hand can switch the opposing Benched Pokémon with the least HP into the Active Spot. Ability suppression and its once-per-turn limit are checked.
+Temporal Forces Feraligatr — Torrential Heart can put five damage counters on Feraligatr to boost its attacks by 120 against the opponent's Active Pokémon for the turn. It is once per turn and blocked when the self-damage would Knock Feraligatr Out.
+Destined Rivals Misty's Psyduck — Flustered Leap discards the bottom card of its owner's deck and returns Psyduck from the Bench to the top of that deck once per turn. It requires a nonempty deck; the opponent AI uses it when Psyduck is damaged.
+Mega Evolution Ninjask — the evolution Ability searches for Shedinja and offers it for the Bench as a Basic Pokémon. The owner's deck is shuffled after selection.
+MEP Psyduck and Golduck — their passive effect suppresses both players' Abilities that require their own Pokémon to be Knocked Out, using the shared self-Knockout suppression path.
+Unseen Forces Feraligatr ex — while Active, suppresses Poké-Powers and Poké-Bodies on both sides' Pokémon-exempt Pokémon. The shared resolver checks its Active condition and whether its own Ability is suppressed.
+Ascended Heroes Dustox — once per turn while Active, flips a coin; heads removes one shared Energy unit from the opponent to approximate returning an attached Energy from their Active Pokémon to hand. Player/NPC Ability flow supported.
+Dragon Frontiers and Celebrations Gardevoir ex δ — once per turn while Active and free of Special Conditions, places a persistent Imprison marker on one opposing Pokémon, suppressing its Poké-Powers and Poké-Bodies while it remains in play. NPC selects the target with the most Abilities.
+Destined Rivals Team Rocket's Arbok — while Active, prevents the opponent from playing Pokémon with Abilities from hand, except Team Rocket's Pokémon. The rule is validated for player and PvP hand-play actions.
+Journey Together Noivern — Tuning Echo ignores all Energy in the cost of Frightening Howl when both players have equal hand sizes. Shared attack-cost resolution supports both players.
+Twilight Masquerade / SVP Thwackey — Festival Lead searches one card from the modeled deck into hand once per turn while the Active Pokémon has an unsuppressed Festival Lead Ability. Supported in PvE, PvP, and NPC battles.
+Perfect Order Vivillon — once per turn, puts the opponent's hand on the bottom of their deck; if any cards were returned, they draw up to four. Uses the shared Kingdra hand-bottoming flow in PvE, PvP, and NPC battles.
+Power Keepers Absol ex — Cursed Eyes moves up to three damage counters from one opposing Pokémon to another when played from hand to the Bench. The trigger timing is enforced for player, PvP, and NPC resolution.
+30th Celebration and MEP Moltres, Zapdos, and Articuno — once per turn, with the other two birds in play, add one matching Fire, Lightning, or Water Energy unit to the shared pool. The source bird receives it; player, PvP, and NPC flows are supported.
+Guardians Rising, Hidden Fates, and SM Black Star Promo Tapu Koko-GX — Aero Trail switches it from the Bench to the Active Spot when played from hand if Lightning Energy is selected and available. Individual Pokémon Energy attachments are not tracked, so the transfer itself is represented by the type and pool-availability check only.
+Paldea Evolved Palafin — Zero to Hero can replace Palafin with a Palafin ex from the deck after Palafin retreats from the Active Spot. Palafin ex is blocked from ordinary hand evolution. The swap retains damage and supported in-play effects, puts Palafin back into the deck, and shuffles; Special Conditions are cleared by the retreat path before the Ability resolves.
+Celestial Storm and SM Black Star Promo Manectric — Electric Start allows Manectric to be selected from hand as an opening front-row Pokémon when its owner goes second. The setup picker supports the front-row placement; its alternate Bench placement is not modeled.
+Paldea Evolved and Paldean Fates Weavile — Dark Cut can switch an opposing Benched Basic Pokémon into the Active Spot after Weavile moves from the Bench to the Active Spot by retreating. The player action checks the retreat event and target subtype.
+Crown Zenith Radiant Eternatus — Cast-Off Shell searches up to two Pokémon VMAX from the deck directly onto open Bench slots when played from hand onto the Bench, shuffles the deck, and ends the turn. Player, PvP, and NPC handling is supported.
+Team Magma vs Team Aqua Cradily ex — while Active, prevents the opponent from evolving their Active Pokémon from hand. The shared evolution option resolver enforces this restriction for player, PvP, and NPC evolution attempts.
+Power Keepers Kabutops and Skyridge Omastar — while Active, prevent the opponent from evolving their Active Pokémon from hand. These variants use the same server-validated evolution lock.
+Wizards Black Star Promo Venusaur — Pure Body clears Asleep, Confused, Paralyzed, and Poisoned from both Active Pokémon once per turn, while unavailable if Venusaur itself is Asleep, Confused, or Paralyzed. Player, PvP, and NPC handling is supported.
+Power Keepers Metagross ex — once per turn while Active and free of Special Conditions, shuffles both players' hands into their decks, then has each draw up to four cards. Supported in player, PvP, and NPC battles.
+Delta Species Metagross — once per turn while free of Special Conditions, selects one of the top four deck cards for hand and puts the rest on the bottom. Player choice and NPC resolution are supported.
+151 / Paldean Fates Ditto — Transform searches the deck for a Basic Pokémon other than Ditto during the owner's first turn while Ditto is Active, replaces Ditto with the chosen Pokémon, discards Ditto, and shuffles the deck. Supported in player, PvP, and NPC battles.
+
+Yanmega ex — Buzzing Boost searches up to three Basic Grass Energy when it moves from the Bench to the Active Spot. The deck search, switch trigger, shared pool cap, and Grass selection are supported in player, PvP, and NPC handling. Since this battle mode tracks Energy in a shared pool, the attachment to Yanmega is approximated by adding those units to that pool.
+
+Phantasmal Flames and MEP Oricorio ex — Fire Dance can repeatedly add Basic Fire Energy from hand to the shared pool while a Fire Mega Evolution Pokémon ex is in play and the owner has a Benched Fire Pokémon. The Ability validates its condition and hand Energy; per-Pokémon Energy attachments are approximated by the shared pool.
+
+Serperior, Meganium, Sceptile, Gardevoir, Galarian Weezing, Charizard, and Venusaur Energy-doubling Abilities reduce effective attack Energy cost when the selected shared Energy type and attacking Pokémon meet the printed type conditions. This approximates attached Energy with the shared pool; Meganium's Neo Genesis Poké-Body also respects its Special Condition restriction.
+
+Ascended Heroes and Destined Rivals Ethan's Ho-Oh ex — Golden Flame consumes up to two Basic Fire Energy cards from hand once per turn when a Benched Ethan's Pokémon is available, adding matching units to the shared Energy pool up to its cap. Individual Pokémon Energy attachments remain approximated by the pool.
+
+Expedition Base Set Typhlosion — Evolutionary Thunder searches one Fire Energy when the opponent has more Energy in the shared pool and Typhlosion has no Special Condition. Adds one unit to the pool to approximate attachment to a Benched Pokémon; player, PvP, and NPC behavior is supported.
+
+Surging Sparks Magneton — once per turn, recovers up to three Basic Lightning Energy from the discard pile to the shared pool when a Lightning Pokémon is in play, then Knocks itself Out. Individual Energy attachment targets are approximated by the shared pool.
+
+Plasma Freeze Metagross — Plasma Search searches for one card with the Team Plasma subtype and puts it into hand. A shared Ability-use key enforces the limit across copies for player, PvP, and NPC turns.
+
+Pitch Black Rampardos ex — once per turn while Active, flips a coin; heads discards one unit from the opponent's shared Energy pool to approximate discarding Energy from the opposing Active Pokémon. Player, PvP, and NPC flows support it.
+
+Astral Radiance Hisuian Typhlosion — Supernatural Orb discards a Psychic Energy card from hand once per turn to Burn and Confuse the opposing Active Pokémon; player, PvP, and NPC flows support it.
+
+
+Phantom Forces / XY Black Star Promos Bronzong — Metal Links recovers one Metal Energy from the discard pile once per turn for a Benched Pokémon, represented in the shared Energy pool.
+
+Great Encounters Slowking — searches for any one card once per turn after one of its Pokémon was Knocked Out during the opponent's last turn; cannot use the Ability while affected by a Special Condition.
+
+
+Holon Phantoms Aerodactyl δ — searches for a Basic Energy once per turn while free of Special Conditions.
+
+Deoxys Magcargo — searches for any card and places it on top of the deck once per turn while free of Special Conditions.
+
+Legendary Collection Dark Dragonair — Active-only search for an Evolution card while free of Special Conditions.
+
+Burning Shadows Ribombee — searches for up to two Basic Energy cards into hand once per turn.
+Perfect Order Aromatisse — its up-to-two Basic Psychic Energy deck search adds up to two Psychic Energy to the shared pool, subject to the format cap. Player, PvP, and NPC use is limited once per turn.
+Evolving Skies Eldegoss — Cotton Lift adds up to two generic Energy to the shared pool, subject to the format cap and once-per-turn use in player, PvP, and NPC battles.
+30th Celebration Solgaleo — its Bench-only search for up to two Basic Metal Energy adds up to two Metal Energy to the shared pool, subject to pool capacity and once-per-turn use in player, PvP, and NPC battles.
+30th Celebration Vivillon — Guiding Dance flips once per turn; heads searches for one Pokémon and adds it to hand. Player, PvP, and NPC flows record the flip and only move a Pokémon on heads.
+30th Celebration: Classic Collection Greninja BREAK — Giant Water Shuriken spends one selected Water Energy from the shared pool, while Active, to place six damage counters on a chosen opposing Pokémon. Player, PvP, and NPC battle flows enforce the cost and Active condition.
+
+Neo Discovery Unown [E] — when played from hand, its owner may shuffle their hand into their Pokémon deck and draw up to four cards. Player and PvP flows support the owner's optional effect; the opponent-side choice is omitted because no opponent decision prompt exists. Trainer searches and recovery remain unsupported in Pokémon-only battle decks.
+Aquapolis Wobbuffet — Mirror Coat reflects Poison or Burn from an opposing attack back to its attacker during the opponent's turn, subject to Ability suppression and status protections.
+SM Black Star Promo Greninja-GX and Vivid Voltage Beedrill — when the Pokémon is the only card in hand, play it onto the Bench and draw up to three cards. Player, PvP, and NPC flows enforce Bench access and existing suppression rules.
+Power Keepers Claydol ex — temporary Fighting type; POP Series 9 Rotom — temporary Psychic type; Dragon Frontiers Salamence ex δ — temporary Fire type. All three use the manual type-change Power path across player, PvP, and NPC battles.
+POP Series 5 Espeon ★ — its optional Bench-entry Power Confuses both Active Pokémon. Player, PvP, and NPC flows respect status protection and Ability-effect protection.
+Burning Shadows Ribombee — Honey Gather adds up to two selected-type Energy to the shared pool from the Bench. Energy search is represented as pool Energy because deck and hand state contains no Energy cards.
+Evolving Skies Galarian Articuno, Galarian Zapdos, and Galarian Moltres — their optional Bench-entry Powers add up to two Psychic, Fighting, or Darkness Energy, respectively, to the shared pool.
+Delta Reign Nidoqueen — Maternal Call flips once per turn to bring an opposing Benched Pokémon into the Active Spot. The NPC chooses the opponent's highest-HP Benched Pokémon.
+Delta Reign Jellicent — Deep Sea Draw draws one card, then lets its owner optionally put a card from hand on the bottom of the deck. NPC battles resolve the optional choice automatically.
+Perfect Order Talonflame — Sky Hunt flips once per turn and discards a random card from the opponent's hand on heads. Player, PvP, and NPC battles record the coin flip and discard the Pokémon card.
+Fusion Strike Inteleon VMAX — spend one shared Water Energy to put two damage counters on each of two opposing Benched Pokémon. The hand Energy cost is represented by the shared pool; player, PvP, and NPC flows use the same two-target rule.

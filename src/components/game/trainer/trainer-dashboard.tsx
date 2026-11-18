@@ -66,8 +66,6 @@ import {
   type TrainerSection,
 } from './trainer-sections'
 
-type DeckFormat = 'baby' | 'champions' | 'masters'
-
 export function TrainerDashboard({
   initialSection = 'profile',
 }: {
@@ -91,7 +89,6 @@ export function TrainerDashboard({
   const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
   const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries)
   const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
-  const [deckFormat, setDeckFormat] = useState<DeckFormat>('baby')
   const trainerBanner =
     getBanner(user?.banner || 'lab')?.imagePath || '/backgrounds/lab.avif'
   const trainerIcon = getIcon(user?.icon || 'ditto')?.icon || {
@@ -166,8 +163,6 @@ export function TrainerDashboard({
             component: (
               <LazyWrapper>
                 <TcgDecksPanel
-                  deckFormat={deckFormat}
-                  setDeckFormat={setDeckFormat}
                   selectedGeneration={deckGeneration}
                   setSelectedGeneration={setDeckGeneration}
                 />
@@ -285,24 +280,6 @@ export function TrainerDashboard({
                   }))}
                 />
               </div>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(['baby', 'champions', 'masters'] as const).map((format) => (
-                  <button
-                    key={format}
-                    type="button"
-                    aria-pressed={deckFormat === format}
-                    onClick={() => setDeckFormat(format)}
-                    className={cn(
-                      'game-focus-ring min-h-10 rounded-md border text-[11px] font-bold capitalize',
-                      deckFormat === format
-                        ? 'border-game-charcoal/45 bg-game-charcoal/8 text-game-charcoal-strong'
-                        : 'border-game-border bg-game-surface text-game-muted',
-                    )}
-                  >
-                    {format}
-                  </button>
-                ))}
-              </div>
             </div>
           )}
         </aside>
@@ -324,27 +301,6 @@ export function TrainerDashboard({
               }))}
             />
           )}
-          {activeTab === 'decks' && (
-            <div className="grid grid-cols-3 gap-2">
-              {(['baby', 'champions', 'masters'] as const).map((format) => (
-                <button
-                  key={format}
-                  type="button"
-                  aria-pressed={deckFormat === format}
-                  onClick={() => setDeckFormat(format)}
-                  className={cn(
-                    'game-focus-ring h-10 rounded-md border text-xs font-bold capitalize transition-colors',
-                    deckFormat === format
-                      ? 'border-game-charcoal/45 bg-game-charcoal/8 text-game-charcoal-strong'
-                      : 'border-game-border bg-game-surface text-game-muted',
-                  )}
-                >
-                  {format}
-                </button>
-              ))}
-            </div>
-          )}
-
           <ScenicChoiceCard
             background={trainerBanner}
             title={user?.trainerName || 'Trainer'}

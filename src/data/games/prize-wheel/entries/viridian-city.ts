@@ -303,14 +303,8 @@ export const viridianCitychanseyEntries: PrizeWheelGameConfig[] = [
     subCategory: 'Viridian City',
     background: '/backgrounds/chansey.avif',
     icon: { type: 'pokemon', id: '113' },
-    daily: true,
     requirements: [
       { type: 'task_completed', targetId: 'explore-viridian' },
-      {
-        type: 'daily_not_completed',
-        targetId: 'chansey-wheel-viridian',
-        count: 5,
-      },
     ],
     criteria: [],
     rewards: [],
@@ -319,7 +313,7 @@ export const viridianCitychanseyEntries: PrizeWheelGameConfig[] = [
       background: '/scratchcard/chansey.avif',
       themeColour: '#FAC0CC', // ChanseyPink
       showSlotLabels: false,
-      cost: { amount: 2, currencyType: 'league-ticket' },
+      cost: { amount: 3, currencyType: 'league-ticket' },
       slots,
     },
   },

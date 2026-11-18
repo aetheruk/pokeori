@@ -406,7 +406,6 @@ export interface GameSettings {
   previewSeconds?: number
   pointsPerCorrect?: number
   // TCG Battle specific
-  deckFormat?: import('@/utilities/tcg/tcg-battle').TcgBattleDeckFormat
   requiredSeries?: string
   opponentDeckCardIds?: string[]
   opponentEnergyType?: import('@/utilities/tcg/tcg-battle').TcgBattleEnergyType

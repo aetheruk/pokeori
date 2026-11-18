@@ -1370,7 +1370,6 @@ export const settingsByGameType: Record<string, z.ZodTypeAny> = {
     .passthrough(),
   'tcg-battle': z
     .object({
-      deckFormat: z.enum(['baby', 'champions', 'masters']),
       requiredSeries: z.string().min(1),
       battleMode: z.enum(['pve', 'pvp']).optional(),
       matchmakingModes: z.array(z.enum(['friendly', 'quick'])).min(1).optional(),

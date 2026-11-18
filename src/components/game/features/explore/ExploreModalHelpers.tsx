@@ -54,7 +54,6 @@ import {
   getTaskProgress,
   isPokemonEligible,
 } from '@/utilities/tasks/task-logic'
-import { TCG_BATTLE_FORMATS } from '@/utilities/tcg/tcg-battle'
 import {
   getExpeditionDisplayName,
   getTypeIcon,
@@ -827,20 +826,6 @@ export function getFormattedStats(
       })
       if (isTcgBattle) {
         const settings = selectedItem.originalData?.settings
-        const deckFormat = settings?.deckFormat as
-          | keyof typeof TCG_BATTLE_FORMATS
-          | undefined
-        const deckLevel = deckFormat
-          ? TCG_BATTLE_FORMATS[deckFormat]?.label || deckFormat
-          : undefined
-
-        if (deckLevel) {
-          stats.push({
-            label: 'Deck Level',
-            value: deckLevel,
-            icon: <BarChart />,
-          })
-        }
         if (settings?.requiredSeries) {
           stats.push({
             label: 'Format',

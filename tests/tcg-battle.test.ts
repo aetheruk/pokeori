@@ -244,7 +244,7 @@ describe('TCG battle utilities', () => {
     const state = makeBattleState({
       turnNumber: 10,
       player: makeBattleSide(player, 5),
-      opponent: makeBattleSide(basic, 5, { deck: [evolution] }),
+      opponent: makeBattleSide(basic, 5, { hand: [evolution] }),
     })
 
     expect(chooseOpponentTcgBattleAction(state).kind).toBe('evolve')
@@ -285,36 +285,20 @@ describe('TCG battle utilities', () => {
     expect(JSON.stringify(state)).toBe(before)
   })
 
-  test('auto-fill builds valid, evolvable decks within each format cost cap', async () => {
+  test('auto-fill builds valid, evolvable decks within the shared cost cap', async () => {
     const collection = Object.fromEntries(
       getAllTcgCards().map((card) => [card.id, 1]),
     )
-    const [baby, champions, masters] = await Promise.all(
-      (['baby', 'champions', 'masters'] as const).map((format) =>
-        autoBuildTcgBattleDeck(collection, format),
-      ),
-    )
+    const result = await autoBuildTcgBattleDeck(collection)
 
-    expect(baby.valid).toBe(true)
-    expect(champions.valid).toBe(true)
-    expect(masters.valid).toBe(true)
-    expect(baby.cards).toHaveLength(15)
-    expect(champions.cards).toHaveLength(15)
-    expect(masters.cards).toHaveLength(15)
-    for (const [format, result] of [
-      ['baby', baby],
-      ['champions', champions],
-      ['masters', masters],
-    ] as const) {
-      expect(result.totalCost).toBeLessThanOrEqual(
-        TCG_BATTLE_FORMATS[format].deckCostLimit,
-      )
-      expect(getTcgBattleDeckLineErrors(result.cards)).toEqual([])
-      expect(result.cards.some((card) => card.subtypes.includes('Stage 1') || card.subtypes.includes('Stage 2'))).toBe(true)
-    }
+    expect(result.valid).toBe(true)
+    expect(result.cards).toHaveLength(15)
+    expect(result.totalCost).toBeLessThanOrEqual(TCG_BATTLE_FORMATS.standard.deckCostLimit)
+    expect(getTcgBattleDeckLineErrors(result.cards)).toEqual([])
+    expect(result.cards.some((card) => card.subtypes.includes('Stage 1') || card.subtypes.includes('Stage 2'))).toBe(true)
   })
 
-  test('requires six Basics and enough matching cards for every evolution', () => {
+  test('requires one Basic and enough matching cards for every evolution', () => {
     const basics = Array.from({ length: 6 }, (_, index) => ({
       ...makeBattleCard(`basic-${index}`, 1),
       name: `Basic ${index}`,
@@ -335,14 +319,8 @@ describe('TCG battle utilities', () => {
     const legalDeck = [...basics.slice(0, 5), pikachu, raichu, ...basics.slice(5)]
 
     expect(getTcgBattleDeckLineErrors(legalDeck)).toEqual([])
-    expect(
-      getTcgBattleDeckLineErrors([
-        ...basics.slice(0, 4),
-        pikachu,
-        raichu,
-      ]),
-    ).toContain(
-      'Deck must include at least 6 Basic Pokémon for the opening line-up.',
+    expect(getTcgBattleDeckLineErrors([raichu])).toContain(
+      'Deck must include at least 1 Basic Pokémon for the opening hand.',
     )
     expect(
       getTcgBattleDeckLineErrors([
@@ -392,8 +370,11 @@ describe('TCG battle utilities', () => {
 
     const activePikachu = { ...pikachu, instanceId: 'pikachu-active' }
     const stage1Side: TcgBattleSideState = {
-      deck: [raichu, raichuPrime],
-      hand: [],
+      deck: [],
+      hand: [raichu, raichuPrime].map((card, index) => ({
+        ...card,
+        instanceId: `evolution-${index}`,
+      })),
       front: [activePikachu],
       back: [],
       discard: [],
@@ -416,7 +397,7 @@ describe('TCG battle utilities', () => {
       statusConditions: undefined,
     })
     expect(firstEvolution?.target.evolutionStack?.map((card) => card.name)).toEqual(['Pikachu'])
-    expect(stage1Side.deck.map((card) => card.id)).toEqual([raichuPrime.id])
+    expect(stage1Side.hand.map((card) => card.id)).toEqual([raichuPrime.id])
     expect(getTcgBattleEvolutionOptions(stage1Side, 4)).toHaveLength(0)
     expect(getTcgBattleEvolutionOptions(stage1Side, 5)).toHaveLength(1)
 
@@ -1261,7 +1242,6 @@ describe('TCG battle utilities', () => {
       const validation = await validateTcgBattleDeck(
         cardIds,
         Object.fromEntries(cardIds.map((cardId) => [cardId, 1])),
-        game.settings.deckFormat,
       )
       expect(validation.valid, `${game.id}: ${validation.errors.join(' ')}`).toBe(true)
     }
@@ -1283,7 +1263,7 @@ describe('TCG battle utilities', () => {
     }
   })
 
-  test('rejects decks over the format cost cap', async () => {
+  test('rejects decks over the shared 60-point cost cap', async () => {
     const cardIds = [
       'base1-4',
       'base1-2',
@@ -1302,10 +1282,10 @@ describe('TCG battle utilities', () => {
       'pgo-58',
     ]
     const collection = Object.fromEntries(cardIds.map((cardId) => [cardId, 1]))
-    const result = await validateTcgBattleDeck(cardIds, collection, 'baby')
+    const result = await validateTcgBattleDeck(cardIds, collection)
 
     expect(result.valid).toBe(false)
-    expect(result.totalCost).toBeGreaterThan(TCG_BATTLE_FORMATS.baby.deckCostLimit)
+    expect(result.totalCost).toBeGreaterThan(TCG_BATTLE_FORMATS.standard.deckCostLimit)
   })
 
   test('ramps attack energy caps by turn bands', () => {

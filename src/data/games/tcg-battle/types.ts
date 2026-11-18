@@ -1,8 +1,7 @@
 import type { BaseGameConfig } from '../shared'
-import type { TcgBattleDeckFormat, TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
+import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
 
 interface BaseTcgBattleGameSettings {
-  deckFormat: TcgBattleDeckFormat
   requiredSeries: string
   themeColour?: string
 }

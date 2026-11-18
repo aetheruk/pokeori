@@ -19,34 +19,23 @@ import {
   type TcgBattleEnergyType,
 } from '@/utilities/tcg/tcg-battle'
 
-export type DeckFormat = 'baby' | 'champions' | 'masters'
 type DeckEntry = { cards: string[]; energy?: TcgBattleEnergyType }
 
 type DeckValidation = { valid: boolean; errors: string[]; totalCost: number }
 
-const DECK_FORMATS: { id: DeckFormat; label: string; cap: number }[] = [
-  { id: 'baby', label: 'Baby', cap: 30 },
-  { id: 'champions', label: 'Champions', cap: 55 },
-  { id: 'masters', label: 'Masters', cap: 85 },
-]
-
 export function TcgDecksPanel({
-  deckFormat,
-  setDeckFormat,
   selectedGeneration,
   setSelectedGeneration,
 }: {
-  deckFormat: DeckFormat
-  setDeckFormat: (format: DeckFormat) => void
   selectedGeneration: string
   setSelectedGeneration: (generation: string) => void
 }) {
   const { gameData } = useUser()
   const [generationDecks, setGenerationDecks] = useState<
-    Record<string, Partial<Record<DeckFormat, DeckEntry>>>
+    Record<string, DeckEntry>
   >({})
   const [deckValidation, setDeckValidation] = useState<
-    Record<string, Record<DeckFormat, DeckValidation>>
+    Record<string, DeckValidation>
   >({})
   const [deckMessage, setDeckMessage] = useState('')
   const [deckBusy, setDeckBusy] = useState(false)
@@ -90,12 +79,10 @@ export function TcgDecksPanel({
         return
       }
       setGenerationDecks(result.generationDecks || {})
-      setDeckValidation(
-        (result.validation || {}) as Record<
-          string,
-          Record<DeckFormat, DeckValidation>
-        >,
-      )
+      setDeckValidation(result.validation || {})
+      if (result.resetLegacyDecks) {
+        setDeckMessage('Old decks cleared. Build one new 15-card deck for each series.')
+      }
       if (
         !selectedGeneration &&
         result.generations &&
@@ -109,12 +96,11 @@ export function TcgDecksPanel({
     }
   }, [gameData, hasDeckBox, selectedGeneration])
 
-  const activeDecks = generationDecks[selectedGeneration] || {}
-  const activeDeckEntry = activeDecks[deckFormat]
+  const activeDeckEntry = generationDecks[selectedGeneration]
   const activeDeck = activeDeckEntry?.cards || []
   const activeDeckKey = activeDeck.join(',')
   const activeEnergy = activeDeckEntry?.energy || ''
-  const activeValidation = deckValidation[selectedGeneration]?.[deckFormat]
+  const activeValidation = deckValidation[selectedGeneration]
   useEffect(() => {
     if (activeDeck.length === 0) {
       setCardsById(new Map())
@@ -155,7 +141,7 @@ export function TcgDecksPanel({
     }
     return activeValidation?.totalCost || 0
   }, [activeDeck, activeValidation?.totalCost, cardsById])
-  const activeFormat = DECK_FORMATS.find((format) => format.id === deckFormat)
+  const costLimit = 60
   const energyOptions = useMemo(
     () =>
       [
@@ -180,7 +166,6 @@ export function TcgDecksPanel({
     setDeckMessage('')
     const result = await saveTcgDeck(
       selectedGeneration,
-      deckFormat,
       activeDeck,
       activeEnergy || null,
     )
@@ -197,7 +182,7 @@ export function TcgDecksPanel({
     if (!selectedGeneration) return
     setDeckBusy(true)
     setDeckMessage('')
-    const result = await autoBuildTcgDeck(selectedGeneration, deckFormat)
+    const result = await autoBuildTcgDeck(selectedGeneration)
     setDeckBusy(false)
     if (result.ok) {
       setGenerationDecks(result.generationDecks || {})
@@ -214,12 +199,7 @@ export function TcgDecksPanel({
       ...current,
       [selectedGeneration]: {
         ...(current[selectedGeneration] || {}),
-        [deckFormat]: {
-          cards: (
-            current[selectedGeneration]?.[deckFormat]?.cards || []
-          ).filter((id) => id !== cardId),
-          energy: current[selectedGeneration]?.[deckFormat]?.energy,
-        },
+        cards: (current[selectedGeneration]?.cards || []).filter((id) => id !== cardId),
       },
     }))
   }
@@ -231,35 +211,31 @@ export function TcgDecksPanel({
       <div className="game-paper-background space-y-4 rounded-xl border border-game-border bg-game-surface p-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-game-border bg-game-surface-raised px-3 py-2">
           <span className="text-sm font-semibold text-game-ink">
-            {activeFormat?.label} Deck
+            {selectedGeneration} Deck
           </span>
           <span className="text-xs font-bold uppercase tracking-[0.12em] text-game-muted">
-            Deck cost{' '}
+            {activeDeck.length}/15 cards · Cost{' '}
             <span
               className={
-                activeCost > (activeFormat?.cap || 0)
+                activeCost > costLimit
                   ? 'text-game-danger'
                   : 'text-game-moss-strong'
               }
             >
-              {activeCost}/{activeFormat?.cap}
+              {activeCost}/{costLimit}
             </span>
           </span>
         </div>
         <PremiumSelect
-          label="Battle Energy Card (Activates Turn 15)"
+          label="Turn 15 Energy Type"
           value={activeEnergy}
           onValueChange={(value) =>
             setGenerationDecks((current) => ({
               ...current,
               [selectedGeneration]: {
                 ...(current[selectedGeneration] || {}),
-                [deckFormat]: {
-                  cards: current[selectedGeneration]?.[deckFormat]?.cards || [],
-                  energy: (value || undefined) as
-                    | TcgBattleEnergyType
-                    | undefined,
-                },
+                cards: current[selectedGeneration]?.cards || [],
+                energy: (value || undefined) as TcgBattleEnergyType | undefined,
               },
             }))
           }
@@ -268,7 +244,7 @@ export function TcgDecksPanel({
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-8">
           {activeDeck.length === 0 ? (
             <span className="col-span-full rounded-md border border-dashed border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-muted">
-              No cards selected. Use Auto fill to draft a legal starting deck.
+              No cards selected. Add cards from the CardDex or use Auto Fill.
             </span>
           ) : (
             activeDeck.map((cardId, index) => {
@@ -357,7 +333,7 @@ export function TcgDecksPanel({
             onClick={saveActiveDeck}
             className="min-h-11"
           >
-            Save {DECK_FORMATS.find((f) => f.id === deckFormat)?.label} Deck
+            Save deck
           </Button>
           {deckMessage && (
             <span

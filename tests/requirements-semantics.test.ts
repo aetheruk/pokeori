@@ -53,42 +53,17 @@ describe('requirements and criteria semantics', () => {
     ).toBe(false)
   })
 
-  test('the Pokemon Center Wheel allows five daily attempts and reopens on the next UTC day', () => {
+  test('the Pokemon Center Wheel has no daily attempt gate', () => {
     const wheels = allGames.filter((game) => game.id.startsWith('chansey-wheel-'))
     expect(wheels).toHaveLength(1)
     expect(wheels[0]?.name).toBe('Pokemon Center Wheel')
-    const today = new Date().toISOString()
-    const yesterday = new Date(Date.now() - 86_400_000).toISOString()
-
     const wheel = wheels[0]!
-    const dailyGate = wheel.requirements.find(
-      (requirement) => requirement.type === 'daily_not_completed',
-    )!
-    expect(dailyGate.count).toBe(5)
-    expect(checkRequirement(baseRequirementData, dailyGate)).toBe(true)
-
-    const result = {
-      gameId: wheel.id,
-      wins: 4,
-      losses: 0,
-      attemptsToday: 4,
-      lastPlayed: today,
-    }
+    expect(wheel.daily).not.toBe(true)
     expect(
-      checkRequirement({ ...baseRequirementData, gameResults: [result] }, dailyGate),
-    ).toBe(true)
-    expect(
-      checkRequirement({
-        ...baseRequirementData,
-        gameResults: [{ ...result, attemptsToday: 5 }],
-      }, dailyGate),
+      wheel.requirements.some(
+        (requirement) => requirement.type === 'daily_not_completed',
+      ),
     ).toBe(false)
-    expect(
-      checkRequirement({
-        ...baseRequirementData,
-        gameResults: [{ ...result, lastPlayed: yesterday }],
-      }, dailyGate),
-    ).toBe(true)
   })
 
   test('requirements gate access while criteria gate completion', () => {

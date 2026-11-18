@@ -72,7 +72,6 @@ const battle = (input: {
   ],
   isEligibleForReplay: input.replayable,
   settings: {
-    deckFormat: 'baby',
     requiredSeries: 'Base',
     opponentEnergyType: input.energy,
     themeColour: input.colour,
@@ -108,7 +107,7 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     gameType: 'tcg-battle',
     name: 'Underground TCG PVP',
     description:
-      'Challenge another collector in a fast-paced Base Champions TCG battle.',
+      'Challenge another collector in a fast-paced Base set TCG battle.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: { type: 'trainer', id: 'tcg-maniac-m' },
@@ -122,7 +121,6 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     isEligibleForReplay: true,
     settings: {
       battleMode: 'pvp',
-      deckFormat: 'champions',
       requiredSeries: 'Base',
       matchmakingModes: ['friendly', 'quick'],
       themeColour: '#287f7a',

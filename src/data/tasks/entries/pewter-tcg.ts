@@ -83,18 +83,18 @@ export const pewterTcgTasks: Task[] = [
       {
         title: 'TCG Instructor',
         message:
-          '“Choose the card group first, then save the deck for that group and format. Kanto uses Base Rules, so Underground battles require a Base-group deck.” He underlines Base three times. Apparently this has gone wrong before.',
-        button: 'Learn the formats',
+          '“Choose a card series and build one deck for it. Kanto battles use Base cards, so Underground battles need a Base-series deck.” He underlines Base three times. Apparently this has gone wrong before.',
+        button: 'Learn the deck limit',
       },
       {
         title: 'TCG Instructor',
         message:
-          '“Baby, Champions, and Masters allow total deck costs of 30, 55, and 85. Your fifteen cards must remain within the chosen limit.”',
+          '“Every series uses the same limit: fifteen unique Pokémon cards with a total cost of 60 or less.”',
         button: 'Review card costs',
       },
     ],
     message:
-      'Card costs reflect what you bring: an evolving Basic costs 1, a Stage 1 costs 3, a Stage 2 costs 5, and a non-evolving Basic costs 5. EX, GX, V, and Radiant cards cost 10; the largest special cards cost 15. At battle start, place three Pokemon in front and three on the bench. The front row attacks while the bench waits to be promoted.',
+      'Card costs reflect what you bring: a Basic that can evolve costs 1, a Stage 1 costs 3, a Stage 2 costs 5, and a Basic that cannot evolve costs 5. EX, GX, V, and Radiant cards cost 10; the largest special cards cost 15. Each battle opens with three cards in hand; if none is Basic, the hand is reshuffled and redrawn until it contains one. Choose 1 to 3 Basic Pokémon for the front row. The board has three front slots and three Bench slots, but you must fill all front slots before playing Pokémon onto the Bench.',
   }),
   lesson({
     id: 'pewter-school-tcg-energy',
@@ -106,7 +106,7 @@ export const pewterTcgTasks: Task[] = [
       {
         title: 'TCG Instructor',
         message:
-          'The instructor places an Energy card beside the board. “Every attack has an energy cost. If you cannot afford an attack, charge energy instead of staring at the card until it becomes cheaper.”',
+          'The instructor places five Energy counters beside the board. “Energy is a shared pool, not cards in your deck, hand, or discard. Every attack has an Energy cost. If you cannot afford an attack, Charge to add two Energy instead of staring at the card until it becomes cheaper.”',
         button: 'Learn attack pacing',
       },
       {
@@ -119,11 +119,17 @@ export const pewterTcgTasks: Task[] = [
         title: 'TCG Instructor',
         message:
           '“Stage 1 cards unlock on turn 3 and Stage 2 on turn 5. Cards costing 10 unlock on turn 7; cards costing 15 wait until turn 10.” The strongest cards are apparently very committed to dramatic entrances.',
+        button: 'How does a turn end?',
+      },
+      {
+        title: 'TCG Instructor',
+        message:
+          '“You automatically draw one card at the start of each turn if your deck has one. Playing a Basic from your hand and evolving from a card in your hand are free actions. Attacking or Charging ends your turn; a specific card effect can also say that it ends your turn.”',
         button: 'Finish the turn',
       },
     ],
     message:
-      'Charge when you need more energy. When you are finished acting, end the turn and let the opponent respond. Plan ahead: the cards and attacks available to both sides expand as the turn count rises.',
+      'Both sides start with 5 Energy; the shared pool holds up to 12. Charge adds 2 Energy and ends your turn; at the cap, it simply ends the turn. Attacking also ends your turn, while playing a Basic, evolving, or retreating does not. You draw one card automatically at the beginning of each turn unless your deck is empty. Attack costs unlock gradually: 1 Energy on turns 1–2, 2 on turns 3–4, 3 on turns 5–6, 4 on turns 7–9, then any cost from turn 10.',
   }),
   lesson({
     id: 'pewter-school-tcg-effects',
@@ -141,18 +147,18 @@ export const pewterTcgTasks: Task[] = [
       {
         title: 'TCG Instructor',
         message:
-          '“Attack text can add coin flips, healing, recoil, protection, status conditions, or damage to the bench. The damage number is only the beginning of the sentence.”',
+          '“Supported attack effects can add coin flips, healing, recoil, protection, status conditions, or damage to the Bench. The damage number is only the beginning of the sentence.”',
         button: 'What if a card is hurt?',
       },
       {
         title: 'TCG Instructor',
         message:
-          '“Compare the danger of staying active with the card’s retreat cost. A timely retreat preserves a useful Pokemon; a late retreat preserves paperwork.”',
+          '“Compare the danger of staying Active with the card’s Retreat Cost. Retreat spends that much from your shared Energy pool, but does not end your turn. A timely retreat preserves a useful Pokémon; a late retreat preserves paperwork.”',
         button: 'Review the lesson',
       },
     ],
     message:
-      'Read type icons and attack text before committing. Weakness can turn a modest hit into a knockout, while Resistance, retreat costs, status conditions, and other effects decide whether a damaged Pokemon should remain active.',
+      'Read type icons and supported attack text before committing. Weakness can turn a modest hit into a Knockout, while Resistance, Retreat Cost, status conditions, and other effects decide whether a damaged Pokémon should remain Active.',
   }),
   lesson({
     id: 'pewter-school-tcg-knockouts',
@@ -164,27 +170,27 @@ export const pewterTcgTasks: Task[] = [
       {
         title: 'Headmaster',
         message:
-          'The Headmaster takes over for the final lesson. “When an active Pokemon is knocked out, it leaves the front row. The empty position must be filled from your bench.”',
-        button: 'Choose a replacement',
+          'The Headmaster takes over for the final lesson. “When an Active Pokémon is Knocked Out, promote one from your Bench if you have one. While another Pokémon remains in play, a Basic from your hand can fill an open front slot for free.”',
+        button: 'What if I have no reserve?',
         icon: headmasterIcon,
       },
       {
         title: 'Headmaster',
         message:
-          '“Promote a healthy card that can act at the current turn. Do not wait until the knockout to remember what is on your bench.” She taps the unused cards pointedly.',
+          '“A Pokémon in your hand cannot save an empty field. You lose if you have no living Pokémon in play, or when six of your Pokémon have been Knocked Out. Your opponent loses by the same rules.” She taps the unused cards pointedly.',
         button: 'How does the battle end?',
         icon: headmasterIcon,
       },
       {
         title: 'Headmaster',
         message:
-          '“The battle ends when one side can no longer continue. A strong front row wins turns; a prepared bench wins battles.”',
+          '“Keep a healthy reserve ready. Your Bench can replace a Knocked Out front-row Pokémon, and a Basic from your hand can fill an open front slot while another Pokémon remains in play. But six Knockouts or no living Pokémon on the field ends the battle.”',
         button: 'Review the lesson',
         icon: headmasterIcon,
       },
     ],
     message:
-      'When an active Pokemon is knocked out, promote one from the bench. Keep a healthy reserve ready, because the battle ends when one side can no longer continue.',
+      'Promote from the Bench when a front Pokémon is Knocked Out if a reserve is available. While another Pokémon remains in play, you may also play a Basic from your hand into an open front slot for free; fill all three front slots before adding Pokémon to the Bench. A side loses when it has no living Pokémon in play or reaches six Knockouts.',
     icon: headmasterIcon,
   }),
   {
@@ -239,7 +245,7 @@ export const pewterTcgTasks: Task[] = [
       {
         id: 2,
         title: 'TCG Pop Quiz',
-        message: '“Good. Of those fifteen cards, how many Pokemon begin in the front row?”',
+        message: '“Good. How many slots are in the front row?”',
         background: schoolBackground,
         icon: headmasterIcon,
         buttons: [
@@ -263,13 +269,13 @@ export const pewterTcgTasks: Task[] = [
       {
         id: 4,
         title: 'TCG Pop Quiz',
-        message: '“What should happen after an active Pokemon is knocked out?”',
+        message: '“What can make you lose a battle?”',
         background: schoolBackground,
         icon: headmasterIcon,
         buttons: [
-          { text: 'Promote a benched Pokemon', type: 'navigate', id: 5 },
-          { text: 'Shuffle the whole deck', type: 'navigate', id: 99 },
-          { text: 'End the battle immediately', type: 'navigate', id: 99 },
+          { text: 'No living Pokémon in play or six Knockouts', type: 'navigate', id: 5 },
+          { text: 'An empty deck', type: 'navigate', id: 99 },
+          { text: 'One Pokémon is Knocked Out', type: 'navigate', id: 99 },
         ],
       },
       {

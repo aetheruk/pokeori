@@ -1364,16 +1364,16 @@ describe('generated game data schemas', () => {
     const wheel = chanseyWheels[0]!
     expect(wheel.id).toBe('chansey-wheel-viridian')
     expect(wheel.name).toBe('Pokemon Center Wheel')
-    expect(wheel.daily).toBe(true)
+    expect(wheel.daily).toBeUndefined()
     expect(wheel.settings.cost).toEqual({
-      amount: 2,
+      amount: 3,
       currencyType: 'league-ticket',
     })
     expect(
-      wheel.requirements.find(
+      wheel.requirements.some(
         (requirement) => requirement.type === 'daily_not_completed',
-      )?.count,
-    ).toBe(5)
+      ),
+    ).toBe(false)
 
     const leafStone = wheel.settings.slots.find((slot) =>
       slot.rewards.some(

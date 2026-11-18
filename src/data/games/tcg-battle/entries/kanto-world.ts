@@ -95,7 +95,6 @@ function worldBattle(input: {
     ],
     isEligibleForReplay: true,
     settings: {
-      deckFormat: 'baby',
       requiredSeries: 'Base',
       opponentEnergyType: input.energy,
       opponentTrainerIcon: input.trainerIcon,

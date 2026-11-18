@@ -2414,8 +2414,8 @@ const cardDetails: TcgCardDetail[] = [
     ],
     "abilities": [
       {
-        "name": "",
-        "text": "",
+        "name": "Dark Scale",
+        "text": "If Dark Gyarados is your Active Pokémon and is Knocked Out by an opponent's attack, put 3 damage counters on the Attacking Pokémon.",
         "type": "Poke-BODY"
       }
     ],

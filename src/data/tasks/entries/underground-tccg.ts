@@ -297,7 +297,7 @@ export const undergroundTccgTasks: Task[] = [
       title: 'Deck Registered',
       icon: { type: 'item', id: 'deck-box' },
       message:
-        'Gideon registers the box under your name, card group, and battle format. “The school in Pewter has people who can explain the rest of the rules. We outsourced teaching after the staff tournament reached its ninth consecutive week.”',
+        'Gideon registers the box under your name and card series. “The school in Pewter has people who can explain the rest of the rules. We outsourced teaching after the staff tournament reached its ninth consecutive week.”',
       closeButtonText: 'Ask About the School',
     },
   },
@@ -390,7 +390,7 @@ export const undergroundTccgTasks: Task[] = [
         id: 1,
         title: 'Gideon',
         message:
-          'Gideon examines your signed quiz certificate and holds it up to the light. “Fifteen cards, three in front, three on the bench. Excellent. Pewter has certified that you can read instructions.”',
+          'Gideon examines your signed quiz certificate and holds it up to the light. “Fifteen cards, one to three in front, and the Bench opens after all three front slots are filled. Excellent. Pewter has certified that you can read instructions.”',
         background: undergroundBackground,
         icon: maniacMale,
         buttons: [{ text: 'What is the practical?', type: 'navigate', id: 2 }],
@@ -428,7 +428,7 @@ export const undergroundTccgTasks: Task[] = [
       title: 'Lost-and-Found Practice',
       icon: { type: 'pokemon', id: '19' },
       message:
-        'Arrange your Base Baby deck and play one practice match against HQ’s Lost-and-Found deck. It is legal, inexpensive, and only slightly smells of a flooded storage cupboard.',
+        'Arrange your Base-series deck and play one practice match against HQ’s Lost-and-Found deck. It is legal, inexpensive, and only slightly smells of a flooded storage cupboard.',
       closeButtonText: 'Find the Practice Table',
     },
   },
