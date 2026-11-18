@@ -9502,8 +9502,19 @@ function useOpponentKarrablastShellOn(state: TcgBattleState): boolean {
   return false
 }
 
+const opponentTurnSteps = new WeakMap<TcgBattleState, number>()
+const MAX_OPPONENT_TURN_STEPS = 48
+
 function runOpponentTurn(state: TcgBattleState) {
   if (state.phase !== 'battle' || state.activeSide !== 'opponent') return
+  const steps = (opponentTurnSteps.get(state) || 0) + 1
+  opponentTurnSteps.set(state, steps)
+  if (steps > MAX_OPPONENT_TURN_STEPS) {
+    opponentTurnSteps.delete(state)
+    state.log.unshift('Opponent automatic actions reached the turn limit; the turn was ended safely.')
+    finishOpponentTurn(state)
+    return
+  }
   if (useOpponentUnownVHeal(state)) return
   if (useOpponentUxieLvXTradeOff(state)) {
     runOpponentTurn(state)

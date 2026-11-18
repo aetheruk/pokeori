@@ -30140,7 +30140,7 @@ export type OpponentTcgBattleAction =
   | { kind: 'charge' }
   | { kind: 'end' }
 
-const OPPONENT_ATTACK_SCORE_SAMPLES = 16
+const OPPONENT_ATTACK_SCORE_SAMPLES = 4
 
 function createOpponentDecisionRandom(seed: string): () => number {
   let value = 2166136261
@@ -30438,125 +30438,16 @@ export function chooseOpponentTcgBattleAttack(state: TcgBattleState, attackerFil
   return getOpponentAttackOptions(state, attackerFilter).sort(compareOpponentAttackOptions)[0] || null
 }
 
-function getProjectedOpponentAttackerScore(
-  state: TcgBattleState,
-  attackerId: string,
-  turnNumber: number,
-  energy: number,
-): number {
-  const front = state.opponent.front.map((card) => ({ ...card }))
-  const back = state.opponent.back.map((card) => ({ ...card }))
-  let activeIndex = front.findIndex((card) => card.instanceId === attackerId)
-  if (activeIndex < 0) {
-    const benchIndex = back.findIndex((card) => card.instanceId === attackerId)
-    if (benchIndex < 0 || front.length === 0) return 0
-    const promoted = back[benchIndex]
-    back[benchIndex] = front[0]
-    front[0] = promoted
-    activeIndex = 0
-  }
-  const projected: TcgBattleState = {
-    ...state,
-    turnNumber,
-    opponent: { ...state.opponent, energy, front, back },
-  }
-  return getOpponentAttackOptions(projected, projected.opponent.front[activeIndex]?.instanceId)
-    .sort(compareOpponentAttackOptions)[0]?.score || 0
-}
-
-function getOpponentEvolutionValue(
-  state: TcgBattleState,
-  evolution: TcgBattleEvolutionOption,
-): number {
-  const current = [...state.opponent.front, ...state.opponent.back]
-    .find((card) => card.instanceId === evolution.targetId)
-  if (!current) return Number.NEGATIVE_INFINITY
-  const isFront = state.opponent.front.some((card) => card.instanceId === current.instanceId)
-  const nextTurn = getNextTcgBattleTurnNumber(state.turnNumber, 'opponent', 'player')
-  const currentPotential = getProjectedOpponentAttackerScore(state, current.instanceId, nextTurn, state.opponent.energy)
-  const projection: TcgBattleState = {
-    ...state,
-    opponent: {
-      ...state.opponent,
-      deck: [...state.opponent.deck],
-      hand: state.opponent.hand.map((card) => ({ ...card })),
-      front: state.opponent.front.map((card) => ({ ...card })),
-      back: state.opponent.back.map((card) => ({ ...card })),
-    },
-  }
-  const projectedTarget = [...projection.opponent.front, ...projection.opponent.back]
-    .find((card) => card.instanceId === evolution.targetId)
-  if (!projectedTarget) return Number.NEGATIVE_INFINITY
-  const hpBeforeEvolution = projectedTarget.currentHp
-  const evolved = applyTcgBattleEvolution(
-    projection.opponent,
-    evolution.targetId,
-    evolution.card.id,
-    state.turnNumber,
-    'opponent',
-    projection.player,
-    state.playerGoesSecond,
-  )
-  if (!evolved) return Number.NEGATIVE_INFINITY
-  if (!isTcgBattleHealingPrevented(projection) && (evolution.effect === 'pichuHeal' || evolution.effect === 'eeveeHeal' || evolution.effect === 'babyHeal')) evolved.target.currentHp = evolved.target.hp
-  const evolvedPotential = getProjectedOpponentAttackerScore(
-    projection,
-    evolution.targetId,
-    nextTurn,
-    state.opponent.energy,
-  )
-  const extraHp = Math.max(0, evolved.target.currentHp - hpBeforeEvolution)
-  const clearedStatusValue = (current.statusConditions || [])
-    .reduce((sum, status) => sum + getOpponentStatusValue(status) * (status === 'poisoned' || status === 'burned' ? 0.75 : 0.55), 0)
-  const defensiveEffectLoss = current.incomingAttackModifier ? 5 : 0
-  const futureValue = (evolvedPotential - currentPotential) * (isFront ? 0.85 : 0.45)
-  return futureValue + extraHp * (isFront ? 0.7 : 0.45) + clearedStatusValue - defensiveEffectLoss + (evolution.effect === 'pichuHeal' || evolution.effect === 'eeveeHeal' || evolution.effect === 'babyHeal' ? extraHp * (isFront ? 0.5 : 0.3) : 0)
-}
-
-function getBestOpponentEvolution(state: TcgBattleState): { option: TcgBattleEvolutionOption; value: number } | null {
-  return getTcgBattleEvolutionOptions(state.opponent, state.turnNumber, 'opponent', state.player, state.playerGoesSecond)
-    .map((option) => ({ option, value: getOpponentEvolutionValue(state, option) }))
-    .sort((a, b) => b.value - a.value || b.option.card.cost - a.option.card.cost || a.option.card.name.localeCompare(b.option.card.name))[0] || null
-}
-
-function getOpponentChargeValue(state: TcgBattleState): number {
-  if (!canSideChargeEnergy(state, 'opponent')) return 0
-  const gain = TCG_BATTLE_FORMATS[state.format].chargeGain
-  const chargedEnergy = Math.min(TCG_BATTLE_FORMATS[state.format].energyCap, state.opponent.energy + gain)
-  const nextTurn = getNextTcgBattleTurnNumber(state.turnNumber, 'opponent', 'player')
-  const currentBest = chooseOpponentTcgBattleAttack(state)?.score || 0
-  const chargedBest = getProjectedOpponentAttackerScore(state, state.opponent.front[0]?.instanceId || '', nextTurn, chargedEnergy)
-  const chargedFrontBest = Math.max(
-    chargedBest,
-    ...state.opponent.front.slice(1).map((card) => getProjectedOpponentAttackerScore(state, card.instanceId, nextTurn, chargedEnergy)),
-  )
-  return Math.max(0, chargedFrontBest - currentBest)
-}
-
 export function chooseOpponentTcgBattleAction(state: TcgBattleState): OpponentTcgBattleAction {
   const attack = chooseOpponentTcgBattleAttack(state)
-  const atEnergyCap = state.opponent.energy >= TCG_BATTLE_FORMATS[state.format].energyCap
-  if (attack && (atEnergyCap || attack.knockoutChance >= 0.5)) return { kind: 'attack', option: attack }
+  if (attack && attack.knockoutChance >= 0.5) return { kind: 'attack', option: attack }
 
-  const evolution = getBestOpponentEvolution(state)
-  const chargeValue = getOpponentChargeValue(state)
-  const attackScore = attack?.score || 0
-  const evolutionThreshold = attack ? Math.max(14, attackScore * 0.85) : 12
-  const chargeThreshold = attack ? Math.max(14, attackScore * 0.45) : 0
+  // Evolution is free in this battle engine. Resolve legal evolutions directly
+  // instead of simulating every attack for every possible evolution card.
+  const evolution = getTcgBattleEvolutionOptions(state.opponent, state.turnNumber, 'opponent', state.player, state.playerGoesSecond)[0]
+  if (evolution) return { kind: 'evolve', option: evolution }
 
-  if (evolution && evolution.value > evolutionThreshold && evolution.value >= chargeValue) {
-    return { kind: 'evolve', option: evolution.option }
-  }
-  if (attack && attack.score <= 0 && canSideChargeEnergy(state, 'opponent') && chargeValue <= 0) {
-    return { kind: 'charge' }
-  }
-  if (canSideChargeEnergy(state, 'opponent') && chargeValue > chargeThreshold && chargeValue > (evolution?.value || 0)) {
-    return { kind: 'charge' }
-  }
   if (attack) return { kind: 'attack', option: attack }
-  if (evolution && evolution.value > 12 && (!canSideChargeEnergy(state, 'opponent') || evolution.value >= chargeValue)) {
-    return { kind: 'evolve', option: evolution.option }
-  }
   if (canSideChargeEnergy(state, 'opponent')) return { kind: 'charge' }
   return { kind: 'end' }
 }
