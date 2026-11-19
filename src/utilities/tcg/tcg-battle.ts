@@ -567,6 +567,8 @@ export interface TcgBattleCardState extends TcgBattleCardSummary {
 
 export interface TcgBattleSideState {
   deck: TcgBattleCardSummary[]
+  /** Public card count for a perspective whose opponent deck contents are hidden. */
+  deckCount?: number
   hand: TcgBattleCardState[]
   front: TcgBattleCardState[]
   back: TcgBattleCardState[]
@@ -1319,8 +1321,9 @@ export function toTcgPvpPerspectiveState(
     shouldFlip ? shared.player : shared.opponent,
   )
 
-  // The opponent's unused deck, private arrangement, and selected Energy remain
-  // server-only until the relevant public battle state makes them visible.
+  // Expose the deck size without revealing card identities; private arrangement
+  // and selected Energy remain hidden until their public battle state allows it.
+  opposingSide.deckCount = opposingSide.deck.length
   opposingSide.deck = []
   const clairvoyanceActive = [...ownSide.front, ...ownSide.back].some((provider) =>
     provider.currentHp > 0 &&

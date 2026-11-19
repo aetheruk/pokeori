@@ -167,7 +167,7 @@ import {
   tcgBattleRetreat,
 } from '../games/tcg-battle'
 
-type BoardZone = 'player-front' | 'opponent-front'
+type BoardZone = 'player-front' | 'opponent-front' | 'player-bench' | 'opponent-bench'
 type BenchMode = 'view' | 'retreat' | 'promote'
 type SideTone = 'player' | 'opponent'
 type TcgClientActionResult =
@@ -694,8 +694,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const [attackerId, setAttackerId] = useState('')
   const [targetId, setTargetId] = useState('')
   const [benchMode, setBenchMode] = useState<BenchMode | null>(null)
+  const [isHandOpen, setIsHandOpen] = useState(false)
   const [showEvolutionSheet, setShowEvolutionSheet] = useState(false)
   const [selectedEvolutionCardId, setSelectedEvolutionCardId] = useState<string | null>(null)
+  const [selectedEvolutionTargetId, setSelectedEvolutionTargetId] = useState<string | null>(null)
   const [turnDrawNotice, setTurnDrawNotice] = useState<string | null>(null)
   const previousBattleLogRef = useRef<Map<string, number> | null>(null)
   const [choiceAttackIndex, setChoiceAttackIndex] = useState<number | null>(
@@ -805,7 +807,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     [state?.player, state?.turnNumber, state?.playerGoesSecond],
   )
   const attackCap = state ? getAllowedAttackCost(state.turnNumber) : 1
-  const formatConfig = state ? TCG_BATTLE_FORMATS[state.format] : null
   const deadlineSeconds = state?.deadlineAt
     ? Math.max(0, Math.ceil((state.deadlineAt - clockNow) / 1000))
     : null
@@ -814,6 +815,29 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const isBusy =
     isPending || isActionBusy || Boolean(resolution) || showOpeningVs
   const closeOpeningVs = useCallback(() => setShowOpeningVs(false), [])
+
+  useEffect(() => {
+    if (!isHandOpen && !selectedEvolutionCardId) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      if (selectedEvolutionCardId) {
+        setSelectedEvolutionCardId(null)
+        setSelectedEvolutionTargetId(null)
+      } else {
+        setIsHandOpen(false)
+      }
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [isHandOpen, selectedEvolutionCardId])
+
+  useEffect(() => {
+    if (!selectedEvolutionCardId || isHandOpen) return
+    const frame = window.requestAnimationFrame(() => {
+      document.querySelector<HTMLButtonElement>('[data-evolution-target="true"]')?.focus()
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [isHandOpen, selectedEvolutionCardId])
 
   useEffect(() => {
     if (!state) return
@@ -2155,7 +2179,11 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           toast.info(`${response.state.lastAction.abilityName || 'Peek'} revealed ${response.state.lastAction.privateRevealedCardNames.join(' and ')}.`)
         }
         setBenchMode(null)
-        if (meta.kind === 'evolve') setShowEvolutionSheet(false)
+        if (meta.kind === 'evolve') {
+          setShowEvolutionSheet(false)
+          setSelectedEvolutionCardId(null)
+          setSelectedEvolutionTargetId(null)
+        }
         if (!previousState) {
           commitActionResult(response.state, response.completion)
           return
@@ -2263,7 +2291,25 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const handleCardTap = (card: TcgBattleCardState, zone: BoardZone) => {
     if (state?.phase !== 'battle' || isBusy) return
     if (zone === 'opponent-front') {
+      if (selectedEvolutionCardId) return
       setTargetId(card.instanceId)
+      return
+    }
+    if (zone === 'opponent-bench') return
+    if (selectedEvolutionCardId) {
+      const matchingEvolution = evolutionOptions.find(
+        (option) =>
+          option.card.id === selectedEvolutionCardId &&
+          option.targetId === card.instanceId,
+      )
+      if (!matchingEvolution) return
+      setSelectedEvolutionTargetId(card.instanceId)
+      setIsHandOpen(false)
+      setShowEvolutionSheet(true)
+      return
+    }
+    if (zone === 'player-bench') {
+      setBenchMode('view')
       return
     }
     setAttackerId(card.instanceId)
@@ -2500,33 +2546,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           deadlineSeconds={deadlineSeconds}
           onSurrender={() => setShowSurrenderConfirm(true)}
         />
-        <AnimatePresence>
-          {turnDrawNotice && state.activeSide === 'player' && (
-            <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} role="status" className="absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.25rem)] z-30 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-game-ochre/60 bg-game-surface-raised px-3 py-2 shadow-xl sm:px-4">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-game-moss text-xs font-black text-white">↓</span>
-              <span className="text-[11px] font-bold text-game-ink">Drew <strong>{turnDrawNotice}</strong></span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {state.battleMode === 'pvp' &&
-          state.phase !== 'finished' &&
-          (state.activeSide === 'opponent' ||
-            state.pendingPromotion === 'opponent') && (
-            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-md border border-game-ochre/35 bg-game-surface-raised px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-game-ink shadow-md">
-              {state.pendingPromotion === 'opponent'
-                ? 'Opponent is choosing a promotion'
-                : 'Opponent’s turn'}
-            </div>
-          )}
-
-        <section className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 pb-16 pt-2 sm:gap-4 sm:pb-20">
-          <TeamEnergyReadout
-            energy={state.opponent.energy}
-            cap={formatConfig?.energyCap || 0}
-            pokemonCount={getLivingCards(state.opponent).length}
-            position="opponent"
-          />
+        <section aria-label="Battlefield" className="flex min-h-0 flex-1 flex-col items-center justify-evenly gap-1 overflow-y-auto px-1 py-2 sm:gap-2">
           {(state.battleMode === 'pvp' || hasTcgBattleOmanyteClairvoyance(state)) && state.opponent.hand.length > 0 && (
             <section aria-label="Opponent's revealed hand" className="w-full rounded-md border border-game-ochre/30 bg-game-surface-raised/90 px-2 py-1.5">
               <p className="mb-1 text-center text-[10px] font-black uppercase tracking-wide text-game-muted">Opponent's hand · revealed by Clairvoyance</p>
@@ -2546,14 +2566,29 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             zone="opponent-front"
             turnNumber={state.turnNumber}
             selectedId={targetId}
+            eligibleTargetIds={[]}
             resolution={resolution}
             damageEvent={resolution?.damageCue || state.lastDamageEvent}
             onCardTap={handleCardTap}
             onPreviewStart={setPreviewCard}
             onPreviewEnd={() => setPreviewCard(null)}
           />
+          <BattleBenchRow
+            cards={state.opponent.back}
+            label="Opponent bench"
+            side="opponent"
+            turnNumber={state.turnNumber}
+            eligibleTargetIds={[]}
+            onPreviewStart={setPreviewCard}
+            onPreviewEnd={() => setPreviewCard(null)}
+          />
 
-          <div className="h-3 sm:h-5" />
+          {selectedEvolutionCardId && (
+            <div role="status" className="flex w-full max-w-xl items-center justify-between gap-2 rounded-lg border border-game-moss/50 bg-game-surface-raised px-3 py-2 text-[11px] font-bold text-game-ink shadow-sm">
+              <span>Choose a Pokémon on your field to evolve with {state.player.hand.find((card) => card.id === selectedEvolutionCardId)?.name || 'this card'}.</span>
+              <Button type="button" variant="ghost" size="sm" className="h-8 shrink-0 px-2 text-[10px] font-black uppercase" onClick={() => { setSelectedEvolutionCardId(null); setSelectedEvolutionTargetId(null) }}>Cancel</Button>
+            </div>
+          )}
 
           <BattleCardRow
             cards={state.player.front}
@@ -2561,27 +2596,22 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             zone="player-front"
             turnNumber={state.turnNumber}
             selectedId={attackerId}
+            eligibleTargetIds={selectedEvolutionCardId ? evolutionOptions.filter((option) => option.card.id === selectedEvolutionCardId).map((option) => option.targetId) : []}
             resolution={resolution}
             damageEvent={resolution?.damageCue || state.lastDamageEvent}
             onCardTap={handleCardTap}
             onPreviewStart={setPreviewCard}
             onPreviewEnd={() => setPreviewCard(null)}
           />
-          <TeamEnergyReadout
-            energy={state.player.energy}
-            cap={formatConfig?.energyCap || 0}
-            pokemonCount={getLivingCards(state.player).length}
-            position="player"
-          />
-
-          <InlineAttackButtons
-            state={state}
-            selectedAttacker={selectedAttacker}
-            selectedTarget={selectedTarget}
-            attackCap={attackCap}
-            isPending={isBusy}
-            resolution={resolution}
-            onAttack={requestAttack}
+          <BattleBenchRow
+            cards={state.player.back}
+            label="Your bench"
+            side="player"
+            turnNumber={state.turnNumber}
+            eligibleTargetIds={selectedEvolutionCardId ? evolutionOptions.filter((option) => option.card.id === selectedEvolutionCardId).map((option) => option.targetId) : []}
+            onCardTap={handleCardTap}
+            onPreviewStart={setPreviewCard}
+            onPreviewEnd={() => setPreviewCard(null)}
           />
           {state.extraAttackPending?.side === 'player' && (
             <p role="status" className="rounded-md border border-game-ochre/45 bg-game-surface-raised px-3 py-2 text-center text-[10px] font-black uppercase tracking-wide text-game-ink">
@@ -2593,24 +2623,31 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         <BattleCommandControls
           state={state}
           selectedAttacker={selectedAttacker}
+          selectedTarget={selectedTarget}
+          attackCap={attackCap}
           isPending={isBusy}
           claimError={claimError}
           resultShown={Boolean(resultOverlay)}
           resolution={resolution}
           evolutionOptions={evolutionOptions}
           selectedEvolutionCardId={selectedEvolutionCardId}
-          onCharge={() =>
-            callAction(() => tcgBattleCharge(state.revision), {
-              kind: 'charge',
-            })
-          }
+          handOpen={isHandOpen}
+          turnDrawNotice={turnDrawNotice}
+          onToggleHand={() => setIsHandOpen((open) => !open)}
+          onCloseHand={() => setIsHandOpen(false)}
+          onPreviewCard={setPreviewCard}
+          onAttack={(attackIndex) => { setIsHandOpen(false); requestAttack(attackIndex) }}
+          onCharge={() => {
+            setIsHandOpen(false)
+            callAction(() => tcgBattleCharge(state.revision), { kind: 'charge' })
+          }}
           onClaim={() =>
             callAction(() => claimTcgBattleResult(), { kind: 'claim' })
           }
           onPromote={() => setBenchMode('promote')}
-          onRetreat={() => setBenchMode('retreat')}
-          onOpenEvolution={(cardId) => { setSelectedEvolutionCardId(cardId); setShowEvolutionSheet(true) }}
-          onPlayBasicToBench={(cardId) => callAction(() => tcgBattlePlayBasicToBench(cardId, state.revision), { kind: 'bench' })}
+          onRetreat={() => { setIsHandOpen(false); setBenchMode('retreat') }}
+          onOpenEvolution={(cardId) => { setSelectedEvolutionCardId(cardId); setSelectedEvolutionTargetId(null); setIsHandOpen(false) }}
+          onPlayBasicToBench={(cardId) => { setIsHandOpen(false); callAction(() => tcgBattlePlayBasicToBench(cardId, state.revision), { kind: 'bench' }) }}
           onUseHealAbility={(sourceId, abilityIndex, targetCardId, abilityName, discardPokemonIds) =>
             callAction(
               () => tcgBattleHealActiveAbility(sourceId, abilityIndex, targetCardId, state.revision, discardPokemonIds),
@@ -2840,7 +2877,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
 
       {showEvolutionSheet && (
         <EvolutionSheet
-          options={selectedEvolutionCardId ? evolutionOptions.filter((option) => option.card.id === selectedEvolutionCardId) : evolutionOptions}
+          options={selectedEvolutionCardId ? evolutionOptions.filter((option) => option.card.id === selectedEvolutionCardId && (!selectedEvolutionTargetId || option.targetId === selectedEvolutionTargetId)) : evolutionOptions}
           discardPokemon={state.player.discard}
           playerSide={state.player}
           opposingSide={state.opponent}
@@ -2849,7 +2886,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           opposingPokemon={[...state.opponent.front, ...state.opponent.back].filter((card) => card.currentHp > 0)}
           opposingBenchPokemon={state.opponent.back.filter((card) => card.currentHp > 0)}
           isPending={isBusy}
-          onClose={() => { setShowEvolutionSheet(false); setSelectedEvolutionCardId(null) }}
+          onClose={() => { setShowEvolutionSheet(false); setSelectedEvolutionCardId(null); setSelectedEvolutionTargetId(null) }}
           onEvolve={(targetId, evolutionCardId, effectTargetId) =>
             callAction(
               () =>
@@ -3196,6 +3233,10 @@ function BattleTopBar({
           )}
         </div>
       </div>
+      <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+        <SideScorePill label="You" side={state.player} energy={state.player.energy} energyCap={TCG_BATTLE_FORMATS[state.format].energyCap} tone="player" />
+        <SideScorePill label={state.battleMode === 'pvp' ? 'Opponent' : 'CPU'} side={state.opponent} energy={state.opponent.energy} energyCap={TCG_BATTLE_FORMATS[state.format].energyCap} tone="opponent" />
+      </div>
     </div>
   )
 }
@@ -3244,47 +3285,6 @@ function EnergyCardActivationBurst({ state }: { state: TcgBattleState }) {
         </p>
       </div>
     </motion.div>
-  )
-}
-
-function TeamEnergyReadout({
-  energy,
-  cap,
-  pokemonCount,
-  inverted = false,
-  position,
-}: {
-  energy: number
-  cap: number
-  pokemonCount: number
-  inverted?: boolean
-  position: SideTone
-}) {
-  return (
-    <div
-      className={cn(
-        'inline-flex items-center justify-center gap-3 rounded-md border border-game-border bg-game-surface-raised px-3 py-1.5 text-sm font-bold text-game-ink',
-        position === 'opponent' ? 'mb-2 sm:mb-3' : 'mt-2 sm:mt-3',
-        inverted && 'rotate-180',
-      )}
-    >
-      <span className="inline-flex items-center gap-1.5">
-        <EnergyIcon type="Colorless" className="h-5 w-5" />
-        <span>
-          {energy}/{cap}
-        </span>
-      </span>
-      <span className="inline-flex items-center gap-1.5 text-game-muted">
-        <Image
-          src="/sprites/items/balls/poke-ball.avif"
-          alt="Pokémon remaining"
-          width={20}
-          height={20}
-          className="h-5 w-5 object-contain"
-        />
-        <span className="font-mono text-game-ink">{pokemonCount}</span>
-      </span>
-    </div>
   )
 }
 
@@ -4391,7 +4391,7 @@ function InlineAttackButtons({
   if (state.phase !== 'battle' || attacks.length === 0) return null
 
   return (
-    <div className="z-20 flex w-full max-w-[min(34rem,calc(100vw-1rem))] flex-wrap items-center justify-center gap-2 px-2 pt-1">
+    <section aria-label={`${selectedAttacker?.name || 'Pokémon'} attacks`} className="z-20 flex w-full max-w-full snap-x snap-mandatory items-center justify-start gap-2 overflow-x-auto overscroll-x-contain px-1 py-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden">
       {attacks.map((attack, index) => {
         const cost = getAttackCost(attack, state, selectedAttacker, 'player')
         const validTargets = selectedAttacker
@@ -4442,7 +4442,7 @@ function InlineAttackButtons({
             type="button"
             key={`${attack.name}-${index}`}
             className={cn(
-              'game-focus-ring group flex min-h-11 min-w-0 flex-1 basis-[10rem] items-center justify-between gap-2 rounded-md border border-game-moss/30 bg-game-surface-raised/95 px-3 py-2 text-left backdrop-blur-md transition-colors hover:border-game-moss-strong/70 hover:bg-game-moss/15',
+              'game-focus-ring group flex min-h-12 min-w-[min(16rem,78vw)] max-w-[min(20rem,86vw)] shrink-0 snap-start items-center justify-between gap-2 rounded-md border border-game-moss/30 bg-game-surface-raised/95 px-3 py-2 text-left backdrop-blur-md transition-colors hover:border-game-moss-strong/70 hover:bg-game-moss/15',
               disabled &&
                 'cursor-default border-game-border/70 bg-game-surface-raised/75 opacity-40 hover:border-game-border/70 hover:bg-game-surface-raised/75',
             )}
@@ -4466,7 +4466,7 @@ function InlineAttackButtons({
           </button>
         )
       })}
-    </div>
+    </section>
   )
 }
 
@@ -5736,12 +5736,20 @@ function getUsableDiscardRevivalEnergyAbilities(state: TcgBattleState) {
 function BattleCommandControls({
   state,
   selectedAttacker,
+  selectedTarget,
+  attackCap,
   isPending,
   claimError,
   resultShown,
   resolution,
   evolutionOptions,
   selectedEvolutionCardId,
+  handOpen,
+  turnDrawNotice,
+  onToggleHand,
+  onCloseHand,
+  onPreviewCard,
+  onAttack,
   onCharge,
   onClaim,
   onPromote,
@@ -5785,12 +5793,20 @@ function BattleCommandControls({
 }: {
   state: TcgBattleState
   selectedAttacker?: TcgBattleCardState
+  selectedTarget?: TcgBattleCardState
+  attackCap: number
   isPending: boolean
   claimError: string | null
   resultShown: boolean
   resolution?: BattleResolution | null
   evolutionOptions: TcgBattleEvolutionOption[]
   selectedEvolutionCardId: string | null
+  handOpen: boolean
+  turnDrawNotice: string | null
+  onToggleHand: () => void
+  onCloseHand: () => void
+  onPreviewCard: (card: TcgBattleCardState | null) => void
+  onAttack: (attackIndex: number) => void
   onCharge: () => void
   onClaim: () => void
   onPromote: () => void
@@ -5834,6 +5850,45 @@ function BattleCommandControls({
 }) {
   const hasAutoClaimedResultRef = useRef(false)
   const [distributedCounterTargets, setDistributedCounterTargets] = useState<Record<string, string[]>>({})
+  const handTriggerRef = useRef<HTMLButtonElement | null>(null)
+  const handCloseRef = useRef<HTMLButtonElement | null>(null)
+  const actionDockRef = useRef<HTMLDivElement | null>(null)
+  const previousHandOpenRef = useRef(handOpen)
+  const handSwipeStartXRef = useRef<number | null>(null)
+  const handSwipeTriggeredRef = useRef(false)
+  const [handBottomInset, setHandBottomInset] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!handOpen) return
+    const actionDock = actionDockRef.current
+    if (!actionDock) return
+
+    const updateBottomInset = () => {
+      const nextInset = Math.max(
+        0,
+        Math.ceil(window.innerHeight - actionDock.getBoundingClientRect().top),
+      )
+      setHandBottomInset((current) =>
+        current === nextInset ? current : nextInset,
+      )
+    }
+
+    const resizeObserver = new ResizeObserver(updateBottomInset)
+    resizeObserver.observe(actionDock)
+    window.addEventListener('resize', updateBottomInset)
+    updateBottomInset()
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', updateBottomInset)
+    }
+  }, [handOpen])
+
+  useEffect(() => {
+    if (handOpen && !previousHandOpenRef.current) handCloseRef.current?.focus()
+    if (!handOpen && previousHandOpenRef.current) handTriggerRef.current?.focus()
+    previousHandOpenRef.current = handOpen
+  }, [handOpen])
 
   useEffect(() => {
     if (
@@ -6144,9 +6199,18 @@ function BattleCommandControls({
   }
 
   return (
-    <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1.25rem)] z-30 flex flex-col items-center justify-center gap-2">
+    <div ref={actionDockRef} className="relative z-40 flex w-full shrink-0 flex-col items-center gap-1.5 bg-gradient-to-t from-game-canvas via-game-canvas/95 to-transparent pb-[calc(env(safe-area-inset-bottom)+0.25rem)] pt-1.5">
+      <InlineAttackButtons
+        state={state}
+        selectedAttacker={selectedAttacker}
+        selectedTarget={selectedTarget}
+        attackCap={attackCap}
+        isPending={isPending}
+        resolution={resolution}
+        onAttack={onAttack}
+      />
       {regidragoPending && state.lastAction?.frontId && typeof state.lastAction.abilityIndex === 'number' && (
-        <div className="flex max-h-56 max-w-[min(34rem,calc(100vw-1rem))] flex-wrap justify-center gap-1.5 overflow-y-auto rounded-lg border border-game-ochre/50 bg-game-canvas/95 p-2 shadow-lg">
+        <div className="flex max-h-[min(20dvh,9rem)] max-w-[min(34rem,calc(100vw-1rem))] flex-wrap justify-center gap-1.5 overflow-y-auto rounded-lg border border-game-ochre/50 bg-game-canvas/95 p-2 shadow-lg">
           <p className="w-full text-center text-[10px] font-black uppercase tracking-wide text-game-ink">Legacy Star · Choose up to 2 cards to return</p>
           {state.player.discard.map((card) => {
             const selected = regidragoRecoveryIds.includes(card.instanceId)
@@ -6156,7 +6220,12 @@ function BattleCommandControls({
         </div>
       )}
       {(usableHealAbilities.length > 0 || usableDrawAbilities.length > 0 || usableRegidragoVstar.length > 0 || usableRotomVstar.length > 0 || usableZacianPsychicEnergy.length > 0 || usableZacianIntrepidSword.length > 0 || usableClaydolCosmicPower.length > 0 || usableToxtricitySinisterSurge.length > 0 || usableFeraligatrDoubleSwitch.length > 0 || usableZamazentaShieldStar.length > 0 || usableLatiasPsychicAttach.length > 0 || usableMagnezoneMetalAcceleration.length > 0 || usableSalamenceTopEnergyAbilities.length > 0 || usablePokemonSwapPowers.length > 0 || usableBenchShuffleAbilities.length > 0 || usableDiscardRecoveryAbilities.length > 0 || usableDamageCounterAbilities.length > 0 || usableBenchSwitchAbilities.length > 0 || usableActiveSwitchAbilities.length > 0 || usableActiveStatusAbilities.length > 0 || usableBenchEntryAbilities.length > 0 || usableUnownVanishAbilities.length > 0 || usableIgglybuffGazeAbilities.length > 0 || usableElekidPlayfulPunchAbilities.length > 0) && canAct && (
-        <div className="flex max-w-full flex-wrap justify-center gap-1.5 px-2">
+        <details className="group relative w-full max-w-5xl px-1">
+          <summary className="game-focus-ring flex min-h-9 cursor-pointer list-none items-center justify-center gap-2 rounded-lg border border-game-border bg-game-surface-raised/95 px-3 text-[10px] font-black uppercase tracking-[0.1em] text-game-ink shadow-sm marker:hidden [&::-webkit-details-marker]:hidden">
+            Pokémon abilities & choices <span className="text-game-muted transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
+          </summary>
+          <div className="absolute bottom-full left-1/2 z-[55] mb-1 max-h-[min(42dvh,22rem)] w-[min(96vw,52rem)] -translate-x-1/2 overflow-y-auto rounded-xl border border-game-border-strong bg-game-canvas/98 p-2 shadow-2xl backdrop-blur-sm">
+          <div className="flex max-w-full flex-wrap justify-center gap-1.5 px-1">
           {usableRegidragoVstar.map(({ source, ability, abilityIndex }) => (
             <Button key={`${source.instanceId}:${abilityIndex}:legacy-star`} type="button" variant="outline" disabled={isPending || Boolean(resolution)} onClick={() => onUseDrawAbility(source.instanceId, abilityIndex, ability.name, undefined, false, false, undefined, false, false, undefined, false, false, false, false, false, false, 'regidragoVstar')} className="game-focus-ring h-9 rounded-md border border-game-dragon/45 bg-game-surface-raised px-3 text-[10px] font-black uppercase tracking-wide text-game-ink hover:bg-game-dragon/10">Discard top 7 · Legacy Star</Button>
           ))}
@@ -6602,7 +6671,9 @@ function BattleCommandControls({
               Flip coin · 20 to {target.name} · {ability.name}
             </Button>
           ))}
+          </div>
         </div>
+        </details>
       )}
       <div className="flex items-center justify-center gap-2 sm:gap-3">
         <LabeledCommandButton
@@ -6625,30 +6696,136 @@ function BattleCommandControls({
           </span>
         </LabeledCommandButton>
       </div>
-      <section aria-label={`Your hand, ${state.player.hand.length} cards`} className="w-full rounded-xl border border-game-border-strong bg-game-surface-raised/95 px-2 py-2 shadow-lg sm:px-3">
-        <div className="mb-1.5 flex items-center justify-between px-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-game-muted">Your hand <span className="ml-1 text-game-ink">{state.player.hand.length}</span></p>
-          {selectedEvolutionCardId && <p className="text-[10px] font-bold text-game-moss">Choose a Pokémon to evolve above</p>}
-        </div>
-        <div className="flex max-w-full snap-x gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {state.player.hand.map((card) => {
-            const isBasic = basicHand.some((item) => item.instanceId === card.instanceId)
-            const evolution = evolutionOptions.some((option) => option.card.id === card.id)
-            const selected = selectedEvolutionCardId === card.id
-            const isEmergencyRotation = emergencyRotationHand.some((item) => item.instanceId === card.instanceId)
-            const isLastCardBenchPlay = lastCardBenchDrawHand.some((item) => item.instanceId === card.instanceId)
-            const playable = (isBasic && canPlaceBasic) || isEmergencyRotation || isLastCardBenchPlay
-            const playLabel = isEmergencyRotation ? 'Emergency Rotation' : isLastCardBenchPlay ? 'Bench · Draw 3' : `Play · ${basicPlayDestination}`
-            const playDescription = isEmergencyRotation ? 'play onto the Bench with Emergency Rotation' : isLastCardBenchPlay ? 'play onto the Bench and draw three cards' : `play to ${basicPlayDestination}`
-            return <button key={card.instanceId} type="button" disabled={!canAct || isPending || (!playable && !evolution)} onClick={() => playable ? onPlayBasicToBench(card.instanceId) : evolution ? onOpenEvolution(card.id) : undefined} aria-pressed={selected} aria-label={`${card.name}${playable ? `, ${playDescription}` : evolution ? ', select to evolve' : ''}`} className={`game-focus-ring group relative w-[76px] shrink-0 snap-start overflow-hidden rounded-lg border-2 text-left transition ${selected ? 'border-game-moss ring-2 ring-game-moss/30' : 'border-game-border hover:border-game-ochre'} ${!canAct || (!playable && !evolution) ? 'opacity-65' : ''}`}>
-              <Image src={card.image} alt={card.name} width={76} height={106} className="h-[106px] w-[76px] object-cover" unoptimized />
-              <span className="block truncate bg-game-canvas px-1 py-1 text-center text-[9px] font-bold text-game-ink">{card.name}</span>
-              {(playable || evolution) && <span className="absolute left-1 right-1 top-1 rounded bg-game-charcoal/90 px-1 py-0.5 text-center text-[8px] font-black uppercase tracking-wide text-white">{playable ? playLabel : 'Evolve'}</span>}
-            </button>
-          })}
-          {state.player.hand.length === 0 && <p className="px-2 py-4 text-xs text-game-muted">Your hand is empty.</p>}
-        </div>
-      </section>
+      <button
+        ref={handTriggerRef}
+        type="button"
+        aria-label={`${handOpen ? 'Close' : 'Open'} hand: ${state.player.hand.length} cards, ${state.player.deck.length} cards remaining in deck`}
+        aria-expanded={handOpen}
+        aria-controls={handOpen ? 'tcg-hand-drawer' : undefined}
+        onTouchStart={(event) => {
+          handSwipeTriggeredRef.current = false
+          handSwipeStartXRef.current = event.changedTouches[0]?.clientX ?? null
+        }}
+        onTouchEnd={(event) => {
+          const startX = handSwipeStartXRef.current
+          const endX = event.changedTouches[0]?.clientX
+          handSwipeStartXRef.current = null
+          if (startX !== null && endX !== undefined && startX - endX > 28) {
+            handSwipeTriggeredRef.current = true
+            if (!handOpen) onToggleHand()
+          }
+        }}
+        onClick={() => {
+          if (handSwipeTriggeredRef.current) {
+            handSwipeTriggeredRef.current = false
+            return
+          }
+          onToggleHand()
+        }}
+        className="game-focus-ring fixed right-0 top-1/2 z-[55] flex h-32 w-11 -translate-y-1/2 flex-col items-center justify-center gap-2 rounded-l-xl border border-r-0 border-game-ochre/70 bg-game-surface-raised/95 text-game-ink shadow-xl backdrop-blur-sm"
+      >
+        <span className="rounded-full bg-game-moss px-1.5 py-0.5 text-[10px] font-black text-white">{state.player.hand.length}</span>
+        <span className="rotate-180 [writing-mode:vertical-rl] text-[10px] font-black uppercase tracking-[0.14em]">Hand</span>
+      </button>
+
+      <AnimatePresence>
+        {turnDrawNotice && state.activeSide === 'player' && !handOpen && (
+          <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} role="status" className="fixed right-12 top-1/2 z-[54] flex max-w-[min(64vw,18rem)] -translate-y-1/2 items-center gap-2 rounded-xl border border-game-ochre/60 bg-game-surface-raised px-3 py-2 shadow-xl">
+            {(() => {
+              const drawnCard = state.player.hand.find((card) => card.name === turnDrawNotice)
+              return drawnCard ? <Image src={drawnCard.image} alt="" width={30} height={42} className="h-[42px] w-[30px] shrink-0 rounded-sm object-cover" unoptimized /> : <span aria-hidden="true" className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-game-moss text-xs font-black text-white">↓</span>
+            })()}
+            <span className="min-w-0 text-[10px] font-bold leading-tight text-game-ink">Drew <strong className="block truncate">{turnDrawNotice}</strong></span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {handOpen && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Close hand drawer"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onCloseHand}
+              style={{ top: 'calc(env(safe-area-inset-top) + max(6rem, min(7.25rem, 25dvh)))', bottom: handBottomInset === null ? 'calc(env(safe-area-inset-bottom) + min(8rem, 30dvh))' : `${handBottomInset}px` }}
+              className="fixed inset-x-0 z-[45] cursor-default bg-game-charcoal/20"
+            />
+            <motion.aside
+              id="tcg-hand-drawer"
+              role="region"
+              aria-label="Your hand"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 330, damping: 34 }}
+              onTouchStart={(event) => { handSwipeStartXRef.current = event.changedTouches[0]?.clientX ?? null }}
+              onTouchEnd={(event) => {
+                const startX = handSwipeStartXRef.current
+                const endX = event.changedTouches[0]?.clientX
+                handSwipeStartXRef.current = null
+                if (startX !== null && endX !== undefined && endX - startX > 48) onCloseHand()
+              }}
+              style={{ top: 'calc(env(safe-area-inset-top) + max(6rem, min(7.25rem, 25dvh)))', bottom: handBottomInset === null ? 'calc(env(safe-area-inset-bottom) + min(8rem, 30dvh))' : `${handBottomInset}px` }}
+              className="fixed right-0 z-[60] flex w-[min(88vw,23rem)] flex-col overflow-hidden rounded-l-2xl border border-r-0 border-game-border-strong bg-game-surface-raised/98 shadow-2xl backdrop-blur-md"
+            >
+              <header
+                className="flex shrink-0 items-center justify-between gap-3 border-b border-game-border px-3 py-3"
+              >
+                <div>
+                  <h2 id="tcg-hand-title" className="text-xs font-black uppercase tracking-[0.14em] text-game-ink">Your hand · {state.player.hand.length}</h2>
+                  <p className="mt-1 text-[10px] font-bold text-game-muted">Deck · {state.player.deck.length} remaining</p>
+                </div>
+                <button ref={handCloseRef} type="button" aria-label="Close hand" onClick={onCloseHand} className="game-focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-full border border-game-border bg-game-canvas text-xl font-light text-game-ink">×</button>
+              </header>
+              {turnDrawNotice && state.activeSide === 'player' && (
+                <div role="status" className="mx-3 mt-2 rounded-lg border border-game-moss/35 bg-game-moss/10 px-3 py-2 text-[10px] font-bold text-game-ink">Drew <strong>{turnDrawNotice}</strong> at the start of your turn.</div>
+              )}
+              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
+                {state.player.hand.map((card) => {
+                  const isBasic = basicHand.some((item) => item.instanceId === card.instanceId)
+                  const evolution = evolutionOptions.some((option) => option.card.id === card.id)
+                  const selected = selectedEvolutionCardId === card.id
+                  const isNewlyDrawn = turnDrawNotice === card.name
+                  const isEmergencyRotation = emergencyRotationHand.some((item) => item.instanceId === card.instanceId)
+                  const isLastCardBenchPlay = lastCardBenchDrawHand.some((item) => item.instanceId === card.instanceId)
+                  const playable = (isBasic && canPlaceBasic) || isEmergencyRotation || isLastCardBenchPlay
+                  const action = isEmergencyRotation ? 'Emergency Rotation' : isLastCardBenchPlay ? 'Bench · Draw 3' : `Play to ${basicPlayDestination}`
+                  return (
+                    <div key={card.instanceId} className={cn('flex items-center gap-2 rounded-xl border p-2', selected ? 'border-game-moss bg-game-moss/10 ring-1 ring-game-moss/30' : isNewlyDrawn ? 'border-game-ochre bg-game-ochre/10 ring-1 ring-game-ochre/30' : 'border-game-border bg-game-canvas/80')}>
+                      <button
+                        type="button"
+                        disabled={!canAct || isPending || (!playable && !evolution)}
+                        onClick={() => playable ? onPlayBasicToBench(card.instanceId) : evolution ? onOpenEvolution(card.id) : undefined}
+                        aria-pressed={selected}
+                        aria-label={`${card.name}${playable ? `, ${action}` : evolution ? ', choose a Pokémon to evolve' : ', cannot be played now'}`}
+                        className="game-focus-ring flex min-w-0 flex-1 items-center gap-2 rounded-md text-left disabled:cursor-default disabled:opacity-55"
+                      >
+                        <Image src={card.image} alt="" width={48} height={66} className="h-[66px] w-12 shrink-0 rounded-sm object-cover" unoptimized />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[11px] font-black text-game-ink">{card.name}</span>
+                          <span className="mt-1 block truncate text-[9px] font-bold uppercase tracking-wide text-game-muted">{playable ? action : evolution ? 'Choose evolution target' : card.subtypes[0] || 'Card'}</span>
+                          {isNewlyDrawn && <span className="mt-1 block text-[8px] font-black uppercase tracking-wide text-game-ochre">New this turn</span>}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Preview ${card.name}`}
+                        onClick={() => { onPreviewCard(card); window.setTimeout(() => onPreviewCard(null), 1100) }}
+                        className="game-focus-ring grid h-9 w-9 shrink-0 place-items-center rounded-full border border-game-border bg-game-surface-raised text-xs font-black text-game-muted"
+                      >i</button>
+                    </div>
+                  )
+                })}
+                {state.player.hand.length === 0 && <p className="rounded-lg border border-dashed border-game-border p-4 text-center text-xs font-bold text-game-muted">Your hand is empty.</p>}
+                {state.player.deck.length === 0 && <p role="status" className="rounded-lg bg-game-clay/10 p-3 text-center text-[10px] font-bold text-game-clay">Your deck is empty. No more cards can be drawn.</p>}
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -6788,98 +6965,46 @@ function CoinFlipOverlay({ cue }: { cue: CoinCue }) {
   )
 }
 
-function BattleHeader({
-  state,
-  title,
-  subtitle,
-}: {
-  state: TcgBattleState
-  title: string
-  subtitle?: string
-}) {
-  const phaseLabel =
-    state.phase === 'finished'
-      ? getWinnerLabel(state.winner)
-      : state.pendingPromotion === 'player'
-        ? 'Promotion'
-        : state.activeSide === 'player'
-          ? 'Your turn'
-          : 'Opponent turn'
-
-  return (
-    <header className="relative overflow-hidden rounded-md border border-game-border bg-game-surface-raised px-3 py-2 shadow-sm">
-      <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-game-ochre" />
-            <h1 className="truncate text-sm font-black uppercase text-game-ink sm:text-base">
-              {title}
-            </h1>
-          </div>
-          <div className="mt-1 flex min-w-0 items-center gap-2 text-[11px] text-game-muted">
-            <span className="truncate">
-              {subtitle || `Turn ${state.turnNumber} / ${phaseLabel}`}
-            </span>
-          </div>
-        </div>
-        <div className="grid grid-cols-[auto_auto] gap-1.5">
-          <SideScorePill
-            label="You"
-            side={state.player}
-            energy={state.player.energy}
-            tone="player"
-          />
-          <SideScorePill
-            label="Foe"
-            side={state.opponent}
-            energy={state.opponent.energy}
-            tone="opponent"
-          />
-        </div>
-      </div>
-    </header>
-  )
-}
-
 function SideScorePill({
   label,
   side,
   energy,
+  energyCap,
   tone,
 }: {
   label: string
   side: TcgBattleState['player']
   energy: number
+  energyCap: number
   tone: SideTone
 }) {
   const living = getLivingCards(side).length
+  const deckCount = side.deckCount ?? side.deck.length
+  const knockoutCount = side.knockoutCount || 0
 
   return (
-    <div
+    <section
       className={cn(
-        'min-w-[4.7rem] rounded-md border px-2 py-1',
+        'min-w-0 rounded-lg border px-2 py-1',
         tone === 'player'
           ? 'border-game-charcoal/30 bg-game-charcoal/10'
           : 'border-game-clay/30 bg-game-clay/10',
       )}
+      aria-label={`${label}: ${energy} of ${energyCap} energy, ${knockoutCount} of 6 knockouts, ${deckCount} cards remaining, ${living} Pokémon on the field`}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
+      <div className="flex items-center justify-between gap-1.5">
+        <div className="truncate text-[9px] font-black uppercase tracking-[0.08em] text-game-muted sm:text-[10px]">
           {label}
         </div>
-        <div className="flex items-center gap-1 text-xs font-black text-game-ink">
-          <span className="text-[9px] uppercase tracking-wide">Energy</span>
-          {energy}
-        </div>
-      </div>
-      <div className="mt-1 flex items-center justify-between gap-2 text-[10px] font-bold text-game-muted">
-        <span>{side.front.length} front</span>
-        <span>{living} live</span>
-        <span className={cn((side.knockoutCount || 0) >= 5 && 'font-black text-game-clay')}>
-          KO {side.knockoutCount || 0}/6
+        <span className={cn('shrink-0 text-[10px] font-black text-game-ink sm:text-[11px]', knockoutCount >= 5 && 'text-game-danger')}>
+          KO {knockoutCount}/6
         </span>
       </div>
-    </div>
+      <div className="mt-0.5 flex items-center justify-between gap-2 text-[10px] font-bold text-game-muted">
+        <span>Energy {energy}/{energyCap}</span>
+        <span className={cn(deckCount === 0 && 'font-black text-game-danger')}>Deck {deckCount}</span>
+      </div>
+    </section>
   )
 }
 
@@ -7041,6 +7166,7 @@ function BattleCardRow({
   zone,
   turnNumber,
   selectedId,
+  eligibleTargetIds,
   resolution,
   damageEvent,
   onCardTap,
@@ -7052,6 +7178,7 @@ function BattleCardRow({
   zone: BoardZone
   turnNumber: number
   selectedId?: string
+  eligibleTargetIds: string[]
   resolution?: BattleResolution | null
   damageEvent?: DamageCue | TcgBattleState['lastDamageEvent']
   onCardTap: (card: TcgBattleCardState, zone: BoardZone) => void
@@ -7066,7 +7193,8 @@ function BattleCardRow({
             key={card.instanceId}
             card={card}
             turnNumber={turnNumber}
-            selected={selectedId === card.instanceId}
+            selected={selectedId === card.instanceId || eligibleTargetIds.includes(card.instanceId)}
+            targetable={eligibleTargetIds.includes(card.instanceId)}
             side={side}
             battleRole={
               resolution?.sourceId === card.instanceId
@@ -7095,6 +7223,53 @@ function BattleCardRow({
             <EmptyCardSlot key={index} side={side} />
           ),
         )}
+      </div>
+    </section>
+  )
+}
+
+function BattleBenchRow({
+  cards,
+  label,
+  side,
+  turnNumber,
+  eligibleTargetIds,
+  onCardTap,
+  onPreviewStart,
+  onPreviewEnd,
+}: {
+  cards: TcgBattleCardState[]
+  label: string
+  side: SideTone
+  turnNumber: number
+  eligibleTargetIds: string[]
+  onCardTap?: (card: TcgBattleCardState, zone: BoardZone) => void
+  onPreviewStart: (card: TcgBattleCardState) => void
+  onPreviewEnd: () => void
+}) {
+  return (
+    <section aria-label={`${label}, ${cards.length} Pokémon`} className="flex min-h-[4rem] w-full max-w-3xl items-center gap-2 rounded-lg border border-game-border/70 bg-game-surface-raised/70 px-2 py-1.5">
+      <div className="w-[4.5rem] shrink-0 text-center">
+        <p className="text-[8px] font-black uppercase tracking-[0.08em] text-game-muted">{label}</p>
+        <p className="text-[10px] font-bold text-game-ink">{cards.length}/3</p>
+      </div>
+      <div className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-x-auto px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {cards.length === 0 ? (
+          <span className="text-[9px] font-semibold text-game-muted">No Benched Pokémon</span>
+        ) : cards.map((card) => (
+          <CardImageButton
+            key={card.instanceId}
+            card={card}
+            turnNumber={turnNumber}
+            selected={eligibleTargetIds.includes(card.instanceId)}
+            targetable={eligibleTargetIds.includes(card.instanceId)}
+            side={side}
+            compact
+            onClick={onCardTap ? () => onCardTap(card, side === 'player' ? 'player-bench' : 'opponent-bench') : undefined}
+            onPreviewStart={() => onPreviewStart(card)}
+            onPreviewEnd={onPreviewEnd}
+          />
+        ))}
       </div>
     </section>
   )
@@ -7331,45 +7506,6 @@ function TinyHpPill({
   )
 }
 
-function BenchBar({
-  state,
-  playerBenchCount,
-  opponentBenchCount,
-  onOpenBench,
-}: {
-  state: TcgBattleState
-  playerBenchCount: number
-  opponentBenchCount: number
-  onOpenBench: () => void
-}) {
-  const turnLabel =
-    state.phase === 'finished'
-      ? getWinnerLabel(state.winner)
-      : state.pendingPromotion === 'player'
-        ? 'Promote'
-        : state.activeSide === 'player'
-          ? 'Your turn'
-          : 'Foe turn'
-
-  return (
-    <div className="grid grid-cols-[1fr_auto_1fr] gap-1.5">
-      <div className="flex items-center justify-center gap-2 border border-game-clay/20 bg-game-surface-raised/80 py-2 text-xs text-game-muted">
-        Foe bench {opponentBenchCount}
-      </div>
-      <div className="flex min-w-20 items-center justify-center border border-game-ochre/30 bg-game-ochre/10 px-2 py-2 text-xs font-black uppercase text-game-ink">
-        {turnLabel}
-      </div>
-      <button
-        type="button"
-        className="game-focus-ring flex items-center justify-center gap-2 border border-game-charcoal/35 bg-game-charcoal/20 py-2 text-xs font-black uppercase text-game-ink transition-colors hover:bg-game-charcoal/35"
-        onClick={onOpenBench}
-      >
-        Bench {playerBenchCount}
-      </button>
-    </div>
-  )
-}
-
 function BenchSheet({
   mode,
   state,
@@ -7476,7 +7612,7 @@ function EvolutionSheet({
   onClose: () => void
   onEvolve: (targetId: string, evolutionCardId: string, effectTargetId?: string | string[]) => void
 }) {
-  const [pendingChoice, setPendingChoice] = useState<{ targetId: string; evolutionCardId: string; effectTargetIds: string[] } | null>(null)
+  const [pendingChoice, setPendingChoice] = useState<{ targetId: string; evolutionCardId: string; effectTargetIds: string[] } | null>(() => options.length === 1 ? { targetId: options[0].targetId, evolutionCardId: options[0].card.id, effectTargetIds: [] } : null)
   const selectedOption = pendingChoice && options.find((option) => option.targetId === pendingChoice.targetId && option.card.id === pendingChoice.evolutionCardId)
   const brightLookEligible = (card: { name: string }, targetId: string) => card.name.toLowerCase() === 'luxray gl lv.x' && playerSide.front.some((target) => target.instanceId === targetId && target.name.toLowerCase() === 'luxray gl')
   const damageTargetCount = selectedOption ? getTcgBattleEvolutionDamageTargetCount(selectedOption.card) : 0
@@ -7520,7 +7656,7 @@ function EvolutionSheet({
         if (!nextOpen) onClose()
       }}
       title="Evolve Pokémon"
-      description="Choose a Pokémon and a matching evolution card from your hand. Evolving does not use your turn; only attacking or charging ends it. Some Pokémon use a once-per-turn Ability to evolve early or heal."
+      description={selectedOption ? `Evolve ${selectedOption.targetName} with ${selectedOption.card.name}. Evolving does not use your turn; only attacking or charging ends it.` : 'Choose a Pokémon and a matching Evolution card from your hand. Evolving does not use your turn; only attacking or charging ends it.'}
       icon={<span className="text-xs font-bold uppercase tracking-wide">Evolve</span>}
       background="/backgrounds/tcg.avif"
       heroLabel="Card battle"
@@ -7778,9 +7914,11 @@ function CardImageButton({
   card,
   turnNumber,
   selected = false,
+  targetable = false,
   muted = false,
   disabled = false,
   draggable = false,
+  compact = false,
   side = 'player',
   battleRole,
   damage,
@@ -7793,9 +7931,11 @@ function CardImageButton({
   card: TcgBattleCardState
   turnNumber?: number
   selected?: boolean
+  targetable?: boolean
   muted?: boolean
   disabled?: boolean
   draggable?: boolean
+  compact?: boolean
   side?: SideTone
   battleRole?: 'attacker' | 'target'
   damage?: number
@@ -7839,7 +7979,8 @@ function CardImageButton({
     <button
       type="button"
       className={cn(
-        'tcg-motion group relative aspect-[240/330] w-[clamp(82px,27vw,150px)] touch-manipulation overflow-visible bg-transparent p-0 text-left transition duration-200 sm:w-[clamp(108px,14vw,190px)]',
+        'tcg-motion group relative aspect-[240/330] touch-manipulation overflow-visible bg-transparent p-0 text-left transition duration-200',
+        compact ? 'w-[clamp(52px,15vw,76px)] sm:w-[clamp(60px,7vw,88px)]' : 'w-[clamp(82px,27vw,150px)] sm:w-[clamp(108px,14vw,190px)]',
         selected
           ? 'drop-shadow-[0_8px_16px_rgba(24,35,39,0.2)]'
           : 'drop-shadow-[0_6px_14px_rgba(24,35,39,0.16)]',
@@ -7854,7 +7995,8 @@ function CardImageButton({
           ? 'cursor-pointer active:scale-[0.985]'
           : 'cursor-default',
       )}
-      aria-label={card.name}
+      aria-label={targetable ? `${card.name}, eligible Evolution target` : card.name}
+      data-evolution-target={targetable ? 'true' : undefined}
       draggable={draggable && !disabled}
       onPointerDown={() => {
         if (disabled || !onPreviewStart) return
@@ -7900,6 +8042,11 @@ function CardImageButton({
               : 'border-red-200 bg-red-300/[0.06]',
           )}
         />
+      )}
+      {targetable && (
+        <span className="pointer-events-none absolute -top-2 left-1/2 z-30 -translate-x-1/2 rounded-full border border-game-moss/50 bg-game-surface-raised px-2 py-0.5 text-[8px] font-black uppercase tracking-wide text-game-moss shadow-sm">
+          Evolve
+        </span>
       )}
       {isLocked && !knockedOut && (
         <div
