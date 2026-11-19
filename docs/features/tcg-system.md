@@ -26,6 +26,12 @@ Lost Origin Drapion VSTAR's Venomous Vortex applies Paralysis and Poison to a se
 
 # TCG System
 
+Set-independent attack text that deals a fixed amount to one selected opposing Pokémon is now recognized across the catalog, including the optional damaged-target restriction and the printed Benched Weakness/Resistance exception. This covers modern Skill Dive and Blindside prints without relying on set-specific attack-name mappings. The resolver also recognizes Active-target damage bonuses that require the opponent's Active Pokémon to already have damage counters, such as Mega Golisopod ex's Finishing Blow.
+
+Bench-scaled attacks now recognize printed type-specific Bench counts and counts of Benched Pokémon with a named attack, covering Circle Circuit and Let's All Rollout without card-specific mappings.
+
+Prize-scaling attack damage, exact/threshold Prize-count damage bonuses, passive personal attack boosts, and Colorless cost reductions use the battle's KO count as a one-Prize-per-KO approximation. Actual Prize-card operations and Prize-card reward modifiers remain unsupported.
+
 Secret Wonders Unown [Z]'s ZERO moves Unown Z from the Bench to the top of its owner's deck once per turn when that deck is empty. The action is available in PvE and PvP.
 Holon Phantoms Crawdaunt ex's Splash Back returns a selected opposing Benched Pokémon and its Evolution stack to its owner's hand once per turn when the opponent has at least four Benched Pokémon. Crawdaunt ex must be free of Special Conditions; player, PvP, and automatic NPC paths validate the target and usage limit.
 Supreme Victors Yanmega can use its Active-only Power once per turn to recover a Grass Energy from the discard pile into the shared Energy pool. Special Conditions block use; player, PvP, and NPC paths use the existing discard Energy attachment Ability flow.

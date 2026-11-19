@@ -1,10 +1,10 @@
 # TCG Battle Pokémon Ability Support Audit
 
-This generated set-by-set inventory covers 217 catalogued sets and 4537 Pokémon ability records with printed text. 3514 records match at least one implemented text family; 1023 do not match any family. Of those unmatched records, 500 are currently classified as out of scope because they require card zones or rules the battle engine does not model and have no direct gameplay equivalent; 523 remain in the implementation review queue. The skip categories use conservative text matching and need review when new kinds of effects appear. 17 additional ability records have blank source text and cannot yet be classified. Category counts are pattern matches and can overlap. “No recognized family” does not claim complete behavior coverage for records that match a supported family.
+This generated set-by-set inventory covers 217 catalogued sets and 4537 Pokémon ability records with printed text. 3528 records match at least one implemented text family; 1009 do not match any family. Of those unmatched records, 3 are already guaranteed by a fixed battle-format rule; 486 require card zones or rules the engine does not model and have no direct gameplay equivalent; 520 remain in the implementation review queue. The skip categories use conservative text matching and need review when new kinds of effects appear. 17 additional ability records have blank source text and cannot yet be classified. Category counts are pattern matches and can overlap. “No recognized family” does not claim complete behavior coverage for records that match a supported family.
 
 Recognized behavior families in the current simplified engine:
 
-- holder damage modifier: 309 matching ability records across 127 sets
+- holder damage modifier: 315 matching ability records across 127 sets
 - team damage boost: 67 matching ability records across 47 sets
 - team damage reduction: 52 matching ability records across 36 sets
 - damage protection: 237 matching ability records across 111 sets
@@ -17,7 +17,7 @@ Recognized behavior families in the current simplified engine:
 - healing amount boost: 38 matching ability records across 27 sets
 - retreat rule: 201 matching ability records across 104 sets
 - opponent attack cost increase: 19 matching ability records across 15 sets
-- conditional attack cost reduction: 55 matching ability records across 31 sets
+- conditional attack cost reduction: 63 matching ability records across 35 sets
 - end-of-turn draws and deck discards: 18 matching ability records across 7 sets
 - activated healing Power: 130 matching ability records across 81 sets
 - activated draw Power: 126 matching ability records across 67 sets
@@ -74,7 +74,7 @@ Basic Pokémon can now be played from hand onto the Bench during battle. Crobat 
 | Ancient Origins | `xy7` | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 7 |
 | Aquapolis | `ecard2` | 56 | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 3 | 2 | 0 | 9 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 5 | 0 | 0 | 1 | 0 | 0 | 0 | 2 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 22 |
 | Arceus | `pl4` | 29 | 1 | 1 | 1 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 3 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 6 |
-| Ascended Heroes | `me2pt5` | 68 | 2 | 0 | 0 | 2 | 3 | 0 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 2 | 2 | 0 | 0 | 2 | 0 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 6 | 0 | 10 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 4 | 0 | 2 | 0 | 1 | 0 | 0 | 4 | 0 | 1 | 0 | 13 |
+| Ascended Heroes | `me2pt5` | 68 | 3 | 0 | 0 | 2 | 3 | 0 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 2 | 2 | 0 | 0 | 2 | 0 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 6 | 0 | 10 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 4 | 0 | 2 | 0 | 1 | 0 | 0 | 4 | 0 | 1 | 0 | 12 |
 | Astral Radiance | `swsh10` | 44 | 2 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 1 | 0 | 10 | 2 | 0 | 3 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 3 | 0 | 0 | 0 | 10 |
 | Astral Radiance Trainer Gallery | `swsh10tg` | 17 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 3 | 0 | 3 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 4 |
 | Base | `base1` | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 2 |
@@ -99,11 +99,11 @@ Basic Pokémon can now be played from hand onto the Bench during battle. Crobat 
 | Celestial Storm | `sm7` | 51 | 4 | 0 | 3 | 7 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 3 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 8 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 5 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 3 | 1 | 7 |
 | Champion's Path | `swsh35` | 12 | 5 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Chaos Rising | `me4` | 22 | 3 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 4 | 0 | 0 | 0 | 4 |
-| Chilling Reign | `swsh6` | 44 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 1 | 0 | 1 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 3 | 3 | 0 | 3 | 3 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 2 | 0 | 0 | 0 | 12 |
-| Cosmic Eclipse | `sm12` | 64 | 2 | 0 | 4 | 1 | 0 | 1 | 3 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 2 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 2 | 0 | 8 | 4 | 2 | 1 | 0 | 0 | 3 | 0 | 0 | 0 | 1 | 3 | 1 | 0 | 0 | 5 | 0 | 0 | 3 | 0 | 0 | 0 | 12 |
+| Chilling Reign | `swsh6` | 44 | 3 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 1 | 0 | 1 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 3 | 3 | 0 | 3 | 3 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 2 | 0 | 0 | 0 | 11 |
+| Cosmic Eclipse | `sm12` | 64 | 3 | 0 | 4 | 1 | 0 | 1 | 3 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 2 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 2 | 0 | 8 | 4 | 2 | 1 | 0 | 0 | 3 | 0 | 0 | 0 | 1 | 3 | 1 | 0 | 0 | 5 | 0 | 0 | 3 | 0 | 0 | 0 | 11 |
 | Crimson Blaze | `tcgp_b1a` | 10 | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 |
 | Crimson Invasion | `sm4` | 23 | 3 | 0 | 0 | 1 | 0 | 1 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 3 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 0 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 5 |
-| Crown Zenith | `swsh12pt5` | 21 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 3 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 1 | 0 | 4 |
+| Crown Zenith | `swsh12pt5` | 21 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 3 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 1 | 0 | 3 |
 | Crown Zenith Galarian Gallery | `swsh12pt5gg` | 36 | 0 | 0 | 2 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 3 | 0 | 10 | 0 | 2 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 4 |
 | Crystal Guardians | `ex14` | 32 | 6 | 0 | 0 | 2 | 0 | 0 | 1 | 0 | 0 | 2 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 3 | 0 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 9 |
 | Dark Explorers | `bw5` | 11 | 1 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
@@ -212,7 +212,7 @@ Basic Pokémon can now be played from hand onto the Bench during battle. Crobat 
 | Platinum | `pl1` | 34 | 1 | 0 | 0 | 0 | 1 | 1 | 2 | 0 | 0 | 2 | 1 | 0 | 0 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 3 | 0 | 1 | 0 | 0 | 3 | 1 | 0 | 0 | 9 |
 | Poké Card Creator Pack | `ex5_5` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Pokémon Futsal Collection | `fut20` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Pokémon GO | `pgo` | 17 | 0 | 3 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 6 |
+| Pokémon GO | `pgo` | 17 | 0 | 3 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 5 |
 | Pokémon Rumble | `ru1` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | POP Series 1 | `pop1` | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | POP Series 2 | `pop2` | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
@@ -225,7 +225,7 @@ Basic Pokémon can now be played from hand onto the Bench during battle. Crobat 
 | POP Series 9 | `pop9` | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Power Keepers | `ex16` | 34 | 3 | 1 | 0 | 1 | 0 | 0 | 2 | 0 | 0 | 1 | 3 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 1 | 0 | 10 |
 | Primal Clash | `xy5` | 35 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 0 | 0 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 5 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 9 |
-| Prismatic Evolutions | `sv8pt5` | 41 | 2 | 1 | 1 | 4 | 1 | 0 | 0 | 0 | 1 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 6 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 1 | 1 | 0 | 2 | 0 | 0 | 3 | 0 | 1 | 0 | 8 |
+| Prismatic Evolutions | `sv8pt5` | 41 | 2 | 1 | 1 | 4 | 1 | 0 | 0 | 0 | 1 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 6 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 1 | 1 | 0 | 2 | 0 | 0 | 3 | 0 | 1 | 0 | 7 |
 | Promos-A | `tcgp_p_a` | 8 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
 | Rebel Clash | `swsh2` | 37 | 4 | 1 | 3 | 2 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 6 | 2 | 0 | 0 | 3 | 0 | 0 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 6 |
 | Rising Rivals | `pl2` | 45 | 3 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 6 | 3 | 0 | 2 | 0 | 2 | 3 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 1 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 3 | 0 | 3 | 0 | 0 | 1 | 0 | 6 |
@@ -233,7 +233,7 @@ Basic Pokémon can now be played from hand onto the Bench during battle. Crobat 
 | Ruby & Sapphire | `ex1` | 18 | 1 | 0 | 0 | 0 | 2 | 1 | 0 | 0 | 0 | 1 | 3 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 |
 | Sandstorm | `ex2` | 28 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 3 | 4 | 0 | 2 | 0 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 3 |
 | Scarlet & Violet | `sv1` | 41 | 3 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 4 | 0 | 0 | 1 | 0 | 0 | 0 | 3 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 0 | 14 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 2 | 2 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 1 | 0 | 2 |
-| Scarlet & Violet Black Star Promos | `svp` | 63 | 2 | 1 | 1 | 2 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 2 | 0 | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 1 | 3 | 0 | 12 | 1 | 1 | 3 | 0 | 0 | 0 | 0 | 3 | 1 | 3 | 0 | 6 | 0 | 0 | 3 | 1 | 0 | 0 | 8 |
+| Scarlet & Violet Black Star Promos | `svp` | 63 | 2 | 1 | 1 | 2 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 2 | 0 | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 1 | 3 | 0 | 12 | 1 | 1 | 3 | 0 | 0 | 0 | 0 | 3 | 1 | 3 | 0 | 6 | 0 | 0 | 3 | 1 | 0 | 0 | 7 |
 | Scarlet & Violet Energies | `sve` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Secluded Springs | `tcgp_a4a` | 19 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 9 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
 | Secret Wonders | `dp3` | 45 | 1 | 0 | 0 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 2 | 1 | 1 | 0 | 4 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 1 | 1 | 5 | 0 | 0 | 1 | 0 | 0 | 0 | 2 | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 0 | 1 | 0 | 13 |
@@ -245,7 +245,7 @@ Basic Pokémon can now be played from hand onto the Bench during battle. Crobat 
 | Silver Tempest | `swsh12` | 38 | 4 | 3 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 1 | 0 | 0 | 10 | 2 | 0 | 0 | 1 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 1 | 0 | 7 |
 | Silver Tempest Trainer Gallery | `swsh12tg` | 11 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
 | Skyridge | `ecard3` | 62 | 3 | 0 | 1 | 0 | 0 | 2 | 0 | 0 | 0 | 2 | 6 | 0 | 0 | 0 | 6 | 0 | 0 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 32 |
-| SM Black Star Promos | `smp` | 74 | 8 | 1 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 1 | 0 | 3 | 0 | 0 | 0 | 3 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 3 | 3 | 0 | 6 | 1 | 0 | 1 | 0 | 0 | 0 | 1 | 5 | 0 | 0 | 0 | 6 | 3 | 2 | 1 | 0 | 0 | 1 | 16 |
+| SM Black Star Promos | `smp` | 74 | 9 | 1 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 1 | 0 | 3 | 0 | 0 | 0 | 3 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 3 | 3 | 0 | 6 | 1 | 0 | 1 | 0 | 0 | 0 | 1 | 5 | 0 | 0 | 0 | 6 | 3 | 2 | 1 | 0 | 0 | 1 | 15 |
 | SM trainer Kit (Alolan Raichu) | `tk_sm_r` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | SM trainer Kit (Lycanroc) | `tk_sm_l` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Southern Islands | `si1` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -257,14 +257,14 @@ Basic Pokémon can now be played from hand onto the Bench during battle. Crobat 
 | Supreme Victors | `pl3` | 34 | 5 | 0 | 0 | 1 | 0 | 1 | 4 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 0 | 0 | 1 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 9 |
 | Surging Sparks | `sv8` | 39 | 3 | 0 | 0 | 5 | 2 | 1 | 3 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 3 | 0 | 2 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 1 | 2 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 4 |
 | Sword & Shield | `swsh1` | 25 | 2 | 1 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 1 | 1 | 6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 1 | 0 | 2 |
-| SWSH Black Star Promos | `swshp` | 95 | 3 | 2 | 2 | 9 | 0 | 4 | 0 | 0 | 1 | 1 | 5 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 4 | 10 | 5 | 1 | 4 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 3 | 0 | 0 | 4 | 0 | 1 | 0 | 33 |
+| SWSH Black Star Promos | `swshp` | 95 | 5 | 2 | 2 | 9 | 0 | 4 | 0 | 0 | 1 | 1 | 5 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 4 | 10 | 5 | 1 | 4 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 3 | 0 | 0 | 4 | 0 | 1 | 0 | 31 |
 | Team Magma vs Team Aqua | `ex4` | 10 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 |
 | Team Rocket | `base5` | 20 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 4 |
 | Team Rocket Returns | `ex7` | 41 | 3 | 0 | 0 | 2 | 3 | 0 | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 2 | 0 | 1 | 0 | 4 | 0 | 5 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 2 | 0 | 0 | 0 | 5 |
 | Team Up | `sm9` | 36 | 1 | 0 | 0 | 5 | 0 | 1 | 1 | 0 | 0 | 0 | 4 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 8 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 12 |
 | Temporal Forces | `sv5` | 37 | 1 | 4 | 0 | 3 | 0 | 0 | 0 | 0 | 4 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 1 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 0 | 0 | 5 |
 | Triumphant Light | `tcgp_a2a` | 22 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 2 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
-| Twilight Masquerade | `sv6` | 45 | 2 | 0 | 0 | 3 | 1 | 0 | 2 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 6 | 1 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 17 |
+| Twilight Masquerade | `sv6` | 45 | 2 | 0 | 0 | 3 | 1 | 0 | 2 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 6 | 1 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 13 |
 | Ultra Prism | `sm5` | 37 | 1 | 1 | 0 | 5 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 6 | 0 | 3 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 4 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 4 |
 | Unbroken Bonds | `sm10` | 53 | 5 | 1 | 1 | 1 | 3 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 2 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 3 | 0 | 0 | 6 | 1 | 4 | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 1 | 0 | 0 | 13 |
 | Unified Minds | `sm11` | 54 | 4 | 0 | 2 | 0 | 0 | 1 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 1 | 0 | 0 | 2 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 1 | 0 | 3 | 3 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 3 | 0 | 1 | 3 | 0 | 0 | 0 | 1 | 0 | 16 |
@@ -307,22 +307,24 @@ Basic Pokémon can now be played from hand onto the Bench during battle. Crobat 
 
 ## All unmatched ability texts
 
-These are exact printed-text groups with no recognized family, ordered by prevalence. “Skip” categories require mechanics with no comparable battle-engine representation; “Review” means the text may fit an existing mechanic or a reasonable approximation and should be considered for implementation. Energy-card effects remain reviewable when they can be mapped to the shared Energy pool; this audit only skips effects that depend on Energy attached to a specific Pokémon or on card identity in a zone. Classifications are rule-based triage, not a substitute for card-by-card confirmation.
+These are exact printed-text groups with no recognized family, ordered by prevalence. “Skip” categories require mechanics with no comparable battle-engine representation; “Review” means the text may fit an existing mechanic or a reasonable approximation and should be considered for implementation. “Format-rule equivalent” means the printed restriction is already guaranteed by the battle format. Energy-card effects remain reviewable when they can be mapped to the shared Energy pool; this audit only skips effects that depend on Energy attached to a specific Pokémon or on card identity in a zone. Classifications are rule-based triage, not a substitute for card-by-card confirmation.
 
-### Out-of-scope skip totals
+### Out-of-scope and format-equivalent totals
 
-| Skip reason | Records |
+| Classification | Records |
 | --- | ---: |
 | Trainer, Supporter, or Item cards/zones | 129 |
-| Prize cards or points | 100 |
+| Prize cards or points | 86 |
 | Stadium cards and their in-play lifecycle | 49 |
 | Pokémon Tool cards and attachment lifecycle | 64 |
 | Lost Zone card zone | 5 |
 | Energy attached to specific Pokémon or attached Energy identity/counts | 152 |
 | Joke/non-battle effect | 1 |
-| **Total classified as skip** | **500** |
-| **Still in implementation review queue** | **523** |
-| **Total unmatched with printed text** | **1023** |
+| Already guaranteed by the battle format’s fixed three-slot Bench | 3 |
+| **Total classified as skip** | **486** |
+| **Already guaranteed by format rules** | **3** |
+| **Still in implementation review queue** | **520** |
+| **Total unmatched with printed text** | **1009** |
 
 ### Unmatched text groups
 
@@ -333,7 +335,6 @@ These are exact printed-text groups with no recognized family, ordered by preval
 | 7 | Review: potentially implementable or approximable | If Festival Grounds is in play, this Pokémon may use an attack it has twice. If the first attack Knocks Out your opponent's Active Pokémon, you may attack again after your opponent chooses a new Active Pokémon. | Twilight Masquerade (sv6): Dipplin; Twilight Masquerade (sv6): Goldeen; Twilight Masquerade (sv6): Swirlix; Prismatic Evolutions (sv8pt5): Dipplin; Prismatic Evolutions (sv8pt5): Goldeen; Prismatic Evolutions (sv8pt5): Seaking |
 | 7 | Trainer, Supporter, or Item cards/zones | Whenever your opponent plays an Item or Supporter card from their hand, prevent all effects of that card done to this Pokémon. | Unified Minds (sm11): Axew; Forbidden Light (sm6): Pyroar; Team Up (sm9): Galvantula; Destined Rivals (sv10): Cetitan ex; Shrouded Fable (sv6pt5): Fraxure |
 | 6 | Pokémon Tool cards and attachment lifecycle | {title}: This Pokémon may have up to 2 Pokémon Tool cards attached to it. | Ancient Origins (xy7): Vespiquen; Ancient Origins (xy7): Entei; Ancient Origins (xy7): Gyarados; Ancient Origins (xy7): M Tyranitar-EX; Ancient Origins (xy7): Metagross |
-| 6 | Prize cards or points | Blood Moon used by this Pokémon costs {C} less for each Prize card your opponent has taken. | Twilight Masquerade (sv6): Bloodmoon Ursaluna ex; Prismatic Evolutions (sv8pt5): Bloodmoon Ursaluna ex; Scarlet & Violet Black Star Promos (svp): Bloodmoon Ursaluna ex |
 | 6 | Review: potentially implementable or approximable | If you played Bird Keeper from your hand during this turn, ignore all Energy in this Pokémon's attack costs. | Darkness Ablaze (swsh3): Rowlet; Darkness Ablaze (swsh3): Starly; Darkness Ablaze (swsh3): Swanna; Shining Fates (swsh45): Rowlet; Shining Fates Shiny Vault (swsh45sv): Rowlet; Shining Fates Shiny Vault (swsh45sv): Swanna |
 | 6 | Stadium cards and their in-play lifecycle | Once during your turn, if a Stadium is in play, you may make your opponent's Active Pokémon Poisoned. | Paldea Evolved (sv2): Paldean Clodsire ex; Paldean Fates (sv4pt5): Paldean Clodsire ex; Rebel Clash (swsh2): Garbodor; SWSH Black Star Promos (swshp): Garbodor |
 | 6 | Review: potentially implementable or approximable | This Pokémon may have up to 4 Pokémon Tools attached to it. If it loses this Ability, discard Pokémon Tools from it until only 1 remains. | Obsidian Flames (sv3): Revavroom ex; Brilliant Stars (swsh9): Honchkrow V |
@@ -355,7 +356,7 @@ These are exact printed-text groups with no recognized family, ordered by preval
 | 4 | Review: potentially implementable or approximable | When you attach a Plasma Energy from your hand to this Pokémon, you may switch 1 of your opponent’s Benched Pokémon with his or her Active Pokémon. | Plasma Blast (bw10): Genesect-EX; 30th Celebration: Classic Collection (me55c): Charizard; 30th Celebration: Classic Collection (me55c): Genesect-EX |
 | 4 | Review: potentially implementable or approximable | When you play this Pokémon from your hand onto your Bench during your turn, you may discard a Special Energy from 1 of your opponent’s Pokémon. | Crimson Invasion (sm4): Kartana-GX; Hidden Fates Shiny Vault (sma): Kartana-GX |
 | 4 | Trainer, Supporter, or Item cards/zones | Whenever your opponent plays an Item card from their hand, prevent all effects of that card done to this Pokémon. | SWSH Black Star Promos (swshp): Greninja V-UNION |
-| 3 | Review: potentially implementable or approximable | As long as this Pokémon is in the Active Spot, your opponent can't have more than 3 Benched Pokémon. If they have 4 or more Benched Pokémon, they discard Benched Pokémon until they have 3 Pokémon on the Bench. If more than one effect changes the number of Benched Pokémon allowed, use the smaller number. | Obsidian Flames (sv3): Glimmora ex; Paldean Fates (sv4pt5): Glimmora ex |
+| 3 | Already guaranteed by the battle format’s fixed three-slot Bench | As long as this Pokémon is in the Active Spot, your opponent can't have more than 3 Benched Pokémon. If they have 4 or more Benched Pokémon, they discard Benched Pokémon until they have 3 Pokémon on the Bench. If more than one effect changes the number of Benched Pokémon allowed, use the smaller number. | Obsidian Flames (sv3): Glimmora ex; Paldean Fates (sv4pt5): Glimmora ex |
 | 3 | Pokémon Tool cards and attachment lifecycle | As long as this Pokémon is in the Active Spot, your opponent can't play any Item cards or Pokémon Tool cards from their hand. | White Flare (rsv10pt5): Jellicent ex |
 | 3 | Stadium cards and their in-play lifecycle | As long as this Pokémon is in the Active Spot, your opponent can't play any Stadium cards from their hand. | Celebrations (cel25): Palkia; 151 (sv3pt5): Antique Helix Fossil; Shrouded Fable (sv6pt5): Copperajah |
 | 3 | Trainer, Supporter, or Item cards/zones | As long as this Pokémon is your Active Pokémon, your opponent can’t play any Item cards from his or her hand. | Legendary Treasures (bw11): Gothitelle; Emerging Powers (bw2): Gothitelle; XY (xy1): Trevenant |
@@ -379,7 +380,6 @@ These are exact printed-text groups with no recognized family, ordered by preval
 | 3 | Review: potentially implementable or approximable | Once during your turn, you may attach a Basic {R} Energy card, a Basic {F} Energy card, or 1 of each from your hand to your Pokémon in any way you like. | Twilight Masquerade (sv6): Infernape; Scarlet & Violet Black Star Promos (svp): Infernape |
 | 3 | Prize cards or points | Once during your turn, you may switch 1 of your opponent's face-down Prize cards with the top card of their deck. (The cards stay face down.) | Darkness Ablaze (swsh3): Galarian Mr. Rime; Shining Fates Shiny Vault (swsh45sv): Galarian Mr. Rime; SWSH Black Star Promos (swshp): Galarian Mr. Rime |
 | 3 | Pokémon Tool cards and attachment lifecycle | This Pokémon may have up to 2 Pokémon Tool cards attached to it. If it loses this Ability, discard Pokémon Tool cards from it until only 1 remains. | Lost Thunder (sm8): Genesect-GX |
-| 3 | Prize cards or points | This Pokémon's attacks do 30 more damage to your opponent's Active Pokémon for each Prize card your opponent has taken (before applying Weakness and Resistance). | Chilling Reign (swsh6): Cinderace; SWSH Black Star Promos (swshp): Cinderace |
 | 3 | Energy attached to specific Pokémon or attached Energy identity/counts | To attach a Water Energy card from your hand to Suicune, you must discard an Energy card attached to Suicune. (Attach the Water Energy, and then discard an Energy card from Suicune.) | Wizards Black Star Promos (basep): Suicune; Aquapolis (ecard2): Suicune |
 | 3 | Review: potentially implementable or approximable | When 1 of your Pokémon is Knocked Out by damage from an attack from your opponent's Pokémon, you may move a {L} Energy from that Pokémon to this Pokémon. | 151 (sv3pt5): Raichu; Paldean Fates (sv4pt5): Raichu |
 | 3 | Review: potentially implementable or approximable | When you play this Pokémon from your hand onto your Bench during your turn, you may discard a Special Energy from your opponent’s Active Pokémon. | Unified Minds (sm11): Giratina; Obsidian Flames (sv3): Mawile; Scarlet & Violet Black Star Promos (svp): Mawile |
@@ -494,8 +494,6 @@ These are exact printed-text groups with no recognized family, ordered by preval
 | 2 | Review: potentially implementable or approximable | Once during your turn, you may use this Ability. Attach a Basic Fire Energy card, a Basic Lightning Energy card, or 1 of each from your hand to your Electivire and Magmortar in any way you like. | Delta Reign (me06): Magmortar |
 | 2 | Energy attached to specific Pokémon or attached Energy identity/counts | Prevent all damage from and effects of attacks done to this Pokémon by your opponent's Pokémon that have any Special Energy attached. | Black Bolt (zsv10pt5): Carracosta |
 | 2 | Review: potentially implementable or approximable | This Pokémon may have up to 2 Pokémon Tools attached to it. If it loses this Ability, discard Pokémon Tools from it until only 1 remains. | Evolving Skies (swsh7): Garbodor VMAX |
-| 2 | Prize cards or points | This Pokémon's attacks cost Colorless less for each Prize card your opponent has taken. | Pokémon GO (pgo): Radiant Charizard; Crown Zenith (swsh12pt5): Radiant Charizard |
-| 2 | Prize cards or points | This Pokémon’s attacks do 20 more damage to your opponent’s Active Pokémon for each Prize card you have taken (before applying Weakness and Resistance). | Cosmic Eclipse (sm12): Buzzwole; SM Black Star Promos (smp): Buzzwole |
 | 2 | Energy attached to specific Pokémon or attached Energy identity/counts | To attach a Fire Energy card from your hand to Entei, you must discard an Energy card attached to Entei. (Attach the Fire Energy, and then discard an Energy from Entei.) | Aquapolis (ecard2): Entei |
 | 2 | Energy attached to specific Pokémon or attached Energy identity/counts | To attach a Lightning Energy card from your hand to Raikou, you must discard an Energy card attached to Raikou. (Attach the Lightning Energy, and then discard an Energy card from Raikou.) | Skyridge (ecard3): Raikou |
 | 2 | Review: potentially implementable or approximable | When 1 of your Basic Pokémon V is Knocked Out by damage from an attack from your opponent's Pokémon, you may move a basic Energy card from that Pokémon to another of your Pokémon. | Astral Radiance (swsh10): Jirachi V; SWSH Black Star Promos (swshp): Jirachi V |
@@ -638,7 +636,6 @@ These are exact printed-text groups with no recognized family, ordered by preval
 | 1 | Review: potentially implementable or approximable | As often as you like during your turn, you may use this Ability. Move an Energy from 1 of your other Pokémon to this Pokémon. | Ascended Heroes (me2pt5): Azumarill ex |
 | 1 | Energy attached to specific Pokémon or attached Energy identity/counts | As often as you would like during your turn (before your attack), you may move a Metal Energy attached to 1 of your Pokémon to another of your Pokémon. | Black & White (bw1): Klinklang |
 | 1 | Review: potentially implementable or approximable | At any time during your turn (before your attack), you may return Tentacool to your hand. (Discard all cards attached to Tentacool.) This power can't be used the turn you put Tentacool into play or if Tentacool is affected by a Special Condition. | Legendary Collection (base6): Tentacool |
-| 1 | Prize cards or points | Attacks used by this Pokémon do 30 more damage to your opponent's Active Pokémon for each Prize card your opponent has taken (before applying Weakness and Resistance). | Ascended Heroes (me2pt5): Kingambit |
 | 1 | Pokémon Tool cards and attachment lifecycle | Attacks used by your opponent's Active Pokémon that has a Pokémon Tool attached do 20 less damage (before applying Weakness and Resistance). | Chaos Rising (me4): Garbodor |
 | 1 | Trainer, Supporter, or Item cards/zones | Basic Energy attached to your Basic Pokémon can't be discarded by effects of your opponent's attacks, Abilities, or Trainer cards. | Fates Collide (xy10): Carbink |
 | 1 | Trainer, Supporter, or Item cards/zones | During your opponent's turn, if this Pokémon is discarded from your deck by an effect of an attack or Ability from your opponent's Pokémon, or by an effect of your opponent's Item or Supporter cards, discard the top 8 cards of your opponent's deck. | Chaos Rising (me4): Ferrothorn |

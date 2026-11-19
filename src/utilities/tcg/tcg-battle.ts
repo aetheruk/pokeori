@@ -41,6 +41,7 @@ export type TcgBattleCountSource =
   | { kind: 'injuredPokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[]; zone: 'bench' | 'play' }
   | { kind: 'injuredPokemonNameContains'; side: 'own' | 'opponent' | 'both'; nameContains: string; zone: 'bench' | 'play' }
   | { kind: 'deckSize'; side: 'own' | 'opponent' }
+  | { kind: 'knockouts' | 'remainingKnockouts'; side: 'own' | 'opponent' }
   | { kind: 'damageCounters'; target: 'attacker' | 'target' }
   | { kind: 'damageCountersOnSide'; side: 'own' | 'opponent' | 'both'; zone: 'front' | 'bench' | 'play' }
   | { kind: 'damageCountersOnTypesInPlay'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; types: string[] }
@@ -156,6 +157,7 @@ export type TcgBattleDamageRule =
   | { kind: 'healedThisTurnBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'countThresholdBonus'; baseDamage: number; bonusDamage: number; source: TcgBattleCountSource; minimumUnits: number }
   | { kind: 'countAtMostBonus'; baseDamage: number; bonusDamage: number; source: TcgBattleCountSource; maximumUnits: number }
+  | { kind: 'countInSetBonus'; baseDamage: number; bonusDamage: number; source: TcgBattleCountSource; units: number[] }
   | { kind: 'energyComparisonBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'energyEqualityBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'sharedTypeBonus'; baseDamage: number; bonusDamage: number }
@@ -1640,6 +1642,11 @@ export function getEffectiveTcgBattleAttackCost(
         const reductionPerStrikePokemon = opponentStrikeReduction[1].match(/colorless|\{c\}/g)?.length || 0
         abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, reductionPerStrikePokemon * opponentStrikeCount))
       }
+      const prizeCostReduction = /^(?:this pokemon's attacks cost (?:colorless|\{c\}) less|blood moon used by this pokemon costs (?:colorless|\{c\}) less) for each prize card your opponent has taken\.$/.test(text)
+      if (prizeCostReduction && (attack.name.toLowerCase() !== 'blood moon' || text.startsWith('blood moon used by')) ) {
+        abilityCostReduction = Math.max(abilityCostReduction, Math.min(colorlessCost, Math.max(0, ownSide.knockoutCount || 0)))
+        continue
+      }
       const costRule = text.match(/if you have (.+?) in play, ignore all (?:(?:\{c\}|colorless) )?energy in the costs of attacks used by this pokemon/)
       if (!costRule) continue
       const requiredCards = costRule[1].split(/,\s*and\s+|\s+and\s+|,\s*/).map((name) => name.trim())
@@ -2292,6 +2299,114 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     return ignoreWeaknessResistance
       ? { ...modifiedEffect, ignoreWeaknessResistance: true }
       : modifiedEffect
+  }
+  const anyOpponentPokemonDamage = text.match(
+    /^this attack does (\d+) damage to 1 of your opponent's pokemon( that has any damage counters on it)?\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?$/,
+  )
+  if (anyOpponentPokemonDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: Number(anyOpponentPokemonDamage[1]) },
+      targetScope: 'any',
+      targetMustHaveDamageCounters: anyOpponentPokemonDamage[2] ? { minimum: 1 } : undefined,
+      ignoreWeaknessResistanceOnBench: text.includes("don't apply weakness and resistance for benched pokemon"),
+    })
+  }
+  const damagedActiveBonus = text.match(
+    /^if your opponent's active pokemon already has any damage counters on it, this attack does (\d+) more damage\.$/,
+  )
+  if (damagedActiveBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'damagedTargetBonus',
+        baseDamage,
+        bonusDamage: Number(damagedActiveBonus[1]),
+      },
+      targetScope: 'front',
+    })
+  }
+  const typedBenchCount = text.match(
+    /^this attack does (\d+) damage for each of your benched \{([grwlpmdycf])\} pokemon\.$/,
+  )
+  if (typedBenchCount) {
+    const energyTypeByCode: Record<string, string> = {
+      g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic',
+      m: 'Fighting', d: 'Darkness', y: 'Metal', f: 'Fairy', c: 'Colorless',
+    }
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(typedBenchCount[1]),
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: [energyTypeByCode[typedBenchCount[2]]], zone: 'bench' },
+      },
+    })
+  }
+  const matchingAttackBenchCount = text.match(
+    /^this attack does (\d+) more damage for each of your benched pokemon that has the (.+) attack\.$/,
+  )
+  if (matchingAttackBenchCount) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(matchingAttackBenchCount[1]),
+        source: { kind: 'pokemonWithAttack', side: 'own', attackName: matchingAttackBenchCount[2], zone: 'bench' },
+      },
+    })
+  }
+  const prizeDamageBonus = text.match(
+    /^this attack does (\d+) more damage for each prize card (your opponent has|you have) taken\.$/,
+  )
+  if (prizeDamageBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(prizeDamageBonus[1]),
+        source: { kind: 'knockouts', side: prizeDamageBonus[2] === 'your opponent has' ? 'own' : 'opponent' },
+      },
+    })
+  }
+  const prizeDamage = text.match(
+    /^this attack does (\d+) damage for each prize card (your opponent has|you have) taken\.$/,
+  )
+  if (prizeDamage) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(prizeDamage[1]),
+        source: { kind: 'knockouts', side: prizeDamage[2] === 'your opponent has' ? 'own' : 'opponent' },
+      },
+    })
+  }
+  const remainingPrizeBonus = text.match(
+    /^if your opponent has (\d+) or fewer prize cards remaining, this attack does (\d+) more damage\.$/,
+  )
+  if (remainingPrizeBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countAtMostBonus',
+        baseDamage,
+        bonusDamage: Number(remainingPrizeBonus[2]),
+        source: { kind: 'remainingKnockouts', side: 'opponent' },
+        maximumUnits: Number(remainingPrizeBonus[1]),
+      },
+    })
+  }
+  const exactPrizeBonus = text.match(
+    /^if (your opponent has|you have) (?:exactly |only )?(\d+(?: or \d+)*) prize cards? remaining, this attack does (\d+) more damage\.$/,
+  )
+  if (exactPrizeBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countInSetBonus',
+        baseDamage,
+        bonusDamage: Number(exactPrizeBonus[3]),
+        source: { kind: 'remainingKnockouts', side: exactPrizeBonus[1] === 'your opponent has' ? 'opponent' : 'own' },
+        units: exactPrizeBonus[2].split(' or ').map(Number),
+      },
+    })
   }
   if (setId === 'ex7' && attack.name.toLowerCase() === 'hard bone') return null
   const exEffect = inferExTcgBattleAttackEffect(attack, text, baseDamage, setId)
@@ -27542,6 +27657,18 @@ function getTcgBattleAbilityDamageModifiers(
         if (provider.instanceId === attacker.instanceId && normalizeTcgBattleAbilityText(attacker.name) === 'heracross' && normalizeTcgBattleAbilityText(attackName || '') === 'megahorn' && provider.currentHp <= 20 && !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) beforeWeaknessResistance += 60
         continue
       }
+      const prizeScaledPersonalBoost = text.match(
+        /^(?:this pokemon's attacks|attacks used by this pokemon) do (\d+) more damage to your opponent's active pokemon for each prize card (your opponent has|you have) taken \(before applying weakness and resistance\)\.$/,
+      )
+      if (prizeScaledPersonalBoost) {
+        if (provider.instanceId === attacker.instanceId && targetIsActive && state && sideKey) {
+          const prizeCount = prizeScaledPersonalBoost[2] === 'your opponent has'
+            ? state[sideKey].knockoutCount || 0
+            : state[targetSide].knockoutCount || 0
+          beforeWeaknessResistance += Math.max(0, prizeCount) * Number(prizeScaledPersonalBoost[1])
+        }
+        continue
+      }
       if (/once during your turn|during your next turn|during this turn|when you play .* from your hand|you may use this (?:ability|power)/.test(text)) continue
       const darknessEnergyGate = /if this pokemon has any \{d\} energy attached/.test(text)
       if (/prize cards?|energy attached|basic energy|special energy|stadium|supporter card|tool card|knocked out|pokemon lv\.?x/.test(text) && !darknessEnergyGate) continue
@@ -33498,6 +33625,10 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (
         getTcgBattleCount(rule.source, context) <= rule.maximumUnits ? rule.bonusDamage : 0
       )
+    case 'countInSetBonus':
+      return rule.baseDamage + (
+        rule.units.includes(getTcgBattleCount(rule.source, context)) ? rule.bonusDamage : 0
+      )
     case 'remainingHpComparisonBonus':
       return rule.baseDamage + (context.target.currentHp < context.attacker.currentHp ? rule.bonusDamage : 0)
     case 'attackerRemainingHpLessBonus':
@@ -33599,6 +33730,13 @@ export function getTcgBattleCount(
     if (!context.state || !context.sideKey) return 0
     const sideKey = source.side === 'own' ? context.sideKey : context.sideKey === 'player' ? 'opponent' : 'player'
     return context.state[sideKey].deck.length
+  }
+
+  if (source.kind === 'knockouts' || source.kind === 'remainingKnockouts') {
+    if (!context.state || !context.sideKey) return 0
+    const sideKey = source.side === 'own' ? context.sideKey : context.sideKey === 'player' ? 'opponent' : 'player'
+    const knockedOut = Math.max(0, context.state[sideKey].knockoutCount || 0)
+    return source.kind === 'knockouts' ? knockedOut : Math.max(0, 6 - knockedOut)
   }
 
   if (source.kind === 'chosenHandCards') {
