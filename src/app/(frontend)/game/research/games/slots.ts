@@ -20,6 +20,7 @@ import {
 } from '@/utilities/game-integrity'
 import { incrementUserActivityResult } from '@/utilities/user-state'
 import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
+import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 
 function getRandomSymbol(symbols: any[]): string {
   if (!symbols.length) return '?'
@@ -153,6 +154,13 @@ export async function spinSlotMachine(clientActionId: string, betAmount?: number
             isWin ? { wins: 1 } : { losses: 1 },
             { req },
           )
+          if (isWin) {
+            await recordDailyActivityProgress(
+              user.id,
+              { kind: 'game_win', sourceId: state.encounterId },
+              { payload, req },
+            )
+          }
           const balance = cost ? currentBalance - cost.amount : currentBalance
           if (cost) {
             await payload.update({
