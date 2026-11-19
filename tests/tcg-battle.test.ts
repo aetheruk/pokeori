@@ -1366,11 +1366,13 @@ describe('TCG battle utilities', () => {
         format: 'champions',
         phase: 'arranging',
         player: makeBattleSide(playerCard, 5, {
+          deck: [makeBattleCard('player-deck-1', 1), makeBattleCard('player-deck-2', 1)],
           hand: [playerCard],
           front: [playerCard],
           selectedEnergy: 'Fire',
         }),
         opponent: makeBattleSide(opponentCard, 5, {
+          deck: [makeBattleCard('opponent-deck-1', 1), makeBattleCard('opponent-deck-2', 1), makeBattleCard('opponent-deck-3', 1)],
           hand: [opponentCard],
           front: [opponentCard],
           selectedEnergy: 'Water',
@@ -1390,6 +1392,7 @@ describe('TCG battle utilities', () => {
       'opponent-private',
     ])
     expect(perspective?.opponent.deck).toEqual([])
+    expect(perspective?.opponent.deckCount).toBe(2)
     expect(perspective?.opponent.hand).toEqual([])
     expect(perspective?.opponent.front).toEqual([])
     expect(perspective?.opponent.back).toEqual([])
@@ -1409,9 +1412,11 @@ describe('TCG battle utilities', () => {
         activeSide: 'opponent',
         winner: 'player',
         player: makeBattleSide(playerCard, 5, {
+          deck: [makeBattleCard('canonical-player-deck-1', 1), makeBattleCard('canonical-player-deck-2', 1)],
           selectedEnergy: 'Fire',
         }),
         opponent: makeBattleSide(opponentCard, 5, {
+          deck: [makeBattleCard('canonical-opponent-deck-1', 1), makeBattleCard('canonical-opponent-deck-2', 1), makeBattleCard('canonical-opponent-deck-3', 1)],
           selectedEnergy: 'Water',
         }),
         playerTrainer: { name: 'Collector A' },
@@ -1462,6 +1467,12 @@ describe('TCG battle utilities', () => {
     expect(perspective?.lastAction?.side).toBe('player')
     expect(perspective?.lastDamageEvent?.targetSide).toBe('opponent')
     expect(perspective?.lastCoinFlipEvent?.side).toBe('player')
+    expect(perspective?.opponent.deck).toEqual([])
+    expect(perspective?.opponent.deckCount).toBe(2)
+    const canonicalPlayerPerspective = toTcgPvpPerspectiveState(shared, 'user-a')
+    expect(canonicalPlayerPerspective?.opponent.deck).toEqual([])
+    expect(canonicalPlayerPerspective?.opponent.deckCount).toBe(3)
+    expect(shared.player.deck).toHaveLength(2)
     expect(perspective?.lastEffectEvents?.[0]).toMatchObject({
       kind: 'energy',
       side: 'opponent',
