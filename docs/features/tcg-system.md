@@ -1943,3 +1943,5 @@ Aquapolis Wobbuffet's Mirror Coat reflects Poison or Burn applied by an opposing
 SM Black Star Promo Greninja-GX and Vivid Voltage Beedrill can play themselves from hand onto the Bench when either is the only card in hand, then draw up to three Pokémon cards. The player and PvP actions validate the hand and board conditions; the NPC can use the effect automatically. All flows retain the three-front-slots-before-Bench rule.
 
 Power Keepers Claydol ex, POP Series 9 Rotom, and Dragon Frontiers Salamence ex δ add temporary Fighting, Psychic, and Fire type-change Powers to the shared player, PvP, and NPC type-change flow.
+
+The trainer deck editor only offers series where the player owns at least one card and uses the selected series artwork in its header. The TCG battle header centers the round and Energy Cap indicators, and the evolution energy notice reads “Surge of power increases the Energy Cap.”

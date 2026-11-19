@@ -3250,10 +3250,10 @@ function BattleTopBar({
   const foe = state.battleMode === 'pvp' ? 'Opponent' : 'CPU'
   return (
     <section className={styles.scoreboard} aria-label="Battle score">
-      <div className={styles.round}>
+      <div className={cn(styles.round, 'justify-center')}>
         <span>Round <b>{state.turnNumber}</b></span>
         <span className={cn('tabular-nums', attackCapPulse && 'tcg-motion animate-[tcg-energy-pulse_950ms_ease-out]')}>
-          Attack cap <b>{formatEnergyCap(attackCap)}</b>
+          Energy Cap <b>{formatEnergyCap(attackCap)}</b>
         </span>
         {state.battleMode === 'pvp' && deadlineSeconds !== null && (
           <span className="tabular-nums">{formatMatchClock(deadlineSeconds)}</span>
@@ -3280,7 +3280,7 @@ function EvolutionEnergyBurst() {
       <div className="relative overflow-hidden rounded-md border border-game-ochre/40 bg-game-surface-raised/95 px-4 py-3 text-center backdrop-blur-md">
         <div className="pointer-events-none absolute inset-0 animate-[tcg-energy-sweep_900ms_ease-out] bg-[linear-gradient(to_right,transparent,rgba(40,127,122,0.18),transparent)]" />
         <p className="relative text-xs font-black uppercase tracking-[0.18em] text-game-ink sm:text-sm">
-          A burst of Evolution Energy sweeps across the battlefield
+          Surge of power increases the Energy Cap
         </p>
       </div>
     </motion.div>
@@ -4461,7 +4461,7 @@ function InlineAttackButtons({
                 : cost > state.player.energy
                   ? `Needs ${cost - state.player.energy} more Energy`
                   : cost > attackCap
-                    ? `Attack cap is ${attackCap} Energy`
+                    ? `Energy Cap is ${attackCap}`
                     : ''
         const key = `${selectedAttacker?.instanceId}:${index}`
 

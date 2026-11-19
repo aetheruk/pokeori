@@ -58,6 +58,7 @@ import { useUser } from '@/context/UserContext'
 import { getBanner, getIcon } from '@/data/user'
 import type { TaskIcon } from '@/data/tasks/types'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
+import { getTcgCardSeriesById } from '@/utilities/tcg/tcg'
 import { cn } from '@/lib/utils'
 import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
 import {
@@ -87,7 +88,15 @@ export function TrainerDashboard({
     normalizedInitialSection,
   )
   const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
-  const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries)
+  const ownedSeries = new Set(
+    (gameData?.tcg || [])
+      .filter((card) => card.quantity > 0)
+      .map((card) => getTcgCardSeriesById(card.cardId))
+      .filter((series): series is string => Boolean(series)),
+  )
+  const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries).filter(
+    (series) => ownedSeries.has(series),
+  )
   const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
   const trainerBanner =
     getBanner(user?.banner || 'lab')?.imagePath || '/backgrounds/lab.avif'
