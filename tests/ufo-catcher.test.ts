@@ -39,9 +39,9 @@ function getItemReward(tierId: string) {
 }
 
 describe('UFO Catcher authored balance', () => {
-  test('UFO Catcher remains eligible for daily completion tracking', () => {
+  test('UFO Catcher and Rocket Slots remain eligible for daily completion tracking', () => {
     expect(isDailyExcludedGameType('ufo-catcher')).toBe(false)
-    expect(isDailyExcludedGameType('slots')).toBe(true)
+    expect(isDailyExcludedGameType('slots')).toBe(false)
     expect(isDailyExcludedGameType('pachinko')).toBe(true)
     expect(isDailyExcludedGameType('prize-wheel')).toBe(true)
   })

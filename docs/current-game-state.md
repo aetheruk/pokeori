@@ -3077,3 +3077,4 @@ TCG battles now show the player's hand as an interactive card tray. Playing a Ba
 The trainer deck editor lists only TCG series represented in the player's owned cards, with selected series artwork in its header. TCG battle round and Energy Cap indicators are centered, and evolution energy notices explain that a surge of power increases the Energy Cap.
 
 Deck series availability is loaded from the server-side TCG collection because the Trainer route does not include collection data in its client state. Set logos render above the header backdrop so the selected series art remains visible.
+Rocket Slots is eligible for daily game-win challenges. A winning spin records progress for the matching daily immediately; ending the slot session does not duplicate that progress.
