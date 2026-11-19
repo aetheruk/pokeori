@@ -695,6 +695,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const [targetId, setTargetId] = useState('')
   const [benchMode, setBenchMode] = useState<BenchMode | null>(null)
   const [showEvolutionSheet, setShowEvolutionSheet] = useState(false)
+  const [selectedEvolutionCardId, setSelectedEvolutionCardId] = useState<string | null>(null)
+  const [turnDrawNotice, setTurnDrawNotice] = useState<string | null>(null)
+  const previousBattleLogRef = useRef<Map<string, number> | null>(null)
   const [choiceAttackIndex, setChoiceAttackIndex] = useState<number | null>(
     null,
   )
@@ -846,6 +849,23 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       return
     }
     prevTurnRef.current = state.turnNumber
+  }, [state])
+
+  useEffect(() => {
+    if (state?.phase !== 'battle') return
+    const previousEntries = previousBattleLogRef.current
+    const currentEntries = new Map<string, number>()
+    for (const entry of state.log) currentEntries.set(entry, (currentEntries.get(entry) || 0) + 1)
+    const drawEntry = previousEntries
+      ? state.log.find((entry) => entry.startsWith('Player drew ') && entry.includes(' at the start of the turn.') && (previousEntries.get(entry) || 0) < (currentEntries.get(entry) || 0))
+      : null
+    previousBattleLogRef.current = currentEntries
+    if (drawEntry) {
+      const cardName = drawEntry.slice('Player drew '.length).replace(/ at the start of the turn\.$/, '')
+      setTurnDrawNotice(cardName)
+      const timer = window.setTimeout(() => setTurnDrawNotice(null), 4500)
+      return () => window.clearTimeout(timer)
+    }
   }, [state])
 
   useEffect(() => {
@@ -2480,6 +2500,14 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           deadlineSeconds={deadlineSeconds}
           onSurrender={() => setShowSurrenderConfirm(true)}
         />
+        <AnimatePresence>
+          {turnDrawNotice && state.activeSide === 'player' && (
+            <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} role="status" className="absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.25rem)] z-30 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-game-ochre/60 bg-game-surface-raised px-3 py-2 shadow-xl sm:px-4">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-game-moss text-xs font-black text-white">↓</span>
+              <span className="text-[11px] font-bold text-game-ink">Drew <strong>{turnDrawNotice}</strong></span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {state.battleMode === 'pvp' &&
           state.phase !== 'finished' &&
@@ -2569,7 +2597,8 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           claimError={claimError}
           resultShown={Boolean(resultOverlay)}
           resolution={resolution}
-          canEvolve={evolutionOptions.length > 0}
+          evolutionOptions={evolutionOptions}
+          selectedEvolutionCardId={selectedEvolutionCardId}
           onCharge={() =>
             callAction(() => tcgBattleCharge(state.revision), {
               kind: 'charge',
@@ -2580,7 +2609,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           }
           onPromote={() => setBenchMode('promote')}
           onRetreat={() => setBenchMode('retreat')}
-          onOpenEvolution={() => setShowEvolutionSheet(true)}
+          onOpenEvolution={(cardId) => { setSelectedEvolutionCardId(cardId); setShowEvolutionSheet(true) }}
           onPlayBasicToBench={(cardId) => callAction(() => tcgBattlePlayBasicToBench(cardId, state.revision), { kind: 'bench' })}
           onUseHealAbility={(sourceId, abilityIndex, targetCardId, abilityName, discardPokemonIds) =>
             callAction(
@@ -2811,7 +2840,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
 
       {showEvolutionSheet && (
         <EvolutionSheet
-          options={evolutionOptions}
+          options={selectedEvolutionCardId ? evolutionOptions.filter((option) => option.card.id === selectedEvolutionCardId) : evolutionOptions}
           discardPokemon={state.player.discard}
           playerSide={state.player}
           opposingSide={state.opponent}
@@ -2820,7 +2849,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           opposingPokemon={[...state.opponent.front, ...state.opponent.back].filter((card) => card.currentHp > 0)}
           opposingBenchPokemon={state.opponent.back.filter((card) => card.currentHp > 0)}
           isPending={isBusy}
-          onClose={() => setShowEvolutionSheet(false)}
+          onClose={() => { setShowEvolutionSheet(false); setSelectedEvolutionCardId(null) }}
           onEvolve={(targetId, evolutionCardId, effectTargetId) =>
             callAction(
               () =>
@@ -5711,7 +5740,8 @@ function BattleCommandControls({
   claimError,
   resultShown,
   resolution,
-  canEvolve,
+  evolutionOptions,
+  selectedEvolutionCardId,
   onCharge,
   onClaim,
   onPromote,
@@ -5759,12 +5789,13 @@ function BattleCommandControls({
   claimError: string | null
   resultShown: boolean
   resolution?: BattleResolution | null
-  canEvolve: boolean
+  evolutionOptions: TcgBattleEvolutionOption[]
+  selectedEvolutionCardId: string | null
   onCharge: () => void
   onClaim: () => void
   onPromote: () => void
   onRetreat: () => void
-  onOpenEvolution: () => void
+  onOpenEvolution: (cardId: string) => void
   onPlayBasicToBench: (cardId: string) => void
   onUseHealAbility: (sourceId: string, abilityIndex: number, targetId: string, abilityName: string, discardPokemonIds?: string[]) => void
   onUseDrawAbility: (sourceId: string, abilityIndex: number, abilityName: string, discardCardIds?: string[], refillDraw?: boolean, discardHandDraw?: boolean, searchDeckIndices?: number[], energySearch?: boolean, benchSearch?: boolean, handDeckSwapCardId?: string, energyAttach?: boolean, energyHandDraw?: boolean, discardFightingAttach?: boolean, revealHand?: boolean, discardBenchSearch?: boolean, shuffleOpponentDeckForCunning?: boolean, mankeyPeekChoice?: 'ownDeck' | 'opponentDeck' | 'randomOpponentHand' | 'bugRadar' | 'bugRadarOrder' | 'jellicentDeepSeaDraw' | 'jellicentDeepSeaBottom' | 'talonflameSkyHunt' | 'sandFlapSelf' | 'sandFlapOpponent' | 'chandelureDeckDiscard' | 'slakingLazyBlow' | 'blisseyKindEgg' | 'salamenceTopEnergy' | 'magcargoTopEnergy' | 'slowkingOwnOrder' | 'slowkingOpponentOrder' | 'krookodileEnergyDiscard' | 'sableyeTopDeckDiscard' | 'aipomDeckBottom' | 'malamarDualPeek' | 'spiritombBuildingSpite' | 'gothitelleDeckSift' | 'kingdraHandBottom' | 'unownEEntryDraw' | 'regidragoVstar' | 'regidragoVstarResolve' | 'rotomVstar' | 'zacianPsychicEnergy' | 'zacianIntrepidSword' | 'claydolCosmicPower' | 'toxtricitySinisterSurge' | 'feraligatrDoubleSwitch' | 'zamazentaShieldStar' | 'latiasPsychicAttach' | 'magnezoneMetalAcceleration') => void
@@ -6575,11 +6606,6 @@ function BattleCommandControls({
       )}
       <div className="flex items-center justify-center gap-2 sm:gap-3">
         <LabeledCommandButton
-          label="Evolve"
-          disabled={!canAct || !canEvolve || isPending}
-          onClick={onOpenEvolution}
-        />
-        <LabeledCommandButton
           label="Switch"
           disabled={!canAct || !selectedAttacker || isPending || isTcgBattleRetreatBlockedByStatus(state.player, selectedAttacker, [state.player, state.opponent])}
           onClick={onRetreat}
@@ -6599,33 +6625,29 @@ function BattleCommandControls({
           </span>
         </LabeledCommandButton>
       </div>
-      {basicHand.length > 0 && canPlaceBasic && (
-        <section className="flex max-w-full snap-x gap-2 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label={`Play a Basic Pokémon from hand into the ${basicPlayDestination}`}>
-          {basicHand.map((card) => (
-            <Button key={card.instanceId} type="button" variant="outline" disabled={!canAct || isPending} onClick={() => onPlayBasicToBench(card.instanceId)} className="game-focus-ring h-9 shrink-0 border-game-moss/45 bg-game-surface-raised px-3 text-[10px] font-black uppercase tracking-wide text-game-ink hover:bg-game-moss/15">
-              {basicPlayDestination === 'front row' ? 'Front' : 'Bench'} {card.name}
-            </Button>
-          ))}
-        </section>
-      )}
-      {emergencyRotationHand.length > 0 && (
-        <section className="flex max-w-full snap-x gap-2 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Play Klinklang with Emergency Rotation">
-          {emergencyRotationHand.map((card) => (
-            <Button key={card.instanceId} type="button" variant="outline" disabled={!canAct || isPending} onClick={() => onPlayBasicToBench(card.instanceId)} className="game-focus-ring h-9 shrink-0 border-game-ochre/45 bg-game-surface-raised px-3 text-[10px] font-black uppercase tracking-wide text-game-ink hover:bg-game-ochre/15">
-              Emergency Rotation · {card.name}
-            </Button>
-          ))}
-        </section>
-      )}
-      {lastCardBenchDrawHand.length > 0 && (
-        <section className="flex max-w-full snap-x gap-2 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Play your last hand card onto the Bench and draw three cards">
-          {lastCardBenchDrawHand.map((card) => (
-            <Button key={card.instanceId} type="button" variant="outline" disabled={!canAct || isPending} onClick={() => onPlayBasicToBench(card.instanceId)} className="game-focus-ring h-9 shrink-0 border-game-ochre/45 bg-game-surface-raised px-3 text-[10px] font-black uppercase tracking-wide text-game-ink hover:bg-game-ochre/15">
-              Last card · Bench and draw 3 · {card.name}
-            </Button>
-          ))}
-        </section>
-      )}
+      <section aria-label={`Your hand, ${state.player.hand.length} cards`} className="w-full rounded-xl border border-game-border-strong bg-game-surface-raised/95 px-2 py-2 shadow-lg sm:px-3">
+        <div className="mb-1.5 flex items-center justify-between px-1">
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-game-muted">Your hand <span className="ml-1 text-game-ink">{state.player.hand.length}</span></p>
+          {selectedEvolutionCardId && <p className="text-[10px] font-bold text-game-moss">Choose a Pokémon to evolve above</p>}
+        </div>
+        <div className="flex max-w-full snap-x gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {state.player.hand.map((card) => {
+            const isBasic = basicHand.some((item) => item.instanceId === card.instanceId)
+            const evolution = evolutionOptions.some((option) => option.card.id === card.id)
+            const selected = selectedEvolutionCardId === card.id
+            const isEmergencyRotation = emergencyRotationHand.some((item) => item.instanceId === card.instanceId)
+            const isLastCardBenchPlay = lastCardBenchDrawHand.some((item) => item.instanceId === card.instanceId)
+            const playable = (isBasic && canPlaceBasic) || isEmergencyRotation || isLastCardBenchPlay
+            const playLabel = isEmergencyRotation ? 'Emergency Rotation' : isLastCardBenchPlay ? 'Bench · Draw 3' : `Play · ${basicPlayDestination}`
+            return <button key={card.instanceId} type="button" disabled={!canAct || isPending || (!playable && !evolution)} onClick={() => playable ? onPlayBasicToBench(card.instanceId) : evolution ? onOpenEvolution(card.id) : undefined} aria-pressed={selected} aria-label={`${card.name}${playable ? `, play to ${basicPlayDestination}` : evolution ? ', select to evolve' : ''}`} className={`game-focus-ring group relative w-[76px] shrink-0 snap-start overflow-hidden rounded-lg border-2 text-left transition ${selected ? 'border-game-moss ring-2 ring-game-moss/30' : 'border-game-border hover:border-game-ochre'} ${!canAct || (!playable && !evolution) ? 'opacity-65' : ''}`}>
+              <Image src={card.image} alt={card.name} width={76} height={106} className="h-[106px] w-[76px] object-cover" unoptimized />
+              <span className="block truncate bg-game-canvas px-1 py-1 text-center text-[9px] font-bold text-game-ink">{card.name}</span>
+              {(playable || evolution) && <span className="absolute left-1 right-1 top-1 rounded bg-game-charcoal/90 px-1 py-0.5 text-center text-[8px] font-black uppercase tracking-wide text-white">{playable ? playLabel : 'Evolve'}</span>}
+            </button>
+          })}
+          {state.player.hand.length === 0 && <p className="px-2 py-4 text-xs text-game-muted">Your hand is empty.</p>}
+        </div>
+      </section>
     </div>
   )
 }
