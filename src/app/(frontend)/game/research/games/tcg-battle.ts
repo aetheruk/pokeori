@@ -4169,7 +4169,7 @@ function formatStatusNames(statuses: TcgBattleStatusCondition[]) {
 }
 
 function normalizeTcgBattleAbilityCardName(value: string) {
-  return value.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+  return normalizeTcgBattleAbilityText(value)
 }
 
 function getLastCardBenchDrawAbilityIndex(card: TcgBattleCardState | undefined): number {
