@@ -1,10 +1,12 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
+import { ArrowUp, LockKeyhole, X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
   type ReactNode,
+  type TouchEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -29,6 +31,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Drawer, DrawerContent, DrawerFooter } from '@/components/ui/drawer'
 import { SectionDivider } from '@/components/ui/section-divider'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import { useHaptics } from '@haptics/react'
@@ -40,6 +43,7 @@ import {
   ACTIVITY_STARTED_EVENT,
 } from '@/utilities/games/update-safety'
 import { getTcgEnergySymbol } from '@/utilities/tcg/energy-symbols'
+import styles from './tcg-battle.module.css'
 import type {
   TcgBattleAttackChoice,
   TcgBattleCardState,
@@ -180,12 +184,6 @@ type TcgClientActionResult =
 type TcgAttack = TcgBattleCardState['attacks'][number]
 type TcgDamageEvent = NonNullable<TcgBattleState['lastDamageEvents']>[number]
 type TcgStatusEvent = NonNullable<TcgBattleState['lastStatusEvents']>[number]
-type DamageCue = {
-  id: string
-  targetId: string
-  damage: number
-  side: SideTone
-}
 type CoinCue = {
   id: string
   sourceId: string
@@ -202,7 +200,6 @@ type BattleResolution = {
   title: string
   detail: string
   sourceId?: string
-  damageCue?: DamageCue
   coinCue?: CoinCue
 }
 type ActionMeta = (
@@ -224,6 +221,36 @@ type ActionMeta = (
 
 interface TcgBattleGameProps {
   encounter: TcgBattleGameConfig
+  actions?: TcgBattlePreviewActions
+}
+
+export type TcgBattlePreviewActions = {
+  start: typeof startTcgBattle
+  attack: typeof tcgBattleAttack
+  charge: typeof tcgBattleCharge
+  evolve: typeof tcgBattleEvolve
+  playBasic: typeof tcgBattlePlayBasicToBench
+  refresh: typeof refreshTcgBattleState
+}
+
+const battleActions: TcgBattlePreviewActions = {
+  start: startTcgBattle,
+  attack: tcgBattleAttack,
+  charge: tcgBattleCharge,
+  evolve: tcgBattleEvolve,
+  playBasic: tcgBattlePlayBasicToBench,
+  refresh: refreshTcgBattleState,
+}
+
+const HIT_DURATION = 620
+
+function getDamageEvents(state: TcgBattleState): TcgDamageEvent[] {
+  const events = new Map<string, TcgDamageEvent>()
+  for (const event of state.lastDamageEvents || []) events.set(event.id, event)
+  if (state.lastDamageEvent && !events.has(state.lastDamageEvent.id)) {
+    events.set(state.lastDamageEvent.id, state.lastDamageEvent)
+  }
+  return [...events.values()]
 }
 
 const TYPE_BADGE_CLASSES: Record<string, string> = {
@@ -579,13 +606,6 @@ function applyVisualRetreat(
   )
 }
 
-function findDamageEvent(
-  state: TcgBattleState,
-  predicate: (event: TcgDamageEvent) => boolean,
-) {
-  return state.lastDamageEvents?.find(predicate)
-}
-
 function makeResolutionId(prefix: string) {
   return `${prefix}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`
 }
@@ -683,7 +703,7 @@ function getWinnerMessage(
   return undefined
 }
 
-export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
+export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleGameProps) {
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { trigger: triggerHaptic } = useHaptics()
@@ -695,17 +715,20 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const [targetId, setTargetId] = useState('')
   const [benchMode, setBenchMode] = useState<BenchMode | null>(null)
   const [isHandOpen, setIsHandOpen] = useState(false)
-  const [showEvolutionSheet, setShowEvolutionSheet] = useState(false)
-  const [selectedEvolutionCardId, setSelectedEvolutionCardId] = useState<string | null>(null)
+  const [selectedEvolutionInstanceId, setSelectedEvolutionInstanceId] = useState<string | null>(null)
   const [selectedEvolutionTargetId, setSelectedEvolutionTargetId] = useState<string | null>(null)
-  const [turnDrawNotice, setTurnDrawNotice] = useState<string | null>(null)
-  const previousBattleLogRef = useRef<Map<string, number> | null>(null)
+  const [evolutionEffectTargets, setEvolutionEffectTargets] = useState<string[]>([])
+  const [damageCues, setDamageCues] = useState<TcgDamageEvent[]>([])
+  const seenDamageRef = useRef(new Set<string>())
+  const damageTimersRef = useRef(new Set<number>())
+  const [settledEvolution, setSettledEvolution] = useState<{ targetId: string; key: string } | null>(null)
   const [choiceAttackIndex, setChoiceAttackIndex] = useState<number | null>(
     null,
   )
   const [previewCard, setPreviewCard] = useState<TcgBattleCardState | null>(
     null,
   )
+  const [handInspection, setHandInspection] = useState<{ card: TcgBattleCardState; detail: string } | null>(null)
   const [showOpeningVs, setShowOpeningVs] = useState(false)
   const [result, setResult] = useState<GameCompletionResult | null>(null)
   const [completionState, setCompletionState] = useState<TcgBattleState | null>(
@@ -745,7 +768,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     let cancelled = false
     window.dispatchEvent(new Event(ACTIVITY_STARTED_EVENT))
     startTransition(async () => {
-      const response = await startTcgBattle(encounter.id)
+      const response = await actions.start(encounter.id)
       if (cancelled) return
       if (!response.success) {
         window.dispatchEvent(new Event(ACTIVITY_SETTLED_EVENT))
@@ -756,6 +779,8 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       if ('cost' in encounter.settings && encounter.settings.cost) {
         void refreshUser()
       }
+      seenDamageRef.current = new Set(getDamageEvents(response.state).map((event) => event.id))
+      setDamageCues([])
       setState(response.state)
       setFrontIds(
         response.state.phase === 'arranging' && !response.state.ready?.player
@@ -766,7 +791,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     return () => {
       cancelled = true
     }
-  }, [encounter.id, router])
+  }, [actions, encounter.id, router])
 
   useEffect(() => {
     if (state?.battleMode !== 'pvp' || state.phase === 'finished') return
@@ -804,9 +829,20 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       state
         ? getTcgBattleEvolutionOptions(state.player, state.turnNumber, 'player', state.opponent, state.playerGoesSecond)
         : [],
-    [state?.player, state?.turnNumber, state?.playerGoesSecond],
+    [state?.player, state?.opponent, state?.turnNumber, state?.playerGoesSecond],
   )
   const attackCap = state ? getAllowedAttackCost(state.turnNumber) : 1
+  const selectedEvolution = evolutionOptions.find(
+    (option) => option.card.instanceId === selectedEvolutionInstanceId && option.targetId === selectedEvolutionTargetId,
+  )
+  const boardEffect = state && selectedEvolution ? getEvolutionBoardEffect(state, selectedEvolution) : null
+  const choosingEvolution = Boolean(selectedEvolutionInstanceId && !selectedEvolutionTargetId)
+  const evolutionTargets = choosingEvolution
+    ? evolutionOptions.filter((option) => option.card.instanceId === selectedEvolutionInstanceId).map((option) => option.targetId)
+    : boardEffect?.targets.map((card) => card.instanceId) || []
+  const drawnCard = state?.activeSide === 'player' && state.player.turnDraw?.turnNumber === state.turnNumber
+    ? state.player.hand.find((card) => card.instanceId === state.player.turnDraw?.instanceId)
+    : undefined
   const deadlineSeconds = state?.deadlineAt
     ? Math.max(0, Math.ceil((state.deadlineAt - clockNow) / 1000))
     : null
@@ -816,28 +852,41 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     isPending || isActionBusy || Boolean(resolution) || showOpeningVs
   const closeOpeningVs = useCallback(() => setShowOpeningVs(false), [])
 
+  const cancelEvolution = useCallback(() => {
+    setSelectedEvolutionInstanceId(null)
+    setSelectedEvolutionTargetId(null)
+    setEvolutionEffectTargets([])
+  }, [])
+
   useEffect(() => {
-    if (!isHandOpen && !selectedEvolutionCardId) return
+    if (handInspection || (!isHandOpen && (!selectedEvolutionInstanceId || (selectedEvolutionTargetId && !boardEffect)))) return
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      if (selectedEvolutionCardId) {
-        setSelectedEvolutionCardId(null)
-        setSelectedEvolutionTargetId(null)
+      if (event.key !== 'Escape' || event.defaultPrevented || isBusy) return
+      if (selectedEvolutionInstanceId) {
+        cancelEvolution()
       } else {
         setIsHandOpen(false)
       }
     }
     window.addEventListener('keydown', closeOnEscape)
     return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [isHandOpen, selectedEvolutionCardId])
+  }, [boardEffect, cancelEvolution, handInspection, isBusy, isHandOpen, selectedEvolutionInstanceId, selectedEvolutionTargetId])
 
   useEffect(() => {
-    if (!selectedEvolutionCardId || isHandOpen) return
+    if (selectedEvolutionInstanceId && (state?.phase !== 'battle' || state.activeSide !== 'player' ||
+      !evolutionOptions.some((option) => option.card.instanceId === selectedEvolutionInstanceId &&
+        (!selectedEvolutionTargetId || option.targetId === selectedEvolutionTargetId)))) {
+      cancelEvolution()
+    }
+  }, [cancelEvolution, evolutionOptions, selectedEvolutionInstanceId, selectedEvolutionTargetId, state?.phase, state?.activeSide])
+
+  useEffect(() => {
+    if (!selectedEvolutionInstanceId || isHandOpen) return
     const frame = window.requestAnimationFrame(() => {
       document.querySelector<HTMLButtonElement>('[data-evolution-target="true"]')?.focus()
     })
     return () => window.cancelAnimationFrame(frame)
-  }, [isHandOpen, selectedEvolutionCardId])
+  }, [isHandOpen, selectedEvolutionInstanceId, selectedEvolutionTargetId])
 
   useEffect(() => {
     if (!state) return
@@ -853,6 +902,12 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     const timer = window.setTimeout(() => setAttackCapPulse(false), 1100)
     return () => window.clearTimeout(timer)
   }, [attackCapPulse])
+
+  useEffect(() => {
+    if (!settledEvolution) return
+    const timer = window.setTimeout(() => setSettledEvolution(null), HIT_DURATION + 400)
+    return () => window.clearTimeout(timer)
+  }, [settledEvolution])
 
   useEffect(() => {
     if (!state) return
@@ -875,22 +930,29 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     prevTurnRef.current = state.turnNumber
   }, [state])
 
+  const playDamage = useCallback((events: TcgDamageEvent[]) => {
+    const fresh = events.filter((event) => {
+      if (event.damage <= 0 || seenDamageRef.current.has(event.id)) return false
+      seenDamageRef.current.add(event.id)
+      return true
+    })
+    if (!fresh.length) return
+    setDamageCues((current) => [...current, ...fresh])
+    const ids = new Set(fresh.map((event) => event.id))
+    const timer = window.setTimeout(() => {
+      damageTimersRef.current.delete(timer)
+      setDamageCues((current) => current.filter((event) => !ids.has(event.id)))
+    }, HIT_DURATION)
+    damageTimersRef.current.add(timer)
+  }, [])
+
   useEffect(() => {
-    if (state?.phase !== 'battle') return
-    const previousEntries = previousBattleLogRef.current
-    const currentEntries = new Map<string, number>()
-    for (const entry of state.log) currentEntries.set(entry, (currentEntries.get(entry) || 0) + 1)
-    const drawEntry = previousEntries
-      ? state.log.find((entry) => entry.startsWith('Player drew ') && entry.includes(' at the start of the turn.') && (previousEntries.get(entry) || 0) < (currentEntries.get(entry) || 0))
-      : null
-    previousBattleLogRef.current = currentEntries
-    if (drawEntry) {
-      const cardName = drawEntry.slice('Player drew '.length).replace(/ at the start of the turn\.$/, '')
-      setTurnDrawNotice(cardName)
-      const timer = window.setTimeout(() => setTurnDrawNotice(null), 4500)
-      return () => window.clearTimeout(timer)
+    const timers = damageTimersRef.current
+    return () => {
+      for (const timer of timers) window.clearTimeout(timer)
+      timers.clear()
     }
-  }, [state])
+  }, [])
 
   useEffect(() => {
     if (!energyNotice) return
@@ -917,6 +979,27 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     [playSfx],
   )
 
+  const settleWithDamage = useCallback(
+    (nextState: TcgBattleState, completion?: GameCompletionResult) => {
+      const remaining = getDamageEvents(nextState).filter(
+        (event) => event.damage > 0 && !seenDamageRef.current.has(event.id),
+      )
+      if (!remaining.length) {
+        commitActionResult(nextState, completion)
+        return
+      }
+      setState((current) => {
+        if (!current) return current
+        const draft = cloneTcgBattleState(current)
+        for (const event of remaining) applyVisualDamageEvent(draft, event)
+        return draft
+      })
+      playDamage(remaining)
+      scheduleResolutionStep(() => commitActionResult(nextState, completion), HIT_DURATION)
+    },
+    [commitActionResult, playDamage, scheduleResolutionStep],
+  )
+
   const animateActionResult = useCallback(
     (
       previousState: TcgBattleState,
@@ -938,6 +1021,14 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       if (meta.kind === 'claim' || meta.kind === 'promote') {
         if (meta.kind === 'promote') playSfx('select')
         commitActionResult(nextState, completion)
+        return
+      }
+
+      if (meta.kind === 'bench') {
+        const playedId = nextState.lastAction?.frontId
+        if (playedId) setSettledEvolution({ targetId: playedId, key: makeResolutionId('played-card') })
+        playSfx('select')
+        settleWithDamage(nextState, completion)
         return
       }
 
@@ -978,28 +1069,29 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           sourceId: meta.sourceId,
         })
         playSfx('good')
-        scheduleResolutionStep(() => commitActionResult(nextState, completion), RESOLUTION_TIMING.actionIntro + RESOLUTION_TIMING.finalSettle)
+        scheduleResolutionStep(() => settleWithDamage(nextState, completion), RESOLUTION_TIMING.actionIntro)
         return
       }
 
       if (meta.kind === 'evolve') {
-        const previous = findSideCard(previousState.player, meta.targetId)
         const evolved = findSideCard(nextState.player, meta.targetId)
+        setSettledEvolution({ targetId: meta.targetId, key: makeResolutionId('evolved-card') })
         setResolution({
           id: makeResolutionId('evolved'),
           tone: 'player',
-          title: 'Evolution',
-          detail: `${previous?.name || 'Your Pokémon'} became ${evolved?.name || 'its next stage'}.`,
+          title: evolved?.name ? `${evolved.name} evolved` : 'Evolution',
+          detail: '',
         })
         playSfx('good')
-        scheduleResolutionStep(
-          () => commitActionResult(nextState, completion),
-          RESOLUTION_TIMING.actionIntro + RESOLUTION_TIMING.finalSettle,
-        )
+        settleWithDamage(nextState, completion)
         return
       }
 
       let cursor = 0
+      const actionDamageEvents = getDamageEvents(nextState).filter(
+        (event) => event.damage > 0 && !seenDamageRef.current.has(event.id),
+      )
+      const queuedDamage = new Set<string>()
       const plannedState = cloneTcgBattleState(previousState)
       const visualState = cloneTcgBattleState(previousState)
       clearVisualActionEvents(plannedState)
@@ -1060,16 +1152,26 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         event?: TcgDamageEvent,
         onShow?: (draft: TcgBattleState) => void,
       ) => {
-        if (event) applyVisualDamageEvent(plannedState, event)
+        const hits = !event ? [] : actionDamageEvents.filter((hit) =>
+          !queuedDamage.has(hit.id) && (hit.id === event.id ||
+            ((event.reason === 'attack' || event.reason === undefined) &&
+              (hit.reason === 'attack' || hit.reason === undefined) &&
+              hit.sourceId === event.sourceId && hit.targetSide === event.targetSide)),
+        )
+        for (const hit of hits) {
+          queuedDamage.add(hit.id)
+          applyVisualDamageEvent(plannedState, hit)
+        }
         queueResolution(
           delay,
           nextResolution,
           sfx,
-          event || onShow
+          hits.length || onShow
             ? () =>
                 publishVisualState((draft) => {
                   onShow?.(draft)
-                  if (event) applyVisualDamageEvent(draft, event)
+                  for (const hit of hits) applyVisualDamageEvent(draft, hit)
+                  playDamage(hits)
                 })
             : undefined,
         )
@@ -1192,8 +1294,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
 
       const playerTargetDamageEvent =
         meta.kind === 'attack'
-          ? findDamageEvent(
-              nextState,
+          ? actionDamageEvents.find(
               (event) =>
                 event.sourceId === meta.attackerId &&
                 event.targetId === meta.targetId &&
@@ -1202,8 +1303,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           : undefined
       const playerRecoilEvent =
         meta.kind === 'attack'
-          ? findDamageEvent(
-              nextState,
+          ? actionDamageEvents.find(
               (event) =>
                 event.reason === 'self' &&
                 event.sourceId === meta.attackerId &&
@@ -1213,8 +1313,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           : undefined
       const playerConfusionEvent =
         meta.kind === 'attack'
-          ? findDamageEvent(
-              nextState,
+          ? actionDamageEvents.find(
               (event) =>
                 event.reason === 'confusion' &&
                 event.sourceId === meta.attackerId &&
@@ -1228,23 +1327,20 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               (event) => event.sourceId === meta.attackerId,
             )
           : undefined
-      const opponentDamageEvent = findDamageEvent(
-        nextState,
+      const opponentDamageEvent = actionDamageEvents.find(
         (event) =>
           event.reason !== 'status' &&
           event.reason !== 'ability' &&
           event.targetSide === 'player' &&
           event.sourceId !== event.targetId,
       )
-      const opponentRecoilEvent = findDamageEvent(
-        nextState,
+      const opponentRecoilEvent = actionDamageEvents.find(
         (event) =>
           event.reason === 'self' &&
           event.targetSide === 'opponent' &&
           event.sourceId === event.targetId,
       )
-      const opponentConfusionEvent = findDamageEvent(
-        nextState,
+      const opponentConfusionEvent = actionDamageEvents.find(
         (event) =>
           event.reason === 'confusion' &&
           event.targetSide === 'opponent' &&
@@ -1321,13 +1417,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           'player',
         )
         const playerCoinCue = playerCoinCues[0]
-        const damage =
-          playerTargetDamageEvent?.damage ??
-          (playerCoinCue
-            ? 0
-            : attack && target
-              ? getProjectedDamage(attacker, attack, target, previousState)
-              : 0)
+        const damage = playerTargetDamageEvent?.damage ?? 0
 
         showResolution(
           {
@@ -1391,15 +1481,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                   ? `${target.name} avoids the damage`
                   : 'The attack resolves',
             sourceId: attacker?.instanceId,
-            damageCue:
-              target && damage > 0
-                ? {
-                    id: makeResolutionId('player-damage-cue'),
-                    targetId: target.instanceId,
-                    damage,
-                    side: 'opponent',
-                  }
-                : undefined,
           },
           damage > 0 ? 'good' : 'select',
           playerTargetDamageEvent,
@@ -1420,12 +1501,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               title: 'Recoil',
               detail: `${attacker?.name || 'Your card'} is hit by recoil`,
               sourceId: playerRecoilEvent.sourceId,
-              damageCue: {
-                id: makeResolutionId('player-recoil-damage'),
-                targetId: playerRecoilEvent.targetId,
-                damage: playerRecoilEvent.damage,
-                side: 'player',
-              },
             },
             'select',
             playerRecoilEvent,
@@ -1442,12 +1517,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               title: 'Confusion',
               detail: `${attacker?.name || 'Your card'} hurt itself in confusion`,
               sourceId: playerConfusionEvent.sourceId,
-              damageCue: {
-                id: makeResolutionId('player-confusion-damage'),
-                targetId: playerConfusionEvent.targetId,
-                damage: playerConfusionEvent.damage,
-                side: 'player',
-              },
             },
             'bad',
             playerConfusionEvent,
@@ -1499,12 +1568,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             ),
         )
         cursor += RESOLUTION_TIMING.actionIntro
-      } else if (meta.kind === 'bench') {
-        const playedId = nextState.lastAction?.frontId
-        const played = nextState.player.front.find((card) => card.instanceId === playedId) || nextState.player.back.find((card) => card.instanceId === playedId)
-        const destination = nextState.player.front.some((card) => card.instanceId === playedId) ? 'front row' : 'Bench'
-        showResolution({ id: makeResolutionId('play-basic'), tone: 'player', title: 'Play Basic Pokémon', detail: `${played?.name || 'Basic Pokémon'} joined your ${destination} without ending your turn.` }, 'select')
-        cursor += RESOLUTION_TIMING.actionIntro
       } else {
         showResolution(
           {
@@ -1521,7 +1584,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         cursor += RESOLUTION_TIMING.actionIntro
       }
 
-      const skipOpponentStep = meta.kind === 'bench' || (
+      const skipOpponentStep = (
         nextState.pendingPromotion === 'player' &&
         opponentCoinCues.length === 0 &&
         !opponentDamageEvent &&
@@ -1568,14 +1631,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                 ? `${playerTarget?.name || 'Your card'} takes the hit`
                 : 'The opponent attack fails to damage',
               sourceId: opponentAttacker?.instanceId,
-              damageCue: opponentDamageEvent
-                ? {
-                    id: makeResolutionId('opponent-damage-cue'),
-                    targetId: opponentDamageEvent.targetId,
-                    damage: opponentDamageEvent.damage,
-                    side: 'player',
-                  }
-                : undefined,
             },
             opponentDamageEvent ? 'bad' : 'select',
             opponentDamageEvent,
@@ -1590,12 +1645,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               title: 'Opponent Attack',
               detail: `${playerTarget?.name || 'Your card'} takes the hit`,
               sourceId: opponentAttacker?.instanceId,
-              damageCue: {
-                id: makeResolutionId('opponent-damage-cue'),
-                targetId: opponentDamageEvent.targetId,
-                damage: opponentDamageEvent.damage,
-                side: 'player',
-              },
             },
             'bad',
             opponentDamageEvent,
@@ -1660,12 +1709,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               title: 'Recoil',
               detail: `${opponentRecoilCard.name} is hit by recoil`,
               sourceId: opponentRecoilEvent.sourceId,
-              damageCue: {
-                id: makeResolutionId('opponent-recoil-damage'),
-                targetId: opponentRecoilEvent.targetId,
-                damage: opponentRecoilEvent.damage,
-                side: 'opponent',
-              },
             },
             'select',
             opponentRecoilEvent,
@@ -1687,12 +1730,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               title: 'Confusion',
               detail: `${opponentConfusionCard.name} hurt itself in confusion`,
               sourceId: opponentConfusionEvent.sourceId,
-              damageCue: {
-                id: makeResolutionId('opponent-confusion-damage'),
-                targetId: opponentConfusionEvent.targetId,
-                damage: opponentConfusionEvent.damage,
-                side: 'opponent',
-              },
             },
             'good',
             opponentConfusionEvent,
@@ -1716,12 +1753,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               title: 'Status Damage',
               detail: `${statusTarget?.name || 'Active card'} suffers poison/burn damage`,
               sourceId: statusDamageEvent.sourceId,
-              damageCue: {
-                id: makeResolutionId('status-damage-cue'),
-                targetId: statusDamageEvent.targetId,
-                damage: statusDamageEvent.damage,
-                side: statusDamageEvent.targetSide,
-              },
             },
             'select',
             statusDamageEvent,
@@ -1733,15 +1764,17 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       }
 
       scheduleResolutionStep(
-        () => commitActionResult(nextState, completion),
+        () => settleWithDamage(nextState, completion),
         cursor + RESOLUTION_TIMING.finalSettle,
       )
     },
     [
       clearResolutionTimers,
       commitActionResult,
+      playDamage,
       playSfx,
       scheduleResolutionStep,
+      settleWithDamage,
     ],
   )
 
@@ -1774,8 +1807,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
 
       const visualState = cloneTcgBattleState(previousState)
       clearVisualActionEvents(visualState)
-      const remoteDamage = nextState.lastDamageEvents?.find(
+      const remoteDamage = getDamageEvents(nextState).find(
         (event) =>
+          !seenDamageRef.current.has(event.id) &&
           event.reason !== 'status' &&
           event.reason !== 'ability' &&
           (event.targetSide === 'player' || event.targetSide === 'opponent'),
@@ -1852,6 +1886,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           : RESOLUTION_TIMING.actionIntro
         if (remoteDamage) {
           scheduleResolutionStep(() => {
+            playDamage([remoteDamage])
             setResolution({
               id: makeResolutionId('remote-damage'),
               tone:
@@ -1863,12 +1898,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                   ? `${target?.name || 'Your card'} takes the hit`
                   : `${attacker?.name || 'Opponent card'} takes damage`,
               sourceId: remoteDamage.sourceId,
-              damageCue: {
-                id: makeResolutionId('remote-damage-cue'),
-                targetId: remoteDamage.targetId,
-                damage: remoteDamage.damage,
-                side: remoteDamage.targetSide,
-              },
             })
             setState((current) => {
               if (!current) return current
@@ -1911,7 +1940,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           statusDelay,
         )
         scheduleResolutionStep(
-          () => commitActionResult(nextState),
+          () => settleWithDamage(nextState),
           finalDelay + RESOLUTION_TIMING.finalSettle,
         )
         return
@@ -1977,15 +2006,17 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       })
       playSfx('select')
       scheduleResolutionStep(
-        () => commitActionResult(nextState),
+        () => settleWithDamage(nextState),
         RESOLUTION_TIMING.actionIntro + RESOLUTION_TIMING.finalSettle,
       )
     },
     [
       clearResolutionTimers,
       commitActionResult,
+      playDamage,
       playSfx,
       scheduleResolutionStep,
+      settleWithDamage,
     ],
   )
 
@@ -2006,7 +2037,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       if (inFlight) return
       inFlight = true
       try {
-        const response = await refreshTcgBattleState()
+        const response = await actions.refresh()
         if (cancelled || !response.success) return
         const currentRevision = state.revision || 0
         const nextRevision = response.state.revision || 0
@@ -2031,6 +2062,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       window.clearInterval(interval)
     }
   }, [
+    actions,
     animateRemoteActionResult,
     commitActionResult,
     isActionBusy,
@@ -2075,16 +2107,12 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       playSfx('select')
       return
     }
-    if (meta.kind === 'evolve') {
-      const target = findSideCard(previousState.player, meta.targetId)
-      const evolution = previousState.player.hand.find(
-        (card) => card.id === meta.evolutionCardId,
-      )
+    if (meta.kind === 'evolve' || meta.kind === 'bench') {
       setResolution({
-        id: makeResolutionId('evolve-queued'),
+        id: makeResolutionId('card-queued'),
         tone: 'player',
-        title: 'Evolution Ready',
-        detail: `${target?.name || 'Your Pokémon'} prepares to evolve${evolution ? ` into ${evolution.name}` : ''}.`,
+        title: meta.kind === 'evolve' ? 'Evolving…' : 'Playing card…',
+        detail: '',
       })
       playSfx('select')
       return
@@ -2179,11 +2207,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           toast.info(`${response.state.lastAction.abilityName || 'Peek'} revealed ${response.state.lastAction.privateRevealedCardNames.join(' and ')}.`)
         }
         setBenchMode(null)
-        if (meta.kind === 'evolve') {
-          setShowEvolutionSheet(false)
-          setSelectedEvolutionCardId(null)
-          setSelectedEvolutionTargetId(null)
-        }
+        if (meta.kind === 'evolve') cancelEvolution()
         if (!previousState) {
           commitActionResult(response.state, response.completion)
           return
@@ -2233,7 +2257,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     }
     callAction(
       () =>
-        tcgBattleAttack(
+        actions.attack(
           selectedAttacker.instanceId,
           attackIndex,
           currentTarget.instanceId,
@@ -2258,7 +2282,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     setChoiceAttackIndex(null)
     callAction(
       () =>
-        tcgBattleAttack(
+        actions.attack(
           selectedAttacker.instanceId,
           attackIndex,
           selectedTargetId,
@@ -2288,24 +2312,50 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     playSfx('select')
   }
 
+  const submitEvolution = (option: TcgBattleEvolutionOption, effectTargetId?: string | string[]) => {
+    if (!state) return
+    const { targetId, card } = option
+    callAction(
+      () => actions.evolve(targetId, card.instanceId, state.revision, effectTargetId),
+      { kind: 'evolve', targetId, evolutionCardId: card.id, effectTargetId },
+    )
+  }
+
   const handleCardTap = (card: TcgBattleCardState, zone: BoardZone) => {
     if (state?.phase !== 'battle' || isBusy) return
+    if (selectedEvolution && boardEffect) {
+      if (!evolutionTargets.includes(card.instanceId)) return
+      if (boardEffect.count === 1) {
+        submitEvolution(selectedEvolution, boardEffect.value(card.instanceId))
+        return
+      }
+      setEvolutionEffectTargets((current) => {
+        if (current.includes(card.instanceId)) return current.filter((id) => id !== card.instanceId)
+        if (current.length >= boardEffect.count || boardEffect.canAdd?.(current, card.instanceId) === false) return current
+        return [...current, card.instanceId]
+      })
+      return
+    }
     if (zone === 'opponent-front') {
-      if (selectedEvolutionCardId) return
+      if (selectedEvolutionInstanceId) return
       setTargetId(card.instanceId)
       return
     }
     if (zone === 'opponent-bench') return
-    if (selectedEvolutionCardId) {
+    if (selectedEvolutionInstanceId) {
       const matchingEvolution = evolutionOptions.find(
         (option) =>
-          option.card.id === selectedEvolutionCardId &&
+          option.card.instanceId === selectedEvolutionInstanceId &&
           option.targetId === card.instanceId,
       )
       if (!matchingEvolution) return
-      setSelectedEvolutionTargetId(card.instanceId)
-      setIsHandOpen(false)
-      setShowEvolutionSheet(true)
+      if (needsEvolutionChoice(matchingEvolution, state.player)) {
+        setSelectedEvolutionTargetId(card.instanceId)
+      } else {
+        const effect = matchingEvolution.effect
+        const heal = effect === 'pichuHeal' || effect === 'eeveeHeal' || effect === 'babyHeal'
+        submitEvolution(matchingEvolution, heal ? effect : undefined)
+      }
       return
     }
     if (zone === 'player-bench') {
@@ -2536,9 +2586,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   }
 
   return (
-    <div className="game-activity-chrome relative h-[100dvh] overflow-hidden bg-game-canvas text-game-ink">
-      <ArenaBackdrop />
-      <main className="relative z-10 mx-auto flex h-full max-w-7xl flex-col px-2 pb-3 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-3 sm:pt-[calc(env(safe-area-inset-top)+1.65rem)]">
+    <MotionConfig reducedMotion="user">
+    <div className={cn('game-activity-chrome relative h-[100dvh] overflow-hidden', styles.table)}>
+      <main className={styles.surface}>
         <BattleTopBar
           state={state}
           attackCap={attackCap}
@@ -2546,7 +2596,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           deadlineSeconds={deadlineSeconds}
           onSurrender={() => setShowSurrenderConfirm(true)}
         />
-        <section aria-label="Battlefield" className="flex min-h-0 flex-1 flex-col items-center justify-evenly gap-1 overflow-y-auto px-1 py-2 sm:gap-2">
+        <section aria-label="Battlefield" className={styles.field}>
           {(state.battleMode === 'pvp' || hasTcgBattleOmanyteClairvoyance(state)) && state.opponent.hand.length > 0 && (
             <section aria-label="Opponent's revealed hand" className="w-full rounded-md border border-game-ochre/30 bg-game-surface-raised/90 px-2 py-1.5">
               <p className="mb-1 text-center text-[10px] font-black uppercase tracking-wide text-game-muted">Opponent's hand · revealed by Clairvoyance</p>
@@ -2560,45 +2610,52 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               </div>
             </section>
           )}
-          <BattleCardRow
-            cards={state.opponent.front}
-            side="opponent"
-            zone="opponent-front"
-            turnNumber={state.turnNumber}
-            selectedId={targetId}
-            eligibleTargetIds={[]}
-            resolution={resolution}
-            damageEvent={resolution?.damageCue || state.lastDamageEvent}
-            onCardTap={handleCardTap}
-            onPreviewStart={setPreviewCard}
-            onPreviewEnd={() => setPreviewCard(null)}
-          />
           <BattleBenchRow
             cards={state.opponent.back}
             label="Opponent bench"
             side="opponent"
             turnNumber={state.turnNumber}
-            eligibleTargetIds={[]}
+            eligibleTargetIds={evolutionTargets}
+            cueSelection={evolutionEffectTargets}
+            damageCues={damageCues}
+            onCardTap={boardEffect ? handleCardTap : undefined}
             onPreviewStart={setPreviewCard}
             onPreviewEnd={() => setPreviewCard(null)}
           />
-
-          {selectedEvolutionCardId && (
-            <div role="status" className="flex w-full max-w-xl items-center justify-between gap-2 rounded-lg border border-game-moss/50 bg-game-surface-raised px-3 py-2 text-[11px] font-bold text-game-ink shadow-sm">
-              <span>Choose a Pokémon on your field to evolve with {state.player.hand.find((card) => card.id === selectedEvolutionCardId)?.name || 'this card'}.</span>
-              <Button type="button" variant="ghost" size="sm" className="h-8 shrink-0 px-2 text-[10px] font-black uppercase" onClick={() => { setSelectedEvolutionCardId(null); setSelectedEvolutionTargetId(null) }}>Cancel</Button>
-            </div>
-          )}
+          <BattleCardRow
+            cards={state.opponent.front}
+            side="opponent"
+            zone="opponent-front"
+            turnNumber={state.turnNumber}
+            selectedId={selectedEvolutionInstanceId ? undefined : targetId}
+            eligibleTargetIds={evolutionTargets}
+            cueSelection={evolutionEffectTargets}
+            resolution={resolution}
+            damageCues={damageCues}
+            onCardTap={handleCardTap}
+            onPreviewStart={setPreviewCard}
+            onPreviewEnd={() => setPreviewCard(null)}
+          />
+          <div className={styles.midline}>
+            <span role="status">
+              {isBusy && resolution ? resolution.title
+                : state.pendingPromotion ? (state.pendingPromotion === 'player' ? 'Choose a Pokémon to promote' : 'Opponent is promoting')
+                : state.phase === 'finished' ? getWinnerLabel(state.winner)
+                : state.activeSide === 'player' ? 'Your turn' : 'Opponent’s turn'}
+            </span>
+          </div>
 
           <BattleCardRow
             cards={state.player.front}
             side="player"
             zone="player-front"
             turnNumber={state.turnNumber}
-            selectedId={attackerId}
-            eligibleTargetIds={selectedEvolutionCardId ? evolutionOptions.filter((option) => option.card.id === selectedEvolutionCardId).map((option) => option.targetId) : []}
+            selectedId={selectedEvolutionInstanceId ? undefined : attackerId}
+            eligibleTargetIds={evolutionTargets}
+            cueSelection={evolutionEffectTargets}
             resolution={resolution}
-            damageEvent={resolution?.damageCue || state.lastDamageEvent}
+            damageCues={damageCues}
+            settledEvolution={settledEvolution}
             onCardTap={handleCardTap}
             onPreviewStart={setPreviewCard}
             onPreviewEnd={() => setPreviewCard(null)}
@@ -2608,7 +2665,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             label="Your bench"
             side="player"
             turnNumber={state.turnNumber}
-            eligibleTargetIds={selectedEvolutionCardId ? evolutionOptions.filter((option) => option.card.id === selectedEvolutionCardId).map((option) => option.targetId) : []}
+            eligibleTargetIds={evolutionTargets}
+            cueSelection={evolutionEffectTargets}
+            damageCues={damageCues}
+            settledEvolution={settledEvolution}
             onCardTap={handleCardTap}
             onPreviewStart={setPreviewCard}
             onPreviewEnd={() => setPreviewCard(null)}
@@ -2630,24 +2690,42 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           resultShown={Boolean(resultOverlay)}
           resolution={resolution}
           evolutionOptions={evolutionOptions}
-          selectedEvolutionCardId={selectedEvolutionCardId}
+          choosingEvolution={Boolean(selectedEvolutionInstanceId)}
+          evolutionPrompt={(choosingEvolution || (selectedEvolution && boardEffect)) && (
+            <div className={styles.choiceRail}>
+              <span role="status">{boardEffect?.hint || `Choose a Pokémon for ${state.player.hand.find((card) => card.instanceId === selectedEvolutionInstanceId)?.name || 'this Evolution'}`}</span>
+              <div className="flex flex-wrap gap-1">
+                {selectedEvolution && boardEffect && (
+                  <>
+                    {boardEffect.count > 1 && <Button type="button" size="sm" disabled={isBusy || evolutionEffectTargets.length !== boardEffect.count} onClick={() => submitEvolution(selectedEvolution, evolutionEffectTargets)}>Use Ability</Button>}
+                    <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => submitEvolution(selectedEvolution)}>Just evolve</Button>
+                  </>
+                )}
+                <button type="button" className={styles.iconButton} aria-label="Cancel Evolution" disabled={isBusy} onClick={cancelEvolution}><X size={16} /></button>
+              </div>
+            </div>
+          )}
           handOpen={isHandOpen}
-          turnDrawNotice={turnDrawNotice}
-          onToggleHand={() => setIsHandOpen((open) => !open)}
+          drawnCard={drawnCard}
+          onToggleHand={() => { cancelEvolution(); setIsHandOpen((open) => !open) }}
           onCloseHand={() => setIsHandOpen(false)}
-          onPreviewCard={setPreviewCard}
+          onInspectCard={(card, detail) => setHandInspection({ card, detail })}
           onAttack={(attackIndex) => { setIsHandOpen(false); requestAttack(attackIndex) }}
           onCharge={() => {
             setIsHandOpen(false)
-            callAction(() => tcgBattleCharge(state.revision), { kind: 'charge' })
+            callAction(() => actions.charge(state.revision), { kind: 'charge' })
           }}
           onClaim={() =>
             callAction(() => claimTcgBattleResult(), { kind: 'claim' })
           }
           onPromote={() => setBenchMode('promote')}
           onRetreat={() => { setIsHandOpen(false); setBenchMode('retreat') }}
-          onOpenEvolution={(cardId) => { setSelectedEvolutionCardId(cardId); setSelectedEvolutionTargetId(null); setIsHandOpen(false) }}
-          onPlayBasicToBench={(cardId) => { setIsHandOpen(false); callAction(() => tcgBattlePlayBasicToBench(cardId, state.revision), { kind: 'bench' }) }}
+          onOpenEvolution={(instanceId) => {
+            setSelectedEvolutionInstanceId(instanceId)
+            setSelectedEvolutionTargetId(null)
+            setIsHandOpen(false)
+          }}
+          onPlayBasicToBench={(cardId) => { setIsHandOpen(false); callAction(() => actions.playBasic(cardId, state.revision), { kind: 'bench' }) }}
           onUseHealAbility={(sourceId, abilityIndex, targetCardId, abilityName, discardPokemonIds) =>
             callAction(
               () => tcgBattleHealActiveAbility(sourceId, abilityIndex, targetCardId, state.revision, discardPokemonIds),
@@ -2875,9 +2953,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         />
       )}
 
-      {showEvolutionSheet && (
-        <EvolutionSheet
-          options={selectedEvolutionCardId ? evolutionOptions.filter((option) => option.card.id === selectedEvolutionCardId && (!selectedEvolutionTargetId || option.targetId === selectedEvolutionTargetId)) : evolutionOptions}
+      {selectedEvolution && !boardEffect && (
+        <EvolutionEffectPicker
+          key={`${selectedEvolution.targetId}:${selectedEvolution.card.instanceId}`}
+          option={selectedEvolution}
           discardPokemon={state.player.discard}
           playerSide={state.player}
           opposingSide={state.opponent}
@@ -2886,14 +2965,8 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           opposingPokemon={[...state.opponent.front, ...state.opponent.back].filter((card) => card.currentHp > 0)}
           opposingBenchPokemon={state.opponent.back.filter((card) => card.currentHp > 0)}
           isPending={isBusy}
-          onClose={() => { setShowEvolutionSheet(false); setSelectedEvolutionCardId(null); setSelectedEvolutionTargetId(null) }}
-          onEvolve={(targetId, evolutionCardId, effectTargetId) =>
-            callAction(
-              () =>
-                tcgBattleEvolve(targetId, evolutionCardId, state.revision, effectTargetId),
-              { kind: 'evolve', targetId, evolutionCardId, effectTargetId },
-            )
-          }
+          onClose={() => setSelectedEvolutionTargetId(null)}
+          onEvolve={(effectTargetId) => submitEvolution(selectedEvolution, effectTargetId)}
         />
       )}
 
@@ -2923,6 +2996,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       <AnimatePresence>
         {previewCard && <CardPreviewOverlay card={previewCard} />}
       </AnimatePresence>
+      {handInspection && <HandCardInspection {...handInspection} onClose={() => setHandInspection(null)} />}
       <AnimatePresence>
         {resolution?.coinCue && <CoinFlipOverlay cue={resolution.coinCue} />}
       </AnimatePresence>
@@ -3077,6 +3151,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         }
       `}</style>
     </div>
+    </MotionConfig>
   )
 }
 
@@ -3090,60 +3165,9 @@ function ArenaBackdrop() {
   )
 }
 
-function ResolutionToast({ resolution }: { resolution: BattleResolution }) {
-  const toneClasses =
-    resolution.tone === 'player'
-      ? 'border-game-charcoal/35 bg-game-surface-raised text-game-ink'
-      : resolution.tone === 'opponent'
-        ? 'border-game-clay/40 bg-game-surface-raised text-game-ink'
-        : 'border-game-ochre/45 bg-game-surface-raised text-game-ink'
-  const actorLabel =
-    resolution.tone === 'player'
-      ? 'You'
-      : resolution.tone === 'opponent'
-        ? 'Foe'
-        : 'Battle'
-
-  return (
-    <motion.div
-      key={resolution.id}
-      className="pointer-events-none fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4.5rem)] z-40 flex justify-center sm:top-[calc(env(safe-area-inset-top)+5.5rem)]"
-      initial={{ opacity: 0, y: -12, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -8, scale: 0.98 }}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
-    >
-      <div
-        className={cn(
-          'relative min-w-64 max-w-[min(32rem,calc(100vw-2rem))] overflow-hidden rounded-md border px-4 py-3 shadow-md',
-          toneClasses,
-        )}
-      >
-        <div className="flex items-center gap-3">
-          <span className="shrink-0 rounded-md border border-game-border bg-game-canvas px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-game-muted">
-            {actorLabel}
-          </span>
-          <div className="min-w-0">
-            <div className="truncate text-xs font-black uppercase">
-              {resolution.title}
-            </div>
-            <div className="mt-0.5 truncate text-[11px] text-game-muted">
-              {resolution.detail}
-            </div>
-          </div>
-          {resolution.damageCue && (
-            <div className="ml-auto flex shrink-0 items-center gap-1 rounded-md border border-game-border bg-game-canvas px-2 py-1 text-xs font-bold text-game-ink">
-              {resolution.damageCue.damage}
-            </div>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  )
-}
 
 function formatEnergyCap(value: number): string {
-  return value === Number.POSITIVE_INFINITY ? '4+' : `${value}`
+  return value === Number.POSITIVE_INFINITY ? 'none' : `${value}`
 }
 
 function formatMatchClock(seconds: number): string {
@@ -3164,80 +3188,25 @@ function BattleTopBar({
   deadlineSeconds: number | null
   onSurrender: () => void
 }) {
-  const freeTypes =
-    state.turnNumber >= 15
-      ? [state.player.selectedEnergy, state.opponent.selectedEnergy].filter(
-          Boolean,
-        )
-      : []
-  const sideLabel =
-    state.phase === 'finished'
-      ? state.winner === 'player'
-        ? 'YOU'
-        : state.winner === 'tie'
-          ? 'DRAW'
-          : state.battleMode === 'pvp'
-            ? 'OPPONENT'
-            : 'CPU'
-      : state.pendingPromotion === 'player' || state.activeSide === 'player'
-        ? 'YOU'
-        : state.battleMode === 'pvp'
-          ? 'OPPONENT'
-          : 'CPU'
-
+  const energyCap = TCG_BATTLE_FORMATS[state.format].energyCap
+  const foe = state.battleMode === 'pvp' ? 'Opponent' : 'CPU'
   return (
-    <div className="mt-1 shrink-0 px-1 py-1 sm:mt-2">
-      <div className="grid grid-cols-3 items-center gap-3">
-        <span className="inline-flex items-center gap-1 text-xs font-black text-game-ink">
-          <EnergyIcon
-            type="Colorless"
-            className={cn(
-              'h-5 w-5',
-              attackCapPulse && 'animate-[tcg-energy-pulse_950ms_ease-out]',
-            )}
-          />
-          {formatEnergyCap(attackCap)}
+    <section className={styles.scoreboard} aria-label="Battle score">
+      <div className={styles.round}>
+        <span>Round <b>{state.turnNumber}</b></span>
+        <span className={cn('tabular-nums', attackCapPulse && 'tcg-motion animate-[tcg-energy-pulse_950ms_ease-out]')}>
+          Attack cap <b>{formatEnergyCap(attackCap)}</b>
         </span>
-        <div className="text-center leading-tight">
-          <div className="text-[11px] font-light tracking-[0.08em] text-game-muted">
-            Round {state.turnNumber}
-            {state.battleMode === 'pvp' && deadlineSeconds !== null
-              ? ` · ${formatMatchClock(deadlineSeconds)}`
-              : ''}
-          </div>
-          <div className="text-[12px] font-black tracking-[0.14em] text-game-ink">
-            {sideLabel}
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-1.5">
-          {freeTypes.length > 0 &&
-            freeTypes.map((type, index) => (
-              <span
-                key={`${type}:${index}`}
-                className="inline-flex items-center"
-              >
-                <EnergyIcon type={type || 'Colorless'} className="h-5 w-5" />
-              </span>
-            ))}
-          {state.battleMode === 'pvp' && state.phase !== 'finished' && (
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="h-10 w-10 text-game-muted hover:bg-game-surface hover:text-game-ink"
-              aria-label="Surrender match"
-              onClick={onSurrender}
-            >
-              <span aria-hidden="true">×</span>
-            </Button>
-          )}
-        </div>
+        {state.battleMode === 'pvp' && deadlineSeconds !== null && (
+          <span className="tabular-nums">{formatMatchClock(deadlineSeconds)}</span>
+        )}
+        {state.battleMode === 'pvp' && state.phase !== 'finished' && (
+          <button type="button" className={styles.iconButton} aria-label="Surrender match" onClick={onSurrender}><X size={15} /></button>
+        )}
       </div>
-      <div className="mt-1.5 grid grid-cols-2 gap-1.5">
-        <SideScorePill label="You" side={state.player} energy={state.player.energy} energyCap={TCG_BATTLE_FORMATS[state.format].energyCap} tone="player" />
-        <SideScorePill label={state.battleMode === 'pvp' ? 'Opponent' : 'CPU'} side={state.opponent} energy={state.opponent.energy} energyCap={TCG_BATTLE_FORMATS[state.format].energyCap} tone="opponent" />
-      </div>
-    </div>
+      <SideScorePill label={foe} side={state.opponent} energyCap={energyCap} active={state.activeSide === 'opponent'} showFreeEnergy={state.turnNumber >= 15} />
+      <SideScorePill label="You" side={state.player} energyCap={energyCap} active={state.activeSide === 'player'} showFreeEnergy={state.turnNumber >= 15} />
+    </section>
   )
 }
 
@@ -4387,11 +4356,12 @@ function InlineAttackButtons({
   const canAct =
     state.phase === 'battle' && state.activeSide === 'player' && !resolution && !moonGuidancePending && !regidragoPending
   const attacks = selectedAttacker ? getTcgBattleAvailableAttacks(state, 'player', selectedAttacker) : []
+  const [inspectedAttack, setInspectedAttack] = useState<string | null>(null)
 
   if (state.phase !== 'battle' || attacks.length === 0) return null
 
   return (
-    <section aria-label={`${selectedAttacker?.name || 'Pokémon'} attacks`} className="z-20 flex w-full max-w-full snap-x snap-mandatory items-center justify-start gap-2 overflow-x-auto overscroll-x-contain px-1 py-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden">
+    <section aria-label={`${selectedAttacker?.name || 'Pokémon'} attacks`} className={styles.attacks} data-scroll={attacks.length > 2}>
       {attacks.map((attack, index) => {
         const cost = getAttackCost(attack, state, selectedAttacker, 'player')
         const validTargets = selectedAttacker
@@ -4420,49 +4390,40 @@ function InlineAttackButtons({
           selectedTarget,
           state,
         )
-        const disabledReason = !canAct
-          ? 'Wait'
+        const disabledReason = !canAct || isPending
+          ? 'Wait for your turn'
           : !isTcgBattleAbilityAttackAllowed(state, 'player', selectedAttacker!)
-            ? 'Ability'
+            ? 'Blocked by an Ability'
           : isTcgBattleAttackDisabled(selectedAttacker!, index)
-            ? 'Disabled'
+            ? 'Attack disabled'
             : !hasResolvableTarget
-              ? 'Target'
+              ? 'No eligible target'
               : !isCardUnlockedByTurn(selectedAttacker, state.turnNumber)
-                ? `Turn ${selectedAttacker ? getTcgBattleCardUnlockTurnForCard(selectedAttacker) : 1}`
+                ? `Unlocks on round ${selectedAttacker ? getTcgBattleCardUnlockTurnForCard(selectedAttacker) : 1}`
                 : cost > state.player.energy
-                  ? 'Energy'
+                  ? `Needs ${cost - state.player.energy} more Energy`
                   : cost > attackCap
-                    ? 'Cap'
+                    ? `Attack cap is ${attackCap} Energy`
                     : ''
-        const disabled = isPending || Boolean(disabledReason)
+        const key = `${selectedAttacker?.instanceId}:${index}`
 
         return (
           <button
             type="button"
             key={`${attack.name}-${index}`}
-            className={cn(
-              'game-focus-ring group flex min-h-12 min-w-[min(16rem,78vw)] max-w-[min(20rem,86vw)] shrink-0 snap-start items-center justify-between gap-2 rounded-md border border-game-moss/30 bg-game-surface-raised/95 px-3 py-2 text-left backdrop-blur-md transition-colors hover:border-game-moss-strong/70 hover:bg-game-moss/15',
-              disabled &&
-                'cursor-default border-game-border/70 bg-game-surface-raised/75 opacity-40 hover:border-game-border/70 hover:bg-game-surface-raised/75',
-            )}
-            disabled={disabled}
-            onClick={() => onAttack(index)}
+            className={styles.attack}
+            aria-disabled={Boolean(disabledReason)}
+            aria-label={`${attack.name}, ${cost} Energy, ${disabledReason || `${projectedDamage} damage`}`}
+            onClick={() => {
+              if (disabledReason) setInspectedAttack((current) => current === key ? null : key)
+              else onAttack(index)
+            }}
           >
-            <span className="flex min-w-0 items-center gap-2">
-              <span className="min-w-0">
-                <span className="block truncate text-[11px] font-black uppercase text-game-ink">
-                  {attack.name}
-                </span>
-                <span className="mt-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-game-muted">
-                  {disabledReason || `${projectedDamage} damage`}
-                </span>
-              </span>
+            <span className={styles.attackName}>{attack.name}</span>
+            <span className={styles.attackStats}><EnergyCost cost={cost} types={attack.cost} />
+              {disabledReason ? <LockKeyhole size={13} aria-hidden="true" /> : <b>{projectedDamage || attack.damage || '—'}</b>}
             </span>
-            <span className="flex shrink-0 items-center gap-1.5 text-[10px] font-black text-game-ink">
-              <EnergyCost cost={cost} types={attack.cost} />
-              <span>{attack.damage}</span>
-            </span>
+            {disabledReason && key === inspectedAttack && <span role="status" className={styles.attackReason}>{disabledReason}</span>}
           </button>
         )
       })}
@@ -5743,12 +5704,13 @@ function BattleCommandControls({
   resultShown,
   resolution,
   evolutionOptions,
-  selectedEvolutionCardId,
+  choosingEvolution,
+  evolutionPrompt,
   handOpen,
-  turnDrawNotice,
+  drawnCard,
   onToggleHand,
   onCloseHand,
-  onPreviewCard,
+  onInspectCard,
   onAttack,
   onCharge,
   onClaim,
@@ -5800,12 +5762,13 @@ function BattleCommandControls({
   resultShown: boolean
   resolution?: BattleResolution | null
   evolutionOptions: TcgBattleEvolutionOption[]
-  selectedEvolutionCardId: string | null
+  choosingEvolution: boolean
+  evolutionPrompt?: ReactNode
   handOpen: boolean
-  turnDrawNotice: string | null
+  drawnCard?: TcgBattleCardState
   onToggleHand: () => void
   onCloseHand: () => void
-  onPreviewCard: (card: TcgBattleCardState | null) => void
+  onInspectCard: (card: TcgBattleCardState, detail: string) => void
   onAttack: (attackIndex: number) => void
   onCharge: () => void
   onClaim: () => void
@@ -5852,43 +5815,30 @@ function BattleCommandControls({
   const [distributedCounterTargets, setDistributedCounterTargets] = useState<Record<string, string[]>>({})
   const handTriggerRef = useRef<HTMLButtonElement | null>(null)
   const handCloseRef = useRef<HTMLButtonElement | null>(null)
-  const actionDockRef = useRef<HTMLDivElement | null>(null)
   const previousHandOpenRef = useRef(handOpen)
-  const handSwipeStartXRef = useRef<number | null>(null)
-  const handSwipeTriggeredRef = useRef(false)
-  const [handBottomInset, setHandBottomInset] = useState<number | null>(null)
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null)
 
-  useEffect(() => {
-    if (!handOpen) return
-    const actionDock = actionDockRef.current
-    if (!actionDock) return
+  const startHandSwipe = (event: TouchEvent<HTMLElement>) => {
+    const touch = event.changedTouches[0]
+    swipeStartRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null
+  }
 
-    const updateBottomInset = () => {
-      const nextInset = Math.max(
-        0,
-        Math.ceil(window.innerHeight - actionDock.getBoundingClientRect().top),
-      )
-      setHandBottomInset((current) =>
-        current === nextInset ? current : nextInset,
-      )
+  const endHandSwipe = (event: TouchEvent<HTMLElement>, direction: -1 | 1, onSwipe: () => void) => {
+    const start = swipeStartRef.current
+    const touch = event.changedTouches[0]
+    swipeStartRef.current = null
+    if (!start || !touch) return
+    const dx = touch.clientX - start.x
+    if (dx * direction > 40 && Math.abs(dx) > Math.abs(touch.clientY - start.y) * 1.5) {
+      onSwipe()
     }
-
-    const resizeObserver = new ResizeObserver(updateBottomInset)
-    resizeObserver.observe(actionDock)
-    window.addEventListener('resize', updateBottomInset)
-    updateBottomInset()
-
-    return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', updateBottomInset)
-    }
-  }, [handOpen])
+  }
 
   useEffect(() => {
     if (handOpen && !previousHandOpenRef.current) handCloseRef.current?.focus()
-    if (!handOpen && previousHandOpenRef.current) handTriggerRef.current?.focus()
+    if (!handOpen && previousHandOpenRef.current && !choosingEvolution) handTriggerRef.current?.focus()
     previousHandOpenRef.current = handOpen
-  }, [handOpen])
+  }, [handOpen, choosingEvolution])
 
   useEffect(() => {
     if (
@@ -5911,7 +5861,7 @@ function BattleCommandControls({
   const formatConfig = TCG_BATTLE_FORMATS[state.format]
   const displayedChargeGain = formatConfig.chargeGain + getTcgBattleEnergyChargeBonus(state, 'player')
   const atCap = state.player.energy >= formatConfig.energyCap
-  const basicHand = state.player.hand.filter((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && canTcgBattlePutPokemonOnBench(state.player, card))
+  const basicHand = state.player.hand.filter((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && (state.player.front.length < 3 || canTcgBattlePutPokemonOnBench(state.player, card)))
   const opponentHasStage2 = [...state.opponent.front, ...state.opponent.back].some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2'))
   const emergencyRotationHand = state.player.hand.filter((card) => hasTcgBattleKlinklangEmergencyRotation(card) && opponentHasStage2 && state.player.front.filter((pokemon) => pokemon.currentHp > 0).length === 3 && getOpenTcgBattleBenchSlots(state.player) > 0 && canTcgBattlePutPokemonOnBench(state.player, card))
   const lastCardBenchDrawHand = state.player.hand.length === 1 && state.player.front.filter((pokemon) => pokemon.currentHp > 0).length === 3 && getOpenTcgBattleBenchSlots(state.player) > 0
@@ -6199,8 +6149,8 @@ function BattleCommandControls({
   }
 
   return (
-    <div ref={actionDockRef} className="relative z-40 flex w-full shrink-0 flex-col items-center gap-1.5 bg-gradient-to-t from-game-canvas via-game-canvas/95 to-transparent pb-[calc(env(safe-area-inset-bottom)+0.25rem)] pt-1.5">
-      <InlineAttackButtons
+    <section className={styles.dock} aria-label="Battle actions">
+      {evolutionPrompt || <InlineAttackButtons
         state={state}
         selectedAttacker={selectedAttacker}
         selectedTarget={selectedTarget}
@@ -6208,7 +6158,7 @@ function BattleCommandControls({
         isPending={isPending}
         resolution={resolution}
         onAttack={onAttack}
-      />
+      />}
       {regidragoPending && state.lastAction?.frontId && typeof state.lastAction.abilityIndex === 'number' && (
         <div className="flex max-h-[min(20dvh,9rem)] max-w-[min(34rem,calc(100vw-1rem))] flex-wrap justify-center gap-1.5 overflow-y-auto rounded-lg border border-game-ochre/50 bg-game-canvas/95 p-2 shadow-lg">
           <p className="w-full text-center text-[10px] font-black uppercase tracking-wide text-game-ink">Legacy Star · Choose up to 2 cards to return</p>
@@ -6219,10 +6169,10 @@ function BattleCommandControls({
           <Button type="button" variant="outline" disabled={isPending} onClick={() => onUseDrawAbility(state.lastAction!.frontId!, state.lastAction!.abilityIndex!, state.lastAction!.abilityName || 'Legacy Star', regidragoRecoveryIds.filter((id) => state.player.discard.some((card) => card.instanceId === id)), false, false, undefined, false, false, undefined, false, false, false, false, false, false, 'regidragoVstarResolve')} className="game-focus-ring h-8 px-3 text-[10px] font-black uppercase">Return selected cards</Button>
         </div>
       )}
-      {(usableHealAbilities.length > 0 || usableDrawAbilities.length > 0 || usableRegidragoVstar.length > 0 || usableRotomVstar.length > 0 || usableZacianPsychicEnergy.length > 0 || usableZacianIntrepidSword.length > 0 || usableClaydolCosmicPower.length > 0 || usableToxtricitySinisterSurge.length > 0 || usableFeraligatrDoubleSwitch.length > 0 || usableZamazentaShieldStar.length > 0 || usableLatiasPsychicAttach.length > 0 || usableMagnezoneMetalAcceleration.length > 0 || usableSalamenceTopEnergyAbilities.length > 0 || usablePokemonSwapPowers.length > 0 || usableBenchShuffleAbilities.length > 0 || usableDiscardRecoveryAbilities.length > 0 || usableDamageCounterAbilities.length > 0 || usableBenchSwitchAbilities.length > 0 || usableActiveSwitchAbilities.length > 0 || usableActiveStatusAbilities.length > 0 || usableBenchEntryAbilities.length > 0 || usableUnownVanishAbilities.length > 0 || usableIgglybuffGazeAbilities.length > 0 || usableElekidPlayfulPunchAbilities.length > 0) && canAct && (
+      {(usableHealAbilities.length > 0 || usableDrawAbilities.length > 0 || usableRegidragoVstar.length > 0 || usableRotomVstar.length > 0 || usableZacianPsychicEnergy.length > 0 || usableZacianIntrepidSword.length > 0 || usableClaydolCosmicPower.length > 0 || usableToxtricitySinisterSurge.length > 0 || usableFeraligatrDoubleSwitch.length > 0 || usableZamazentaShieldStar.length > 0 || usableLatiasPsychicAttach.length > 0 || usableMagnezoneMetalAcceleration.length > 0 || usableSalamenceTopEnergyAbilities.length > 0 || usablePokemonSwapPowers.length > 0 || usableBenchShuffleAbilities.length > 0 || usableDiscardRecoveryAbilities.length > 0 || usableDamageCounterAbilities.length > 0 || usableBenchSwitchAbilities.length > 0 || usableActiveSwitchAbilities.length > 0 || usableActiveStatusAbilities.length > 0 || usableBenchEntryAbilities.length > 0 || usableUnownVanishAbilities.length > 0 || usableIgglybuffGazeAbilities.length > 0 || usableElekidPlayfulPunchAbilities.length > 0) && canAct && !choosingEvolution && !handOpen && (
         <details className="group relative w-full max-w-5xl px-1">
           <summary className="game-focus-ring flex min-h-9 cursor-pointer list-none items-center justify-center gap-2 rounded-lg border border-game-border bg-game-surface-raised/95 px-3 text-[10px] font-black uppercase tracking-[0.1em] text-game-ink shadow-sm marker:hidden [&::-webkit-details-marker]:hidden">
-            Pokémon abilities & choices <span className="text-game-muted transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
+            Abilities <span className="text-game-muted transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
           </summary>
           <div className="absolute bottom-full left-1/2 z-[55] mb-1 max-h-[min(42dvh,22rem)] w-[min(96vw,52rem)] -translate-x-1/2 overflow-y-auto rounded-xl border border-game-border-strong bg-game-canvas/98 p-2 shadow-2xl backdrop-blur-sm">
           <div className="flex max-w-full flex-wrap justify-center gap-1.5 px-1">
@@ -6675,158 +6625,144 @@ function BattleCommandControls({
         </div>
         </details>
       )}
-      <div className="flex items-center justify-center gap-2 sm:gap-3">
+      <div className={styles.commands}>
         <LabeledCommandButton
           label="Switch"
-          disabled={!canAct || !selectedAttacker || isPending || isTcgBattleRetreatBlockedByStatus(state.player, selectedAttacker, [state.player, state.opponent])}
+          disabled={!canAct || !selectedAttacker || !state.player.back.length || isPending || choosingEvolution || isTcgBattleRetreatBlockedByStatus(state.player, selectedAttacker, [state.player, state.opponent])}
           onClick={onRetreat}
-        />
+        >
+          <Image src="/sprites/items/balls/poke-ball.avif" alt="" width={20} height={20} unoptimized className="shrink-0" />
+        </LabeledCommandButton>
         <LabeledCommandButton
-          label={atCap ? 'End Turn' : 'Charge'}
-          disabled={!canAct || isPending}
+          label={atCap ? 'End turn' : 'Charge'}
+          disabled={!canAct || isPending || choosingEvolution}
           onClick={onCharge}
         >
-          <span className="relative inline-flex items-center justify-center">
-            <EnergyIcon type="Colorless" className="h-[18px] w-[18px]" />
-            {!atCap && (
-              <span className="absolute -right-5 -top-3 rounded border border-game-charcoal bg-game-charcoal px-1 py-[1px] text-[10px] font-black leading-none text-white">
-                +{displayedChargeGain}
-              </span>
-            )}
-          </span>
+          <EnergyIcon type="Colorless" decorative className="size-[18px] shrink-0" />
+          {!atCap && <b className="tabular-nums">+{displayedChargeGain}</b>}
         </LabeledCommandButton>
+        <button
+          ref={handTriggerRef}
+          type="button"
+          aria-label={`Hand, ${state.player.hand.length} cards`}
+          aria-expanded={handOpen}
+          aria-controls={handOpen ? 'tcg-hand-drawer' : undefined}
+          onClick={onToggleHand}
+          onTouchStart={startHandSwipe}
+          onTouchEnd={(event) => endHandSwipe(event, -1, () => { if (!handOpen) onToggleHand() })}
+          className={styles.handTrigger}
+        >
+          <Image src="/images/tcg-back.avif" alt="" width={13} height={18} unoptimized className="shrink-0 rounded-[2px]" />
+          Hand <b className="tabular-nums">{state.player.hand.length}</b>
+        </button>
       </div>
-      <button
-        ref={handTriggerRef}
-        type="button"
-        aria-label={`${handOpen ? 'Close' : 'Open'} hand: ${state.player.hand.length} cards, ${state.player.deck.length} cards remaining in deck`}
-        aria-expanded={handOpen}
-        aria-controls={handOpen ? 'tcg-hand-drawer' : undefined}
-        onTouchStart={(event) => {
-          handSwipeTriggeredRef.current = false
-          handSwipeStartXRef.current = event.changedTouches[0]?.clientX ?? null
-        }}
-        onTouchEnd={(event) => {
-          const startX = handSwipeStartXRef.current
-          const endX = event.changedTouches[0]?.clientX
-          handSwipeStartXRef.current = null
-          if (startX !== null && endX !== undefined && startX - endX > 28) {
-            handSwipeTriggeredRef.current = true
-            if (!handOpen) onToggleHand()
-          }
-        }}
-        onClick={() => {
-          if (handSwipeTriggeredRef.current) {
-            handSwipeTriggeredRef.current = false
-            return
-          }
-          onToggleHand()
-        }}
-        className="game-focus-ring fixed right-0 top-1/2 z-[55] flex h-32 w-11 -translate-y-1/2 flex-col items-center justify-center gap-2 rounded-l-xl border border-r-0 border-game-ochre/70 bg-game-surface-raised/95 text-game-ink shadow-xl backdrop-blur-sm"
-      >
-        <span className="rounded-full bg-game-moss px-1.5 py-0.5 text-[10px] font-black text-white">{state.player.hand.length}</span>
-        <span className="rotate-180 [writing-mode:vertical-rl] text-[10px] font-black uppercase tracking-[0.14em]">Hand</span>
-      </button>
 
       <AnimatePresence>
-        {turnDrawNotice && state.activeSide === 'player' && !handOpen && (
-          <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} role="status" className="fixed right-12 top-1/2 z-[54] flex max-w-[min(64vw,18rem)] -translate-y-1/2 items-center gap-2 rounded-xl border border-game-ochre/60 bg-game-surface-raised px-3 py-2 shadow-xl">
-            {(() => {
-              const drawnCard = state.player.hand.find((card) => card.name === turnDrawNotice)
-              return drawnCard ? <Image src={drawnCard.image} alt="" width={30} height={42} className="h-[42px] w-[30px] shrink-0 rounded-sm object-cover" unoptimized /> : <span aria-hidden="true" className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-game-moss text-xs font-black text-white">↓</span>
-            })()}
-            <span className="min-w-0 text-[10px] font-bold leading-tight text-game-ink">Drew <strong className="block truncate">{turnDrawNotice}</strong></span>
-          </motion.div>
+        {drawnCard && (
+          <DrawnCardNotice key={drawnCard.instanceId} card={drawnCard} hidden={handOpen || choosingEvolution} onOpen={onToggleHand} />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {handOpen && (
-          <>
-            <motion.button
-              type="button"
-              aria-label="Close hand drawer"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={onCloseHand}
-              style={{ top: 'calc(env(safe-area-inset-top) + max(6rem, min(7.25rem, 25dvh)))', bottom: handBottomInset === null ? 'calc(env(safe-area-inset-bottom) + min(8rem, 30dvh))' : `${handBottomInset}px` }}
-              className="fixed inset-x-0 z-[45] cursor-default bg-game-charcoal/20"
-            />
-            <motion.aside
-              id="tcg-hand-drawer"
-              role="region"
-              aria-label="Your hand"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', stiffness: 330, damping: 34 }}
-              onTouchStart={(event) => { handSwipeStartXRef.current = event.changedTouches[0]?.clientX ?? null }}
-              onTouchEnd={(event) => {
-                const startX = handSwipeStartXRef.current
-                const endX = event.changedTouches[0]?.clientX
-                handSwipeStartXRef.current = null
-                if (startX !== null && endX !== undefined && endX - startX > 48) onCloseHand()
-              }}
-              style={{ top: 'calc(env(safe-area-inset-top) + max(6rem, min(7.25rem, 25dvh)))', bottom: handBottomInset === null ? 'calc(env(safe-area-inset-bottom) + min(8rem, 30dvh))' : `${handBottomInset}px` }}
-              className="fixed right-0 z-[60] flex w-[min(88vw,23rem)] flex-col overflow-hidden rounded-l-2xl border border-r-0 border-game-border-strong bg-game-surface-raised/98 shadow-2xl backdrop-blur-md"
-            >
-              <header
-                className="flex shrink-0 items-center justify-between gap-3 border-b border-game-border px-3 py-3"
-              >
-                <div>
-                  <h2 id="tcg-hand-title" className="text-xs font-black uppercase tracking-[0.14em] text-game-ink">Your hand · {state.player.hand.length}</h2>
-                  <p className="mt-1 text-[10px] font-bold text-game-muted">Deck · {state.player.deck.length} remaining</p>
-                </div>
-                <button ref={handCloseRef} type="button" aria-label="Close hand" onClick={onCloseHand} className="game-focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-full border border-game-border bg-game-canvas text-xl font-light text-game-ink">×</button>
-              </header>
-              {turnDrawNotice && state.activeSide === 'player' && (
-                <div role="status" className="mx-3 mt-2 rounded-lg border border-game-moss/35 bg-game-moss/10 px-3 py-2 text-[10px] font-bold text-game-ink">Drew <strong>{turnDrawNotice}</strong> at the start of your turn.</div>
-              )}
-              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
-                {state.player.hand.map((card) => {
-                  const isBasic = basicHand.some((item) => item.instanceId === card.instanceId)
-                  const evolution = evolutionOptions.some((option) => option.card.id === card.id)
-                  const selected = selectedEvolutionCardId === card.id
-                  const isNewlyDrawn = turnDrawNotice === card.name
-                  const isEmergencyRotation = emergencyRotationHand.some((item) => item.instanceId === card.instanceId)
-                  const isLastCardBenchPlay = lastCardBenchDrawHand.some((item) => item.instanceId === card.instanceId)
-                  const playable = (isBasic && canPlaceBasic) || isEmergencyRotation || isLastCardBenchPlay
-                  const action = isEmergencyRotation ? 'Emergency Rotation' : isLastCardBenchPlay ? 'Bench · Draw 3' : `Play to ${basicPlayDestination}`
-                  return (
-                    <div key={card.instanceId} className={cn('flex items-center gap-2 rounded-xl border p-2', selected ? 'border-game-moss bg-game-moss/10 ring-1 ring-game-moss/30' : isNewlyDrawn ? 'border-game-ochre bg-game-ochre/10 ring-1 ring-game-ochre/30' : 'border-game-border bg-game-canvas/80')}>
-                      <button
-                        type="button"
-                        disabled={!canAct || isPending || (!playable && !evolution)}
-                        onClick={() => playable ? onPlayBasicToBench(card.instanceId) : evolution ? onOpenEvolution(card.id) : undefined}
-                        aria-pressed={selected}
-                        aria-label={`${card.name}${playable ? `, ${action}` : evolution ? ', choose a Pokémon to evolve' : ', cannot be played now'}`}
-                        className="game-focus-ring flex min-w-0 flex-1 items-center gap-2 rounded-md text-left disabled:cursor-default disabled:opacity-55"
-                      >
-                        <Image src={card.image} alt="" width={48} height={66} className="h-[66px] w-12 shrink-0 rounded-sm object-cover" unoptimized />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[11px] font-black text-game-ink">{card.name}</span>
-                          <span className="mt-1 block truncate text-[9px] font-bold uppercase tracking-wide text-game-muted">{playable ? action : evolution ? 'Choose evolution target' : card.subtypes[0] || 'Card'}</span>
-                          {isNewlyDrawn && <span className="mt-1 block text-[8px] font-black uppercase tracking-wide text-game-ochre">New this turn</span>}
-                        </span>
+          <motion.aside
+            id="tcg-hand-drawer"
+            aria-label="Your hand"
+            initial={{ x: 24, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 24, opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className={styles.handTray}
+          >
+            <header onTouchStart={startHandSwipe} onTouchEnd={(event) => endHandSwipe(event, 1, onCloseHand)}>
+              <h2>Your hand <span>{state.player.hand.length}</span></h2>
+              <button ref={handCloseRef} type="button" aria-label="Close hand" onClick={onCloseHand} className={styles.iconButton}><X size={17} /></button>
+            </header>
+            <ul className={styles.handCards}>
+              {state.player.hand.map((card) => {
+                const isBasic = basicHand.some((item) => item.instanceId === card.instanceId)
+                const evolution = evolutionOptions.some((option) => option.card.instanceId === card.instanceId)
+                const isNew = drawnCard?.instanceId === card.instanceId
+                const emergencyRotation = emergencyRotationHand.some((item) => item.instanceId === card.instanceId)
+                const lastCardBenchPlay = lastCardBenchDrawHand.some((item) => item.instanceId === card.instanceId)
+                const basicPlay = (isBasic && canPlaceBasic) || emergencyRotation || lastCardBenchPlay
+                const playable = canAct && !isPending && (basicPlay || evolution)
+                const action = emergencyRotation ? 'Emergency Rotation' : lastCardBenchPlay ? 'Bench and draw 3'
+                  : basicPlay ? `Play to ${basicPlayDestination}` : 'Choose Evolution target'
+                const unlockTurn = getTcgBattleCardUnlockTurnForCard(card)
+                const detail = playable ? action
+                  : !canAct || isPending ? 'Wait for your turn to play this card.'
+                  : card.evolvesFrom && unlockTurn > state.turnNumber ? `Evolution unlocks on round ${unlockTurn} unless an Ability lets you evolve early.`
+                  : card.evolvesFrom ? `No Pokémon can evolve into ${card.name} right now.`
+                  : !canPlaceBasic ? 'Your front row and Bench are full.' : 'This card can’t be played right now.'
+                return (
+                  <li key={card.instanceId} data-new={isNew}>
+                    <button
+                      type="button"
+                      data-playable={playable}
+                      className={styles.handCard}
+                      onClick={() => {
+                        if (!playable) onInspectCard(card, detail)
+                        else if (basicPlay) onPlayBasicToBench(card.instanceId)
+                        else onOpenEvolution(card.instanceId)
+                      }}
+                      aria-label={`${card.name}, ${playable ? action : 'inspect card'}${isNew ? ', new this turn' : ''}`}
+                    >
+                      <Image src={card.image} alt="" fill sizes="120px" unoptimized draggable={false} />
+                      {isNew && <span className={styles.newCard}>New</span>}
+                      {!playable && <LockKeyhole className={styles.cardLock} size={15} aria-hidden="true" />}
+                    </button>
+                    {playable && (
+                      <button type="button" aria-label={`Inspect ${card.name}`} className={styles.inspectCard} onClick={() => onInspectCard(card, detail)}>
+                        <Image src="/sprites/items/scope-lens.avif" alt="" width={24} height={24} unoptimized />
                       </button>
-                      <button
-                        type="button"
-                        aria-label={`Preview ${card.name}`}
-                        onClick={() => { onPreviewCard(card); window.setTimeout(() => onPreviewCard(null), 1100) }}
-                        className="game-focus-ring grid h-9 w-9 shrink-0 place-items-center rounded-full border border-game-border bg-game-surface-raised text-xs font-black text-game-muted"
-                      >i</button>
-                    </div>
-                  )
-                })}
-                {state.player.hand.length === 0 && <p className="rounded-lg border border-dashed border-game-border p-4 text-center text-xs font-bold text-game-muted">Your hand is empty.</p>}
-                {state.player.deck.length === 0 && <p role="status" className="rounded-lg bg-game-clay/10 p-3 text-center text-[10px] font-bold text-game-clay">Your deck is empty. No more cards can be drawn.</p>}
-              </div>
-            </motion.aside>
-          </>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+            {state.player.hand.length === 0 && <p className={styles.emptyHand}>Your hand is empty.</p>}
+          </motion.aside>
         )}
       </AnimatePresence>
-    </div>
+    </section>
+  )
+}
+
+function DrawnCardNotice({ card, hidden, onOpen }: { card: TcgBattleCardState; hidden: boolean; onOpen: () => void }) {
+  const [visible, setVisible] = useState(true)
+  useEffect(() => {
+    const timer = window.setTimeout(() => setVisible(false), 3800)
+    return () => window.clearTimeout(timer)
+  }, [])
+  return (
+    <AnimatePresence>
+      {visible && !hidden && (
+        <motion.button
+          type="button"
+          initial={{ y: 13, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 8, opacity: 0 }}
+          className={styles.drawNotice}
+          onClick={onOpen}
+        >
+          <Image src={card.image} alt="" width={26} height={36} unoptimized />
+          <span role="status">Drew <b>{card.name}</b></span>
+        </motion.button>
+      )}
+    </AnimatePresence>
+  )
+}
+
+function HandCardInspection({ card, detail, onClose }: { card: TcgBattleCardState; detail: string; onClose: () => void }) {
+  return (
+    <Dialog open onOpenChange={(open) => { if (!open) onClose() }}>
+      <DialogContent className={styles.inspection}>
+        <DialogTitle>{card.name}</DialogTitle>
+        <DialogDescription>{detail}</DialogDescription>
+        <Image src={card.image} alt={card.name} width={260} height={358} unoptimized />
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -6842,24 +6778,16 @@ function LabeledCommandButton({
   children?: ReactNode
 }) {
   return (
-    <Button
+    <button
       type="button"
-      variant="outline"
       aria-label={label}
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className={cn(
-        'game-focus-ring h-11 rounded-md border border-game-border bg-game-surface-raised px-4 text-game-ink shadow-sm transition-colors hover:border-game-moss/55 hover:bg-game-moss/10',
-        'inline-flex items-center gap-2',
-        disabled && 'opacity-35',
-      )}
+      className={styles.command}
     >
-      {children && <span className="shrink-0">{children}</span>}
-      <span className="text-[11px] font-light uppercase tracking-[0.14em]">
-        {label}
-      </span>
-    </Button>
+      {children}{label}
+    </button>
   )
 }
 
@@ -6968,42 +6896,39 @@ function CoinFlipOverlay({ cue }: { cue: CoinCue }) {
 function SideScorePill({
   label,
   side,
-  energy,
   energyCap,
-  tone,
+  active,
+  showFreeEnergy,
 }: {
   label: string
   side: TcgBattleState['player']
-  energy: number
   energyCap: number
-  tone: SideTone
+  active: boolean
+  showFreeEnergy: boolean
 }) {
-  const living = getLivingCards(side).length
   const deckCount = side.deckCount ?? side.deck.length
-  const knockoutCount = side.knockoutCount || 0
+  const knockouts = side.knockoutCount || 0
 
   return (
-    <section
-      className={cn(
-        'min-w-0 rounded-lg border px-2 py-1',
-        tone === 'player'
-          ? 'border-game-charcoal/30 bg-game-charcoal/10'
-          : 'border-game-clay/30 bg-game-clay/10',
-      )}
-      aria-label={`${label}: ${energy} of ${energyCap} energy, ${knockoutCount} of 6 knockouts, ${deckCount} cards remaining, ${living} Pokémon on the field`}
-    >
-      <div className="flex items-center justify-between gap-1.5">
-        <div className="truncate text-[9px] font-black uppercase tracking-[0.08em] text-game-muted sm:text-[10px]">
-          {label}
-        </div>
-        <span className={cn('shrink-0 text-[10px] font-black text-game-ink sm:text-[11px]', knockoutCount >= 5 && 'text-game-danger')}>
-          KO {knockoutCount}/6
-        </span>
-      </div>
-      <div className="mt-0.5 flex items-center justify-between gap-2 text-[10px] font-bold text-game-muted">
-        <span>Energy {energy}/{energyCap}</span>
-        <span className={cn(deckCount === 0 && 'font-black text-game-danger')}>Deck {deckCount}</span>
-      </div>
+    <section className={styles.score} data-active={active} aria-label={label}>
+      <b>{label}</b>
+      <span title="Pokémon knocked out. Six loses the match." className={cn(knockouts >= 5 && styles.critical)}>
+        <span aria-hidden="true">KO </span><span className="sr-only">Knocked out </span><b>{knockouts}/6</b>
+      </span>
+      <span title="Cards left in deck" className={cn(deckCount === 0 && styles.critical)}>
+        <Image src="/sprites/items/deck-box.avif" alt="" width={16} height={16} unoptimized className="shrink-0" />
+        <span className="sr-only">Deck </span><b>{deckCount}</b>
+      </span>
+      <span title="Energy in the shared pool">
+        <EnergyIcon type="Colorless" decorative className="size-3.5 shrink-0" />
+        <span className="sr-only">Energy </span><b>{side.energy}/{energyCap}</b>
+        {showFreeEnergy && side.selectedEnergy && (
+          <span title={`Free ${side.selectedEnergy} Energy`}>
+            <EnergyIcon type={side.selectedEnergy} decorative className="size-3.5 shrink-0" />
+            <span className="sr-only">Free {side.selectedEnergy} Energy</span>
+          </span>
+        )}
+      </span>
     </section>
   )
 }
@@ -7160,118 +7085,80 @@ function SetupHandCard({
   )
 }
 
-function BattleCardRow({
-  cards,
-  side,
-  zone,
-  turnNumber,
-  selectedId,
-  eligibleTargetIds,
-  resolution,
-  damageEvent,
-  onCardTap,
-  onPreviewStart,
-  onPreviewEnd,
-}: {
+type CardLanding = { targetId: string; key: string }
+
+type BoardRowProps = {
   cards: TcgBattleCardState[]
   side: SideTone
-  zone: BoardZone
   turnNumber: number
-  selectedId?: string
   eligibleTargetIds: string[]
-  resolution?: BattleResolution | null
-  damageEvent?: DamageCue | TcgBattleState['lastDamageEvent']
-  onCardTap: (card: TcgBattleCardState, zone: BoardZone) => void
+  cueSelection: string[]
+  damageCues: TcgDamageEvent[]
+  settledEvolution?: CardLanding | null
   onPreviewStart: (card: TcgBattleCardState) => void
   onPreviewEnd: () => void
+}
+
+function BattleCardRow({ zone, selectedId, resolution, onCardTap, ...row }: BoardRowProps & {
+  zone: BoardZone
+  selectedId?: string
+  resolution?: BattleResolution | null
+  onCardTap: (card: TcgBattleCardState, zone: BoardZone) => void
 }) {
   return (
-    <section className="relative w-full overflow-visible">
-      <div className="relative z-10 grid grid-cols-3 place-items-center gap-2 sm:gap-5">
-        {cards.map((card) => (
-          <CardImageButton
-            key={card.instanceId}
-            card={card}
-            turnNumber={turnNumber}
-            selected={selectedId === card.instanceId || eligibleTargetIds.includes(card.instanceId)}
-            targetable={eligibleTargetIds.includes(card.instanceId)}
-            side={side}
-            battleRole={
-              resolution?.sourceId === card.instanceId
-                ? 'attacker'
-                : resolution?.damageCue?.targetId === card.instanceId
-                  ? 'target'
-                  : undefined
-            }
-            damage={
-              damageEvent?.targetId === card.instanceId
-                ? damageEvent.damage
-                : undefined
-            }
-            damageKey={
-              damageEvent?.targetId === card.instanceId
-                ? damageEvent.id
-                : undefined
-            }
-            onPreviewStart={() => onPreviewStart(card)}
-            onPreviewEnd={onPreviewEnd}
-            onClick={() => onCardTap(card, zone)}
-          />
-        ))}
-        {Array.from({ length: Math.max(0, 3 - cards.length) }).map(
-          (_, index) => (
-            <EmptyCardSlot key={index} side={side} />
-          ),
-        )}
+    <section aria-label={row.side === 'player' ? 'Your front row' : 'Opponent front row'} className={styles.frontRow}>
+      <BoardSlots {...row} selectedId={selectedId} attackingId={resolution?.sourceId} onTap={(card) => onCardTap(card, zone)} />
+    </section>
+  )
+}
+
+function BattleBenchRow({ label, onCardTap, ...row }: BoardRowProps & {
+  label: string
+  onCardTap?: (card: TcgBattleCardState, zone: BoardZone) => void
+}) {
+  const zone = row.side === 'player' ? 'player-bench' : 'opponent-bench'
+  return (
+    <section aria-label={`${label}, ${row.cards.length} of 3`} className={styles.benchRow}>
+      <span aria-hidden="true">Bench</span>
+      <div className={styles.benchSlots}>
+        <BoardSlots {...row} compact onTap={onCardTap ? (card) => onCardTap(card, zone) : undefined} />
       </div>
     </section>
   )
 }
 
-function BattleBenchRow({
-  cards,
-  label,
-  side,
-  turnNumber,
-  eligibleTargetIds,
-  onCardTap,
-  onPreviewStart,
-  onPreviewEnd,
-}: {
-  cards: TcgBattleCardState[]
-  label: string
-  side: SideTone
-  turnNumber: number
-  eligibleTargetIds: string[]
-  onCardTap?: (card: TcgBattleCardState, zone: BoardZone) => void
-  onPreviewStart: (card: TcgBattleCardState) => void
-  onPreviewEnd: () => void
+function BoardSlots({
+  cards, side, turnNumber, eligibleTargetIds, cueSelection, damageCues, settledEvolution,
+  selectedId, attackingId, compact, onTap, onPreviewStart, onPreviewEnd,
+}: BoardRowProps & {
+  selectedId?: string
+  attackingId?: string
+  compact?: boolean
+  onTap?: (card: TcgBattleCardState) => void
 }) {
   return (
-    <section aria-label={`${label}, ${cards.length} Pokémon`} className="flex min-h-[4rem] w-full max-w-3xl items-center gap-2 rounded-lg border border-game-border/70 bg-game-surface-raised/70 px-2 py-1.5">
-      <div className="w-[4.5rem] shrink-0 text-center">
-        <p className="text-[8px] font-black uppercase tracking-[0.08em] text-game-muted">{label}</p>
-        <p className="text-[10px] font-bold text-game-ink">{cards.length}/3</p>
-      </div>
-      <div className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-x-auto px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {cards.length === 0 ? (
-          <span className="text-[9px] font-semibold text-game-muted">No Benched Pokémon</span>
-        ) : cards.map((card) => (
-          <CardImageButton
-            key={card.instanceId}
-            card={card}
-            turnNumber={turnNumber}
-            selected={eligibleTargetIds.includes(card.instanceId)}
-            targetable={eligibleTargetIds.includes(card.instanceId)}
-            side={side}
-            compact
-            onClick={onCardTap ? () => onCardTap(card, side === 'player' ? 'player-bench' : 'opponent-bench') : undefined}
-            onPreviewStart={() => onPreviewStart(card)}
-            onPreviewEnd={onPreviewEnd}
-          />
-        ))}
-      </div>
-    </section>
+    <>
+      {cards.map((card) => (
+        <CardImageButton
+          key={card.instanceId}
+          card={card}
+          side={side}
+          turnNumber={turnNumber}
+          compact={compact}
+          selected={selectedId === card.instanceId || cueSelection.includes(card.instanceId)}
+          targetable={eligibleTargetIds.includes(card.instanceId)}
+          battleRole={attackingId === card.instanceId && !compact ? 'attacker' : undefined}
+          damageCues={damageCues.filter((event) => event.targetId === card.instanceId && event.targetSide === side)}
+          landingKey={settledEvolution?.targetId === card.instanceId ? settledEvolution.key : undefined}
+          onClick={onTap ? () => onTap(card) : undefined}
+          onPreviewStart={() => onPreviewStart(card)}
+          onPreviewEnd={onPreviewEnd}
+        />
+      ))}
+      {Array.from({ length: Math.max(0, 3 - cards.length) }, (_, index) => (
+        <div key={index} aria-hidden="true" className={compact ? styles.benchSlot : styles.frontSlot} />
+      ))}
+    </>
   )
 }
 
@@ -7587,8 +7474,148 @@ function BenchSheet({
   )
 }
 
-function EvolutionSheet({
-  options,
+const getEvolutionDeckDiscardCount = (card: Pick<TcgBattleCardState, 'abilities'>) => {
+  const text = card.abilities?.map((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()) || []
+  const existingKnockoutPower = text.some((abilityText) => /^once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability\. you may also use this ability if this pokemon is in the active spot and is knocked out by damage from an attack from your opponent's pokemon\. discard the top 2 cards of your opponent's deck\.$/.test(abilityText))
+  if (existingKnockoutPower) return 2
+  return Number(text.map((abilityText) => abilityText.match(/^(?:once during your turn, )?when you play (?:this pokemon|[a-z0-9 .'-]+) from your hand to evolve 1 of your pokemon(?: during your turn)?, you may discard the top (\d+) cards (?:of|from) your opponent's deck\.$|^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you must flip a coin\. if heads, discard the top (\d+) cards (?:of|from) your opponent's deck\. if tails, discard the top (\d+) cards (?:of|from) your deck\.$|^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you must discard the top (\d+) cards of your deck\.$/)?.[1] || abilityText.match(/if heads, discard the top (\d+) cards (?:of|from) your opponent's deck\. if tails/)?.[1] || abilityText.match(/must discard the top (\d+) cards of your deck/)?.[1]).find(Boolean) || 0)
+}
+const hasDeckDiscardAbility = (card: Pick<TcgBattleCardState, 'abilities'>) => getEvolutionDeckDiscardCount(card) > 0
+const hasEvolutionRandomHandDiscardAbility = (card: Pick<TcgBattleCardState, 'abilities'>) => (card.abilities || []).some((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim() === "when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may discard a random card from your opponent's hand. if this pokemon is your active pokemon and is knocked out by damage from an opponent's attack, you may discard a random card from your opponent's hand.")
+
+function hasMiloticRecover(card: TcgBattleEvolutionOption['card']) {
+  return card.name.toLowerCase() === 'milotic' && card.abilities?.some((ability) =>
+    ability.text.toLowerCase().replace(/\s+/g, ' ').includes('each player puts a basic pokemon from their discard pile onto their bench'),
+  )
+}
+
+function getEvolutionDamage(option: TcgBattleEvolutionOption, player: TcgBattleState['player']) {
+  const isGallade = option.card.name.toLowerCase() === 'gallade e4 lv.x'
+  if (isGallade && !player.front.some((card) =>
+    card.instanceId === option.targetId && card.name.toLowerCase() === 'gallade e4',
+  )) return null
+  return getTcgBattleEvolutionDamageEffect(option.card)
+}
+
+function canChooseEvolutionSwitch(option: TcgBattleEvolutionOption, player: TcgBattleState['player']) {
+  return hasTcgBattleEvolutionSwitchEffect(option.card) &&
+    (option.card.name.toLowerCase() !== 'luxray gl lv.x' || player.front.some((card) =>
+      card.instanceId === option.targetId && card.name.toLowerCase() === 'luxray gl',
+    ))
+}
+
+function needsEvolutionChoice(option: TcgBattleEvolutionOption, player: TcgBattleState['player']) {
+  const { card, effect, targetId } = option
+  return Boolean(
+    effect === 'azumarillFroth' || effect === 'phantumpDamageEvolve' ||
+    getTcgBattleEvolutionDiscardRecoveryCount(card) || getTcgBattleEvolutionBenchSearchCount(card) ||
+    hasTcgBattleEvolutionMassHealEffect(card) || getTcgBattleEvolutionAttackBoost(card) ||
+    getEvolutionDamage(option, player) || hasEvolutionRandomHandDiscardAbility(card) ||
+    hasDeckDiscardAbility(card) || getTcgBattleEvolutionCoinHealingEffect(card) ||
+    hasTcgBattleEvolutionTargetedFullHealEffect(card) || getTcgBattleEvolutionShuffleEffect(card) ||
+    getTcgBattleEvolutionDiscardEffect(card) || getTcgBattleEvolutionDevolutionEffect(card) ||
+    getTcgBattleEvolutionAttackProtectionEffect(card) || getTcgBattleEvolutionStatusEffect(card) ||
+    hasMiloticRecover(card) || getTcgBattleEvolutionEnergyEffect(card) || getTcgBattleEvolutionDrawCount(card) ||
+    hasTcgBattleEvolutionCardSearchEffect(card) || canChooseEvolutionSwitch(option, player) ||
+    hasTcgBattleEvolutionReturnPokemonEffect(card) ||
+    (hasTcgBattleEvolutionSelfSwitchEffect(card) && player.back.some((target) => target.instanceId === targetId)),
+  )
+}
+
+function getEvolutionHealTargets(option: TcgBattleEvolutionOption, player: TcgBattleState['player']) {
+  const name = option.card.name.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const healingRipples = name === 'milotic' &&
+    option.card.abilities?.some((ability) => ability.name.toLowerCase() === 'healing ripples')
+  const activeIds = new Set(player.front.map((card) => card.instanceId))
+  return [...player.front, ...player.back].filter((card) =>
+    card.currentHp > 0 && card.currentHp < card.hp &&
+    (name !== 'whimsicott' || (activeIds.has(card.instanceId) && card.types.includes('Grass'))) &&
+    (!healingRipples || card.types.includes('Water')),
+  )
+}
+
+type EvolutionBoardEffect = {
+  hint: string
+  targets: TcgBattleCardState[]
+  count: number
+  value: (instanceId: string) => string
+  canAdd?: (chosen: string[], instanceId: string) => boolean
+}
+
+function getEvolutionBoardEffect(state: TcgBattleState, option: TcgBattleEvolutionOption): EvolutionBoardEffect | null {
+  const { player, opponent } = state
+  const { card, effect, targetId } = option
+  if (effect === 'phantumpDamageEvolve' || effect === 'azumarillFroth' ||
+    getTcgBattleEvolutionDiscardRecoveryCount(card) || getTcgBattleEvolutionBenchSearchCount(card) ||
+    hasTcgBattleEvolutionMassHealEffect(card) || getTcgBattleEvolutionAttackBoost(card)) return null
+
+  const choose = (hint: string, candidates: TcgBattleCardState[], prefix = ''): EvolutionBoardEffect | null => {
+    const targets = candidates.filter((candidate) => candidate.currentHp > 0)
+    return targets.length ? { hint, targets, count: 1, value: (id) => prefix + id } : null
+  }
+  const foe = [...opponent.front, ...opponent.back]
+  const damage = getEvolutionDamage(option, player)
+  if (damage) {
+    if (damage.allOpposing || damage.targetCount < 1) return null
+    const legal = damage.targetRule === 'pokemonExOrGx'
+      ? foe.filter((target) => target.subtypes.some((subtype) => /(?:pokemon[- ]?)?(?:ex|gx)/i.test(subtype)))
+      : foe
+    const splitDamage = damage.activeAmount !== undefined && damage.benchAmount !== undefined
+    const isBenched = (id: string) => opponent.back.some((target) => target.instanceId === id)
+    const count = getTcgBattleEvolutionDamageTargetCount(card)
+    const hint = splitDamage
+      ? 'Choose 1 opposing Active Pokémon and 1 from the Bench'
+      : count > 1 ? `Choose ${count} opposing Pokémon` : 'Choose an opposing Pokémon'
+    const choice = choose(hint, legal)
+    if (!choice || choice.targets.length < count) return null
+    if (splitDamage && (!choice.targets.some((target) => isBenched(target.instanceId)) ||
+      !choice.targets.some((target) => !isBenched(target.instanceId)))) return null
+    return {
+      ...choice,
+      count,
+      canAdd: splitDamage ? (chosen, id) => chosen.every((other) => isBenched(other) !== isBenched(id)) : undefined,
+    }
+  }
+  if (hasEvolutionRandomHandDiscardAbility(card) || hasDeckDiscardAbility(card) ||
+    getTcgBattleEvolutionCoinHealingEffect(card)) return null
+  if (hasTcgBattleEvolutionTargetedFullHealEffect(card)) {
+    return choose('Choose a Pokémon to heal', getEvolutionHealTargets(option, player), 'dragoniteHeal:')
+  }
+  if (getTcgBattleEvolutionShuffleEffect(card)) {
+    return choose('Choose an opposing Pokémon to shuffle', foe, 'evolutionShuffle:')
+  }
+  if (getTcgBattleEvolutionDiscardEffect(card) || getTcgBattleEvolutionDevolutionEffect(card) ||
+    getTcgBattleEvolutionAttackProtectionEffect(card)) return null
+  const status = getTcgBattleEvolutionStatusEffect(card)
+  if (status) return status.chooseDefending && !status.mandatory
+    ? choose('Choose an opposing Pokémon to poison', opponent.front, 'evolutionStatus:')
+    : null
+  if (hasMiloticRecover(card) || getTcgBattleEvolutionEnergyEffect(card) ||
+    getTcgBattleEvolutionDrawCount(card) || hasTcgBattleEvolutionCardSearchEffect(card)) return null
+  if (canChooseEvolutionSwitch(option, player)) {
+    const maxHp = getTcgBattleEvolutionSwitchMaxRemainingHp(card)
+    const choices = opponent.back.filter((target) =>
+      (!hasTcgBattleEvolutionOnlySwitchEffect(card) || target.evolvesFrom) &&
+      (maxHp === undefined || target.currentHp <= maxHp) &&
+      (!hasTcgBattleEvolutionExSwitchEffect(card) || target.subtypes.some((subtype) => ['ex', 'pokemon-ex'].includes(subtype.toLowerCase()))),
+    )
+    return choose('Choose an opposing Pokémon to bring in', choices)
+  }
+  if (hasTcgBattleEvolutionReturnPokemonEffect(card)) {
+    const canReplaceActive = player.back.some((target) => target.currentHp > 0)
+    const candidates = canReplaceActive ? [...player.front, ...player.back] : player.back
+    return choose('Choose a Pokémon to return to your hand', candidates.filter(
+      (target) => target.instanceId !== targetId && !target.name.toLowerCase().startsWith('corviknight'),
+    ))
+  }
+  if (hasTcgBattleEvolutionSelfSwitchEffect(card) && player.back.some((target) => target.instanceId === targetId)) {
+    return choose('Choose a Pokémon to switch out', player.front)
+  }
+  return null
+}
+
+function EvolutionEffectPicker({
+  option: selectedOption,
   discardPokemon,
   playerSide,
   opposingSide,
@@ -7600,7 +7627,7 @@ function EvolutionSheet({
   onClose,
   onEvolve,
 }: {
-  options: TcgBattleEvolutionOption[]
+  option: TcgBattleEvolutionOption
   discardPokemon: TcgBattleCardState[]
   playerSide: TcgBattleState['player']
   opposingSide: TcgBattleState['opponent']
@@ -7610,26 +7637,28 @@ function EvolutionSheet({
   opposingBenchPokemon: TcgBattleCardState[]
   isPending: boolean
   onClose: () => void
-  onEvolve: (targetId: string, evolutionCardId: string, effectTargetId?: string | string[]) => void
+  onEvolve: (effectTargetId?: string | string[]) => void
 }) {
-  const [pendingChoice, setPendingChoice] = useState<{ targetId: string; evolutionCardId: string; effectTargetIds: string[] } | null>(() => options.length === 1 ? { targetId: options[0].targetId, evolutionCardId: options[0].card.id, effectTargetIds: [] } : null)
-  const selectedOption = pendingChoice && options.find((option) => option.targetId === pendingChoice.targetId && option.card.id === pendingChoice.evolutionCardId)
-  const brightLookEligible = (card: { name: string }, targetId: string) => card.name.toLowerCase() === 'luxray gl lv.x' && playerSide.front.some((target) => target.instanceId === targetId && target.name.toLowerCase() === 'luxray gl')
-  const damageTargetCount = selectedOption ? getTcgBattleEvolutionDamageTargetCount(selectedOption.card) : 0
-  const bladeStormEligible = Boolean(selectedOption && selectedOption.card.name.toLowerCase() === 'gallade e4 lv.x' && playerSide.front.some((card) => card.instanceId === selectedOption.targetId && card.name.toLowerCase() === 'gallade e4'))
-  const damageEffect = selectedOption && (selectedOption.card.name.toLowerCase() !== 'gallade e4 lv.x' || bladeStormEligible) ? getTcgBattleEvolutionDamageEffect(selectedOption.card) : null
+  const [effectTargetIds, setEffectTargetIds] = useState<string[]>([])
+  function toggleTarget(id: string) {
+    setEffectTargetIds((current) => current.includes(id)
+      ? current.filter((choice) => choice !== id)
+      : [...current, id])
+  }
+  const damageTargetCount = getTcgBattleEvolutionDamageTargetCount(selectedOption.card)
+  const damageEffect = getEvolutionDamage(selectedOption, playerSide)
   const damageTargetOptions = damageEffect?.targetRule === 'pokemonExOrGx' ? opposingPokemon.filter((card) => card.currentHp > 0 && card.subtypes.some((subtype) => /(?:pokemon[- ]?)?(?:ex|gx)/i.test(subtype))) : opposingPokemon
-  const coinHealingEffect = selectedOption ? getTcgBattleEvolutionCoinHealingEffect(selectedOption.card) : null
+  const coinHealingEffect = getTcgBattleEvolutionCoinHealingEffect(selectedOption.card)
   const isMiloticHealingRipples = selectedOption?.card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === 'milotic' && selectedOption.card.abilities?.some((ability) => ability.name.toLowerCase() === 'healing ripples')
-  const targetedHealTargets = playerSide.front.concat(playerSide.back).filter((card) => card.currentHp > 0 && card.currentHp < card.hp && (selectedOption?.card.name.toLowerCase().replace(/[^a-z0-9]/g, '') !== 'whimsicott' || playerSide.front.some((active) => active.instanceId === card.instanceId) && card.types.some((type) => type.toLowerCase() === 'grass')) && (!isMiloticHealingRipples || card.types.some((type) => type.toLowerCase() === 'water')))
+  const targetedHealTargets = getEvolutionHealTargets(selectedOption, playerSide)
   const opposingActivePokemon = opposingPokemon.filter((card) => !opposingBenchPokemon.some((benchCard) => benchCard.instanceId === card.instanceId) && card.currentHp > 0)
-  const benchSearchCount = selectedOption ? getTcgBattleEvolutionBenchSearchCount(selectedOption.card) : 0
-  const opponentDiscardBenchSearch = selectedOption ? hasTcgBattleEvolutionOpponentDiscardBenchSearch(selectedOption.card) : false
+  const benchSearchCount = getTcgBattleEvolutionBenchSearchCount(selectedOption.card)
+  const opponentDiscardBenchSearch = hasTcgBattleEvolutionOpponentDiscardBenchSearch(selectedOption.card)
   const opponentDiscardBenchOptions = opposingDiscardPokemon.filter((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && canTcgBattlePutPokemonOnBench(opposingSide, card))
-  const benchSearchShedinja = selectedOption ? hasTcgBattleEvolutionShedinjaSearch(selectedOption.card) : false
+  const benchSearchShedinja = hasTcgBattleEvolutionShedinjaSearch(selectedOption.card)
   const benchSearchNamedPokemon = selectedOption ? getTcgBattleEvolutionNamedBenchSearchNames(selectedOption.card) : []
-  const benchSearchShedinjaHandDiscard = selectedOption ? hasTcgBattleEvolutionShedinjaHandDiscard(selectedOption.card) : false
-  const benchSearchShedinjaDiscard = selectedOption ? hasTcgBattleEvolutionShedinjaDiscardSearch(selectedOption.card) : false
+  const benchSearchShedinjaHandDiscard = hasTcgBattleEvolutionShedinjaHandDiscard(selectedOption.card)
+  const benchSearchShedinjaDiscard = hasTcgBattleEvolutionShedinjaDiscardSearch(selectedOption.card)
   const benchSearchOptions = benchSearchShedinjaHandDiscard
     ? [
         ...playerSide.hand.map((card) => ({ card, index: `hand:${card.instanceId}` })),
@@ -7639,274 +7668,196 @@ function EvolutionSheet({
     ? playerSide.discard.map((card) => ({ card, index: `discard:${card.instanceId}` })).filter(({ card }) => card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === 'shedinja' && canTcgBattlePutPokemonOnBench(playerSide, card))
     : playerSide.deck.map((card, index) => ({ card, index: String(index) })).filter(({ card }) => (benchSearchNamedPokemon.length ? benchSearchNamedPokemon.includes(card.name.toLowerCase().replace(/[^a-z0-9]/g, '')) : benchSearchShedinja ? card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === 'shedinja' : card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) && canTcgBattlePutPokemonOnBench(playerSide, card))
   const evolutionCardSearchOptions = playerSide.deck.map((card, index) => ({ card, index }))
-  const discardRecoveryCount = selectedOption ? getTcgBattleEvolutionDiscardRecoveryCount(selectedOption.card) : 0
+  const discardRecoveryCount = getTcgBattleEvolutionDiscardRecoveryCount(selectedOption.card)
   const recoverablePokemon = discardPokemon.filter((card) => card.subtypes.some((subtype) => ['basic', 'stage 1', 'stage 2'].includes(subtype.toLowerCase())))
-  const getEvolutionDeckDiscardCount = (card: Pick<TcgBattleCardState, 'abilities'>) => {
-    const text = card.abilities?.map((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()) || []
-    const existingKnockoutPower = text.some((abilityText) => /^once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability\. you may also use this ability if this pokemon is in the active spot and is knocked out by damage from an attack from your opponent's pokemon\. discard the top 2 cards of your opponent's deck\.$/.test(abilityText))
-    if (existingKnockoutPower) return 2
-    return Number(text.map((abilityText) => abilityText.match(/^(?:once during your turn, )?when you play (?:this pokemon|[a-z0-9 .'-]+) from your hand to evolve 1 of your pokemon(?: during your turn)?, you may discard the top (\d+) cards (?:of|from) your opponent's deck\.$|^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you must flip a coin\. if heads, discard the top (\d+) cards (?:of|from) your opponent's deck\. if tails, discard the top (\d+) cards (?:of|from) your deck\.$|^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you must discard the top (\d+) cards of your deck\.$/)?.[1] || abilityText.match(/if heads, discard the top (\d+) cards (?:of|from) your opponent's deck\. if tails/)?.[1] || abilityText.match(/must discard the top (\d+) cards of your deck/)?.[1]).find(Boolean) || 0)
-  }
-  const hasDeckDiscardAbility = (card: Pick<TcgBattleCardState, 'abilities'>) => getEvolutionDeckDiscardCount(card) > 0
-  const hasEvolutionRandomHandDiscardAbility = (card: Pick<TcgBattleCardState, 'abilities'>) => (card.abilities || []).some((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim() === "when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may discard a random card from your opponent's hand. if this pokemon is your active pokemon and is knocked out by damage from an opponent's attack, you may discard a random card from your opponent's hand.")
   return (
-    <ResponsivePanel
-      open
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) onClose()
-      }}
-      title="Evolve Pokémon"
-      description={selectedOption ? `Evolve ${selectedOption.targetName} with ${selectedOption.card.name}. Evolving does not use your turn; only attacking or charging ends it.` : 'Choose a Pokémon and a matching Evolution card from your hand. Evolving does not use your turn; only attacking or charging ends it.'}
-      icon={<span className="text-xs font-bold uppercase tracking-wide">Evolve</span>}
-      background="/backgrounds/tcg.avif"
-      heroLabel="Card battle"
-      className="bg-game-surface-raised text-game-ink"
-    >
-      <div className="min-h-0 flex-1 overflow-y-auto p-4">
-        <div className="mx-auto flex max-w-2xl flex-col gap-2">
-          {selectedOption?.effect === 'azumarillFroth' ? (
+    <Dialog open onOpenChange={(open) => { if (!open && !isPending) onClose() }}>
+      <DialogContent
+        onEscapeKeyDown={(event) => { if (isPending) event.preventDefault() }}
+        onInteractOutside={(event) => { if (isPending) event.preventDefault() }}
+        className={styles.effectPicker}
+      >
+        <DialogTitle>{selectedOption.card.name}</DialogTitle>
+        <DialogDescription className="sr-only">Choose how this Evolution resolves.</DialogDescription>
+        <div className={styles.effectChoices}>
+          {selectedOption.effect === 'phantumpDamageEvolve' ? (
+            <>
+              <p>This Pokémon takes 20 damage when it evolves.</p>
+              <Button type="button" disabled={isPending} onClick={() => onEvolve()}>Evolve</Button>
+            </>
+          ) : selectedOption.effect === 'azumarillFroth' ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Use Froth when Azumarill evolves from your hand? It Paralyzes each opposing Active Pokémon.</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'azumarillFroth')} className="justify-start game-focus-ring">Evolve & use Froth</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using Froth</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('azumarillFroth')} className="justify-start game-focus-ring">Evolve & use Froth</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && discardRecoveryCount > 0 ? (
+          ) : discardRecoveryCount > 0 ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{selectedOption.card.name.toLowerCase() === 'milotic' ? 'Choose a Pokémon card from your discard pile to return to your hand.' : `Choose up to ${discardRecoveryCount} Pokémon from your discard pile to return to your hand.`}</p>
               {recoverablePokemon.map((card) => (
-                <Button key={card.instanceId} type="button" variant="outline" disabled={isPending || (pendingChoice.effectTargetIds.length >= discardRecoveryCount && !pendingChoice.effectTargetIds.includes(card.instanceId))} onClick={() => setPendingChoice((current) => current ? { ...current, effectTargetIds: current.effectTargetIds.includes(card.instanceId) ? current.effectTargetIds.filter((id) => id !== card.instanceId) : [...current.effectTargetIds, card.instanceId] } : current)} className="justify-start game-focus-ring">{pendingChoice.effectTargetIds.includes(card.instanceId) ? 'Selected · ' : ''}{card.name}</Button>
+                <Button key={card.instanceId} type="button" variant="outline" disabled={isPending || (effectTargetIds.length >= discardRecoveryCount && !effectTargetIds.includes(card.instanceId))} onClick={() => toggleTarget(card.instanceId)} className="justify-start game-focus-ring">{effectTargetIds.includes(card.instanceId) ? 'Selected · ' : ''}{card.name}</Button>
               ))}
-              {pendingChoice.effectTargetIds.length > 0 && <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, pendingChoice.effectTargetIds)} className="justify-start game-focus-ring">Evolve & return {pendingChoice.effectTargetIds.length} Pokémon</Button>}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              {effectTargetIds.length > 0 && <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(effectTargetIds)} className="justify-start game-focus-ring">Evolve & return {effectTargetIds.length} Pokémon</Button>}
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && benchSearchCount > 0 && opponentDiscardBenchSearch ? (
+          ) : benchSearchCount > 0 && opponentDiscardBenchSearch ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Choose a Basic Pokémon from your opponent’s discard pile to put onto their Bench.</p>
-              {opponentDiscardBenchOptions.map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, `redEyes:${card.instanceId}`)} className="justify-start game-focus-ring">Put {card.name} onto the opponent’s Bench</Button>)}
+              {opponentDiscardBenchOptions.map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(`redEyes:${card.instanceId}`)} className="justify-start game-focus-ring">Put {card.name} onto the opponent’s Bench</Button>)}
               {opponentDiscardBenchOptions.length === 0 && <p className="rounded-md bg-game-surface-raised p-3 text-sm text-game-ink">No Basic Pokémon can be added to the opponent’s Bench.</p>}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && benchSearchCount > 0 ? (
+          ) : benchSearchCount > 0 ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{benchSearchShedinjaHandDiscard ? 'Choose Shedinja from your hand or discard pile to put on your Bench as a Basic Pokémon.' : benchSearchShedinjaDiscard ? 'Choose Shedinja from your discard pile to put on your Bench.' : benchSearchShedinja ? 'Choose Shedinja from your deck to put on your Bench as a Basic Pokémon.' : `Choose up to ${Math.min(benchSearchCount, getOpenTcgBattleBenchSlots(playerSide))} Basic Pokémon from your deck to put on your Bench.`}</p>
               {benchSearchOptions.map(({ card, index }) => (
-                <Button key={`${card.id}:${index}`} type="button" variant="outline" disabled={isPending || (!pendingChoice.effectTargetIds.includes(String(index)) && pendingChoice.effectTargetIds.length >= Math.min(benchSearchCount, getOpenTcgBattleBenchSlots(playerSide)))} onClick={() => setPendingChoice((current) => current ? { ...current, effectTargetIds: current.effectTargetIds.includes(String(index)) ? current.effectTargetIds.filter((id) => id !== String(index)) : [...current.effectTargetIds, String(index)] } : current)} className="justify-start game-focus-ring">{pendingChoice.effectTargetIds.includes(String(index)) ? 'Selected · ' : ''}{card.name} · {card.hp} HP</Button>
+                <Button key={`${card.id}:${index}`} type="button" variant="outline" disabled={isPending || (!effectTargetIds.includes(String(index)) && effectTargetIds.length >= Math.min(benchSearchCount, getOpenTcgBattleBenchSlots(playerSide)))} onClick={() => toggleTarget(String(index))} className="justify-start game-focus-ring">{effectTargetIds.includes(String(index)) ? 'Selected · ' : ''}{card.name} · {card.hp} HP</Button>
               ))}
-              {pendingChoice.effectTargetIds.length > 0 && <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, pendingChoice.effectTargetIds)} className="justify-start game-focus-ring">Evolve & put {benchSearchShedinja ? 'Shedinja' : `${pendingChoice.effectTargetIds.length} Basic Pokémon`} on the Bench</Button>}
+              {effectTargetIds.length > 0 && <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(effectTargetIds)} className="justify-start game-focus-ring">Evolve & put {benchSearchShedinja ? 'Shedinja' : `${effectTargetIds.length} Basic Pokémon`} on the Bench</Button>}
               {benchSearchOptions.length === 0 && <p className="rounded-md bg-game-surface-raised p-3 text-sm text-game-ink">{benchSearchShedinja ? 'No Shedinja can be added to your Bench right now.' : 'No Basic Pokémon can be added to your Bench right now.'}</p>}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && hasTcgBattleEvolutionMassHealEffect(selectedOption.card) ? (
+          ) : hasTcgBattleEvolutionMassHealEffect(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{selectedOption.card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === 'garchompclvx' ? 'Use Healing Breath to heal all of your Pokémon SP?' : selectedOption.card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === 'dachsbunex' ? 'Heal all damage from your Evolution Pokémon? If any damage is healed, discard all Energy from the shared Energy pool.' : ['blissey', 'blisseyex'].includes(selectedOption.card.name.toLowerCase().replace(/[^a-z0-9]/g, '')) ? 'Heal all damage from your damaged Pokémon? This approximates attached Energy by discarding all Energy from the shared pool if any damage is healed.' : 'Use Healing Shower to heal all damage from every Pokémon except Pokémon-ex on both sides?'}</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'miloticHeal')} className="justify-start game-focus-ring">Evolve & use {selectedOption.card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === 'garchompclvx' ? 'Healing Breath' : ['dachsbunex', 'blissey', 'blisseyex'].includes(selectedOption.card.name.toLowerCase().replace(/[^a-z0-9]/g, '')) ? 'healing Ability' : 'Healing Shower'}</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('miloticHeal')} className="justify-start game-focus-ring">Evolve & use {selectedOption.card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === 'garchompclvx' ? 'Healing Breath' : ['dachsbunex', 'blissey', 'blisseyex'].includes(selectedOption.card.name.toLowerCase().replace(/[^a-z0-9]/g, '')) ? 'healing Ability' : 'Healing Shower'}</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && getTcgBattleEvolutionAttackBoost(selectedOption.card) ? (
+          ) : getTcgBattleEvolutionAttackBoost(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Use Ludicolo&apos;s Ability? Basic Pokémon&apos;s attacks do 100 more damage to the opponent&apos;s Active Pokémon this turn, before Weakness and Resistance.</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'evolutionAttackBoost')} className="justify-start game-focus-ring">Evolve & boost Basic Pokémon attacks</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('evolutionAttackBoost')} className="justify-start game-focus-ring">Evolve & boost Basic Pokémon attacks</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && damageEffect ? (
+          ) : damageEffect ? (
             <>
               {damageEffect.allOpposing ? (
                 <>
                   <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{damageEffect.coinSpreadCount ? `Flip ${damageEffect.coinSpreadCount} coins. For each heads, put 1 damage counter on each opposing Benched Pokémon.` : 'Put 1 damage counter on each of your opponent’s Pokémon.'}</p>
-                  <Button type="button" variant="outline" disabled={isPending || opposingPokemon.length === 0} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, opposingPokemon.map((card) => card.instanceId))} className="justify-start game-focus-ring">Evolve & use {damageEffect.coinSpreadCount ? 'Dragon Pulse' : selectedOption.card.name.toLowerCase() === 'gallade e4 lv.x' ? 'Blade Storm' : 'Thorn Tempest'}</Button>
+                  <Button type="button" variant="outline" disabled={isPending || opposingPokemon.length === 0} onClick={() => onEvolve(opposingPokemon.map((card) => card.instanceId))} className="justify-start game-focus-ring">Evolve & use {damageEffect.coinSpreadCount ? 'Dragon Pulse' : selectedOption.card.name.toLowerCase() === 'gallade e4 lv.x' ? 'Blade Storm' : 'Thorn Tempest'}</Button>
                 </>
               ) : <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{damageEffect.activeAmount !== undefined && damageEffect.benchAmount !== undefined ? `Choose 1 opposing Active Pokémon to take ${damageEffect.activeAmount / 10} damage counters and 1 opposing Benched Pokémon to take ${damageEffect.benchAmount / 10} damage counters.` : `Choose ${damageTargetCount === 1 ? 'an opposing Pokémon' : `${damageTargetCount} opposing Pokémon`} to ${damageEffect.counters ? `take ${damageEffect.amount / 10} damage counter${damageEffect.amount === 10 ? '' : 's'}` : `take ${damageEffect.amount} damage`}${damageEffect.applyWeaknessResistance ? ' (applying Weakness and Resistance)' : ''}.`}</p>
               {damageTargetOptions.map((card) => (
-                <Button key={card.instanceId} type="button" variant="outline" disabled={isPending || (damageTargetCount > 1 && pendingChoice.effectTargetIds.length >= damageTargetCount && !pendingChoice.effectTargetIds.includes(card.instanceId)) || (damageEffect.activeAmount !== undefined && damageEffect.benchAmount !== undefined && !pendingChoice.effectTargetIds.includes(card.instanceId) && pendingChoice.effectTargetIds.some((id) => opposingBenchPokemon.some((benchCard) => benchCard.instanceId === id) === opposingBenchPokemon.some((benchCard) => benchCard.instanceId === card.instanceId)))} onClick={() => damageTargetCount === 1 ? onEvolve(selectedOption.targetId, selectedOption.card.id, card.instanceId) : setPendingChoice((current) => current ? { ...current, effectTargetIds: current.effectTargetIds.includes(card.instanceId) ? current.effectTargetIds.filter((id) => id !== card.instanceId) : [...current.effectTargetIds, card.instanceId] } : current)} className="justify-start game-focus-ring">{pendingChoice.effectTargetIds.includes(card.instanceId) ? 'Selected · ' : ''}{damageEffect.activeAmount !== undefined && damageEffect.benchAmount !== undefined ? opposingBenchPokemon.some((benchCard) => benchCard.instanceId === card.instanceId) ? 'Bench · 3 counters · ' : 'Active · 2 counters · ' : ''}{card.name} · {card.currentHp}/{card.hp} HP</Button>
+                <Button key={card.instanceId} type="button" variant="outline" disabled={isPending || (damageTargetCount > 1 && effectTargetIds.length >= damageTargetCount && !effectTargetIds.includes(card.instanceId)) || (damageEffect.activeAmount !== undefined && damageEffect.benchAmount !== undefined && !effectTargetIds.includes(card.instanceId) && effectTargetIds.some((id) => opposingBenchPokemon.some((benchCard) => benchCard.instanceId === id) === opposingBenchPokemon.some((benchCard) => benchCard.instanceId === card.instanceId)))} onClick={() => damageTargetCount === 1 ? onEvolve(card.instanceId) : toggleTarget(card.instanceId)} className="justify-start game-focus-ring">{effectTargetIds.includes(card.instanceId) ? 'Selected · ' : ''}{damageEffect.activeAmount !== undefined && damageEffect.benchAmount !== undefined ? opposingBenchPokemon.some((benchCard) => benchCard.instanceId === card.instanceId) ? 'Bench · 3 counters · ' : 'Active · 2 counters · ' : ''}{card.name} · {card.currentHp}/{card.hp} HP</Button>
               ))}
-              {damageTargetCount > 1 && <Button type="button" variant="outline" disabled={isPending || pendingChoice.effectTargetIds.length !== damageTargetCount} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, pendingChoice.effectTargetIds)} className="justify-start game-focus-ring">Evolve & use Ability</Button>}
+              {damageTargetCount > 1 && <Button type="button" variant="outline" disabled={isPending || effectTargetIds.length !== damageTargetCount} onClick={() => onEvolve(effectTargetIds)} className="justify-start game-focus-ring">Evolve & use Ability</Button>}
               </>}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && hasEvolutionRandomHandDiscardAbility(selectedOption.card) ? (
+          ) : hasEvolutionRandomHandDiscardAbility(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Use Arf Arf Bark to discard a random card from your opponent’s hand?</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'evolutionHandDiscard')} className="justify-start game-focus-ring">Evolve & use Arf Arf Bark</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('evolutionHandDiscard')} className="justify-start game-focus-ring">Evolve & use Arf Arf Bark</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && hasDeckDiscardAbility(selectedOption.card) ? (
+          ) : hasDeckDiscardAbility(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{selectedOption.card.name === 'Gyarados' ? `Discard the top ${getEvolutionDeckDiscardCount(selectedOption.card)} cards of your deck when Gyarados evolves.` : selectedOption.card.name === 'Feraligatr' ? 'Flip a coin. On heads discard the top 5 cards of the opponent’s deck; on tails discard the top 5 cards of your deck?' : `Use ${selectedOption.card.name === 'Rhyperior' ? 'Earth Fissure' : 'Sandy Flapping'} to discard the top ${getEvolutionDeckDiscardCount(selectedOption.card)} cards of your opponent’s deck?`}</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'deckDiscard')} className="justify-start game-focus-ring">{selectedOption.card.name === 'Gyarados' ? 'Evolve & discard the top cards' : selectedOption.card.name === 'Feraligatr' ? 'Evolve & flip for deck discard' : `Evolve & use ${selectedOption.card.name === 'Rhyperior' ? 'Earth Fissure' : 'Sandy Flapping'}`}</Button>
-              {selectedOption.card.name !== 'Gyarados' && <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)}>Evolve without using the Ability</Button>}
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('deckDiscard')} className="justify-start game-focus-ring">{selectedOption.card.name === 'Gyarados' ? 'Evolve & discard the top cards' : selectedOption.card.name === 'Feraligatr' ? 'Evolve & flip for deck discard' : `Evolve & use ${selectedOption.card.name === 'Rhyperior' ? 'Earth Fissure' : 'Sandy Flapping'}`}</Button>
+              {selectedOption.card.name !== 'Gyarados' && <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()}>Just evolve</Button>}
             </>
-          ) : selectedOption && coinHealingEffect ? (
+          ) : coinHealingEffect ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Use Softboiled? Heads heals up to {coinHealingEffect.headsCounters * 10} damage; tails heals up to {coinHealingEffect.tailsCounters * 10} damage.</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'softboiled')} className="justify-start game-focus-ring">Evolve & use Softboiled</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('softboiled')} className="justify-start game-focus-ring">Evolve & use Softboiled</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && hasTcgBattleEvolutionTargetedFullHealEffect(selectedOption.card) ? (
+          ) : hasTcgBattleEvolutionTargetedFullHealEffect(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{isMiloticHealingRipples ? 'Choose one of your damaged Water Pokémon. Heal 60 damage from it.' : selectedOption.card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === 'whimsicott' ? 'Choose your damaged Active Grass Pokémon. Heal all damage from it, then discard all Energy from the shared Energy pool.' : `Choose one of your damaged Pokémon to heal all damage from with ${selectedOption.card.abilities?.find((ability) => hasTcgBattleEvolutionTargetedFullHealEffect({ ...selectedOption.card, abilities: [ability] }))?.name || 'this Ability'}.`}</p>
-              {targetedHealTargets.map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, `dragoniteHeal:${card.instanceId}`)} className="justify-start game-focus-ring">{card.name} · {card.currentHp}/{card.hp} HP</Button>)}
+              {targetedHealTargets.map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(`dragoniteHeal:${card.instanceId}`)} className="justify-start game-focus-ring">{card.name} · {card.currentHp}/{card.hp} HP</Button>)}
               {targetedHealTargets.length === 0 && <p className="rounded-md bg-game-surface-raised p-3 text-sm text-game-ink">No damaged Pokémon can be healed.</p>}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && getTcgBattleEvolutionShuffleEffect(selectedOption.card) ? (
+          ) : getTcgBattleEvolutionShuffleEffect(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Choose an opposing Pokémon. Flip a coin; on heads, shuffle it and its Evolution cards into its owner’s deck. Individual attached cards are not tracked.</p>
-              {opposingPokemon.filter((card) => card.currentHp > 0).map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, `evolutionShuffle:${card.instanceId}`)} className="justify-start game-focus-ring">Choose {card.name} · {card.currentHp}/{card.hp} HP</Button>)}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              {opposingPokemon.filter((card) => card.currentHp > 0).map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(`evolutionShuffle:${card.instanceId}`)} className="justify-start game-focus-ring">Choose {card.name} · {card.currentHp}/{card.hp} HP</Button>)}
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && getTcgBattleEvolutionDiscardEffect(selectedOption.card) ? (
+          ) : getTcgBattleEvolutionDiscardEffect(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Flip 2 coins. If both are heads, discard the opposing Active Pokémon and its Evolution cards without counting it as a Knock Out. Individual attached cards are not tracked.</p>
-              <Button type="button" variant="outline" disabled={isPending || opposingActivePokemon.length === 0} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'evolutionDiscard')}>Evolve & use {getTcgBattleEvolutionDiscardEffect(selectedOption.card)!.abilityName}</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)}>Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending || opposingActivePokemon.length === 0} onClick={() => onEvolve('evolutionDiscard')}>Evolve & use {getTcgBattleEvolutionDiscardEffect(selectedOption.card)!.abilityName}</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()}>Just evolve</Button>
             </>
-          ) : selectedOption && getTcgBattleEvolutionDevolutionEffect(selectedOption.card) ? (
+          ) : getTcgBattleEvolutionDevolutionEffect(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Use {getTcgBattleEvolutionDevolutionEffect(selectedOption.card)!.abilityName} to return the highest Evolution card from each opposing evolved Pokémon to its owner’s hand?</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'evolutionDevolution')} className="justify-start game-focus-ring">Evolve & use {getTcgBattleEvolutionDevolutionEffect(selectedOption.card)!.abilityName}</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('evolutionDevolution')} className="justify-start game-focus-ring">Evolve & use {getTcgBattleEvolutionDevolutionEffect(selectedOption.card)!.abilityName}</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && getTcgBattleEvolutionAttackProtectionEffect(selectedOption.card) ? (
+          ) : getTcgBattleEvolutionAttackProtectionEffect(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Use {getTcgBattleEvolutionAttackProtectionEffect(selectedOption.card)!.abilityName} to prevent all effects, including damage, from your opponent’s attacks until the end of their next turn?</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'evolutionProtection')} className="justify-start game-focus-ring">Evolve & use {getTcgBattleEvolutionAttackProtectionEffect(selectedOption.card)!.abilityName}</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('evolutionProtection')} className="justify-start game-focus-ring">Evolve & use {getTcgBattleEvolutionAttackProtectionEffect(selectedOption.card)!.abilityName}</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && getTcgBattleEvolutionStatusEffect(selectedOption.card) ? (
+          ) : getTcgBattleEvolutionStatusEffect(selectedOption.card) ? (
             (() => {
               const effect = getTcgBattleEvolutionStatusEffect(selectedOption.card)!
               const activeTargets = opposingPokemon.filter((card) => !opposingBenchPokemon.some((benchCard) => benchCard.instanceId === card.instanceId))
               return effect.chooseDefending ? <>
                 <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Choose an opposing Active Pokémon to become Poisoned. Its Poison damage is increased to 20 during Pokémon Checkup.</p>
-                {activeTargets.map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, `evolutionStatus:${card.instanceId}`)} className="justify-start game-focus-ring">Poison {card.name}</Button>)}
-                <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)}>Evolve without using the Ability</Button>
-                <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+                {activeTargets.map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(`evolutionStatus:${card.instanceId}`)} className="justify-start game-focus-ring">Poison {card.name}</Button>)}
+                <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()}>Just evolve</Button>
               </> : <>
                 <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{effect.coinFlip ? `Use ${effect.abilityName} to flip a coin. On heads, the opponent’s Active Pokémon becomes ${effect.statuses.join(' and ')}.` : `${effect.mandatory ? `${effect.abilityName} will make ` : `Use ${effect.abilityName} to make `}${effect.bothActive ? 'both Active Pokémon' : 'the opponent’s Active Pokémon'} ${effect.statuses.join(' and ')}${effect.mandatory ? ' when Beedrill evolves.' : '?'}`}</p>
-                <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'evolutionStatus')} className="justify-start game-focus-ring">{effect.mandatory ? 'Evolve & apply the effect' : `Evolve & use ${effect.abilityName}`}</Button>
-                {!effect.mandatory && <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)}>Evolve without using the Ability</Button>}
-                <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+                <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('evolutionStatus')} className="justify-start game-focus-ring">{effect.mandatory ? 'Evolve & apply the effect' : `Evolve & use ${effect.abilityName}`}</Button>
+                {!effect.mandatory && <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()}>Just evolve</Button>}
               </>
             })()
-          ) : selectedOption && selectedOption.card.name.toLowerCase() === 'milotic' && selectedOption.card.abilities?.some((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().replace(/\s+/g, ' ').includes('each player puts a basic pokemon from their discard pile onto their bench')) ? (
+          ) : hasMiloticRecover(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Each player puts the highest HP legal Basic Pokémon from their discard pile onto their Bench. Your opponent goes first.</p>
-              <Button type="button" variant="outline" disabled={isPending || !playerSide.discard.some((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) && !opposingSide.discard.some((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic'))} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'miloticDiscardBench')} className="justify-start game-focus-ring">Evolve & use Recover</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending || !playerSide.discard.some((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) && !opposingSide.discard.some((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic'))} onClick={() => onEvolve('miloticDiscardBench')} className="justify-start game-focus-ring">Evolve & use Recover</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && getTcgBattleEvolutionEnergyEffect(selectedOption.card) ? (
+          ) : getTcgBattleEvolutionEnergyEffect(selectedOption.card) ? (
             (() => {
               const effect = getTcgBattleEvolutionEnergyEffect(selectedOption.card)!
               return <>
                 <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{effect.coinFlipDiscard ? 'Flip a coin. On heads, discard 1 shared Energy from the opponent’s pool?' : effect.discardOpponentActive ? 'Discard 1 shared Energy from the opponent’s pool?' : effect.coinFlip ? `Flip a coin. On heads, add up to ${effect.count} Fire Energy to the shared Energy pool?` : `Add up to ${effect.count} ${{ g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', m: 'Fighting', d: 'Darkness', y: 'Metal', c: 'Colorless', f: 'Fairy', any: playerSide.selectedEnergy || 'selected type' }[effect.energyType]} Energy to the shared Energy pool?`}</p>
-                <Button type="button" variant="outline" disabled={isPending || effect.energyType === 'any' && !playerSide.selectedEnergy || effect.discardOpponentActive && !effect.coinFlipDiscard && opposingEnergy < 1 || Boolean(effect.discardPile || effect.searchDeck || effect.topDeckCount) && playerSide.energy > 0 && Boolean(playerSide.selectedEnergy) && playerSide.selectedEnergy!.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'fighting', d: 'darkness', y: 'metal', c: 'colorless', f: 'fairy' } as Record<string, string>)[effect.energyType]} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'energy')} className="justify-start game-focus-ring">{effect.coinFlipDiscard ? 'Evolve & flip for opponent Energy discard' : effect.discardOpponentActive ? 'Evolve & discard 1 opponent Energy' : effect.coinFlip ? 'Evolve & flip for Fire Energy' : `Evolve & gain up to ${effect.count} ${effect.energyType === 'any' ? `${playerSide.selectedEnergy || ''} ` : ''}Energy`}</Button>
-                <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-                <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+                <Button type="button" variant="outline" disabled={isPending || effect.energyType === 'any' && !playerSide.selectedEnergy || effect.discardOpponentActive && !effect.coinFlipDiscard && opposingEnergy < 1 || Boolean(effect.discardPile || effect.searchDeck || effect.topDeckCount) && playerSide.energy > 0 && Boolean(playerSide.selectedEnergy) && playerSide.selectedEnergy!.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'fighting', d: 'darkness', y: 'metal', c: 'colorless', f: 'fairy' } as Record<string, string>)[effect.energyType]} onClick={() => onEvolve('energy')} className="justify-start game-focus-ring">{effect.coinFlipDiscard ? 'Evolve & flip for opponent Energy discard' : effect.discardOpponentActive ? 'Evolve & discard 1 opponent Energy' : effect.coinFlip ? 'Evolve & flip for Fire Energy' : `Evolve & gain up to ${effect.count} ${effect.energyType === 'any' ? `${playerSide.selectedEnergy || ''} ` : ''}Energy`}</Button>
+                <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
               </>
             })()
-          ) : selectedOption && getTcgBattleEvolutionDrawCount(selectedOption.card) > 0 ? (
+          ) : getTcgBattleEvolutionDrawCount(selectedOption.card) > 0 ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">{selectedOption.card.name.toLowerCase() === 'thievul' ? 'Shuffle both players’ hands to the bottoms of their decks; if either hand had cards, each player draws up to 4.' : selectedOption.card.name.toLowerCase() === 'alcremie' ? 'Each player draws 1 card.' : `Draw ${getTcgBattleEvolutionDrawCount(selectedOption.card)} cards with this evolution Ability?`}</p>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, 'draw')} className="justify-start game-focus-ring">{selectedOption.card.name.toLowerCase() === 'thievul' ? 'Evolve & use Fumbling Hands' : selectedOption.card.name.toLowerCase() === 'alcremie' ? 'Evolve & let each player draw 1' : `Evolve & draw ${getTcgBattleEvolutionDrawCount(selectedOption.card)}`}</Button>
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve('draw')} className="justify-start game-focus-ring">{selectedOption.card.name.toLowerCase() === 'thievul' ? 'Evolve & use Fumbling Hands' : selectedOption.card.name.toLowerCase() === 'alcremie' ? 'Evolve & let each player draw 1' : `Evolve & draw ${getTcgBattleEvolutionDrawCount(selectedOption.card)}`}</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && hasTcgBattleEvolutionCardSearchEffect(selectedOption.card) ? (
+          ) : hasTcgBattleEvolutionCardSearchEffect(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Choose any card from your deck to add to your hand.</p>
-              {evolutionCardSearchOptions.map(({ card, index }) => <Button key={`${card.id}:${index}`} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, `cardSearch:${index}`)} className="justify-start game-focus-ring">{card.name}{card.types.length ? ` · ${card.types.join('/')}` : ''}</Button>)}
+              {evolutionCardSearchOptions.map(({ card, index }) => <Button key={`${card.id}:${index}`} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(`cardSearch:${index}`)} className="justify-start game-focus-ring">{card.name}{card.types.length ? ` · ${card.types.join('/')}` : ''}</Button>)}
               {evolutionCardSearchOptions.length === 0 && <p className="rounded-md bg-game-surface-raised p-3 text-sm text-game-ink">Your deck is empty.</p>}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && hasTcgBattleEvolutionSwitchEffect(selectedOption.card) && (selectedOption.card.name.toLowerCase() !== 'luxray gl lv.x' || brightLookEligible(selectedOption.card, selectedOption.targetId)) ? (
+          ) : canChooseEvolutionSwitch(selectedOption, playerSide) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Choose an opposing Benched Pokémon to switch into the Active Spot.</p>
-              {opposingBenchPokemon.filter((card) => (!hasTcgBattleEvolutionOnlySwitchEffect(selectedOption.card) || Boolean(card.evolvesFrom)) && (getTcgBattleEvolutionSwitchMaxRemainingHp(selectedOption.card) === undefined || card.currentHp <= getTcgBattleEvolutionSwitchMaxRemainingHp(selectedOption.card)!) && (!hasTcgBattleEvolutionExSwitchEffect(selectedOption.card) || card.subtypes.some((subtype) => ['ex', 'pokemon-ex'].includes(subtype.toLowerCase())))).map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, card.instanceId)} className="justify-start game-focus-ring">{card.name} · {card.currentHp}/{card.hp} HP</Button>)}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              {opposingBenchPokemon.filter((card) => (!hasTcgBattleEvolutionOnlySwitchEffect(selectedOption.card) || Boolean(card.evolvesFrom)) && (getTcgBattleEvolutionSwitchMaxRemainingHp(selectedOption.card) === undefined || card.currentHp <= getTcgBattleEvolutionSwitchMaxRemainingHp(selectedOption.card)!) && (!hasTcgBattleEvolutionExSwitchEffect(selectedOption.card) || card.subtypes.some((subtype) => ['ex', 'pokemon-ex'].includes(subtype.toLowerCase())))).map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(card.instanceId)} className="justify-start game-focus-ring">{card.name} · {card.currentHp}/{card.hp} HP</Button>)}
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && hasTcgBattleEvolutionReturnPokemonEffect(selectedOption.card) ? (
+          ) : hasTcgBattleEvolutionReturnPokemonEffect(selectedOption.card) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Choose one of your Pokémon, except Corviknight, to return to your hand. Its Evolution cards return too; individual attached cards are not tracked.</p>
-              {[...playerSide.front, ...playerSide.back].filter((card) => card.currentHp > 0 && card.instanceId !== selectedOption.targetId && !card.name.toLowerCase().startsWith('corviknight') && (!playerSide.front.some((active) => active.instanceId === card.instanceId) || playerSide.back.some((bench) => bench.currentHp > 0))).map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, card.instanceId)} className="justify-start game-focus-ring">Return {card.name} · {card.currentHp}/{card.hp} HP</Button>)}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using the Ability</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              {[...playerSide.front, ...playerSide.back].filter((card) => card.currentHp > 0 && card.instanceId !== selectedOption.targetId && !card.name.toLowerCase().startsWith('corviknight') && (!playerSide.front.some((active) => active.instanceId === card.instanceId) || playerSide.back.some((bench) => bench.currentHp > 0))).map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(card.instanceId)} className="justify-start game-focus-ring">Return {card.name} · {card.currentHp}/{card.hp} HP</Button>)}
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
-          ) : selectedOption && hasTcgBattleEvolutionSelfSwitchEffect(selectedOption.card) && playerSide.back.some((card) => card.instanceId === selectedOption.targetId) ? (
+          ) : hasTcgBattleEvolutionSelfSwitchEffect(selectedOption.card) && playerSide.back.some((card) => card.instanceId === selectedOption.targetId) ? (
             <>
               <p className="rounded-md bg-game-surface-raised p-3 text-sm font-bold text-game-ink">Switch Arcanine with one of your Active Pokémon? Individual attached Energy cards are not tracked, so no Energy moves.</p>
-              {playerSide.front.filter((card) => card.currentHp > 0).map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id, card.instanceId)} className="justify-start game-focus-ring">Switch with {card.name} · {card.currentHp}/{card.hp} HP</Button>)}
-              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(selectedOption.targetId, selectedOption.card.id)} className="justify-start game-focus-ring">Evolve without using Flame Dash</Button>
-              <Button type="button" variant="ghost" onClick={() => setPendingChoice(null)}>Back</Button>
+              {playerSide.front.filter((card) => card.currentHp > 0).map((card) => <Button key={card.instanceId} type="button" variant="outline" disabled={isPending} onClick={() => onEvolve(card.instanceId)} className="justify-start game-focus-ring">Switch with {card.name} · {card.currentHp}/{card.hp} HP</Button>)}
+              <Button type="button" variant="outline" disabled={isPending} onClick={() => onEvolve()} className="justify-start game-focus-ring">Just evolve</Button>
             </>
           ) : null}
-          {selectedOption && (discardRecoveryCount > 0 || benchSearchCount > 0 || damageEffect || coinHealingEffect || hasTcgBattleEvolutionTargetedFullHealEffect(selectedOption.card) || getTcgBattleEvolutionDrawCount(selectedOption.card) > 0 || hasTcgBattleEvolutionCardSearchEffect(selectedOption.card) || hasTcgBattleEvolutionSwitchEffect(selectedOption.card) || hasTcgBattleEvolutionReturnPokemonEffect(selectedOption.card) || hasTcgBattleEvolutionSelfSwitchEffect(selectedOption.card) && playerSide.back.some((card) => card.instanceId === selectedOption.targetId)) ? null : options.length === 0 ? (
-            <div
-              className="flex min-h-28 items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface-raised px-4 text-center text-sm font-bold text-game-muted"
-              role="status"
-            >
-              No Pokémon can evolve right now.
-            </div>
-          ) : (
-            options.map((option) => (
-              <div
-                key={`${option.targetId}:${option.card.id}`}
-                className="flex items-center gap-3 rounded-md border border-game-border bg-game-canvas p-2.5"
-              >
-                <Image
-                  src={option.card.image}
-                  alt={option.card.name}
-                  width={44}
-                  height={60}
-                  className="h-[60px] w-11 rounded-sm object-cover"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-black uppercase text-game-ink">
-                    {option.targetName} → {option.card.name}
-                  </p>
-                  <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-game-muted">
-                    {option.card.subtypes.join(' · ')}
-                  </p>
-                  {option.effect === 'meganiumStage2' && <p className="mt-1 text-[10px] font-black uppercase tracking-wide text-game-ochre">Meganium · evolve a Basic directly</p>}
-                  {option.effect === 'dittoPrismStage1' && <p className="mt-1 text-[10px] font-black uppercase tracking-wide text-game-ochre">Ditto Prism · evolve into any Stage 1</p>}
-                  {option.effect === 'phantumpDamageEvolve' && <p className="mt-1 text-[10px] font-black uppercase tracking-wide text-game-ochre">Natural Cure · evolve now and take 2 damage counters</p>}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isPending}
-                  onClick={() => option.effect === 'pichuHeal' || option.effect === 'eeveeHeal' || option.effect === 'babyHeal' ? onEvolve(option.targetId, option.card.id, option.effect) : getTcgBattleEvolutionAttackBoost(option.card) || getTcgBattleEvolutionDiscardRecoveryCount(option.card) > 0 || getTcgBattleEvolutionBenchSearchCount(option.card) > 0 || getTcgBattleEvolutionDamageEffect(option.card) || getTcgBattleEvolutionCoinHealingEffect(option.card) || getTcgBattleEvolutionEnergyEffect(option.card) || getTcgBattleEvolutionStatusEffect(option.card) || getTcgBattleEvolutionAttackProtectionEffect(option.card) || getTcgBattleEvolutionDevolutionEffect(option.card) || getTcgBattleEvolutionShuffleEffect(option.card) || getTcgBattleEvolutionDiscardEffect(option.card) || getTcgBattleEvolutionDrawCount(option.card) > 0 || hasTcgBattleEvolutionCardSearchEffect(option.card) || hasTcgBattleEvolutionSwitchEffect(option.card) && (option.card.name.toLowerCase() !== 'luxray gl lv.x' || brightLookEligible(option.card, option.targetId)) || hasTcgBattleEvolutionSelfSwitchEffect(option.card) && playerSide.back.some((card) => card.instanceId === option.targetId) || hasDeckDiscardAbility(option.card) || hasEvolutionRandomHandDiscardAbility(option.card) || hasTcgBattleEvolutionMassHealEffect(option.card) || hasTcgBattleEvolutionTargetedFullHealEffect(option.card) || option.effect === 'azumarillFroth' ? setPendingChoice({ targetId: option.targetId, evolutionCardId: option.card.id, effectTargetIds: [] }) : onEvolve(option.targetId, option.card.id)}
-                  className="game-focus-ring min-h-10 shrink-0 rounded-md border border-game-moss/50 bg-game-surface-raised px-3 text-[10px] font-black uppercase tracking-wide text-game-ink hover:bg-game-moss/10"
-                >
-                  {option.effect === 'pichuHeal' || option.effect === 'eeveeHeal' || option.effect === 'babyHeal' ? 'Evolve & heal all damage' : option.effect === 'azumarillFroth' ? 'Evolve & choose Froth' : getTcgBattleEvolutionAttackBoost(option.card) ? 'Evolve & boost Basic attacks' : hasTcgBattleEvolutionMassHealEffect(option.card) ? 'Evolve & choose Healing Shower' : hasTcgBattleEvolutionTargetedFullHealEffect(option.card) ? 'Evolve & choose healing Ability' : getTcgBattleEvolutionDiscardRecoveryCount(option.card) > 0 || getTcgBattleEvolutionBenchSearchCount(option.card) > 0 ? 'Evolve & choose Pokémon' : hasEvolutionRandomHandDiscardAbility(option.card) ? 'Evolve & use Ability' : hasDeckDiscardAbility(option.card) ? 'Evolve & choose Ability' : getTcgBattleEvolutionCoinHealingEffect(option.card) ? 'Evolve & choose Ability' : getTcgBattleEvolutionEnergyEffect(option.card) ? 'Evolve & choose Energy effect' : getTcgBattleEvolutionStatusEffect(option.card) || getTcgBattleEvolutionAttackProtectionEffect(option.card) || getTcgBattleEvolutionDevolutionEffect(option.card) || getTcgBattleEvolutionShuffleEffect(option.card) || getTcgBattleEvolutionDiscardEffect(option.card) ? 'Evolve & choose Ability' : getTcgBattleEvolutionDamageEffect(option.card) || hasTcgBattleEvolutionCardSearchEffect(option.card) || hasTcgBattleEvolutionSwitchEffect(option.card) && (option.card.name.toLowerCase() !== 'luxray gl lv.x' || brightLookEligible(option.card, option.targetId)) || hasTcgBattleEvolutionSelfSwitchEffect(option.card) && playerSide.back.some((card) => card.instanceId === option.targetId) ? 'Evolve & choose' : getTcgBattleEvolutionDrawCount(option.card) > 0 ? 'Evolve & draw' : 'Evolve'}
-                </Button>
-              </div>
-            ))
-          )}
-          <p className="px-1 pt-2 text-[11px] leading-relaxed text-game-muted">
-            Damage counters stay on the Pokémon. Poison, sleep, and temporary effects clear when it evolves.
-          </p>
         </div>
-      </div>
-    </ResponsivePanel>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -7921,8 +7872,8 @@ function CardImageButton({
   compact = false,
   side = 'player',
   battleRole,
-  damage,
-  damageKey,
+  damageCues = [],
+  landingKey,
   onClick,
   onDropCard,
   onPreviewStart,
@@ -7938,8 +7889,8 @@ function CardImageButton({
   compact?: boolean
   side?: SideTone
   battleRole?: 'attacker' | 'target'
-  damage?: number
-  damageKey?: string
+  damageCues?: TcgDamageEvent[]
+  landingKey?: string
   onClick?: () => void
   onDropCard?: (sourceId: string) => void
   onPreviewStart?: () => void
@@ -7947,7 +7898,6 @@ function CardImageButton({
 }) {
   const interactive = Boolean(onClick || draggable || onDropCard)
   const knockedOut = card.currentHp <= 0
-  const damageTaken = Math.max(0, card.hp - card.currentHp)
   const statuses = card.statusConditions || []
   const unlockTurn = getTcgBattleCardUnlockTurnForCard(card)
   const lockedTurnsRemaining = turnNumber
@@ -7979,23 +7929,23 @@ function CardImageButton({
     <button
       type="button"
       className={cn(
-        'tcg-motion group relative aspect-[240/330] touch-manipulation overflow-visible bg-transparent p-0 text-left transition duration-200',
-        compact ? 'w-[clamp(52px,15vw,76px)] sm:w-[clamp(60px,7vw,88px)]' : 'w-[clamp(82px,27vw,150px)] sm:w-[clamp(108px,14vw,190px)]',
-        selected
-          ? 'drop-shadow-[0_8px_16px_rgba(24,35,39,0.2)]'
-          : 'drop-shadow-[0_6px_14px_rgba(24,35,39,0.16)]',
+        'tcg-motion touch-manipulation',
+        styles.boardCard,
+        compact && styles.compactCard,
+        damageCues.length > 0 && styles.hitCard,
         battleRole === 'attacker' &&
           (side === 'player'
             ? 'animate-[tcg-player-lunge_520ms_ease-out]'
             : 'animate-[tcg-opponent-lunge_520ms_ease-out]'),
-        battleRole === 'target' && 'animate-[tcg-card-hit_460ms_ease-out]',
         muted && 'opacity-[0.82]',
         disabled && 'opacity-50',
         interactive && !disabled
           ? 'cursor-pointer active:scale-[0.985]'
           : 'cursor-default',
       )}
-      aria-label={targetable ? `${card.name}, eligible Evolution target` : card.name}
+      aria-label={`${card.name}, ${card.currentHp} of ${card.hp} HP${statuses.length ? `, ${statuses.join(', ')}` : ''}${targetable ? ', eligible Evolution target' : ''}`}
+      aria-pressed={interactive ? selected : undefined}
+      data-selected={selected}
       data-evolution-target={targetable ? 'true' : undefined}
       draggable={draggable && !disabled}
       onPointerDown={() => {
@@ -8033,76 +7983,31 @@ function CardImageButton({
         if (sourceId && sourceId !== card.instanceId) onDropCard(sourceId)
       }}
     >
-      {selected && (
-        <div
-          className={cn(
-            'pointer-events-none absolute -inset-2 z-20 rounded-xl border-2',
-            side === 'player'
-              ? 'border-game-ochre bg-game-ochre/[0.06]'
-              : 'border-red-200 bg-red-300/[0.06]',
-          )}
-        />
-      )}
       {targetable && (
-        <span className="pointer-events-none absolute -top-2 left-1/2 z-30 -translate-x-1/2 rounded-full border border-game-moss/50 bg-game-surface-raised px-2 py-0.5 text-[8px] font-black uppercase tracking-wide text-game-moss shadow-sm">
-          Evolve
-        </span>
+        <span aria-hidden="true" className={styles.targetMarker}><ArrowUp size={13} /></span>
       )}
       {isLocked && !knockedOut && (
-        <div
-          className={cn(
-            'pointer-events-none absolute z-30 flex items-center gap-1 rounded-full border border-game-ochre/60 bg-game-surface-raised/95 px-2 py-1 text-[10px] font-black uppercase text-game-ink shadow-md backdrop-blur-sm',
-            side === 'opponent' ? '-left-2 -top-2' : '-right-2 -top-2',
-          )}
-        >
-          <span>Locked · T-{lockedTurnsRemaining}</span>
-        </div>
+        <span title={`Unlocks on round ${unlockTurn}`} className={styles.boardLock}><LockKeyhole size={12} /><span>{unlockTurn}</span></span>
       )}
-      {damage !== undefined && damage > 0 && (
-        <span
-          key={damageKey}
-          className="pointer-events-none absolute left-1/2 top-1/2 z-40 -translate-x-1/2 -translate-y-1/2 animate-[tcg-hit_900ms_ease-out_forwards] rounded-full bg-red-500 px-2 py-1 text-sm font-black text-game-cream shadow-lg"
-        >
-          -{damage}
-        </span>
-      )}
-      <div
-        className={cn(
-          'relative h-full w-full overflow-hidden rounded-md shadow-[0_6px_14px_rgba(24,35,39,0.18)]',
-          side === 'opponent' && 'rotate-180',
-        )}
-      >
+      {damageCues.map((event, index) => (
+        <span key={event.id} data-hit-id={event.id} role="status" className={styles.hitNumber} style={{ top: `${45 + index * 14}%` }}>−{event.damage}</span>
+      ))}
+      <div key={landingKey || card.id} className={cn(styles.cardFace, landingKey && styles.cardLanding)}>
         <Image
           src={card.image}
-          alt={card.name}
+          alt=""
           fill
-          sizes="(max-width: 640px) 30vw, 196px"
-          className={cn(
-            'select-none object-cover transition duration-300',
-            knockedOut && 'grayscale opacity-45',
-          )}
-          priority={false}
+          sizes={compact ? '55px' : '(max-width: 640px) 28vw, 142px'}
+          className={cn('select-none object-cover', knockedOut && 'grayscale opacity-45')}
+          unoptimized
         />
       </div>
-      {damageTaken > 0 && (
-        <div
-          className={cn(
-            'pointer-events-none absolute z-30 flex h-8 w-8 items-center justify-center rounded-full border border-red-100/70 bg-red-500 text-xs font-black text-game-cream shadow-[0_0_18px_rgba(239,68,68,0.55),0_8px_18px_rgba(0,0,0,0.45)] sm:h-9 sm:w-9 sm:text-sm',
-            side === 'opponent'
-              ? '-left-2 -top-2 rotate-180'
-              : '-bottom-2 -right-2',
-          )}
-        >
-          {damageTaken}
-        </div>
-      )}
+      <span aria-hidden="true" className={styles.hp}>{card.currentHp}<small>/{card.hp}</small></span>
       {statuses.length > 0 && (
         <div
           className={cn(
             'pointer-events-none absolute z-30 flex gap-1 rounded-full border border-game-border bg-game-surface-raised p-1 shadow-sm',
-            side === 'opponent'
-              ? '-bottom-2 -right-2 rotate-180'
-              : '-left-2 -top-2',
+            '-left-1 -top-1',
           )}
         >
           {statuses.map((status) => (
@@ -8126,7 +8031,6 @@ function CardImageButton({
         <div
           className={cn(
             'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-md border border-game-ochre/50 bg-game-surface-raised px-1.5 py-1 text-[8px] font-bold uppercase tracking-wide text-game-ink shadow-sm',
-            side === 'opponent' && 'rotate-180',
           )}
           title={`${card.markers
             .filter((marker) => marker === 'lightningRod' || marker === 'shockWave')
@@ -8141,28 +8045,19 @@ function CardImageButton({
   )
 }
 
-function EmptyCardSlot({ side }: { side: SideTone }) {
-  return (
-    <div
-      className={cn(
-        'aspect-[240/330] w-[clamp(82px,27vw,150px)] opacity-0 sm:w-[clamp(108px,14vw,190px)]',
-        side === 'player' ? 'bg-game-charcoal/0' : 'bg-game-clay/0',
-      )}
-    />
-  )
-}
-
 function EnergyIcon({
   type,
+  decorative = false,
   className = 'h-4 w-4',
 }: {
   type?: string
+  decorative?: boolean
   className?: string
 }) {
   return (
     <Image
       src={getTcgEnergySymbol(type)}
-      alt={type || 'Colorless'}
+      alt={decorative ? '' : type || 'Colorless'}
       width={24}
       height={24}
       unoptimized

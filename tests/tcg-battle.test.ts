@@ -1369,12 +1369,14 @@ describe('TCG battle utilities', () => {
           deck: [makeBattleCard('player-deck-1', 1), makeBattleCard('player-deck-2', 1)],
           hand: [playerCard],
           front: [playerCard],
+          turnDraw: { instanceId: playerCard.instanceId, turnNumber: 1 },
           selectedEnergy: 'Fire',
         }),
         opponent: makeBattleSide(opponentCard, 5, {
           deck: [makeBattleCard('opponent-deck-1', 1), makeBattleCard('opponent-deck-2', 1), makeBattleCard('opponent-deck-3', 1)],
           hand: [opponentCard],
           front: [opponentCard],
+          turnDraw: { instanceId: opponentCard.instanceId, turnNumber: 1 },
           selectedEnergy: 'Water',
         }),
       }),
@@ -1393,6 +1395,9 @@ describe('TCG battle utilities', () => {
     ])
     expect(perspective?.opponent.deck).toEqual([])
     expect(perspective?.opponent.deckCount).toBe(2)
+    expect(perspective?.player.turnDraw?.instanceId).toBe(opponentCard.instanceId)
+    expect(perspective?.opponent.turnDraw).toBeUndefined()
+    expect(shared.player.turnDraw?.instanceId).toBe(playerCard.instanceId)
     expect(perspective?.opponent.hand).toEqual([])
     expect(perspective?.opponent.front).toEqual([])
     expect(perspective?.opponent.back).toEqual([])
