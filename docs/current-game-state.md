@@ -3073,3 +3073,5 @@ Delta Reign Nidoqueen can use Maternal Call once per turn to flip for a switch o
 
 TCG battles now track each side's Knockouts. A side loses immediately when its sixth Pokémon is Knocked Out; having no living Pokémon remains a loss condition. The battle header shows KO progress toward 6. If both sides reach six Knockouts in the same resolution, the battle is a tie.
 TCG battles now show the player's hand as an interactive card tray. Playing a Basic Pokémon is done from its card, and selecting a playable Evolution card opens only its legal evolution targets and supported effect choices. The dedicated Evolve command and named “Bench Pokémon” action buttons are removed. The start-of-turn automatic draw is surfaced as a brief draw notice; charging and attacking remain the turn-ending actions.
+
+The trainer deck editor lists only TCG series represented in the player's owned cards, with selected series artwork in its header. TCG battle round and Energy Cap indicators are centered, and evolution energy notices explain that a surge of power increases the Energy Cap.

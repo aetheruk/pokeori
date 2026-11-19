@@ -33,6 +33,7 @@
 }
 
 .round {
+  position: relative;
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
@@ -40,10 +41,11 @@
   gap: .85rem;
   font-size: .72rem;
   color: #c0d4d2;
+  justify-content: center;
 }
 
 .round b { color: var(--table-paper); }
-.round > button { margin-inline-start: auto; }
+.round > button { position: absolute; inset-inline-end: 0; }
 
 .score {
   display: grid;
