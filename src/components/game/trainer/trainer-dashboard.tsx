@@ -57,10 +57,7 @@ import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { useUser } from '@/context/UserContext'
 import { getBanner, getIcon } from '@/data/user'
 import type { TaskIcon } from '@/data/tasks/types'
-import { tcgSetSummaries } from '@/data/tcg/summaries'
-import { getTcgCardSeriesById } from '@/utilities/tcg/tcg'
 import { cn } from '@/lib/utils'
-import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
 import {
   getTrainerSectionHref,
   resolveTrainerSection,
@@ -88,16 +85,8 @@ export function TrainerDashboard({
     normalizedInitialSection,
   )
   const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
-  const ownedSeries = new Set(
-    (gameData?.tcg || [])
-      .filter((card) => card.quantity > 0)
-      .map((card) => getTcgCardSeriesById(card.cardId))
-      .filter((series): series is string => Boolean(series)),
-  )
-  const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries).filter(
-    (series) => ownedSeries.has(series),
-  )
-  const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
+  const [deckGenerations, setDeckGenerations] = useState<string[]>([])
+  const [deckGeneration, setDeckGeneration] = useState('')
   const trainerBanner =
     getBanner(user?.banner || 'lab')?.imagePath || '/backgrounds/lab.avif'
   const trainerIcon = getIcon(user?.icon || 'ditto')?.icon || {
@@ -174,6 +163,7 @@ export function TrainerDashboard({
                 <TcgDecksPanel
                   selectedGeneration={deckGeneration}
                   setSelectedGeneration={setDeckGeneration}
+                  setAvailableGenerations={setDeckGenerations}
                 />
               </LazyWrapper>
             ),

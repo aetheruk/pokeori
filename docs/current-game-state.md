@@ -3075,3 +3075,5 @@ TCG battles now track each side's Knockouts. A side loses immediately when its s
 TCG battles now show the player's hand as an interactive card tray. Playing a Basic Pokémon is done from its card, and selecting a playable Evolution card opens only its legal evolution targets and supported effect choices. The dedicated Evolve command and named “Bench Pokémon” action buttons are removed. The start-of-turn automatic draw is surfaced as a brief draw notice; charging and attacking remain the turn-ending actions.
 
 The trainer deck editor lists only TCG series represented in the player's owned cards, with selected series artwork in its header. TCG battle round and Energy Cap indicators are centered, and evolution energy notices explain that a surge of power increases the Energy Cap.
+
+Deck series availability is loaded from the server-side TCG collection because the Trainer route does not include collection data in its client state. Set logos render above the header backdrop so the selected series art remains visible.
