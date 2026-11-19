@@ -51,6 +51,12 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [1280, 800]])
     await handButton(page).click()
     await expect(hand(page)).toBeVisible()
     await expect(hand(page)).toHaveCSS('opacity', '1')
+    const handButtonsHaveNoHaptics = await hand(page)
+      .locator('ul button')
+      .evaluateAll((buttons) =>
+        buttons.every((button) => button.getAttribute('data-haptic-disabled') === 'true'),
+      )
+    expect(handButtonsHaveNoHaptics).toBe(true)
     await expect(page.getByRole('button', { name: /^Drew / })).toHaveCount(0)
     const [handBox, dockBox] = await Promise.all([hand(page).boundingBox(), dock.boundingBox()])
     expect(handBox!.x).toBeGreaterThanOrEqual(0)
@@ -126,7 +132,10 @@ test('an NPC hit that causes a knockout plays once before the board settles', as
   await expect(page.getByRole('region', { name: 'Your front row' }).getByRole('button', { name: /^Rhyhorn,/ })).toBeVisible()
   await page.getByRole('button', { name: /^Thunder Wave,/ }).click()
   await expect.poll(() => hits).toEqual(['player-hit'])
-  await expect(page.getByRole('region', { name: 'CPU' })).toContainText('3/6')
+  const cpuLives = page.getByRole('region', { name: 'CPU' }).getByRole('img', {
+    name: '3 lives remaining. The battle is lost at zero.',
+  })
+  await expect(cpuLives).toBeVisible()
   await expect(page.getByRole('region', { name: 'You', exact: true })).toContainText(/Deck\s*7/)
   await expect(page.getByRole('region', { name: 'Opponent front row' }).getByRole('button', { name: /^Meowth,/ })).toHaveCount(0)
   await handButton(page).click()

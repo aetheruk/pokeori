@@ -229,7 +229,7 @@ describe('TCG battle utilities', () => {
     if (action.kind === 'attack') expect(action.option.knockoutChance).toBe(1)
   })
 
-  test('opponent evolves for a strong next-turn upgrade but takes an available knockout first', () => {
+  test('opponent evolves before nonlethal attacks but chooses a current knockout', () => {
     const basic = makeBattleCard('opponent-basic', 1)
     basic.attacks[0].damage = '10'
     const evolution = makeBattleCard('opponent-stage-one', 1)
@@ -251,7 +251,7 @@ describe('TCG battle utilities', () => {
 
     state.opponent.energy = TCG_BATTLE_FORMATS.baby.energyCap
     player.currentHp = 50
-    expect(chooseOpponentTcgBattleAction(state).kind).toBe('attack')
+    expect(chooseOpponentTcgBattleAction(state).kind).toBe('evolve')
 
     state.opponent.energy = 5
     player.currentHp = 10

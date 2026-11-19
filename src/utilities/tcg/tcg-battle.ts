@@ -31313,7 +31313,7 @@ function inferClassicTcgBattleAttackEffect(
       damage: { kind: 'zeroOnTails', amount: 20 },
       coinFlipCount: 1,
       benchDamage: [{ amount: 20, side: 'opponent', maxTargets: 1, condition: 'tails' }],
-      ignoreWeaknessResistance: true,
+      ignoreWeaknessResistanceOnBench: true,
     }
   }
   if (['coin hurl', 'jump over'].includes(name)) {

@@ -1593,11 +1593,15 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
         opponentStatusEvents.length === 0 &&
         endOfRoundStatusDamageEvents.length === 0
       )
+      const opponentTurnWasRun = (
+        nextState.lastAction?.side === 'opponent' &&
+        nextState.lastAction.id !== previousState.lastAction?.id
+      ) || nextState.turnNumber > previousState.turnNumber
       const playerTarget = opponentDamageEvent
         ? findSideCard(plannedState.player, opponentDamageEvent.targetId)
         : undefined
 
-      if (!skipOpponentStep && nextState.battleMode !== 'pvp') {
+      if (!skipOpponentStep && opponentTurnWasRun && nextState.battleMode !== 'pvp') {
         if (opponentCoinCues.length > 0) {
           opponentCoinCues.forEach((coinCue, index) => {
             queueResolution(
@@ -6676,7 +6680,7 @@ function BattleCommandControls({
           >
             <header onTouchStart={startHandSwipe} onTouchEnd={(event) => endHandSwipe(event, 1, onCloseHand)}>
               <h2>Your hand <span>{state.player.hand.length}</span></h2>
-              <button ref={handCloseRef} type="button" aria-label="Close hand" onClick={onCloseHand} className={styles.iconButton}><X size={17} /></button>
+              <button ref={handCloseRef} type="button" data-haptic-disabled="true" aria-label="Close hand" onClick={onCloseHand} className={styles.iconButton}><X size={17} /></button>
             </header>
             <ul className={styles.handCards}>
               {state.player.hand.map((card) => {
@@ -6699,6 +6703,7 @@ function BattleCommandControls({
                   <li key={card.instanceId} data-new={isNew}>
                     <button
                       type="button"
+                      data-haptic-disabled="true"
                       data-playable={playable}
                       className={styles.handCard}
                       onClick={() => {
@@ -6713,7 +6718,7 @@ function BattleCommandControls({
                       {!playable && <LockKeyhole className={styles.cardLock} size={15} aria-hidden="true" />}
                     </button>
                     {playable && (
-                      <button type="button" aria-label={`Inspect ${card.name}`} className={styles.inspectCard} onClick={() => onInspectCard(card, detail)}>
+                      <button type="button" data-haptic-disabled="true" aria-label={`Inspect ${card.name}`} className={styles.inspectCard} onClick={() => onInspectCard(card, detail)}>
                         <Image src="/sprites/items/scope-lens.avif" alt="" width={24} height={24} unoptimized />
                       </button>
                     )}
@@ -6908,12 +6913,21 @@ function SideScorePill({
 }) {
   const deckCount = side.deckCount ?? side.deck.length
   const knockouts = side.knockoutCount || 0
+  const livesRemaining = Math.max(0, 6 - knockouts)
 
   return (
     <section className={styles.score} data-active={active} aria-label={label}>
       <b>{label}</b>
-      <span title="Pokémon knocked out. Six loses the match." className={cn(knockouts >= 5 && styles.critical)}>
-        <span aria-hidden="true">KO </span><span className="sr-only">Knocked out </span><b>{knockouts}/6</b>
+      <span
+        role="img"
+        aria-label={`${livesRemaining} lives remaining. The battle is lost at zero.`}
+        title={`${livesRemaining} lives remaining. The battle is lost at zero.`}
+        className={cn(livesRemaining <= 1 && styles.critical)}
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="size-3.5 fill-current">
+          <path d="M12 21s-7.1-4.35-9.6-8.55C.5 9.1 2.1 5.5 5.5 5.5c1.9 0 3.3 1.1 4.1 2.3.8-1.2 2.2-2.3 4.1-2.3 3.4 0 5 3.6 3.1 6.95C19 16.65 12 21 12 21Z" />
+        </svg>
+        <b aria-hidden="true">{livesRemaining}</b>
       </span>
       <span title="Cards left in deck" className={cn(deckCount === 0 && styles.critical)}>
         <Image src="/sprites/items/deck-box.avif" alt="" width={16} height={16} unoptimized className="shrink-0" />
