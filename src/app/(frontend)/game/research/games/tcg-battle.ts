@@ -5072,15 +5072,6 @@ function applyAttack(
   if (targetDamageApplied > 0 || attack.name.toLowerCase() === 'midnight eyes') {
     recordTcgBattleAttackHit(target, sideKey)
   }
-  if (targetDamageApplied > 0) {
-    recordDamageEvent(state, {
-      sourceId: attacker.instanceId,
-      targetId: target.instanceId,
-      targetSide: targetSideKey,
-      damage: targetDamageApplied,
-      reason: 'attack',
-    })
-  }
   const enteiBurningRoar = targetSideKey !== sideKey && target.currentHp <= 0 && targetDamageApplied > 0 &&
     normalizeTcgBattleAbilityCardName(attacker.name) === 'entei' &&
     !isTcgBattleAbilitySuppressedByShadyTail(attacker, [state.player, state.opponent]) &&
