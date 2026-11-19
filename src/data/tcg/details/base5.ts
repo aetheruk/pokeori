@@ -809,7 +809,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Gloom",
+    "evolvesFrom": "Dark Gloom",
     "evolvesTo": [],
     "rules": [],
     "abilities": [
@@ -1826,7 +1826,7 @@ const cardDetails: TcgCardDetail[] = [
     "types": [
       "Grass"
     ],
-    "evolvesFrom": "Gloom",
+    "evolvesFrom": "Dark Gloom",
     "evolvesTo": [],
     "rules": [],
     "abilities": [

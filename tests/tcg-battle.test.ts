@@ -332,6 +332,26 @@ describe('TCG battle utilities', () => {
     ).toContain('Pikachu needs enough matching Basic Pokémon cards in the deck for every evolution.')
   })
 
+  test('recognizes Dark Gloom as the predecessor of Dark Vileplume', async () => {
+    const oddish = await buildTcgBattleCardSummary('base5-63')
+    const darkGloom = await buildTcgBattleCardSummary('base5-36')
+    const regularGloom = await buildTcgBattleCardSummary('base2-37')
+    const darkVileplumes = await Promise.all(
+      ['base5-13', 'base5-30'].map((cardId) => buildTcgBattleCardSummary(cardId)),
+    )
+
+    expect(oddish).not.toBeNull()
+    expect(darkGloom).not.toBeNull()
+    expect(regularGloom).not.toBeNull()
+    for (const darkVileplume of darkVileplumes) {
+      expect(darkVileplume?.evolvesFrom).toBe('Dark Gloom')
+      expect(getTcgBattleDeckLineErrors([oddish!, darkGloom!, darkVileplume!])).toEqual([])
+      expect(getTcgBattleDeckLineErrors([oddish!, darkGloom!, darkVileplume!, regularGloom!])).toContain(
+        'Oddish needs enough matching Basic Pokémon cards in the deck for every evolution.',
+      )
+    }
+  })
+
   test('opens with Basics and evolves through a damage-preserving stack', () => {
     const pikachu = {
       ...makeBattleCard('base1-58', 1),
