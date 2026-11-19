@@ -219,6 +219,33 @@ type ActionMeta = (
   | { kind: 'claim' }
 ) & { actorSide?: SideTone }
 
+type TcgClientActionTiming = {
+  kind: ActionMeta['kind']
+  startedAt: number
+  responseAt?: number
+}
+
+function reportTcgClientActionTiming(
+  timing: TcgClientActionTiming,
+  outcome: 'success' | 'failed' | 'missing-completion',
+) {
+  const finishedAt = performance.now()
+  const requestRoundTripMs =
+    Math.round(((timing.responseAt ?? finishedAt) - timing.startedAt) * 10) / 10
+  const totalMs = Math.round((finishedAt - timing.startedAt) * 10) / 10
+  const animationWaitMs =
+    Math.round(Math.max(0, totalMs - requestRoundTripMs) * 10) / 10
+  const verbose = process.env.NEXT_PUBLIC_GAME_PERFORMANCE_LOGS === 'true'
+  if (!verbose && requestRoundTripMs < 500 && totalMs < 900) return
+  console.info('[tcg-battle] client action timing', {
+    kind: timing.kind,
+    outcome,
+    requestRoundTripMs,
+    animationWaitMs,
+    totalMs,
+  })
+}
+
 interface TcgBattleGameProps {
   encounter: TcgBattleGameConfig
   actions?: TcgBattlePreviewActions
@@ -242,7 +269,7 @@ const battleActions: TcgBattlePreviewActions = {
   refresh: refreshTcgBattleState,
 }
 
-const HIT_DURATION = 620
+const HIT_DURATION = 420
 
 function getDamageEvents(state: TcgBattleState): TcgDamageEvent[] {
   const events = new Map<string, TcgDamageEvent>()
@@ -276,15 +303,17 @@ const STATUS_ICON_SRC: Record<TcgBattleStatusCondition, string> = {
 }
 
 const RESOLUTION_TIMING = {
-  actionIntro: 760,
-  coinFlip: 1380,
-  damageHold: 980,
-  betweenActions: 620,
-  recoil: 860,
-  faint: 760,
-  boardUpdate: 900,
-  statusUpdate: 140,
-  finalSettle: 780,
+  // Keep the event order readable while returning control in under a second
+  // for a typical player attack followed by an opponent response.
+  actionIntro: 180,
+  coinFlip: 420,
+  damageHold: 240,
+  betweenActions: 120,
+  recoil: 200,
+  faint: 180,
+  boardUpdate: 170,
+  statusUpdate: 100,
+  finalSettle: 80,
 } as const
 
 function getAllowedAttackCost(turnNumber: number): number {
@@ -453,7 +482,8 @@ function cloneTcgBattleState(state: TcgBattleState): TcgBattleState {
     lastStatusEvents: state.lastStatusEvents
       ? [...state.lastStatusEvents]
       : undefined,
-    log: [...state.log],
+    // Visual-only state changes never edit the server-provided battle log.
+    log: state.log,
   }
 }
 
@@ -748,6 +778,17 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
   const timersRef = useRef<number[]>([])
   const lastAnimatedActionRef = useRef<string | null>(null)
   const energyNoticeIdRef = useRef(0)
+  const actionTimingRef = useRef<TcgClientActionTiming | null>(null)
+
+  const finishActionTiming = useCallback(
+    (outcome: 'success' | 'failed' | 'missing-completion') => {
+      const timing = actionTimingRef.current
+      if (!timing) return
+      reportTcgClientActionTiming(timing, outcome)
+      actionTimingRef.current = null
+    },
+    [],
+  )
 
   const clearResolutionTimers = useCallback(() => {
     timersRef.current.forEach((timer) => window.clearTimeout(timer))
@@ -758,7 +799,12 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
 
   const scheduleResolutionStep = useCallback(
     (callback: () => void, delay: number) => {
-      const timer = window.setTimeout(callback, delay)
+      const timer = window.setTimeout(() => {
+        timersRef.current = timersRef.current.filter(
+          (scheduled) => scheduled !== timer,
+        )
+        callback()
+      }, delay)
       timersRef.current.push(timer)
     },
     [],
@@ -963,6 +1009,7 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
 
   const commitActionResult = useCallback(
     (nextState: TcgBattleState, completion?: GameCompletionResult) => {
+      finishActionTiming('success')
       setState(nextState)
       setResolution(null)
       setIsActionBusy(false)
@@ -976,7 +1023,7 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
         else playSfx('stance_tie')
       }
     },
-    [playSfx],
+    [finishActionTiming, playSfx],
   )
 
   const settleWithDamage = useCallback(
@@ -2167,6 +2214,7 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
     const previousState = state
     if (previousState?.lastAction?.abilityEffect === 'moonGuidancePending' && !(meta.kind === 'ability' && meta.abilityEffect === 'moonGuidanceResolve')) return
     if (previousState?.lastAction?.abilityEffect === 'regidragoVstarPending' && !(meta.kind === 'ability' && meta.abilityEffect === 'regidragoVstarResolve')) return
+    actionTimingRef.current = { kind: meta.kind, startedAt: performance.now() }
     setIsActionBusy(true)
     if (meta.kind === 'claim') setClaimError(null)
     primeActionResolution(previousState, meta)
@@ -2185,7 +2233,11 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
     startTransition(async () => {
       try {
         const response = await action()
+        if (actionTimingRef.current) {
+          actionTimingRef.current.responseAt = performance.now()
+        }
         if (!response.success) {
+          finishActionTiming('failed')
           setIsActionBusy(false)
           setResolution(null)
           if (previousState) setState(previousState)
@@ -2196,6 +2248,7 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
           return
         }
         if (meta.kind === 'claim' && !response.completion) {
+          finishActionTiming('missing-completion')
           setIsActionBusy(false)
           setResolution(null)
           if (previousState) setState(previousState)
@@ -2223,6 +2276,7 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
           response.completion,
         )
       } catch (error) {
+        finishActionTiming('failed')
         setIsActionBusy(false)
         setResolution(null)
         if (previousState) setState(previousState)

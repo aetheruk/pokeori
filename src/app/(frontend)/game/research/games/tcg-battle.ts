@@ -159,6 +159,8 @@ type WithoutId<T> = T extends { id: string } ? Omit<T, 'id'> : never
 
 const BATTLE_TTL_SECONDS = 60 * 60
 const GAME_TTL_SECONDS = 60 * 60
+const MAX_TCG_BATTLE_LOG_ENTRIES = 40
+const TCG_BATTLE_PERFORMANCE_LOGS = process.env.GAME_PERFORMANCE_LOGS === 'true'
 const PVP_QUEUE_TTL_SECONDS = 5 * 60
 const PVP_ACTION_TIMEOUT_MS = 2 * 60 * 1000
 const PVP_RESULT_TTL_SECONDS = 60 * 60
@@ -238,14 +240,38 @@ function isTcgPvpEncounter(
 }
 
 async function withTcgPvpLock<T>(matchId: string, action: () => Promise<T>) {
+  const lockStartedAt = performance.now()
   const lock = await acquireActionLock(`lock:tcg:pvp:${matchId}`, 12)
+  const acquiredAt = performance.now()
   if (!lock.acquired) {
+    logTcgBattlePerformance('action', {
+      mode: 'pvp',
+      outcome: 'busy',
+      lockWaitMs: roundTcgBattleDuration(acquiredAt - lockStartedAt),
+    }, true)
     throw new Error('Another TCG PVP action is already being processed.')
   }
+  let outcome = 'success'
   try {
     return await action()
+  } catch (error) {
+    outcome = 'error'
+    throw error
   } finally {
-    await releaseActionLock(lock)
+    const actionFinishedAt = performance.now()
+    try {
+      await releaseActionLock(lock)
+    } finally {
+      const releasedAt = performance.now()
+      const actionMs = roundTcgBattleDuration(actionFinishedAt - acquiredAt)
+      logTcgBattlePerformance('action', {
+        mode: 'pvp',
+        outcome,
+        lockWaitMs: roundTcgBattleDuration(acquiredAt - lockStartedAt),
+        actionMs,
+        lockReleaseMs: roundTcgBattleDuration(releasedAt - actionFinishedAt),
+      }, actionMs >= 250)
+    }
   }
 }
 
@@ -254,9 +280,23 @@ async function loadTcgPvpStatus(userId: string) {
 }
 
 async function loadTcgPvpSharedState(matchId: string) {
-  return (await redis.get(
+  const startedAt = performance.now()
+  const state = (await redis.get(
     pvpBattleKey(matchId),
   )) as TcgPvpSharedBattleState | null
+  const durationMs = roundTcgBattleDuration(performance.now() - startedAt)
+  if (state) {
+    const trimmedLogEntries = trimTcgBattleLog(state)
+    logTcgBattlePerformance('state-read', {
+      mode: 'pvp',
+      durationMs,
+      turnNumber: state.turnNumber,
+      logEntries: state.log.length,
+      trimmedLogEntries,
+      cardCount: getTcgBattleCardCount(state),
+    }, durationMs >= 100)
+  }
+  return state
 }
 
 async function rejectTcgBattleStart(userId: string, error: string) {
@@ -268,20 +308,87 @@ async function rejectTcgBattleStart(userId: string, error: string) {
 }
 
 async function withTcgBattleLock<T>(userId: string, action: () => Promise<T>) {
+  const lockStartedAt = performance.now()
   const lock = await acquireActionLock(lockKey(userId), 10)
-  if (!lock.acquired)
+  const acquiredAt = performance.now()
+  if (!lock.acquired) {
+    logTcgBattlePerformance('action', {
+      mode: 'pve',
+      outcome: 'busy',
+      lockWaitMs: roundTcgBattleDuration(acquiredAt - lockStartedAt),
+    }, true)
     throw new Error('Another TCG battle action is already being processed.')
+  }
+  let outcome = 'success'
   try {
     return await action()
+  } catch (error) {
+    outcome = 'error'
+    throw error
   } finally {
-    await releaseActionLock(lock)
+    const actionFinishedAt = performance.now()
+    try {
+      await releaseActionLock(lock)
+    } finally {
+      const releasedAt = performance.now()
+      const actionMs = roundTcgBattleDuration(actionFinishedAt - acquiredAt)
+      logTcgBattlePerformance('action', {
+        mode: 'pve',
+        outcome,
+        lockWaitMs: roundTcgBattleDuration(acquiredAt - lockStartedAt),
+        actionMs,
+        lockReleaseMs: roundTcgBattleDuration(releasedAt - actionFinishedAt),
+      }, actionMs >= 250)
+    }
   }
+}
+
+function roundTcgBattleDuration(durationMs: number) {
+  return Math.round(durationMs * 10) / 10
+}
+
+function logTcgBattlePerformance(
+  event: string,
+  details: Record<string, string | number | boolean | undefined>,
+  slow = false,
+) {
+  if (!TCG_BATTLE_PERFORMANCE_LOGS && !slow) return
+  try {
+    console.info(JSON.stringify({ event: `tcg-battle-${event}`, ...details }))
+  } catch {
+    // Diagnostic logging must not affect battle actions.
+  }
+}
+
+function trimTcgBattleLog(state: Pick<TcgBattleState, 'log'>) {
+  if (!Array.isArray(state.log)) {
+    state.log = []
+    return 0
+  }
+  const removed = Math.max(0, state.log.length - MAX_TCG_BATTLE_LOG_ENTRIES)
+  if (removed > 0) state.log.length = MAX_TCG_BATTLE_LOG_ENTRIES
+  return removed
+}
+
+function getTcgBattleCardCount(state: TcgBattleState) {
+  return [state.player, state.opponent].reduce(
+    (total, side) =>
+      total +
+      side.deck.length +
+      side.hand.length +
+      side.front.length +
+      side.back.length +
+      side.discard.length +
+      (side.lostZone?.length || 0),
+    0,
+  )
 }
 
 async function getActiveTcgBattleEncounter(
   userId: string,
   encounterId?: string,
 ) {
+  const startedAt = performance.now()
   const researchState = (await redis.get(
     `game:${userId}`,
   )) as GameActivityState | null
@@ -298,13 +405,29 @@ async function getActiveTcgBattleEncounter(
   }
 
   await redis.expire(`game:${userId}`, GAME_TTL_SECONDS)
+  const durationMs = roundTcgBattleDuration(performance.now() - startedAt)
+  logTcgBattlePerformance('encounter-read', {
+    mode: encounter.settings.battleMode || 'pve',
+    durationMs,
+  }, durationMs >= 100)
   return encounter
 }
 
 async function loadState(userId: string): Promise<TcgBattleState> {
+  const startedAt = performance.now()
   const state = (await redis.get(battleKey(userId))) as TcgBattleState | null
   if (!state) throw new Error('No active TCG battle.')
+  const trimmedLogEntries = trimTcgBattleLog(state)
   if (state.lastReactiveAbilityId === undefined) state.lastReactiveAbilityId = state.lastAction?.id
+  const durationMs = roundTcgBattleDuration(performance.now() - startedAt)
+  logTcgBattlePerformance('state-read', {
+    mode: 'pve',
+    durationMs,
+    turnNumber: state.turnNumber,
+    logEntries: state.log.length,
+    trimmedLogEntries,
+    cardCount: getTcgBattleCardCount(state),
+  }, durationMs >= 100)
   return state
 }
 
@@ -373,7 +496,19 @@ async function saveState(state: TcgBattleState): Promise<TcgBattleState> {
     state.phase = 'finished'
     state.winner = winner
   }
+  trimTcgBattleLog(state)
+  const payloadChars = TCG_BATTLE_PERFORMANCE_LOGS ? JSON.stringify(state).length : undefined
+  const writeStartedAt = performance.now()
   await redis.set(battleKey(state.userId), state, { ex: BATTLE_TTL_SECONDS })
+  const durationMs = roundTcgBattleDuration(performance.now() - writeStartedAt)
+  logTcgBattlePerformance('state-write', {
+    mode: 'pve',
+    durationMs,
+    turnNumber: state.turnNumber,
+    logEntries: state.log.length,
+    cardCount: getTcgBattleCardCount(state),
+    payloadChars,
+  }, durationMs >= 100)
   return state
 }
 
@@ -9963,14 +10098,19 @@ function afterPlayerAction(state: TcgBattleState) {
   const opponentTurnStartedAt = performance.now()
   runOpponentTurn(state)
   const opponentTurnDurationMs = Math.round(performance.now() - opponentTurnStartedAt)
-  if (opponentTurnDurationMs >= 1_000) {
-    console.warn('[tcg-battle] Slow NPC turn resolution', {
+  if (opponentTurnDurationMs >= 1_000 || TCG_BATTLE_PERFORMANCE_LOGS) {
+    const details = {
       durationMs: opponentTurnDurationMs,
       turnNumber: state.turnNumber,
       actionSteps: opponentTurnSteps.get(state) || 0,
       playerPokemon: state.player.front.length + state.player.back.length,
       opponentPokemon: state.opponent.front.length + state.opponent.back.length,
-    })
+    }
+    if (opponentTurnDurationMs >= 1_000) {
+      console.warn('[tcg-battle] Slow NPC turn resolution', details)
+    } else {
+      logTcgBattlePerformance('npc-turn', details)
+    }
   }
 }
 
@@ -10584,9 +10724,21 @@ function makeEmptyTcgPvpSummary() {
 
 async function saveTcgPvpSharedState(state: TcgPvpSharedBattleState) {
   state.updatedAt = Date.now()
+  trimTcgBattleLog(state)
+  const payloadChars = TCG_BATTLE_PERFORMANCE_LOGS ? JSON.stringify(state).length : undefined
+  const writeStartedAt = performance.now()
   await redis.set(pvpBattleKey(state.matchId), state, {
     ex: BATTLE_TTL_SECONDS,
   })
+  const durationMs = roundTcgBattleDuration(performance.now() - writeStartedAt)
+  logTcgBattlePerformance('state-write', {
+    mode: 'pvp',
+    durationMs,
+    turnNumber: state.turnNumber,
+    logEntries: state.log.length,
+    cardCount: getTcgBattleCardCount(state),
+    payloadChars,
+  }, durationMs >= 100)
 }
 
 async function finalizeTcgPvpResult(state: TcgPvpSharedBattleState) {

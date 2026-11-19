@@ -29,6 +29,8 @@ The Pewter School TCG lessons now match the live battle rules: three-card openin
 
 The TCG battle table shows each side's KO losses, deck count, and Energy. The hand highlights the specific copy drawn at the start of the turn. Plain Evolution resolves by choosing the card and its board target, with additional prompts for effects that need a decision. Damage feedback follows fresh battle events in NPC and PvP play.
 
+TCG action playback now uses a short ordered animation sequence so attacks, damage, knockouts, and promotions remain readable without holding the player for several seconds. Completed animation timers are removed from the pending cleanup queue. Battle history retains the 40 newest entries; performance diagnostics can separately report client request/animation time and server lock, encounter, state I/O, and NPC resolution time.
+
 Secret Wonders Unown [Z] can use ZERO once per turn from the Bench when its deck is empty, moving itself to the top of that deck. PvE and PvP are supported.
 
 Holon Phantoms Crawdaunt ex can use Splash Back once per turn, while free of Special Conditions, to return one opposing Benched Pokémon and its Evolution cards to the opponent's hand when they have at least four Benched Pokémon. Player, PvP, and automatic NPC use are supported.
