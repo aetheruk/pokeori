@@ -13,8 +13,6 @@ import { useUser } from '@/context/UserContext'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard } from '@/data/tcg/types'
 import { APP_VERSION } from '@/utilities/app-version'
-import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
-import { getTcgCardSeriesById } from '@/utilities/tcg/tcg'
 import {
   calculateTcgBattleCardCost,
   type TcgBattleEnergyType,
@@ -27,9 +25,11 @@ type DeckValidation = { valid: boolean; errors: string[]; totalCost: number }
 export function TcgDecksPanel({
   selectedGeneration,
   setSelectedGeneration,
+  setAvailableGenerations,
 }: {
   selectedGeneration: string
   setSelectedGeneration: (generation: string) => void
+  setAvailableGenerations: (generations: string[]) => void
 }) {
   const { gameData } = useUser()
   const [generationDecks, setGenerationDecks] = useState<
@@ -56,19 +56,14 @@ export function TcgDecksPanel({
   )
   const hasDeckBox = (inventory['deck-box'] || 0) > 0
 
-  const generationOptions = useMemo(() => {
-    const ownedSeries = new Set(
-      (gameData?.tcg || [])
-        .filter((card) => card.quantity > 0)
-        .map((card) => getTcgCardSeriesById(card.cardId))
-        .filter((value): value is string => Boolean(value)),
-    )
-    const series = getTcgSeriesInReleaseOrder(tcgSetSummaries).filter((value) => ownedSeries.has(value))
-    return series.map((entry) => ({
+  const [availableGenerations, setLocalAvailableGenerations] = useState<string[]>([])
+  const generationOptions = useMemo(
+    () => availableGenerations.map((entry) => ({
       id: entry,
       label: entry.replace('&', 'and'),
-    }))
-  }, [gameData?.tcg])
+    })),
+    [availableGenerations],
+  )
 
   useEffect(() => {
     if (
@@ -90,21 +85,20 @@ export function TcgDecksPanel({
       }
       setGenerationDecks(result.generationDecks || {})
       setDeckValidation(result.validation || {})
+      const ownedGenerations = result.ownedGenerations || []
+      setLocalAvailableGenerations(ownedGenerations)
+      setAvailableGenerations(ownedGenerations)
       if (result.resetLegacyDecks) {
         setDeckMessage('Old decks cleared. Build one new 15-card deck for each series.')
       }
-      if (
-        !selectedGeneration &&
-        result.generations &&
-        result.generations.length > 0
-      ) {
-        setSelectedGeneration(result.generations[0])
+      if (!selectedGeneration && ownedGenerations.length > 0) {
+        setSelectedGeneration(ownedGenerations[0])
       }
     })
     return () => {
       mounted = false
     }
-  }, [gameData, hasDeckBox, selectedGeneration])
+  }, [gameData, hasDeckBox, selectedGeneration, setAvailableGenerations])
 
   const activeDeckEntry = generationDecks[selectedGeneration]
   const activeDeck = activeDeckEntry?.cards || []
@@ -226,15 +220,16 @@ export function TcgDecksPanel({
               src={seriesSet.images.logo}
               alt=""
               fill
+              unoptimized
               sizes="(max-width: 768px) 100vw, 70vw"
-              className="-z-10 object-contain object-right p-4 opacity-30"
+              className="z-0 object-contain object-right p-4 opacity-45"
             />
           )}
-          <div className="relative">
+          <div className="relative z-10">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-game-cream/75">Trading Card Game</p>
             <h2 className="mt-1 text-2xl font-black tracking-tight md:text-3xl">{selectedGeneration || 'Choose a series'}</h2>
           </div>
-          <span className="relative ml-auto text-right text-xs font-bold uppercase tracking-[0.12em] text-game-cream/90">
+          <span className="relative z-10 ml-auto text-right text-xs font-bold uppercase tracking-[0.12em] text-game-cream/90">
             {activeDeck.length}/15 cards · Cost{' '}
             <span
               className={

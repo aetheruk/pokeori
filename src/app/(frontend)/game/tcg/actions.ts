@@ -37,6 +37,7 @@ export interface TcgDeckActionResult {
   error?: string
   generationDecks?: Record<string, { cards: string[]; energy?: TcgBattleEnergyType }>
   generations?: string[]
+  ownedGenerations?: string[]
   resetLegacyDecks?: boolean
   generation?: string
   deck?: string[]
@@ -136,6 +137,11 @@ export async function getTcgDecks(): Promise<TcgDeckActionResult> {
     }
     const generationDecks = resetLegacyDecks ? {} : normalizeGenerationDecks((user as any).tcgDecksByGeneration)
     const generations = getKnownTcgGenerations()
+    const ownedGenerations = generations.filter((generation) =>
+      Object.entries(collection).some(
+        ([cardId, quantity]) => quantity > 0 && getTcgCardSeriesById(cardId) === generation,
+      ),
+    )
     const validation = {} as Record<string, { valid: boolean; errors: string[]; totalCost: number }>
 
     for (const generation of generations) {
@@ -144,7 +150,7 @@ export async function getTcgDecks(): Promise<TcgDeckActionResult> {
       validation[generation] = { valid: result.valid, errors: result.errors, totalCost: result.totalCost }
     }
 
-    return { ok: true, generationDecks, generations, validation, resetLegacyDecks }
+    return { ok: true, generationDecks, generations, ownedGenerations, validation, resetLegacyDecks }
   } catch (error) {
     console.error('[TCG Decks] Failed to load decks.', error)
     return { ok: false, error: error instanceof Error ? error.message : 'Unable to load decks.' }
