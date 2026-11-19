@@ -7,6 +7,7 @@ import configPromise from '@payload-config'
 import { redis } from '@/utilities/redis'
 import {
   canSideChargeEnergy,
+  canTcgBattlePokemonAttack,
   getTcgBattleEnergyChargeBonus,
   markTcgBattleEnergyChargeBonusUsed,
   arrangeOpponentOpeningCards,
@@ -7308,13 +7309,13 @@ function useOpponentSalamenceDragonWind(state: TcgBattleState): boolean {
 function useOpponentWaterActiveSwitchAbility(state: TcgBattleState): boolean {
   const side = state.opponent
   const active = side.front.find((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === 'water'))
-  if (!active || active.temporaryEffects?.cannotSwitch || chooseOpponentTcgBattleAttack(state, active.instanceId)) return false
+  if (!active || active.temporaryEffects?.cannotSwitch || canTcgBattlePokemonAttack(state, 'opponent', active)) return false
   for (const [abilityIndex, ability] of (active.abilities || []).entries()) {
     const text = ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim()
     if (text !== 'once during your turn, you may switch your active {w} pokemon with 1 of your benched pokemon.') continue
     const usageKey = `${abilityIndex}:${ability.name}`
     if (active.abilityUses?.[usageKey] === state.turnNumber) continue
-    const replacement = side.back.find((card) => card.currentHp > 0 && chooseOpponentTcgBattleAttack(state, card.instanceId))
+    const replacement = side.back.find((card) => canTcgBattlePokemonAttack(state, 'opponent', card, true))
     if (!replacement || !swapTcgBattleCards(state, 'opponent', active, replacement.instanceId)) continue
     active.abilityUses = { ...active.abilityUses, [usageKey]: state.turnNumber }
     state.log.unshift(`Opponent used ${active.name}'s ${ability.name} to switch ${replacement.name} into the Active Spot.`)
@@ -9965,7 +9966,18 @@ function afterPlayerAction(state: TcgBattleState) {
   applyTcgBattleSnorlaxStirAndSnooze(state, 'player', globalTwoCoinSleepActive)
   if (state.pendingPromotion) return
   advanceTurn(state, 'opponent')
+  const opponentTurnStartedAt = performance.now()
   runOpponentTurn(state)
+  const opponentTurnDurationMs = Math.round(performance.now() - opponentTurnStartedAt)
+  if (opponentTurnDurationMs >= 1_000) {
+    console.warn('[tcg-battle] Slow NPC turn resolution', {
+      durationMs: opponentTurnDurationMs,
+      turnNumber: state.turnNumber,
+      actionSteps: opponentTurnSteps.get(state) || 0,
+      playerPokemon: state.player.front.length + state.player.back.length,
+      opponentPokemon: state.opponent.front.length + state.opponent.back.length,
+    })
+  }
 }
 
 function afterPlayerFreeEvolution(state: TcgBattleState) {

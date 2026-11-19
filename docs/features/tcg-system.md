@@ -1,6 +1,6 @@
 Energy is modeled as a shared pool, with no Energy cards in deck, hand, or discard. Modeled searches and recoveries that would move Energy cards into hand or from discard add the printed type and amount to the pool, capped at 12. Concealed Cards and Salazzle/Ninetales Fire Energy draw Powers spend a shared-pool unit for their printed hand Energy discard costs. Effects that depend on individual attached Energy are unsupported unless explicitly mapped to another pool operation. Trainer-card effects are not implemented by this Ability/Power system.
 
-NPC turns run in bounded, lightweight steps after the player's action. The opponent evolves any legal Pokémon, then chooses an available attack, charges if it cannot attack, or ends the turn. Attack scoring uses fewer outcome samples to keep battle actions from blocking the app server; a safety limit ends a turn if automatic effects fail to make progress.
+NPC turns run in bounded, lightweight steps after the player's action. The opponent evolves any legal Pokémon, then chooses an available attack, charges if it cannot attack, or ends the turn. Attack scoring uses one deterministic outcome sample per attack and target; Water Pokémon switching checks attack availability without running the scorer. Slow NPC turn resolutions log duration and board-size diagnostics, and a safety limit ends turns if automatic effects fail to make progress.
 
 Silver Tempest Radiant Alakazam’s once-per-turn Painful Spoons Ability selects an opposing Pokémon with damage and moves up to two counters to another opposing Pokémon using the shared counter-move interface.
 Banette ex, Typhlosion δ, and Cresselia LV.X have once-per-turn damage-counter movement across either player's board. Banette ex and Typhlosion δ require the source to be Active; all three effects are blocked by Special Conditions and use the existing source/target selection flow.
@@ -19,6 +19,7 @@ Diamond & Pearl Unown [D]'s Bench-only Ability flips a coin once per turn. On he
 Unbroken Bonds Salazzle's once-per-turn Ability discards a Fire Energy from hand and draws 3 cards. The battle UI filters for Fire Energy and server actions validate the discard in PvE and PvP.
 Astral Radiance Radiant Greninja's Concealed Cards Ability requires discarding an Energy card from hand, then draws 2 cards once per turn. The battle UI offers Energy cards as discard choices and the server validates the submitted card in PvE and PvP.
 Lost Origin Drapion VSTAR's Venomous Vortex applies Paralysis and Poison to a selected opposing Active Pokémon, with 30 Poison damage during Pokémon Checkup. It consumes the shared once-per-game VSTAR Power limit in PvE and PvP.
+
 # TCG System
 
 Secret Wonders Unown [Z]'s ZERO moves Unown Z from the Bench to the top of its owner's deck once per turn when that deck is empty. The action is available in PvE and PvP.
