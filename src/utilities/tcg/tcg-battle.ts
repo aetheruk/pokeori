@@ -28326,8 +28326,30 @@ function isTcgBattleAbilityBoostEligible(
   return true
 }
 
+// NPC Ability passes revisit the same printed text many times in one action.
+// Keep this bounded so uncommon card data cannot grow the process indefinitely.
+const NORMALIZED_TCG_BATTLE_ABILITY_TEXT_CACHE_LIMIT = 8192
+const normalizedTcgBattleAbilityTextCache = new Map<string, string>()
+
 export function normalizeTcgBattleAbilityText(text: string): string {
-  return text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+  const cached = normalizedTcgBattleAbilityTextCache.get(text)
+  if (cached !== undefined) {
+    normalizedTcgBattleAbilityTextCache.delete(text)
+    normalizedTcgBattleAbilityTextCache.set(text, cached)
+    return cached
+  }
+
+  const lowerCase = text.replace(/[’]/g, "'").toLowerCase()
+  const normalized = /[^\x00-\x7f]/.test(lowerCase)
+    ? lowerCase.normalize('NFD').replace(/\p{Diacritic}/gu, '')
+    : lowerCase
+
+  if (normalizedTcgBattleAbilityTextCache.size >= NORMALIZED_TCG_BATTLE_ABILITY_TEXT_CACHE_LIMIT) {
+    const oldestText = normalizedTcgBattleAbilityTextCache.keys().next().value
+    if (oldestText !== undefined) normalizedTcgBattleAbilityTextCache.delete(oldestText)
+  }
+  normalizedTcgBattleAbilityTextCache.set(text, normalized)
+  return normalized
 }
 
 export function getTcgBattleCoinFlipStatusPower(text: string): TcgBattleStatusCondition | null {
@@ -30147,6 +30169,24 @@ export type OpponentTcgBattleAction =
   | { kind: 'charge' }
   | { kind: 'end' }
 
+type OpponentTcgBattleBoardIndex = {
+  playerCards: Map<string, TcgBattleCardState>
+  opponentCards: Map<string, TcgBattleCardState>
+  playerFrontIds: Set<string>
+  opponentFrontIds: Set<string>
+  playerLivingCount: number
+}
+
+function createOpponentTcgBattleBoardIndex(state: TcgBattleState): OpponentTcgBattleBoardIndex {
+  return {
+    playerCards: new Map([...state.player.front, ...state.player.back].map((card) => [card.instanceId, card])),
+    opponentCards: new Map([...state.opponent.front, ...state.opponent.back].map((card) => [card.instanceId, card])),
+    playerFrontIds: new Set(state.player.front.map((card) => card.instanceId)),
+    opponentFrontIds: new Set(state.opponent.front.map((card) => card.instanceId)),
+    playerLivingCount: getLivingTcgBattleCards(state.player).length,
+  }
+}
+
 // NPC attack scoring is performed while resolving the player's server action.
 // One deterministic outcome sample keeps it bounded even when many attacks
 // and targets are legal.
@@ -30249,6 +30289,7 @@ function scoreOpponentAttackResolution(
   attacker: TcgBattleCardState,
   target: TcgBattleCardState,
   resolution: TcgBattleAttackResolution,
+  boardIndex: OpponentTcgBattleBoardIndex,
 ): { score: number; damage: number; frontKnockOut: boolean } {
   const damageByCard = new Map<string, number>()
   const addDamage = (cardId: string, amount: number) => {
@@ -30263,17 +30304,16 @@ function scoreOpponentAttackResolution(
   let damage = 0
   let frontKnockOut = false
   for (const [cardId, amount] of damageByCard) {
-    const sideKey: TcgBattleSide | undefined = [...state.player.front, ...state.player.back].some((card) => card.instanceId === cardId)
+    const sideKey: TcgBattleSide | undefined = boardIndex.playerCards.has(cardId)
       ? 'player'
-      : [...state.opponent.front, ...state.opponent.back].some((card) => card.instanceId === cardId)
+      : boardIndex.opponentCards.has(cardId)
         ? 'opponent'
         : undefined
     if (!sideKey) continue
-    const side = state[sideKey]
-    const card = [...side.front, ...side.back].find((entry) => entry.instanceId === cardId)
+    const card = (sideKey === 'player' ? boardIndex.playerCards : boardIndex.opponentCards).get(cardId)
     if (!card) continue
     const effectiveDamage = Math.min(card.currentHp, amount)
-    const isFront = side.front.some((entry) => entry.instanceId === cardId)
+    const isFront = sideKey === 'player' ? boardIndex.playerFrontIds.has(cardId) : boardIndex.opponentFrontIds.has(cardId)
     const isEnemy = sideKey === 'player'
     const weight = isEnemy ? (isFront ? 1 : 0.78) : (isFront ? -1.2 : -0.9)
     score += effectiveDamage * weight
@@ -30281,7 +30321,7 @@ function scoreOpponentAttackResolution(
     if (amount >= card.currentHp) {
       score += isEnemy ? (isFront ? 25 : 14) : -30
       if (isEnemy && isFront) frontKnockOut = true
-      if (isEnemy && getLivingTcgBattleCards(side).length === 1) score += 35
+      if (isEnemy && boardIndex.playerLivingCount === 1) score += 35
     }
   }
   if (resolution.selfKnockOut) score -= 42
@@ -30343,9 +30383,10 @@ function scoreOpponentAttackOption(
   attack: TcgBattleAttack,
   target: TcgBattleCardState,
   attackIndex: number,
-  choice?: TcgBattleAttackChoice,
+  choice: TcgBattleAttackChoice | undefined,
+  energyCost: number,
+  boardIndex: OpponentTcgBattleBoardIndex,
 ): OpponentTcgBattleAttackOption {
-  const energyCost = getEffectiveTcgBattleAttackCost(state, attack, attacker, 'opponent')
   const sampleScores: number[] = []
   let knockoutSamples = 0
   let expectedDamage = 0
@@ -30371,7 +30412,7 @@ function scoreOpponentAttackOption(
       choice,
       random,
     })
-    const outcome = scoreOpponentAttackResolution(state, attacker, target, resolution)
+    const outcome = scoreOpponentAttackResolution(state, attacker, target, resolution, boardIndex)
     sampleScores.push(outcome.score)
     expectedDamage += outcome.damage
     if (outcome.frontKnockOut) knockoutSamples += 1
@@ -30406,6 +30447,7 @@ function scoreOpponentAttackOption(
 function getOpponentAttackOptions(state: TcgBattleState, attackerFilter?: string): OpponentTcgBattleAttackOption[] {
   const maxCost = getAllowedTcgBattleAttackCost(state.turnNumber)
   const options: OpponentTcgBattleAttackOption[] = []
+  const boardIndex = createOpponentTcgBattleBoardIndex(state)
 
   for (const attacker of state.opponent.front.filter((card) => card.currentHp > 0)) {
     if (attackerFilter && attacker.instanceId !== attackerFilter) continue
@@ -30413,20 +30455,23 @@ function getOpponentAttackOptions(state: TcgBattleState, attackerFilter?: string
     if (!isTcgBattleSummaryUnlocked(attacker, state.turnNumber)) continue
     for (const [attackIndex, attack] of getTcgBattleAvailableAttacks(state, 'opponent', attacker).entries()) {
       if (isTcgBattleAttackDisabled(attacker, attackIndex)) continue
+      const attackEffect = getTcgBattleAttackEffect(attack)
       const cost = getEffectiveTcgBattleAttackCost(state, attack, attacker, 'opponent')
       if (cost > maxCost || cost > state.opponent.energy) continue
       for (const target of getValidTcgBattleTargets(state, 'opponent', attacker, attack)) {
-        const choice = chooseTcgBattleAttackChoice({
-          state,
-          sideKey: 'opponent',
-          attacker,
-          attack,
-          target,
-          paidAttackCost: cost,
-        })
-        const requirement = getTcgBattleAttackEffect(attack)?.choiceRequirement
+        const requirement = attackEffect?.choiceRequirement
+        const choice = requirement
+          ? chooseTcgBattleAttackChoice({
+              state,
+              sideKey: 'opponent',
+              attacker,
+              attack,
+              target,
+              paidAttackCost: cost,
+            })
+          : undefined
         if (requirement && !choice && !isOptionalBenchChoiceSatisfied(requirement, state, 'opponent')) continue
-        options.push(scoreOpponentAttackOption(state, attacker, attack, target, attackIndex, choice))
+        options.push(scoreOpponentAttackOption(state, attacker, attack, target, attackIndex, choice, cost, boardIndex))
       }
     }
   }
@@ -32417,17 +32462,30 @@ function calculateTcgBattleProtection(
   return applied
 }
 
-export function getTcgBattleAttackEffect(attack: TcgBattleAttack): TcgBattleAttackEffect | null {
-  if (!attack.battleEffect) return inferTcgBattleAttackEffect(attack)
+// Attack definitions are immutable during battle resolution, so inference and
+// legacy-effect normalization can be reused for repeated NPC scoring passes.
+const tcgBattleAttackEffectCache = new WeakMap<TcgBattleAttack, TcgBattleAttackEffect | null>()
 
-  // Battles already in progress can carry an effect inferred before the text
-  // bypass rule was added. Refresh this one flag without rebuilding the rest
-  // of the persisted attack effect.
-  return shouldIgnoreTcgWeaknessAndResistance(
-    normalizeTcgAttackText(attack.text || ''),
-  ) && !attack.battleEffect.ignoreWeaknessResistance
-    ? { ...attack.battleEffect, ignoreWeaknessResistance: true }
-    : attack.battleEffect
+export function getTcgBattleAttackEffect(attack: TcgBattleAttack): TcgBattleAttackEffect | null {
+  const cached = tcgBattleAttackEffectCache.get(attack)
+  if (cached !== undefined) return cached
+
+  let effect: TcgBattleAttackEffect | null
+  if (!attack.battleEffect) {
+    effect = inferTcgBattleAttackEffect(attack)
+  } else {
+    // Battles already in progress can carry an effect inferred before the text
+    // bypass rule was added. Refresh this one flag without rebuilding the rest
+    // of the persisted attack effect.
+    effect = shouldIgnoreTcgWeaknessAndResistance(
+      normalizeTcgAttackText(attack.text || ''),
+    ) && !attack.battleEffect.ignoreWeaknessResistance
+      ? { ...attack.battleEffect, ignoreWeaknessResistance: true }
+      : attack.battleEffect
+  }
+
+  tcgBattleAttackEffectCache.set(attack, effect)
+  return effect
 }
 
 export function getValidTcgBattleTargets(
