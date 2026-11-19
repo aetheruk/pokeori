@@ -569,6 +569,8 @@ export interface TcgBattleSideState {
   deck: TcgBattleCardSummary[]
   /** Public card count for a perspective whose opponent deck contents are hidden. */
   deckCount?: number
+  /** Identifies the copy drawn at the start of this side's turn. */
+  turnDraw?: { instanceId: string; turnNumber: number }
   hand: TcgBattleCardState[]
   front: TcgBattleCardState[]
   back: TcgBattleCardState[]
@@ -1325,6 +1327,7 @@ export function toTcgPvpPerspectiveState(
   // and selected Energy remain hidden until their public battle state allows it.
   opposingSide.deckCount = opposingSide.deck.length
   opposingSide.deck = []
+  delete opposingSide.turnDraw
   const clairvoyanceActive = [...ownSide.front, ...ownSide.back].some((provider) =>
     provider.currentHp > 0 &&
     !provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) &&
@@ -28974,7 +28977,7 @@ export function hasTcgBattleRecentRuleBoxKnockout(state: TcgBattleState, sideKey
 export interface TcgBattleEvolutionOption {
   targetId: string
   targetName: string
-  card: TcgBattleCardSummary
+  card: TcgBattleCardState
   effect?: 'pichuHeal' | 'eeveeHeal' | 'babyHeal' | 'azumarillFroth' | 'meganiumStage2' | 'dittoPrismStage1' | 'phantumpDamageEvolve'
   abilityIndex?: number
   abilityName?: string
@@ -29781,12 +29784,13 @@ export function applyTcgBattleEvolution(
   battleState?: TcgBattleState,
 ): { target: TcgBattleCardState; evolution: TcgBattleCardSummary; previousName: string } | null {
   const option = getTcgBattleEvolutionOptions(side, turnNumber, sideKey, opposingSide, playerGoesSecond).find(
-    (candidate) => candidate.targetId === targetId && candidate.card.id === evolutionCardId,
+    (candidate) => candidate.targetId === targetId &&
+      (candidate.card.instanceId === evolutionCardId || candidate.card.id === evolutionCardId),
   )
   if (!option) return null
   const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId)
   if (!target) return null
-  const evolutionHandIndex = side.hand.findIndex((card) => card.id === option.card.id)
+  const evolutionHandIndex = side.hand.findIndex((card) => card.instanceId === option.card.instanceId)
   if (evolutionHandIndex < 0) return null
   if ((option.effect === 'meganiumStage2' || option.effect === 'dittoPrismStage1') && option.abilitySourceId !== undefined && option.abilityIndex !== undefined && option.abilityName) {
     const provider = [...side.front, ...side.back].find((card) => card.instanceId === option.abilitySourceId)

@@ -122,6 +122,8 @@ using the [deployment guide](/docs/development/deployment.md).
 
 ## Isolated browser and security integration
 
+`bun run test:e2e e2e/tcg-battle.pw.ts` opens the real battle client at `/ui-test/tcg-battle` with an isolated action transport. It checks the dock and hand bounds on narrow phones, short landscape, and desktop, card inspection, turn draw markers, front and Bench placement, Evolution choices, KO/deck totals, and one-time damage cues after both NPC and PvP state updates. The browser tests save board, hand, and Evolution target screenshots in `test-results/`.
+
 `e2e/ufo-catcher.pw.ts` exercises the real UFO cabinet at mobile and desktop
 widths using a deterministic local transport. It checks cabinet/control bounds,
 keyboard focus-loss release, pointer release outside the control, and persistent

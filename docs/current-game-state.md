@@ -27,6 +27,8 @@ The Viridian Chansey Pokemon Center Wheel is now repeatable without a daily atte
 
 The Pewter School TCG lessons now match the live battle rules: three-card opening and Basic redraw, one to three opening front-row Basics, front-before-Bench placement, automatic turn-start draws, shared Energy and Charge, free Basic plays/evolution, supported-effects wording, and the six-Knockout/empty-board loss conditions. The quiz now asks about front-row slots and battle loss conditions.
 
+The TCG battle table shows each side's KO losses, deck count, and Energy. The hand highlights the specific copy drawn at the start of the turn. Plain Evolution resolves by choosing the card and its board target, with additional prompts for effects that need a decision. Damage feedback follows fresh battle events in NPC and PvP play.
+
 Secret Wonders Unown [Z] can use ZERO once per turn from the Bench when its deck is empty, moving itself to the top of that deck. PvE and PvP are supported.
 
 Holon Phantoms Crawdaunt ex can use Splash Back once per turn, while free of Special Conditions, to return one opposing Benched Pokémon and its Evolution cards to the opponent's hand when they have at least four Benched Pokémon. Player, PvP, and automatic NPC use are supported.

@@ -15,7 +15,7 @@ describe('TCG battle completion navigation', () => {
       'window.dispatchEvent(new Event(ACTIVITY_STARTED_EVENT))',
     )
     const startAction = source.indexOf(
-      'startTcgBattle(encounter.id)',
+      'actions.start(encounter.id)',
       startEvent,
     )
     const returnHandler = source.indexOf('const returnToExplore = async () =>')

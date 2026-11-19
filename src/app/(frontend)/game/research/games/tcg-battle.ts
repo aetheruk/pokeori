@@ -1845,6 +1845,7 @@ function finishByStallIfNeeded(state: TcgBattleState) {
 
 function drawTcgBattleTurnStartCard(state: TcgBattleState, sideKey: TcgBattleSide) {
   const side = state[sideKey]
+  delete side.turnDraw
   const card = side.deck.shift()
   if (!card) return
   const turnStartBenchAbility = (card.abilities || []).find((ability) => {
@@ -1864,7 +1865,9 @@ function drawTcgBattleTurnStartCard(state: TcgBattleState, sideKey: TcgBattleSid
     return
   }
   side.hand.push(drawnCard)
-  state.log.unshift(`${sideKey === 'player' ? 'Player' : 'Opponent'} drew ${card.name} at the start of the turn.`)
+  side.turnDraw = { instanceId: drawnCard.instanceId, turnNumber: state.turnNumber }
+  const drawnName = state.battleMode === 'pvp' ? 'a card' : card.name
+  state.log.unshift(`${sideKey === 'player' ? 'Player' : 'Opponent'} drew ${drawnName} at the start of the turn.`)
 
   const psychicTurnStartText = 'at the beginning of your turn, if this pokemon is in the active spot, put a random {p} pokemon from your deck into your hand.'
   const psychicSearchProvider = side.front.find((active) =>
@@ -11936,7 +11939,9 @@ export async function tcgBattleEvolve(
             return 'It is not your turn.'
           }
           const opposingSide = state[viewerSide === 'player' ? 'opponent' : 'player']
-          const evolutionOption = getTcgBattleEvolutionOptions(state[viewerSide], state.turnNumber, viewerSide, opposingSide, state.playerGoesSecond).find((option) => option.targetId === targetId && option.card.id === evolutionCardId)
+          const evolutionOption = getTcgBattleEvolutionOptions(state[viewerSide], state.turnNumber, viewerSide, opposingSide, state.playerGoesSecond).find(
+            (option) => option.targetId === targetId && (option.card.instanceId === evolutionCardId || option.card.id === evolutionCardId),
+          )
           const hasEvolutionHealPower = evolutionOption?.effect === 'pichuHeal' || evolutionOption?.effect === 'eeveeHeal' || evolutionOption?.effect === 'babyHeal'
           const usesEvolutionHealPower = effectTargetId === 'pichuHeal' || effectTargetId === 'eeveeHeal' || effectTargetId === 'babyHeal'
           const hasMiloticHealPower = Boolean(evolutionOption && hasTcgBattleEvolutionMassHealEffect(evolutionOption.card))
@@ -12078,7 +12083,9 @@ export async function tcgBattleEvolve(
       if (state.phase !== 'battle' || state.activeSide !== 'player') {
         return { success: false, error: 'It is not your turn.' }
       }
-      const evolutionOption = getTcgBattleEvolutionOptions(state.player, state.turnNumber, 'player', state.opponent, state.playerGoesSecond).find((option) => option.targetId === targetId && option.card.id === evolutionCardId)
+      const evolutionOption = getTcgBattleEvolutionOptions(state.player, state.turnNumber, 'player', state.opponent, state.playerGoesSecond).find(
+        (option) => option.targetId === targetId && (option.card.instanceId === evolutionCardId || option.card.id === evolutionCardId),
+      )
       const hasEvolutionHealPower = evolutionOption?.effect === 'pichuHeal' || evolutionOption?.effect === 'eeveeHeal' || evolutionOption?.effect === 'babyHeal'
       const usesEvolutionHealPower = effectTargetId === 'pichuHeal' || effectTargetId === 'eeveeHeal' || effectTargetId === 'babyHeal'
       const hasMiloticHealPower = Boolean(evolutionOption && hasTcgBattleEvolutionMassHealEffect(evolutionOption.card))
