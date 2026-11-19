@@ -30140,7 +30140,10 @@ export type OpponentTcgBattleAction =
   | { kind: 'charge' }
   | { kind: 'end' }
 
-const OPPONENT_ATTACK_SCORE_SAMPLES = 4
+// NPC attack scoring is performed while resolving the player's server action.
+// One deterministic outcome sample keeps it bounded even when many attacks
+// and targets are legal.
+const OPPONENT_ATTACK_SCORE_SAMPLES = 1
 
 function createOpponentDecisionRandom(seed: string): () => number {
   let value = 2166136261
@@ -30330,11 +30333,11 @@ function getOpponentAttackSuccessChance(attacker: TcgBattleCardState, attack: Tc
 function scoreOpponentAttackOption(
   state: TcgBattleState,
   attacker: TcgBattleCardState,
+  attack: TcgBattleAttack,
   target: TcgBattleCardState,
   attackIndex: number,
   choice?: TcgBattleAttackChoice,
 ): OpponentTcgBattleAttackOption {
-  const attack = getTcgBattleAvailableAttacks(state, 'opponent', attacker)[attackIndex]
   const energyCost = getEffectiveTcgBattleAttackCost(state, attack, attacker, 'opponent')
   const sampleScores: number[] = []
   let knockoutSamples = 0
@@ -30416,7 +30419,7 @@ function getOpponentAttackOptions(state: TcgBattleState, attackerFilter?: string
         })
         const requirement = getTcgBattleAttackEffect(attack)?.choiceRequirement
         if (requirement && !choice && !isOptionalBenchChoiceSatisfied(requirement, state, 'opponent')) continue
-        options.push(scoreOpponentAttackOption(state, attacker, target, attackIndex, choice))
+        options.push(scoreOpponentAttackOption(state, attacker, attack, target, attackIndex, choice))
       }
     }
   }
@@ -30450,6 +30453,40 @@ export function chooseOpponentTcgBattleAction(state: TcgBattleState): OpponentTc
   if (attack) return { kind: 'attack', option: attack }
   if (canSideChargeEnergy(state, 'opponent')) return { kind: 'charge' }
   return { kind: 'end' }
+}
+
+export function canTcgBattlePokemonAttack(
+  state: TcgBattleState,
+  sideKey: TcgBattleSide,
+  attacker: TcgBattleCardState,
+  assumeActive = false,
+): boolean {
+  const side = state[sideKey]
+  if (
+    attacker.currentHp <= 0 ||
+    (!assumeActive && !side.front.some((card) => card.instanceId === attacker.instanceId)) ||
+    !isTcgBattleAbilityAttackAllowed(state, sideKey, attacker) ||
+    !isTcgBattleSummaryUnlocked(attacker, state.turnNumber)
+  ) return false
+
+  const maxCost = getAllowedTcgBattleAttackCost(state.turnNumber)
+  return getTcgBattleAvailableAttacks(state, sideKey, attacker).some((attack, attackIndex) => {
+    if (isTcgBattleAttackDisabled(attacker, attackIndex)) return false
+    const cost = getEffectiveTcgBattleAttackCost(state, attack, attacker, sideKey)
+    if (cost > maxCost || cost > side.energy) return false
+    return getValidTcgBattleTargets(state, sideKey, attacker, attack).some((target) => {
+      const requirement = getTcgBattleAttackEffect(attack)?.choiceRequirement
+      const choice = requirement ? chooseTcgBattleAttackChoice({
+        state,
+        sideKey,
+        attacker,
+        attack,
+        target,
+        paidAttackCost: cost,
+      }) : undefined
+      return !requirement || Boolean(choice) || isOptionalBenchChoiceSatisfied(requirement, state, sideKey)
+    })
+  })
 }
 
 export function canSideTakeTcgBattleAction(state: TcgBattleState, sideKey: TcgBattleSide): boolean {
