@@ -3,6 +3,7 @@ import { FUJI_GLASSES_ITEM_ID } from '@/data/items/special-item-ids'
 import { KANTO_GYM_CHRONICLES } from '@/data/gym-leader-chronicles'
 import {
   FISHER_SECRET_BOOKS,
+  FORTUNE_CHANNELING_CONTENT,
   SPIRIT_CHANNELING_ACTIVITY_PREFIX,
   type SpiritChannelerRequirement,
   type SpiritChannelingIncenseItemId,
@@ -20,6 +21,78 @@ export type SpiritChannelingConfig = SpiritChannelerRequirement & {
   requiredEnergy: SpiritChannelingEnergy
   rewards: LocationReward[]
 }
+
+const fortuneChannelingRequirements: Array<
+  SpiritChannelerRequirement & {
+    mementoItemId: string
+    requiredEnergy: SpiritChannelingEnergy
+  }
+> = [
+  {
+    mementoItemId: 'nugget',
+    requiredEnergy: { steel: 28 },
+    channelerMinLevel: 10,
+  },
+  {
+    mementoItemId: 'big-nugget',
+    requiredEnergy: { steel: 63 },
+    channelerMinLevel: 25,
+  },
+  {
+    mementoItemId: 'pearl',
+    requiredEnergy: { water: 24 },
+    channelerMinLevel: 10,
+    channelerType: 'water',
+  },
+  {
+    mementoItemId: 'big-pearl',
+    requiredEnergy: { water: 57 },
+    channelerMinLevel: 25,
+    channelerType: 'water',
+  },
+  {
+    mementoItemId: 'stardust',
+    requiredEnergy: { psychic: 39 },
+    channelerMinLevel: 15,
+    channelerFormId: '35',
+  },
+  {
+    mementoItemId: 'star-piece',
+    requiredEnergy: { psychic: 68 },
+    channelerMinLevel: 30,
+    channelerFormId: '36',
+  },
+  {
+    mementoItemId: 'rare-bone',
+    requiredEnergy: { ground: 46 },
+    channelerMinLevel: 20,
+    channelerType: 'ground',
+  },
+  {
+    mementoItemId: 'big-mushroom',
+    requiredEnergy: { grass: 34 },
+    channelerMinLevel: 15,
+    channelerFormId: '47',
+  },
+  {
+    mementoItemId: 'tiny-mushroom',
+    requiredEnergy: { grass: 21 },
+    channelerMinLevel: 10,
+    channelerFormId: '46',
+  },
+  {
+    mementoItemId: 'comet-shard',
+    requiredEnergy: { psychic: 77 },
+    channelerMinLevel: 35,
+    channelerType: 'fairy',
+  },
+  {
+    mementoItemId: 'balmmushroom',
+    requiredEnergy: { grass: 52 },
+    channelerMinLevel: 25,
+    channelerType: 'grass',
+  },
+]
 
 export const SPIRIT_CHANNELING_CONFIGS: SpiritChannelingConfig[] = [
   {
@@ -75,6 +148,32 @@ export const SPIRIT_CHANNELING_CONFIGS: SpiritChannelingConfig[] = [
         {
           type: 'item' as const,
           targetId: book.itemId,
+          quantity: 1,
+          dropChance: 100,
+        },
+      ],
+    }
+  }),
+  ...FORTUNE_CHANNELING_CONTENT.map((content) => {
+    const requirements = fortuneChannelingRequirements.find(
+      (entry) => entry.mementoItemId === content.mementoItemId,
+    )
+    if (!requirements) {
+      throw new Error(
+        `Missing channeling requirements for ${content.mementoItemId}`,
+      )
+    }
+
+    return {
+      id: `${content.mementoItemId}-fortune-memory`,
+      name: content.bookName,
+      description: `A fortune hidden in the ${content.mementoItemId.replaceAll('-', ' ')}.`,
+      ...requirements,
+      correctIncenseItemId: 'incense-fortune' as const,
+      rewards: [
+        {
+          type: 'item' as const,
+          targetId: content.bookItemId,
           quantity: 1,
           dropChance: 100,
         },

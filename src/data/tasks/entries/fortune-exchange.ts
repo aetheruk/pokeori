@@ -1,0 +1,40 @@
+import type { Task } from '../../types'
+import { FORTUNE_CHANNELING_CONTENT } from '@/data/spirit-channeling-public'
+
+export const fortuneExchangeTasks: Task[] = FORTUNE_CHANNELING_CONTENT.map(
+  (ritual) => ({
+    id: ritual.taskId,
+    name: ritual.taskName,
+    description: ritual.taskDescription,
+    category: 'Kanto',
+    subCategory: ritual.subCategory,
+    icon: { type: 'item', id: ritual.mementoItemId },
+    repeatable: true,
+    secret: true,
+    completionTrigger: 'manual',
+    completeButtonText: 'Exchange Item',
+    requirements: [{ type: 'item_owned', targetId: ritual.bookItemId }],
+    criteria: [
+      {
+        type: 'item_owned',
+        targetId: ritual.mementoItemId,
+        count: 1,
+        consume: true,
+      },
+    ],
+    rewards: [
+      {
+        type: 'currency',
+        targetId: 'pokedollars',
+        quantity: ritual.payout,
+        dropChance: 100,
+      },
+    ],
+    exitModal: {
+      title: ritual.exitTitle,
+      icon: { type: 'item', id: ritual.mementoItemId },
+      message: ritual.exitMessage,
+      closeButtonText: ritual.closeButtonText,
+    },
+  }),
+)
