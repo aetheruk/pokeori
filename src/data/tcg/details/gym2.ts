@@ -1957,7 +1957,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "",
+        "damage": "50",
         "text": "Flip a coin. If tails, this attack does nothing."
       }
     ],
@@ -3839,7 +3839,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 1,
-        "damage": "",
+        "damage": "20",
         "text": "Flip a coin. If tails, this attack does nothing."
       },
       {
@@ -4091,7 +4091,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "",
+        "damage": "30",
         "text": "Flip a coin. If tails, this attack does nothing."
       },
       {
@@ -4227,7 +4227,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fighting"
         ],
         "convertedEnergyCost": 1,
-        "damage": "",
+        "damage": "20",
         "text": "Flip a coin. If tails, this attack does nothing."
       },
       {
@@ -4744,7 +4744,7 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 1,
-        "damage": "",
+        "damage": "20",
         "text": "Flip a coin. If tails, this attack does nothing."
       },
       {

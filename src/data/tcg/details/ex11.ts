@@ -4900,7 +4900,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 2,
-        "damage": "10+",
+        "damage": "10",
         "text": ""
       }
     ],

@@ -37,40 +37,52 @@ export type TcgBattleStatusCondition = 'asleep' | 'poisoned' | 'burned' | 'paral
 export type TcgBattleCountSource =
   | { kind: 'bench'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'pokemonInPlay'; side: 'own' | 'opponent' | 'both'; excludeAttacker?: boolean }
+  | { kind: 'pokemonWithAbilitiesInPlay'; side: 'own' | 'opponent' | 'both'; zone?: 'bench' | 'play' }
   | { kind: 'injuredPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play' }
   | { kind: 'injuredPokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[]; zone: 'bench' | 'play' }
   | { kind: 'injuredPokemonNameContains'; side: 'own' | 'opponent' | 'both'; nameContains: string; zone: 'bench' | 'play' }
   | { kind: 'deckSize'; side: 'own' | 'opponent' }
   | { kind: 'knockouts' | 'remainingKnockouts'; side: 'own' | 'opponent' }
   | { kind: 'damageCounters'; target: 'attacker' | 'target' }
+  | { kind: 'chosenSelfDamageCounters' }
+  | { kind: 'selectedOwnPokemonDamageCounters' }
   | { kind: 'damageCountersOnSide'; side: 'own' | 'opponent' | 'both'; zone: 'front' | 'bench' | 'play' }
   | { kind: 'damageCountersOnTypesInPlay'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; types: string[] }
+  | { kind: 'damageCountersOnSubtypesInPlay'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; subtypes: string[] }
   | { kind: 'damageCountersOnNamedPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; names: string[] }
   | { kind: 'damageCountersOnNamedPokemonContains'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; nameContains: string }
   | { kind: 'energyOnTarget' }
   | { kind: 'retreatCost'; target: 'attacker' | 'target' }
   | { kind: 'pokemonInDiscard'; side: 'own' | 'opponent'; max?: number; includeSubtypes?: string[]; all?: boolean }
+  | { kind: 'pokemonInLostZone'; side: 'own' | 'opponent'; excludeSubtypes?: string[] }
   | { kind: 'pokemonOfTypesInDiscard'; side: 'own' | 'opponent'; types: string[]; max?: number }
   | { kind: 'pokemonWithAttackInDiscard'; side: 'own' | 'opponent'; attackName: string }
   | { kind: 'namedPokemonInDiscard'; side: 'own' | 'opponent'; names: string[]; max?: number }
   | { kind: 'deltaPokemonInPlay'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'pokemonExInPlay'; side: 'own' | 'opponent' }
+  | { kind: 'pokemonExOrGxOnBench'; side: 'own' | 'opponent' }
+  | { kind: 'pokemonWithAbilityInDiscard'; side: 'own' | 'opponent'; abilityName: string }
   | { kind: 'pokemonEvolvedInPlay'; side: 'own' | 'opponent' | 'both' }
+  | { kind: 'pokemonNotEvolvedInPlay'; side: 'own' | 'opponent' }
   | { kind: 'pokemonEvolvedFromInPlay'; side: 'own' | 'opponent' | 'both'; evolvesFrom: string }
   | { kind: 'pokemonEvolvedOnBench'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'pokemonOfTypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[]; zone?: 'bench' | 'play' }
+  | { kind: 'pokemonHealedThisTurn'; side: 'own' | 'opponent' | 'both'; types?: string[] }
   | { kind: 'pokemonOfTypesWithSubtypesInPlay'; side: 'own' | 'opponent' | 'both'; types: string[]; subtypes: string[]; zone: 'bench' | 'play' }
   | { kind: 'distinctTypesInPlay'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play' }
   | { kind: 'retreatCostOnNamedPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; names: string[] }
   | { kind: 'pokemonWithAttack'; side: 'own' | 'opponent' | 'both'; attackName: string; zone: 'bench' | 'play' }
+  | { kind: 'pokemonWithAttackInDeck'; side: 'own' | 'opponent'; attackName: string; position: 'top' | 'bottom'; maxCards: number }
   | { kind: 'distinctTypesOfNamedPokemon'; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play'; nameContains: string }
   | { kind: 'distinctTypesOfPokemonWithSubtypesInPlay'; side: 'own' | 'opponent' | 'both'; subtypes: string[]; zone: 'bench' | 'play' }
   | { kind: 'handSize'; side: 'own' | 'opponent'; max?: number }
+  | { kind: 'pokemonNamesInHand'; side: 'own' | 'opponent'; names: string[] }
+  | { kind: 'distinctTypesInHand'; side: 'own' | 'opponent' }
   | { kind: 'chosenHandCards' }
   | { kind: 'unusedEnergy' }
   | { kind: 'chosenEnergy' }
   | { kind: 'energy'; side: 'own' | 'opponent' | 'both'; max?: number }
-  | { kind: 'energyOfType'; side: 'own' | 'opponent'; type: TcgBattleEnergyType }
+  | { kind: 'energyOfType'; side: 'own' | 'opponent' | 'both'; type: TcgBattleEnergyType }
   | {
       kind: 'namedPokemon'
       side: 'own' | 'opponent' | 'both'
@@ -89,6 +101,12 @@ export type TcgBattleCountSource =
 
 export type TcgBattleDamageRule =
   | { kind: 'fixed'; amount: number }
+  | { kind: 'previousTurnAttackBonus'; baseDamage: number; bonusDamage: number; requiredAttackName?: string; requiredPokemonName?: string; requiredSubtype?: string; excludeAttacker?: boolean; sameAttacker?: boolean }
+  | { kind: 'targetLegacyAbilityBonus'; baseDamage: number; bonusDamage: number; abilityTypes: string[] }
+  | { kind: 'powerUseHistoryBonus'; baseDamage: number; bonusDamage: number; checkSide: 'own' | 'opponent'; powerKind: 'gx' | 'vstar' }
+  | { kind: 'targetDamageState'; undamagedDamage: number; damagedDamage: number }
+  | { kind: 'attackerBecameActiveThisTurnBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'targetBecameActiveLastTurnBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'zeroOnTails'; amount: number }
   | { kind: 'zeroIfAnyTails'; amount: number; coinFlipCount: number }
   | { kind: 'coinCount'; amountPerHeads: number; coinFlipCount: number; exactHeads?: number }
@@ -110,25 +128,34 @@ export type TcgBattleDamageRule =
   | { kind: 'positiveComparativeCount'; baseDamage: number; perUnitDamage: number; addSource: TcgBattleCountSource; subtractSource: TcgBattleCountSource }
   | { kind: 'weightedCount'; baseDamage: number; sources: { source: TcgBattleCountSource; perUnitDamage: number; maxUnits?: number }[] }
   | { kind: 'countComparisonBonus'; baseDamage: number; bonusDamage: number; addSource: TcgBattleCountSource; subtractSource: TcgBattleCountSource }
-  | { kind: 'countEqualityBonus'; baseDamage: number; bonusDamage: number; firstSource: TcgBattleCountSource; secondSource: TcgBattleCountSource; minimumUnits?: number }
+  | { kind: 'prizeTotalThresholdBonus'; baseDamage: number; bonusDamage: number; maximumPrizeTotal: number }
+  | { kind: 'countEqualityBonus'; baseDamage: number; bonusDamage: number; firstSource: TcgBattleCountSource; secondSource: TcgBattleCountSource; minimumUnits?: number; exactUnits?: number[] }
   | { kind: 'evolvedTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'targetSubtypeBonus'; baseDamage: number; bonusDamage: number; subtype: string }
+  | { kind: 'targetTypeAnyBonus'; baseDamage: number; bonusDamage: number; targetTypes: string[] }
   | { kind: 'pokemonExOrGxTargetBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'pokemonVOrGxTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'pokemonExOrVTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'pokemonVTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'targetTypeBonus'; baseDamage: number; bonusDamage: number; targetType: string }
+  | { kind: 'targetTypeMultiplier'; baseDamage: number; multiplier: number; targetType: string }
   | { kind: 'evolvedFromBonus'; baseDamage: number; bonusDamage: number; evolvesFrom: string }
+  | { kind: 'evolvedThisTurnBonus'; baseDamage: number; bonusDamage: number; evolvesFrom: string }
   | { kind: 'retreatCostZeroBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'knockOutLowestRemainingHp' }
   | { kind: 'knockOutAtDamageCounters'; minimumCounters: number; maximumCounters?: number }
+  | { kind: 'knockOutTargetSubtype'; subtype: string }
   | { kind: 'handSizeComparisonBonus'; baseDamage: number; bonusDamage: number; comparison: 'equal' | 'more' }
   | { kind: 'attackerDamagedBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'emptyHandBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'namedPokemonSetBonus'; baseDamage: number; bonusDamage: number; side: 'own' | 'opponent'; names: string[]; zone?: 'bench' | 'play' }
+  | { kind: 'sameNameInPlayBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'sameNameInHandsBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'namedPokemonBenchBonus'; baseDamage: number; bonusDamage: number; injuredBonusDamage: number; nameContains: string }
   | { kind: 'stage2TargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'deltaSpeciesTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'namedTargetBonus'; baseDamage: number; bonusDamage: number; names: string[] }
+  | { kind: 'targetNameContainsBonus'; baseDamage: number; bonusDamage: number; nameContains: string }
   | { kind: 'resistanceTypeBonus'; baseDamage: number; bonusDamage: number; resistanceType: string }
   | { kind: 'targetResistanceBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'darknessOrNameTargetBonus'; baseDamage: number; bonusDamage: number; nameContains: string }
@@ -136,26 +163,32 @@ export type TcgBattleDamageRule =
   | { kind: 'handDiscardBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'pokemonExTargetBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'damagedTargetBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'wasDamagedAsActiveLastTurnBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'remainingHpComparisonBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'attackerRemainingHpLessBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'attackerRemainingHpAtMostBonus'; baseDamage: number; bonusDamage: number; maximumHp: number }
   | { kind: 'selectedEnergyTypeMatchBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'attackerHpExactBonus'; baseDamage: number; bonusDamage: number; remainingHp: number }
+  | { kind: 'allBenchedInjuredBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'attackerFullHpBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'targetSubtypeKnockOut'; subtype: string }
   | { kind: 'knockOutAtRemainingHpAtMost'; maximumHp: number }
+  | { kind: 'knockOutAtDamageCountersAtLeast'; minimumCounters: number }
   | { kind: 'optionalChoiceBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'ownBenchDiscardBonus'; baseDamage: number; bonusDamagePerPokemon: number }
+  | { kind: 'choiceDamageCounterMultiplier'; damagePerCounter: number }
+  | { kind: 'secondPlayerFirstTurnBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'healthyTarget'; healthyDamage: number; damagedDamage: number }
   | { kind: 'headsTable'; damages: number[]; coinFlipCount: number }
   | { kind: 'headsBonusEachIfEnergyAvailable'; baseDamage: number; bonusDamage: number; coinFlipCount: number }
   | { kind: 'lastHitBonus'; baseDamage: number; bonusDamage: number }
-  | { kind: 'lastTurnKnockoutBonus'; baseDamage: number; bonusDamage: number; knockedOutNameContains?: string }
+  | { kind: 'lastTurnKnockoutBonus'; baseDamage: number; bonusDamage: number; knockedOutNameContains?: string; knockedOutType?: string }
   | { kind: 'statusBonus'; baseDamage: number; bonusDamage: number; statuses: TcgBattleStatusCondition[]; statusTarget?: 'attacker' | 'target' }
   | { kind: 'statusCountBonus'; baseDamage: number; bonusDamagePerStatus: number; statuses: TcgBattleStatusCondition[]; statusTarget?: 'attacker' | 'target' }
   | { kind: 'damageCounterThresholdBonus'; baseDamage: number; bonusDamage: number; minimumCounters: number }
   | { kind: 'targetStatusDamageCounterCount'; requiredStatus: TcgBattleStatusCondition; damagePerCounter: number }
   | { kind: 'healedThisTurnBonus'; baseDamage: number; bonusDamage: number }
-  | { kind: 'countThresholdBonus'; baseDamage: number; bonusDamage: number; source: TcgBattleCountSource; minimumUnits: number }
+  | { kind: 'countThresholdBonus'; baseDamage: number; bonusDamage: number; source: TcgBattleCountSource; minimumUnits: number; countIncludesPaidAttackCost?: boolean }
   | { kind: 'countAtMostBonus'; baseDamage: number; bonusDamage: number; source: TcgBattleCountSource; maximumUnits: number }
   | { kind: 'countInSetBonus'; baseDamage: number; bonusDamage: number; source: TcgBattleCountSource; units: number[] }
   | { kind: 'energyComparisonBonus'; baseDamage: number; bonusDamage: number }
@@ -166,8 +199,9 @@ export type TcgBattleDamageRule =
   | { kind: 'lastIncomingDamageBonus'; baseDamage: number }
 
 export type TcgBattleSelfDamageRule =
-  | { kind: 'fixed'; amount: number; condition?: TcgBattleCoinCondition }
+  | { kind: 'fixed'; amount: number; condition?: TcgBattleCoinCondition; requiresTargetCurrentHpAbove?: number; requiresTargetKnockOut?: boolean }
   | { kind: 'optionalChoice'; amount: number }
+  | { kind: 'choiceDamageCounters' }
   | { kind: 'damageCounters'; perCounterDamage: number; condition?: TcgBattleCoinCondition }
   | { kind: 'count'; perUnitDamage: number; source: TcgBattleCountSource; condition?: TcgBattleCoinCondition }
   | { kind: 'perHead'; amount: number }
@@ -182,6 +216,7 @@ export type TcgBattleEnergyDiscardRule = {
   requiresTargetSubtype?: string
   targetSubtype?: 'ex' | 'stage2'
   targetEvolved?: boolean
+  requiresPrizeTotalAtMost?: number
 }
 
 export type TcgBattleEnergyDiscardResolution = {
@@ -200,6 +235,7 @@ export type TcgBattleStatusRule = {
   requiresOptionalChoice?: boolean
   requiresTargetStatusAbsent?: TcgBattleStatusCondition
   requiresEnergy?: { side: 'own' | 'opponent'; minimum: number; maximum?: number }
+  requiresExtraEnergy?: number
   requiresAttackerStatus?: TcgBattleStatusCondition
   requiresTargetSubtype?: string
   requiresAttackerDamaged?: boolean
@@ -236,12 +272,18 @@ export type TcgBattleBenchDamageRule = {
   requiresEnergy?: { side: 'own' | 'opponent'; minimum: number }
   maxTargets?: number
   maxTargetsFrom?: TcgBattleCountSource
+  onlyDamaged?: boolean
   condition?: TcgBattleCoinCondition
+  excludeAttacker?: boolean
   excludeTarget?: boolean
+  randomAcrossBothSides?: boolean
   selectedEnergyType?: boolean
   typeFilter?: { include?: string[]; exclude?: string[] }
   subtypeFilter?: { include?: string[]; exclude?: string[] }
+  requiresAbilityTypes?: string[]
+  requiresAnyAbility?: boolean
   nameContains?: string[]
+  allowRepeatedTargets?: boolean
 }
 
 export type TcgBattleCounterDamageRule =
@@ -252,14 +294,18 @@ export type TcgBattleCounterDamageRule =
       side: 'own' | 'opponent' | 'both'
       maxTargets?: number
       condition?: TcgBattleCoinCondition
+      requiresCount?: { source: TcgBattleCountSource; minimum: number }
       requiresEnergy?: { side: 'own' | 'opponent'; minimum: number }
       zone?: 'bench' | 'front' | 'play'
       onlyDamaged?: boolean
       excludeAttacker?: boolean
       excludeTarget?: boolean
+      requiresAnyAbility?: boolean
       typeFilter?: { include?: string[]; exclude?: string[] }
+      requiresChosenType?: boolean
       perTargetCoinFlip?: boolean
     }
+  | { amountPerTargetDamageCounter: number; side: 'own' | 'opponent' | 'both'; zone?: 'bench' | 'front' | 'play'; maxTargets?: number; requiresCount?: { source: TcgBattleCountSource; minimum: number } }
   | { amountPerTargetRetreatCost: number; side: 'own' | 'opponent' | 'both'; zone?: 'bench' | 'front' | 'play'; condition?: TcgBattleCoinCondition }
   | {
       amount: number
@@ -281,21 +327,22 @@ export type TcgBattleCounterDamageRule =
     }
   | { amountPerHead: number; side: 'own' | 'opponent' | 'both'; zone?: 'bench' | 'play'; condition?: TcgBattleCoinCondition; excludeAttacker?: boolean; excludeTarget?: boolean }
   | { amountPerUnit: number; source: TcgBattleCountSource; target: 'self' | 'opponent' | 'target'; condition?: TcgBattleCoinCondition; maxUnits?: number; requiresTargetStatus?: TcgBattleStatusCondition }
-  | { target: 'opponent'; amountToLeaveHp: number }
+  | { target: 'opponent' | 'target'; amountToLeaveHp: number }
   | { target: 'self'; amountToLeaveHp: number }
   | { target: 'opponent'; amountToLeaveHpOfAttacker: true }
   | { amountToLeaveHp: number; side: 'own' | 'opponent' | 'both'; zone: 'bench' | 'play' }
 
 export type TcgBattleHealingRule =
   | { amount: number | 'all'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition; amountPerHead?: number; amountPerUnit?: number; source?: TcgBattleCountSource; requiresOwnBench?: boolean; requiresEnergy?: { side: 'own' | 'opponent'; minimum: number }; requiresTargetStatus?: TcgBattleStatusCondition }
-  | { target: 'selectedOwnBench'; amount: number | 'all'; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition; sameTypeAsAttacker?: boolean; subtypeFilter?: { include?: string[]; exclude?: string[] }; requiresTargetStatus?: TcgBattleStatusCondition }
+  | { target: 'selectedOwnBench'; amount: number | 'all'; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition; sameTypeAsAttacker?: boolean; subtypeFilter?: { include?: string[]; exclude?: string[] }; typeFilter?: string[]; requiresTargetStatus?: TcgBattleStatusCondition; damagedOnly?: boolean }
   | { target: 'selectedOwnPokemon'; amount: number | 'all'; condition?: TcgBattleCoinCondition; requiresTargetStatus?: TcgBattleStatusCondition }
-  | { amount: number | 'all'; side: 'own' | 'opponent' | 'both'; maxTargets?: number; condition?: TcgBattleCoinCondition; zone?: 'bench' | 'front' | 'play'; amountPerHead?: number; sameTypeAsAttacker?: boolean; subtypeFilter?: { include?: string[]; exclude?: string[] }; excludeAttacker?: boolean; nameContains?: string; requiresEnergy?: { side: 'own' | 'opponent'; minimum: number }; requiresTargetStatus?: TcgBattleStatusCondition }
+  | { amount: number | 'all'; side: 'own' | 'opponent' | 'both'; maxTargets?: number; condition?: TcgBattleCoinCondition; zone?: 'bench' | 'front' | 'play'; amountPerHead?: number; sameTypeAsAttacker?: boolean; typeFilter?: string[]; subtypeFilter?: { include?: string[]; exclude?: string[] }; excludeAttacker?: boolean; nameContains?: string; requiresEnergy?: { side: 'own' | 'opponent'; minimum: number }; requiresTargetStatus?: TcgBattleStatusCondition }
   | { target: 'self' | 'opponent'; amountFrom: 'damageDealt' | 'counterDamageDealt' | 'halfDamageDealtRoundedUp'; condition?: TcgBattleCoinCondition; requiresTargetStatus?: TcgBattleStatusCondition }
 
 export type TcgBattleEnergyGainRule = {
   target: 'self' | 'opponent'
   amount?: number
+  amountOnSecondPlayerFirstTurn?: number
   amountPerHead?: number
   amountPerUnit?: number
   maxAmount?: number
@@ -305,13 +352,22 @@ export type TcgBattleEnergyGainRule = {
   requiresDamageDealt?: boolean
   requiresSourceSurvival?: boolean
   requiresOwnBench?: boolean
+  requiresOwnBenchSubtype?: string
+  requiresOwnBenchCount?: number
 }
 
 export type TcgBattleAttackChoice =
+  | { kind: 'topDeckPokemon'; cardId: string }
+  | { kind: 'topDeckPokemonSet'; cardIds: string[] }
+  | { kind: 'playerSide'; side: TcgBattleSide }
   | { kind: 'copiedAttack'; attackIndex: number; followUp?: TcgBattleAttackChoice }
   | { kind: 'damageCounterTransfer'; sourceCardId?: string }
   | { kind: 'discardHandCards'; cardIds: string[] }
   | { kind: 'discardPokemonToHand'; cardId?: string; cardIds?: string[] }
+  | { kind: 'discardPokemonToBench'; cardIds: string[] }
+  | { kind: 'discardOwnBenchPokemon'; cardIds: string[] }
+  | { kind: 'selfDamageCounters'; amount: number }
+  | { kind: 'switchAndDeckEvolution'; benchCardId: string; evolutionCardId?: string }
   | { kind: 'ownPokemon'; cardId: string }
   | { kind: 'counterDistribution'; assignments: Array<{ cardId: string; counters: number }> }
   | { kind: 'disabledAttack'; attackIndex: number }
@@ -331,10 +387,17 @@ export type TcgBattleAttackChoice =
     }
 
 export type TcgBattleChoiceRequirement =
+  | 'topDeckPokemon'
+  | 'topDeckPokemonSet'
+  | 'playerSide'
   | 'copyAttack'
   | 'damageCounterTransfer'
   | 'discardHandCards'
   | 'discardPokemonToHand'
+  | 'discardPokemonToBench'
+  | 'discardOwnBenchPokemon'
+  | 'selfDamageCounters'
+  | 'switchAndDeckEvolution'
   | 'ownPokemon'
   | 'counterDistribution'
   | 'disableAttack'
@@ -352,26 +415,48 @@ export type TcgBattleChoiceRequirement =
   | 'textureMagic'
 
 export type TcgBattleSpecialRule =
-  | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; includeResistanceTypes?: string[]; includeSelectedEnergyType?: boolean; destination?: 'bench' | 'hand'; random?: boolean; condition?: TcgBattleCoinCondition; treatAsBasic?: boolean; damageCountersOnSearch?: number; oneOfEachName?: boolean; oneOfEachType?: boolean }
+  | { kind: 'coinFlipKnockOutActiveOrSelectedBenchBasic' }
+  | { kind: 'drawDeckEndCards'; positions: Array<'top' | 'bottom'> }
+  | { kind: 'shuffleBothHandsAndDrawOpponentHandCount' }
+  | { kind: 'knockOutTargetsAtRemainingHpAtMost'; maximumHp: number }
+  | { kind: 'devolveSelectedPokemon'; condition?: TcgBattleCoinCondition }
+  | { kind: 'devolveOpponentPokemon'; destination: 'hand' | 'deck'; all: boolean; condition?: TcgBattleCoinCondition }
+  | { kind: 'chooseTopDeckPokemonOrDiscardDraw'; drawCount: number; amount?: number }
+  | { kind: 'discardTopDeckChoosePokemonToHand'; amount: number }
+  | { kind: 'chooseTopDeckPokemonToHandAndLostZone'; revealCount: number; handCount: number }
+  | { kind: 'revealUntilBasicPokemonToHand' }
+  | { kind: 'searchDeckPokemon'; maxCount: number; maxCountFrom?: TcgBattleCountSource; basicOnly?: boolean; includeBasic?: boolean; includeNames?: string[]; includeNameContains?: string[]; includeEvolvesFrom?: string[]; includeTypes?: string[]; includeTargetType?: boolean; includeSubtypes?: string[]; excludeSubtypes?: string[]; includeResistanceTypes?: string[]; includeSelectedEnergyType?: boolean; destination?: 'bench' | 'hand' | 'discard' | 'lostZone' | 'topDeck'; random?: boolean; condition?: TcgBattleCoinCondition; requiresNameInPlay?: string; requiresOpponentEvolved?: boolean; requiresOwnBenchType?: TcgBattleEnergyType; treatAsBasic?: boolean; damageCountersOnSearch?: number; oneOfEachName?: boolean; oneOfEachType?: boolean; sameNameAsFirst?: boolean; evolveAttacker?: boolean; evolveTarget?: boolean; shuffleAfterEvolution?: boolean; topCardCount?: number; shuffleAfterReveal?: boolean; shuffleAfterSearch?: boolean }
+  | { kind: 'shuffleDeck'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
   | { kind: 'revealTopDeckPokemon'; amount: number; includeSubtypes: string[] }
-  | { kind: 'drawCards'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; amountPerUnit?: number; untilHandSize?: number; untilHandSizeMatches?: 'opponent'; source?: TcgBattleCountSource; shuffleHandIntoDeck?: boolean; condition?: TcgBattleCoinCondition; requiresDiscardChoice?: boolean }
+  | { kind: 'drawCards'; target: 'self' | 'opponent' | 'choice'; amount?: number; amountPerHead?: number; amountPerUnit?: number; maxUnits?: number; untilHandSize?: number; untilHandSizeMatches?: 'opponent' | 'opponentPlusOne'; onlyIfOwnHandAtMostOpponent?: boolean; source?: TcgBattleCountSource; shuffleHandIntoDeck?: boolean; condition?: TcgBattleCoinCondition; requiresDiscardChoice?: boolean; requiresOpponentEvolved?: boolean; requiresAttackerStatus?: TcgBattleStatusCondition; amountIfEvolutionUnder?: { name: string; amount: number }; maxHandSize?: number }
   | { kind: 'shuffleRandomHandCardIntoDeck'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; condition?: TcgBattleCoinCondition; revealSelected?: boolean }
-  | { kind: 'discardRandomHandCard'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; amountPerTail?: number; untilHandSize?: number; condition?: TcgBattleCoinCondition; requiresDiscardChoice?: boolean }
-  | { kind: 'discardSelectedHandPokemon' }
+  | { kind: 'discardRandomHandCard'; target: 'self' | 'opponent'; amount?: number; amountPerHead?: number; amountPerTail?: number; untilHandSize?: number; condition?: TcgBattleCoinCondition; requiresDiscardChoice?: boolean; extraAmountIfAttackerEvolvedFromThisTurn?: { name: string; amount: number } }
+  | { kind: 'discardSelectedHandPokemon'; destination?: 'discard' | 'lostZone' }
+  | { kind: 'discardSelectedOwnBenchPokemon' }
   | { kind: 'recoverRandomPokemonFromDiscardToHand'; amountPerHead: number }
-  | { kind: 'recoverPokemonFromDiscardToHand'; includeSubtypes?: string[]; includeNames?: string[]; includeTypes?: string[]; maxCount?: number; upTo?: boolean; condition?: TcgBattleCoinCondition }
+  | { kind: 'recoverPokemonFromDiscardToHand'; includeSubtypes?: string[]; includeNames?: string[]; includeTypes?: string[]; maxCount?: number; upTo?: boolean; amountPerHead?: number; condition?: TcgBattleCoinCondition; destination?: 'hand' | 'topDeck' }
+  | { kind: 'recoverPokemonFromDiscardToBench'; includeNames?: string[]; includeTypes?: string[]; includeSubtypes?: string[]; maxCount: number; upTo?: boolean; basicOnly?: boolean; requiresExtraEnergy?: number; energyPerPokemon?: number }
   | { kind: 'discardAllHandCards'; requiresOptionalChoice?: boolean }
   | { kind: 'returnOwnBenchToHand' }
-  | { kind: 'returnOwnPokemonToDeck'; requiresOptionalChoice?: boolean }
-  | { kind: 'returnOwnBenchToDeck' }
-  | { kind: 'returnTargetToHand'; condition?: TcgBattleCoinCondition }
-  | { kind: 'knockOutTarget'; requiresAnyTargetStatus?: boolean; requiresTargetStatus?: TcgBattleStatusCondition }
-  | { kind: 'transferDamageCounters'; maxCounters: number; sourceZone?: 'bench' | 'play'; sourceNameContains?: string }
+  | { kind: 'returnOpponentBenchToHand' }
+  | { kind: 'returnOwnPokemonToDeck'; requiresOptionalChoice?: boolean; requiresHealing?: boolean }
+  | { kind: 'returnOwnBenchToDeck'; condition?: TcgBattleCoinCondition }
+  | { kind: 'returnTargetToHand'; condition?: TcgBattleCoinCondition; requiresAlternateOpponentPokemon?: boolean }
+  | { kind: 'knockOutTarget'; requiresAnyTargetStatus?: boolean; requiresTargetStatus?: TcgBattleStatusCondition; consumeDelayedKnockOut?: boolean }
+  | { kind: 'armKnockOutOnNextDamage'; requiredAttackerSubtype?: string }
+  | { kind: 'lockOpponentAttacksForNextTurn' }
+  | { kind: 'increaseDefendingAttackCost'; amount: number; untilSourceLeaves?: boolean }
+  | { kind: 'increaseDefendingRetreatCost'; amount: number }
+  | { kind: 'ignoreOwnAttackCostsForTypes'; types: string[] }
+  | { kind: 'increasePoisonCheckupDamageOnce'; amount: number }
+  | { kind: 'armAttackBuffAfterPriorActiveDamage'; attackName: string; damageBonus: number }
+  | { kind: 'armAttackCoinCountOverride'; attackName: string; coinFlipCount: number }
+  | { kind: 'transferDamageCounters'; maxCounters: number; sourceZone?: 'bench' | 'play'; sourceNameContains?: string; sourceSubtypeContains?: string; sourceAttacker?: boolean }
   | { kind: 'transferDamageCountersFromOwnSide'; maxCountersPerPokemon: number }
-  | { kind: 'shuffleTargetIntoDeck'; requiresOpponentBench?: boolean; targetZone?: 'front' | 'bench' | 'selected'; condition?: TcgBattleCoinCondition }
-  | { kind: 'shuffleDiscardPokemonIntoDeck'; maxCount: number }
+  | { kind: 'shuffleTargetIntoDeck'; requiresOpponentBench?: boolean; targetZone?: 'front' | 'bench' | 'selected' | 'selectedChoice'; condition?: TcgBattleCoinCondition }
+  | { kind: 'shuffleDiscardPokemonIntoDeck'; maxCount: number; includeTypes?: string[]; condition?: TcgBattleCoinCondition }
   | { kind: 'revealHand'; target: 'self' | 'opponent' }
-  | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerHead?: number; amountPerOwnEnergy?: number; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition; requiresOptionalChoice?: boolean }
+  | { kind: 'millCards'; target: 'self' | 'opponent'; amount: number; amountPerHead?: number; amountPerOwnEnergy?: number; amountPerUnit?: number; source?: TcgBattleCountSource; condition?: TcgBattleCoinCondition; requiresOptionalChoice?: boolean; requiresAttackerDamaged?: boolean; position?: 'top' | 'random' }
   | {
       kind: 'switch'
       target: 'self' | 'opponent'
@@ -381,40 +466,54 @@ export type TcgBattleSpecialRule =
       ifCounterDamage?: boolean
       beforeDamage?: boolean
       poisonAfterSwitch?: boolean
+      opponentChooses?: boolean
     }
   | { kind: 'disableAttack'; condition?: TcgBattleCoinCondition; targetBasicOnly?: boolean }
   | { kind: 'buffAttack'; attackName?: string; attackNames?: string[]; target?: 'self' | 'opponent' | 'switchedOwn'; baseDamage?: number; damageBonus?: number; damageMultiplier?: number; selfDamageMultiplier?: number; condition?: TcgBattleCoinCondition }
-  | { kind: 'buffDefendingPokemon'; damageBonus: number }
+  | { kind: 'buffSideAttackDamage'; damageBonus: number; targetActiveOnly?: boolean; requiresExtraEnergyType?: TcgBattleEnergyType; minimumExtraEnergy?: number; extraPrizeOnDamageKnockout?: boolean }
+  | { kind: 'lockOpponentGxAttacks' }
+  | { kind: 'buffDefendingPokemon'; damageBonus: number; requiresOptionalChoice?: boolean }
   | { kind: 'blockTargeting'; condition?: TcgBattleCoinCondition; targetMaxHpAtMost?: number }
   | { kind: 'cannotAttack'; target?: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
   | { kind: 'disableSelfAttack'; attackName: string; condition?: TcgBattleCoinCondition; requiresOptionalChoice?: boolean }
   | { kind: 'preventRetreat'; target?: 'self' | 'opponent'; condition?: TcgBattleCoinCondition; untilSourceLeaves?: boolean; untilTargetLeaves?: boolean; sourceLeavesClears?: boolean }
+  | { kind: 'freeRetreat' }
   | { kind: 'preventSwitch'; condition?: TcgBattleCoinCondition; sourceLeavesClears?: boolean }
   | { kind: 'clearStatus'; target: 'self' | 'opponent'; statuses: TcgBattleStatusCondition[] }
   | { kind: 'clearStatusOnSide'; side: 'own' | 'opponent'; statuses: TcgBattleStatusCondition[] }
   | { kind: 'preventStatus'; target: 'self' | 'opponent'; statuses: TcgBattleStatusCondition[]; whileActive?: boolean }
-  | { kind: 'setStatus'; target: 'self' | 'opponent'; statuses: TcgBattleStatusCondition[] }
+  | { kind: 'setStatus'; target: 'self' | 'opponent'; statuses: TcgBattleStatusCondition[]; requiresRemainingPrizeCount?: number }
   | { kind: 'endure'; condition?: TcgBattleCoinCondition }
   | { kind: 'attackFailsOnTails'; condition?: TcgBattleCoinCondition }
   | { kind: 'grow'; maxHp: number; attackName: string; baseDamage: number; condition?: TcgBattleCoinCondition }
   | { kind: 'swapDamageCounters'; condition?: TcgBattleCoinCondition }
   | { kind: 'transferAllDamageCounters' }
-  | { kind: 'reviveDiscardPokemon'; side?: 'self' | 'opponent' }
-  | { kind: 'changeWeakness'; condition?: TcgBattleCoinCondition }
+  | { kind: 'reviveDiscardPokemon'; side?: 'self' | 'opponent'; restoreFullHp?: boolean }
+  | { kind: 'changeWeakness'; condition?: TcgBattleCoinCondition; fixedType?: TcgBattleEnergyType; expiresAfterTurns?: number }
   | { kind: 'changeResistance'; condition?: TcgBattleCoinCondition }
-  | { kind: 'changeType'; condition?: TcgBattleCoinCondition }
+  | { kind: 'changeType'; condition?: TcgBattleCoinCondition; target?: 'attacker' | 'defending'; expiresAfterTurns?: number }
+  | { kind: 'lockOnCoinOverride' }
+  | { kind: 'forceOpponentCoinFlipsToTails' }
+  | { kind: 'activeAttackDamageBonus'; cardName: string; amount: number; maximum: number }
+  | { kind: 'poisonCheckupBonus'; amount: number }
   | { kind: 'textureMagic' }
   | { kind: 'destinyBond' }
   | { kind: 'discardEnergyOnKnockout' }
   | { kind: 'mirrorLastDamage' }
+  | { kind: 'useOwnBenchPokemonAttack'; namePrefix?: string; subtype?: string }
+  | { kind: 'usePreviousEvolutionAttack'; freeCost?: boolean }
+  | { kind: 'useDiscardPokemonAttack'; type?: string; side?: 'self' | 'opponent'; freeCost?: boolean }
+  | { kind: 'usePreviousTurnAttack'; excludeGx?: boolean; sourceMustBeTarget?: boolean; requireCopyAttackerWasAlreadyInPlay?: boolean }
   | { kind: 'reflectDamage'; damageMultiplier?: number; reflectFixedDamage?: number; preventIncomingOnHeads?: boolean; coinGate?: TcgBattleCoinCondition }
   | { kind: 'placeMarker'; marker: 'lightningRod' | 'shockWave' }
   | { kind: 'markerDamage'; marker: 'lightningRod' | 'shockWave'; amount: number }
-  | { kind: 'copyAttack'; coinGate?: TcgBattleCoinCondition; preserveExtraCosts: boolean }
+  | { kind: 'copyAttack'; coinGate?: TcgBattleCoinCondition; preserveExtraCosts: boolean; excludeGx?: boolean; excludePokemonEx?: boolean; requireTera?: boolean; sourceScope?: 'target' | 'any' | 'bench' | 'ownBench' | 'ownPlay'; requiresEmptyHand?: boolean; freeCost?: boolean; sourceNameContains?: string; requiresCopiedAttackEnergy?: boolean }
+  | { kind: 'winIfRemainingPrizes'; count: number }
 
 export type TcgBattleStatusResolution = {
   target: 'self' | 'opponent' | 'ownActive'
   statuses: TcgBattleStatusCondition[]
+  requiresExtraEnergy?: number
 }
 
 export type TcgBattleIncomingAttackModifier =
@@ -431,13 +530,17 @@ export interface TcgBattleTemporaryEffects {
   pokemonPowerSuppression?: { remainingTurns: number }
   disabledAttack?: { attackIndex: number; remainingTurns: number }
   cannotAttack?: { remainingTurns: number }
+  attackCostIncrease?: { amount: number; remainingTurns: number; sourceId?: string; untilSourceLeaves?: boolean }
+  retreatCostIncrease?: { amount: number; remainingTurns: number }
+  knockOutOnNextAttackDamage?: { ownerSide: TcgBattleSide; remainingTurns: number; requiredAttackerSubtype?: string }
   cannotRetreat?: { remainingTurns: number; sourceId?: string; untilSourceLeaves?: boolean; untilTargetLeaves?: boolean }
   cannotSwitch?: { remainingTurns: number; sourceId?: string; untilSourceLeaves?: boolean }
   endure?: { remainingTurns: number }
   preventStatusConditions?: { statuses: TcgBattleStatusCondition[]; remainingTurns: number; whileActive?: boolean }
   attackFailsOnTails?: true
   cannotTarget?: { targetId: string; remainingTurns: number }
-  nextAttackBuff?: { attackName: string; attackNames?: string[]; baseDamage?: number; damageBonus?: number; damageMultiplier?: number; selfDamageMultiplier?: number; remainingTurns: number }
+  nextAttackBuff?: { attackName: string; attackNames?: string[]; baseDamage?: number; damageBonus?: number; damageMultiplier?: number; selfDamageMultiplier?: number; remainingTurns: number; requiresOwnCurrentActiveAttackDamageEvent?: boolean }
+  attackCoinCountOverride?: { attackName: string; coinFlipCount: number; remainingTurns: number }
   attackBaseDamageOverrides?: { attackName: string; baseDamage: number; turnNumber?: number }[]
   originalMaxHp?: number
   abilityHpBonus?: number
@@ -445,8 +548,18 @@ export interface TcgBattleTemporaryEffects {
   lastAttackTurnNumber?: number
   healedBySide?: TcgBattleSide
   weaknessType?: TcgBattleEnergyType
+  weaknessOverrideExpiresAtTurn?: number
   resistanceType?: TcgBattleEnergyType
   battleType?: TcgBattleEnergyType
+  battleTypeOverrideExpiresAtTurn?: number
+  activeAttackDamageBonus?: number
+  lockOnCoinOverride?: {
+    ownerSide: TcgBattleSide
+    targetId: string
+    targetEvolvedTurn?: number
+    targetBecameActiveTurn?: number
+    expiresTurn: number
+  }
   typeOverride?: string
   typeOverrides?: string[]
   typeOverrideOwner?: TcgBattleSide
@@ -456,13 +569,18 @@ export interface TcgBattleTemporaryEffects {
   weaknessValue?: string | null
   discardEnergyOnKnockout?: { remainingTurns: number }
   lostZoneOnKnockout?: true
+  extraKnockoutCountOnFaint?: number
+  knockoutPrizeReductionOnFaint?: number
   returnToHandOnKnockout?: true
+  returnToDeckOnKnockout?: true
   rescueEvolutionStackToHandOnKnockout?: true
   lastIncomingAttackDamage?: number
+  wasDamagedByAttackAsActiveLastTurn?: boolean
   lastNightEyesAttackBySide?: Partial<Record<TcgBattleSide, number>>
   lastAttackHitBySide?: Partial<Record<TcgBattleSide, number>>
   attackDamageTakenBuff?: { sourceSide: TcgBattleSide; damageBonus: number; remainingTurns: number }
   poisonCheckupBonus?: number
+  poisonCheckupBonusTurns?: number
   burnCheckupBonus?: number
 }
 
@@ -481,15 +599,28 @@ export interface TcgBattleAttackEffect {
   healing?: TcgBattleHealingRule[]
   energyGain?: TcgBattleEnergyGainRule[]
   protection?: TcgBattleProtectionRule[]
-  targetScope?: 'front' | 'bench' | 'any' | 'all'
+  targetScope?: 'front' | 'bench' | 'any' | 'all' | 'own' | 'ownBench'
   targetMustBeDamaged?: boolean
   targetMustBeUndamaged?: boolean
+  targetMustBeEvolved?: boolean
+  requiresOpenBench?: boolean
   targetMustBeLowestRemainingHp?: boolean
   targetMustHaveSubtype?: string
   targetMustHaveAnySubtype?: string[]
+  targetMustHaveAbilityTypes?: string[]
   targetMustHaveRemainingHpAtMost?: number
   targetMustHaveDamageCounters?: { minimum: number; maximum?: number }
+  requiredLostZoneCount?: number
+  oncePerGameVstar?: boolean
+  oncePerGameGx?: boolean
+  /** Attack can be used only once while the named Pokémon remains in play. */
+  onceWhilePokemonInPlay?: string
+  /** Attack can be used only on the second player's first turn. */
+  secondPlayerFirstTurnOnly?: boolean
+  previousTurnAttackRequirement?: { cardName: string; attackName: string }
   targetMustNotHaveSubtype?: string
+  requiresPrizeTotalAtMost?: number
+  requiresRemainingPrizeCount?: number
   attackerMustBeDamaged?: boolean
   targetMustHaveDeltaMark?: boolean
   minimumExtraEnergyDiscard?: number
@@ -497,14 +628,34 @@ export interface TcgBattleAttackEffect {
   ignoreWeakness?: boolean
   ignoreResistance?: boolean
   ignoreTargetDamageModifiers?: boolean
+  ignoreTargetDamageModifiersWhenCount?: { source: TcgBattleCountSource; minimumUnits: number }
   choiceRequirement?: TcgBattleChoiceRequirement
   choiceEnergyMax?: number
   choiceEnergyType?: TcgBattleEnergyType
+  choiceEnergyTypes?: TcgBattleEnergyType[]
   choiceAllowedTypes?: TcgBattleEnergyType[]
   choiceCounterCount?: number
+  choiceSelfDamageCounterMax?: number
+  choiceSelfDamageCountersUpToRemainingHp?: boolean
   choiceCounterCountFrom?: TcgBattleCountSource
+  choiceCounterCountMultiplier?: number
+  choiceCounterCountPerTarget?: number
+  choiceCounterTargetCount?: number
+  choiceCounterAllowRepeatedTargets?: boolean
+  choiceCounterTargetSubtypeFilter?: { include?: string[]; exclude?: string[] }
+  choiceCounterTargetZone?: 'bench' | 'play'
+  choiceCounterTargetDamage?: number
+  choiceOwnPokemonZone?: 'bench' | 'play'
+  choiceOwnPokemonSide?: 'any'
+  choiceOwnPokemonMustBeDamaged?: boolean
   choiceHandCardCount?: number
+  choiceHandCardMaxCount?: number
+  choiceHandCardRetreatCost?: number
+  choiceHandCardNames?: string[]
+  choiceHandCardSubtypes?: string[]
   optionalBonusPrompt?: string
+  optionalBonusYesLabel?: string
+  optionalBonusNoLabel?: string
   allowWhileAsleep?: boolean
   ignoreWeaknessResistanceOnBench?: boolean
   special?: TcgBattleSpecialRule[]
@@ -557,6 +708,14 @@ export interface TcgBattleCardState extends TcgBattleCardSummary {
   playedToBenchTurn?: number
   /** Turn on which this Basic Pokémon entered a front-row slot from hand. */
   playedToFrontTurn?: number
+  /** Turn number when this Pokémon moved from the Bench into a front-row slot. */
+  becameActiveTurn?: number
+  /** Turn number on which this Pokémon most recently evolved. */
+  evolvedTurn?: number
+  /** Attack-use locks whose card text lasts while the Pokémon remains in play. */
+  attacksUsedWhileInPlay?: string[]
+  /** Turn number on which this Pokémon has zero Retreat Cost from an attack effect. */
+  freeRetreatTurn?: number
   transformOriginal?: Pick<TcgBattleCardSummary, 'hp' | 'types' | 'weaknesses' | 'resistances' | 'convertedRetreatCost' | 'attacks'>
   evolutionStack?: TcgBattleCardSummary[]
   statusConditions?: TcgBattleStatusCondition[]
@@ -584,11 +743,19 @@ export interface TcgBattleSideState {
   energy: number
   selectedEnergy?: TcgBattleEnergyType
   /** Side-wide attack damage boosts active during the recorded turn. */
-  temporaryAttackDamageBoosts?: Array<{ type?: TcgBattleEnergyType; subtype?: string; cardName?: string; damageBonus: number; turnNumber: number; targetActiveOnly?: boolean }>
+  temporaryAttackDamageBoosts?: Array<{ type?: TcgBattleEnergyType; subtype?: string; cardName?: string; damageBonus: number; turnNumber: number; duration?: 'game'; targetActiveOnly?: boolean }>
   /** Side-wide damage reduction for the specified defending turn. */
   temporaryAttackDamageReduction?: { damageReduction: number; turnNumber: number }
+  /** Forces this side's coin flips to tails during a specified turn. */
+  temporaryCoinFlipOverride?: { result: 'tails'; turnNumber: number }
   /** A VSTAR Power has been used by this side during the current battle. */
   usedVstarPower?: boolean
+  /** A GX attack has been used by this side during the current battle. */
+  usedGxAttack?: boolean
+  /** Opponent GX attacks are disabled for the rest of this battle. */
+  gxAttacksLocked?: boolean
+  /** Damage Knock Outs by this side take one additional Prize equivalent. */
+  extraPrizeForDamageKnockout?: boolean
   /** Per-card Ability use records for cards whose effects resolve from deck/discard zones. */
   abilityUses?: Record<string, number>
 }
@@ -623,6 +790,8 @@ function tcgBattleRetreatScopeMatches(card: TcgBattleCardState, scopeText: strin
 
 export function getTcgBattleAbilityRetreatCost(side: TcgBattleSideState, card: TcgBattleCardState, opposingSide?: TcgBattleSideState, turnNumber?: number): number {
   let cost = card.convertedRetreatCost ?? 1
+  cost += card.temporaryEffects?.retreatCostIncrease?.amount || 0
+  if (turnNumber !== undefined && card.freeRetreatTurn === turnNumber) cost = 0
   const board = [...side.front, ...side.back].filter((pokemon) => pokemon.currentHp > 0)
   const abilityBoards = opposingSide ? [side, opposingSide] : [side]
   const allBoardCards = abilityBoards.flatMap((owner) => [...owner.front, ...owner.back].filter((pokemon) => pokemon.currentHp > 0))
@@ -1155,6 +1324,19 @@ export type TcgBattleLastAction = {
   privateRevealedCardIds?: string[]
 }
 
+export type TcgBattleAttackHistoryEntry = {
+  attackerId: string
+  cardName: string
+  subtypes: string[]
+  attackName: string
+  attack?: TcgBattleAttack
+}
+
+export type TcgBattleAttackHistoryTurn = {
+  turnNumber: number
+  attacks: TcgBattleAttackHistoryEntry[]
+}
+
 export interface TcgBattleState {
   userId: string
   encounterId: string
@@ -1177,8 +1359,12 @@ export interface TcgBattleState {
   resumeTurnAfterPromotion?: boolean
   /** One additional attack is available to this Pokémon after its Ability grants it. */
   extraAttackPending?: { side: TcgBattleSide; attackerId: string }
+  /** Prevents every Pokémon on this side from attacking for its next turn. */
+  opponentAttackLock?: { blockedSide: TcgBattleSide; sourceSide: TcgBattleSide }
+  /** Side-specific next-turn Energy cost override, including Pokémon entering play then. */
+  temporaryAttackCostIgnores?: { side: TcgBattleSide; types: string[]; remainingTurns: number }
   consecutivePasses: number
-  lastOpponentAttackKnockout?: Partial<Record<TcgBattleSide, { turnNumber: number; knockedOut: boolean; knockedOutNames?: string[]; knockedOutRuleBox?: boolean; knockedOutGrassPokemon?: boolean }>>
+  lastOpponentAttackKnockout?: Partial<Record<TcgBattleSide, { turnNumber: number; knockedOut: boolean; knockedOutNames?: string[]; knockedOutTypes?: string[]; knockedOutRuleBox?: boolean; knockedOutGrassPokemon?: boolean }>>
   winner?: TcgBattleSide | 'tie'
   lastDamageEvent?: {
     id: string
@@ -1248,6 +1434,7 @@ export interface TcgBattleState {
   ready?: Record<TcgBattleSide, boolean>
   revision?: number
   lastAction?: TcgBattleLastAction
+  attackHistoryBySide?: Partial<Record<TcgBattleSide, TcgBattleAttackHistoryTurn[]>>
   lastReactiveAbilityId?: string
   deadlineAt?: number
   pendingPromotions?: TcgBattleSide[]
@@ -1460,6 +1647,14 @@ export function normalizeTcgBattleEnergyType(value: unknown): TcgBattleEnergyTyp
     : null
 }
 
+function normalizeTcgBattleEnergySymbol(value: string): TcgBattleEnergyType | null {
+  const symbols: Record<string, TcgBattleEnergyType> = {
+    g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting',
+    d: 'Darkness', m: 'Metal', y: 'Fairy', c: 'Colorless',
+  }
+  return symbols[value.toLowerCase()] || null
+}
+
 function getTcgBattleGlobalEnergyReductions(state: TcgBattleState): Partial<Record<TcgBattleEnergyType, number>> {
   if (state.turnNumber < 15) return {}
   const reductions: Partial<Record<TcgBattleEnergyType, number>> = {}
@@ -1483,6 +1678,13 @@ export function getEffectiveTcgBattleAttackCost(
   let abilityCostReduction = 0
   let abilityEnergyMultiplier = 1
   if (attacker && sideKey) {
+    abilityCostIncrease += attacker.temporaryEffects?.attackCostIncrease?.amount || 0
+    const temporaryCostIgnore = state.temporaryAttackCostIgnores
+    if (
+      temporaryCostIgnore?.side === sideKey &&
+      state.activeSide === sideKey &&
+      attacker.types.some((type) => temporaryCostIgnore.types.includes(normalizeTcgBattleAbilityText(type)))
+    ) abilityCostReduction = baseCost
     const ownSide = state[sideKey]
     const ownBoard = [...ownSide.front, ...ownSide.back].filter((card) => card.currentHp > 0)
     const colorlessCost = costs.filter((cost) => normalizeTcgBattleEnergyType(cost) === 'Colorless').length
@@ -1544,6 +1746,49 @@ export function getEffectiveTcgBattleAttackCost(
     )) abilityCostReduction = Math.max(abilityCostReduction, 1)
     for (const ability of attackerAbilities) {
       const text = normalizeTcgBattleAbilityText(ability.text)
+      if (
+        normalizeTcgBattlePokemonName(attacker.name) === 'azumarill' &&
+        normalizeTcgBattleAbilityText(attack.name) === 'double-edge' &&
+        text.replace(/\s+/g, ' ').trim() === 'if you have any tera pokemon in play, this pokemon can use the double-edge attack for {p}.' &&
+        ownBoard.some((card) => card.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === 'tera'))
+      ) {
+        abilityCostReduction = Math.max(abilityCostReduction, Math.max(0, baseCost - 1))
+        continue
+      }
+      const normalizedAttackerName = normalizeTcgBattlePokemonName(attacker.name)
+      const normalizedAttackName = normalizeTcgBattlePokemonName(attack.name)
+      if (
+        normalizedAttackerName === 'rayquazaex' &&
+        hasTcgBattlePrizeAdvantage(state, sideKey) &&
+        text.replace(/\s+/g, ' ').trim() === "if you have more prize cards left than your opponent, the attack cost of rayquaza ex's special circuit is now lightning and rayquaza ex's sky-high claws is now lightning lightning."
+      ) {
+        if (normalizedAttackName === 'specialcircuit') {
+          abilityCostReduction = Math.max(abilityCostReduction, Math.max(0, baseCost - 1))
+          continue
+        }
+        if (normalizedAttackName === 'skyhighclaws') {
+          abilityCostReduction = Math.max(abilityCostReduction, Math.max(0, baseCost - 2))
+          continue
+        }
+      }
+      if (
+        normalizedAttackerName === 'latias' &&
+        normalizedAttackName === 'extracrush' &&
+        text.replace(/\s+/g, ' ').trim() === "if you have latios or latios ex in play, the attack cost of latias's extra crush is now lightning metal colorless." &&
+        ownBoard.some((card) => card.instanceId !== attacker.instanceId && normalizeTcgBattlePokemonName(card.name).startsWith('latios'))
+      ) {
+        abilityCostReduction = Math.max(abilityCostReduction, Math.max(0, baseCost - 3))
+        continue
+      }
+      if (
+        normalizedAttackerName === 'latios' &&
+        normalizedAttackName === 'psychicforce' &&
+        text.replace(/\s+/g, ' ').trim() === "if you have latias or latias ex in play, the attack cost of latios's psychic force is now lightning metal colorless." &&
+        ownBoard.some((card) => card.instanceId !== attacker.instanceId && normalizeTcgBattlePokemonName(card.name).startsWith('latias'))
+      ) {
+        abilityCostReduction = Math.max(abilityCostReduction, Math.max(0, baseCost - 3))
+        continue
+      }
       if (normalizeTcgBattleAbilityText(attacker.name) === 'noivern' && normalizeTcgBattleAbilityText(attack.name) === 'frightening howl' && text.replace(/\s+/g, ' ').trim() === 'if you have the same number of cards in your hand as your opponent, ignore all energy in the cost of frightening howl used by this pokemon.' && ownSide.hand.length === opponentSide.hand.length) {
         abilityCostReduction = Math.max(abilityCostReduction, baseCost)
         continue
@@ -1720,6 +1965,16 @@ export function getEffectiveTcgBattleAttackCost(
 }
 
 /** Checks supported passive attack requirements printed on the attacking Pokémon. */
+export function getTcgBattleRemainingPrizeCount(state: TcgBattleState, sideKey: TcgBattleSide): number {
+  const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+  return Math.max(0, 6 - (state[opponentKey].knockoutCount || 0))
+}
+
+function hasTcgBattlePrizeAdvantage(state: TcgBattleState, sideKey: TcgBattleSide): boolean {
+  const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+  return getTcgBattleRemainingPrizeCount(state, sideKey) > getTcgBattleRemainingPrizeCount(state, opponentKey)
+}
+
 export function isTcgBattleAbilityAttackAllowed(
   state: TcgBattleState,
   sideKey: TcgBattleSide,
@@ -1745,6 +2000,12 @@ export function isTcgBattleAbilityAttackAllowed(
   for (const ability of attackerAbilities) {
     const text = normalizeTcgBattleAbilityText(ability.text)
     if (normalizeTcgBattleAbilityText(attacker.name) === 'slaking' && text === "if slaking used any attacks during your last turn, slaking can't attack." && attacker.temporaryEffects?.lastAttackTurnNumber === state.turnNumber - 1) return false
+    const remainingPrizeAttackLock = text.match(/^if you have (?:exactly )?(.+?) prize cards? (?:left|remaining), this pokemon can't attack\.?$/)
+    if (remainingPrizeAttackLock?.[1] && remainingPrizeAttackLock[1].match(/\d+/g)?.map(Number).includes(getTcgBattleRemainingPrizeCount(state, sideKey))) return false
+    const opponentPrizeAttackLimit = text.match(/^this pokemon can't attack unless your opponent has (\d+) or fewer prize cards? remaining\.?$/)
+    if (opponentPrizeAttackLimit && getTcgBattleRemainingPrizeCount(state, opponentKey) > Number(opponentPrizeAttackLimit[1])) return false
+    const namedOpponentPrizeAttackLimit = text.match(/^[a-z0-9 '’-]+ can't attack until your opponent has (\d+) or less prize cards? left\.?$/)
+    if (namedOpponentPrizeAttackLimit && getTcgBattleRemainingPrizeCount(state, opponentKey) > Number(namedOpponentPrizeAttackLimit[1])) return false
     const rocketRequirement = text.match(/this pokemon can't attack unless you have (\d+) or more team rocket's pokemon in play/)
     if (rocketRequirement && countTeam('rocket', ownBoard) < Number(rocketRequirement[1])) return false
 
@@ -2135,6 +2396,7 @@ export function createTcgBattleCardState(card: TcgBattleCardSummary, index: numb
     ...card,
     instanceId: `${card.id}:${index}:${Math.random().toString(36).slice(2, 8)}`,
     currentHp: card.hp,
+    attacksUsedWhileInPlay: undefined,
   }
 }
 
@@ -2270,6 +2532,12 @@ export function doesTcgBattleSubtypeFilterMatch(
   )
 }
 
+export function doesTcgBattleTypeFilterMatch(types: string[], filter?: string[]): boolean {
+  if (!filter?.length) return true
+  const normalizedTypes = types.map((type) => type.toLowerCase())
+  return filter.some((type) => normalizedTypes.includes(type.toLowerCase()))
+}
+
 export function isCleanTcgAttackDamage(damage: string): boolean {
   return /^\d+$/.test(damage.trim())
 }
@@ -2286,19 +2554,3801 @@ export function getSupportedTcgBattleAttacks(attacks: TcgCardAttack[], setId?: s
 }
 
 export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string): TcgBattleAttackEffect | null {
-  const text = normalizeTcgAttackText(attack.text || '')
+  let text = normalizeTcgAttackText(attack.text || '')
+  const secondPlayerFirstTurnOnly = /^you can use this attack only if you go second, and only (?:during|on) your first turn\. (.+)$/.exec(text)
+  if (secondPlayerFirstTurnOnly) text = secondPlayerFirstTurnOnly[1]
+  const normalizedAttackName = (attack.name || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
   const ignoreWeaknessResistance = shouldIgnoreTcgWeaknessAndResistance(text)
   const normalizedDamage = normalizeTcgDamageText(attack.damage || '')
   const exactDamage = parseTcgAttackDamage(normalizedDamage)
   const baseDamage = parseTcgAttackBaseDamage(normalizedDamage)
+  const supporterPlayedBonus = text.match(/^if you played (?:a|any) supporter card(?: .+?)? from your hand during this turn, this attack does (?:\d+ more damage|\d+ damage plus \d+ more damage)\.$/)
+  if (supporterPlayedBonus) {
+    // Supporter cards are not represented in the Pokémon-only battle hand, so this bonus cannot be active.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^if you played candice from your hand during this turn, this attack does \d+ more damage, and your opponent's active pokemon is now paralyzed\.$/.test(text)) {
+    // Candice is a Supporter and cannot be played from the modeled Pokémon-only hand.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^draw a card\. if you didn't play any supporter card from your hand during this turn, draw 2 more cards\.$/.test(text)) {
+    // The modeled hand cannot contain Supporter cards, so Inquire always draws all three cards.
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: 3 }],
+    }
+  }
+  if (/^switch in 1 of your opponent's benched pokemon to the active spot\. if you do, this attack does 120 damage to the new active pokemon\. if you didn't play xerosic's machinations from your hand during this turn, this attack does nothing\.$/.test(text)) {
+    // Xerosic's Machinations is a Supporter and cannot be played in this battle format, so the attack does nothing.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^if you played koga's trap from your hand during this turn, this attack does 90 more damage\. if you played janine from your hand during this turn, prevent all damage done to this pokemon by attacks from basic pokemon during your opponent's next turn\.$/.test(text)) {
+    // Both named cards are Supporters and cannot be played from the modeled Pokémon-only hand.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^this attack does \d+ damage for each pokemon tool attached to all of your pokemon\.$/.test(text)) {
+    // Pokémon Tool attachments are not represented in battle state, so the count is zero.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^if (?:this pokemon|your opponent's active pokemon) has a pokemon tool(?: card)? attached(?: to it)?, this attack does \d+ more damage(?:, and your opponent's active pokemon is now confused)?\.$/.test(text) ||
+    /^if this pokemon has a pokemon tool card that has "[^\"]+" in its name attached to it, this attack does \d+ more damage\.$/.test(text) ||
+    /^if this pokemon has a [a-z -]+ card attached to it, this attack does \d+ more damage\.$/.test(text) && /karate belt|fairy charm/.test(text) ||
+    /^if you attached a pokemon tool card from your hand to this pokemon during this turn, this attack does \d+ more damage\.$/.test(text)) {
+    // The condition is false because Pokémon Tool attachments are not modeled.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^put any number of pokemon tool cards from your discard pile in the lost zone\. this attack does \d+ more damage for each card you put in the lost zone in this way\.$/.test(text)) {
+    // Pokémon Tool cards are absent from the modeled discard pile, so there are none to move or count.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^you may discard a combination of up to \d+ pokemon tool cards and rocket's secret machine cards from your hand, and then do \d+ damage plus \d+ more damage for each card you discarded\.$/.test(text)) {
+    // Pokémon Tools and Secret Machine Trainer cards cannot be present in the modeled hand.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^discard up to \d+ pokemon tools? from your opponent's pokemon\.$/.test(text)) {
+    // Pokémon Tool attachments are not represented in battle state.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^discard (?:a|all|up to \d+) pokemon tool(?: cards?)?(?: attached)? from (?:1 of |all of )?your opponent's (?:active )?pokemon\.$/.test(text) ||
+    /^discard all pokemon tools from all of your opponent's pokemon\.$/.test(text) ||
+    /^discard all pokemon tools from your opponent's active pokemon\.$/.test(text) ||
+    /^discard all pokemon tool cards from your opponent's active pokemon\.$/.test(text) ||
+    /^discard all pokemon tool cards attached to each of your opponent's pokemon\.$/.test(text) ||
+    /^discard (?:a|all|up to \d+) pokemon tool cards? attached to (?:the defending pokemon|1 of your opponent's pokemon|your opponent's pokemon)\.$/.test(text) ||
+    /^discard all pokemon tool cards attached to the defending pokemon\.$/.test(text)) {
+    // Pokémon Tool attachments are not represented in battle state.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^discard a random pokemon tool card from your opponent's hand\.$/.test(text)) {
+    // Pokémon Tool cards cannot be present in the modeled hand.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^move a pokemon tool card attached to .+\.(?: \(if an effect of this attack is prevented, this attack does nothing\.\))?$/.test(text)) {
+    // No Pokémon Tool attachments can be selected or moved.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^before doing damage, discard all pokemon tools from your opponent's active pokemon\. if you discarded a pokemon tool in this way, this attack does \d+ more damage(?:, and your opponent's active pokemon is now paralyzed)?\.$/.test(text) ||
+    /^before doing damage, discard all pokemon tool cards from your opponent's active pokemon\. if you discarded a pokemon tool card in this way, this attack does \d+ more damage(?:, and your opponent's active pokemon is now paralyzed)?\.$/.test(text) ||
+    /^if you discarded a pokemon tool card in this way, this attack does \d+ more damage(?:, and your opponent's active pokemon is now paralyzed)?\.$/.test(text) ||
+    /^before doing damage, discard all pokemon tools? cards? from your opponent's active pokemon\. if you discarded a pokemon tool card in this way, this attack does \d+ more damage(?:, and your opponent's active pokemon is now paralyzed)?\.$/.test(text) ||
+    /^before doing damage, you may discard any number of pokemon tools from your pokemon\. this attack does \d+ more damage for each card you discarded in this way\.$/.test(text)) {
+    // No Pokémon Tool attachments can be discarded, so dependent bonuses and Special Conditions do not occur.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^this attack does \d+ damage for each pokemon tool card in (?:the lost zone|your discard pile)(?: \(both yours and your opponent's\))?\.(?: then, shuffle those cards into your deck\.)?$/.test(text)) {
+    // Pokémon Tool cards are absent from both the Lost Zone and discard pile.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^this attack does \d+ damage for each pokemon tool card attached to all pokemon\.$/.test(text) ||
+    /^this attack does \d+ damage to each of your opponent's pokemon that has a pokemon tool(?: card)? attached\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?$/.test(text) ||
+    /^put \d+ damage counters? on each of your opponent's pokemon that has a pokemon tool card attached to it\.$/.test(text)) {
+    // No Pokémon has a modeled Tool attachment.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^choose any number of your benched pokemon that don't already have a pokemon tool attached to them\. for each of those pokemon, search your deck for a pokemon tool card and attach it to that pokemon\. then, shuffle your deck\.$/.test(text) ||
+    /^choose up to \d+ of your benched pokemon that have no pokemon tools attached to them\. for each of those pokemon, search your deck for a pokemon tool card and attach it to that pokemon\. shuffle your deck afterward\.$/.test(text)) {
+    // Pokémon Tool cards are absent from the modeled deck.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for a pokemon tool card, a supporter card, and a basic energy card, show them to your opponent, and put them into your hand\. shuffle your deck afterward\.$/.test(text) ||
+    /^search your deck for a technical machine or pokemon tool card, show it to your opponent, and put it into your hand\. shuffle your deck afterward\.$/.test(text)) {
+    // These searches cannot find their eligible non-Pokémon cards.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^look at your opponent's hand\. if your opponent has any pokemon tool or technical machine cards in his or her hand, put those cards on top of his or her deck\. your opponent shuffles his or her deck afterward\.$/.test(text) ||
+    /^look at your opponent's hand\. choose all technical machine and pokemon tool cards there and put them into his or her deck\. your opponent shuffles the deck afterward\.$/.test(text)) {
+    // Technical Machine Trainer cards and Pokémon Tools cannot be present in the modeled hand.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^choose up to \d+ in any combination of pokemon tool cards and technical machine cards in play \(both yours and your opponent's\) and discard them\. this attack does \d+ damage times the number of cards discarded in this way\.$/.test(text)) {
+    // Neither Pokémon Tools nor Technical Machine cards are represented in play.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^search your deck for up to 6 item cards, reveal them, and put them into your hand\. then, shuffle your deck\. \(you can't use more than 1 gx attack in a game\.\)$/.test(text)) {
+    // Item cards are absent from the modeled deck; the GX usage limit is still applied from the printed rider.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, special: [{ kind: 'shuffleDeck', target: 'self' }] }
+  }
+  if (/^search your deck for (?:a|an|up to \d+) (?:trainer|supporter|item|stadium) cards?(?: \(excluding supporter cards\))?, (?:show|reveal) (?:it|them)(?: to your opponent)?, and put (?:it|them) into your hand\. (?:then, )?shuffle your deck(?: afterward)?\.$/.test(text)) {
+    // Trainer, Supporter, Item, and Stadium cards are absent from the modeled deck and hand.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for a moomoo milk card, show it to your opponent, and put it into your hand\. shuffle your deck afterward\.$/.test(text)) {
+    // Moomoo Milk is absent from the Pokémon-only deck, but the printed deck shuffle still resolves.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, special: [{ kind: 'shuffleDeck', target: 'self' }] }
+  }
+  if (/^for each energy attached to this pokemon, search your deck for a trainer card, reveal it, and put it into your hand\. then, shuffle your deck\.$/.test(text)) {
+    // Trainer cards are absent from the deck; preserve the printed shuffle after the empty searches.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, special: [{ kind: 'shuffleDeck', target: 'self' }] }
+  }
+  if (/^flip a coin\. if heads, (?:you may )?search your deck for (?:a trainer card|an item card),? (?:show it to your opponent|reveal it),? and put it into your hand\. (?:then, )?shuffle your deck(?: afterward)?\.$/.test(text) ||
+    /^flip a coin\. if heads, you may search your deck for a trainer card\. show it to your opponent and put it into your hand\. shuffle your deck afterward\.$/.test(text)) {
+    // Trainer and Item cards are absent; retain the coin flip and its conditional deck shuffle.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, coinFlipCount: 1, special: [{ kind: 'shuffleDeck', target: 'self', condition: 'heads' }] }
+  }
+  if (/^look at the top 5 cards of your deck\. choose as many trainer cards as you like, show them to your opponent, and put them into your hand\. put the other cards back on top of your deck\. shuffle your deck afterward\.$/.test(text)) {
+    // The Pokémon-only deck has no Trainer cards to take; the revealed cards return before the printed shuffle.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, special: [{ kind: 'shuffleDeck', target: 'self' }] }
+  }
+  if (/^search your deck for a trainer, supporter, or stadium card, show it to your opponent, and put it into your hand\. shuffle your deck afterward\.$/.test(text) ||
+    /^search your deck for a supporter card and a stadium card, reveal them, and put them into your hand\. then, shuffle your deck\.$/.test(text)) {
+    // Every eligible card in these searches is absent from the modeled deck.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for a trainer card, show it to your opponent, and put it into your hand\. if that card is a pokemon tool card, you may attach it to 1 of your pokemon instead\. shuffle your deck afterward\.$/.test(text) ||
+    /^search your deck for an item card, reveal it, and put it into your hand\. then, shuffle your deck\. if that card is a pokemon tool card, instead of putting it into your hand, you may attach it to 1 of your pokemon that doesn't already have a pokemon tool attached to it\.$/.test(text)) {
+    // Trainer and Item cards are absent from the modeled deck, so no Tool can be found either.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for a pokemon tool card or rocket's secret machine card, show it to your opponent, and put it into your hand\. if you do, you may switch rocket's meowth with 1 of your benched pokemon\. shuffle your deck afterward\.$/.test(text)) {
+    // Pokémon Tools and Secret Machine Trainer cards are absent, so no Pokémon is switched.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your discard pile for pokemon tool cards and rocket's secret machine cards\. you may either show 1 pokemon tool card or rocket's secret machine card to your opponent and put it into your hand, or show a combination of 3 pokemon tool cards or rocket's secret machine cards to your opponent and shuffle them into your deck\.$/.test(text)) {
+    // Neither Pokémon Tools nor Secret Machine Trainer cards are represented in the discard pile.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^put up to \d+ in any combination of item cards and pokemon tool cards from your discard pile into your hand\.$/.test(text) ||
+    /^your opponent reveals their hand\. discard all item cards and pokemon tool cards you find there\.$/.test(text)) {
+    // Item and Pokémon Tool cards are absent from the modeled hand and discard pile.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^shuffle \d+ item cards from your discard pile into your deck\.$/.test(text)) {
+    // Item cards are absent from the modeled discard pile, so Salvage has nothing to return.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^put (?:a|an|\d+|up to \d+) (?:(?:fusion strike )?trainer|supporter|item|stadium|pokemon tool) cards? from your discard pile into your hand\.$/.test(text)) {
+    // Trainer, Supporter, Item, and Stadium cards are absent from the modeled discard pile and hand.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your discard pile for (?:a|an|up to \d+) (?:trainer|supporter|item|stadium) cards?, (?:show|reveal) (?:it|them)(?: to your opponent)?, and put (?:it|them) into your hand\.$/.test(text)) {
+    // Trainer, Supporter, and Item cards are absent from the modeled discard pile and hand.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your discard pile for a basic pokemon \(or evolution card\), a trainer card, and an energy card\. show them to your opponent and put them into your hand\.$/.test(text)) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 1, upTo: true }],
+    }
+  }
+  if (/^search your discard pile for a trainer card or a supporter card, show it to your opponent, and put it into your hand\.$/.test(text) ||
+    /^search your discard pile for a trainer card, show it to your opponent, an put it into your hand\.$/.test(text)) {
+    // The Pokémon-only discard pile contains no Trainer or Supporter cards.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^flip a coin\. if heads, search your discard pile for a trainer card, show it to your opponent, and put it into your hand\.$/.test(text)) {
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, coinFlipCount: 1 }
+  }
+  if (/^flip a coin\. if heads, choose a trainer card from your discard pile, show it to your opponent, and then shuffle it into your deck\.$/.test(text)) {
+    // Trainer cards are absent from the Pokémon-only discard pile, so the coin-gated retrieval has no target.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, coinFlipCount: 1 }
+  }
+  if (/^if [^.]*stadium[^.]* in play, this attack does (?:\d+ more damage|\d+ damage plus \d+ more damage)\.$/.test(text) ||
+    /^if [^.]*stadium[^.]* in play, this attack does (?:\d+ more damage|\d+ damage plus \d+ more damage)\. (?:then, )?discard (?:that|a) stadium(?: card)?(?: in play)?\.$/.test(text)) {
+    // Stadium cards are not represented in battle state, so the condition is false and its discard is empty.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^if magnetic storm is in play, this attack does \d+ damage plus \d+ more damage\.$/.test(text)) {
+    // Magnetic Storm is a Stadium and cannot be in the modeled play area.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^this attack does \d+ damage to each opponent's pokemon for each pokemon tool and stadium card your opponent has in play\.(?: don't apply weakness and resistance for benched pokemon\.)?$/.test(text)) {
+    // Neither Pokémon Tools nor Stadium cards are represented in play, so the count is zero.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^choose 1 of your opponent's pokemon\. this attack does \d+ damage to that pokemon for each pokemon tool and stadium card your opponent has in play\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?$/.test(text)) {
+    // Neither Pokémon Tools nor Stadium cards are represented in play, so the selected Pokémon takes no damage.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^you may discard a stadium in play\. if you do, this attack does \d+ more damage\.$/.test(text)) {
+    // No Stadium is in play, so the optional discard and its damage bonus cannot occur.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^discard (?:a|any) stadium(?: card)? in play\.$/.test(text)) {
+    // Stadium cards are absent from the modeled in-play zone.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for a stadium card and play it\. shuffle your deck afterward\.$/.test(text)) {
+    // Stadium cards are absent from the modeled deck and play area.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for (?:a|\d+|up to \d+) pokemon tool cards?, reveal (?:it|them), and put (?:it|them) into your hand\. (?:then, )?shuffle your deck(?: afterward)?\.$/.test(text) ||
+    /^flip a coin\. if heads, search your deck for a pokemon tool card, reveal it, and put it into your hand\. shuffle your deck afterward\.$/.test(text)) {
+    // Pokémon Tool cards are absent from the modeled deck and hand.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for up to \d+ pokemon tool cards and attach them to any of your pokemon \(excluding pokemon that already have a pokemon tool attached to them\)\. shuffle your deck afterward\.$/.test(text)) {
+    // Pokémon Tool cards are absent from the modeled deck.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  const absentSupporterCopyEffect = text.includes('supporter card') &&
+    /use (?:the effect of that card|its effect|the effect of a supporter card|it as the effect of this attack)/.test(text) &&
+    /your opponent's hand|opponent reveals (?:his or her|their) hand|your opponent's discard pile|your discard pile|if you have a supporter card in play/.test(text) &&
+    !text.includes('prize card')
+  if (absentSupporterCopyEffect || /^your opponent reveals (?:his or her|their) hand\. discard all supporter cards you find there\. \(you can't use more than 1 gx attack in a game\.\)$/.test(text)) {
+    // Supporter cards are absent from the modeled hand, discard pile, and play area.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^(?:flip a coin\. if heads, )?(?:your opponent|you opponent) can't play (?:any )?(?:trainer|supporter|item) cards?(?: from (?:his or her|their) hand)? (?:during|until) (?:the end of )?(?:your opponent's|his or her|their) next turn\.$/.test(text) ||
+    /^flip a coin\. if heads, your opponent can't play a trainer card from his or her hand until the end of your opponent's next turn\.$/.test(text) ||
+    /^flip a coin\. if heads, your opponent can't play any trainer, supporter, or stadium cards from his or her hand during his or her next turn\.$/.test(text) ||
+    /^your opponent can't play trainer cards during his or her next turn\.$/.test(text) ||
+    /^you opponent can't play any trainer cards from his or her hand during your opponent's next turn\.$/.test(text)) {
+    // Trainer, Supporter, and Item cards are absent, so these play restrictions have no effect.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, ...(secondPlayerFirstTurnOnly ? { secondPlayerFirstTurnOnly: true } : {}) }
+  }
+  if (/^if you have a supporter card in play, use the effect of that card as the effect of this attack\.$/.test(text)) {
+    // Supporter cards are absent from the modeled play area.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for a supporter card named iris, reveal it, and put it into your hand\. shuffle your deck afterward\.$/.test(text)) {
+    // Iris is a Supporter and cannot be in the Pokémon-only modeled deck.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^search your deck for a supporter card and discard it\. shuffle your deck afterward\. then, use the effect of that card as the effect of this attack\.$/.test(text) ||
+    /^flip a coin\. if heads, search your deck for a supporter card, reveal it, and put it into your hand\. (?:then, )?shuffle your deck(?: afterward)?\.$/.test(text) ||
+    /^put a random supporter card from your deck into your hand\.$/.test(text)) {
+    // Supporter cards are absent from the modeled deck, so no follow-on effect occurs.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^your opponent reveals (?:his or her|their) hand\. (?:choose a supporter card you find there\. your opponent shuffles that card into their deck\.|choose a supporter card you find there and put it on the bottom of their deck\.|you may have your opponent shuffle a supporter card you find there into his or her deck\. if you do, your opponent draws a card\.|you may choose a supporter card you find there\. if you do, your opponent plays that supporter card\. however, you make all decisions for that card\. \(that supporter card is discarded\.\))$/.test(text)) {
+    // Supporter cards cannot be selected from the modeled opponent hand.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^flip a coin\. if heads, look at your opponent's hand\. if (?:he or she|they) has any trainer cards there, choose 1 of them\. your opponent shuffles that card into (?:his or her|their) deck\.$/.test(text)) {
+    // Trainer cards are absent from the opponent's Pokémon-only hand, so the coin-gated effect has no target.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, coinFlipCount: 1 }
+  }
+  if (/^flip a coin\. if heads, discard all trainer cards attached to your opponent's pokemon\.$/.test(text)) {
+    // Trainer attachments are not represented in battle state, so the coin-gated discard has no target.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, coinFlipCount: 1 }
+  }
+  if (/^your opponent reveals (?:his or her|their) hand\.$/.test(text)) {
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+  if (/^your opponent reveals (?:his or her|their) hand\. discard all item cards you find there\.$/.test(text)) {
+    // The hand is revealed, but it contains no Item cards to discard.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, special: [{ kind: 'revealHand', target: 'opponent' }] }
+  }
+  if (/^choose a card from your opponent's hand without looking and discard it\. if you discarded a trainer, supporter, or stadium card, choose 1 more card from your opponent's hand without looking and discard it\.$/.test(text)) {
+    // The blind discard is a random Pokémon; its non-Pokémon-card bonus cannot trigger in the modeled hand.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 }, special: [{ kind: 'discardRandomHandCard', target: 'opponent', amount: 1 }] }
+  }
+  if (/^reveal any number of moomoo milk cards in your hand\. this attack does \d+ damage for each card you revealed in this way\.$/.test(text)) {
+    // Moomoo Milk is an Item and cannot be present in the Pokémon-only modeled hand.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^if (?:rosa's encouragement|jessie & james) is in your discard pile, this attack does \d+ more damage\.$/.test(text) && baseDamage !== null) {
+    // These named Supporter cards cannot be present in the Pokémon-only discard pile.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (/^you may discard an item card from your hand\. if you do, this attack does \d+ more damage\.$/.test(text) && baseDamage !== null) {
+    // Item cards are absent from the Pokémon-only modeled hand, so the optional cost and bonus are unavailable.
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  if (/^look at your opponent's hand\. you may have your opponent shuffle a supporter card you find there into his or her deck\. if you do, your opponent draws a card\.$/.test(text)) {
+    // The hand contains no Supporter cards, so neither the shuffle nor conditional draw occurs.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^you may discard (?:an unidentified fossil card|helix fossil, dome fossil, or old amber) from your hand\. if you do, this attack does (?:\d+ more damage|\d+ damage plus \d+ more damage)\.$/.test(text)) {
+    // Fossil cards are Item cards and cannot be present in the modeled hand.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^(?:does |this attack does )\d+ damage plus \d+ more damage for each (?:helix fossil, dome fossil, and old amber|helix fossil, dome fossil, or old amber) in your discard pile\.$/.test(text)) {
+    // Fossil Item cards are absent from the modeled discard pile.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^(?:put 2 item cards that have fossil in their names from your discard pile into your hand|shuffle up to 4 in any combination of unidentified fossil and rare fossil cards from your discard pile into your deck)\.$/.test(text)) {
+    // Fossil Item cards are absent from the modeled discard pile.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^if (?:this pokemon|your opponent's active pokemon) has any special energy attached(?: to it)?, this attack does \d+ more damage\.$/.test(text) ||
+    /^if (?:your opponent's active pokemon|this pokemon) has any special energy attached, this attack does \d+ more damage\.$/.test(text)) {
+    // Special Energy identities are not represented by the shared Energy pool.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^this attack does \d+ damage for each special energy(?: card)? attached to (?:this pokemon|all of your opponent's pokemon|your opponent's pokemon)\.$/.test(text)) {
+    // Special Energy identities and per-Pokémon attachments are not represented.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^(?:discard (?:all|up to \d+|a) special energy(?: cards?)?(?:(?: attached to| from) .+)?|move as many special energy attached to your opponent's pokemon to your opponent's other pokemon in any way you like|put a special energy attached to 1 of your opponent's pokemon in the lost zone)\.$/.test(text) ||
+    /^flip a coin\. if heads, choose a special energy card attached to 1 of your opponent's pokemon\. your opponent shuffles that card into his or her deck\.$/.test(text)) {
+    // Special Energy cards cannot be selected or moved in the shared-pool model.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^if your opponent's active pokemon has any special energy attached(?: to it)?, (?:this attack does \d+ more damage|it is knocked out)\.$/.test(text) ||
+    /^if this pokemon has any special energy attached, this attack does \d+ more damage\.$/.test(text)) {
+    // The opponent cannot have a represented Special Energy attachment.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  if (/^put a (?:trainer|supporter) card from your discard pile into your hand\.$/.test(text)) {
+    // Trainer and Supporter cards cannot be present in the modeled discard pile.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  if (/^this attack does \d+ damage for each energy card in your discard pile\. \(you can't use more than 1 vstar power in a game\.\)$/.test(text)) {
+    // The Pokémon-only discard pile cannot contain Energy cards, so the printed count is always zero here.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^shuffle (?:up to )?(?:\d+|a|one) (?:(?:basic|grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless|\{[grwlpmdycf]\}) )*energy cards? from your discard pile into your deck\.$/.test(text)) {
+    // No Energy cards can be in the Pokémon-only discard pile, so this shuffle has no cards to move.
+    return { damage: { kind: 'fixed', amount: exactDamage || 0 } }
+  }
+  const absentNonPokemonDiscardCount = /(?:energy|supporter|trainer|stadium) card/.test(text) && text.includes('discard pile') &&
+    /(?:this attack does|^does) .*damage/.test(text) && /(?:damage.*(?:for each|times the number of)|(?:for each|times the number of).*damage)/.test(text) &&
+    !/attached|damage counter|attach|burned|confused|paralyzed|poisoned|asleep/.test(text)
+  if (absentNonPokemonDiscardCount) {
+    // Energy and Trainer cards are absent from the modeled discard piles, so these counts and their shuffles are zero.
+    const retainsPrintedBase = /(?:more damage for each|damage plus)/.test(text)
+    return { damage: { kind: 'fixed', amount: retainsPrintedBase ? baseDamage : 0 } }
+  }
+  const absentTrainerHandCount = text.includes('hand') &&
+    /(?:trainer|supporter|stadium|energy|item|pokemon tool) card/.test(text) && /this attack does .*damage/.test(text) &&
+    /(?:damage.*(?:for each|times the number of)|(?:for each|times the number of).*damage)/.test(text)
+  if (absentTrainerHandCount) {
+    const retainsPrintedBase = /(?:more damage for each|damage plus)/.test(text)
+    return { damage: { kind: 'fixed', amount: retainsPrintedBase ? baseDamage : 0 } }
+  }
+  if (/^reveal any number of sweet honey cards from your hand\. this attack does 60 damage for each card you revealed in this way\.$/.test(text)) {
+    // Sweet Honey is an Item card and cannot be present in the modeled Pokémon-only hand.
+    return { damage: { kind: 'fixed', amount: 0 } }
+  }
+  if (/^does \d+ damage plus \d+ more damage for each trainer card your opponent has in play\.$/.test(text)) {
+    // Trainer cards are not represented in the battle play area, so the bonus count is zero.
+    return { damage: { kind: 'fixed', amount: baseDamage || 0 } }
+  }
+  const sharedActiveEnergyBonus = text.match(/^this attack does (\d+) more damage (?:for each energy|times the amount of energy) attached to both active pokemon\.$/)
+  if (sharedActiveEnergyBonus) {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: baseDamage || 0,
+        perUnitDamage: Number(sharedActiveEnergyBonus[1]),
+        source: { kind: 'energy', side: 'both' },
+      },
+    }
+  }
+  const absentSupporterDiscardBonus = text.match(/^this attack does (\d+) more damage for each (?:team rocket )?supporter card in (?:your|your opponent's) discard pile\.(?: you can't add more than \d+ damage in this way\.)?$/)
+  if (absentSupporterDiscardBonus) {
+    return { damage: { kind: 'fixed', amount: baseDamage } }
+  }
+  const noSupporterDiscardBonus = text.match(/^if you have no supporter cards? in your discard pile, this attack does (\d+) more damage\.$/)
+  if (noSupporterDiscardBonus) {
+    return { damage: { kind: 'fixed', amount: baseDamage + Number(noSupporterDiscardBonus[1]) } }
+  }
+  const poisonCheckupBonus = text.match(/^if the defending pokemon is poisoned, put (\d+) more damage counters? on that pokemon between turns\. this effect can be applied more than once\.$/)
+  if (poisonCheckupBonus) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'poisonCheckupBonus', amount: Number(poisonCheckupBonus[1]) * 10 }],
+    }
+  }
+  const activeAttackDamageBonus = text.match(/^as long as this ([a-z0-9' -]+) is your active pokemon, each of its attacks does (\d+) more damage \(before applying weakness and resistance\)\. you can't add more than (\d+) damage in this way\.$/)
+  if (activeAttackDamageBonus) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'activeAttackDamageBonus',
+        cardName: activeAttackDamageBonus[1].trim(),
+        amount: Number(activeAttackDamageBonus[2]),
+        maximum: Number(activeAttackDamageBonus[3]),
+      }],
+    }
+  }
+  if (/^during your next turn, treat any tails flipped when using magnemite's electric bolt attack on the defending pokemon as if they were heads\. \(benching or evolving either pokemon ends this effect\.\)$/.test(text)) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'lockOnCoinOverride' }],
+    }
+  }
+  if (/^(?:during your opponent's next turn, whenever they flip a coin, treat it as tails|whenever your opponent flips a coin during his or her next turn, treat it as tails)\.$/.test(text)) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'forceOpponentCoinFlipsToTails' }],
+    }
+  }
+  const lostMine = text.match(/^you can use this attack only if you have (\d+) or more cards in the lost zone\. put (\d+) damage counters? on your opponent's pokemon in any way you like\.$/)
+  if (lostMine) {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      requiredLostZoneCount: Number(lostMine[1]),
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: Number(lostMine[2]),
+      counterDamage: [{ target: 'distributed', amountPerCounter: 10 }],
+    }
+  }
+  const lostMarchDamage = text.match(/^this attack does (\d+) damage for each of your pokemon, except \{\*\} \(prism star\) pokemon, in the lost zone\.$/)
+  if (lostMarchDamage) {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(lostMarchDamage[1]),
+        source: { kind: 'pokemonInLostZone', side: 'own', excludeSubtypes: ['Prism Star'] },
+      },
+    }
+  }
+  const dimensionSphereDamage = text.match(/^does \d+ damage plus (\d+) more damage for each of your pokemon in the lost zone\.$/)
+  if (dimensionSphereDamage && baseDamage !== null) {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(dimensionSphereDamage[1]),
+        source: { kind: 'pokemonInLostZone', side: 'own' },
+      },
+    }
+  }
+  if (/^choose grass, fire, water, lightning, psychic, fighting, darkness, metal, fairy, or dragon type\. until the end of your next turn, this pokemon is that type\.$/.test(text)) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'typeChange',
+      choiceAllowedTypes: ['Grass', 'Fire', 'Water', 'Lightning', 'Psychic', 'Fighting', 'Darkness', 'Metal', 'Fairy', 'Dragon'],
+      special: [{ kind: 'changeType', target: 'attacker', expiresAfterTurns: 2 }],
+    }
+  }
+  const targetLegacyAbilityBonus = text.match(/^if the defending pokemon has any (poke-powers or )?poke-bodies, this attack does \d+ damage plus (\d+) more damage\.$/)
+  if (targetLegacyAbilityBonus && baseDamage !== null) {
+    return {
+      damage: {
+        kind: 'targetLegacyAbilityBonus',
+        baseDamage,
+        bonusDamage: Number(targetLegacyAbilityBonus[2]),
+        abilityTypes: targetLegacyAbilityBonus[1] ? ['poke-power', 'poke-body'] : ['poke-body'],
+      },
+    }
+  }
+  const powerUseHistoryBonus = text.match(/^if (you|your opponent) (?:have|has) used (?:your|their) (vstar power|gx attack)(?: during this game)?, this attack does (\d+) more damage\.$/)
+  if (powerUseHistoryBonus && baseDamage !== null) {
+    return {
+      damage: {
+        kind: 'powerUseHistoryBonus',
+        baseDamage,
+        bonusDamage: Number(powerUseHistoryBonus[3]),
+        checkSide: powerUseHistoryBonus[1] === 'you' ? 'own' : 'opponent',
+        powerKind: powerUseHistoryBonus[2] === 'gx attack' ? 'gx' : 'vstar',
+      },
+    }
+  }
+  const weaknessUntilNextTurn = text.match(/^until the end of your next turn, the defending pokemon's weakness is now (?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless))\. \(the amount of weakness doesn't change\.\)$/)
+  if (weaknessUntilNextTurn) {
+    const weaknessTypes: Record<string, TcgBattleEnergyType> = {
+      g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', m: 'Metal', d: 'Darkness', y: 'Fairy', c: 'Colorless',
+    }
+    const weaknessTypeNames: Record<string, TcgBattleEnergyType> = {
+      grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', colorless: 'Colorless',
+    }
+    return {
+      damage: { kind: 'fixed', amount: baseDamage },
+      special: [{ kind: 'changeWeakness', fixedType: weaknessTypes[weaknessUntilNextTurn[1]] || weaknessTypeNames[weaknessUntilNextTurn[2]], expiresAfterTurns: 2 }],
+    }
+  }
+  const onceWhilePokemonInPlay = text.match(/^flip a coin\. if tails, this attack does nothing\. either way, you can't use this attack again as long as ([a-z0-9' -]+) stays in play \(even putting [a-z0-9' -]+ on the bench won't let you use it again\)\.$/)
+  if (onceWhilePokemonInPlay) {
+    return {
+      damage: { kind: 'zeroOnTails', amount: baseDamage },
+      coinFlipCount: 1,
+      onceWhilePokemonInPlay: onceWhilePokemonInPlay[1].trim(),
+    }
+  }
+  const previousTurnAttackRequirement = text.match(/^this attack can't be used unless ([a-z0-9' -]+) used (?:its|their) ([a-z0-9' -]+) attack last turn\.$/)
+  if (previousTurnAttackRequirement) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      previousTurnAttackRequirement: {
+        cardName: previousTurnAttackRequirement[1].trim(),
+        attackName: previousTurnAttackRequirement[2].trim(),
+      },
+    }
+  }
+  const starRequiem = text.match(/^you can use this attack only if you have (\d+) or more cards in the lost zone\. your opponent's active pokemon is knocked out\.(?: \(you can't use more than 1 vstar power in a game\.\))?$/)
+  if (starRequiem) {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      requiredLostZoneCount: Number(starRequiem[1]),
+      oncePerGameVstar: true,
+      special: [{ kind: 'knockOutTarget' }],
+    }
+  }
+  const alteredCreation = text.match(/^for the rest of this game, your pokemon's attacks do (\d+) more damage to your opponent's active pokemon \(before applying weakness and resistance\)\. if this pokemon has at least 1 extra water energy attached to it \(in addition to this attack's cost\), when your opponent's active pokemon is knocked out by damage from those attacks, take 1 more prize card\. \(you can't use more than 1 gx attack in a game\.\)$/)
+  if (alteredCreation) {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'buffSideAttackDamage', damageBonus: Number(alteredCreation[1]), targetActiveOnly: true, requiresExtraEnergyType: 'Water', minimumExtraEnergy: 1, extraPrizeOnDamageKnockout: true }],
+    }
+  }
+  if (text === "for the rest of this game, your opponent can't use any gx attacks. (you can't use more than 1 gx attack in a game.)") {
+    return { damage: { kind: 'fixed', amount: 0 }, special: [{ kind: 'lockOpponentGxAttacks' }] }
+  }
+  if (/^if your opponent's pokemon used an attack during (?:their|his or her) last turn, use it as this attack\.$/.test(text)) {
+    return { damage: { kind: 'fixed', amount: 0 }, special: [{ kind: 'usePreviousTurnAttack' }] }
+  }
+  if (text === "if your opponent's pokemon used an attack that isn't a gx attack during their last turn, use it as this attack.") {
+    return { damage: { kind: 'fixed', amount: 0 }, special: [{ kind: 'usePreviousTurnAttack', excludeGx: true }] }
+  }
+  if (text === 'if the defending pokemon attacked last turn, and smeargle was in play during that attack, smeargle copies that attack except for its energy costs and anything else required in order to use that attack.') {
+    return { damage: { kind: 'fixed', amount: 0 }, special: [{ kind: 'usePreviousTurnAttack', sourceMustBeTarget: true, requireCopyAttackerWasAlreadyInPlay: true }] }
+  }
+  const previousEvolutionCopy = /^(?:choose (?:1|an) attack from (?:1 of )?this pokemon's previous evolutions and use it as this attack|choose 1 of this pokemon's attacks from its previous evolutions and use it as this attack)\.$/.test(text)
+  const freePreviousEvolutionCopy = /^use any attack from [a-z0-9' -]+ basic pokemon card or (?:stage 1 )?evolution card\. \([a-z0-9' -]+ doesn't have to pay for that attack's energy cost\.\)$/.test(text)
+  if (previousEvolutionCopy || freePreviousEvolutionCopy) {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'usePreviousEvolutionAttack', freeCost: freePreviousEvolutionCopy }],
+    }
+  }
+  const discardPokemonCopy = text.match(/^choose an attack from a ([a-z]+) pokemon in your discard pile and use it as this attack\.$/)
+  if (discardPokemonCopy) {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'useDiscardPokemonAttack', type: discardPokemonCopy[1] }],
+    }
+  }
+  if (/^choose an attack on 1 of your opponent's pokemon in (?:his or her|their) discard pile\. [a-z0-9' -]+ copies that attack except for its energy cost\. \(you must still do anything else required for that attack\.\) [a-z0-9' -]+ performs that attack\.$/.test(text)) {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'useDiscardPokemonAttack', side: 'opponent', freeCost: true }],
+    }
+  }
+  const doubleBlaze = text.match(/^if this pokemon has at least (\d+) extra fire energy attached to it \(in addition to this attack's cost\), this attack does (\d+) more damage, and this attack's damage isn't affected by any effects on your opponent's active pokemon\. \(you can't use more than 1 gx attack in a game\.\)$/)
+  if (doubleBlaze && normalizedDamage.endsWith('+')) {
+    const extraEnergy = Number(doubleBlaze[1])
+    const source: TcgBattleCountSource = { kind: 'energyOfType', side: 'own', type: 'Fire' }
+    const minimumUnits = (attack.convertedEnergyCost ?? attack.cost.length) + extraEnergy
+    return {
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(doubleBlaze[2]),
+        source,
+        minimumUnits,
+        countIncludesPaidAttackCost: true,
+      },
+      targetScope: 'front',
+      ignoreTargetDamageModifiersWhenCount: { source, minimumUnits },
+    }
+  }
+  if (text === "choose 1 of your benched n's pokemon's attacks and use it as this attack.") {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'useOwnBenchPokemonAttack', namePrefix: "n's" }],
+    }
+  }
+  if (text === "choose 1 of your benched fusion strike pokemon's attacks and use it as this attack.") {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'useOwnBenchPokemonAttack', subtype: 'Fusion Strike' }],
+    }
+  }
+  const topDeckToHandAndLostZone = text.match(/^look at the top (\d+) cards? of your deck and put (\d+) of them into your hand\. put the other cards in the lost zone\.$/)
+  if (topDeckToHandAndLostZone) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'topDeckPokemonSet',
+      special: [{
+        kind: 'chooseTopDeckPokemonToHandAndLostZone',
+        revealCount: Number(topDeckToHandAndLostZone[1]),
+        handCount: Number(topDeckToHandAndLostZone[2]),
+      }],
+    }
+  }
+  const previousTurnAttackBonus = text.match(/^if this pokemon used ([a-z0-9' -]+) during your last turn, this attack does (\d+) more damage\.$/)
+  if (previousTurnAttackBonus && baseDamage !== null) {
+    return {
+      damage: {
+        kind: 'previousTurnAttackBonus',
+        baseDamage,
+        bonusDamage: Number(previousTurnAttackBonus[2]),
+        requiredAttackName: previousTurnAttackBonus[1].trim(),
+        sameAttacker: true,
+      },
+    }
+  }
+  const previousTurnTeammateAttackBonus = text.match(/^if (?:1 of your |your )([a-z][a-z0-9' -]*?) used (?:an attack|([a-z0-9' -]+)) during your last turn, this attack does (\d+) more damage\.$/)
+  if (previousTurnTeammateAttackBonus && !text.startsWith('if 1 of your other ') && baseDamage !== null) {
+    return {
+      damage: {
+        kind: 'previousTurnAttackBonus',
+        baseDamage,
+        bonusDamage: Number(previousTurnTeammateAttackBonus[3]),
+        requiredPokemonName: previousTurnTeammateAttackBonus[1].trim(),
+        requiredAttackName: previousTurnTeammateAttackBonus[2]?.trim(),
+      },
+    }
+  }
+  const previousTurnSubtypeAttackBonus = text.match(/^if 1 of your (other )?([a-z][a-z0-9' -]+) pokemon used an attack during your last turn, this attack does (\d+) more damage\.$/)
+  if (previousTurnSubtypeAttackBonus && baseDamage !== null) {
+    return {
+      damage: {
+        kind: 'previousTurnAttackBonus',
+        baseDamage,
+        bonusDamage: Number(previousTurnSubtypeAttackBonus[3]),
+        requiredSubtype: previousTurnSubtypeAttackBonus[2].trim(),
+        excludeAttacker: Boolean(previousTurnSubtypeAttackBonus[1]),
+      },
+    }
+  }
+  if (setId === '_2023sv' && normalizedAttackName === 'sweeping tackle' && text === 'this attack does 20 less damage for each damage counter on this' && normalizedDamage === '200-') {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage: 200,
+        perUnitDamage: 20,
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+  const linkedSelfDamageCounters = text.match(/^put up to (\d+) damage counters? on [a-z0-9' -]+\. then, put that many damage counters? on (?:the )?defending pokemon\.$/)
+  const linkedRemainingHpCounters = text.match(/^put as many damage counters? as you like on ([a-z0-9' -]+)\. \(you can't put more than [a-z0-9' -]+'s remaining hp\.\) put that many damage counters? on (?:the )?defending pokemon\.$/)
+  if (linkedSelfDamageCounters || linkedRemainingHpCounters) {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'selfDamageCounters',
+      choiceSelfDamageCounterMax: linkedSelfDamageCounters ? Number(linkedSelfDamageCounters[1]) : 0,
+      choiceSelfDamageCountersUpToRemainingHp: Boolean(linkedRemainingHpCounters),
+      selfDamage: [{ kind: 'choiceDamageCounters' }],
+      counterDamage: [{ amountPerUnit: 10, source: { kind: 'chosenSelfDamageCounters' }, target: 'target' }],
+    }
+  }
+  const activeCopy = text.match(/^choose 1 of your opponent's active (pokemon|tera pokemon)'s (?:non-gx )?attacks and use it as this attack\.$/)
+  const coinGatedActiveCopy = text.match(/^flip a coin\. if heads, choose 1 of your opponent's active (pokemon|tera pokemon)'s attacks and use it as this attack\.$/)
+  const coinGatedAnyOpponentCopy = text === "flip a coin. if heads, choose an attack from 1 of your opponent's pokemon in play and use it as this attack."
+  const anyOpponentPokemonCopy = /^(?:choose 1 of your opponent's pokemon's attacks and use it as this attack\.(?: if this pokemon doesn't have the necessary energy to use that attack, this attack does nothing\.)?(?: \(you can't use more than 1 gx attack in a game\.\))?|if you have no cards in your hand, choose an attack from 1 of your opponent's pokemon in play and use it as this attack\.)$/.test(text)
+  const defendingPokemonCopy = text === "choose 1 of the defending pokemon's attacks and use it as this attack."
+  const legacyDefendingPokemonCopy = text.startsWith("choose 1 of the defending pokemon's attacks. copy copies that attack. this attack does nothing if mew doesn't have the energy necessary to use that attack.")
+  const rainbowMovesCopy = text.startsWith("choose 1 of your opponent's benched pokemon's attacks. rainbow moves copies that attack except for its energy cost.")
+  const copyAFriend = text === "choose 1 of your benched pokemon's attacks, except any pokemon ex, and use it as this attack. if this pokemon doesn't have the necessary energy to use that attack, this attack does nothing."
+  const assistCopy = text === "flip a coin. if heads, choose 1 of your benched pokemon's attacks and use it as this attack."
+  const darkLinkCopy = text.startsWith('flip a coin. if heads, choose an attack on 1 of your pokemon in play that has dark in its name (excluding this one). dark link copies that attack except for its energy cost.')
+  if (activeCopy || coinGatedActiveCopy || coinGatedAnyOpponentCopy || defendingPokemonCopy || legacyDefendingPokemonCopy || anyOpponentPokemonCopy || rainbowMovesCopy || copyAFriend || assistCopy || darkLinkCopy) {
+    const copyText = activeCopy?.[0] || coinGatedActiveCopy?.[0] || ''
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'copyAttack',
+      special: [{
+        kind: 'copyAttack',
+        preserveExtraCosts: true,
+        excludeGx: /non-gx/.test(copyText),
+        excludePokemonEx: copyAFriend,
+        requireTera: /active tera pokemon/.test(copyText),
+        sourceScope: assistCopy || copyAFriend ? 'ownBench' : darkLinkCopy ? 'ownPlay' : rainbowMovesCopy ? 'bench' : anyOpponentPokemonCopy || coinGatedAnyOpponentCopy ? 'any' : 'target',
+        requiresEmptyHand: text.startsWith('if you have no cards in your hand,'),
+        freeCost: rainbowMovesCopy || darkLinkCopy,
+        sourceNameContains: darkLinkCopy ? 'Dark' : undefined,
+        requiresCopiedAttackEnergy: legacyDefendingPokemonCopy || (anyOpponentPokemonCopy || copyAFriend) && text.includes("if this pokemon doesn't have the necessary energy"),
+        coinGate: darkLinkCopy || assistCopy || coinGatedAnyOpponentCopy || coinGatedActiveCopy ? 'heads' : undefined,
+      }],
+      coinFlipCount: darkLinkCopy || assistCopy || coinGatedAnyOpponentCopy || coinGatedActiveCopy ? 1 : undefined,
+    }
+  }
+  const secondPlayerFirstTurnBonus = text.match(/^if you go second, this attack does (\d+) more damage during your first turn\.$/)
+  if (secondPlayerFirstTurnBonus && baseDamage !== null) {
+    return { damage: { kind: 'secondPlayerFirstTurnBonus', baseDamage, bonusDamage: Number(secondPlayerFirstTurnBonus[1]) } }
+  }
+  const firstTurnBasicBenchSearch = text.match(/^if you go first, you can use this attack (?:during|on) your first turn\. search your deck for up to (\d+) basic pokemon and put them onto your bench\. then, shuffle your deck\.$/)
+  if (firstTurnBasicBenchSearch) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [
+        { kind: 'searchDeckPokemon', maxCount: Number(firstTurnBasicBenchSearch[1]), destination: 'bench', basicOnly: true },
+        { kind: 'shuffleDeck', target: 'self' },
+      ],
+    }
+  }
+  const firstTurnSingleCardSearch = text.match(/^if you go first, you can use this attack (?:during|on) your first turn\. search your deck for a card and put it into your hand\. then, shuffle your deck\.$/)
+  const singleCardSearch = firstTurnSingleCardSearch || text.match(/^search your deck for a card and put it into your hand\. then, shuffle your deck\.$/)
+  if (singleCardSearch) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand' }],
+    }
+  }
+  if (text === 'search your deck for any 1 card. shuffle your deck, then put that card on top of your deck.') {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'topDeck', shuffleAfterSearch: true }],
+    }
+  }
+  if (/^switch this pokemon with 1 of your benched pokemon\. if you do, search your deck for a card that evolves from this pokemon and put it onto this pokemon to evolve it\. then, shuffle your deck\.$/.test(text)) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'switchAndDeckEvolution',
+      special: [
+        { kind: 'switch', target: 'self' },
+        { kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', evolveAttacker: true },
+      ],
+    }
+  }
+  const typedPokemonSearch = text.match(/^search your deck for up to (\d+) pokemon[- ](v|gx)(?: with different names)?, reveal them, and put them into your hand\. then, shuffle your deck\.$/)
+  if (typedPokemonSearch) {
+    const subtype = typedPokemonSearch[2].toUpperCase()
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: Number(typedPokemonSearch[1]),
+        includeSubtypes: [subtype],
+        oneOfEachName: text.includes('with different names'),
+        destination: 'hand',
+      }],
+    }
+  }
+  const placeCountersForDamage = text.match(/^put up to (\d+) damage counters? on this pokemon\. this attack does (\d+) damage for each damage counter you placed in this way\.$/)
+  if (placeCountersForDamage) {
+    const maximumCounters = Number(placeCountersForDamage[1])
+    return {
+      damage: { kind: 'choiceDamageCounterMultiplier', damagePerCounter: Number(placeCountersForDamage[2]) },
+      selfDamage: [{ kind: 'choiceDamageCounters' }],
+      choiceRequirement: 'selfDamageCounters',
+      choiceSelfDamageCounterMax: maximumCounters,
+    }
+  }
+  const evolutionStackBonusDraw = text.match(/^draw (?:a|1) card\. if ([a-z0-9' -]+) is anywhere under ([a-z0-9' -]+), draw (\d+) more cards?\.$/)
+  if (evolutionStackBonusDraw) {
+    return {
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'drawCards', target: 'self', amount: 1,
+        amountIfEvolutionUnder: { name: evolutionStackBonusDraw[1].trim(), amount: Number(evolutionStackBonusDraw[3]) },
+      }],
+    }
+  }
+  if (normalizedAttackName === 'queen s orders' && /^you may discard any number of your benched pokemon\. this attack does 40 more damage for each benched pokemon you discarded in this way\.$/.test(text) && baseDamage !== null) {
+    return {
+      damage: { kind: 'ownBenchDiscardBonus', baseDamage, bonusDamagePerPokemon: 40 },
+      choiceRequirement: 'discardOwnBenchPokemon',
+      special: [{ kind: 'discardSelectedOwnBenchPokemon' }],
+    }
+  }
+  if (text === 'reveal cards from your deck until you reveal a basic pokemon. show that card to your opponent and put it into your hand. shuffle the other revealed cards into your deck. (if you don\'t reveal a basic pokemon, shuffle all the revealed cards back into your deck.)') {
+    return {
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'revealUntilBasicPokemonToHand' }],
+    }
+  }
   const applyAttackTextModifiers = (effect: TcgBattleAttackEffect): TcgBattleAttackEffect => {
     const optionalSwitch = text.includes('may switch')
       ? effect.special?.map((rule) => rule.kind === 'switch' ? { ...rule, optional: true } : rule)
       : effect.special
-    const modifiedEffect = optionalSwitch ? { ...effect, special: optionalSwitch } : effect
-    return ignoreWeaknessResistance
-      ? { ...modifiedEffect, ignoreWeaknessResistance: true }
-      : modifiedEffect
+    const healingChoice = effect.healing?.some((rule) => 'target' in rule && rule.target === 'selectedOwnBench')
+      ? 'ownBench' as const
+      : effect.healing?.some((rule) => 'target' in rule && rule.target === 'selectedOwnPokemon')
+        ? 'ownPokemon' as const
+        : undefined
+    const withChoice = healingChoice && !effect.choiceRequirement
+      ? { ...effect, choiceRequirement: healingChoice }
+      : effect
+    const modifiedEffect = optionalSwitch ? { ...withChoice, special: optionalSwitch } : withChoice
+    const ignoresWeaknessOnly = /(?:this attack(?:'s)? damage|this damage) (?:isn't|is not) affected by weakness\b(?!\s*(?:,|or|and)\s*resistance)/.test(text)
+    return {
+      ...modifiedEffect,
+      ...(ignoreWeaknessResistance ? { ignoreWeaknessResistance: true } : {}),
+      ...(ignoresWeaknessOnly ? { ignoreWeakness: true } : {}),
+    }
+  }
+  const bilateralTopCardMill = /^each player discards? the top card of (?:his or her|their) deck\./.test(text)
+  const bilateralMillEnergyDamage = /this attack does \d+ damage times the number of energy cards discarded in this way\.|this attack does \d+ damage plus \d+ more damage for each (?:[a-z]+ )?energy card discarded in this way\.|this attack does \d+ more damage for each energy card discarded in this way\./.test(text)
+  if (bilateralTopCardMill && bilateralMillEnergyDamage) {
+    const scalesAllDamageToDiscardedEnergy = /this attack does \d+ damage times the number of energy cards discarded in this way\./.test(text)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: scalesAllDamageToDiscardedEnergy ? 0 : baseDamage || 0 },
+      special: [
+        { kind: 'millCards', target: 'self', amount: 1 },
+        { kind: 'millCards', target: 'opponent', amount: 1 },
+      ],
+    })
+  }
+  if (/^discard the top card of your deck\. if that card is an energy card, this attack does \d+ more damage\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: baseDamage || 0 },
+      special: [{ kind: 'millCards', target: 'self', amount: 1 }],
+    })
+  }
+  if (text === "move an energy card attached to 1 of your opponent's pokemon to another of your opponent's pokemon. smoochum is now asleep.") {
+    // Attached Energy is not represented, but the printed self-status remains usable.
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      status: [{ target: 'self', statuses: ['asleep'] }],
+    })
+  }
+  const chooseLegacyAbilityPokemon = text.match(/^choose 1 of your opponent's pokemon that has any (poke-bodies?|poke-powers?)\. this attack does (\d+) damage to that pokemon\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?$/)
+  if (chooseLegacyAbilityPokemon) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: Number.parseInt(chooseLegacyAbilityPokemon[3], 10) },
+      targetScope: 'any',
+      targetMustHaveAbilityTypes: [chooseLegacyAbilityPokemon[1].replace(/[^a-z]/g, '').replace(/s$/, '')],
+      ignoreWeaknessResistanceOnBench: text.includes("don't apply weakness and resistance for benched pokemon"),
+    })
+  }
+  const boardWideKnockOut = text.match(/^knock out each of your opponent's pokemon that has (\d+) hp or less remaining\.$/)
+  if (boardWideKnockOut) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'knockOutTargetsAtRemainingHpAtMost', maximumHp: Number(boardWideKnockOut[1]) }],
+    })
+  }
+  const devolutionText = text.match(/^devolve each of your opponent's evolved pokemon (?:by (?:putting|shuffling)|and put) the highest stage evolution card on (?:it|them) into your opponent's (hand|deck)\.?$/)
+  if (devolutionText) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'devolveOpponentPokemon', destination: devolutionText[1] as 'hand' | 'deck', all: true }],
+    })
+  }
+  if (/^if your opponent has any evolved pokemon in play, remove the highest stage evolution card from each of them and put those cards back into (?:his or her|their) hand\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'devolveOpponentPokemon', destination: 'hand', all: true }],
+    })
+  }
+  if (text === "search your deck for a baby pokemon card and put it onto your bench. shuffle your deck afterward. (you can't use this attack if your bench is full.)") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      requiresOpenBench: true,
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'bench', includeSubtypes: ['Baby'] }],
+    })
+  }
+  if (text === "choose an evolved pokemon (your own or your opponent's). return the highest stage evolution card on that pokemon to its player's hand. that pokemon is no longer asleep, confused, paralyzed, poisoned, or anything else that might be the result of an attack (just as if you had evolved it).") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'all',
+      targetMustBeEvolved: true,
+      special: [{ kind: 'devolveSelectedPokemon' }],
+    })
+  }
+  if (text === "flip a coin. if heads, choose 1 of either player's evolved pokemon, remove the highest stage evolution card from that pokemon, and put it into that player's hand.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      targetScope: 'all',
+      targetMustBeEvolved: true,
+      special: [{ kind: 'devolveSelectedPokemon', condition: 'heads' }],
+    })
+  }
+  if (text === "flip a coin. if heads, knock out your opponent's active basic pokemon. if tails, knock out 1 of your opponent's benched basic pokemon.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      targetScope: 'any',
+      targetMustHaveSubtype: 'Basic',
+      special: [{ kind: 'coinFlipKnockOutActiveOrSelectedBenchBasic' }],
+    })
+  }
+  const singleDevolutionHand = text.match(/^devolve 1 of your opponent's evolved pokemon by putting the highest stage evolution card on it into your opponent's hand\.?$/)
+  if (singleDevolutionHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'any',
+      targetMustBeEvolved: true,
+      special: [{ kind: 'devolveOpponentPokemon', destination: 'hand', all: false }],
+    })
+  }
+  const singleDevolutionDeck = text.match(/^devolve 1 of your opponent's evolved pokemon by removing the highest stage evolution card from it\. your opponent shuffles that card into their deck\.?$/)
+  if (singleDevolutionDeck) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'any',
+      targetMustBeEvolved: true,
+      special: [{ kind: 'devolveOpponentPokemon', destination: 'deck', all: false }],
+    })
+  }
+  const coinDevolutionDeck = text.match(/^if your opponent has any evolved pokemon in play, choose 1 of them and flip a coin\. if heads, remove the highest stage evolution card on that pokemon and have your opponent shuffl(?:e|ed) (?:it|that card) into (?:his or her|their) deck\.?$/)
+  if (coinDevolutionDeck) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'any',
+      targetMustBeEvolved: true,
+      coinFlipCount: 1,
+      special: [{ kind: 'devolveOpponentPokemon', destination: 'deck', all: false, condition: 'heads' }],
+    })
+  }
+  const chosenDevolutionDeck = text.match(/^choose 1 of your opponent's evolved pokemon\. remove the highest stage evolution card from that pokemon and have your opponent shuffle that card into (?:his or her|their) deck\.?$/)
+  if (chosenDevolutionDeck) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'any',
+      targetMustBeEvolved: true,
+      special: [{ kind: 'devolveOpponentPokemon', destination: 'deck', all: false }],
+    })
+  }
+  const optionalTopDeckEnergyDamage = text.match(/^you may discard the top card of your deck\. if that card is a [a-z]+ energy card?, this attack does (\d+) more damage\.$/)
+  if (optionalTopDeckEnergyDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: baseDamage || 0 },
+      choiceRequirement: 'optionalBonus',
+      optionalBonusPrompt: 'Discard the top Pokémon from your deck? The Energy bonus cannot apply in this Pokémon-only deck.',
+      optionalBonusYesLabel: 'Discard it',
+      optionalBonusNoLabel: 'Keep it',
+      special: [{ kind: 'millCards', target: 'self', amount: 1, requiresOptionalChoice: true, position: 'top' }],
+    })
+  }
+  if (text === 'look at the top card of your deck. you may discard that card.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'optionalBonus',
+      optionalBonusPrompt: 'Discard the top Pokémon from your deck?',
+      optionalBonusYesLabel: 'Discard it',
+      optionalBonusNoLabel: 'Keep it',
+      special: [{ kind: 'millCards', target: 'self', amount: 1, requiresOptionalChoice: true, position: 'top' }],
+    })
+  }
+  if (text === 'look at the top card of your deck. you may put it into your hand. if not, discard it and draw a card.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'optionalBonus',
+      optionalBonusPrompt: 'Add the top Pokémon to your hand, or discard it and draw a card?',
+      optionalBonusYesLabel: 'Add to hand',
+      optionalBonusNoLabel: 'Discard and draw',
+      special: [{ kind: 'chooseTopDeckPokemonOrDiscardDraw', drawCount: 1 }],
+    })
+  }
+  const chooseTopDeckSetOrDiscardDraw = text.match(/^look at the top (\d+) cards? of your deck\. you may put those cards into your hand\. if you don't, discard those cards and draw (\d+) cards?\.$/)
+  if (chooseTopDeckSetOrDiscardDraw) {
+    const amount = Number(chooseTopDeckSetOrDiscardDraw[1])
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'optionalBonus',
+      optionalBonusPrompt: `Take the top ${amount} Pokémon from your deck into your hand, or discard them and draw ${Number(chooseTopDeckSetOrDiscardDraw[2])}?`,
+      optionalBonusYesLabel: 'Take them',
+      optionalBonusNoLabel: 'Discard and draw',
+      special: [{ kind: 'chooseTopDeckPokemonOrDiscardDraw', amount, drawCount: Number(chooseTopDeckSetOrDiscardDraw[2]) }],
+    })
+  }
+  const bottomDeckAttackCount = text.match(/^reveal the bottom (\d+) cards? of your deck,? and this attack does (\d+) damage for each pokemon you find there that has the ([a-z0-9' -]+) attack\. then, shuffle any revealed pokemon back into your deck\. discard the other cards\.$/)
+  if (bottomDeckAttackCount) {
+    const maxCards = Number(bottomDeckAttackCount[1])
+    const attackName = bottomDeckAttackCount[3].trim()
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(bottomDeckAttackCount[2]),
+        source: { kind: 'pokemonWithAttackInDeck', side: 'own', attackName, position: 'bottom', maxCards },
+      },
+      special: [{ kind: 'shuffleDeck', target: 'self' }],
+    })
+  }
+  if (text === 'reveal the top card of your deck and put it into your hand. if that card is a pokemon, draw 2 cards.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [
+        { kind: 'searchDeckPokemon', maxCount: 1, topCardCount: 1, shuffleAfterReveal: false, random: true, destination: 'hand' },
+        { kind: 'drawCards', target: 'self', amount: 2 },
+      ],
+    })
+  }
+  if (text === 'flip 3 coins. put a number of cards up to the number of heads from your discard pile into your hand.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'discardPokemonToHand',
+      coinFlipCount: 3,
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 3, upTo: true, amountPerHead: 1 }],
+    })
+  }
+  const coinGatedDiscardRecovery = text.match(/^flip (\d+) coins?\. for each heads, put a card from your discard pile into your hand\.$/)
+  if (coinGatedDiscardRecovery) {
+    const coinCount = Number(coinGatedDiscardRecovery[1])
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: coinCount,
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: coinCount, upTo: true, amountPerHead: 1 }],
+    })
+  }
+  const topDeckBenchSearch = text.match(/^look at the top (\d+) cards? of your deck\. you may put any number of (basic )?pokemon you find there onto your bench\. shuffle the other cards back into your deck\.$/)
+  if (topDeckBenchSearch) {
+    const topCardCount = Number(topDeckBenchSearch[1])
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: topCardCount,
+        topCardCount,
+        basicOnly: Boolean(topDeckBenchSearch[2]),
+        destination: 'bench',
+      }],
+    })
+  }
+  const topDeckPokemonToHand = text.match(/^look at the top (\d+) cards? of your deck(?:,? and then)?(?:,? choose (?:1|one) (?:pokemon you find there|of those cards|of them),? (?:show it to your opponent,? and )?put it into your hand| and put (?:1|one) of them into your hand)\. (?:shuffle (?:the )?(?:other|rest of the) cards? back into your deck(?: afterward)?|put the other cards back on top of your deck\. shuffle your deck afterward)\.$/)
+  if (topDeckPokemonToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, topCardCount: Number(topDeckPokemonToHand[1]), destination: 'hand' }],
+    })
+  }
+  const topDeckChoiceRestoreThenShuffle = text.match(/^look at the top (\d+) cards? of your deck, choose (?:1|one) of them, and put it into your hand\. put (?:the )?(?:\d+ )?other cards? back on top of your deck\. shuffle your deck afterward\.$/)
+  const topDeckChoiceShuffleRest = text.match(/^look at the top (\d+) cards? of your deck, choose (?:1|one) of them, and put it into your hand\. shuffle (?:the )?other cards? back into your deck(?: afterward)?\.$/)
+  const topDeckChoiceRestore = topDeckChoiceRestoreThenShuffle || topDeckChoiceShuffleRest
+  if (topDeckChoiceRestore) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, topCardCount: Number(topDeckChoiceRestore[1]), destination: 'hand' }],
+    })
+  }
+  const topDeckAnyCardToHand = text.match(/^look at the top (\d+) cards? of your deck,? and then choose (?:1|one) of those cards and put it into your hand\. shuffle the rest into your deck afterward\.$/)
+  if (topDeckAnyCardToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, topCardCount: Number(topDeckAnyCardToHand[1]), destination: 'hand' }],
+    })
+  }
+  const topDeckPokemonToHandAndBottom = text.match(/^look at the top (\d+) cards? of your deck, choose (?:1|one) of them, and put (?:it|one) into your hand\. put the other card on the bottom of your deck\.$/)
+  if (topDeckPokemonToHandAndBottom) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: 1,
+        topCardCount: Number(topDeckPokemonToHandAndBottom[1]),
+        destination: 'hand',
+        shuffleAfterReveal: false,
+      }],
+    })
+  }
+  if (text === 'draw a card from the top and the bottom of your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawDeckEndCards', positions: ['top', 'bottom'] }],
+    })
+  }
+  if (text === 'choose a card from your hand and put it in the lost zone. then, draw 3 cards.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardCount: 1,
+      special: [
+        { kind: 'discardSelectedHandPokemon', destination: 'lostZone' },
+        { kind: 'drawCards', target: 'self', amount: 3, requiresDiscardChoice: true },
+      ],
+    })
+  }
+  const handLostZoneDraw = text.match(/^put a card from your hand in the lost zone\. if you do, draw (\d+) cards?\.$/)
+  if (handLostZoneDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardCount: 1,
+      special: [
+        { kind: 'discardSelectedHandPokemon', destination: 'lostZone' },
+        { kind: 'drawCards', target: 'self', amount: Number(handLostZoneDraw[1]), requiresDiscardChoice: true },
+      ],
+    })
+  }
+  const drawBottomCards = text.match(/^draw (a|\d+) cards? from the bottom of your deck\.$/)
+  if (drawBottomCards) {
+    const countText = drawBottomCards[1]
+    const count = countText === 'a' ? 1 : Number(countText)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawDeckEndCards', positions: Array.from({ length: count }, () => 'bottom' as const) }],
+    })
+  }
+  if (text === 'discard the top 3 cards of your deck and put 1 of them into your hand.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'topDeckPokemon',
+      special: [{ kind: 'discardTopDeckChoosePokemonToHand', amount: 3 }],
+    })
+  }
+  if (text === "this attack does 60 damage for each energy attached to this pokemon. switch this pokemon with 1 of your benched pokemon. (you can't use more than 1 vstar power in a game.)") {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: 60,
+        source: { kind: 'energy', side: 'own' },
+      },
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    })
+  }
+  const switchAndExtraEnergyBonus = text.match(/^switch this pokemon with 1 of your benched pokemon\. if this pokemon has at least (\d+) extra (?:\{l\}|lightning) energy attached to it \(in addition to this attack's cost\), this attack does (\d+) more damage\. \(you can't use more than 1 gx attack in a game\.\)$/)
+  if (switchAndExtraEnergyBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(switchAndExtraEnergyBonus[2]),
+        source: { kind: 'energyOfType', side: 'own', type: 'Lightning' },
+        minimumUnits: (attack.convertedEnergyCost ?? attack.cost.length) + Number(switchAndExtraEnergyBonus[1]),
+      },
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    })
+  }
+  const typedEnergyCoins = text.match(/^flip a coin for each (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) energy attached to (?:this pokemon|[a-z0-9' .-]+)\. this attack does (\d+) damage plus (\d+) more damage for each heads\.$/)
+  const typedEnergyCoinMultiplier = text.match(/^flip a coin for each (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) energy attached to (?:this pokemon|[a-z0-9' .-]+)\. this attack does (\d+) damage times the number of heads\.$/)
+  if (typedEnergyCoins || typedEnergyCoinMultiplier) {
+    const match = typedEnergyCoins || typedEnergyCoinMultiplier!
+    const energyType: Record<string, TcgBattleEnergyType> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' }
+    const coinFlipSource = { kind: 'energyOfType' as const, side: 'own' as const, type: energyType[match[1]] }
+    return applyAttackTextModifiers({
+      damage: typedEnergyCoins
+        ? { kind: 'headsBonusEach', baseDamage: Number(match[2]), bonusDamage: Number(match[3]), coinFlipCount: 0 }
+        : { kind: 'headsMultiplier', damagePerHeads: Number(match[2]), coinFlipCount: 0 },
+      coinFlipSource,
+    })
+  }
+  const namedAttackerDeckEvolution = text.match(/^search your deck for (?:an evolution card named )?(.+?) and put it (?:onto|on) (.+?) \(this counts as evolving (.+?)\.?\)\.? shuffle your deck afterward\.$/)
+  const namedEvolutionCards = namedAttackerDeckEvolution?.[1].split(/\s+or\s+/).map((name) => name.trim())
+  const namedEvolutionTarget = namedAttackerDeckEvolution?.[2].replace(/[^a-z0-9]/g, '')
+  const namedEvolutionReference = namedAttackerDeckEvolution?.[3].replace(/[^a-z0-9]/g, '')
+  if (namedAttackerDeckEvolution && namedEvolutionTarget === namedEvolutionReference && namedEvolutionCards?.every((name) => !/^a card that evolves from/.test(name))) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', includeNames: namedEvolutionCards, evolveAttacker: true }],
+    })
+  }
+  if (text === 'search your deck for a card that evolves from paras. attach it to paras. this counts as evolving paras. shuffle your deck afterward.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeEvolvesFrom: ['Paras'], destination: 'hand', evolveAttacker: true }],
+    })
+  }
+  if (text === 'search your deck for a card that evolves from 1 of your pokemon and put it onto that pokemon to evolve it. then, shuffle your deck.' ||
+    /^search your deck for a card that evolves from 1 of your pokemon and put it (?:onto|on) that pokemon\. \(this counts as evolving that pokemon\.\) shuffle your deck afterward\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'own',
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', evolveTarget: true }],
+    })
+  }
+  if (text === 'choose 1 of your pokemon. search your deck for a card that evolves from that pokemon and put it onto that pokemon. (this counts as evolving that pokemon.) shuffle your deck afterward.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'own',
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', evolveTarget: true }],
+    })
+  }
+  const darkBenchEvolution = text.match(/^if you have any ([a-z]+) pokemon on your bench, search your deck for a card that evolves from this pokemon and put it onto this pokemon\. \(this counts as evolving this pokemon\.\) shuffle your deck afterward\.$/)
+  const darkBenchEvolutionType = darkBenchEvolution
+    ? TCG_BATTLE_ENERGY_TYPES.find((type) => type.toLowerCase() === darkBenchEvolution[1]) || null
+    : null
+  if (darkBenchEvolution && darkBenchEvolutionType) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', evolveAttacker: true, requiresOwnBenchType: darkBenchEvolutionType }],
+    })
+  }
+  const coinGatedNamedAttackerEvolution = text.match(/^flip a coin\. if heads, search your deck for ([a-z0-9' -]+) and put it onto this [a-z0-9' -]+ to evolve it\. then, shuffle your deck\.$/)
+  if (coinGatedNamedAttackerEvolution) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeNames: [coinGatedNamedAttackerEvolution[1].trim()], destination: 'hand', random: true, evolveAttacker: true, condition: 'heads' }],
+    })
+  }
+  const coinGatedOwnEvolution = text.match(/^flip a coin\. if heads, search your deck for a card that evolves from 1 of your (pokemon|benched pokemon) and put (?:it|that card) (?:onto|on) that pokemon\. \(this counts as evolving that pokemon\.\) shuffle your deck afterward\.$/)
+  if (coinGatedOwnEvolution) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      targetScope: coinGatedOwnEvolution[1] === 'benched pokemon' ? 'ownBench' : 'own',
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', evolveTarget: true, condition: 'heads' }],
+    })
+  }
+  if (text === 'put a random card from your deck that evolves from this pokemon onto this pokemon to evolve it.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', random: true, evolveAttacker: true, shuffleAfterEvolution: false }],
+    })
+  }
+  const partnerEvolution = text.match(/^if (shelmet|karrablast) is in play, search your deck for a card that evolves from this pokemon and put it onto this pokemon\. \(this counts as evolving this pokemon\.\) shuffle your deck afterward\.$/)
+  if (partnerEvolution) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: 1,
+        destination: 'hand',
+        evolveAttacker: true,
+        requiresNameInPlay: partnerEvolution[1] === 'shelmet' ? 'karrablast' : 'shelmet',
+      }],
+    })
+  }
+  if (/^flip a coin\. if heads, your opponent shuffles their active pokemon into their deck\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      special: [{ kind: 'shuffleTargetIntoDeck', targetZone: 'front', condition: 'heads' }],
+    })
+  }
+  const shuffleOpponentActiveIntoDeck = text.match(/^(?:your opponent shuffles (?:their|his or her) active pokemon|shuffle your opponent's active pokemon) and (?:all (?:cards )?attached to it|all attached cards) into (?:their|his or her) deck\.(?: if your opponent has no benched pokemon, this attack does nothing\.)?(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (shuffleOpponentActiveIntoDeck) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'shuffleTargetIntoDeck',
+        targetZone: 'front',
+        ...(text.includes('if your opponent has no benched pokemon') ? { requiresOpponentBench: true } : {}),
+      }],
+    })
+  }
+  const blindHandShuffle = text.match(/^(?:flip a coin\. if heads, )?choose 1 card from your opponent's hand without looking\. look at (?:the|that) card you chose, then have your opponent shuffle that card into (?:his or her|their) deck\.$/)
+  const randomHandShuffle = text.match(/^(?:flip a coin\. if heads, )?(?:your opponent reveals a random card from their hand and shuffles it into their deck|look at a random card from your opponent's hand(?: and shuffle it into their deck|\. your opponent shuffles that card into (?:his or her|their) deck)|choose a random card from your opponent's hand\. your opponent reveals that card and shuffles it into (?:his or her|their) deck)\.$/)
+  if (blindHandShuffle || randomHandShuffle) {
+    const coinGated = text.startsWith('flip a coin.')
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      ...(coinGated ? { coinFlipCount: 1 } : {}),
+      special: [{
+        kind: 'shuffleRandomHandCardIntoDeck',
+        target: 'opponent',
+        revealSelected: true,
+        ...(coinGated ? { condition: 'heads' as const } : {}),
+      }],
+    })
+  }
+  const blindHandDiscard = text.match(/^(?:flip a coin\. if heads, )?choose 1 card from your opponent's hand without looking and discard it\.$/)
+  if (blindHandDiscard) {
+    const coinGated = text.startsWith('flip a coin.')
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      ...(coinGated ? { coinFlipCount: 1 } : {}),
+      special: [{
+        kind: 'discardRandomHandCard',
+        target: 'opponent',
+        ...(coinGated ? { condition: 'heads' as const } : {}),
+      }],
+    })
+  }
+  const attackerEvolutionText = text.replace(/^if you go first, you can use this attack during your first turn\. /, '')
+  const attackerDeckEvolution = attackerEvolutionText.match(/^search your deck for a card that evolves from (this pokemon|[a-z0-9' -]+) and put it (?:onto|on) (this pokemon|[a-z0-9' -]+)(?: to evolve it)?\.(?: \(this counts as evolving (this pokemon|[a-z0-9' -]+)\.\))? (?:then, )?shuffle your deck(?: afterward)?\.$/)
+  const attackerEvolutionNames = attackerDeckEvolution?.slice(1).filter(Boolean).map((name) => name!.replace(/[^a-z0-9]/g, ''))
+  if (attackerDeckEvolution && attackerEvolutionNames?.every((name) => name === attackerEvolutionNames[0])) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', evolveAttacker: true }],
+    })
+  }
+  const sameNameHandsBonus = text.match(/^each player reveals their hand\. if a card in your opponent's hand has the same name as a card in your hand, this attack does (\d+) more damage\.$/)
+  if (sameNameHandsBonus && baseDamage !== null) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'sameNameInHandsBonus', baseDamage, bonusDamage: Number(sameNameHandsBonus[1]) },
+    })
+  }
+  const handSizeDamage = text.match(/^this attack does (\d+) damage for each card in your hand\.$/)
+  if (handSizeDamage) {
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: Number(handSizeDamage[1]), source: { kind: 'handSize', side: 'own' } },
+    }
+  }
+  const dynamicSwing = text.match(/^you may do (\d+) more damage\. if you do, during your opponent's next turn, this pokemon takes (\d+) more damage from attacks \(after applying weakness and resistance\)\.$/)
+  if (dynamicSwing && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: Number(dynamicSwing[1]) },
+      choiceRequirement: 'optionalBonus',
+      special: [{ kind: 'buffDefendingPokemon', damageBonus: Number(dynamicSwing[2]), requiresOptionalChoice: true }],
+    })
+  }
+  const optionalDamageWithBilateralMill = text.match(/^you may do (\d+) more damage\. if you do, discard the top (\d+) cards of each player's deck\.$/)
+  if (optionalDamageWithBilateralMill && normalizedDamage.endsWith('+')) {
+    const millCount = Number(optionalDamageWithBilateralMill[2])
+    return applyAttackTextModifiers({
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: Number(optionalDamageWithBilateralMill[1]) },
+      choiceRequirement: 'optionalBonus',
+      special: [
+        { kind: 'millCards', target: 'self', amount: millCount, requiresOptionalChoice: true },
+        { kind: 'millCards', target: 'opponent', amount: millCount, requiresOptionalChoice: true },
+      ],
+    })
+  }
+  const dragonDanceBonus = text.match(/^during your next turn, if any of your current active pokemon does damage to any defending pokemon, this attack does (\d+) more damage \(before applying weakness and resistance\)\.$/)
+  if (dragonDanceBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'armAttackBuffAfterPriorActiveDamage', attackName: attack.name, damageBonus: Number(dragonDanceBonus[1]) }],
+    })
+  }
+  const nextTurnCoinCount = text.match(/^during your next turn, flip (\d+) coins instead of (\d+) for this pokemon's ([a-z0-9' -]+) attack\.$/)
+  if (nextTurnCoinCount) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'armAttackCoinCountOverride',
+        attackName: nextTurnCoinCount[3],
+        coinFlipCount: Number(nextTurnCoinCount[1]),
+      }],
+    })
+  }
+  const fixedRetaliation = text.match(/^during your opponent's next turn, if [a-z0-9' -]+ is damaged by (?:an attack|an opponent's attack) \(even if [a-z0-9' -]+ is knocked out\), put (\d+) damage counters? on the attacking pokemon\.$/)
+  if (fixedRetaliation) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'reflectDamage', reflectFixedDamage: Number(fixedRetaliation[1]) * 10 }],
+    })
+  }
+  const crosscounterRetaliation = text.match(/^if an attack does damage to ([a-z0-9' -]+) during your opponent's next turn \(even if [a-z0-9' -]+ is knocked out\), flip a coin\. if heads, [a-z0-9' -]+ attacks your opponent's active pokemon for double that amount of damage\.(?: \(if [^)]*\))?$/)
+  if (crosscounterRetaliation) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'reflectDamage', damageMultiplier: 2, coinGate: 'heads' }],
+    })
+  }
+  const delayedKnockOutSubtype = text.match(/^during your next turn, if the defending pokemon is damaged by an attack from a ([a-z][a-z0-9 -]*) pokemon, it (?:will be|is) knocked out\.$/)
+  if (delayedKnockOutSubtype) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'armKnockOutOnNextDamage', requiredAttackerSubtype: delayedKnockOutSubtype[1] }],
+    })
+  }
+  if (/^during your next turn, if the defending pokemon is damaged by an attack, it (?:will be|is) knocked out\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'armKnockOutOnNextDamage' }],
+    })
+  }
+  if (/^during your opponent's next turn, their pokemon can't attack\. \(this includes pokemon that come into play on that turn\.\)(?: \(you can't use more than 1 gx attack in a game\.\))?$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'lockOpponentAttacksForNextTurn' }],
+    })
+  }
+  const defendingAttackCostIncrease = text.match(/^(?:([a-z0-9' -]+) is now asleep\. )?during your opponent's next turn, the attack cost of each of the defending pokemon's attacks is (colorless|\{c\}) more\.$/)
+  if (defendingAttackCostIncrease) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [
+        ...(defendingAttackCostIncrease[1] ? [{ kind: 'setStatus' as const, target: 'opponent' as const, statuses: ['asleep' as const] }] : []),
+        { kind: 'increaseDefendingAttackCost', amount: 1 },
+      ],
+    })
+  }
+  const defendingRetreatCostIncrease = text.match(/^during your opponent's next turn, the defending pokemon's retreat cost is (colorless|\{c\}) more\.$/)
+  if (defendingRetreatCostIncrease) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'increaseDefendingRetreatCost', amount: 1 }],
+    })
+  }
+  const sourceLinkedAttackCostIncrease = text.match(/^until this ([a-z0-9' -]+) leaves the active spot, the defending pokemon's attacks cost ((?:colorless|\{c\})+) more, and the defending pokemon can't retreat\. this effect can't be applied more than once\.$/)
+  if (sourceLinkedAttackCostIncrease) {
+    const amount = sourceLinkedAttackCostIncrease[2].match(/colorless|\{c\}/g)?.length || 0
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [
+        { kind: 'increaseDefendingAttackCost', amount, untilSourceLeaves: true },
+        { kind: 'preventRetreat', target: 'opponent', untilSourceLeaves: true },
+      ],
+    })
+  }
+  const freeAttackCostTypes = text.match(/^during your next turn, ignore all energy in the attack costs of ([a-z]+ pokemon(?: and [a-z]+ pokemon)*)(?:\. \(this includes pokemon that come into play on that turn\.\))?\.?$/)
+  if (freeAttackCostTypes) {
+    const types = [...freeAttackCostTypes[1].matchAll(/([a-z]+) pokemon/g)].map((match) => match[1])
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'ignoreOwnAttackCostsForTypes', types }],
+    })
+  }
+  const poisonCheckupReplacement = text.match(/^if your opponent's active pokemon is poisoned, put (\d+) damage counters? instead of (\d+) on that pokemon between turns\.$/)
+  if (poisonCheckupReplacement) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'increasePoisonCheckupDamageOnce',
+        amount: Math.max(0, Number(poisonCheckupReplacement[1]) - Number(poisonCheckupReplacement[2])) * 10,
+      }],
+    })
+  }
+  const coinGatedNextTurnBaseDamage = text.match(/^flip a coin\. if heads, during your next turn, ([a-z][a-z0-9 -]*?)'s ([a-z][a-z0-9 -]*?) attack's base damage is (\d+)\.$/)
+  if (coinGatedNextTurnBaseDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      special: [{
+        kind: 'buffAttack',
+        target: 'self',
+        attackName: coinGatedNextTurnBaseDamage[2].trim(),
+        baseDamage: Number(coinGatedNextTurnBaseDamage[3]),
+        condition: 'heads',
+      }],
+    })
+  }
+  if (/^flip a coin[.,] if heads, (?:the )?defending pokemon (?:can't|cannot) attack during your opponent's next turn\.$/.test(text) ||
+    /^flip a coin\. if heads, during your opponent's next turn, (?:the )?defending pokemon (?:can't|cannot) attack\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      special: [{ kind: 'cannotAttack', target: 'opponent', condition: 'heads' }],
+    })
+  }
+  const silverWind = text.match(/^during your next turn, if an attack does damage to the defending pokemon \(after applying weakness and resistance\), that attack does (\d+) more damage\.$/)
+  if (silverWind) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'buffDefendingPokemon', damageBonus: Number(silverWind[1]) }],
+    })
+  }
+  if (/^flip a coin\. if heads, remove 2 damage counters from vileplume \(1 if it only has 1\)\. then, if you have any benched pokemon with damage counters on them, choose 1 of them and remove 2 damage counters from it \(1 if it only has 1\)\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      choiceRequirement: 'ownBench',
+      healing: [
+        { target: 'self', amount: 20, condition: 'heads' },
+        { target: 'selectedOwnBench', amount: 20, damagedOnly: true },
+      ],
+    })
+  }
+  if (
+    normalizedAttackName === 'antler swipe' &&
+    text.startsWith('flip a coin. if heads, this attack does 20 damage to the defending pokemon') &&
+    text.includes('if tails and your opponent has any benched pokemon, choose 1 of them and this attack does 20 damage to it.')
+  ) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'conditionalBonus', baseDamage: 0, bonusDamage: 20, condition: 'heads' },
+      coinFlipCount: 1,
+      targetScope: 'front',
+      ignoreWeaknessResistance: true,
+      benchDamage: [{ amount: 20, side: 'opponent', zone: 'bench', maxTargets: 1, condition: 'tails', ignoreWeaknessResistance: true }],
+    })
+  }
+  if (normalizedAttackName === 'lick wounds' && /^flip a coin\. if heads, choose 1 pokemon \(yours or your opponent's\) with damage counters on it and remove 2 damage counters from it \(1 if it only has 1\)\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      choiceRequirement: 'ownPokemon',
+      choiceOwnPokemonSide: 'any',
+      choiceOwnPokemonMustBeDamaged: true,
+      healing: [{ target: 'selectedOwnPokemon', amount: 20, condition: 'heads' }],
+    })
+  }
+  if (normalizedAttackName === 'paradise pollen' && /^flip a coin\. if heads, remove 2 damage counters from vileplume \(1 if it only has 1\)\. then, if you have any benched pokemon with damage counters on them, choose 1 of them and remove 2 damage counters from it \(1 if it only has 1\)\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      healing: [
+        { target: 'self', amount: 20, condition: 'heads' },
+        { target: 'selectedOwnBench', amount: 20, condition: 'heads' },
+      ],
+    })
+  }
+  if (/^put a basic pokemon from either player's discard pile onto that player's bench\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'discardPokemon',
+      special: [{ kind: 'reviveDiscardPokemon', restoreFullHp: true }],
+    })
+  }
+  if (/^put damage counters? on your opponent's active pokemon until its remaining hp is 10\. if you placed any damage counters? in this way, this attack also does 120 damage to this pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'front',
+      counterDamage: [{ target: 'opponent', amountToLeaveHp: 10 }],
+      selfDamage: [{ kind: 'fixed', amount: 120, requiresTargetCurrentHpAbove: 10 }],
+    })
+  }
+  if (setId === 'pop4' && normalizedAttackName === 'nap' && text === 'remove 2 damage counters from wobbuffet.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      healing: [{ target: 'self', amount: 20 }],
+    })
+  }
+  if (text === "knock out your opponent's active pokemon. if your opponent's active pokemon is knocked out in this way, this pokemon does 200 damage to itself.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'front',
+      special: [{ kind: 'knockOutTarget' }],
+      selfDamage: [{ kind: 'fixed', amount: 200, requiresTargetKnockOut: true }],
+    })
+  }
+  if (text === 'during your next turn, this pokemon has no retreat cost.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'freeRetreat' }],
+    })
+  }
+  if (
+    normalizedAttackName === 'hidden power' &&
+    text.includes('flip a coin') &&
+    text.includes('put damage counters on the defending pokemon until it is 10 hp away from being knocked out')
+  ) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'targetToRemainingHp', remainingHp: 10, condition: 'heads' },
+      coinFlipCount: 1,
+      ignoreWeaknessResistance: true,
+    })
+  }
+  if (
+    normalizedAttackName === 'everyone discharge' &&
+    /this attack does 20 more damage for each of your benched (?:\{l\}|lightning) pokemon/.test(text)
+  ) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: 20,
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: ['Lightning'], zone: 'bench' },
+      },
+      ignoreWeakness: true,
+    })
+  }
+  const poolEnergySearch = text.match(/^(?:search your deck for )?(?:up to )?(?:a )?(\d+ )?(?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)) energy cards?[^.]*\.(?:\s*(?:then, )?shuffle your deck(?: afterward)?\.)?$/)
+  const poolEnergySearchAttach = /\b(?:search your deck for|put .* into your hand|reveal .* and put .* into your hand)\b/.test(text) && /\b(?:attach (?:them|it|up to \d+|\d+) to|attach .* to (?:this|1 of your|your) pokemon|put (?:it|them) into your hand)\b/.test(text)
+  if (poolEnergySearch && poolEnergySearchAttach) {
+    const energyTypeCodes: Record<string, TcgBattleEnergyType> = { g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', m: 'Metal', d: 'Darkness', y: 'Fairy', c: 'Colorless' }
+    const energyType = poolEnergySearch[2]
+      ? energyTypeCodes[poolEnergySearch[2]]
+      : poolEnergySearch[3]
+        ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[poolEnergySearch[3]]
+        : undefined
+    const amount = poolEnergySearch[1] ? Number.parseInt(poolEnergySearch[1], 10) : 1
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount, ...(energyType ? { requiresEnergyType: energyType } : {}) }],
+    })
+  }
+  if (/^flip a coin\. if heads, choose 1 of the defending pokemon's attacks?\. that pokemon can't use that attack during your opponent's next turn\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'disableAttack',
+      coinFlipCount: 1,
+      special: [{ kind: 'disableAttack', condition: 'heads' }],
+    })
+  }
+  if (/^flip 2 coins?\. if both of them are heads, your opponent's active pokemon is knocked out\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'knockOutOnCoinCondition', condition: { result: 'heads', minimum: 2 } },
+      coinFlipCount: 2,
+      targetScope: 'front',
+    })
+  }
+  if (/^flip a coin\. if heads, put your opponent's active pokemon into their hand\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      targetScope: 'front',
+      special: [{ kind: 'returnTargetToHand', condition: 'heads' }],
+    })
+  }
+  const coinGatedDefendingPokemonReturn = text.match(/^flip a coin\. if heads, your opponent returns the defending pokemon and all cards attached to it to his or her hand\.(?: \(if your opponent doesn't have any benched pokemon or other active pokemon, this attack does nothing\.\))?$/)
+  if (coinGatedDefendingPokemonReturn) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      targetScope: 'front',
+      special: [{ kind: 'returnTargetToHand', condition: 'heads', requiresAlternateOpponentPokemon: text.includes("if your opponent doesn't have any benched pokemon or other active pokemon") }],
+    })
+  }
+  if (text === 'your opponent puts the defending pokemon and all cards attached to it into his or her hand.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      targetScope: 'front',
+      special: [{ kind: 'returnTargetToHand' }],
+    })
+  }
+  if (/^shuffle ([a-z0-9' -]+) into your deck\. \(discard all cards attached to \1\.\)$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'returnOwnPokemonToDeck' }],
+    })
+  }
+  if (text === 'shuffle aipom and all cards attached to it into your deck. flip a coin. if heads, shuffle a card from your discard pile into your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      special: [
+        { kind: 'returnOwnPokemonToDeck' },
+        { kind: 'shuffleDiscardPokemonIntoDeck', maxCount: 1, condition: 'heads' },
+      ],
+    })
+  }
+  if (text === 'if you have any benched pokemon, shuffle 1 of them and all cards attached to it into your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'returnOwnBenchToDeck' }],
+    })
+  }
+  const coinGatedBenchShuffle = text.match(/^flip a coin\. if heads, put (?:1|one) of your benched pokemon and (?:all cards attached to(?: it)?|all attached cards) on top of your deck\. shuffle your deck afterward\.$/)
+  if (coinGatedBenchShuffle) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'returnOwnBenchToDeck', condition: 'heads' }],
+    })
+  }
+  const coinGatedOpponentBenchShuffle = text.match(/^flip a coin\. if heads, put (?:1|one) of your opponent's benched pokemon and all cards attached to it on top of your opponent's deck\. your opponent shuffles (?:his or her|their) deck afterward\.$/)
+  if (coinGatedOpponentBenchShuffle) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'shuffleTargetIntoDeck', targetZone: 'selectedChoice', condition: 'heads' }],
+    })
+  }
+  if (text === "choose 1 of your opponent's benched pokemon. they shuffle that pokemon and all attached cards into their deck. then, shuffle this pokemon and all attached cards into your deck.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'opponentBench',
+      special: [
+        { kind: 'shuffleTargetIntoDeck', targetZone: 'selectedChoice' },
+        { kind: 'returnOwnPokemonToDeck' },
+      ],
+    })
+  }
+  if (/^choose 1 of your opponent's pokemon\. search your deck for a pokemon that is the same type as the pokemon you chose, show it to your opponent, and put it into your hand\. shuffle your deck afterward\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      targetScope: 'any',
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', includeTargetType: true }],
+    })
+  }
+  if (/^choose 1 of your opponent's benched pokemon\. put that pokemon and all cards attached to it back to your opponent's hand\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'returnOpponentBenchToHand' }],
+    })
+  }
+  if (
+    setId === 'gym1' &&
+    normalizedAttackName === 'blot' &&
+    /^if there are any damage counters on erika's oddish, remove 1 of them\.$/.test(text)
+  ) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      healing: [{ target: 'self', amount: 10 }],
+    })
+  }
+  if (
+    setId === 'pop8' &&
+    normalizedAttackName === 'magical leaf' &&
+    text === 'flip a coin. if heads, this attack does 20 damage plus 20 more damage and remove 3 damage counters from cherrim.'
+  ) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'headsBonus', baseDamage: 20, bonusDamage: 20 },
+      coinFlipCount: 1,
+      healing: [{ target: 'self', amount: 30, condition: 'heads' }],
+    })
+  }
+  const damagedPokemonTargetAttack = text.match(/^choose 1 of your opponent's pokemon that has any damage counters? on it\. this attack does (\d+) damage to that pokemon\./)
+  if (damagedPokemonTargetAttack) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: Number.parseInt(damagedPokemonTargetAttack[1], 10) },
+      targetScope: 'any',
+      targetMustBeDamaged: true,
+      ignoreWeaknessResistanceOnBench: /\(?(?:don't|do not) apply weakness and resistance for benched pokemon\)?/.test(text),
+    })
+  }
+  if (/^heal all damage from all of your pokemon\./.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      healing: [{ amount: 'all', side: 'own', zone: 'play' }],
+    })
+  }
+  if (text === 'heal all damage from each of your benched pokemon. if you healed any damage in this way, shuffle this pokemon and all attached cards into your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      healing: [{ amount: 'all', side: 'own', zone: 'bench' }],
+      special: [{ kind: 'returnOwnPokemonToDeck', requiresHealing: true }],
+    })
+  }
+  const coinGatedAnyTargetDamage = text.match(/^flip a coin\. if heads, choose 1 of your opponent's pokemon\. this attack does (\d+) damage to that pokemon\. this attack's damage isn't affected by weakness or resistance\.$/)
+  if (coinGatedAnyTargetDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'conditionalBonus', baseDamage: 0, bonusDamage: Number(coinGatedAnyTargetDamage[1]), condition: 'heads' },
+      coinFlipCount: 1,
+      targetScope: 'any',
+      ignoreWeaknessResistance: true,
+    })
+  }
+  const coinGatedUnmodifiedAnyTargetDamage = text.match(/^flip a coin\. if heads, choose 1 of your opponent's pokemon\. this attack does (\d+) damage to that pokemon\. don't apply weakness and resistance\.$/)
+  if (coinGatedUnmodifiedAnyTargetDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'conditionalBonus', baseDamage: 0, bonusDamage: Number(coinGatedUnmodifiedAnyTargetDamage[1]), condition: 'heads' },
+      coinFlipCount: 1,
+      targetScope: 'any',
+      ignoreWeaknessResistance: true,
+    })
+  }
+  const selectedTargetRemainingHp = text.match(/^put damage counters? on 1 of your opponent's pokemon until its remaining hp is (\d+)\.$/)
+  if (selectedTargetRemainingHp) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      targetScope: 'any',
+      counterDamage: [{ target: 'target', amountToLeaveHp: Number.parseInt(selectedTargetRemainingHp[1], 10) }],
+    })
+  }
+  const targetDamageState = text.match(
+    /^if the defending pokemon has no damage counters on it, this attack does (\d+) damage\. if it has any damage counters on it, this attack does (\d+) damage\.$/,
+  )
+  if (targetDamageState) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'targetDamageState',
+        undamagedDamage: Number.parseInt(targetDamageState[1], 10),
+        damagedDamage: Number.parseInt(targetDamageState[2], 10),
+      },
+    })
+  }
+  if (/^if this pokemon has no damage counters on it, this attack does nothing\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'attackerFullHpBonus', baseDamage: 0, bonusDamage: baseDamage },
+    })
+  }
+  const ownBenchDamageCounterCount = text.match(/^put damage counters on your opponent's active pokemon equal to the number of damage counters on 1 of your benched pokemon\.$/)
+  if (ownBenchDamageCounterCount) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'front',
+      choiceRequirement: 'ownPokemon',
+      choiceOwnPokemonZone: 'bench',
+      choiceOwnPokemonMustBeDamaged: true,
+      counterDamage: [{ amountPerUnit: 10, source: { kind: 'selectedOwnPokemonDamageCounters' }, target: 'opponent' }],
+    })
+  }
+  const countersPerAttackerDamageCounter = text.match(/^for each damage counter on this [a-z0-9' -]+, put (\d+) damage counters? on your opponent's pokemon in any way you like\.$/)
+  if (countersPerAttackerDamageCounter) {
+    const countersPerUnit = Number.parseInt(countersPerAttackerDamageCounter[1], 10)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCountFrom: { kind: 'damageCounters', target: 'attacker' },
+      choiceCounterCountMultiplier: countersPerUnit,
+      counterDamage: [{ target: 'distributed', amountPerCounter: 10 }],
+    })
+  }
+  const fixedCountersOnSelectedTargets = text.match(/^choose (\d+) of your opponent's pokemon and put (\d+) damage counters? on each of them\.$/)
+  if (fixedCountersOnSelectedTargets) {
+    const targetCount = Number.parseInt(fixedCountersOnSelectedTargets[1], 10)
+    const countersPerTarget = Number.parseInt(fixedCountersOnSelectedTargets[2], 10)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: targetCount * countersPerTarget,
+      choiceCounterCountPerTarget: countersPerTarget,
+      choiceCounterTargetCount: targetCount,
+      counterDamage: [{ target: 'distributed', amountPerCounter: 10 }],
+    })
+  }
+  const repeatedDamageTargets = text.match(/^choose 1 of your opponent's pokemon(?:-gx or pokemon-ex)? (\d+) times\. \(you can choose the same pokemon more than once\.\) for each time you chose a pokemon, do (\d+) damage to it\. this damage isn't affected by weakness or resistance\.(?: \(you can.t use more than 1 (?:gx attack|vstar power) in a game\.\))?$/)
+  if (repeatedDamageTargets) {
+    const count = Number.parseInt(repeatedDamageTargets[1], 10)
+    const damagePerChoice = Number.parseInt(repeatedDamageTargets[2], 10)
+    const requiresGxOrEx = text.includes("pokemon-gx or pokemon-ex")
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: count,
+      choiceCounterAllowRepeatedTargets: true,
+      choiceCounterTargetSubtypeFilter: requiresGxOrEx ? { include: ['GX', 'EX'] } : undefined,
+      counterDamage: [{ target: 'distributed', amountPerCounter: damagePerChoice }],
+    })
+  }
+  const fixedDamageOnChosenTargets = text.match(/^this attack does (\d+) damage to (\d+) of your opponent's benched pokemon\. \(don't apply weakness and resistance for benched pokemon\.\)(?: \(you can.t use more than 1 vstar power in a game\.\))?$/)
+  if (fixedDamageOnChosenTargets) {
+    const damage = Number.parseInt(fixedDamageOnChosenTargets[1], 10)
+    const targetCount = Number.parseInt(fixedDamageOnChosenTargets[2], 10)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: targetCount,
+      choiceCounterCountPerTarget: 1,
+      choiceCounterTargetCount: targetCount,
+      choiceCounterTargetZone: 'bench',
+      choiceCounterTargetDamage: damage,
+      counterDamage: [{ target: 'distributed', amountPerCounter: damage }],
+    })
+  }
+  const damageToChosenBenchedPokemon = text.match(/^choose (\d+) of your opponent's benched pokemon\. this attack does (\d+) damage to each of them\. \(don't apply weakness and resistance for benched pokemon\.\)$/)
+  if (damageToChosenBenchedPokemon) {
+    const targetCount = Number.parseInt(damageToChosenBenchedPokemon[1], 10)
+    const damage = Number.parseInt(damageToChosenBenchedPokemon[2], 10)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: targetCount,
+      choiceCounterCountPerTarget: 1,
+      choiceCounterTargetCount: targetCount,
+      choiceCounterTargetZone: 'bench',
+      choiceCounterTargetDamage: damage,
+      counterDamage: [{ target: 'distributed', amountPerCounter: damage }],
+    })
+  }
+  const prizeGatedTeamCounters = text.match(/^you can use this attack only if the total of both players' remaining prize cards is (\d+) or less\. put (\d+) damage counters? on each of your opponent's pokemon\.(?: \(you can.t use more than 1 gx attack in a game\.\))?$/)
+  if (prizeGatedTeamCounters) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      requiresPrizeTotalAtMost: Number.parseInt(prizeGatedTeamCounters[1], 10),
+      counterDamage: [{ amount: Number.parseInt(prizeGatedTeamCounters[2], 10) * 10, side: 'opponent', zone: 'play' }],
+    })
+  }
+  const teamEnergyMultiplier = text.match(/^this attack does (\d+) damage (?:(?:for each)|(?:times the amount of)) (?:basic )?(?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) )?energy attached to (all of your opponent's pokemon|all of your pokemon|all pokemon)\.(?: \(you can.t use more than 1 (?:gx attack|vstar power) in a game\.\))?$/)
+  if (teamEnergyMultiplier) {
+    const sourceSide = teamEnergyMultiplier[4] === "all of your opponent's pokemon" ? 'opponent' : teamEnergyMultiplier[4] === 'all pokemon' ? 'both' : 'own'
+    const sourceTypeCode = teamEnergyMultiplier[2]
+    const sourceTypeWord = teamEnergyMultiplier[3]?.trim()
+    const sourceEnergyType = sourceTypeCode ? normalizeTcgBattleEnergySymbol(sourceTypeCode) : sourceTypeWord ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[sourceTypeWord] : null
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(teamEnergyMultiplier[1], 10),
+        source: sourceEnergyType ? { kind: 'energyOfType', side: sourceSide, type: sourceEnergyType } : { kind: 'energy', side: sourceSide },
+      },
+    })
+  }
+  const teamMultiTypeEnergy = text.match(/^this attack does (\d+) damage for each (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) energy and each (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) energy attached to (all of your opponent's pokemon|all of your pokemon|all pokemon)\.$/)
+  if (teamMultiTypeEnergy) {
+    const getType = (symbol: string | undefined, word: string | undefined): TcgBattleEnergyType => symbol
+      ? normalizeTcgBattleEnergySymbol(symbol)!
+      : ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[word!]
+    const side = teamMultiTypeEnergy[6] === "all of your opponent's pokemon" ? 'opponent' : teamMultiTypeEnergy[6] === 'all pokemon' ? 'both' : 'own'
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'weightedCount',
+        baseDamage: 0,
+        sources: [
+          { source: { kind: 'energyOfType', side, type: getType(teamMultiTypeEnergy[2], teamMultiTypeEnergy[3]) }, perUnitDamage: Number(teamMultiTypeEnergy[1]) },
+          { source: { kind: 'energyOfType', side, type: getType(teamMultiTypeEnergy[4], teamMultiTypeEnergy[5]) }, perUnitDamage: Number(teamMultiTypeEnergy[1]) },
+        ],
+      },
+    })
+  }
+  const teamEnergyBonus = text.match(/^this attack does (\d+) more damage for each (?:basic )?(?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) )?energy attached to (all of your opponent's pokemon|all of your pokemon)\.(?: \(you can.t use more than 1 (?:gx attack|vstar power) in a game\.\))?$/)
+  if (teamEnergyBonus) {
+    const energyType = teamEnergyBonus[2] ? normalizeTcgBattleEnergySymbol(teamEnergyBonus[2]) : teamEnergyBonus[3] ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[teamEnergyBonus[3]] : null
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(teamEnergyBonus[1], 10),
+        source: energyType ? { kind: 'energyOfType', side: teamEnergyBonus[4] === "all of your opponent's pokemon" ? 'opponent' : 'own', type: energyType } : { kind: 'energy', side: teamEnergyBonus[4] === "all of your opponent's pokemon" ? 'opponent' : 'own' },
+      },
+    })
+  }
+  const individualEnergyMultiplier = text.match(/^(?:this attack )?does (\d+) damage (?:(?:for each)|(?:times the amount of)) (?:basic )?(?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) )?energy attached to (this pokemon|your opponent's active pokemon|the defending pokemon)(?: and (?:your opponent's active pokemon|the defending pokemon))?\.(?: \(you can.t use more than 1 (?:gx attack|vstar power) in a game\.\))?$/)
+  if (individualEnergyMultiplier) {
+    const targetText = individualEnergyMultiplier[4]
+    const includesOpponent = Boolean(individualEnergyMultiplier[5]) || targetText !== 'this pokemon'
+    const energyType = individualEnergyMultiplier[2]
+      ? normalizeTcgBattleEnergySymbol(individualEnergyMultiplier[2])
+      : individualEnergyMultiplier[3]
+        ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[individualEnergyMultiplier[3]]
+        : null
+    const side = individualEnergyMultiplier[5] ? 'both' : includesOpponent ? 'opponent' : 'own'
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(individualEnergyMultiplier[1], 10),
+        source: energyType ? { kind: 'energyOfType', side, type: energyType } : { kind: 'energy', side },
+      },
+    })
+  }
+  const individualEnergyBonus = text.match(/^this attack does (\d+) more damage (?:(?:for each)|(?:times the amount of)) (?:basic )?(?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) )?energy attached to (this pokemon|your opponent's active pokemon|the defending pokemon)\.(?: \(you can.t use more than 1 (?:gx attack|vstar power) in a game\.\))?$/)
+  if (individualEnergyBonus) {
+    const energyType = individualEnergyBonus[2]
+      ? normalizeTcgBattleEnergySymbol(individualEnergyBonus[2])
+      : individualEnergyBonus[3]
+        ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[individualEnergyBonus[3]]
+        : null
+    const side = individualEnergyBonus[4] === 'this pokemon' ? 'own' : 'opponent'
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(individualEnergyBonus[1], 10),
+        source: energyType ? { kind: 'energyOfType', side, type: energyType } : { kind: 'energy', side },
+      },
+    })
+  }
+  if (/^if you use this attack when you have (?:only|exactly) 1 prize card (?:remaining|left), you win this game\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      requiresRemainingPrizeCount: 1,
+      special: [{ kind: 'winIfRemainingPrizes', count: 1 }],
+    })
+  }
+  const discardPokemonMultiplier = text.match(/^this attack does (\d+) damage for each pokemon in your discard pile\.(?: \(you can.t use more than 1 vstar power in a game\.\))?$/)
+  if (discardPokemonMultiplier) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(discardPokemonMultiplier[1], 10),
+        source: { kind: 'pokemonInDiscard', side: 'own' },
+      },
+    })
+  }
+  if (/^for each pokemon in your opponent's discard pile, put 1 damage counter on your opponent's pokemon in any way you like\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCountFrom: { kind: 'pokemonInDiscard', side: 'opponent', all: true },
+      counterDamage: [{ target: 'distributed', amountPerCounter: 10 }],
+    })
+  }
+  const targetTypeMultiplier = text.match(/^if the defending pokemon is (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless), this attack's base damage is doubled\.$/)
+  if (targetTypeMultiplier) {
+    const targetType = targetTypeMultiplier[1]
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'targetTypeMultiplier',
+        baseDamage,
+        multiplier: 2,
+        targetType: targetType[0].toUpperCase() + targetType.slice(1),
+      },
+    })
+  }
+  const exOrGxActiveBonus = text.match(/^if your opponent's active pokemon is a pokemon-gx or a pokemon-ex, this attack does (\d+) more damage(?: \(before applying weakness and resistance\))?\.(?: this attack's damage isn't affected by weakness\.)?$/)
+  if (exOrGxActiveBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'pokemonExOrGxTargetBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(exOrGxActiveBonus[1], 10),
+      },
+    })
+  }
+  const vOrGxActiveBonus = text.match(/^if your opponent's active pokemon is a pokemon v or pokemon-gx, this attack does (\d+) more damage\.$/)
+  if (vOrGxActiveBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'pokemonVOrGxTargetBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(vOrGxActiveBonus[1], 10),
+      },
+    })
+  }
+  const minimumEnergyTypeBonus = text.match(/^if you have at least (\d+) (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) energy in play, this attack does (\d+) more damage\.$/)
+  if (minimumEnergyTypeBonus && normalizedDamage.endsWith('+')) {
+    const energyType = minimumEnergyTypeBonus[2]
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(minimumEnergyTypeBonus[3], 10),
+        source: { kind: 'energyOfType', side: 'own', type: energyType[0].toUpperCase() + energyType.slice(1) as TcgBattleEnergyType },
+        minimumUnits: Number.parseInt(minimumEnergyTypeBonus[1], 10),
+      },
+    })
+  }
+  const extraEnergyThresholdBonus = text.match(/^if this pokemon has at least (\d+) extra (?:(\{[grwlpmdycf]\}|grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless) )?energy attached(?: to this pokemon)?, this attack does (\d+) more damage\.$/)
+  if (extraEnergyThresholdBonus && normalizedDamage.endsWith('+')) {
+    const energyTypeToken = extraEnergyThresholdBonus[2]
+    const energyType = energyTypeToken
+      ? normalizeTcgBattleEnergySymbol(energyTypeToken.replace(/[{}]/g, '')) || ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[energyTypeToken]
+      : undefined
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(extraEnergyThresholdBonus[3]),
+        source: energyType ? { kind: 'energyOfType', side: 'own', type: energyType } : { kind: 'energy', side: 'own' },
+        minimumUnits: (attack.convertedEnergyCost ?? attack.cost.length) + Number(extraEnergyThresholdBonus[1]),
+      },
+    })
+  }
+  const evolvedBenchBonus = text.match(/^this attack does (\d+) more damage for each evolution pokemon on your bench\.$/)
+  if (evolvedBenchBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(evolvedBenchBonus[1], 10),
+        source: { kind: 'pokemonEvolvedOnBench', side: 'own' },
+      },
+    })
+  }
+  const namedDiscardPokemonMultiplier = text.match(/^this attack does (\d+) damage for each ([a-z0-9' -]+) in your discard pile\.$/)
+  if (namedDiscardPokemonMultiplier && /[×x]$/.test(normalizedDamage)) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(namedDiscardPokemonMultiplier[1], 10),
+        source: { kind: 'namedPokemonInDiscard', side: 'own', names: [namedDiscardPokemonMultiplier[2]] },
+      },
+    })
+  }
+  const namedDiscardPokemonBonus = text.match(/^this attack does (\d+) more damage for each ([a-z0-9' -]+) in your discard pile\.$/)
+  if (namedDiscardPokemonBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(namedDiscardPokemonBonus[1], 10),
+        source: { kind: 'namedPokemonInDiscard', side: 'own', names: [namedDiscardPokemonBonus[2]] },
+      },
+    })
+  }
+  const evolvedInPlayBonus = text.match(/^this attack does (\d+) more damage for each of your evolution pokemon in play\.$/)
+  if (evolvedInPlayBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(evolvedInPlayBonus[1], 10),
+        source: { kind: 'pokemonEvolvedInPlay', side: 'own' },
+      },
+    })
+  }
+  const pokemonExCountBonus = text.match(/^this attack does (\d+) more damage for each of your opponent's pokemon-ex\.$/)
+  if (pokemonExCountBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(pokemonExCountBonus[1], 10),
+        source: { kind: 'pokemonExInPlay', side: 'opponent' },
+      },
+    })
+  }
+  const threeNamedBenchBonus = text.match(/^if ([a-z0-9' -]+), ([a-z0-9' -]+), and ([a-z0-9' -]+) are on your bench, this attack does (\d+) more damage\.$/)
+  if (threeNamedBenchBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'namedPokemonSetBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(threeNamedBenchBonus[4], 10),
+        side: 'own',
+        names: [threeNamedBenchBonus[1], threeNamedBenchBonus[2], threeNamedBenchBonus[3]],
+        zone: 'bench',
+      },
+    })
+  }
+  if (/^if (?:1|one) of your opponent's pokemon in play has the same name as (?:1|one) of your pokemon in play, this attack does \d+ more damage\.$/.test(text) && normalizedDamage.endsWith('+')) {
+    const bonusDamage = Number.parseInt(text.match(/this attack does (\d+) more damage/)?.[1] || '0', 10)
+    return applyAttackTextModifiers({
+      damage: { kind: 'sameNameInPlayBonus', baseDamage, bonusDamage },
+    })
+  }
+  const namedBenchDamageCounterBonus = text.match(/^this attack does (\d+) more damage for each damage counter on each of your benched ([a-z0-9' -]+)\.$/)
+  if (namedBenchDamageCounterBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(namedBenchDamageCounterBonus[1], 10),
+        source: { kind: 'damageCountersOnNamedPokemon', side: 'own', zone: 'bench', names: [namedBenchDamageCounterBonus[2]] },
+      },
+    })
+  }
+  const subtypeBenchDamageCounterMultiplier = text.match(/^this attack does (\d+) damage for each damage counter on all of your benched ([a-z0-9' -]+) pokemon\.$/)
+  if (subtypeBenchDamageCounterMultiplier && /[×x]$/.test(normalizedDamage)) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(subtypeBenchDamageCounterMultiplier[1], 10),
+        source: {
+          kind: 'damageCountersOnSubtypesInPlay',
+          side: 'own',
+          zone: 'bench',
+          subtypes: [subtypeBenchDamageCounterMultiplier[2]],
+        },
+      },
+    })
+  }
+  const specialConditionMultiplier = text.match(/^this attack does (\d+) damage for each special condition affecting this pokemon\.$/)
+  if (specialConditionMultiplier && /[×x]$/.test(normalizedDamage)) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'statusCountBonus',
+        baseDamage: 0,
+        bonusDamagePerStatus: Number.parseInt(specialConditionMultiplier[1], 10),
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+        statusTarget: 'attacker',
+      },
+    })
+  }
+  const noBenchExOrGxBonus = text.match(/^if you don't have any pokemon-gx or pokemon-ex on your bench, this attack does (\d+) more damage\.$/)
+  if (noBenchExOrGxBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countAtMostBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(noBenchExOrGxBonus[1], 10),
+        source: { kind: 'pokemonExOrGxOnBench', side: 'own' },
+        maximumUnits: 0,
+      },
+    })
+  }
+  const discardAbilityBonus = text.match(/^if you have (\d+) or more pokemon that have the ([a-z0-9 ' -]+) ability in your discard pile, this attack does (\d+) more damage\.$/)
+  if (discardAbilityBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(discardAbilityBonus[3], 10),
+        source: { kind: 'pokemonWithAbilityInDiscard', side: 'own', abilityName: discardAbilityBonus[2].trim() },
+        minimumUnits: Number.parseInt(discardAbilityBonus[1], 10),
+      },
+    })
+  }
+  const activeThisTurnBonus = text.match(/^if this pokemon (?:was on the bench and became (?:an|your) active pokemon|moved from your bench to the active spot) this turn, this attack does (\d+) more damage\.(?: this attack's damage isn't affected by weakness\.)?$/)
+  if (activeThisTurnBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'attackerBecameActiveThisTurnBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(activeThisTurnBonus[1], 10),
+      },
+    })
+  }
+  const evolvedThisTurnBonus = text.match(/^if this pokemon evolved from ([a-z0-9♀♂' -]+) during this turn, this attack does (\d+) more damage\.$/)
+  if (evolvedThisTurnBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'evolvedThisTurnBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(evolvedThisTurnBonus[2], 10),
+        evolvesFrom: evolvedThisTurnBonus[1].trim(),
+      },
+    })
+  }
+  const repeatedRandomOpponentDamage = text.match(/^(1 of your opponent's pokemon|1 other pokemon \(either yours or your opponent's\)) is chosen at random(?: (\d+) times?)?\. (?:for each time a pokemon was chosen, )?do (\d+) damage (?:to it|to the chosen pokemon)\.$/)
+  if (repeatedRandomOpponentDamage) {
+    const targetCount = Number.parseInt(repeatedRandomOpponentDamage[2] || '1', 10)
+    const targetsBothSides = repeatedRandomOpponentDamage[1].startsWith('1 other pokemon')
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      benchDamage: [{
+        amount: Number.parseInt(repeatedRandomOpponentDamage[3], 10),
+        side: targetsBothSides ? 'both' : 'opponent',
+        zone: 'play',
+        maxTargets: targetCount,
+        allowRepeatedTargets: targetCount > 1,
+        excludeAttacker: targetsBothSides,
+        randomAcrossBothSides: targetsBothSides,
+      }],
+    })
+  }
+  const opposingActiveLastTurnBonus = text.match(/^if your opponent's active pokemon moved from the bench to the active spot during your opponent's last turn, this attack does (\d+) more damage\.$/)
+  if (opposingActiveLastTurnBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'targetBecameActiveLastTurnBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(opposingActiveLastTurnBonus[1], 10),
+      },
+    })
+  }
+  const healedTypeBonus = text.match(/^if any of your (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) pokemon were healed during this turn, this attack does (\d+) more damage\.$/)
+  if (healedTypeBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(healedTypeBonus[2], 10),
+        source: { kind: 'pokemonHealedThisTurn', side: 'own', types: [healedTypeBonus[1]] },
+        minimumUnits: 1,
+      },
+    })
+  }
+  const targetTypeBonus = text.match(/^if (?:your opponent's active pokemon|the defending pokemon) is (?:a )?(.+?) pokemon, this attack does (?:\d+ damage plus )?(\d+) more damage\.$/)
+  if (targetTypeBonus && normalizedDamage.endsWith('+')) {
+    const typeCodes: Record<string, string> = {
+      grass: 'Grass', '{g}': 'Grass',
+      fire: 'Fire', '{r}': 'Fire',
+      water: 'Water', '{w}': 'Water',
+      lightning: 'Lightning', '{l}': 'Lightning',
+      psychic: 'Psychic', '{p}': 'Psychic',
+      fighting: 'Fighting', '{f}': 'Fighting',
+      darkness: 'Darkness', '{d}': 'Darkness',
+      metal: 'Metal', '{m}': 'Metal',
+      fairy: 'Fairy', '{y}': 'Fairy',
+      dragon: 'Dragon',
+      colorless: 'Colorless', '{c}': 'Colorless',
+    }
+    const targetTypes = targetTypeBonus[1].split(/\s+or\s+/).map((value) => typeCodes[value.trim()])
+    if (targetTypes.every(Boolean)) {
+      return applyAttackTextModifiers({
+        damage: {
+          kind: 'targetTypeAnyBonus',
+          baseDamage,
+          bonusDamage: Number.parseInt(targetTypeBonus[2], 10),
+          targetTypes,
+        },
+      })
+    }
+  }
+  const targetBasicBonus = text.match(/^if (?:your opponent's active pokemon|the defending pokemon) is a basic pokemon, this attack does (\d+) more damage\.$/)
+  if (targetBasicBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'targetSubtypeBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(targetBasicBonus[1], 10),
+        subtype: 'Basic',
+      },
+    })
+  }
+  const targetPokemonExBonus = text.match(/^if your opponent's active pokemon is a pokemon \{?ex\}?, this attack does (\d+) more damage\.$/)
+  if (targetPokemonExBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'pokemonExTargetBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(targetPokemonExBonus[1], 10),
+      },
+    })
+  }
+  const injuredNamedBenchDamageBonus = text.match(/^if any of your benched ([a-z0-9' .&-]+) have any damage counters on them, this attack does (\d+) more damage\.$/)
+  if (injuredNamedBenchDamageBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'namedPokemonBenchBonus',
+        baseDamage,
+        bonusDamage: 0,
+        injuredBonusDamage: Number.parseInt(injuredNamedBenchDamageBonus[2], 10),
+        nameContains: injuredNamedBenchDamageBonus[1].trim(),
+      },
+    })
+  }
+  const attackerDamagedBonus = text.match(/^if this pokemon has (?:any )?(?:damage counters? on it|damage on it), this attack does (\d+) more damage\./)
+  if (attackerDamagedBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'attackerDamagedBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(attackerDamagedBonus[1], 10),
+      },
+    })
+  }
+  const statusDamageBonus = text.match(/^if (your opponent's active pokemon|the defending pokemon|this pokemon) is (asleep|burned|confused|paralyzed|poisoned), this attack does (\d+) more damage\./)
+  if (statusDamageBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(statusDamageBonus[3], 10),
+        statuses: [statusDamageBonus[2] as TcgBattleStatusCondition],
+        statusTarget: statusDamageBonus[1] === 'this pokemon' ? 'attacker' : 'target',
+      },
+    })
+  }
+  const targetHasMoreRemainingHpBonus = text.match(/^if your opponent's active pokemon has more remaining hp than this pokemon, this attack does (\d+) more damage\.$/)
+  if (targetHasMoreRemainingHpBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'attackerRemainingHpLessBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(targetHasMoreRemainingHpBonus[1], 10),
+      },
+    })
+  }
+  const healedThisTurnBonus = text.match(/^if this pokemon was healed during this turn, this attack does (\d+) more damage\.$/)
+  if (healedThisTurnBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'healedThisTurnBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(healedThisTurnBonus[1], 10),
+      },
+    })
+  }
+  const attackerRemainingHpThresholdBonus = text.match(/^if this pokemon's remaining hp is (\d+) or less, this attack does (\d+) more damage\.$/)
+  if (attackerRemainingHpThresholdBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'attackerRemainingHpAtMostBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(attackerRemainingHpThresholdBonus[2], 10),
+        maximumHp: Number.parseInt(attackerRemainingHpThresholdBonus[1], 10),
+      },
+    })
+  }
+  const emptyHandDamageBonus = text.match(/^if you have no cards in your hand, this attack does (\d+) more damage\.$/)
+  if (emptyHandDamageBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'emptyHandBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(emptyHandDamageBonus[1], 10),
+      },
+    })
+  }
+  const coinFlipDamageBonus = text.match(/^flip a coin\. if heads,? this attack does (\d+) more damage\.$/)
+  if (coinFlipDamageBonus && baseDamage > 0) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'headsBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(coinFlipDamageBonus[1], 10),
+      },
+      coinFlipCount: 1,
+    })
+  }
+  const allHeadsDamageBonus = text.match(/^flip (\d+) coins?\. if both(?: of them)? are heads, this attack does (\d+) more damage\.$/)
+  if (allHeadsDamageBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'conditionalBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(allHeadsDamageBonus[2], 10),
+        condition: { result: 'heads', minimum: 2, exactly: 2 },
+      },
+      coinFlipCount: Number.parseInt(allHeadsDamageBonus[1], 10),
+    })
+  }
+  const nextTurnDefendingDamageTaken = text.match(/^during your next turn, the defending pokemon takes (\d+) more damage from attacks \(after applying weakness and resistance\)\.$/)
+  if (nextTurnDefendingDamageTaken) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'buffDefendingPokemon', damageBonus: Number.parseInt(nextTurnDefendingDamageTaken[1], 10) }],
+    })
+  }
+  const coinGatedSelfRecoil = text.match(
+    /^flip a coin\. if heads, this attack does (\d+) damage to your opponent's active pokemon\. if tails, this pokemon does (\d+) damage to itself\.$/,
+  )
+  if (coinGatedSelfRecoil) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'zeroOnTails', amount: Number.parseInt(coinGatedSelfRecoil[1], 10) },
+      coinFlipCount: 1,
+      targetScope: 'front',
+      selfDamage: [{ kind: 'fixed', amount: Number.parseInt(coinGatedSelfRecoil[2], 10), condition: 'tails' }],
+    })
+  }
+  const tailsNoDamageSelfRecoil = text.match(
+    /^flip a coin\. if tails, this attack does (?:nothing|no damage) to (?:the )?defending pokemon and [a-z0-9' .-]+ does (\d+) damage to itself\.$/,
+  )
+  if (tailsNoDamageSelfRecoil) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'zeroOnTails', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      selfDamage: [{ kind: 'fixed', amount: Number(tailsNoDamageSelfRecoil[1]), condition: 'tails' }],
+    })
+  }
+  const anyTailsNoDamage = text.match(/^flip (\d+) coins?\. if 1 or both of them are tails, this attack does nothing\.$/)
+  if (anyTailsNoDamage) {
+    const coinFlipCount = Number(anyTailsNoDamage[1])
+    return applyAttackTextModifiers({
+      damage: { kind: 'zeroIfAnyTails', amount: exactDamage || 0, coinFlipCount },
+      coinFlipCount,
+    })
+  }
+  const poisonedAttackerDamageAndPoison = text.match(/^if [a-z0-9' .-]+ is poisoned, this attack's base damage is (\d+) instead of (\d+) and the defending pokemon is now poisoned\.$/)
+  if (poisonedAttackerDamageAndPoison) {
+    const boostedDamage = Number(poisonedAttackerDamageAndPoison[1])
+    const base = Number(poisonedAttackerDamageAndPoison[2])
+    return applyAttackTextModifiers({
+      damage: { kind: 'statusBonus', baseDamage: base, bonusDamage: Math.max(0, boostedDamage - base), statuses: ['poisoned'], statusTarget: 'attacker' },
+      special: [{ kind: 'setStatus', target: 'opponent', statuses: ['poisoned'] }],
+    })
+  }
+  const damagedTargetKnockOut = text.match(/^if your opponent's active pokemon has (\d+) or more damage counters on it, that pokemon is knocked out\.$/)
+  if (damagedTargetKnockOut) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'knockOutAtDamageCountersAtLeast', minimumCounters: Number(damagedTargetKnockOut[1]) },
+      targetScope: 'front',
+    })
+  }
+  const removeUnownCounters = text.match(/^remove (\d+) damage counters from unown\. \(all if there are less than \d+\.\)$/)
+  if (removeUnownCounters && normalizedAttackName === 'hidden power') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      healing: [{ target: 'self', amount: Number(removeUnownCounters[1]) * 10 }],
+    })
+  }
+  if (
+    normalizedAttackName === 'hidden power' &&
+    /^flip a coin\. if heads, switch all damage counters on unown with those on the defending pokemon\. \(if an effect of this attack is prevented, this attack does nothing\.\)$/.test(text)
+  ) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      special: [{ kind: 'swapDamageCounters', condition: 'heads' }],
+    })
+  }
+  const coinGatedDraw = text.match(/^flip a coin\. if heads, draw (a card|1 card|\d+ cards?)\.?$/)
+  if (coinGatedDraw) {
+    const amount = Number.parseInt(coinGatedDraw[1], 10) || 1
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      special: [{ kind: 'drawCards', target: 'self', amount, condition: 'heads' }],
+    })
+  }
+  const flipUntilTailsDraw = text.match(/^flip a coin until you get tails\. for each heads?, draw (a|1|\d+) cards?\./)
+  if (flipUntilTailsDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawCards', target: 'self', amountPerHead: Number.parseInt(flipUntilTailsDraw[1], 10) || 1 }],
+      flipUntilTails: true,
+    })
+  }
+  const flipUntilTailsEnergySearch = text.match(/^flip a coin until you get tails\. for each heads?, search your deck for (?:a |an )?(?:basic )?(?:\{[grwlpmdycf]\}|grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) energy card and attach it to this pokemon\. shuffle your deck afterward\.$/)
+  if (flipUntilTailsEnergySearch) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      flipUntilTails: true,
+      energyGain: [{ target: 'self', amountPerHead: 1 }],
+    })
+  }
+  const coinHealOwnPokemon = text.match(/^flip a coin\. if heads, remove (\d+) damage counters? from (?:1|one) of your pokemon \(\d+ if it has only 1\)\.$/)
+  if (coinHealOwnPokemon) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      healing: [{
+        target: 'selectedOwnPokemon',
+        amount: Number(coinHealOwnPokemon[1]) * 10,
+        condition: 'heads',
+      }],
+    })
+  }
+  if (text === 'switch this pokemon with 1 of your benched pokemon.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    })
+  }
+  if (text === "switch 1 of your opponent's benched pokemon with the defending pokemon.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    })
+  }
+  if (/^your opponent switches (?:the )?defending pokemon with (?:1|one) of (?:his or her|their) benched pokemon, if any\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'optionalOpponentBench',
+      special: [{ kind: 'switch', target: 'opponent', optional: true }],
+    })
+  }
+  if (/^switch out your opponent's active pokemon to the bench\. \(your opponent chooses the new active pokemon\.?\)\.?$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'switch', target: 'opponent', opponentChooses: true }],
+    })
+  }
+  if (/^your opponent switches (?:their|his or her) active pokemon with (?:1|one) of (?:their|his or her) benched pokemon\.?$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'switch', target: 'opponent', opponentChooses: true }],
+    })
+  }
+  if (/^flip a coin\. if heads, switch 1 of your opponent's benched pokemon with (?:their|his or her) active pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', condition: 'heads' }],
+    })
+  }
+  if (/^flip a coin\. if heads, switch in 1 of your opponent's benched pokemon to the active spot\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', condition: 'heads' }],
+    })
+  }
+  const switchAndHitNewActive = text.match(/^(?:switch 1 of your opponent's benched pokemon with (?:their|the) active pokemon|switch in 1 of your opponent's benched pokemon to the active spot)\. this attack does (\d+) damage to the new active pokemon\.$/)
+  if (switchAndHitNewActive) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: Number.parseInt(switchAndHitNewActive[1], 10) },
+      targetScope: 'front',
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', beforeDamage: true }],
+    })
+  }
+  const eachPlayerDraw = text.match(/^each player draws (?:a|one|(\d+)) cards?\.?$/)
+  if (eachPlayerDraw) {
+    const amount = Number.parseInt(eachPlayerDraw[1] || '1', 10)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [
+        { kind: 'drawCards', target: 'self', amount },
+        { kind: 'drawCards', target: 'opponent', amount },
+      ],
+    })
+  }
+  const shuffleDeck = text.match(/^shuffle (your|your opponent's) deck\.$/)
+  if (shuffleDeck) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'shuffleDeck', target: shuffleDeck[1] === 'your' ? 'self' : 'opponent' }],
+    })
+  }
+  const selectedOpponentCounterDamage = text.match(/^put (\d+) damage counters? on (?:1|one) of your opponent's pokemon\.$/)
+  if (selectedOpponentCounterDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'any',
+      counterDamage: [{ amount: Number.parseInt(selectedOpponentCounterDamage[1], 10) * 10, target: 'opponent' }],
+    })
+  }
+  if (/^the defending pokemon can't retreat during your opponent's next turn\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'preventRetreat', target: 'opponent' }],
+    })
+  }
+  if (/^during your opponent's next turn, the defending pokemon can't retreat\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'preventRetreat', target: 'opponent' }],
+    })
+  }
+  if (/^remove all special conditions from this pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'clearStatus', target: 'self', statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'] }],
+    })
+  }
+  if (/^count the number of pokemon you have in play that has (?:δ|delta) on its card\. draw up to that many cards?\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'deltaPokemonInPlay', side: 'own' },
+      }],
+    })
+  }
+  if (/^draw a number of cards up to the number of your opponent's basic pokemon in play\. \(you can't have more than 10 cards in your hand in this way\.\)$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'pokemonWithSubtypesInPlay', side: 'opponent', subtypes: ['Basic'], zone: 'play' },
+        maxHandSize: 10,
+      }],
+    })
+  }
+  if (/^switch this pokemon with (?:1|one) of your benched pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'ownBench',
+      special: [{ kind: 'switch', target: 'self' }],
+    })
+  }
+  if (/^switch (?:1|one) of your opponent's benched pokemon with (?:the )?defending pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    })
+  }
+  if (/^choose (?:1|one) of your opponent's benched pokemon and switch it with (?:the )?defending pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'optionalOpponentBench',
+      special: [{ kind: 'switch', target: 'opponent', optional: true }],
+    })
+  }
+  if (/^switch (?:1|one) of your opponent's benched pokemon with (?:his or her|their) active pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent' }],
+    })
+  }
+  const chosenOpponentCounters = text.match(/^put (\d+) damage counters? on (?:1|one) of your opponent's pokemon\.$/)
+  if (chosenOpponentCounters) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'any',
+      counterDamage: [{ amount: Number.parseInt(chosenOpponentCounters[1], 10) * 10, target: 'target' }],
+    })
+  }
+  const moveAllBenchCountersToActive = text.match(/^move all damage counters from (?:1|one) of your benched (?:(team rocket's|ancient) )?pokemon to (?:(?:the )?defending pokemon|your opponent's active pokemon)\.$/)
+  if (moveAllBenchCountersToActive) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'damageCounterTransfer',
+      special: [{
+        kind: 'transferDamageCounters',
+        maxCounters: Number.MAX_SAFE_INTEGER,
+        sourceZone: 'bench',
+        sourceNameContains: moveAllBenchCountersToActive[1] === "team rocket's" ? 'Team Rocket' : undefined,
+        sourceSubtypeContains: moveAllBenchCountersToActive[1] === 'ancient' ? 'Ancient' : undefined,
+      }],
+    })
+  }
+  const conditionalDraw = text.match(/^if ([a-z0-9' .-]+) is on your bench, draw (\d+) cards?\.$/)
+  if (conditionalDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: Number.parseInt(conditionalDraw[2], 10),
+        source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: [conditionalDraw[1].trim()] },
+      }],
+    })
+  }
+  const conditionalExtraDraw = text.match(/^draw (?:a|1) card\. if ([a-z0-9' .-]+) is on your bench, draw (\d+) more cards?\.$/)
+  if (conditionalExtraDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amount: 1,
+        amountPerUnit: Number.parseInt(conditionalExtraDraw[2], 10),
+        source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: [conditionalExtraDraw[1].trim()] },
+      }],
+    })
+  }
+  if (/^each player counts the number of cards in (?:his or her|their) opponent's hand\. each player shuffles (?:his or her|their) hand into (?:his or her|their) deck\. then,? each player draws a number of cards equal to the number of cards (?:his or her|their) opponent had\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'shuffleBothHandsAndDrawOpponentHandCount' }],
+    })
+  }
+  if (/^each player shuffles (?:his or her|their) hand into (?:his or her|their) deck and draws 4 cards?\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [
+        { kind: 'drawCards', target: 'self', amount: 4, shuffleHandIntoDeck: true },
+        { kind: 'drawCards', target: 'opponent', amount: 4, shuffleHandIntoDeck: true },
+      ],
+    })
+  }
+  if (/^shuffle your hand into your deck\. then,? draw a number of cards equal to the number of cards in your opponent's hand\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'handSize', side: 'opponent' },
+        shuffleHandIntoDeck: true,
+      }],
+    })
+  }
+  if (text === "choose a player. that player shuffles their hand into their deck and draws 4 cards.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'playerSide',
+      special: [{ kind: 'drawCards', target: 'choice', amount: 4, shuffleHandIntoDeck: true }],
+    })
+  }
+  if (/^shuffle your hand into your deck\. (?:then,? )?draw (?:a|1) card for each card in your opponent's hand\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'handSize', side: 'opponent' },
+        shuffleHandIntoDeck: true,
+      }],
+    })
+  }
+  const shuffleAndDraw = text.match(/^shuffle your hand into your deck,? then draw (\d+) cards?(?:\. [a-z0-9' .-]+ is now (asleep|confused|paralyzed|poisoned|burned))?\.$/)
+  if (shuffleAndDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: Number.parseInt(shuffleAndDraw[1], 10), shuffleHandIntoDeck: true }],
+      status: shuffleAndDraw[2] ? [{ target: 'self', statuses: [shuffleAndDraw[2] as TcgBattleStatusCondition] }] : undefined,
+    })
+  }
+  if (/^flip a coin\. if heads, switch the number of damage counters on .+ with the number of damage counters on the defending pokemon(?: \([^)]*\))?(?:\..*)?$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipCount: 1,
+      special: [{ kind: 'swapDamageCounters', condition: 'heads' }],
+    })
+  }
+  if (/^switch all damage counters on this pokemon with those on your opponent's active pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'swapDamageCounters' }],
+    })
+  }
+  const chosenOpponentDamage = text.match(/^choose (?:1|one) of your opponent's pokemon\. this attack does (\d+) damage to that pokemon\./)
+  if (chosenOpponentDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: Number.parseInt(chosenOpponentDamage[1], 10) },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: true,
+    })
+  }
+  const attackerStatusBonus = text.match(/^if this pokemon is affected by a special condition, this attack does (\d+) more damage\./)
+  if (attackerStatusBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(attackerStatusBonus[1], 10),
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+        statusTarget: 'attacker',
+      },
+    })
+  }
+  const damagePerTargetCounter = text.match(/^does (\d+) damage plus (\d+) more damage for each damage counter on (?:the )?defending pokemon\.$/)
+  if (damagePerTargetCounter && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: Number(damagePerTargetCounter[1]),
+        perUnitDamage: Number(damagePerTargetCounter[2]),
+        source: { kind: 'damageCounters', target: 'target' },
+      },
+    })
+  }
+  const namedBenchBonus = text.match(/^if ([a-z0-9 .'-]+) is on your bench, this attack does (?:(\d+) damage plus )?(\d+) more damage\.$/)
+  if (namedBenchBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage: Number(namedBenchBonus[2] || baseDamage),
+        bonusDamage: Number(namedBenchBonus[3]),
+        source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: [namedBenchBonus[1].trim()] },
+        minimumUnits: 1,
+      },
+    })
+  }
+  const optionalRecoilBonus = text.match(/^you may do (\d+) more damage\. if you do, this pokemon does (\d+) damage to itself\./)
+  if (optionalRecoilBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: Number.parseInt(optionalRecoilBonus[1], 10) },
+      selfDamage: [{ kind: 'optionalChoice', amount: Number.parseInt(optionalRecoilBonus[2], 10) }],
+      choiceRequirement: 'optionalBonus',
+    })
+  }
+  const optionalBonusNextTurnAttackLock = text.match(/^you may do (\d+) more damage\. if you do, during your next turn, this pokemon can't attack\.$/)
+  if (optionalBonusNextTurnAttackLock && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'optionalChoiceBonus', baseDamage, bonusDamage: Number(optionalBonusNextTurnAttackLock[1]) },
+      special: [{ kind: 'disableSelfAttack', attackName: attack.name, requiresOptionalChoice: true }],
+      choiceRequirement: 'optionalBonus',
+    })
+  }
+  const nextTurnAttackBonus = text.match(/^during your next turn, each of this pokemon's attacks does (\d+) more damage\b/)
+  if (nextTurnAttackBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'buffAttack', target: 'self', attackName: '*', damageBonus: Number.parseInt(nextTurnAttackBonus[1], 10) }],
+    })
+  }
+  const nextTurnNamedAttackBonus = text.match(/^during your next turn, this pokemon's ([a-z0-9' -]+) attack does (\d+) more damage\b/)
+  if (nextTurnNamedAttackBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'buffAttack', target: 'self', attackName: nextTurnNamedAttackBonus[1].trim(), damageBonus: Number.parseInt(nextTurnNamedAttackBonus[2], 10) }],
+    })
+  }
+  const nextTurnMultipleBaseDamage = text.match(/^during your next turn, ([a-z][a-z0-9 -]+)'s base damage is (\d+) instead of \d+, and ([a-z][a-z0-9 -]+)'s base damage is (\d+) instead of \d+\.$/)
+  if (nextTurnMultipleBaseDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [
+        { kind: 'buffAttack', target: 'self', attackName: nextTurnMultipleBaseDamage[1].trim(), baseDamage: Number.parseInt(nextTurnMultipleBaseDamage[2], 10) },
+        { kind: 'buffAttack', target: 'self', attackName: nextTurnMultipleBaseDamage[3].trim(), baseDamage: Number.parseInt(nextTurnMultipleBaseDamage[4], 10) },
+      ],
+    })
+  }
+  if (text === "during your next turn, rocket's scizor's agility attack's damage is doubled.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'buffAttack', target: 'self', attackName: 'Agility', damageMultiplier: 2 }],
+    })
+  }
+  const nextTurnBaseDamage = text.match(/^during your next turn, base damage of .+?'s ([a-z][a-z0-9 -]+?) is (\d+) instead of \d+\./)
+  if (nextTurnBaseDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'buffAttack', target: 'self', attackName: nextTurnBaseDamage[1].trim(), baseDamage: Number.parseInt(nextTurnBaseDamage[2], 10) }],
+    })
+  }
+  if (normalizedAttackName === 'mad party' || normalizedAttackName === 'united wings') {
+    const perPokemon = Number(text.match(/does (\d+) damage for each pokemon/)?.[1] || 20)
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: perPokemon,
+        source: { kind: 'pokemonWithAttackInDiscard', side: 'own', attackName: normalizedAttackName === 'mad party' ? 'Mad Party' : 'United Wings' },
+      },
+    })
+  }
+  const namedPokemonConditionalStatus = text.match(/^if you have ([a-z0-9' .-]+) in play, this attack does (\d+) damage plus (\d+) more damage and the defending pokemon is now (asleep|poisoned|burned|paralyzed|confused)\.$/)
+  if (namedPokemonConditionalStatus && normalizedDamage.endsWith('+')) {
+    const requiredPokemon = namedPokemonConditionalStatus[1].trim()
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage: Number.parseInt(namedPokemonConditionalStatus[2], 10),
+        bonusDamage: Number.parseInt(namedPokemonConditionalStatus[3], 10),
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: [requiredPokemon] },
+        minimumUnits: 1,
+      },
+      status: [{
+        target: 'opponent',
+        statuses: [namedPokemonConditionalStatus[4] as TcgBattleStatusCondition],
+        requiresNamedPokemon: { side: 'own', names: [requiredPokemon] },
+      }],
+    })
+  }
+  const poisonBonus = text.match(/^if your opponent's active pokemon is poisoned, this attack does (\d+) more damage\.$/)
+  if (poisonBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'statusBonus', baseDamage, bonusDamage: Number(poisonBonus[1]), statuses: ['poisoned'], statusTarget: 'target' },
+      targetScope: 'front',
+    })
+  }
+  const targetStatusBonus = text.match(/^if your opponent's active pokemon is affected by a special condition, this attack does (\d+) more damage\./)
+  if (targetStatusBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'statusBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(targetStatusBonus[1], 10),
+        statuses: ['asleep', 'poisoned', 'burned', 'paralyzed', 'confused'],
+        statusTarget: 'target',
+      },
+      targetScope: 'front',
+    })
+  }
+  const teamActiveBonus = text.match(/^if your opponent's active pokemon is a (team magma|team aqua) pokemon, this attack does (\d+) more damage\./)
+  if (teamActiveBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'targetNameContainsBonus', baseDamage, bonusDamage: Number.parseInt(teamActiveBonus[2], 10), nameContains: teamActiveBonus[1] },
+      targetScope: 'front',
+    })
+  }
+  const injuredBenchBonus = text.match(/^if (?:(?:any|1 or more of) your benched pokemon have damage on them|your benched pokemon have any damage counters on them), this attack does (\d+) more damage\.$/)
+  if (injuredBenchBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(injuredBenchBonus[1]),
+        source: { kind: 'injuredPokemon', side: 'own', zone: 'bench' },
+        minimumUnits: 1,
+      },
+    })
+  }
+  const typedBenchBonus = text.match(/^if you have any (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) pokemon on your bench, this attack does (\d+) more damage\.$/)
+  if (typedBenchBonus && normalizedDamage.endsWith('+')) {
+    const type = typedBenchBonus[1]
+    const displayType = type[0].toUpperCase() + type.slice(1)
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(typedBenchBonus[2]),
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: [displayType], zone: 'bench' },
+        minimumUnits: 1,
+      },
+    })
+  }
+  const allInjuredBenchBonus = text.match(/^if all (?:of )?your benched pokemon have at least 1 damage counter on them, this attack does (\d+) more damage\.$/)
+  if (allInjuredBenchBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countEqualityBonus',
+        baseDamage,
+        bonusDamage: Number(allInjuredBenchBonus[1]),
+        firstSource: { kind: 'bench', side: 'own' },
+        secondSource: { kind: 'injuredPokemon', side: 'own', zone: 'bench' },
+        minimumUnits: 1,
+      },
+    })
+  }
+  const activeAbilityBonus = text.match(/^if your opponent's active pokemon has an ability, this attack does (\d+) more damage\.$/)
+  if (activeAbilityBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(activeAbilityBonus[1]),
+        source: { kind: 'pokemonWithAbilitiesInPlay', side: 'opponent', zone: 'play' },
+        minimumUnits: 1,
+      },
+      targetScope: 'front',
+    })
+  }
+  if (text === "flip a coin. if heads, your opponent's active pokemon's remaining hp is now 10.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'targetToRemainingHp', remainingHp: 10, condition: { result: 'heads', minimum: 1 } },
+      coinFlipCount: 1,
+      targetScope: 'front',
+      ignoreWeaknessResistance: true,
+    })
+  }
+  const previousTurnKnockoutBonus = text.match(/^if any of your pokemon were knocked out by damage from (?:an attack during your opponent's last turn|an opponent's attack during their last turn|an attack from your opponent's pokemon during their last turn), this attack does (\d+) more damage\.$/)
+  if (previousTurnKnockoutBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage: Number(previousTurnKnockoutBonus[1]) },
+    })
+  }
+  const previousTurnKnockoutConfusionBonus = text.match(/^if any of your pokemon were knocked out by damage from an attack from your opponent's pokemon during their last turn, this attack does (\d+) more damage, and your opponent's active pokemon is now confused\.$/)
+  if (previousTurnKnockoutConfusionBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'lastTurnKnockoutBonus', baseDamage, bonusDamage: Number(previousTurnKnockoutConfusionBonus[1]) },
+      status: [{ target: 'opponent', statuses: ['confused'], requiresLastTurnKnockout: true }],
+      targetScope: 'front',
+    })
+  }
+  const previousTurnTypedKnockoutBonus = text.match(/^if any of your (\{[grwlpfdmyc]\}|grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) pokemon were knocked out by damage from (?:an attack during your opponent's last turn|an opponent's attack during their last turn|an attack from your opponent's pokemon during their last turn), this attack does (\d+) more damage\.$/)
+  if (previousTurnTypedKnockoutBonus) {
+    const energyTypeByCode: Record<string, string> = {
+      '{g}': 'Grass', '{r}': 'Fire', '{w}': 'Water', '{l}': 'Lightning',
+      '{p}': 'Psychic', '{f}': 'Fighting', '{d}': 'Darkness', '{m}': 'Metal',
+      '{y}': 'Fairy', '{c}': 'Colorless',
+    }
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'lastTurnKnockoutBonus',
+        baseDamage,
+        bonusDamage: Number(previousTurnTypedKnockoutBonus[2]),
+        knockedOutType: energyTypeByCode[previousTurnTypedKnockoutBonus[1]] || previousTurnTypedKnockoutBonus[1][0].toUpperCase() + previousTurnTypedKnockoutBonus[1].slice(1),
+      },
+    })
+  }
+  const previousTurnKnockoutPoison = text.match(/^if any of your pokemon were knocked out by damage from an opponent's attack during (?:your opponent's|his or her) last turn, this attack does (\d+) damage plus (\d+) more damage and the defending pokemon is now poisoned\.$/)
+  if (previousTurnKnockoutPoison) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'lastTurnKnockoutBonus', baseDamage: Number(previousTurnKnockoutPoison[1]), bonusDamage: Number(previousTurnKnockoutPoison[2]) },
+      status: [{ target: 'opponent', statuses: ['poisoned'] }],
+      targetScope: 'front',
+    })
+  }
+  const damageCounterScale = text.match(/^this attack does more damage equal to the damage this pokemon has on it\.$/)
+  if (damageCounterScale) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } },
+    })
+  }
+  const opposingBoardDamageCounterBonus = text.match(/^this attack does (\d+) more damage for each damage counter on all of your opponent's pokemon\.$/)
+  if (opposingBoardDamageCounterBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(opposingBoardDamageCounterBonus[1], 10),
+        source: { kind: 'damageCountersOnSide', side: 'opponent', zone: 'play' },
+      },
+    })
+  }
+  const printedDiscardTypeScale = text.match(
+    /^(?:this attack )?does \d+ damage plus (\d+) more(?: damage)? for each (?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)) pokemon in your discard pile\.$/,
+  )
+  if (printedDiscardTypeScale && normalizedDamage.endsWith('+')) {
+    const type = printedDiscardTypeScale[2]
+      ? normalizeTcgBattleEnergySymbol(printedDiscardTypeScale[2])
+      : printedDiscardTypeScale[3]
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(printedDiscardTypeScale[1]),
+        source: { kind: 'pokemonOfTypesInDiscard', side: 'own', types: type ? [type] : [] },
+      },
+    })
+  }
+  const discardSubtypeScale = text.match(
+    /^this attack does (\d+) more damage for each (ancient|single strike|rapid strike|fusion strike|team plasma|team aqua|team magma) (?:card|pokemon) in your discard pile\.$/,
+  )
+  if (discardSubtypeScale) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(discardSubtypeScale[1]),
+        source: { kind: 'pokemonInDiscard', side: 'own', includeSubtypes: [discardSubtypeScale[2]] },
+      },
+    })
+  }
+  const discardTypeScale = text.match(/^this attack does (\d+) more damage for each (?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)) pokemon in your discard pile\.$/)
+  if (discardTypeScale) {
+    const type = discardTypeScale[2] ? normalizeTcgBattleEnergySymbol(discardTypeScale[2]) : discardTypeScale[3]
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(discardTypeScale[1]),
+        source: { kind: 'pokemonOfTypesInDiscard', side: 'own', types: type ? [type] : [] },
+      },
+    })
+  }
+  const discardAttackBenchDamage = text.match(/^this attack does (\d+) damage for each pokemon in your discard pile that has the (.+) attack to 1 of your opponent's benched pokemon\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?$/)
+  if (discardAttackBenchDamage) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(discardAttackBenchDamage[1]),
+        source: { kind: 'pokemonWithAttackInDiscard', side: 'own', attackName: discardAttackBenchDamage[2] },
+      },
+      targetScope: 'bench',
+      ignoreWeaknessResistanceOnBench: true,
+    })
+  }
+  const fixedAnyTargetAttack = text.match(/^choose 1 of your opponent's pokemon\. this attack does (\d+) damage to that pokemon\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?$/)
+  if (fixedAnyTargetAttack) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: Number(fixedAnyTargetAttack[1]) },
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: text.includes("don't apply weakness and resistance for benched pokemon"),
+    })
+  }
+  const allOpponentPokemonCoinDamage = text.match(/^flip (\d+) coins?\. this attack does (\d+) damage times the number of heads to each of your opponent's pokemon\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?$/)
+  if (allOpponentPokemonCoinDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'headsMultiplier', damagePerHeads: Number(allOpponentPokemonCoinDamage[2]), coinFlipCount: Number(allOpponentPokemonCoinDamage[1]) },
+      coinFlipCount: Number(allOpponentPokemonCoinDamage[1]),
+      benchDamage: [{ amount: 0, amountPerHead: Number(allOpponentPokemonCoinDamage[2]), side: 'opponent', zone: 'bench' }],
+      ignoreWeaknessResistanceOnBench: true,
+    })
+  }
+  const namedBenchScaling = text.match(/^this attack does (\d+) more damage for each of your benched ([a-z0-9' -]+)\.$/)
+  if (namedBenchScaling) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(namedBenchScaling[1]),
+        source: { kind: 'namedPokemonContains', side: 'own', zone: 'bench', values: [namedBenchScaling[2]] },
+      },
+    })
+  }
+  const distributedCounters = text.match(/^put (\d+) damage counters? on your opponent's pokemon in any way you like\./)
+  if (distributedCounters) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'counterDistribution',
+      choiceCounterCount: Number.parseInt(distributedCounters[1], 10),
+      counterDamage: [{ target: 'distributed', amountPerCounter: 10 }],
+    })
+  }
+  const randomPokemonToHand = text.match(/^put (?:a|1) random (?:\{([a-z])\} )?pokemon from your deck into your hand\./)
+  if (randomPokemonToHand) {
+    const randomType = randomPokemonToHand[1] ? normalizeTcgBattleEnergySymbol(randomPokemonToHand[1]) : null
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', random: true, includeTypes: randomType ? [randomType] : undefined }],
+    })
+  }
+  const findPokemonForHand = text.match(/^(flip a coin\. if heads, )?search your deck for (?:a )?(?:(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon) )?pokemon,? (?:reveal it|show it to your opponent),? and put it into your hand\./)
+  if (findPokemonForHand) {
+    const rule: Extract<TcgBattleSpecialRule, { kind: 'searchDeckPokemon' }> = {
+      kind: 'searchDeckPokemon',
+      maxCount: 1,
+      destination: 'hand',
+      includeTypes: findPokemonForHand[2] ? [`${findPokemonForHand[2][0].toUpperCase()}${findPokemonForHand[2].slice(1)}`] : undefined,
+      condition: findPokemonForHand[1] ? 'heads' : undefined,
+    }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      coinFlipCount: findPokemonForHand[1] ? 1 : 0,
+      special: [rule],
+    })
+  }
+  const topDeckEnergyAttachment = text.match(/^look at the top (\d+) cards? of your deck(?: and attach|\. (?:you may )?attach) (?:any number of|as many) (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless))(?: or (?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)))? energy cards? you find there(?: as you like)? to (?:this pokemon|1 of your pokemon|your pokemon in any way you like)\.(?: (?:shuffle the other cards back into your deck|put the other cards back in any order)\.)?(?: \(you can't use more than 1 vstar power in a game\.\))?$/)
+    || text.match(/^look at the top (\d+) cards? of your deck(?: and attach|\. (?:you may )?attach) (?:any number of|as many) (?:basic )?energy cards? you find there(?: as you like)? to (?:this pokemon|1 of your pokemon|your pokemon in any way you like)\.(?: (?:shuffle the other cards back into your deck|put the other cards back in any order)\.)?(?: \(you can't use more than 1 vstar power in a game\.\))?$/)
+  if (topDeckEnergyAttachment) {
+    const energyTypeByCode: Record<string, TcgBattleEnergyType> = { g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', m: 'Metal', d: 'Darkness', y: 'Fairy', c: 'Colorless' }
+    const energyTypeByName: Record<string, TcgBattleEnergyType> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' }
+    const energyTypes = [topDeckEnergyAttachment[2], topDeckEnergyAttachment[3], topDeckEnergyAttachment[4], topDeckEnergyAttachment[5]]
+      .filter((value): value is string => Boolean(value))
+      .map((value) => energyTypeByCode[value] || energyTypeByName[value])
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: energyTypes.length > 0
+        ? energyTypes.map((requiresEnergyType) => ({ target: 'self' as const, amount: Number.parseInt(topDeckEnergyAttachment[1], 10), requiresEnergyType }))
+        : [{ target: 'self', amount: Number.parseInt(topDeckEnergyAttachment[1], 10) }],
+    })
+  }
+  if (/^search your deck for a number of lightning energy cards up to the number of mareep in play \(both yours and your opponent's\) and attach them to mareep\. shuffle your deck afterward\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amountPerUnit: 1, requiresEnergyType: 'Lightning', source: { kind: 'namedPokemonContains', side: 'both', zone: 'play', values: ['Mareep'] } }],
+    })
+  }
+  if (/^take up to 2 lightning energy cards from your discard pile and attach them to lt\. surge's electabuzz\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 2, requiresEnergyType: 'Lightning' }],
+    })
+  }
+  if (/^attach a basic \{f\} energy card from your discard pile to each of your benched pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amountPerUnit: 1, requiresEnergyType: 'Fighting', source: { kind: 'bench', side: 'own' } }],
+    })
+  }
+  if (/^flip 3 coins?\. for each heads, attach a basic energy card from your discard pile to your benched pokemon-ex in any way you like\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 3,
+      energyGain: [{ target: 'self', amountPerHead: 1, requiresOwnBenchSubtype: 'ex' }],
+    })
+  }
+  const discardEnergyAttachmentSingle = text.match(/^attach (?:a|an|one) (?:basic )?(?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)) )?energy card from your discard pile to (?:this pokemon|1 of your (?:benched )?pokemon|[a-z0-9 .'-]+)\.$/)
+  if (discardEnergyAttachmentSingle) {
+    const energyTypeByCode: Record<string, TcgBattleEnergyType> = { g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', m: 'Metal', d: 'Darkness', y: 'Fairy', c: 'Colorless' }
+    const energyTypeByName: Record<string, TcgBattleEnergyType> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' }
+    const energyType = discardEnergyAttachmentSingle[1]
+      ? energyTypeByCode[discardEnergyAttachmentSingle[1]]
+      : discardEnergyAttachmentSingle[2]
+        ? energyTypeByName[discardEnergyAttachmentSingle[2]]
+        : undefined
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 1, ...(energyType ? { requiresEnergyType: energyType } : {}) }],
+    })
+  }
+  if (/^flip a coin\. if heads, attach a basic energy card from your discard pile to 1 of your benched pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      energyGain: [{ target: 'self', amount: 1, condition: 'heads', requiresOwnBench: true }],
+    })
+  }
+  if (/^flip 3 coins?\. attach a number of basic \{l\} energy cards up to the number of heads from your discard pile to your benched pokemon in any way you like\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 3,
+      energyGain: [{ target: 'self', amountPerHead: 1, requiresEnergyType: 'Lightning', requiresOwnBench: true }],
+    })
+  }
+  const namedDiscardEnergyAttach = text.match(/^take 1 lightning energy card from your discard pile and attach it to lt\. surge's pikachu\.$/)
+  if (namedDiscardEnergyAttach) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 1, requiresEnergyType: 'Lightning' }],
+    })
+  }
+  if (text === 'search your deck for up to 3 basic energy cards of different types and attach them to your pokemon in any way you like. then, shuffle your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 3 }],
+    })
+  }
+  if (text === 'search your deck for up to 2 basic energy cards of different types and attach them to your pokemon in any way you like. then, shuffle your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 2 }],
+    })
+  }
+  if (/^for each of your benched pokemon, search your deck for a basic \{[grwlpmdycf]\} energy card and attach it to that pokemon\. then, shuffle your deck\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amountPerUnit: 1, source: { kind: 'bench', side: 'own' } }],
+    })
+  }
+  if (/^choose up to 2 of your benched pokemon\. for each of those pokemon, search your deck for a basic energy card and attach it to that pokemon\. then, shuffle your deck\.$/.test(text)) {
+    return {
+      ...applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: exactDamage || 0 },
+        energyGain: [{ target: 'self', amountPerUnit: 1, maxAmount: 2, source: { kind: 'bench', side: 'own' } }],
+      }),
+      ...(secondPlayerFirstTurnOnly ? { secondPlayerFirstTurnOnly: true } : {}),
+    }
+  }
+  if (text === 'search your deck for an energy card and attach it to mew ex. shuffle your deck afterward. then, you may switch mew ex with 1 of your benched pokemon.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 1 }],
+      choiceRequirement: 'optionalOwnBench',
+      special: [{ kind: 'switch', target: 'self', optional: true }],
+    })
+  }
+  const deckEnergySearch = text.match(/^(?:(flip a coin\. if heads, )|(flip (\d+) coins?\. for each heads, ))?search your deck for ([^.]+)\.(.*)$/)
+  if (deckEnergySearch) {
+    const searchTarget = deckEnergySearch[4]
+    const energyTerm = searchTarget.match(/energy cards?/)
+    const energyWordIndex = energyTerm ? searchTarget.indexOf(energyTerm[0]) : -1
+    const targetBeforeEnergy = energyWordIndex >= 0 ? searchTarget.slice(0, energyWordIndex) : ''
+    const targetHasOnlyEnergy = energyWordIndex >= 0 && !/pokemon|trainer|supporter|item|tool|stadium/.test(targetBeforeEnergy)
+    const countMatch = searchTarget.match(/(?:up to )?(\d+)(?: different types of)?/)
+    const hasSingleEnergyTarget = /\b(?:a|an|one) (?:basic )?(?:\{[grwlpmdycf]\} )?energy card/.test(searchTarget)
+    const energyCount = countMatch ? Number.parseInt(countMatch[1], 10) : hasSingleEnergyTarget ? 1 : undefined
+    const trailingAction = energyTerm
+      ? `${searchTarget.slice(energyWordIndex + energyTerm[0].length)}.${deckEnergySearch[5]}`.replace(/^\s*\.\s*/, '').replace(/\s+/g, ' ').trim()
+      : ''
+    const supportedTrailingAction = trailingAction.replace(/\s*\(you can't use more than 1 gx attack in a game\.\)$/, '')
+    const actionOnlyAddsEnergy = /^(?:(?:, )?(?:reveal|show) (?:them|it|that card|those cards)(?: to your opponent)?,? (?:and )?(?:then )?)?(?:and )?(?:put (?:them|it|that card|those cards) into your hand|attach (?:them|it) to (?:this pokemon|your pokemon in any way you like|[a-z0-9 .'-]+))(?:\. (?:then,? )?shuffle your deck(?: afterward)?\.)?\.?$/.test(supportedTrailingAction)
+    const unsupportedRider = /if you go first|during your first turn/.test(text)
+    if (targetHasOnlyEnergy && energyCount !== undefined && actionOnlyAddsEnergy && !unsupportedRider) {
+      const perHead = Boolean(deckEnergySearch[2])
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: exactDamage || 0 },
+        coinFlipCount: perHead ? Number.parseInt(deckEnergySearch[3], 10) : deckEnergySearch[1] ? 1 : 0,
+        energyGain: [{
+          target: 'self',
+          amount: perHead ? 0 : energyCount,
+          amountPerHead: perHead ? 1 : undefined,
+          condition: deckEnergySearch[1] ? 'heads' : undefined,
+        }],
+      })
+    }
+  }
+  const deckEnergyToHand = text.match(/^(flip a coin\. if heads, )?search your deck for (?:(?:up to )?(\d+)(?: different types of)?|a|an) (?:basic )?(?:\{[grwlpmdycf]\}|grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)? ?energy cards?(?: of different types)?,? (?:(?:reveal|show) (?:them|it)(?: to your opponent)?|show (?:them|it) to your opponent),? (?:(?:and )?(?:then )?)put (?:them|it) into your hand\.(?: then,? shuffle your deck(?: afterward)?\.)?$/)
+  if (deckEnergyToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: deckEnergyToHand[1] ? 1 : 0,
+      energyGain: [{ target: 'self', amount: Number.parseInt(deckEnergyToHand[2] || '1', 10), condition: deckEnergyToHand[1] ? 'heads' : undefined }],
+    })
+  }
+  const deckShownEnergyToHand = text.match(/^search your deck for a (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) energy card\. show that card to your opponent, then put it into your hand\. shuffle your deck afterward\.$/)
+  if (deckShownEnergyToHand) {
+    const energyType = deckShownEnergyToHand[1]
+      ? normalizeTcgBattleEnergySymbol(deckShownEnergyToHand[1])
+      : ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[deckShownEnergyToHand[2]]
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 1, ...(energyType ? { requiresEnergyType: energyType } : {}) }],
+    })
+  }
+  if (text === 'search your deck for an energy card, show it to your opponent, and put into your hand. shuffle your deck afterward.') {
+    return applyAttackTextModifiers({ damage: { kind: 'fixed', amount: exactDamage || 0 }, energyGain: [{ target: 'self', amount: 1 }] })
+  }
+  const secondPlayerFirstTurnEnergySearch = text.match(/^search your deck for a \{([grwlpmdycf])\} energy card and attach it to 1 of your pokemon\. if you go second and it's your first turn, instead search for up to (\d+) \{\1\} energy cards and attach them to 1 of your pokemon\. then, shuffle your deck\.$/)
+  const flareStarterEnergySearch = text.match(/^search your deck for a fire energy card and attach it to 1 of your pokemon\. if you go second and it's your first turn, instead search for up to (\d+) fire energy cards and attach them to your pokemon in any way you like\. then, shuffle your deck\.$/)
+  if (secondPlayerFirstTurnEnergySearch || flareStarterEnergySearch) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 1, amountOnSecondPlayerFirstTurn: Number(secondPlayerFirstTurnEnergySearch?.[2] || flareStarterEnergySearch?.[1]) }],
+    })
+  }
+  if (text === "flip 3 coins. for each heads, if you have a fire energy card in your discard pile, put it into your hand.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 3,
+      energyGain: [{ target: 'self', amountPerHead: 1, maxAmount: 3, requiresEnergyType: 'Fire' }],
+    })
+  }
+  const deckEnergyAttach = text.match(/^search your deck for (?:(?:up to )?(\d+)(?: different types of)?|a|an) (?:basic )?(?:\{[grwlpmdycf]\}|grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)? ?energy cards? and attach (?:them|it) to (?:this pokemon|your pokemon in any way you like|[a-z0-9 .'-]+)\.(?: then,? shuffle your deck(?: afterward)?\.)?$/)
+  if (deckEnergyAttach) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: Number.parseInt(deckEnergyAttach[1] || '1', 10) }],
+    })
+  }
+  const firstTurnDeckEnergyAttach = text.match(/^if you go first, you can use this attack during your first turn\. search your deck for an energy card and attach it to this pokemon\. then, shuffle your deck\.$/)
+  if (firstTurnDeckEnergyAttach) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 1 }],
+    })
+  }
+  const searchAnyDeckCard = text.match(
+    /^(flip a coin\. if heads, )?search your deck for (?:up to (\d+) )?(?:(?:a|any) )?(?:\d+ )?cards?(?: and|,? reveal (?:it|them),? and)? put (?:it|them) into your hand\.(?: then,? shuffle your deck| shuffle your deck(?: afterward)?)?\.?$/,
+  )
+  const evolutionCardToHand = text.match(/^flip a coin\. if heads, search your deck for a card that evolves from ([a-z0-9 .'-]+), show it to your opponent, and put it into your hand\. shuffle your deck afterward\.$/)
+  if (evolutionCardToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      coinFlipCount: 1,
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', includeEvolvesFrom: [evolutionCardToHand[1]], condition: 'heads' }],
+    })
+  }
+  const evolutionCardsToHand = text.match(/^(flip a coin\. if heads, )?search your deck for (?:(?:up to )?(\d+) cards?|a card) that evolv(?:e|es) from ([a-z0-9 .'-]+), (?:show (?:them|it) to your opponent|reveal (?:them|it)),? and put (?:them|it) into your hand\.(?: (?:then,? )?shuffle your deck(?: afterward)?\.)?$/)
+  if (evolutionCardsToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      coinFlipCount: evolutionCardsToHand[1] ? 1 : 0,
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(evolutionCardsToHand[2] || 1), destination: 'hand', includeEvolvesFrom: [evolutionCardsToHand[3]], condition: evolutionCardsToHand[1] ? 'heads' : undefined }],
+    })
+  }
+  if (text === 'search your deck for a number of cards up to the number of your benched pokemon and put them into your hand. then, shuffle your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 6, maxCountFrom: { kind: 'bench', side: 'own' }, destination: 'hand' }],
+    })
+  }
+  if (text === "if any of your opponent's active pokemon are evolved pokemon, search your deck for any 1 card and put it into your hand. shuffle your deck afterward.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', requiresOpponentEvolved: true }],
+    })
+  }
+  const randomEvolutionCardToHand = text.match(/^put a random card that evolves from ([a-z0-9 .'-]+) from your deck into your hand\.$/)
+  if (randomEvolutionCardToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', includeEvolvesFrom: [randomEvolutionCardToHand[1]], random: true }],
+    })
+  }
+  if (text === 'search your deck for a pokemon that has δ on its card, show it to your opponent, and put it into your hand. shuffle your deck afterward.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', includeNameContains: ['δ'] }],
+    })
+  }
+  const namedCardPokemonToHand = text.match(/^search your deck for a card named ([a-z0-9' .,-]+)\. show it to your opponent and put it into your hand\. shuffle your deck afterward\.$/)
+  if (namedCardPokemonToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand', includeNames: namedCardPokemonToHand[1].split(/,\s*|\s+or\s+/i).map((name) => name.trim()) }],
+    })
+  }
+  if (text === "search your deck for any number of pokemon named tentacool, tentacruel, misty's tentacool, and/or misty's tentacruel. show those cards to your opponent, then put them into your hand. shuffle your deck afterward.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 99, destination: 'hand', includeNames: ['Tentacool', 'Tentacruel', "Misty's Tentacool", "Misty's Tentacruel"] }],
+    })
+  }
+  const namedPokemonToHand = text.match(/^(flip a coin\. if heads, )?search your deck for (?:(?:up to )?(\d+) )?([a-z0-9' .-]+), (?:reveal|show) (?:them|it)(?: to your opponent)?,? and put (?:them|it) into your hand\.(?: (?:then,? )?shuffle your deck(?: afterward)?\.)?$/)
+  if (namedPokemonToHand && !/pokemon|\bcard\b/i.test(namedPokemonToHand[3])) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      coinFlipCount: namedPokemonToHand[1] ? 1 : 0,
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(namedPokemonToHand[2] || 1), destination: 'hand', includeNames: namedPokemonToHand[3].split(/,? or /i).map((name) => name.trim()), condition: namedPokemonToHand[1] ? 'heads' : undefined }],
+    })
+  }
+  const teamAquaPokemonToHand = text.match(/^search your deck for pokemon that has team aqua in its name, show up to (\d+) of them to your opponent, and put them into your hand\. shuffle your deck afterward\.$/)
+  if (teamAquaPokemonToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(teamAquaPokemonToHand[1]), destination: 'hand', includeNameContains: ['Team Aqua'] }],
+    })
+  }
+  const differentTypeBasicPokemonToBench = text.match(/^search your deck for up to (\d+) different types of basic pokemon and put them onto your bench\. shuffle your deck afterward\.$/)
+  if (differentTypeBasicPokemonToBench) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(differentTypeBasicPokemonToBench[1]), destination: 'bench', basicOnly: true, oneOfEachType: true }],
+    })
+  }
+  const basicPokemonToBench = text.match(/^search your deck for (?:(?:up to )?(\d+) |any number of )?(?:(basic) )?(?:(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless|dragon) )?pokemon(?: cards?)? and put (?:them|it) onto your bench\.(?: then,? shuffle your deck(?: afterward)?\.| shuffle your deck(?: afterward)?\.)?(?: \(you can't use this attack if your bench is full\)\.)?(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (basicPokemonToBench) {
+    const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless', dragon: 'Dragon' }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: basicPokemonToBench[1] ? Number(basicPokemonToBench[1]) : basicPokemonToBench[0].includes('any number of') ? 6 : 1,
+        destination: 'bench',
+        basicOnly: Boolean(basicPokemonToBench[2]),
+        includeTypes: basicPokemonToBench[3] ? [typeNames[basicPokemonToBench[3]]] : undefined,
+      }],
+    })
+  }
+  const typedFirstBasicPokemonToBench = text.match(/^search your deck for (?:(?:up to )?(\d+) |a |an )?(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless|dragon) basic pokemon(?: cards?)? and put (?:them|it) onto your bench\. shuffle your deck afterward\.(?: \(you can't use this attack if your bench is full\.\))?$/)
+  if (typedFirstBasicPokemonToBench) {
+    const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless', dragon: 'Dragon' }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(typedFirstBasicPokemonToBench[1] || 1), destination: 'bench', basicOnly: true, includeTypes: [typeNames[typedFirstBasicPokemonToBench[2]]] }],
+    })
+  }
+  const typedSymbolBasicPokemonToBench = text.match(/^search your deck for up to (\d+) basic \{([grwlpmdycf])\} pokemon and put them onto your bench\. then, shuffle your deck\.$/)
+  if (typedSymbolBasicPokemonToBench) {
+    const typeBySymbol: Record<string, TcgBattleEnergyType> = { g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', d: 'Darkness', m: 'Metal', y: 'Fairy', c: 'Colorless' }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [
+        { kind: 'searchDeckPokemon', maxCount: Number(typedSymbolBasicPokemonToBench[1]), destination: 'bench', basicOnly: true, includeTypes: [typeBySymbol[typedSymbolBasicPokemonToBench[2]]] },
+        { kind: 'shuffleDeck', target: 'self' },
+      ],
+    })
+  }
+  if (text === "search your deck for a baby pokemon or basic pokemon card and put it onto your bench. shuffle your deck afterward. (you can't use this attack if your bench is full.)") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'bench', includeBasic: true, includeSubtypes: ['Baby'] }],
+    })
+  }
+  const coinGatedNamedBasicBenchSearch = text.match(/^flip a coin\. if heads, you may search your deck for a basic pokemon(?: card)? with ([a-z0-9' -]+) in its name and put it onto your bench\.(?: \(you can't use this attack if your bench is full\.\))? shuffle your deck afterward\.(?: \(you can't use this attack if your bench is full\.\))?$/)
+  if (coinGatedNamedBasicBenchSearch) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'bench', basicOnly: true, includeNameContains: [coinGatedNamedBasicBenchSearch[1].trim()], condition: 'heads' }],
+    })
+  }
+  const teamMagmaBenchSearch = text.match(/^search your deck for up to (\d+) basic team magma pokemon and put them onto your bench\. shuffle your deck afterward\.$/)
+  if (teamMagmaBenchSearch) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(teamMagmaBenchSearch[1]), destination: 'bench', basicOnly: true, includeNameContains: ["Team Magma's", 'Team Magma'] }],
+    })
+  }
+  const namedPokemonBenchSearch = text.match(/^search your deck for (?:a )?(?:basic )?pokemon(?: card)? named ([a-z0-9' ♀♂.-]+?)(?: or ([a-z0-9' ♀♂.-]+?))? and put it onto your bench\. shuffle your deck afterward\.(?: \(you can't use this attack if your bench is full\.\))?$/)
+  if (namedPokemonBenchSearch) {
+    const pokemonNames = [namedPokemonBenchSearch[1], namedPokemonBenchSearch[2]].filter(Boolean).map((name) => {
+      const normalized = name.toLowerCase().trim()
+      if (normalized === 'nidoran m') return 'Nidoran ♂'
+      if (normalized === 'nidoran f') return 'Nidoran ♀'
+      return name.trim()
+    })
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'bench', basicOnly: /basic pokemon/.test(text), includeNames: pokemonNames }],
+    })
+  }
+  const randomPokemonBenchSearch = text.match(/^put (\d+) random (?:cards? from among ([a-z0-9' ♀♂.&-]+)|([a-z0-9' ♀♂.-]+)) from your deck onto your bench\.$/)
+  if (randomPokemonBenchSearch) {
+    const names = (randomPokemonBenchSearch[2] || randomPokemonBenchSearch[3]).split(/ and /i).map((name) => name.trim())
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(randomPokemonBenchSearch[1]), destination: 'bench', includeNames: names, random: true }],
+    })
+  }
+  const namedPokemonToBench = text.match(/^search your deck for (?:(?:up to )?(\d+) )?(?:(?:a|an) )?([a-z0-9' .-]+?)(?: cards?)? and put (?:them|it) onto your bench\.(?: then,? shuffle your deck(?: afterward)?\.| shuffle your deck(?: afterward)?\.)?$/)
+  if (namedPokemonToBench && !/pokemon|\bbasic\b|\bgrass\b|\bfire\b|\bwater\b|\blightning\b|\bpsychic\b|\bfighting\b|\bdarkness\b|\bmetal\b|\bfairy\b|\bcolorless\b|\bdragon\b/i.test(namedPokemonToBench[2])) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(namedPokemonToBench[1] || 1), destination: 'bench', includeNames: [namedPokemonToBench[2].trim()] }],
+    })
+  }
+  const typedBasicPokemonToHand = text.match(/^search your deck for (?:(?:up to )?(\d+) )?(?:(?:a|an) )?(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless|dragon) basic pokemon, (?:reveal|show) (?:them|it)(?: to your opponent)?,? and put (?:them|it) into your hand\.(?: (?:then,? )?shuffle your deck(?: afterward)?\.)?$/)
+  if (typedBasicPokemonToHand) {
+    const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless', dragon: 'Dragon' }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(typedBasicPokemonToHand[1] || 1), destination: 'hand', basicOnly: true, includeTypes: [typeNames[typedBasicPokemonToHand[2]]] }],
+    })
+  }
+  const pokemonToHand = text.match(/^search your deck for (?:(?:up to )?(\d+) )?(?:(?:a|an) )?(basic )?(?:(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless|dragon)(?: or (?:grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless|dragon))* )?pokemon(?:-ex)?(?: \(excluding pokemon-ex\))?, (?:reveal|show) (?:them|it)(?: to your opponent)?,? and put (?:them|it) into your hand\.(?: (?:then,? )?shuffle your deck(?: afterward)?\.)?$/)
+  if (pokemonToHand) {
+    const isPokemonExSearch = /pokemon-ex/.test(text)
+    const excludePokemonEx = /excluding pokemon-ex/.test(text)
+    const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless', dragon: 'Dragon' }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: Number(pokemonToHand[1] || 1),
+        destination: 'hand',
+        basicOnly: Boolean(pokemonToHand[2]),
+        includeTypes: pokemonToHand[3] ? pokemonToHand[3].split(/\s+or\s+/).map((type) => typeNames[type]) : undefined,
+        includeSubtypes: isPokemonExSearch ? ['ex'] : undefined,
+        excludeSubtypes: excludePokemonEx ? ['ex'] : undefined,
+      }],
+    })
+  }
+  if (text === 'search your deck for any 1 card and discard it. shuffle your deck afterward.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'discard' }, { kind: 'shuffleDeck', target: 'self' }],
+    })
+  }
+  if (text === 'search your deck for 1 pokemon and put it in the lost zone. shuffle your deck afterward.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'lostZone' }, { kind: 'shuffleDeck', target: 'self' }],
+    })
+  }
+  if (text === "search your deck for a trainer card, show it to your opponent, and put it into your hand. put chatot g and all cards attached to it on top of your deck. shuffle your deck afterward.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'returnOwnPokemonToDeck' }],
+    })
+  }
+  const multiplePokemonToDiscard = text.match(/^search your deck for up to (\d+) (?:pokemon|cards) and discard them\.(?: then,? shuffle your deck(?: afterward)?| shuffle your deck(?: afterward)?)\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (multiplePokemonToDiscard) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [
+        { kind: 'searchDeckPokemon', maxCount: Number(multiplePokemonToDiscard[1]), destination: 'discard' },
+        { kind: 'shuffleDeck', target: 'self' },
+      ],
+    })
+  }
+  const multiplePokemonToHand = text.match(/^search your deck for up to (\d+) pokemon, reveal them, and put them into your hand\. then, shuffle your deck(?:\. \(you can't use more than 1 (?:gx attack|vstar power) in a game\.\))?$/)
+  if (multiplePokemonToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(multiplePokemonToHand[1]), destination: 'hand' }],
+    })
+  }
+  const multipleCardsToHand = text.match(/^search your deck for up to (\d+) cards? and put them into your hand\. then, shuffle your deck(?:\. \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (multipleCardsToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: Number(multipleCardsToHand[1]), destination: 'hand' }],
+    })
+  }
+  if (text === 'search your deck for a number of cards up to the number of different types of pokemon you have in play and put them into your hand. then, shuffle your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: 6,
+        maxCountFrom: { kind: 'distinctTypesInPlay', side: 'own', zone: 'play' },
+        destination: 'hand',
+      }],
+    })
+  }
+  const namedPokemonGroupToHand = text.match(/^search your deck for a ([a-z0-9' .-]+), a ([a-z0-9' .-]+), and a ([a-z0-9' .-]+)\. reveal them, and put them into your hand\. then, shuffle your deck\.$/)
+  if (namedPokemonGroupToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: 3,
+        destination: 'hand',
+        includeNames: [namedPokemonGroupToHand[1], namedPokemonGroupToHand[2], namedPokemonGroupToHand[3]],
+        oneOfEachName: true,
+      }],
+    })
+  }
+  if (searchAnyDeckCard) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      coinFlipCount: searchAnyDeckCard[1] ? 1 : 0,
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: Number(searchAnyDeckCard[2] ?? 1),
+        destination: 'hand',
+        condition: searchAnyDeckCard[1] ? 'heads' : undefined,
+      }],
+    })
+  }
+  if (/^move all damage counters from this pokemon to (?:your opponent's active pokemon|the defending pokemon)\./.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'transferDamageCounters', maxCounters: Number.MAX_SAFE_INTEGER, sourceAttacker: true }],
+    })
+  }
+  const handEnergyAttachment = text.match(/^attach (?:(?:up to )?(\d+)|any number of|a|an|one) (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless))? ?energy cards? from your hand to (?:this pokemon|your pokemon in any way you like|[a-z0-9 .'-]+)\.$/)
+  if (handEnergyAttachment) {
+    const energyTypeCodes: Record<string, TcgBattleEnergyType> = { g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', m: 'Metal', d: 'Darkness', y: 'Fairy', c: 'Colorless' }
+    const energyType = handEnergyAttachment[2]
+      ? energyTypeCodes[handEnergyAttachment[2]]
+      : handEnergyAttachment[3]
+        ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[handEnergyAttachment[3]]
+        : undefined
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: handEnergyAttachment[1] ? Number(handEnergyAttachment[1]) : /any number of/.test(text) ? 12 : 1, ...(energyType ? { requiresEnergyType: energyType } : {}) }],
+    })
+  }
+  const discardEnergyAttachment = text.match(/^search your discard pile for as many (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless))? ?energy cards? as you like and attach them to your pokemon in any way you like\.$/)
+  if (discardEnergyAttachment) {
+    const energyTypeCodes: Record<string, TcgBattleEnergyType> = { g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', m: 'Metal', d: 'Darkness', y: 'Fairy', c: 'Colorless' }
+    const energyType = discardEnergyAttachment[1]
+      ? energyTypeCodes[discardEnergyAttachment[1]]
+      : ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[discardEnergyAttachment[2]]
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: 12, requiresEnergyType: energyType }],
+    })
+  }
+  const discardEnergyToHand = text.match(/^put (?:(?:up to )?(\d+)|a|an|one) (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless))? ?energy cards? from your discard pile into your hand(?:\. [a-z0-9' -]+ does (\d+) damage to itself)?\.$/)
+  if (discardEnergyToHand) {
+    const energyType = discardEnergyToHand[2]
+      ? ({ g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', f: 'Fighting', m: 'Metal', d: 'Darkness', y: 'Fairy', c: 'Colorless' } as Record<string, TcgBattleEnergyType>)[discardEnergyToHand[2]]
+      : discardEnergyToHand[3]
+        ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[discardEnergyToHand[3]]
+        : undefined
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: discardEnergyToHand[1] ? Number.parseInt(discardEnergyToHand[1], 10) : 1, ...(energyType ? { requiresEnergyType: energyType } : {}) }],
+      selfDamage: discardEnergyToHand[4] ? [{ kind: 'fixed', amount: Number.parseInt(discardEnergyToHand[4], 10) }] : undefined,
+    })
+  }
+  const searchedDiscardEnergyToHand = text.match(/^search your discard pile for (?:(?:up to )?(\d+)|a|an) (?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless))? ?energy cards?, show (?:them|it) to your opponent, and put (?:them|it) into your hand\.$/)
+  if (searchedDiscardEnergyToHand) {
+    const energyType = searchedDiscardEnergyToHand[2]
+      ? normalizeTcgBattleEnergySymbol(searchedDiscardEnergyToHand[2])
+      : searchedDiscardEnergyToHand[3]
+        ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[searchedDiscardEnergyToHand[3]]
+        : undefined
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: Number.parseInt(searchedDiscardEnergyToHand[1] || '1', 10), ...(energyType ? { requiresEnergyType: energyType } : {}) }],
+    })
+  }
+  const discardEnergyAttachmentUpTo = text.match(/^attach up to (\d+) (?:basic )?(?:\{[grwlpmdycf]\}|grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)? ?energy cards? from your discard pile to (?:this pokemon|[a-z0-9 .'-]+)\.$/)
+  if (discardEnergyAttachmentUpTo) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: Number.parseInt(discardEnergyAttachmentUpTo[1], 10) }],
+    })
+  }
+  const crimsonFlamePillar = text.match(/^attach (\d+) basic energy cards from your discard pile to your pokemon in any way you like\. if this pokemon has at least (\d+) extra energy attached to it \(in addition to this attack's cost\), your opponent's active pokemon is now burned and confused\. \(you can't use more than 1 gx attack in a game\.\)$/)
+  if (crimsonFlamePillar) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: Number(crimsonFlamePillar[1]) }],
+      status: [{ target: 'opponent', statuses: ['burned', 'confused'], requiresExtraEnergy: Number(crimsonFlamePillar[2]) }],
+    })
+  }
+  const discardEnergyAttachAnyWay = text.match(/^attach (\d+) (?:basic )?(?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) )?energy cards? from your discard pile to your pokemon in any way you like\.(?: if this pokemon has at least \d+ extra energy attached to it \(in addition to this attack's cost\), prevent all effects of attacks, including damage, done to it during your opponent's next turn\.)?(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (discardEnergyAttachAnyWay) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      energyGain: [{ target: 'self', amount: Number.parseInt(discardEnergyAttachAnyWay[1], 10), ...(discardEnergyAttachAnyWay[2] || discardEnergyAttachAnyWay[3] ? { requiresEnergyType: normalizeTcgBattleEnergySymbol(discardEnergyAttachAnyWay[2] || ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', fighting: 'f', darkness: 'd', metal: 'm', fairy: 'y', colorless: 'c' } as Record<string, string>)[discardEnergyAttachAnyWay[3]]) || undefined } : {}) }],
+    })
+  }
+  const energyZoneHeads = text.match(/^flip (\d+) coins?\. take an amount of \{([a-z])\} energy from your energy zone equal to (?:the number of )?heads and attach it to your benched \{\2\} pokemon in any way you like\./)
+  if (energyZoneHeads) {
+    const energyType = normalizeTcgBattleEnergySymbol(energyZoneHeads[2])
+    if (energyType) {
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: 0 },
+        coinFlipCount: Number.parseInt(energyZoneHeads[1], 10),
+        energyGain: [{ target: 'self', amountPerHead: 1, requiresEnergyType: energyType }],
+      })
+    }
+  }
+  const energyZoneAttach = text.match(/^take (\d+|a) \{([a-z])\} energy from your energy zone and attach it to this pokemon\./)
+  if (energyZoneAttach) {
+    const energyType = normalizeTcgBattleEnergySymbol(energyZoneAttach[2])
+    if (energyType) {
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: 0 },
+        energyGain: [{ target: 'self', amount: energyZoneAttach[1] === 'a' ? 1 : Number.parseInt(energyZoneAttach[1], 10), requiresEnergyType: energyType }],
+      })
+    }
+  }
+  const energyZoneTwoBenchAttach = text.match(
+    /^choose (\d+) of your benched pokemon\. for each of those pokemon, take a \{([a-z])\} energy from your energy zone and attach it to that pokemon\./,
+  )
+  if (energyZoneTwoBenchAttach) {
+    const energyType = normalizeTcgBattleEnergySymbol(energyZoneTwoBenchAttach[2])
+    if (energyType) {
+      const count = Number.parseInt(energyZoneTwoBenchAttach[1], 10)
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: 0 },
+        energyGain: [{
+          target: 'self',
+          amount: count,
+          requiresEnergyType: energyType,
+          requiresOwnBenchCount: count,
+        }],
+      })
+    }
+  }
+  const deckTwoBenchEnergyAttach = text.match(
+    /^choose (\d+) of your benched pokemon\. for each of those pokemon, search your deck for (?:a |an )?(?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)) energy card and attach it to that pokemon\. shuffle your deck(?: afterward)?\.$/,
+  )
+  if (deckTwoBenchEnergyAttach) {
+    const energyType = deckTwoBenchEnergyAttach[2]
+      ? normalizeTcgBattleEnergySymbol(deckTwoBenchEnergyAttach[2])
+      : normalizeTcgBattleEnergyType(`${deckTwoBenchEnergyAttach[3][0].toUpperCase()}${deckTwoBenchEnergyAttach[3].slice(1)}`)
+    if (energyType) {
+      const count = Number.parseInt(deckTwoBenchEnergyAttach[1], 10)
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: 0 },
+        energyGain: [{
+          target: 'self',
+          amount: count,
+          requiresEnergyType: energyType,
+          requiresOwnBenchCount: count,
+        }],
+      })
+    }
+  }
+  const energyZoneBenchAttach = text.match(
+    /^take a \{([a-z])\} energy from your energy zone and attach it to 1 of your benched (basic )?pokemon\./,
+  )
+  if (energyZoneBenchAttach) {
+    const energyType = normalizeTcgBattleEnergySymbol(energyZoneBenchAttach[1])
+    if (energyType) {
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: 0 },
+        energyGain: [{
+          target: 'self',
+          amount: 1,
+          requiresEnergyType: energyType,
+          requiresOwnBench: true,
+          requiresOwnBenchSubtype: energyZoneBenchAttach[2] ? 'Basic' : undefined,
+        }],
+      })
+    }
+  }
+  const searchBasicBench = text.match(/^search your deck for (?:(?:up to )?(\d+)|a) basic pokemon and put (?:them|it) onto your bench\./)
+  if (searchBasicBench) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{
+        kind: 'searchDeckPokemon',
+        maxCount: Number(searchBasicBench[1] || 1),
+        basicOnly: true,
+        destination: 'bench',
+      }],
+    })
+  }
+  const searchNamedBench = text.match(/^search your deck for (?:a )?(basic )?pokemon(?: card)? named ([^.]*) and put (?:it|them) onto your bench\./) ||
+    text.match(/^search your deck for a card named ([^.]+) and put it onto your bench\./)
+  if (searchNamedBench) {
+    const basicOnly = Boolean(searchNamedBench[1] && searchNamedBench[2])
+    const nameText = searchNamedBench[2] || searchNamedBench[1]
+    const names = nameText.split(/\s+or\s+/).map((name) => name.trim()).filter(Boolean)
+    if (!names.some((name) => /nidoran/i.test(name))) {
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: 0 },
+        choiceRequirement: 'deckPokemon',
+        special: [{ kind: 'searchDeckPokemon', maxCount: 1, basicOnly, destination: 'bench', includeNames: names }],
+      })
+    }
+  }
+  const randomBasicBench = text.match(/^put (?:a|1) random basic pokemon from your deck onto your bench\./)
+  if (randomBasicBench) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, basicOnly: true, destination: 'bench', random: true }],
+    })
+  }
+  const randomNamedBench = text.match(/^put (?:a|1) random ([a-z0-9♀♂' -]+) from your deck onto your bench\./)
+  if (randomNamedBench && !/^(?:basic )?pokemon$/.test(randomNamedBench[1])) {
+    const names = randomNamedBench[1].split(/\s+or\s+/).map((name) => name.trim()).filter(Boolean)
+    if (!names.some((name) => /nidoran/i.test(name))) {
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: 0 },
+        special: [{ kind: 'searchDeckPokemon', maxCount: 1, destination: 'bench', random: true, includeNames: names }],
+      })
+    }
+  }
+  const energyThresholdBonus = text.match(/^if you have (\d+) or more (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon) energy in play, this attack does (\d+) more damage\./)
+  if (energyThresholdBonus) {
+    const energyType = `${energyThresholdBonus[2][0].toUpperCase()}${energyThresholdBonus[2].slice(1)}` as TcgBattleEnergyType
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(energyThresholdBonus[3], 10),
+        source: { kind: 'energyOfType', side: 'own', type: energyType },
+        minimumUnits: Number.parseInt(energyThresholdBonus[1], 10),
+      },
+    })
   }
   const anyOpponentPokemonDamage = text.match(
     /^this attack does (\d+) damage to 1 of your opponent's pokemon( that has any damage counters on it)?\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?$/,
@@ -2311,17 +6361,900 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
       ignoreWeaknessResistanceOnBench: text.includes("don't apply weakness and resistance for benched pokemon"),
     })
   }
+  const unmodifiedAnyTargetDamage = text.match(/^this attack does (\d+) damage to 1 of your opponent's pokemon\. this damage (?:isn't|is not) affected by weakness, resistance, or any other effects on that pokemon\./)
+  if (unmodifiedAnyTargetDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: Number(unmodifiedAnyTargetDamage[1]) },
+      targetScope: 'any',
+      ignoreTargetDamageModifiers: true,
+    })
+  }
+  const simpleStatus = text.match(/^(your opponent['’]s active pokemon|this pokemon) is now ((?:asleep|burned|confused|paralyzed|poisoned)(?: and (?:asleep|burned|confused|paralyzed|poisoned))*)\.?$/)
+  if (simpleStatus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      status: [{
+        target: simpleStatus[1] === 'this pokemon' ? 'self' : 'opponent',
+        statuses: simpleStatus[2].match(/asleep|burned|confused|paralyzed|poisoned/g) as TcgBattleStatusCondition[],
+      }],
+    })
+  }
+  const opponentHandDiscard = text.match(/^your opponent reveals their hand\. discard (\d+) cards? from it\./)
+  if (opponentHandDiscard) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [
+        { kind: 'revealHand', target: 'opponent' },
+        { kind: 'discardRandomHandCard', target: 'opponent', amount: Number(opponentHandDiscard[1]) },
+      ],
+    })
+  }
+  if (text === "your opponent discards a card from their hand. if this pokemon evolved from salandit during this turn, your opponent discards 2 more cards.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'discardRandomHandCard', target: 'opponent', amount: 1, extraAmountIfAttackerEvolvedFromThisTurn: { name: 'Salandit', amount: 2 } }],
+    })
+  }
+  const discardOpponentDeckTop = text.match(/^discard the top (\d+) cards? of your opponent's deck\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (discardOpponentDeckTop) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'millCards', target: 'opponent', amount: Number(discardOpponentDeckTop[1]) }],
+    })
+  }
+  const coinGatedOpponentDeckMill = text.match(/^flip a coin\. if heads, discard the top (\d+) cards? of your opponent's deck\.$/)
+  if (coinGatedOpponentDeckMill) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      special: [{ kind: 'millCards', target: 'opponent', amount: Number(coinGatedOpponentDeckMill[1]), condition: 'heads' }],
+    })
+  }
+  if (text === "flip a coin. if heads, discard the top 5 cards of your opponent's deck. if tails, discard the top 5 cards of your deck.") {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: 1,
+      special: [
+        { kind: 'millCards', target: 'opponent', amount: 5, condition: 'heads' },
+        { kind: 'millCards', target: 'self', amount: 5, condition: 'tails' },
+      ],
+    })
+  }
+  const discardTopEnergyForDamage = text.match(/^discard the top (\d+) cards? (?:from|of) your deck\. this attack does \d+ damage (?:for each energy card you discarded(?: in this way)?|times the number of energy cards you discarded)\.$/)
+  const discardTopEnergyAttachment = text.match(/^discard the top (\d+) cards? of your deck\. if any of those cards are (?:fighting )?energy cards?, attach them to this pokemon\.$/)
+  if (discardTopEnergyForDamage || discardTopEnergyAttachment) {
+    const count = Number((discardTopEnergyForDamage || discardTopEnergyAttachment)![1])
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'millCards', target: 'self', amount: count, position: 'top' }],
+    })
+  }
+  const coinGatedOpponentDeckDiscard = text.match(/^flip (\d+) coins?\. for each heads, discard the top (\d+) cards? of your opponent's deck\.$/)
+  if (coinGatedOpponentDeckDiscard) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      coinFlipCount: Number(coinGatedOpponentDeckDiscard[1]),
+      special: [{ kind: 'millCards', target: 'opponent', amount: 0, amountPerHead: Number(coinGatedOpponentDeckDiscard[2]) }],
+    })
+  }
+  const selfDeckEnergyScaledMill = text.match(/^discard the top (\d+) cards? of your deck(?:\.? \(if there are fewer than \d+ cards in your deck, discard all of them\.\))?(?:,? and)?\.? (?:this attack does )(.+)$/)
+  if (selfDeckEnergyScaledMill && /energy.*discarded/.test(selfDeckEnergyScaledMill[2])) {
+    const scalesAllDamageToEnergy = normalizedDamage.endsWith('x') || /damage times the number of energy/.test(text)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: scalesAllDamageToEnergy ? 0 : baseDamage || 0 },
+      special: [{ kind: 'millCards', target: 'self', amount: Number(selfDeckEnergyScaledMill[1]) }],
+    })
+  }
+  const opponentDeckEnergyScaledMill = text.match(/^discard the top (\d+) cards? (?:from|of) your opponent's deck\. this attack does \d+ damage times the number of energy cards you discarded to each of your opponent's benched pokemon\./)
+  if (opponentDeckEnergyScaledMill) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'millCards', target: 'opponent', amount: Number(opponentDeckEnergyScaledMill[1]) }],
+    })
+  }
+  const damagedAttackerOpponentDeckDiscard = text.match(/^if this pokemon has any damage counters on it, discard the top (\d+) cards? of your opponent's deck\.$/)
+  if (damagedAttackerOpponentDeckDiscard) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'millCards', target: 'opponent', amount: Number(damagedAttackerOpponentDeckDiscard[1]), requiresAttackerDamaged: true }],
+    })
+  }
+  const discardOpponentDeckPerNamedPokemon = text.match(/^for each of your ([a-z0-9' -]+) in play, discard the top card of your opponent's deck\.$/)
+  if (discardOpponentDeckPerNamedPokemon) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'millCards',
+        target: 'opponent',
+        amount: 0,
+        amountPerUnit: 1,
+        position: 'top',
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: [discardOpponentDeckPerNamedPokemon[1].trim()] },
+      }],
+    })
+  }
+  if (/^(?:look at your opponent's hand|your opponent reveals their hand)\.?$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'revealHand', target: 'opponent' }],
+    })
+  }
+  const recoverThreeCardsFromDiscard = text.match(/^put 3 cards from your discard pile into your hand\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (recoverThreeCardsFromDiscard) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 3, upTo: true }],
+    })
+  }
+  if (['put any 1 card from your discard pile into your hand.', 'put a card from your discard pile into your hand.', 'flip a coin. if heads, put any 1 card from your discard pile into your hand.', 'flip a coin. if heads, put a card from your discard pile into your hand.'].includes(text)) {
+    const coinGated = text.startsWith('flip a coin.')
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      ...(coinGated ? { coinFlipCount: 1 } : {}),
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 1, ...(coinGated ? { condition: 'heads' as const } : {}) }],
+    })
+  }
+  if (/^search your discard pile for a (?:baby pokemon, )?basic pokemon, evolution card, or basic energy card, show it to your opponent, and (?:then )?put it into your hand\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 1 }],
+    })
+  }
+  if (text === 'put a card from your discard pile on top of your deck.' ||
+    text === 'search your discard pile for any 1 card, show it to your opponent, and put it on top of your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: 1, destination: 'topDeck' }],
+    })
+  }
+  const recoverPokemonFromDiscard = text.match(/^put (\d+) pokemon from your discard pile into your hand\.$/)
+  if (recoverPokemonFromDiscard) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: Number(recoverPokemonFromDiscard[1]) }],
+    })
+  }
+  const recoverTypedPokemonFromDiscard = text.match(/^put (\d+) (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) pokemon from your discard pile into your hand\.$/)
+  if (recoverTypedPokemonFromDiscard) {
+    const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: Number(recoverTypedPokemonFromDiscard[1]), includeTypes: [typeNames[recoverTypedPokemonFromDiscard[2]]] }],
+    })
+  }
+  const shufflePokemonFromDiscard = text.match(/^shuffle (?:up to )?(\d+) (?:(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) )?pokemon from your discard pile into your deck\.$/)
+  if (shufflePokemonFromDiscard) {
+    const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'shuffleDiscardPokemonIntoDeck', maxCount: Number(shufflePokemonFromDiscard[1]), ...(shufflePokemonFromDiscard[2] ? { includeTypes: [typeNames[shufflePokemonFromDiscard[2]]] } : {}) }],
+    })
+  }
+  const searchDiscardPokemonToDeck = text.match(/^search your discard pile for up to (\d+) pokemon, show them to your opponent, and shuffle them into your deck\.$/)
+  if (searchDiscardPokemonToDeck) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'shuffleDiscardPokemonIntoDeck', maxCount: Number(searchDiscardPokemonToDeck[1]) }],
+    })
+  }
+  const searchMixedPokemonSupporterToDeck = text.match(/^search your discard pile for up to (\d+) in any combination of pokemon and supporter cards\. show them to your opponent and shuffle them into your deck\.$/)
+  if (searchMixedPokemonSupporterToDeck) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'shuffleDiscardPokemonIntoDeck', maxCount: Number(searchMixedPokemonSupporterToDeck[1]) }],
+    })
+  }
+  const searchDiscardPokemonToHand = text.match(/^search your discard pile for up to (\d+) pokemon, show them to your opponent, and put them into your hand\.$/)
+  if (searchDiscardPokemonToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToHand',
+      special: [{ kind: 'recoverPokemonFromDiscardToHand', maxCount: Number(searchDiscardPokemonToHand[1]), upTo: true }],
+    })
+  }
+  if (text === 'search your deck for an evolution card, show it to your opponent, and put it into your hand. shuffle your deck afterward.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 1, includeSubtypes: ['Stage 1', 'Stage 2', 'BREAK', 'Level-Up', 'VMAX', 'VSTAR', 'MEGA'], destination: 'hand' }],
+    })
+  }
+  if (text === 'search your deck for a pokemon and a supporter card, reveal them, and put them into your hand. then, shuffle your deck.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [
+        { kind: 'searchDeckPokemon', maxCount: 1, destination: 'hand' },
+        { kind: 'shuffleDeck', target: 'self' },
+      ],
+    })
+  }
+  const searchNamedPairToHand = text.match(/^search your deck for a ([a-z0-9' .-]+) and a ([a-z0-9' .-]+) card, show them to your opponent, and put them into your hand\. shuffle your deck afterward\.$/)
+  if (searchNamedPairToHand) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, includeNames: [searchNamedPairToHand[1].trim(), searchNamedPairToHand[2].trim()], oneOfEachName: true, destination: 'hand' }],
+    })
+  }
+  if (text === 'search your deck for both halves of a pokemon legend, show them to your opponent, and put them into your hand. shuffle your deck afterward.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'deckPokemon',
+      special: [{ kind: 'searchDeckPokemon', maxCount: 2, includeSubtypes: ['LEGEND'], sameNameAsFirst: true, destination: 'hand' }],
+    })
+  }
+  const reviveBasicPokemonToBench = text.match(/^put (?:a|1) (?:basic )?pokemon from (your|either player's) discard pile onto (your|that player's) bench\.$/)
+  if (reviveBasicPokemonToBench) {
+    const bothPlayersChoose = reviveBasicPokemonToBench[1] === "either player's"
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemon',
+      special: [{ kind: 'reviveDiscardPokemon', side: bothPlayersChoose ? undefined : 'self', restoreFullHp: true }],
+    })
+  }
+  if (text === 'put a teddiursa from your discard pile onto your bench. then, attach an energy card from your discard pile to that pokemon.') {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToBench',
+      special: [{ kind: 'recoverPokemonFromDiscardToBench', maxCount: 1, includeNames: ['Teddiursa'], upTo: false, energyPerPokemon: 1 }],
+    })
+  }
+  const darkUnionGx = text.match(/^put (\d+) in any combination of darkness pokemon-gx and darkness pokemon-ex from your discard pile onto your bench\. if this pokemon has at least (\d+) extra energy attached to it \(in addition to this attack's cost\), attach (\d+) energy cards from your discard pile to each pokemon that you put onto your bench in this way\. \(you can't use more than 1 gx attack in a game\.\)$/)
+  if (darkUnionGx) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToBench',
+      special: [{
+        kind: 'recoverPokemonFromDiscardToBench',
+        maxCount: Number(darkUnionGx[1]),
+        includeTypes: ['Darkness'],
+        includeSubtypes: ['GX', 'EX'],
+        upTo: false,
+        basicOnly: false,
+        requiresExtraEnergy: Number(darkUnionGx[2]),
+        energyPerPokemon: Number(darkUnionGx[3]),
+      }],
+    })
+  }
+  const recoverSubtypeCombinationToBench = text.match(/^put (\d+) in any combination of (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) pokemon-(gx|ex) or (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) pokemon-(gx|ex) from your discard pile onto your bench\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (recoverSubtypeCombinationToBench) {
+    const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' }
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToBench',
+      special: [{
+        kind: 'recoverPokemonFromDiscardToBench',
+        maxCount: Number(recoverSubtypeCombinationToBench[1]),
+        includeTypes: [...new Set([typeNames[recoverSubtypeCombinationToBench[2]], typeNames[recoverSubtypeCombinationToBench[4]]])],
+        includeSubtypes: [...new Set([recoverSubtypeCombinationToBench[3].toUpperCase(), recoverSubtypeCombinationToBench[5].toUpperCase()])],
+        upTo: false,
+      }],
+    })
+  }
+  const recoverTypedPokemonToBench = text.match(/^put (up to )?(\d+) (?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless)) pokemon from your discard pile onto your bench\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (recoverTypedPokemonToBench) {
+    const typeNames: Record<string, string> = { grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' }
+    const type = recoverTypedPokemonToBench[3]
+      ? normalizeTcgBattleEnergySymbol(recoverTypedPokemonToBench[3])
+      : typeNames[recoverTypedPokemonToBench[4]]
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToBench',
+      special: [{ kind: 'recoverPokemonFromDiscardToBench', maxCount: Number(recoverTypedPokemonToBench[2]), includeTypes: type ? [type] : [], upTo: Boolean(recoverTypedPokemonToBench[1]) }],
+    })
+  }
+  const recoverNamedPokemonToBench = text.match(/^put up to (\d+) ([a-z0-9' .-]+?) from your discard pile onto your bench\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (recoverNamedPokemonToBench) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardPokemonToBench',
+      special: [{ kind: 'recoverPokemonFromDiscardToBench', maxCount: Number(recoverNamedPokemonToBench[1]), includeNames: [recoverNamedPokemonToBench[2].trim()], upTo: true }],
+    })
+  }
+  const evolvedOpponentDraw = text.match(/^if your opponent has any evolved pokemon in play, draw (\d+) cards?\.?$/)
+  if (evolvedOpponentDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: Number(evolvedOpponentDraw[1]), requiresOpponentEvolved: true }],
+    })
+  }
+  const confusedDraw = text.match(/^if ([a-z0-9 .'-]+) is confused, draw (\d+) cards?\.?$/)
+  if (confusedDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: Number(confusedDraw[2]), requiresAttackerStatus: 'confused' }],
+    })
+  }
+  const drawPerTypedPokemon = text.match(/^draw (?:a|1) card for each of your (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) pokemon in play\.$/)
+  if (drawPerTypedPokemon) {
+    const type = drawPerTypedPokemon[1]
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: [type[0].toUpperCase() + type.slice(1)] },
+      }],
+    })
+  }
+  if (/^draw (?:a|1) card for each of your opponent's pokemon that isn't an evolved pokemon\.$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amountPerUnit: 1,
+        source: { kind: 'pokemonNotEvolvedInPlay', side: 'opponent' },
+      }],
+    })
+  }
+  const namedPokemonBoostedDraw = text.match(/^draw (?:a|1) card\. if you have ([a-z0-9' -]+) in play, draw 2 cards instead\.$/)
+  if (namedPokemonBoostedDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{
+        kind: 'drawCards',
+        target: 'self',
+        amount: 1,
+        amountPerUnit: 1,
+        maxUnits: 1,
+        source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: [namedPokemonBoostedDraw[1]] },
+      }],
+    })
+  }
+  const drawCards = text.match(/^draw (?:a card|(\d+) cards?)\.?$/)
+  if (drawCards) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: Number(drawCards[1] || 1) }],
+    })
+  }
+  const drawUntilHandSize = text.match(/^draw cards until you have (\d+) cards in your hand\.?$/)
+  if (drawUntilHandSize) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: 0, untilHandSize: Number(drawUntilHandSize[1]) }],
+    })
+  }
+  const conditionalDrawUntilHandSize = text.match(/^if you have less than (\d+) cards in your hand, draw cards until you have (\d+) cards in your hand\.$/)
+  if (conditionalDrawUntilHandSize) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: 0, untilHandSize: Number(conditionalDrawUntilHandSize[2]) }],
+    })
+  }
+  if (/^(?:if you have less cards in your hand than your opponent, )?draw cards until you have the same number of cards(?: in your hand)? as your opponent(?: has in (?:his or her|their) hand)?\.?(?: \(if you have more or the same number of cards(?: in your hand)? as your opponent, this attack does nothing\.\))?$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'drawCards', target: 'self', untilHandSizeMatches: 'opponent' }],
+    })
+  }
+  if (/^if you have the same number of cards or less in your hand as your opponent, draw cards until you have 1 more card than your opponent\. \(if you have more cards in your hand than your opponent, this attack does nothing\.\)$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'drawCards', target: 'self', untilHandSizeMatches: 'opponentPlusOne', onlyIfOwnHandAtMostOpponent: true }],
+    })
+  }
+  const discardPokemonByRetreatCost = text.match(/^discard any number of pokemon with a retreat cost of exactly (\d+) from your hand\. this attack does (\d+) damage for each card you discarded in this way\.$/)
+  if (discardPokemonByRetreatCost && normalizedDamage.endsWith('x')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(discardPokemonByRetreatCost[2]),
+        source: { kind: 'chosenHandCards' },
+      },
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardRetreatCost: Number(discardPokemonByRetreatCost[1]),
+      special: [{ kind: 'discardSelectedHandPokemon' }],
+    })
+  }
+  const discardNamedHandPokemonForDamage = text.match(/^discard any number of ([a-z0-9' -]+) from your hand\. this attack does (\d+) damage for each card you discarded in this way\.$/)
+  if (discardNamedHandPokemonForDamage && normalizedDamage.endsWith('x')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(discardNamedHandPokemonForDamage[2], 10),
+        source: { kind: 'chosenHandCards' },
+      },
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardNames: [discardNamedHandPokemonForDamage[1]],
+    })
+  }
+  const discardHandAndDrawPerCard = text.match(/^discard up to (\d+) cards? from your hand\. for each card you discarded, draw a card\.$/)
+  if (discardHandAndDrawPerCard) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || baseDamage || 0 },
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardMaxCount: Number(discardHandAndDrawPerCard[1]),
+      special: [
+        { kind: 'discardSelectedHandPokemon' },
+        { kind: 'drawCards', target: 'self', amountPerUnit: 1, source: { kind: 'chosenHandCards' }, requiresDiscardChoice: true },
+      ],
+    })
+  }
+  const discardHandCardsForDamage = text.match(/^discard up to (\d+) cards? from your hand\. this attack does (\d+) damage for each card you discarded in this way\.$/)
+  if (discardHandCardsForDamage && normalizedDamage.endsWith('x')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(discardHandCardsForDamage[2], 10),
+        source: { kind: 'chosenHandCards' },
+      },
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardMaxCount: Number.parseInt(discardHandCardsForDamage[1], 10),
+      special: [{ kind: 'discardSelectedHandPokemon' }],
+    })
+  }
+  if (/^discard a card from your hand\. if you do, draw (\d+) cards?\.$/.test(text)) {
+    const discardThenDraw = text.match(/^discard a card from your hand\. if you do, draw (\d+) cards?\.$/)
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardHandCards',
+      special: [
+        { kind: 'discardSelectedHandPokemon' },
+        { kind: 'drawCards', target: 'self', amount: Number.parseInt(discardThenDraw?.[1] || '0', 10), requiresDiscardChoice: true },
+      ],
+    })
+  }
+  const discardTeamPlasmaThenDraw = text.match(/^discard a team plasma card from your hand\. if you do, draw (\d+) cards?\.$/)
+  if (discardTeamPlasmaThenDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      choiceRequirement: 'discardHandCards',
+      choiceHandCardCount: 1,
+      choiceHandCardSubtypes: ['Team Plasma'],
+      special: [
+        { kind: 'discardSelectedHandPokemon' },
+        { kind: 'drawCards', target: 'self', amount: Number(discardTeamPlasmaThenDraw[1]), requiresDiscardChoice: true },
+      ],
+    })
+  }
+  const equalHandSizeBonus = text.match(/^if you have the same number of cards in your hand as your opponent(?: has in (?:his or her|their) hand)?, this attack does (?:(\d+) damage plus )?(\d+) more damage\.$/)
+  if (equalHandSizeBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'handSizeComparisonBonus',
+        baseDamage: Number(equalHandSizeBonus[1] || baseDamage),
+        bonusDamage: Number(equalHandSizeBonus[2]),
+        comparison: 'equal',
+      },
+    })
+  }
+  const moreCardsHandSizeBonus = text.match(/^if you have more cards in your hand than your opponent, this attack does (?:(\d+) damage plus )?(\d+) more damage\.$/)
+  if (moreCardsHandSizeBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'handSizeComparisonBonus',
+        baseDamage: Number(moreCardsHandSizeBonus[1] || baseDamage),
+        bonusDamage: Number(moreCardsHandSizeBonus[2]),
+        comparison: 'more',
+      },
+    })
+  }
+  const totalEnergyThresholdBonus = text.match(/^if you have (?:at least )?(\d+) energy in play, this attack does (\d+) more damage\.$/)
+  if (totalEnergyThresholdBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(totalEnergyThresholdBonus[2], 10),
+        source: { kind: 'energy', side: 'own' },
+        minimumUnits: Number.parseInt(totalEnergyThresholdBonus[1], 10),
+      },
+    })
+  }
+  const damagePerOpponentHandCard = text.match(/^does (\d+) damage plus (\d+) more damage for each card in your opponent's hand\.$/)
+  if (damagePerOpponentHandCard && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: Number(damagePerOpponentHandCard[1]),
+        perUnitDamage: Number(damagePerOpponentHandCard[2]),
+        source: { kind: 'handSize', side: 'opponent' },
+      },
+    })
+  }
+  const damageForEachOpponentHandCard = text.match(/^this attack does (\d+) damage for each card in your opponent's hand\.$/)
+  if (damageForEachOpponentHandCard) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(damageForEachOpponentHandCard[1], 10),
+        source: { kind: 'handSize', side: 'opponent' },
+      },
+    })
+  }
+  const prizeThresholdEnergyDiscardBonus = text.match(/^if the total of both players' remaining prize cards is (\d+) or less, discard all energy from this pokemon, and this attack does (\d+) more damage\.$/)
+  if (prizeThresholdEnergyDiscardBonus) {
+    const maximumPrizeTotal = Number(prizeThresholdEnergyDiscardBonus[1])
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'prizeTotalThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(prizeThresholdEnergyDiscardBonus[2]),
+        maximumPrizeTotal,
+      },
+      energyDiscard: [{ target: 'self', amount: 'all', requiresPrizeTotalAtMost: maximumPrizeTotal }],
+    })
+  }
+  const discardHandAndDraw = text.match(/^discard your hand and draw (\d+) cards?\./)
+  if (discardHandAndDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [
+        { kind: 'discardAllHandCards' },
+        { kind: 'drawCards', target: 'self', amount: Number(discardHandAndDraw[1]) },
+      ],
+    })
+  }
+  const discardEnergyForDamage = text.match(/^discard any amount of energy from your pokemon\. this attack does (\d+) more damage for each card you discarded in this way\./)
+  if (discardEnergyForDamage) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(discardEnergyForDamage[1]),
+        source: { kind: 'chosenEnergy' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+      choiceEnergyMax: Number.MAX_SAFE_INTEGER,
+    })
+  }
+  const discardAllEnergyForDamage = text.match(/^discard all energy from this pokemon\. this attack does (\d+) damage for each card you discarded in this way\./)
+  if (discardAllEnergyForDamage) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(discardAllEnergyForDamage[1]),
+        source: { kind: 'unusedEnergy' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'all' }],
+    })
+  }
+  const attachedEnergyCoinDamage = text.match(/^flip a coin for each (?:(?:basic )?(fire|water|grass|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless|\{[grwlpmdfyc]\}) )?energy attached to this pokemon\. this attack does (\d+) (damage|more damage) for each heads\.$/)
+  if (attachedEnergyCoinDamage) {
+    const energyTypeToken = attachedEnergyCoinDamage[1]
+    const energyType = energyTypeToken
+      ? energyTypeToken.startsWith('{')
+        ? normalizeTcgBattleEnergySymbol(energyTypeToken.slice(1, -1))
+        : normalizeTcgBattleEnergyType(`${energyTypeToken[0].toUpperCase()}${energyTypeToken.slice(1)}`)
+      : null
+    if (!energyTypeToken || energyType) {
+      const damagePerHeads = Number(attachedEnergyCoinDamage[2])
+      const addsToBase = attachedEnergyCoinDamage[3] === 'more damage'
+      const energySource: TcgBattleCountSource = energyType
+        ? { kind: 'energyOfType', side: 'own', type: energyType }
+        : { kind: 'energy', side: 'own' }
+      return applyAttackTextModifiers({
+        damage: addsToBase
+          ? { kind: 'headsBonusEach', baseDamage, bonusDamage: damagePerHeads, coinFlipCount: 0 }
+          : { kind: 'headsMultiplier', damagePerHeads, coinFlipCount: 0 },
+        coinFlipSource: energySource,
+      })
+    }
+  }
+  const attachedEnergyCoinDraw = text.match(/^flip a number of coins equal to the number of (?:basic )?(water|grass|fire|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless|\{[grwlpmdfyc]\}) energy cards? attached to [a-z0-9 .'-]+\. for each heads, draw (\d+) cards?\.$/)
+  if (attachedEnergyCoinDraw) {
+    const energyTypeToken = attachedEnergyCoinDraw[1]
+    const energyType = energyTypeToken.startsWith('{')
+      ? normalizeTcgBattleEnergySymbol(energyTypeToken.slice(1, -1))
+      : normalizeTcgBattleEnergyType(`${energyTypeToken[0].toUpperCase()}${energyTypeToken.slice(1)}`)
+    if (energyType) {
+      return applyAttackTextModifiers({
+        damage: { kind: 'fixed', amount: exactDamage || 0 },
+        coinFlipSource: { kind: 'energyOfType', side: 'own', type: energyType },
+        special: [{ kind: 'drawCards', target: 'self', amountPerHead: Number(attachedEnergyCoinDraw[2]) }],
+      })
+    }
+  }
+  const benchTypedEnergyDiscard = text.match(/^discard up to (\d+) in any combination of basic (?:fire|\{r\}) and basic (?:lightning|\{l\}) energy cards from your benched pokemon\. this attack does (\d+) damage for each card you discarded in this way\.$/)
+  const typedEnergyDiscard = text.match(/^you may discard up to (\d+) basic (?:fire|\{r\}) energy or up to \1 basic (?:lightning|\{l\}) energy from this pokemon\. this attack does (\d+) more damage for each card you discarded in this way\.$/)
+  const unlimitedTypedEnergyDiscard = text.match(/^you may discard any amount of basic (?:fire|\{r\}) energy or any amount of basic (?:lightning|\{l\}) energy from this pokemon\. this attack does (\d+) more damage for each card you discarded in this way\.$/)
+  const waterHandEnergyDiscard = text.match(/^discard up to (\d+) basic (?:water|\{w\}) energy cards? from your hand\. this attack does (\d+) damage for each card you discarded in this way\.$/)
+  if (benchTypedEnergyDiscard || typedEnergyDiscard || unlimitedTypedEnergyDiscard || waterHandEnergyDiscard) {
+    const match = benchTypedEnergyDiscard || typedEnergyDiscard || unlimitedTypedEnergyDiscard || waterHandEnergyDiscard!
+    const maximum = unlimitedTypedEnergyDiscard ? Number.MAX_SAFE_INTEGER : Number(match[1])
+    const perEnergyDamage = Number(benchTypedEnergyDiscard || waterHandEnergyDiscard ? match[2] : unlimitedTypedEnergyDiscard ? match[1] : match[3])
+    const additionalDamage = Boolean(typedEnergyDiscard || unlimitedTypedEnergyDiscard)
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: additionalDamage ? baseDamage : 0,
+        perUnitDamage: perEnergyDamage,
+        source: { kind: 'chosenEnergy' },
+      },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+      choiceEnergyMax: maximum,
+      choiceEnergyType: waterHandEnergyDiscard ? 'Water' : undefined,
+      choiceEnergyTypes: waterHandEnergyDiscard ? undefined : ['Fire', 'Lightning'],
+    })
+  }
+  const shuffleHandAndDraw = text.match(/^shuffle your hand into your deck\. then, draw (\d+) cards?\./)
+  if (shuffleHandAndDraw) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: Number(shuffleHandAndDraw[1]), shuffleHandIntoDeck: true }],
+    })
+  }
+  const shuffleHandAndDrawUpTo = text.match(/^shuffle your hand into your deck\. draw up to (\d+) cards?\.$/)
+  if (shuffleHandAndDrawUpTo) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [{ kind: 'drawCards', target: 'self', amount: Number(shuffleHandAndDrawUpTo[1]), shuffleHandIntoDeck: true }],
+    })
+  }
+  const discardAndDrawToHandSize = text.match(/^you may discard any number of cards from your hand until you have (\d+) or fewer\. draw cards until you have (\d+) cards in your hand\./)
+  if (discardAndDrawToHandSize) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: exactDamage || 0 },
+      special: [
+        { kind: 'discardRandomHandCard', target: 'self', untilHandSize: Number(discardAndDrawToHandSize[1]) },
+        { kind: 'drawCards', target: 'self', untilHandSize: Number(discardAndDrawToHandSize[2]) },
+      ],
+    })
+  }
   const damagedActiveBonus = text.match(
-    /^if your opponent's active pokemon already has any damage counters on it, this attack does (\d+) more damage\.$/,
+    /^if (?:your opponent's active|the defending) pokemon already has any damage counters? on it, this attack does (?:(\d+) damage plus )?(\d+) more damage\.$/,
   )
   if (damagedActiveBonus) {
     return applyAttackTextModifiers({
       damage: {
         kind: 'damagedTargetBonus',
-        baseDamage,
-        bonusDamage: Number(damagedActiveBonus[1]),
+        baseDamage: Number(damagedActiveBonus[1] || baseDamage),
+        bonusDamage: Number(damagedActiveBonus[2]),
       },
       targetScope: 'front',
+    })
+  }
+  const wasDamagedAsActiveLastTurn = text.match(/^if this pokemon was damaged by an attack during your opponent's last turn while it was your active pokemon, this attack does (\d+) more damage\.$/)
+  if (wasDamagedAsActiveLastTurn && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'wasDamagedAsActiveLastTurnBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(wasDamagedAsActiveLastTurn[1], 10),
+      },
+    })
+  }
+  const damageCounterThresholdBonus = text.match(
+    /^if the defending pokemon already has at least (\d+) damage counters? on it, this attack does \d+ damage plus (\d+) more damage\.$/,
+  )
+  if (damageCounterThresholdBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'damageCounterThresholdBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(damageCounterThresholdBonus[2], 10),
+        minimumCounters: Number.parseInt(damageCounterThresholdBonus[1], 10),
+      },
+      targetScope: 'front',
+    })
+  }
+  const attackerDamageCounterBonus = text.match(/^(?:this attack )?does (\d+) more damage for each damage counter on this pokemon\./)
+  if (attackerDamageCounterBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(attackerDamageCounterBonus[1]),
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    })
+  }
+  const damagedAttackerBonus = text.match(/^if this pokemon has damage on it, this attack does (\d+) more damage\./)
+  if (damagedAttackerBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'attackerDamagedBonus', baseDamage, bonusDamage: Number(damagedAttackerBonus[1]) },
+    })
+  }
+  const namedDamagedAttackerBonus = text.match(/^if (?:this pokemon|[a-z0-9' .-]+) has any damage counters? on it, this attack does \d+ damage plus (\d+) more damage\.$/)
+  if (namedDamagedAttackerBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'attackerDamagedBonus', baseDamage, bonusDamage: Number(namedDamagedAttackerBonus[1]) },
+    })
+  }
+  const opponentNamedPokemonBonus = text.match(/^if your opponent has ([a-z0-9' .-]+?)(?: \(including [^)]+\))? in play, this attack does (\d+) more damage\.$/)
+  if (opponentNamedPokemonBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countThresholdBonus',
+        baseDamage,
+        bonusDamage: Number(opponentNamedPokemonBonus[2]),
+        source: { kind: 'namedPokemonContains', side: 'opponent', zone: 'play', values: [opponentNamedPokemonBonus[1].trim()] },
+        minimumUnits: 1,
+      },
+    })
+  }
+  const opponentPokemonAbilityDamageBonus = text.match(/^this attack does (\d+) more damage for each of your opponent's pokemon that has an ability\.$/)
+  if (opponentPokemonAbilityDamageBonus && normalizedDamage.endsWith('+')) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(opponentPokemonAbilityDamageBonus[1], 10),
+        source: { kind: 'pokemonWithAbilitiesInPlay', side: 'opponent', zone: 'play' },
+      },
+    })
+  }
+  const opponentPokemonAbilityMultiplier = text.match(/^this attack does (\d+) damage for each of your opponent's pokemon that has an ability\.$/)
+  if (opponentPokemonAbilityMultiplier) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(opponentPokemonAbilityMultiplier[1], 10),
+        source: { kind: 'pokemonWithAbilitiesInPlay', side: 'opponent', zone: 'play' },
+      },
+    })
+  }
+  const activePokemonExBonus = text.match(/^if your opponent's active pokemon is a pokemon ex, this attack does (\d+) more damage\./)
+  if (activePokemonExBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'pokemonExTargetBonus', baseDamage, bonusDamage: Number(activePokemonExBonus[1]) },
+      targetScope: 'front',
+    })
+  }
+  const opponentDamagedBonus = text.match(/^if your opponent's active pokemon has damage on it, this attack does (\d+) more damage\./)
+  if (opponentDamagedBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'damagedTargetBonus', baseDamage, bonusDamage: Number(opponentDamagedBonus[1]) },
+      targetScope: 'front',
+    })
+  }
+  const evolutionTargetBonus = text.match(/^if your opponent's active pokemon is an evolution pokemon, this attack does (\d+) more damage\./)
+  if (evolutionTargetBonus) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'evolvedTargetBonus', baseDamage, bonusDamage: Number(evolutionTargetBonus[1]) },
+    })
+  }
+  const exactCounterKnockOut = text.match(/^if your opponent's active pokemon has exactly (\d+) damage counters? on it, that pokemon is knocked out\./)
+  if (exactCounterKnockOut) {
+    const counters = Number(exactCounterKnockOut[1])
+    return applyAttackTextModifiers({
+      damage: { kind: 'knockOutAtDamageCounters', minimumCounters: counters, maximumCounters: counters },
+    })
+  }
+  const chooseDamageCounterType = text.match(/^choose (?:grass fire water lightning psychic fighting darkness metal or colorless) type\. put (\d+) damage counters? on each pokemon your opponent has in play of the type you chose\.$/)
+  if (chooseDamageCounterType) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'typeChange',
+      choiceAllowedTypes: ['Grass', 'Fire', 'Water', 'Lightning', 'Psychic', 'Fighting', 'Darkness', 'Metal', 'Colorless'],
+      counterDamage: [{
+        amount: Number.parseInt(chooseDamageCounterType[1], 10) * 10,
+        side: 'opponent',
+        zone: 'play',
+        requiresChosenType: true,
+      }],
+    })
+  }
+  const damageUntilSwitch = text.match(/^put damage counters on (?:the )?defending pokemon until (?:it is|it's) (\d+) hp away from being knocked out\. if you do, your opponent switches (?:the )?defending pokemon with (?:1|one) of his or her benched pokemon\.$/)
+  if (damageUntilSwitch) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      choiceRequirement: 'opponentBench',
+      counterDamage: [{ target: 'opponent', amountToLeaveHp: Number.parseInt(damageUntilSwitch[1], 10) }],
+      special: [{ kind: 'switch', target: 'opponent', ifTargetSurvives: true, ifCounterDamage: true }],
+    })
+  }
+  const placeCountersOnOpponentPokemon = text.match(/^place (\d+) damage counters? on (?:1|one) of your opponent's pokemon\.$/)
+  if (placeCountersOnOpponentPokemon) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'any',
+      counterDamage: [{ amount: Number.parseInt(placeCountersOnOpponentPokemon[1], 10) * 10, target: 'opponent' }],
+    })
+  }
+  if (/^if your opponent's active pokemon is affected by a special condition, (?:that pokemon|it) is knocked out\./.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'knockOutTarget', requiresAnyTargetStatus: true }],
+    })
+  }
+  if (/^(?:choose a pokemon in play \(yours or your opponent's\) that has the least hp remaining, except for this pokemon, and it is knocked out\.|the pokemon that has the least hp remaining, except for this pokemon, is knocked out\. \(if multiple pokemon are tied, choose one\.\))$/.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'knockOutLowestRemainingHp' },
+      targetScope: 'all',
+      targetMustBeLowestRemainingHp: true,
+    })
+  }
+  const perOpponentPokemonCoinDamage = text.match(
+    /^for each of your opponent's pokemon, flip a coin\. if heads, this attack does (\d+) damage to that pokemon\. \(don't apply weakness and resistance for benched pokemon\.\)$/,
+  )
+  if (perOpponentPokemonCoinDamage) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      coinFlipSource: { kind: 'pokemonInPlay', side: 'opponent' },
+      benchDamage: [{
+        amount: Number(perOpponentPokemonCoinDamage[1]),
+        side: 'opponent',
+        zone: 'play',
+        perTargetCoinFlip: true,
+        ignoreWeaknessResistanceOnBench: true,
+      }],
+    })
+  }
+  if (/^move all damage counters from each of your pokemon to your opponent's active pokemon\./.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      special: [{ kind: 'transferDamageCountersFromOwnSide', maxCountersPerPokemon: Number.MAX_SAFE_INTEGER }],
+    })
+  }
+  const subtypeKnockOut = text.match(/^if your opponent's active pokemon is an? ([a-z ]+), it is knocked out\./)
+  if (subtypeKnockOut) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'knockOutTargetSubtype', subtype: subtypeKnockOut[1].trim() },
+    })
+  }
+  if (/^knock out (?:1|one) of your opponent's basic pokemon that isn't a pokemon-gx\./.test(text)) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'fixed', amount: 0 },
+      targetScope: 'any',
+      targetMustHaveSubtype: 'Basic',
+      targetMustNotHaveSubtype: 'GX',
+      special: [{ kind: 'knockOutTarget' }],
+    })
+  }
+  const opponentBenchDamage = text.match(/^this attack does (\d+) damage for each of your opponent['’]s benched pokemon\./)
+  if (opponentBenchDamage) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(opponentBenchDamage[1]),
+        source: { kind: 'bench', side: 'opponent' },
+      },
+    })
+  }
+  const opponentBenchBonus = text.match(/^this attack does (\d+) more damage for each of your opponent['’]s benched pokemon\./)
+  if (opponentBenchBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(opponentBenchBonus[1]),
+        source: { kind: 'bench', side: 'opponent' },
+      },
+    })
+  }
+  const opposingRetreatCostMultiplier = text.match(
+    /^this attack does (\d+) damage for each \{c\} in your opponent's active pokemon's retreat cost\./,
+  )
+  if (opposingRetreatCostMultiplier) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(opposingRetreatCostMultiplier[1], 10),
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+      targetScope: 'front',
+    })
+  }
+  const bothBenchesBonus = text.match(/^this attack does (\d+) more damage for each benched pokemon \(both yours and your opponent's\)\./)
+  if (bothBenchesBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(bothBenchesBonus[1]),
+        source: { kind: 'bench', side: 'both' },
+      },
     })
   }
   const typedBenchCount = text.match(
@@ -2341,6 +7274,38 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
       },
     })
   }
+  const wishiwashiBenchBonus = text.match(/^this attack does (\d+) more damage for each of your benched wishiwashi and wishiwashi ex\./)
+  if (wishiwashiBenchBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(wishiwashiBenchBonus[1]),
+        source: { kind: 'namedPokemonContains', side: 'own', zone: 'bench', values: ['Wishiwashi'] },
+      },
+    })
+  }
+  const flipUntilTailsMultiplier = text.match(/^flip a coin until you get tails\. this attack does (\d+) damage times the number of heads\./)
+  if (flipUntilTailsMultiplier) {
+    return applyAttackTextModifiers({
+      damage: { kind: 'headsMultiplier', damagePerHeads: Number(flipUntilTailsMultiplier[1]), coinFlipCount: 0 },
+      flipUntilTails: true,
+    })
+  }
+  const flipUntilTails = text.match(/^flip a coin until you get tails\. this attack does (?:(\d+) more damage|(?:(\d+) damage)) for each heads\./)
+  if (flipUntilTails) {
+    const bonus = flipUntilTails[1]
+    if (bonus) {
+      return applyAttackTextModifiers({
+        damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: Number(bonus), coinFlipCount: 0 },
+        flipUntilTails: true,
+      })
+    }
+    return applyAttackTextModifiers({
+      damage: { kind: 'headsMultiplier', damagePerHeads: Number(flipUntilTails[2]), coinFlipCount: 0 },
+      flipUntilTails: true,
+    })
+  }
   const matchingAttackBenchCount = text.match(
     /^this attack does (\d+) more damage for each of your benched pokemon that has the (.+) attack\.$/,
   )
@@ -2355,7 +7320,7 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
     })
   }
   const prizeDamageBonus = text.match(
-    /^this attack does (\d+) more damage for each prize card (your opponent has|you have) taken\.$/,
+    /^this attack does (\d+) more damage for each prize card (your opponent has|you have) taken\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/,
   )
   if (prizeDamageBonus) {
     return applyAttackTextModifiers({
@@ -2367,8 +7332,35 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
       },
     })
   }
+  const prizeCountScaling = text.match(
+    /^this attack does (\d+) damage for each (?:of your remaining prize cards|prize card your opponent has taken)\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/,
+  )
+  if (prizeCountScaling) {
+    const opponentHasTakenPrizes = text.includes('prize card your opponent has taken')
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(prizeCountScaling[1]),
+        source: opponentHasTakenPrizes
+          ? { kind: 'knockouts', side: 'own' }
+          : { kind: 'remainingKnockouts', side: 'opponent' },
+      },
+    })
+  }
+  const remainingPrizeDamageBonus = text.match(/^this attack does (\d+) more damage for each of your remaining prize cards?\.$/)
+  if (remainingPrizeDamageBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number(remainingPrizeDamageBonus[1]),
+        source: { kind: 'remainingKnockouts', side: 'opponent' },
+      },
+    })
+  }
   const prizeDamage = text.match(
-    /^this attack does (\d+) damage for each prize card (your opponent has|you have) taken\.$/,
+    /^this attack does (\d+) damage for each prize card (your opponent has|you have) taken\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/,
   )
   if (prizeDamage) {
     return applyAttackTextModifiers({
@@ -2377,6 +7369,22 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
         baseDamage: 0,
         perUnitDamage: Number(prizeDamage[1]),
         source: { kind: 'knockouts', side: prizeDamage[2] === 'your opponent has' ? 'own' : 'opponent' },
+      },
+    })
+  }
+  const prizeDamageTimesCount = text.match(
+    /^this attack does (\d+) damage times the number of (your remaining prize cards|prize cards your opponent has taken)\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/,
+  )
+  if (prizeDamageTimesCount) {
+    const opponentHasTakenPrizes = prizeDamageTimesCount[2] === 'prize cards your opponent has taken'
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number(prizeDamageTimesCount[1]),
+        source: opponentHasTakenPrizes
+          ? { kind: 'knockouts', side: 'own' }
+          : { kind: 'remainingKnockouts', side: 'opponent' },
       },
     })
   }
@@ -2394,15 +7402,72 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
       },
     })
   }
-  const exactPrizeBonus = text.match(
-    /^if (your opponent has|you have) (?:exactly |only )?(\d+(?: or \d+)*) prize cards? remaining, this attack does (\d+) more damage\.$/,
+  const prizeAdvantageBonus = text.match(
+    /^if you have more prize cards (?:remaining|left) than your opponent, this attack does (?:(\d+) damage plus )?(\d+) more damage\.$/,
   )
+  if (prizeAdvantageBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countComparisonBonus',
+        baseDamage: prizeAdvantageBonus[1] ? Number(prizeAdvantageBonus[1]) : baseDamage,
+        bonusDamage: Number(prizeAdvantageBonus[2]),
+        addSource: { kind: 'remainingKnockouts', side: 'opponent' },
+        subtractSource: { kind: 'remainingKnockouts', side: 'own' },
+      },
+    })
+  }
+  const prizeLeadScalingDamage = text.match(
+    /^if you have more prize cards left than your opponent, this attack does (\d+) damage plus (\d+) more damage for each prize card more than your opponent\.$/,
+  )
+  if (prizeLeadScalingDamage) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'positiveComparativeCount',
+        baseDamage: Number(prizeLeadScalingDamage[1]),
+        perUnitDamage: Number(prizeLeadScalingDamage[2]),
+        addSource: { kind: 'remainingKnockouts', side: 'opponent' },
+        subtractSource: { kind: 'remainingKnockouts', side: 'own' },
+      },
+    })
+  }
+  const exactPrizeBonus = text.match(
+    /^if (your opponent has|you have) (?:exactly |only )?(\d+(?: or \d+)*) prize cards? (?:remaining|left), this attack does (?:(\d+) damage plus )?(\d+) more damage\.$/,
+  )
+  const prizeGatedStatusBonus = text.match(
+    /^if your opponent has (?:exactly 1 prize cards? (?:remaining|left)|only 1 prize cards? (?:remaining|left)), this attack does (?:(\d+) damage plus )?(\d+) more damage,? and (?:your opponent's active|the defending) pokemon is now (asleep|burned|confused|paralyzed|poisoned)\.$/,
+  )
+  if (prizeGatedStatusBonus) {
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countInSetBonus',
+        baseDamage: prizeGatedStatusBonus[1] ? Number(prizeGatedStatusBonus[1]) : baseDamage,
+        bonusDamage: Number(prizeGatedStatusBonus[2]),
+        source: { kind: 'remainingKnockouts', side: 'opponent' },
+        units: [1],
+      },
+      special: [{ kind: 'setStatus', target: 'opponent', statuses: [prizeGatedStatusBonus[3] as TcgBattleStatusCondition], requiresRemainingPrizeCount: 1 }],
+    })
+  }
+  const bothPlayersExactPrizeBonus = text.match(/^if each player has exactly (\d+) prize cards? remaining, this attack does (\d+) more damage\.$/)
+  if (bothPlayersExactPrizeBonus) {
+    const prizeCount = Number(bothPlayersExactPrizeBonus[1])
+    return applyAttackTextModifiers({
+      damage: {
+        kind: 'countEqualityBonus',
+        baseDamage,
+        bonusDamage: Number(bothPlayersExactPrizeBonus[2]),
+        firstSource: { kind: 'remainingKnockouts', side: 'own' },
+        secondSource: { kind: 'remainingKnockouts', side: 'opponent' },
+        exactUnits: [prizeCount],
+      },
+    })
+  }
   if (exactPrizeBonus) {
     return applyAttackTextModifiers({
       damage: {
         kind: 'countInSetBonus',
-        baseDamage,
-        bonusDamage: Number(exactPrizeBonus[3]),
+        baseDamage: exactPrizeBonus[3] ? Number(exactPrizeBonus[3]) : baseDamage,
+        bonusDamage: Number(exactPrizeBonus[4]),
         source: { kind: 'remainingKnockouts', side: exactPrizeBonus[1] === 'your opponent has' ? 'opponent' : 'own' },
         units: exactPrizeBonus[2].split(' or ').map(Number),
       },
@@ -2772,7 +7837,7 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack, setId?: string
   const status = inferTcgBattleStatus(text)
   const benchDamage = inferTcgBattleBenchDamage(text)
   const counterDamage = inferTcgBattleCounterDamage(text)
-  const healing = inferTcgBattleHealing(text)
+  const healing = inferTcgBattleHealing(text, attack.name)
   const protection = inferTcgBattleProtection(text)
   const selfKnockOut = /\b(?:knock out this pokemon|this pokemon is knocked out)\b/.test(text)
   const selfEffects = selfDamage.length > 0 ? selfDamage : undefined
@@ -6446,6 +11511,13 @@ function inferDp2TcgBattleAttackEffect(
     }
   }
   if (name === 'hidden power') {
+    if (/if heads, put damage counters on the defending pokemon until it is 10 hp away from being knocked out/.test(text)) {
+      return {
+        damage: { kind: 'targetToRemainingHp', remainingHp: 10, condition: 'heads' },
+        coinFlipCount: 1,
+        ignoreWeaknessResistance: true,
+      }
+    }
     if (text.includes('if heads, this attack does 30 damage. if tails, this attack does 30 damage to 1 of your pokemon')) {
       return {
         damage: { kind: 'conditionalBonus', baseDamage: 0, bonusDamage: 30, condition: 'heads' },
@@ -14795,7 +19867,7 @@ function inferSunMoonBurningShadowsTcgBattleAttackEffect(
   if (name === 'infinite force') {
     return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 30, source: { kind: 'energy', side: 'both' } } }
   }
-  if (name === 'twilight-gx') {
+  if (name === 'twilight gx') {
     return { ...zero(), special: [{ kind: 'shuffleDiscardPokemonIntoDeck', maxCount: 10 }] }
   }
   if (name === 'boomburst-gx') {
@@ -19758,7 +24830,9 @@ function inferAstralRadianceTcgBattleAttackEffect(
     const perEnergy = Number(text.match(/does (\d+) damage for each energy/)?.[1] || 50)
     return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: perEnergy, source: { kind: 'energy', side: 'opponent' } } }
   }
-  if (name === 'borne ashore') return null
+  if (name === 'borne ashore') {
+    return { ...zero(), choiceRequirement: 'discardPokemon', special: [{ kind: 'reviveDiscardPokemon' }] }
+  }
   if (name === 'thrash') {
     const bonusDamage = Number(text.match(/does (\d+) more damage/)?.[1] || 60)
     return {
@@ -22041,8 +27115,8 @@ function inferParadoxRiftTcgBattleAttackEffect(
     }
   }
   if (name === 'filch') return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 1 }] }
-  if (name === 'collect' && text.includes('draw 2 cards')) {
-    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: 2 }] }
+  if (name === 'collect' && /^draw (?:a card|1 card|2 cards)\.?$/.test(text)) {
+    return { ...zero(), special: [{ kind: 'drawCards', target: 'self', amount: text.includes('2 cards') ? 2 : 1 }] }
   }
   if (name === 'hand fling') {
     return {
@@ -26468,6 +31542,7 @@ export function resolveTcgBattleAttack(params: {
   random?: () => number
 }): TcgBattleAttackResolution {
   const { state, sideKey, attacker, attack, target, paidAttackCost, choice, random = Math.random } = params
+  const forceCoinFlipsToTails = state[sideKey].temporaryCoinFlipOverride?.turnNumber === state.turnNumber
   const printedEffect = getTcgBattleAttackEffect(attack)
   if (!printedEffect) {
     return {
@@ -26486,13 +31561,29 @@ export function resolveTcgBattleAttack(params: {
       return /(?:damage from attacks used by this pokemon|damage from this pokemon's attacks|damage from attacks of your lightning pokemon) isn't affected by any effects on your opponent's active pokemon/.test(text) &&
         isTcgBattleAbilityEnabled(text, attacker, state[sideKey].front.some((card) => card.instanceId === attacker.instanceId))
     })
-  const effect = ignoresActiveTargetEffects
+  const conditionalTargetDamageBypass = doesTcgBattleAttackIgnoreTargetDamageModifiers(
+    state,
+    sideKey,
+    attacker,
+    target,
+    attack,
+    paidAttackCost ?? attack.convertedEnergyCost ?? attack.cost?.length ?? 0,
+    true,
+  )
+  const effect = (ignoresActiveTargetEffects || conditionalTargetDamageBypass) && !printedEffect.ignoreTargetDamageModifiers
     ? { ...printedEffect, ignoreTargetDamageModifiers: true }
     : printedEffect
 
   const optionalCoinDisabled = effect.damage.kind === 'optionalCoinDamage' &&
     choice?.kind === 'optionalBonus' && !choice.enabled
-  const dynamicCoinCount = effect.coinFlipSource
+  const coinCountOverride = attacker.temporaryEffects?.attackCoinCountOverride
+  const matchingCoinCountOverride = coinCountOverride && coinCountOverride.remainingTurns > 0 &&
+    coinCountOverride.attackName.toLowerCase() === attack.name.toLowerCase()
+    ? coinCountOverride.coinFlipCount
+    : undefined
+  const dynamicCoinCount = optionalCoinDisabled
+    ? 0
+    : matchingCoinCountOverride ?? (effect.coinFlipSource
     ? getTcgBattleCount(effect.coinFlipSource, {
         state,
         sideKey,
@@ -26501,14 +31592,22 @@ export function resolveTcgBattleAttack(params: {
         paidAttackCost,
         coinMode: 'actual',
       })
-    : optionalCoinDisabled
-      ? 0
-      : effect.coinFlipCount || 0
-  const coinFlips = effect.flipUntilTails
-    ? rollTcgBattleCoinsUntilTails(random)
+    : effect.coinFlipCount || 0)
+  let coinFlips = effect.flipUntilTails
+    ? rollTcgBattleCoinsUntilTails(random, forceCoinFlipsToTails)
     : dynamicCoinCount > 0
-      ? rollTcgBattleCoins(dynamicCoinCount, random)
+      ? rollTcgBattleCoins(dynamicCoinCount, random, forceCoinFlipsToTails)
       : undefined
+  const lockOnOverride = attacker.temporaryEffects?.lockOnCoinOverride
+  const lockOnTarget = lockOnOverride && state.turnNumber === lockOnOverride.expiresTurn &&
+    sideKey === lockOnOverride.ownerSide && attack.name.toLowerCase() === 'electric bolt' &&
+    normalizeTcgBattleCardName(attacker.name) === 'magnemite' && target.instanceId === lockOnOverride.targetId &&
+    target.becameActiveTurn === lockOnOverride.targetBecameActiveTurn &&
+    target.evolvedTurn === lockOnOverride.targetEvolvedTurn && targetIsActive
+  if (lockOnTarget && coinFlips) {
+    const results = coinFlips.results.map(() => 'heads' as const)
+    coinFlips = { results, heads: results.length, tails: 0 }
+  }
 
   const copyRule = effect.special?.find((rule) => rule.kind === 'copyAttack')
   if (
@@ -26516,8 +31615,24 @@ export function resolveTcgBattleAttack(params: {
     doesTcgBattleConditionPass(copyRule.coinGate, coinFlips) &&
     choice?.kind === 'copiedAttack'
   ) {
-    const copiedAttack = getTcgBattleAvailableAttacks(state, sideKey === 'player' ? 'opponent' : 'player', target)[choice.attackIndex]
+    const copiedAttack = getTcgBattleCopyAttackOptions(state, sideKey, target, attack, attacker)[choice.attackIndex]?.attack
     const copiedEffect = copiedAttack && getTcgBattleAttackEffect(copiedAttack)
+    if (copyRule.requiresCopiedAttackEnergy && copiedAttack) {
+      const remainingEnergy = Math.max(0, state[sideKey].energy - (paidAttackCost || 0))
+      const copiedCost = getEffectiveTcgBattleAttackCost(state, copiedAttack, attacker, sideKey)
+      const selectedEnergyType = normalizeTcgBattleEnergyType(state[sideKey].selectedEnergy || '')
+      const requiredEnergyTypes = copiedAttack.cost.map(normalizeTcgBattleEnergyType).filter((type) => type && type !== 'Colorless')
+      if (remainingEnergy < copiedCost || requiredEnergyTypes.some((type) => type !== selectedEnergyType)) {
+        return {
+          targetDamage: 0,
+          targetDamageBeforeModifiers: 0,
+          selfDamage: 0,
+          selfKnockOut: false,
+          coinFlips,
+          copiedAttackName: copiedAttack.name,
+        }
+      }
+    }
     if (copiedAttack && copiedEffect && !copiedEffect.special?.some((rule) => rule.kind === 'copyAttack')) {
       const copiedResolution = resolveTcgBattleAttack({
         state,
@@ -26592,17 +31707,17 @@ export function resolveTcgBattleAttack(params: {
   }
   const abilityProtectionCoinFlips = !effect.ignoreTargetDamageModifiers && Boolean(random) &&
     (abilityDamage.coinPreventOnHeads || abilityDamage.coinDamageReduction > 0) && typedDamage > 0
-    ? abilityDamage.coinDamageReductionFlipUntilTails ? rollTcgBattleCoinsUntilTails(random) : rollTcgBattleCoins(1, random)
+    ? abilityDamage.coinDamageReductionFlipUntilTails ? rollTcgBattleCoinsUntilTails(random, forceCoinFlipsToTails) : rollTcgBattleCoins(1, random, forceCoinFlipsToTails)
     : undefined
   const abilitySurvivalCoinFlips = !effect.ignoreTargetDamageModifiers && abilityDamage.coinSurviveKnockout &&
     typedDamage >= target.currentHp && typedDamage > 0
-    ? rollTcgBattleCoins(1, random)
+    ? rollTcgBattleCoins(1, random, forceCoinFlipsToTails)
     : undefined
   const abilitySurvivesKnockout = !effect.ignoreTargetDamageModifiers && abilityDamage.knockoutSurvivalHp !== undefined &&
     typedDamage >= target.currentHp && typedDamage > 0
   const incomingCoinFlips = !effect.ignoreTargetDamageModifiers &&
     target.incomingAttackModifier?.kind === 'coinPreventDamage' && typedDamage > 0
-    ? rollTcgBattleCoins(1, random)
+    ? rollTcgBattleCoins(1, random, forceCoinFlipsToTails)
     : undefined
   let targetDamage = effect.ignoreTargetDamageModifiers
     ? Math.max(0, typedDamage)
@@ -26632,7 +31747,13 @@ export function resolveTcgBattleAttack(params: {
     : 0
   const selfDamage = (effect.selfDamage || []).reduce(
     (sum, rule) =>
-      doesTcgBattleConditionPass('condition' in rule ? rule.condition : undefined, coinFlips)
+      doesTcgBattleConditionPass('condition' in rule ? rule.condition : undefined, coinFlips) &&
+      (!('requiresTargetCurrentHpAbove' in rule) || rule.requiresTargetCurrentHpAbove === undefined || target.currentHp > rule.requiresTargetCurrentHpAbove) &&
+      (!('requiresTargetKnockOut' in rule) || !rule.requiresTargetKnockOut || effect.special?.some((special) =>
+        special.kind === 'knockOutTarget' && target.currentHp > 0 &&
+        (!special.requiresAnyTargetStatus || Boolean(target.statusConditions?.length)) &&
+        (!special.requiresTargetStatus || Boolean(target.statusConditions?.includes(special.requiresTargetStatus))),
+      ))
         ? sum + calculateTcgBattleSelfDamage(rule, {
             state,
             sideKey,
@@ -26695,6 +31816,7 @@ export function resolveTcgBattleAttack(params: {
     coinFlips,
     paidAttackCost,
     choice,
+    effect.choiceOwnPokemonSide,
   )
   const protection = calculateTcgBattleProtection(effect.protection || [], sideKey, attacker, target, coinFlips)
   const skullStoneText = "during your opponent's turn, if skull fossil would be knocked out by damage from an opponent's attack, flip a coin until you get tails. for each heads, put 1 damage counter on the attacking pokemon."
@@ -26705,6 +31827,9 @@ export function resolveTcgBattleAttack(params: {
   const skullStoneCounterDamage = skullStoneCoins && skullStoneCoins.heads > 0
     ? { targetSide: sideKey, targetId: attacker.instanceId, damage: skullStoneCoins.heads * 10 }
     : undefined
+  const delayedKnockOutMarker = target.temporaryEffects?.knockOutOnNextAttackDamage
+  const delayedKnockOutTriggered = targetDamage > 0 && delayedKnockOutMarker?.ownerSide === sideKey &&
+    (!delayedKnockOutMarker.requiredAttackerSubtype || attacker.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype) === delayedKnockOutMarker.requiredAttackerSubtype))
 
   return {
     targetDamage,
@@ -26723,13 +31848,23 @@ export function resolveTcgBattleAttack(params: {
         doesTcgBattleConditionPass(gain.condition, coinFlips) &&
         (!gain.requiresEnergyType || state[sideKey].selectedEnergy === gain.requiresEnergyType) &&
         (!gain.requiresDamageDealt || targetDamage > 0) &&
-        (!gain.requiresOwnBench || state[sideKey].back.some((card) => card.currentHp > 0)),
+        (!gain.requiresOwnBench || state[sideKey].back.some((card) => card.currentHp > 0)) &&
+        (!gain.requiresOwnBenchCount || state[sideKey].back.filter((card) => card.currentHp > 0).length >= gain.requiresOwnBenchCount) &&
+        (!gain.requiresOwnBenchSubtype || state[sideKey].back.some((card) =>
+          card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === gain.requiresOwnBenchSubtype?.toLowerCase()),
+        )),
       )
       .map((gain) => ({
         target: gain.target,
         amount: Math.min(
           gain.maxAmount ?? Number.POSITIVE_INFINITY,
-          (gain.amount || 0) +
+          ((gain.amountOnSecondPlayerFirstTurn !== undefined && typeof state.playerGoesSecond === 'boolean' &&
+            (sideKey === 'player' ? state.playerGoesSecond : !state.playerGoesSecond) &&
+            state.turnNumber === (sideKey === 'player'
+              ? (state.playerGoesSecond ? 2 : 1)
+              : (state.playerGoesSecond ? 1 : 2)))
+            ? gain.amountOnSecondPlayerFirstTurn
+            : (gain.amount || 0)) +
             (gain.amountPerHead || 0) * (coinFlips?.heads || 0) +
             (gain.amountPerUnit || 0) * (gain.source
               ? getTcgBattleCount(gain.source, { state, sideKey, attacker, target, paidAttackCost, coinMode: 'actual', choice })
@@ -26740,10 +31875,17 @@ export function resolveTcgBattleAttack(params: {
     protection: protection.length > 0 ? protection : undefined,
     energyDiscards: energyDiscards.length > 0 ? energyDiscards : undefined,
     statusConditions: statusConditions.length > 0 ? statusConditions : undefined,
-    specialEffects: (effect.special || []).filter((rule) => {
+    specialEffects: [
+      ...(effect.special || []).filter((rule) => {
       if (rule.kind === 'copyAttack') return false
+      if ('requiresRemainingPrizeCount' in rule && typeof rule.requiresRemainingPrizeCount === 'number') {
+        const opponentSideKey = sideKey === 'player' ? 'opponent' : 'player'
+        if (getTcgBattleRemainingPrizeCount(state, opponentSideKey) !== rule.requiresRemainingPrizeCount) return false
+      }
       return doesTcgBattleConditionPass('condition' in rule ? rule.condition : undefined, coinFlips)
-    }),
+      }),
+      ...(delayedKnockOutTriggered ? [{ kind: 'knockOutTarget' as const, consumeDelayedKnockOut: true }] : []),
+    ],
     coinFlips: combineTcgBattleCoinFlips(coinFlips, combineTcgBattleCoinFlips(abilityProtectionCoinFlips, combineTcgBattleCoinFlips(abilitySurvivalCoinFlips, combineTcgBattleCoinFlips(incomingCoinFlips, skullStoneCoins)))),
   }
 }
@@ -26774,12 +31916,24 @@ function applyTcgBattleTemporaryAttackBoost(
   if (override) boostedDamage = Math.max(boostedDamage, override.baseDamage)
 
   const buff = attacker.temporaryEffects?.nextAttackBuff
+  const priorActiveDamageEvent = Boolean(
+    state && sideKey &&
+    buff?.requiresOwnCurrentActiveAttackDamageEvent &&
+    state.lastAttackDamageEventsTurnNumber === state.turnNumber &&
+    (state.lastAttackDamageEvents || []).some((event) =>
+      event.turnNumber === state.turnNumber &&
+      event.attackingSide === sideKey &&
+      event.targetSide !== sideKey &&
+      event.damage > 0 &&
+      state[sideKey].front.some((active) => active.instanceId === event.sourceId && active.currentHp > 0),
+    ),
+  )
   if (
     buff && (
       buff.attackName === '*' ||
       buff.attackName.toLowerCase() === name ||
       buff.attackNames?.some((attackName) => attackName.toLowerCase() === name)
-    )
+    ) && (!buff.requiresOwnCurrentActiveAttackDamageEvent || priorActiveDamageEvent)
   ) {
     if (typeof buff.baseDamage === 'number') boostedDamage = Math.max(boostedDamage, buff.baseDamage)
     if (typeof buff.damageBonus === 'number') boostedDamage += buff.damageBonus
@@ -26788,8 +31942,12 @@ function applyTcgBattleTemporaryAttackBoost(
     }
   }
   if (state && sideKey) {
+    if (attacker.temporaryEffects?.activeAttackDamageBonus &&
+      state[sideKey].front.some((card) => card.instanceId === attacker.instanceId)) {
+      boostedDamage += attacker.temporaryEffects.activeAttackDamageBonus
+    }
     for (const boost of state[sideKey].temporaryAttackDamageBoosts || []) {
-      if (boost.turnNumber !== state.turnNumber) continue
+      if (boost.duration !== 'game' && boost.turnNumber !== state.turnNumber) continue
       if (boost.type && !attacker.types.some((type) => type.toLowerCase() === boost.type!.toLowerCase())) continue
       if (boost.subtype && !attacker.subtypes.some((subtype) => subtype.toLowerCase() === boost.subtype!.toLowerCase())) continue
       if (boost.cardName && normalizeTcgBattleCardName(attacker.name) !== normalizeTcgBattleCardName(boost.cardName)) continue
@@ -26874,6 +32032,7 @@ export function clearTcgBattleControlStatus(
 ) {
   card.statusConditions = (card.statusConditions || []).filter((condition) => condition !== status)
   if (!card.statusConditions.includes('poisoned') && card.temporaryEffects) delete card.temporaryEffects.poisonCheckupBonus
+  if (!card.statusConditions.includes('poisoned') && card.temporaryEffects) delete card.temporaryEffects.poisonCheckupBonusTurns
   if (!card.statusConditions.includes('burned') && card.temporaryEffects) delete card.temporaryEffects.burnCheckupBonus
   if (card.statusConditions.length === 0) card.statusConditions = undefined
 }
@@ -26882,6 +32041,7 @@ export function clearTcgBattleStatuses(card: TcgBattleCardState) {
   card.statusConditions = undefined
   if (card.temporaryEffects) {
     delete card.temporaryEffects.poisonCheckupBonus
+    delete card.temporaryEffects.poisonCheckupBonusTurns
     delete card.temporaryEffects.burnCheckupBonus
   }
 }
@@ -26921,14 +32081,19 @@ export function tickTcgBattleIncomingAttackModifiers(state: TcgBattleState, side
 
     const effects = card.temporaryEffects
     if (!effects) continue
-    for (const key of ['disabledAttack', 'cannotAttack', 'cannotRetreat', 'cannotSwitch', 'endure', 'preventStatusConditions', 'cannotTarget', 'nextAttackBuff', 'destinyBond', 'discardEnergyOnKnockout', 'reflectDamage', 'pokemonPowerSuppression'] as const) {
+    for (const key of ['disabledAttack', 'cannotAttack', 'attackCostIncrease', 'retreatCostIncrease', 'attackCoinCountOverride', 'knockOutOnNextAttackDamage', 'cannotRetreat', 'cannotSwitch', 'endure', 'preventStatusConditions', 'cannotTarget', 'nextAttackBuff', 'destinyBond', 'discardEnergyOnKnockout', 'reflectDamage', 'pokemonPowerSuppression'] as const) {
       const effect = effects[key]
       if (!effect) continue
+      if (key === 'attackCostIncrease' && effects.attackCostIncrease?.untilSourceLeaves) continue
       if (key === 'cannotRetreat' && (effects.cannotRetreat?.untilSourceLeaves || effects.cannotRetreat?.untilTargetLeaves)) continue
       if (key === 'preventStatusConditions' && effects.preventStatusConditions?.whileActive) continue
       effect.remainingTurns -= 1
       if (effect.remainingTurns <= 0) delete effects[key]
     }
+  }
+  if (state.temporaryAttackCostIgnores?.side === sideKey) {
+    state.temporaryAttackCostIgnores.remainingTurns -= 1
+    if (state.temporaryAttackCostIgnores.remainingTurns <= 0) state.temporaryAttackCostIgnores = undefined
   }
 }
 
@@ -26967,7 +32132,7 @@ export function calculateTcgBattleDamage(
 ): number {
   const effect = getTcgBattleAttackEffect(attack)
   if (!effect) return 0
-  const projectedChoice = effect.choiceRequirement === 'optionalBonus' && state && sideKey
+  const projectedChoice = (effect.choiceRequirement === 'optionalBonus' || effect.choiceRequirement === 'discardOwnBenchPokemon') && state && sideKey
     ? chooseTcgBattleAttackChoice({
         state,
         sideKey,
@@ -26989,9 +32154,14 @@ export function calculateTcgBattleDamage(
         coinMode: 'max',
       })
     : 0
+  const coinCountOverride = attacker.temporaryEffects?.attackCoinCountOverride
+  const matchingCoinCountOverride = coinCountOverride && coinCountOverride.remainingTurns > 0 &&
+    coinCountOverride.attackName.toLowerCase() === attack.name.toLowerCase()
+    ? coinCountOverride.coinFlipCount
+    : undefined
   const projectedCoinCount = effect.flipUntilTails
     ? 1
-    : Math.max(0, effect.coinFlipSource ? dynamicCount : effect.coinFlipCount || 0)
+    : Math.max(0, matchingCoinCountOverride ?? (effect.coinFlipSource ? dynamicCount : effect.coinFlipCount || 0))
   const useTails = effect.damage.kind === 'tailsMultiplier' || effect.damage.kind === 'tailsBonus'
   const projectedCoins = projectedCoinCount > 0
     ? {
@@ -27669,6 +32839,36 @@ function getTcgBattleAbilityDamageModifiers(
         }
         continue
       }
+      const prizeAdvantagePersonalBoost = text.match(
+        /^(?:(?:if|as long as) )?you have more prize cards (?:left|remaining) than your opponent, (?:this pokemon's attacks|each of [a-z0-9 '’-]+? attacks) do(?:es)? (\d+) more damage to (?:your opponent's )?active pokemon(?: \(before applying weakness and resistance\))?\.$/,
+      )
+      const prizeThresholdPersonalBoost = text.match(
+        /^if your opponent has (\d+) or (?:fewer|less) prize cards? (?:remaining|left), (?:each of ([a-z0-9 '’-]+)'s attacks|this pokemon's attacks) do(?:es)? (\d+) more damage to (?:the |your opponent's )?active pokemon(?: \(before applying weakness and resistance\))?\.$/,
+      )
+      if (prizeThresholdPersonalBoost) {
+        const providerName = normalizeTcgBattleAbilityText(provider.name)
+        const namedProviderMatches = !prizeThresholdPersonalBoost[2] ||
+          normalizeTcgBattleAbilityText(prizeThresholdPersonalBoost[2]) === providerName
+        if (provider.instanceId === attacker.instanceId && namedProviderMatches && targetIsActive && state && sideKey &&
+          getTcgBattleRemainingPrizeCount(state, targetSide) <= Number(prizeThresholdPersonalBoost[1])) {
+          beforeWeaknessResistance += Number(prizeThresholdPersonalBoost[3])
+        }
+        continue
+      }
+      const hariyamaPrizeAdvantageBoost = text === "as long as you have more prize cards left than your opponent, each of hariyama's attacks does 20 more damage to the active pokemon (before applying weakness and resistance) and damage done by the active pokemon to hariyama is reduced by 20 (after applying weakness and resistance)."
+      const vespiquenPrizeAdvantageBoost = text.match(
+        /^as long as you have more prize cards left than your opponent, vespiquen's attacks do (\d+) more damage for each grass pokemon on your bench to the active pokemon \(before applying weakness and resistance\)\.$/,
+      )
+      if (prizeAdvantagePersonalBoost || hariyamaPrizeAdvantageBoost || vespiquenPrizeAdvantageBoost) {
+        if (provider.instanceId === attacker.instanceId && targetIsActive && state && sideKey && hasTcgBattlePrizeAdvantage(state, sideKey)) {
+          const amount = Number(prizeAdvantagePersonalBoost?.[1] || (hariyamaPrizeAdvantageBoost ? 20 : 0) || vespiquenPrizeAdvantageBoost?.[1] || 0)
+          const grassBenchCount = vespiquenPrizeAdvantageBoost
+            ? state[sideKey].back.filter((card) => card.currentHp > 0 && card.types.some((type) => normalizeTcgBattleAbilityText(type) === 'grass')).length
+            : 1
+          beforeWeaknessResistance += amount * grassBenchCount
+        }
+        continue
+      }
       if (/once during your turn|during your next turn|during this turn|when you play .* from your hand|you may use this (?:ability|power)/.test(text)) continue
       const darknessEnergyGate = /if this pokemon has any \{d\} energy attached/.test(text)
       if (/prize cards?|energy attached|basic energy|special energy|stadium|supporter card|tool card|knocked out|pokemon lv\.?x/.test(text) && !darknessEnergyGate) continue
@@ -27759,6 +32959,12 @@ function getTcgBattleAbilityDamageModifiers(
       normalizedText === "if your opponent has 5 or more cards in his or her hand, any damage done to pinsir by attacks is reduced by 30 (after applying weakness and resistance)." &&
       state && sideKey && state[sideKey].hand.length >= 5) {
       afterWeaknessResistance -= 30
+      continue
+    }
+    const hariyamaPrizeAdvantageText = "as long as you have more prize cards left than your opponent, each of hariyama's attacks does 20 more damage to the active pokemon (before applying weakness and resistance) and damage done by the active pokemon to hariyama is reduced by 20 (after applying weakness and resistance)."
+    if (normalizeTcgBattlePokemonName(target.name) === 'hariyama' &&
+      normalizedText === hariyamaPrizeAdvantageText && targetIsActive && attackerIsActive && state && hasTcgBattlePrizeAdvantage(state, targetSide)) {
+      afterWeaknessResistance -= 20
       continue
     }
     const attachedEnergyReduction = normalizedText.match(/^if this pokemon has any (?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless|basic)) )?energy attached(?: to it)?, it takes (\d+) less damage from attacks \(after applying weakness and resistance\)\.$/)
@@ -28479,6 +33685,67 @@ export function normalizeTcgBattleAbilityText(text: string): string {
   return normalized
 }
 
+export function hasTcgBattleExtraPrizeForAttackKnockout(attacker: TcgBattleCardState, target: TcgBattleCardState): boolean {
+  return (attacker.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim()
+    const match = text.match(/^if your opponent's (basic )?pokemon is knocked out by damage from an attack (?:of|used by) (this pokemon|[a-z0-9 &'’-]+), take 1 more prize card\.$/)
+    if (!match) return false
+    if (match[1] && !target.subtypes.some((subtype) => normalizeTcgBattleAbilityText(subtype).includes('basic'))) return false
+    const sourceName = normalizeTcgBattleCardName(match[2])
+    return sourceName === 'thispokemon' || sourceName === normalizeTcgBattleCardName(attacker.name)
+  })
+}
+
+export function hasTcgBattleWonderKiss(card: TcgBattleCardState): boolean {
+  return (card.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim() === "when your opponent's active pokemon is knocked out, flip a coin. if heads, take 1 more prize card. the effect of wonder kiss doesn't stack.",
+  )
+}
+
+export function getTcgBattleKnockoutPrizeReduction(attacker: TcgBattleCardState, target: TcgBattleCardState, ownerSide: TcgBattleSideState, allSides: TcgBattleSideState[]): number {
+  const targetAbilityActive = !isTcgBattleAbilitySuppressed(target, allSides)
+  const attackerSubtypes = new Set(attacker.subtypes.map((subtype) => normalizeTcgBattleAbilityText(subtype).replace(/[^a-z]/g, '')))
+  const isPokemonV = ['v', 'pokemonv', 'vmax', 'pokemonvmax', 'vstar', 'pokemonvstar'].some((subtype) => attackerSubtypes.has(subtype))
+  const isPokemonEx = attackerSubtypes.has('ex') || attackerSubtypes.has('pokemonex')
+  const targetAbilities = targetAbilityActive ? (target.abilities || []).map((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim()) : []
+
+  const preventsPrizeForVKnockout = targetAbilities.some((text) => text === "if this pokemon is knocked out by damage from an attack from your opponent's pokemon v, your opponent can't take any prize cards for it.")
+  const preventsPrizeForExKnockout = targetAbilities.some((text) => text === "if this pokemon is knocked out by damage from an attack from your opponent's pokemon ex, your opponent can't take any prize cards for it.")
+  const preventsPrizeWhileAsleep = targetAbilities.some((text) => text === "if this pokemon is asleep and is knocked out by damage from an attack from your opponent's pokemon, your opponent can't take any prize cards for it.") && target.statusConditions?.includes('asleep')
+  const preventsPrizeWhileConfused = targetAbilities.some((text) => text === "if weezing is confused and is knocked out, your opponent can't take a prize card.") && target.statusConditions?.includes('confused')
+  const preventsPrizeOnKnockout = targetAbilities.some((text) => text === "if this pokemon is knocked out, your opponent can't take any prize cards for it.")
+  const hasPecharuntForMunkidori = targetAbilities.some((text) => text === "if this pokemon is knocked out by damage from an attack from your opponent's pokemon, and if you have any pecharunt ex in play, your opponent takes 1 fewer prize card.") &&
+    ownerSide.front.concat(ownerSide.back).some((card) => card.currentHp > 0 && normalizeTcgBattleCardName(card.name) === 'pecharuntex' && !isTcgBattleAbilitySuppressed(card, allSides))
+
+  const isLegacyShedinja = normalizeTcgBattleCardName(target.name) === 'shedinja' && targetAbilities.some((text) => text === "when shedinja is knocked out, your opponent doesn't take any prize cards.")
+  if (preventsPrizeOnKnockout || isLegacyShedinja || preventsPrizeWhileConfused || hasPecharuntForMunkidori || (isPokemonV && preventsPrizeForVKnockout) || (isPokemonEx && preventsPrizeForExKnockout) || preventsPrizeWhileAsleep) return 1
+
+  if (target.types.includes('Darkness') && isPokemonEx) {
+    const megaGengarProvider = ownerSide.front.concat(ownerSide.back).find((provider) => provider.currentHp > 0 &&
+      normalizeTcgBattleCardName(provider.name) === 'megagengarex' &&
+      !isTcgBattleAbilitySuppressed(provider, allSides) &&
+      (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim() === "if 1 of your {d} pokemon is knocked out by damage from an attack from your opponent's pokemon ex, that player takes 1 fewer prize card. the effect of shadowy concealment doesn't stack."))
+    if (megaGengarProvider) return 1
+  }
+
+  return 0
+}
+
+export function hasTcgBattleCoinFlipKnockoutPrizeReduction(target: TcgBattleCardState): boolean {
+  return (target.abilities || []).some((ability) => {
+    const text = normalizeTcgBattleAbilityText(ability.text).replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim()
+    return text === "when this pokemon is knocked out, flip a coin. if heads, your opponent can't get any points for it." ||
+      text === "when this pokemon is knocked out, flip a coin. if heads, your opponent can't take any prize cards for it." ||
+      text === "when this pokemon is knocked out, flip a coin. if heads, your opponent can't take a prize card. shuffle this pokemon and all cards attached to it into your deck."
+  })
+}
+
+export function hasTcgBattleShuffleIntoDeckOnKnockout(target: TcgBattleCardState): boolean {
+  return (target.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim() === "when this pokemon is knocked out, flip a coin. if heads, your opponent can't take a prize card. shuffle this pokemon and all cards attached to it into your deck.",
+  )
+}
+
 export function getTcgBattleCoinFlipStatusPower(text: string): TcgBattleStatusCondition | null {
   const normalized = normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim()
   if (normalized === "once during your turn (before your attack), you may flip a coin. if heads, your opponent's active pokemon is now asleep. if you use this ability, your turn ends.") return 'asleep'
@@ -28510,6 +33777,12 @@ export function isTcgBattleVileplumeChoiceStatus(text: string): boolean {
 export function hasTcgBattleKlinklangEmergencyRotation(card: TcgBattleCardSummary): boolean {
   return normalizeTcgBattleAbilityText(card.name) === 'klinklang' && (card.abilities || []).some((ability) =>
     normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'once during your turn, if this pokemon is in your hand and your opponent has any stage 2 pokemon in play, you may put this pokemon onto your bench.',
+  )
+}
+
+export function hasTcgBattleLuxrayPrizeBenchAbility(card: TcgBattleCardSummary): boolean {
+  return (card.abilities || []).some((ability) =>
+    normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'once during your turn, if this pokemon is in your hand and you have more prize cards remaining than your opponent, you may put this pokemon onto your bench.',
   )
 }
 
@@ -28865,7 +34138,105 @@ export function getTcgBattleAvailableAttacks(state: TcgBattleState, sideKey: Tcg
   const attacks: TcgBattleAttack[] = [
     ...card.attacks,
     ...(grantingSource || aerodactylMemoryActive ? card.evolutionStack!.flatMap((stage) => stage.attacks || []) : []),
-  ]
+  ].flatMap((attack) => {
+    const effect = getTcgBattleAttackEffect(attack)
+    const searchRule = effect?.special?.find((rule) => rule.kind === 'searchDeckPokemon')
+    const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+    if (searchRule?.kind === 'searchDeckPokemon' && searchRule.requiresOpponentEvolved &&
+      !state[opponentKey].front.some((pokemon) => pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)))) return []
+    const historyCopyRule = effect?.special?.find((rule) => rule.kind === 'usePreviousTurnAttack')
+    if (historyCopyRule?.kind === 'usePreviousTurnAttack') {
+      if (historyCopyRule.requireCopyAttackerWasAlreadyInPlay && (
+        card.playedToBenchTurn === state.turnNumber || card.playedToFrontTurn === state.turnNumber || card.evolvedTurn === state.turnNumber
+      )) return []
+      const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+      const currentOpposingActiveId = state[opponentKey].front.find((pokemon) => pokemon.currentHp > 0)?.instanceId
+      const previousTurn = state.attackHistoryBySide?.[opponentKey]?.find((entry) => entry.turnNumber === state.turnNumber - 1)
+      return (previousTurn?.attacks || [])
+        .filter((entry) => entry.attack && (!historyCopyRule.sourceMustBeTarget || entry.attackerId === currentOpposingActiveId))
+        .filter((entry) => {
+          const copied = entry.attack!
+          const copiedEffect = getTcgBattleAttackEffect(copied)
+          if (!copiedEffect || copiedEffect.special?.some((rule) => rule.kind === 'copyAttack' || rule.kind === 'usePreviousTurnAttack')) return false
+          if (!historyCopyRule.excludeGx) return true
+          return !copiedEffect.oncePerGameGx && !/\bgx\b/i.test(copied.name) && !/you can't use more than 1 gx attack in a game/i.test(copied.text || '')
+        })
+        .flatMap((entry) => entry.attack ? [{
+          ...entry.attack,
+          cost: [...attack.cost],
+          convertedEnergyCost: attack.convertedEnergyCost,
+        }] : [])
+    }
+    const previousEvolutionCopy = effect?.special?.find((rule) => rule.kind === 'usePreviousEvolutionAttack')
+    if (previousEvolutionCopy?.kind === 'usePreviousEvolutionAttack') {
+      return (card.evolutionStack || []).flatMap((stage) => (stage.attacks || []).map((copiedAttack) => ({
+        ...copiedAttack,
+        cost: previousEvolutionCopy.freeCost ? [] : [...attack.cost],
+        convertedEnergyCost: previousEvolutionCopy.freeCost ? 0 : attack.convertedEnergyCost,
+      })))
+    }
+    const discardPokemonCopy = effect?.special?.find((rule) => rule.kind === 'useDiscardPokemonAttack')
+    if (discardPokemonCopy?.kind === 'useDiscardPokemonAttack') {
+      const sourceSideKey = discardPokemonCopy.side === 'opponent' ? (sideKey === 'player' ? 'opponent' : 'player') : sideKey
+      const requiredType = discardPokemonCopy.type ? normalizeTcgBattlePokemonName(discardPokemonCopy.type) : undefined
+      return state[sourceSideKey].discard
+        .filter((pokemon) => !requiredType || pokemon.types.some((type) => normalizeTcgBattlePokemonName(type) === requiredType))
+        .flatMap((pokemon) => pokemon.attacks
+          .filter((copiedAttack) => {
+            const copiedEffect = getTcgBattleAttackEffect(copiedAttack)
+            return Boolean(copiedEffect) && !copiedEffect?.special?.some((rule) => rule.kind === 'copyAttack' || rule.kind === 'usePreviousTurnAttack')
+          })
+          .map((copiedAttack) => ({
+            ...copiedAttack,
+            cost: discardPokemonCopy.freeCost ? [] : [...attack.cost],
+            convertedEnergyCost: discardPokemonCopy.freeCost ? 0 : attack.convertedEnergyCost,
+          })))
+    }
+    const copyRule = effect?.special?.find((rule) => rule.kind === 'useOwnBenchPokemonAttack')
+    if (copyRule?.kind !== 'useOwnBenchPokemonAttack') return [attack]
+    const namePrefix = copyRule.namePrefix
+      ? normalizeTcgBattleAbilityText(copyRule.namePrefix).replace(/[^a-z0-9]/g, '')
+      : undefined
+    const subtype = copyRule.subtype ? normalizeTcgBattlePokemonName(copyRule.subtype) : undefined
+    return side.back
+      .filter((pokemon) => pokemon.currentHp > 0 &&
+        (!namePrefix || normalizeTcgBattleAbilityText(pokemon.name).replace(/[^a-z0-9]/g, '').startsWith(namePrefix)) &&
+        (!subtype || pokemon.subtypes.some((candidate) => normalizeTcgBattlePokemonName(candidate) === subtype)))
+      .flatMap((pokemon) => pokemon.attacks.map((copiedAttack) => ({
+        ...copiedAttack,
+        cost: [...attack.cost],
+        convertedEnergyCost: attack.convertedEnergyCost,
+      })))
+  }).filter((attack) => {
+    const effect = getTcgBattleAttackEffect(attack)
+    if (effect?.secondPlayerFirstTurnOnly) {
+      if (typeof state.playerGoesSecond !== 'boolean') return false
+      const sideGoesSecond = sideKey === 'player' ? state.playerGoesSecond : !state.playerGoesSecond
+      const sideFirstTurn = sideKey === 'player'
+        ? (state.playerGoesSecond ? 2 : 1)
+        : (state.playerGoesSecond ? 1 : 2)
+      if (!sideGoesSecond || state.turnNumber !== sideFirstTurn) return false
+    }
+    const copyRule = effect?.special?.find((rule) => rule.kind === 'copyAttack')
+    if (copyRule?.kind === 'copyAttack' && copyRule.requiresEmptyHand && side.hand.length > 0) return false
+    if (effect?.onceWhilePokemonInPlay) {
+      const requiredPokemon = normalizeTcgBattlePokemonName(effect.onceWhilePokemonInPlay)
+      const sourceRemainsInPlay = normalizeTcgBattlePokemonName(card.name) === requiredPokemon ||
+        (card.evolutionStack || []).some((stage) => normalizeTcgBattlePokemonName(stage.name) === requiredPokemon)
+      if (sourceRemainsInPlay && card.attacksUsedWhileInPlay?.includes(getTcgBattleAttackUsageKey(attack))) return false
+    }
+    if (effect?.previousTurnAttackRequirement) {
+      const previousTurn = state.attackHistoryBySide?.[sideKey]?.find((entry) => entry.turnNumber === state.turnNumber - 1)
+      const requirement = effect.previousTurnAttackRequirement
+      if (!previousTurn?.attacks.some((entry) =>
+        normalizeTcgBattlePokemonName(entry.cardName) === normalizeTcgBattlePokemonName(requirement.cardName) &&
+        normalizeTcgBattlePokemonName(entry.attackName) === normalizeTcgBattlePokemonName(requirement.attackName),
+      )) return false
+    }
+    if (effect?.oncePerGameVstar && side.usedVstarPower) return false
+    if (effect?.oncePerGameGx && (side.usedGxAttack || side.gxAttacksLocked)) return false
+    return true
+  })
   if (isTcgBattleAbilitySuppressed(card, [state.player, state.opponent])) return attacks
 
   const normalizedAbilities = (card.abilities || []).map((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim())
@@ -28976,6 +34347,48 @@ export function getTcgBattleAvailableAttacks(state: TcgBattleState, sideKey: Tcg
     attacks.push(attack)
   }
   return attacks
+}
+
+export type TcgBattleCopyAttackOption = { attack: TcgBattleAttack; source: TcgBattleCardState }
+
+export function getTcgBattleCopyAttackOptions(
+  state: TcgBattleState,
+  sideKey: TcgBattleSide,
+  target: TcgBattleCardState,
+  copyAttack: TcgBattleAttack,
+  attacker: TcgBattleCardState,
+): TcgBattleCopyAttackOption[] {
+  const copyRule = getTcgBattleAttackEffect(copyAttack)?.special?.find((rule) => rule.kind === 'copyAttack')
+  if (copyRule?.kind !== 'copyAttack') return []
+  if (copyRule.requiresEmptyHand && state[sideKey].hand.length > 0) return []
+  const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+  const opponent = state[opponentKey]
+  const sources = copyRule.sourceScope === 'any'
+    ? [...opponent.front, ...opponent.back].filter((card) => card.currentHp > 0)
+    : copyRule.sourceScope === 'bench'
+      ? opponent.back.filter((card) => card.currentHp > 0)
+      : copyRule.sourceScope === 'ownBench'
+        ? state[sideKey].back.filter((card) => card.currentHp > 0)
+        : copyRule.sourceScope === 'ownPlay'
+        ? [...state[sideKey].front, ...state[sideKey].back].filter((card) => card.currentHp > 0 && card.instanceId !== attacker.instanceId)
+        : [target]
+  const sourceSideKey = copyRule.sourceScope === 'ownPlay' || copyRule.sourceScope === 'ownBench' ? sideKey : opponentKey
+  return sources.flatMap((source) => {
+    if (copyRule.excludePokemonEx && source.subtypes.some((subtype) => ['ex', 'pokemonex'].includes(normalizeTcgBattlePokemonName(subtype)))) return []
+    if (copyRule.requireTera && !source.subtypes.some((subtype) => normalizeTcgBattlePokemonName(subtype) === 'tera')) return []
+    if (copyRule.sourceNameContains && !normalizeTcgBattlePokemonName(source.name).includes(normalizeTcgBattlePokemonName(copyRule.sourceNameContains))) return []
+    return getTcgBattleAvailableAttacks(state, sourceSideKey, source)
+      .filter((attack) => {
+        const effect = getTcgBattleAttackEffect(attack)
+        if (!effect || effect.special?.some((rule) => rule.kind === 'copyAttack')) return false
+        if (copyRule.excludeGx && (effect.oncePerGameGx || /\bgx\b/i.test(attack.name) || /you can't use more than 1 gx attack in a game/i.test(attack.text || ''))) return false
+        return true
+      })
+      .map((attack) => ({
+        attack: copyRule.freeCost ? { ...attack, cost: [], convertedEnergyCost: 0 } : attack,
+        source,
+      }))
+  })
 }
 
 export function isTcgBattleStatusBlockedByAbility(
@@ -29243,7 +34656,7 @@ export function getTcgBattleEvolutionAttackProtectionEffect(card: TcgBattleCardS
       return { abilityName: ability.name }
     }
     if (normalizeTcgBattlePokemonName(card.name) === 'lucariolvx' &&
-      text === "once during your turn (before your attack), when you put lucario lv. x from your hand onto your active lucario, you may use this power. prevent all effects of an attack, including damage, done to lucario during your opponent's next turn. (if lucario is no longer your active pokemon, this effect ends).") {
+      /^once during your turn \(before your attack\), when you put lucario lv\.? ?x from your hand onto your active lucario, you may use this power\. prevent all effects of an attack, including damage, done to lucario during your opponent's next turn\. \(if lucario is no longer your active pokemon, this effect ends\.\)$/.test(text)) {
       return { abilityName: ability.name, activeOnly: true }
     }
   }
@@ -29403,17 +34816,19 @@ export function hasTcgBattleEvolutionMassHealEffect(card: TcgBattleCardSummary):
   })
 }
 
-export function getTcgBattleEvolutionEnergyEffect(card: TcgBattleCardSummary): { count: number; energyType: string; coinFlip?: boolean; discardOpponentActive?: boolean; discardPile?: boolean; coinFlipDiscard?: boolean; searchDeck?: boolean; topDeckCount?: number; topDeckBasicEnergy?: boolean } | null {
+export function getTcgBattleEvolutionEnergyEffect(card: TcgBattleCardSummary): { count: number; energyType: string; coinFlip?: boolean; discardOpponentActive?: boolean; discardPile?: boolean; coinFlipDiscard?: boolean; searchDeck?: boolean; topDeckCount?: number; topDeckBasicEnergy?: boolean; opponentPrizeScaling?: boolean } | null {
   for (const ability of card.abilities || []) {
     const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
     if (text === 'when you play typhlosion from your hand, you may flip a coin. if heads, search your deck for up to 4 fire energy cards and attach them to typhlosion. shuffle your deck afterward.') return { count: 4, energyType: 'r', coinFlip: true, searchDeck: true }
     if (text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may attach a water energy card from your discard pile to 1 of your pokemon.') return { count: 1, energyType: 'w', discardPile: true }
     if (normalizeTcgBattlePokemonName(card.name) === 'abomasnow' && text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may attach a grass energy card from your discard pile to 1 of your pokemon.') return { count: 1, energyType: 'g', discardPile: true }
     if (text === 'when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may attach up to 2 basic {m} energy cards from your discard pile to your {m} pokemon in any way you like.') return { count: 2, energyType: 'y', discardPile: true }
+    if (normalizeTcgBattlePokemonName(card.name) === 'tyranitar' && text === "when you play this pokemon from your hand to evolve 1 of your pokemon, you may attach 1 darkness energy from your discard pile to this pokemon for each prize card your opponent has taken.") return { count: 1, energyType: 'd', discardPile: true, opponentPrizeScaling: true }
     if (/^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may discard an energy attached to your opponent's active pokemon(?:\. if this pokemon is your active pokemon and is knocked out by damage from an opponent's attack, you may discard an energy from your opponent's active pokemon)?\.$/.test(text)) return { count: 1, energyType: '', discardOpponentActive: true }
     if (text === "once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability. flip a coin. if heads, discard an energy from your opponent's active pokemon.") return { count: 1, energyType: '', coinFlip: true, discardOpponentActive: true, coinFlipDiscard: true }
-    const match = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards and attach them to your pokemon in any way you like\. then, shuffle your deck\.$/)
+    const match = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards and attach them to (?:your pokemon|your marnie's pokemon|marnie's pokemon) in any way you like\. then, shuffle your deck\.$/)
     if (match) return { count: Number(match[1]), energyType: match[2], searchDeck: true }
+    if (normalizeTcgBattlePokemonName(card.name) === 'infernape' && text === "once during your turn (before your attack), when you play infernape from your hand to evolve 1 of your pokemon, you may flip a coin. if heads, search your deck for up to 4 fire energy cards and attach them to your pokemon in any way you like. shuffle your deck afterward.") return { count: 4, energyType: 'r', coinFlip: true, searchDeck: true }
     const anyBasicEnergy = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may search your deck for up to (\d+) basic energy cards and attach them to your pokemon in any way you like\. then, shuffle your deck\.$/)
     if (anyBasicEnergy) return { count: Number(anyBasicEnergy[1]), energyType: 'any', searchDeck: true }
     const topDeckGeneric = text.match(/^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may look at the top (\d+) cards of your deck(?:\. choose any)? and attach any number of basic energy cards? you find there to your pokemon in any way you like\. shuffle the other cards back into your deck\.$/)
@@ -29450,7 +34865,7 @@ export function getTcgBattleEvolutionActiveHealAmount(card: TcgBattleCardSummary
 export function hasTcgBattleEvolutionSwitchEffect(card: TcgBattleCardSummary): boolean {
   return (card.abilities || []).some((ability) => {
     const text = normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim()
-    return /^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may switch 1 of your opponent's benched (?:evolution )?pokemon(?:-ex)? with (?:their|his or her) active pokemon\.?$/.test(text) || /^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may switch in 1 of your opponent's benched pokemon to the active spot\.$/.test(text) || text === "once during your turn (before your attack), when you put luxray gl lv.x from your hand onto your active luxray gl, you may switch the defending pokemon with 1 of your opponent's benched pokemon." || getTcgBattleEvolutionSwitchMaxRemainingHp(card) !== undefined
+    return /^when you play this pokemon from your hand to evolve 1 of your pokemon(?: during your turn)?, you may switch 1 of your opponent's benched (?:evolution )?pokemon(?:-ex)? with (?:their|his or her) active pokemon\.?$/.test(text) || /^when you play this pokemon from your hand to evolve 1 of your pokemon during your turn, you may (?:use this ability\. )?switch in 1 of your opponent's benched pokemon to the active spot\.$/.test(text) || /^once during your turn, when you play this pokemon from your hand to evolve 1 of your pokemon, you may use this ability\. switch in 1 of your opponent's benched pokemon to the active spot\.$/.test(text) || text === "once during your turn (before your attack), when you put luxray gl lv.x from your hand onto your active luxray gl, you may switch the defending pokemon with 1 of your opponent's benched pokemon." || getTcgBattleEvolutionSwitchMaxRemainingHp(card) !== undefined
   })
 }
 
@@ -29539,7 +34954,7 @@ export function getTcgBattlePokemonSwapPower(text: string): { pokemonName: strin
   return { pokemonName, powerName }
 }
 
-export function getTcgBattleAbilityDamageCounterEffect(text: string): { count: number; energyType?: string; activeOnly: boolean; benchOnly: boolean; vstar: boolean; benchToActiveOnly: boolean; shuffleSource?: boolean; spreadToAllOpponents?: boolean; distributeCounters?: boolean; fixedTargetCount?: number; fixedCountersPerTarget?: number; selfKnockout?: boolean; directDamage?: number; coinFlip?: boolean; endsTurn?: boolean; specialConditionGate?: boolean; requiresOtherActiveName?: string; counterRemoval?: boolean; defendingOnly?: boolean; discardOpposingEnergy?: boolean; returnOpposingEnergy?: boolean; requiredTargetSubtype?: string; requiredTargetMarker?: 'delta'; ownTargets?: boolean; sourceBenchOnly?: boolean; excludedTargetName?: string; discardHandForSelfCounters?: boolean; discardSingleCardFromHand?: boolean; mysteriousPotion?: boolean; damagedTargetOnly?: boolean } | null {
+export function getTcgBattleAbilityDamageCounterEffect(text: string): { count: number; energyType?: string; activeOnly: boolean; benchOnly: boolean; vstar: boolean; benchToActiveOnly: boolean; shuffleSource?: boolean; spreadToAllOpponents?: boolean; distributeCounters?: boolean; fixedTargetCount?: number; fixedCountersPerTarget?: number; selfKnockout?: boolean; directDamage?: number; coinFlip?: boolean; endsTurn?: boolean; specialConditionGate?: boolean; requiresOtherActiveName?: string; requiresNameInPlay?: string; counterRemoval?: boolean; defendingOnly?: boolean; discardOpposingEnergy?: boolean; returnOpposingEnergy?: boolean; requiredTargetSubtype?: string; requiredTargetMarker?: 'delta'; ownTargets?: boolean; sourceBenchOnly?: boolean; excludedTargetName?: string; discardHandForSelfCounters?: boolean; discardSingleCardFromHand?: boolean; mysteriousPotion?: boolean; damagedTargetOnly?: boolean } | null {
   const normalized = normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim()
   if (normalized === "you must discard a {w} energy card from your hand in order to use this ability. once during your turn, you may choose 2 of your opponent's benched pokemon and put 2 damage counters on each of them.") {
     return { count: 4, energyType: 'w', activeOnly: false, benchOnly: true, vstar: false, benchToActiveOnly: false, distributeCounters: true, fixedTargetCount: 2, fixedCountersPerTarget: 2 }
@@ -29595,7 +35010,8 @@ export function getTcgBattleAbilityDamageCounterEffect(text: string): { count: n
   if (/^once during your turn \(before your attack\), you may remove 2 damage counters? from 1 of the defending pokemon\.$/.test(normalized)) {
     return { count: 2, activeOnly: false, benchOnly: false, vstar: false, benchToActiveOnly: false, counterRemoval: true, defendingOnly: true }
   }
-  const directDamage = normalized.match(/^once during your turn, you may do (\d+) damage to 1 of your opponent's pokemon\.$/)
+  const arceusCrobatDamage = normalized === "once during your turn, if you have arceus or arceus ex in play, you may do 30 damage to your opponent's active pokemon."
+  const directDamage = normalized.match(/^once during your turn, you may do (\d+) damage to 1 of your opponent's pokemon\.$/) || (arceusCrobatDamage ? [' ', '30'] : null)
   const energyType = normalized.match(/discard a (?:basic )?\{([grwlpmdycf])\} energy card from your hand/)?.[1] || (/discard a fire energy card from your hand/.test(normalized) ? 'r' : /discard a water energy card from your hand/.test(normalized) ? 'w' : undefined)
   const counters = normalized.match(/(?:put|place) (\d+) damage counters? on 1 of your opponent's (benched )?pokemon/)?.[1]
   const freeCounterAbility = /^once during your turn(?: \(before your attack\))?, you may put \d+ damage counters? on 1 of your opponent's pokemon\.?$/.test(normalized)
@@ -29617,6 +35033,8 @@ export function getTcgBattleAbilityDamageCounterEffect(text: string): { count: n
     spreadToAllOpponents: Boolean(spreadAbility || nidokingEarthRage),
     selfKnockout: Boolean(selfKnockoutAbility),
     directDamage: directDamage ? Number(directDamage[1]) : undefined,
+    requiresNameInPlay: arceusCrobatDamage ? 'arceus' : undefined,
+    defendingOnly: arceusCrobatDamage,
     coinFlip: misdreavusDarkSpell || nidokingEarthRage,
     endsTurn: Boolean(tyrogueBrattyKick),
     specialConditionGate: misdreavusDarkSpell || nidokingEarthRage,
@@ -29624,11 +35042,14 @@ export function getTcgBattleAbilityDamageCounterEffect(text: string): { count: n
   }
 }
 
-export function getTcgBattleAbilityDamageCounterMoveEffect(text: string): { maxCounters: number; activeOnly: boolean; ownToOpponent: boolean; ownToOwn?: boolean; opponentToOpponent?: boolean; requiresDarknessEnergy: boolean; benchPlayOnly?: boolean; repeatable?: boolean; allCounters?: boolean; blockedBySpecialCondition?: boolean; blockedStatuses?: TcgBattleStatusCondition[]; preventKnockout?: boolean; targetSelf?: boolean; targetActiveOnly?: boolean; sourceNameContains?: string; targetNameContains?: string; requiredName?: string; sourceSelf?: boolean; minimumSourceHp?: number; pokemonSpOnly?: boolean; pokemonType?: string } | null {
+export function getTcgBattleAbilityDamageCounterMoveEffect(text: string): { maxCounters: number; activeOnly: boolean; ownToOpponent: boolean; ownToOwn?: boolean; opponentToOpponent?: boolean; requiresDarknessEnergy: boolean; benchPlayOnly?: boolean; repeatable?: boolean; allCounters?: boolean; blockedBySpecialCondition?: boolean; blockedStatuses?: TcgBattleStatusCondition[]; preventKnockout?: boolean; targetSelf?: boolean; targetActiveOnly?: boolean; sourceNameContains?: string; targetNameContains?: string; requiredName?: string; sourceSelf?: boolean; minimumSourceHp?: number; pokemonSpOnly?: boolean; pokemonType?: string; opponentRemainingPrizesAtMost?: number } | null {
   const normalized = normalizeTcgBattleAbilityText(text).replace(/\s+/g, ' ').trim()
   if (normalized === "once during your turn (before your attack), if banette ex is your active pokemon, you may move 1 damage counter from either player's pokemon to another pokemon (yours or your opponent's). this power can't be used if banette ex is affected by a special condition." ||
     normalized === "once during your turn (before your attack), if typhlosion is your active pokemon, you may move 1 damage counter from either player's pokemon to another pokemon (yours or your opponent's). this power can't be used if typhlosion is affected by a special condition.") {
     return { maxCounters: 1, activeOnly: true, ownToOpponent: false, ownToOwn: false, requiresDarknessEnergy: false, blockedBySpecialCondition: true }
+  }
+  if (normalized === "once during your turn (before your attack), if your opponent has 3 or fewer prizes, you may move 1 damage counter from 1 pokemon (yours or your opponent's) to another (even if it would knock out the other pokemon). this power can't be used if gengar is affected by a special condition.") {
+    return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: false, requiresDarknessEnergy: false, blockedBySpecialCondition: true, opponentRemainingPrizesAtMost: 3 }
   }
   if (normalized === "once during your turn (before your attack), you may move 1 damage counter from either player's pokemon to another pokemon (yours or your opponent's). this power can't be used if cresselia is affected by a special condition.") {
     return { maxCounters: 1, activeOnly: false, ownToOpponent: false, ownToOwn: false, requiresDarknessEnergy: false, blockedBySpecialCondition: true }
@@ -29736,6 +35157,7 @@ export function getTcgBattleEvolutionOptions(
   sideKey: TcgBattleSide = 'player',
   opposingSide?: TcgBattleSideState,
   playerGoesSecond?: boolean,
+  attackEvolution = false,
 ): TcgBattleEvolutionOption[] {
   const options: TcgBattleEvolutionOption[] = []
   const globalEvolutionLock = Boolean(opposingSide && [...opposingSide.front, ...opposingSide.back].some((provider) =>
@@ -29760,18 +35182,22 @@ export function getTcgBattleEvolutionOptions(
         'as long as kabutops is your active pokemon, neither player can play basic pokemon or evolution cards from his or her hand to evolve benched pokemon.'),
     ),
   ))
-  if (globalEvolutionLock || ancientPowerEvolutionLock) return options
+  if (!attackEvolution && (globalEvolutionLock || ancientPowerEvolutionLock)) return options
   const asleepEvolutionLock = Boolean(opposingSide && [...opposingSide.front, ...opposingSide.back].some((provider) =>
     provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
     (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "your opponent can't play any basic pokemon or evolution cards from his or her hand to evolve an asleep pokemon and can't attach any energy cards from his or her hand to an asleep pokemon."),
   ))
   for (const target of [...side.front, ...side.back]) {
     if (target.currentHp <= 0) continue
-    if (asleepEvolutionLock && target.statusConditions?.includes('asleep')) continue
+    // Entry-turn Evolution is blocked for hand plays and effects alike.
+    if (target.playedToBenchTurn === turnNumber || target.playedToFrontTurn === turnNumber) continue
+    // A Pokémon that evolved this turn cannot evolve again, including through an effect.
+    if (target.evolvedTurn === turnNumber) continue
+    if (!attackEvolution && asleepEvolutionLock && target.statusConditions?.includes('asleep')) continue
     if ((target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).includes("ditto can't evolve"))) continue
     const targetStage = getTcgBattleEvolutionStage(target)
     const targetIsActive = side.front.some((pokemon) => pokemon.instanceId === target.instanceId)
-    if (activeKabutopsBenchEvolutionLock && !targetIsActive) continue
+    if (!attackEvolution && activeKabutopsBenchEvolutionLock && !targetIsActive) continue
     const isGalladeLvXTarget = targetIsActive && normalizeTcgBattlePokemonName(target.name) === 'galladee4' && side.hand.some((card) =>
       normalizeTcgBattlePokemonName(card.name) === 'galladee4lvx' && normalizeTcgBattlePokemonName(card.evolvesFrom) === 'galladee4' && card.subtypes.some((subtype) => normalizeTcgBattlePokemonName(subtype) === 'levelup'),
     )
@@ -29794,7 +35220,7 @@ export function getTcgBattleEvolutionOptions(
       provider.currentHp > 0 && !isTcgBattleAbilitySuppressed(provider, [side, opposingSide]) &&
       (provider.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as this pokemon is in the active spot, your opponent can't play any pokemon from their hand to evolve their pokemon."),
     )
-    if (activeEvolutionLock || dracovishPrimalLaw) continue
+    if (!attackEvolution && (activeEvolutionLock || dracovishPrimalLaw)) continue
     const pichuPower = target.name.toLowerCase().includes('pichu')
       ? (target.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex })).find(({ ability, abilityIndex }) => {
           const text = normalizeTcgBattleAbilityText(ability.text)
@@ -29901,18 +35327,13 @@ export function getTcgBattleEvolutionOptions(
           if (/as long as this pokemon is in the active spot/.test(text) && !isActive) return false
           return /this pokemon can evolve during your first turn or the turn you play it|(?:as long as this pokemon is in the active spot, )?it can evolve during your first turn or the turn you play it|you may play this card from your hand to evolve a pokemon during your first turn or the turn you play that pokemon|burmy (?:plant|sandy|trash) cloak can evolve during the turn you play it/.test(text)
         })
-      const hasOpponentActiveExEvolutionPermission = (card.abilities || []).some((ability) =>
-        normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "if your opponent's active pokemon is a pokemon-gx or pokemon-ex, this pokemon can evolve during the turn you play it.",
-      ) && Boolean(opposingSide?.front.some((pokemon) => pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => ['ex', 'pokemon-ex', 'gx', 'pokemon-gx'].includes(normalizeTcgBattleAbilityText(subtype)))))
-      const canEvolveOnPlayTurn = (target.playedToBenchTurn === turnNumber || target.playedToFrontTurn === turnNumber) &&
-        (hasEarlyEvolutionPermission(target.abilities, targetIsActive) || hasEarlyEvolutionPermission(card.abilities, false) || hasOpponentActiveExEvolutionPermission)
       const sideGoesSecond = sideKey === 'player' ? playerGoesSecond === true : playerGoesSecond === undefined || playerGoesSecond === false
       const secondPlayerEvolutionPermission = sideGoesSecond && !isTcgBattleAbilitySuppressedByShadyTail(target, [side, opposingSide || side]) && (target.abilities || []).some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === 'if you go second, this pokemon can evolve during your first turn.')
       const canEvolveOnFirstTurn = turnNumber === 1 && (
         hasEarlyEvolutionPermission(card.abilities, false) || hasEarlyEvolutionPermission(target.abilities, targetIsActive)
         || secondPlayerEvolutionPermission
       )
-      if ((turnNumber < costUnlockTurn || turnNumber < stageUnlockTurn) && !canEvolveOnFirstTurn && !canEvolveOnPlayTurn) continue
+      if (!attackEvolution && (turnNumber < costUnlockTurn || turnNumber < stageUnlockTurn) && !canEvolveOnFirstTurn) continue
       const frothAbility = targetIsActive && normalizeTcgBattlePokemonName(card.name) === 'azumarill'
         ? (card.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex })).find(({ ability }) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "once during your turn, when you play azumarill from your hand to evolve 1 of your active pokemon, you may use this power. each defending pokemon is now paralyzed.")
         : undefined
@@ -29931,14 +35352,20 @@ export function applyTcgBattleEvolution(
   opposingSide?: TcgBattleSideState,
   playerGoesSecond?: boolean,
   battleState?: TcgBattleState,
+  attackEvolution = false,
 ): { target: TcgBattleCardState; evolution: TcgBattleCardSummary; previousName: string } | null {
-  const option = getTcgBattleEvolutionOptions(side, turnNumber, sideKey, opposingSide, playerGoesSecond).find(
+  const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId)
+  if (
+    !target ||
+    target.playedToBenchTurn === turnNumber ||
+    target.playedToFrontTurn === turnNumber ||
+    target.evolvedTurn === turnNumber
+  ) return null
+  const option = getTcgBattleEvolutionOptions(side, turnNumber, sideKey, opposingSide, playerGoesSecond, attackEvolution).find(
     (candidate) => candidate.targetId === targetId &&
       (candidate.card.instanceId === evolutionCardId || candidate.card.id === evolutionCardId),
   )
   if (!option) return null
-  const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId)
-  if (!target) return null
   const evolutionHandIndex = side.hand.findIndex((card) => card.instanceId === option.card.instanceId)
   if (evolutionHandIndex < 0) return null
   if ((option.effect === 'meganiumStage2' || option.effect === 'dittoPrismStage1') && option.abilitySourceId !== undefined && option.abilityIndex !== undefined && option.abilityName) {
@@ -29956,6 +35383,8 @@ export function applyTcgBattleEvolution(
     currentHp: _evolutionCurrentHp,
     playedToBenchTurn: _evolutionPlayedToBenchTurn,
     playedToFrontTurn: _evolutionPlayedToFrontTurn,
+    becameActiveTurn: _evolutionBecameActiveTurn,
+    evolvedTurn: _evolutionEvolvedTurn,
     abilityUses: _evolutionAbilityUses,
     evolutionStack: _evolutionStack,
     statusConditions: _evolutionStatusConditions,
@@ -29969,6 +35398,10 @@ export function applyTcgBattleEvolution(
   const {
     instanceId,
     currentHp: _currentHp,
+    playedToBenchTurn: _playedToBenchTurn,
+    playedToFrontTurn: _playedToFrontTurn,
+    becameActiveTurn: _becameActiveTurn,
+    evolvedTurn: _evolvedTurn,
     evolutionStack,
     statusConditions: _statusConditions,
     incomingAttackModifier: _incomingAttackModifier,
@@ -30000,6 +35433,7 @@ export function applyTcgBattleEvolution(
   Object.assign(target, evolutionSummary, {
     instanceId,
     currentHp: Math.max(0, evolutionSummary.hp - damageCounters),
+    evolvedTurn: turnNumber,
     evolutionStack: stack,
     statusConditions: gliscorStopsConditionRemoval ? target.statusConditions : heatranStopsBurnRemoval ? ['burned'] : poisonSacsPreservesPoison ? ['poisoned'] : undefined,
     incomingAttackModifier: undefined,
@@ -30048,30 +35482,55 @@ export function getTcgBattleDeckSearchMaxCount(params: {
 export function getAvailableTcgBattleDeckPokemon(
   side: TcgBattleSideState,
   rule: Extract<TcgBattleSpecialRule, { kind: 'searchDeckPokemon' }>,
+  attacker?: TcgBattleCardState,
+  target?: TcgBattleCardState,
 ): TcgBattleCardSummary[] {
+  if (rule.requiresOwnBenchType && !side.back.some((card) =>
+    card.currentHp > 0 && card.types.some((type) => normalizeTcgBattleEnergyType(type) === rule.requiresOwnBenchType),
+  )) return []
+  if (rule.requiresNameInPlay && ![...side.front, ...side.back].some((card) =>
+    card.currentHp > 0 && normalizeTcgBattlePokemonName(card.name) === normalizeTcgBattlePokemonName(rule.requiresNameInPlay!),
+  )) return []
   const unavailableIds = getTcgBattleUsedDeckCardIds(side)
-  const normalizeName = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const normalizeName = (name: string) => name.toLowerCase().replace(/δ/g, 'delta').replace(/[^a-z0-9]/g, '')
+  const normalizeSubtype = (subtype: string) => subtype.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/^pokemon[- ]?/, '').replace(/[^a-z0-9]/g, '')
   const eligibleNames = rule.includeNames?.map(normalizeName)
   const eligibleNameParts = rule.includeNameContains?.map(normalizeName)
-  const eligibleTypes = rule.includeTypes?.map((type) => type.toLowerCase())
-  const eligibleSubtypes = rule.includeSubtypes?.map((subtype) => subtype.toLowerCase())
+  const evolutionTarget = rule.evolveTarget ? target : attacker
+  const eligibleEvolvesFrom = [
+    ...(rule.includeEvolvesFrom || []),
+    ...(rule.evolveAttacker && attacker ? [attacker.name] : []),
+    ...(rule.evolveTarget && evolutionTarget ? [evolutionTarget.name] : []),
+  ].map(normalizeName)
+  const eligibleTypes = [
+    ...(rule.includeTypes || []).map((type) => type.toLowerCase()),
+    ...(rule.includeTargetType ? target?.types.map((type) => type.toLowerCase()) || [] : []),
+  ]
+  const eligibleSubtypes = rule.includeSubtypes?.map(normalizeSubtype)
+  const excludedSubtypes = rule.excludeSubtypes?.map(normalizeSubtype)
   const eligibleResistanceTypes = rule.includeResistanceTypes?.map((type) => type.toLowerCase())
   const selectedEnergyType = rule.includeSelectedEnergyType ? side.selectedEnergy?.toLowerCase() : undefined
 
-  return side.deck.filter((card) => {
+  return (rule.topCardCount === undefined ? side.deck : side.deck.slice(0, rule.topCardCount)).filter((card) => {
     if (unavailableIds.has(card.id)) return false
     const isBasic = card.subtypes.includes('Basic')
     const normalizedName = normalizeName(card.name)
     const isNamed = Boolean(eligibleNames?.includes(normalizedName))
     const nameContains = Boolean(eligibleNameParts?.some((value) => normalizedName.includes(value)))
+    const evolvesFromMatches = Boolean(card.evolvesFrom && eligibleEvolvesFrom?.includes(normalizeName(card.evolvesFrom)))
+    const isNextEvolutionStage = Boolean(
+      Boolean(evolutionTarget && (rule.evolveAttacker || rule.evolveTarget) && getTcgBattleEvolutionStage(card) === getTcgBattleEvolutionStage(evolutionTarget) + 1),
+    )
     const typeMatches = Boolean(card.types.some((type) => eligibleTypes?.includes(type.toLowerCase())))
     const selectedEnergyTypeMatches = Boolean(selectedEnergyType && card.types.some((type) => type.toLowerCase() === selectedEnergyType))
-    const subtypeMatches = Boolean(card.subtypes.some((subtype) => eligibleSubtypes?.includes(subtype.toLowerCase())))
+    const subtypeMatches = Boolean(card.subtypes.some((subtype) => eligibleSubtypes?.includes(normalizeSubtype(subtype))))
+    const excludedSubtypeMatches = Boolean(card.subtypes.some((subtype) => excludedSubtypes?.includes(normalizeSubtype(subtype))))
     const resistanceMatches = Boolean(card.resistances.some((resistance) => eligibleResistanceTypes?.includes(resistance.type.toLowerCase())))
-    if (rule.basicOnly && !isBasic) return false
+    if (rule.basicOnly && !isBasic || excludedSubtypeMatches) return false
+    if ((rule.evolveAttacker || rule.evolveTarget) && (!evolvesFromMatches || !isNextEvolutionStage)) return false
     if (
-      (eligibleNames?.length || eligibleNameParts?.length || eligibleTypes?.length || eligibleSubtypes?.length || eligibleResistanceTypes?.length || rule.includeSelectedEnergyType || rule.includeBasic) &&
-      !(isNamed || nameContains || typeMatches || selectedEnergyTypeMatches || subtypeMatches || resistanceMatches || (rule.includeBasic && isBasic))
+      (eligibleNames?.length || eligibleNameParts?.length || eligibleEvolvesFrom?.length || eligibleTypes.length || eligibleSubtypes?.length || rule.excludeSubtypes?.length || eligibleResistanceTypes?.length || rule.includeSelectedEnergyType || rule.includeBasic) &&
+      !(isNamed || nameContains || evolvesFromMatches || typeMatches || selectedEnergyTypeMatches || subtypeMatches || resistanceMatches || (rule.includeBasic && isBasic))
     ) return false
     return true
   })
@@ -30152,6 +35611,20 @@ export function syncTcgBattleFloetteFlowerVeil(state: TcgBattleState): boolean {
               const count = board.filter((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityText(pokemon.name) === namedBoardHp[3]).length
               return bonus + Number(namedBoardHp[2]) * count
             }
+            const prizeThresholdHp = text.match(/^if your opponent has (\d+) or (?:fewer|less) prize cards? (?:remaining|left), (this pokemon|[a-z0-9 '’-]+) gets \+(\d+) hp\.$/)
+            if (prizeThresholdHp && (prizeThresholdHp[2] === 'this pokemon' || normalizeTcgBattleAbilityText(prizeThresholdHp[2]) === normalizeTcgBattleAbilityText(card.name)) &&
+              getTcgBattleRemainingPrizeCount(state, sideKey === 'player' ? 'opponent' : 'player') <= Number(prizeThresholdHp[1])) {
+              return bonus + Number(prizeThresholdHp[3])
+            }
+            const prizeThresholdMaximumHp = text.match(/^if your opponent has (\d+) or (?:fewer|less) prize cards? (?:remaining|left), this pokemon's maximum hp is (\d+)\.$/)
+            if (prizeThresholdMaximumHp && getTcgBattleRemainingPrizeCount(state, sideKey === 'player' ? 'opponent' : 'player') <= Number(prizeThresholdMaximumHp[1])) {
+              return bonus + Math.max(0, Number(prizeThresholdMaximumHp[2]) - baseHp)
+            }
+            const prizeTakenHp = text.match(/^this pokemon gets \+(\d+) hp for each prize card your opponent has taken\.$/)
+            if (prizeTakenHp) {
+              const opponentSideKey = sideKey === 'player' ? 'opponent' : 'player'
+              return bonus + Number(prizeTakenHp[1]) * Math.max(0, state[opponentSideKey].knockoutCount || 0)
+            }
             const energyTypeNames: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
             const thresholdHp = text.match(/^if (this pokemon|[a-z0-9 '’-]+) has (\d+) or more (?:\{([grwlpfmdyc])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless)) energy attached(?: to (it|[a-z0-9 '’-]+))?, (it|this pokemon|[a-z0-9 '’-]+) gets \+(\d+) hp\.$/)
             const energyPerHp = text.match(/^(this pokemon|[a-z0-9 '’-]+) gets \+(\d+) hp for each (?:\{([grwlpfmdyc])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|dragon|fairy|colorless)) energy cards? attached to (it|[a-z0-9 '’-]+)\.$/)
@@ -30210,8 +35683,9 @@ export function syncTcgBattleFloetteFlowerVeil(state: TcgBattleState): boolean {
 export function compactTcgBattleBoard(side: TcgBattleSideState): void {
   const faintedFront = side.front.filter((card) => card.currentHp <= 0)
   const faintedBack = side.back.filter((card) => card.currentHp <= 0)
-  side.knockoutCount = (side.knockoutCount || 0) + faintedFront.length + faintedBack.length
-  for (const card of [...faintedFront, ...faintedBack]) {
+  const fainted = [...faintedFront, ...faintedBack]
+  side.knockoutCount = (side.knockoutCount || 0) + fainted.reduce((count, card) => count + Math.max(0, 1 + (card.temporaryEffects?.extraKnockoutCountOnFaint || 0) - (card.temporaryEffects?.knockoutPrizeReductionOnFaint || 0)), 0)
+  for (const card of fainted) {
     if (card.temporaryEffects?.abilityHpBonus) {
       card.hp = Math.max(1, card.hp - card.temporaryEffects.abilityHpBonus)
       delete card.temporaryEffects.abilityHpBonus
@@ -30245,6 +35719,16 @@ export function compactTcgBattleBoard(side: TcgBattleSideState): void {
       }
       const { evolutionStack: _stack, instanceId: _instanceId, currentHp: _currentHp, playedToBenchTurn: _playedToBenchTurn, abilityUses: _abilityUses, statusConditions: _statusConditions, incomingAttackModifier: _incomingAttackModifier, temporaryEffects: _temporaryEffects, markers: _markers, ...returnedCard } = card
       side.hand.push({ ...returnedCard, instanceId: `${returnedCard.id}:hand:${card.instanceId}`, currentHp: returnedCard.hp })
+      continue
+    }
+    if (card.temporaryEffects?.returnToDeckOnKnockout) {
+      side.deck.push(...(card.evolutionStack || []).map((summary) => ({ ...summary })))
+      const { evolutionStack: _stack, instanceId: _instanceId, currentHp: _currentHp, playedToBenchTurn: _playedToBenchTurn, abilityUses: _abilityUses, statusConditions: _statusConditions, incomingAttackModifier: _incomingAttackModifier, temporaryEffects: _temporaryEffects, markers: _markers, ...returnedCard } = card
+      side.deck.push(returnedCard)
+      for (let index = side.deck.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1))
+        ;[side.deck[index], side.deck[swapIndex]] = [side.deck[swapIndex], side.deck[index]]
+      }
       continue
     }
     if (card.temporaryEffects?.lostZoneOnKnockout) {
@@ -30575,6 +36059,7 @@ function getOpponentAttackOptions(state: TcgBattleState, attackerFilter?: string
   const maxCost = getAllowedTcgBattleAttackCost(state.turnNumber)
   const options: OpponentTcgBattleAttackOption[] = []
   const boardIndex = createOpponentTcgBattleBoardIndex(state)
+  if (isTcgBattleSideAttackLocked(state, 'opponent')) return options
 
   for (const attacker of state.opponent.front.filter((card) => card.currentHp > 0)) {
     if (attackerFilter && attacker.instanceId !== attackerFilter) continue
@@ -30642,6 +36127,7 @@ export function canTcgBattlePokemonAttack(
 ): boolean {
   const side = state[sideKey]
   if (
+    isTcgBattleSideAttackLocked(state, sideKey) ||
     attacker.currentHp <= 0 ||
     (!assumeActive && !side.front.some((card) => card.instanceId === attacker.instanceId)) ||
     !isTcgBattleAbilityAttackAllowed(state, sideKey, attacker) ||
@@ -30669,6 +36155,7 @@ export function canTcgBattlePokemonAttack(
 }
 
 export function canSideTakeTcgBattleAction(state: TcgBattleState, sideKey: TcgBattleSide): boolean {
+  if (isTcgBattleSideAttackLocked(state, sideKey)) return false
   const side = state[sideKey]
   const opponent = state[sideKey === 'player' ? 'opponent' : 'player']
   if (side.energy <= 0 || opponent.front.every((card) => card.currentHp <= 0)) return false
@@ -30760,16 +36247,24 @@ export function canTcgBattleEndByPassStall(state: TcgBattleState): boolean {
 
 function normalizeTcgAttackText(text: string): string {
   return text
+    .replace(/<[^>]*>/g, '')
     .replace(/Pokémon/g, 'Pokemon')
     .replace(/pokémon/g, 'pokemon')
+    .replace(/[’‘]/g, "'")
     .replace(/×/g, 'x')
     .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
     .replace(/\s+/g, ' ')
     .trim()
 }
 
+export function getTcgBattleAttackUsageKey(attack: TcgBattleAttack): string {
+  return `${normalizeTcgAttackText(attack.name)}|${normalizeTcgAttackText(attack.text || '')}`
+}
+
 function normalizeTcgDamageText(damage: string): string {
-  return damage.replace(/×/g, 'x').trim()
+  return damage.replace(/×/g, 'x').replace(/[＋﹢]/g, '+').trim()
 }
 
 function parseTcgAttackCoinFlipCount(text: string): number | undefined {
@@ -31631,7 +37126,192 @@ function inferVariableTcgBattleDamage(
   text: string,
   damage: string,
   baseDamage: number,
-): Pick<TcgBattleAttackEffect, 'damage' | 'coinFlipCount'> | null {
+): Pick<TcgBattleAttackEffect, 'damage' | 'coinFlipCount' | 'coinFlipSource' | 'targetScope' | 'ignoreWeaknessResistanceOnBench' | 'selfDamage'> | null {
+  const teamCoinCount = text.match(/^flip a coin for each (team magma|team aqua) pokemon you have in play\. this attack does (\d+) damage times the number of heads\./)
+  if (teamCoinCount) {
+    return {
+      damage: { kind: 'coinCount', amountPerHeads: Number.parseInt(teamCoinCount[2], 10), coinFlipCount: 0 },
+      coinFlipSource: { kind: 'namedPokemonContains', side: 'own', zone: 'play', values: [teamCoinCount[1]] },
+    }
+  }
+
+  const colorfulWhip = text.match(/^reveal any number of pokemon from your hand, and this attack does (\d+) damage for each different type of pokemon you revealed in this way\.$/)
+  if (colorfulWhip && damage.endsWith('x')) {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(colorfulWhip[1], 10),
+        source: { kind: 'distinctTypesInHand', side: 'own' },
+      },
+    }
+  }
+  const weaponizedSwords = text.match(/^reveal any number of ([a-z0-9', .-]+) from your hand, and this attack does (\d+) damage for each card you revealed in this way\.$/)
+  if (weaponizedSwords && damage.endsWith('x')) {
+    const names = weaponizedSwords[1].replace(/,? and /g, ', ').split(',').map((name) => name.trim()).filter(Boolean)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: 0,
+        perUnitDamage: Number.parseInt(weaponizedSwords[2], 10),
+        source: { kind: 'pokemonNamesInHand', side: 'own', names },
+      },
+    }
+  }
+  const selectedPokemonCoinMultiplier = text.match(
+    /^flip (\d+) coins?\. this attack does (\d+) damage times the number of heads to (?:1|one) of your opponent's pokemon\.(?: \(don't apply weakness and resistance for benched pokemon\.\))?/,
+  )
+  if (selectedPokemonCoinMultiplier) {
+    return {
+      damage: {
+        kind: 'headsMultiplier',
+        damagePerHeads: Number.parseInt(selectedPokemonCoinMultiplier[2], 10),
+        coinFlipCount: Number.parseInt(selectedPokemonCoinMultiplier[1], 10),
+      },
+      coinFlipCount: Number.parseInt(selectedPokemonCoinMultiplier[1], 10),
+      targetScope: 'any',
+      ignoreWeaknessResistanceOnBench: /don't apply weakness and resistance for benched pokemon/.test(text),
+    }
+  }
+
+  const lifeDrain = text.match(/^flip a coin\. if heads, your opponent's active pokemon's remaining hp is now (\d+)\./)
+  if (lifeDrain) {
+    return {
+      damage: { kind: 'targetToRemainingHp', remainingHp: Number.parseInt(lifeDrain[1], 10), condition: 'heads' },
+      coinFlipCount: 1,
+      targetScope: 'front',
+    }
+  }
+
+  const pokemonCountCoins = text.match(
+    /^flip a coin for each pokemon you have in play\. this attack does (\d+) damage for each heads\./,
+  )
+  if (pokemonCountCoins && damage.endsWith('x')) {
+    return {
+      damage: {
+        kind: 'coinCount',
+        amountPerHeads: Number.parseInt(pokemonCountCoins[1], 10),
+        coinFlipCount: 0,
+      },
+      coinFlipSource: { kind: 'pokemonInPlay', side: 'own' },
+    }
+  }
+
+  const anyBenchedInjuredBonus = text.match(
+    /^if any of your benched pokemon have damage on them, this attack does (\d+) more damage\./,
+  )
+  if (anyBenchedInjuredBonus && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'conditionalCount',
+        baseDamage,
+        perUnitDamage: Number.parseInt(anyBenchedInjuredBonus[1], 10),
+        source: { kind: 'injuredPokemon', side: 'own', zone: 'bench' },
+        minUnits: 1,
+        maxUnits: 1,
+      },
+    }
+  }
+
+  const namedBenchedPokemonBonus = text.match(
+    /^if ([a-z0-9' .&♀♂-]+) is on your bench, this attack does (\d+) more damage\./,
+  )
+  if (namedBenchedPokemonBonus && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'conditionalCount',
+        baseDamage,
+        perUnitDamage: Number.parseInt(namedBenchedPokemonBonus[2], 10),
+        source: { kind: 'namedPokemonContains', side: 'own', zone: 'bench', values: [namedBenchedPokemonBonus[1]] },
+        minUnits: 1,
+        maxUnits: 1,
+      },
+    }
+  }
+
+  const opposingActiveRetreatCostBonus = text.match(
+    /^this attack does (\d+) more damage for each (?:colorless|\{c\}) in your opponent's active pokemon's retreat cost\./,
+  )
+  if (opposingActiveRetreatCostBonus && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(opposingActiveRetreatCostBonus[1], 10),
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+
+  const printedDefendingRetreatCostBonus = text.match(
+    /^(?:this attack )?does \d+ damage plus (\d+) more(?: damage)? for each (?:colorless|\{c\}) energy in (?:the )?(?:defending|opponent's active) pokemon's retreat cost(?: \(after applying effects to the retreat cost\))?\./,
+  )
+  if (printedDefendingRetreatCostBonus && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: Number.parseInt(printedDefendingRetreatCostBonus[1], 10),
+        source: { kind: 'retreatCost', target: 'target' },
+      },
+    }
+  }
+
+  const allBenchedInjuredBonus = text.match(
+    /^if all (?:of )?your benched pokemon have at least 1 damage counter on them, this attack does (\d+) more damage\./,
+  )
+  if (allBenchedInjuredBonus && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'allBenchedInjuredBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(allBenchedInjuredBonus[1], 10),
+      },
+    }
+  }
+
+  const lessDamagePerCounter = text.match(
+    /^this attack does (\d+) less damage for each damage counter on this pokemon\./,
+  )
+  if (lessDamagePerCounter && damage.endsWith('-')) {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: Number.parseInt(lessDamagePerCounter[1], 10),
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+
+  const namedAttackerLessDamagePerCounter = text.match(
+    /^does (\d+) damage minus (\d+) damage for each damage counter on [a-z0-9' .-]+\.$/,
+  )
+  if (namedAttackerLessDamagePerCounter && damage.endsWith('-')) {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage: Number.parseInt(namedAttackerLessDamagePerCounter[1], 10),
+        perUnitDamage: Number.parseInt(namedAttackerLessDamagePerCounter[2], 10),
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+
+  const damageReducedByOwnCounters = text.match(
+    /^(?:this attack )?does \d+ damage minus (\d+) damage for each damage counter on (?:this pokemon|[a-z0-9' .-]+)\./,
+  )
+  if (damageReducedByOwnCounters && /[-−–]$/.test(damage)) {
+    return {
+      damage: {
+        kind: 'subtractCount',
+        baseDamage,
+        perUnitDamage: Number.parseInt(damageReducedByOwnCounters[1], 10),
+        source: { kind: 'damageCounters', target: 'attacker' },
+      },
+    }
+  }
+
   const headsBonus = text.match(/flip a coin\. if heads, this attack does (\d+) more damage\b/)
   if (headsBonus && damage.endsWith('+')) {
     return {
@@ -31639,6 +37319,28 @@ function inferVariableTcgBattleDamage(
         kind: 'headsBonus',
         baseDamage,
         bonusDamage: Number.parseInt(headsBonus[1], 10),
+      },
+      coinFlipCount: 1,
+    }
+  }
+
+  const printedBaseHeadsBonus = text.match(/flip a coin\. if heads, this attack does \d+ damage plus (\d+) more damage\./)
+  if (printedBaseHeadsBonus && damage.endsWith('+') && !/; if tails, (?:this attack|the attack) does \d+ damage and /.test(text)) {
+    return {
+      damage: { kind: 'headsBonus', baseDamage, bonusDamage: Number.parseInt(printedBaseHeadsBonus[1], 10) },
+      coinFlipCount: 1,
+    }
+  }
+
+  const headsBonusTailsRecoil = text.match(
+    /^flip a coin\. if heads, this attack does (\d+) damage plus (\d+) more damage; if tails, (?:this attack|the attack) does (\d+) damage and [a-z0-9' .-]+ does (\d+) damage to itself\./,
+  )
+  if (headsBonusTailsRecoil && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'headsBonus',
+        baseDamage: Number.parseInt(headsBonusTailsRecoil[1], 10),
+        bonusDamage: Number.parseInt(headsBonusTailsRecoil[2], 10),
       },
       coinFlipCount: 1,
     }
@@ -31671,17 +37373,58 @@ function inferVariableTcgBattleDamage(
     }
   }
 
+  const printedBaseHeadsBonusEach = text.match(
+    /flip (\d+) coins?\. this attack does \d+ damage plus (\d+) more damage for each heads\b/,
+  )
+  if (printedBaseHeadsBonusEach && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'headsBonusEach',
+        baseDamage,
+        bonusDamage: Number.parseInt(printedBaseHeadsBonusEach[2], 10),
+        coinFlipCount: Number.parseInt(printedBaseHeadsBonusEach[1], 10),
+      },
+      coinFlipCount: Number.parseInt(printedBaseHeadsBonusEach[1], 10),
+    }
+  }
+
   const headsMultiplier = text.match(
-    /flip (\d+) coins\. this attack does (\d+) damage (?:for each heads|times (?:the )?number of heads)\b/,
+    /flip (\d+) coins?\. this attack does (?:(\d+) damage (?:for each heads|times? (?:the )?number of heads)|(\d+) times? (?:the )?number of heads)\b/,
   )
   if (headsMultiplier && damage.endsWith('x')) {
     return {
       damage: {
         kind: 'headsMultiplier',
-        damagePerHeads: Number.parseInt(headsMultiplier[2], 10),
+        damagePerHeads: Number.parseInt(headsMultiplier[2] || headsMultiplier[3], 10),
         coinFlipCount: Number.parseInt(headsMultiplier[1], 10),
       },
       coinFlipCount: Number.parseInt(headsMultiplier[1], 10),
+    }
+  }
+
+  const pokemonExOrVTargetBonus = text.match(
+    /^if your opponent's active pokemon is a pokemon ex or pokemon v, this attack does (\d+) more damage\./,
+  )
+  if (pokemonExOrVTargetBonus && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'pokemonExOrVTargetBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(pokemonExOrVTargetBonus[1], 10),
+      },
+    }
+  }
+
+  const pokemonVTargetBonus = text.match(
+    /^if your opponent's active pokemon is a pokemon v(?:max|star)?, this attack does (\d+) more damage\./,
+  )
+  if (pokemonVTargetBonus && damage.endsWith('+')) {
+    return {
+      damage: {
+        kind: 'pokemonVTargetBonus',
+        baseDamage,
+        bonusDamage: Number.parseInt(pokemonVTargetBonus[1], 10),
+      },
     }
   }
 
@@ -31694,6 +37437,87 @@ function inferTcgBattleBenchDamage(text: string): TcgBattleBenchDamageRule[] {
   const addRule = (amount: number, side: TcgBattleBenchDamageRule['side'], maxTargets?: number) => {
     if (!Number.isFinite(amount) || amount <= 0) return
     rules.push({ amount, side, maxTargets })
+  }
+
+  const allOpponentPokemon = text.match(/(?:this attack )?does (\d+) damage to each of your opponent's pokemon\./)
+  if (allOpponentPokemon) {
+    rules.push({
+      amount: Number.parseInt(allOpponentPokemon[1], 10),
+      side: 'opponent',
+      zone: 'play',
+      ignoreWeaknessResistanceOnBench: /(?:don't|do not) apply weakness and resistance for benched pokemon/.test(text),
+    })
+  }
+
+  const allDamagedOpponentPokemon = text.match(/this attack does (\d+) damage to each of your opponent's pokemon that has any damage counters? on it\./)
+  if (allDamagedOpponentPokemon) {
+    rules.push({
+      amount: Number.parseInt(allDamagedOpponentPokemon[1], 10),
+      side: 'opponent',
+      zone: 'play',
+      onlyDamaged: true,
+      ignoreWeaknessResistanceOnBench: /(?:don't|do not) apply weakness and resistance for benched pokemon/.test(text),
+    })
+  }
+
+  const allPokemonWithLegacyAbility = text.match(/(?:this attack )?does (\d+) damage to each (?:(of your opponent's )?pokemon that has any (poke-powers?|poke-bodies?)(?: or (poke-powers?|poke-bodies?))?(?: \(both yours and your opponent's\))?)\./)
+  if (allPokemonWithLegacyAbility) {
+    const abilityTypes = [allPokemonWithLegacyAbility[3], allPokemonWithLegacyAbility[4]]
+      .filter((type): type is string => Boolean(type))
+      .map((type) => type.replace(/[^a-z]/g, '').replace(/s$/, ''))
+    rules.push({
+      amount: Number.parseInt(allPokemonWithLegacyAbility[1], 10),
+      side: text.includes('(both yours and your opponent') || !allPokemonWithLegacyAbility[2] ? 'both' : 'opponent',
+      zone: 'play',
+      ignoreWeaknessResistance: /this attack's damage (?:isn't|is not) affected by weakness or resistance|don't apply weakness or resistance\./.test(text),
+      ignoreWeaknessResistanceOnBench: /(?:don't|do not) apply weakness and resistance for benched pokemon/.test(text),
+      requiresAbilityTypes: abilityTypes,
+    })
+  }
+
+  const allPokemonWithLegacyAbilityPair = text.match(/(?:this attack )?does (\d+) damage to each pokemon with a poke-?body or poke-?power(?: \(yours and your opponent's\))?\./)
+    || text.match(/(?:this attack )?does (\d+) damage to each pokemon in play that has a pokemon power\./)
+  if (allPokemonWithLegacyAbilityPair) {
+    rules.push({
+      amount: Number.parseInt(allPokemonWithLegacyAbilityPair[1], 10),
+      side: 'both',
+      zone: 'play',
+      ignoreWeaknessResistance: true,
+      requiresAbilityTypes: ['pokebody', 'pokepower'],
+    })
+  }
+
+  const allPokemonWithAbility = text.match(/(?:this attack )?does (\d+) damage to each pokemon that has an ability(?: \(both yours and your opponent's\))?\./)
+  if (allPokemonWithAbility) {
+    rules.push({
+      amount: Number.parseInt(allPokemonWithAbility[1], 10),
+      side: text.includes('(both yours and your opponent') ? 'both' : 'opponent',
+      zone: 'play',
+      ignoreWeaknessResistanceOnBench: /(?:don't|do not) apply weakness and resistance for benched pokemon/.test(text),
+      requiresAnyAbility: true,
+    })
+  }
+
+  const allOpponentV = text.match(/this attack does (\d+) damage to each of your opponent's pokemon v\./)
+  if (allOpponentV) {
+    rules.push({
+      amount: Number.parseInt(allOpponentV[1], 10),
+      side: 'opponent',
+      zone: 'play',
+      subtypeFilter: { include: ['V', 'VMAX', 'VSTAR'] },
+      ignoreWeaknessResistance: /this damage (?:isn't|is not) affected by weakness or resistance/.test(text),
+    })
+  }
+
+  const allOpponentGxEx = text.match(/this attack does (\d+) damage to each of your opponent's pokemon-gx and pokemon-ex\./)
+  if (allOpponentGxEx) {
+    rules.push({
+      amount: Number.parseInt(allOpponentGxEx[1], 10),
+      side: 'opponent',
+      zone: 'play',
+      subtypeFilter: { include: ['GX', 'EX'] },
+      ignoreWeaknessResistance: /this damage (?:isn't|is not) affected by weakness or resistance/.test(text),
+    })
   }
 
   const eachBoth = text.match(/(?:and )?(\d+) damage to each benched pokemon \(both yours and your opponent's\)/)
@@ -31711,6 +37535,16 @@ function inferTcgBattleBenchDamage(text: string): TcgBattleBenchDamageRule[] {
   const oneOwn = text.match(/(?:and )?(\d+) damage to (?:1|one) of your benched pokemon/)
   if (oneOwn) addRule(Number.parseInt(oneOwn[1], 10), 'own', 1)
 
+  const selectedOpponentPokemon = text.match(/this attack does (\d+) damage to (\d+) of your opponent's pokemon\b/)
+  if (selectedOpponentPokemon) {
+    rules.push({
+      amount: Number.parseInt(selectedOpponentPokemon[1], 10),
+      side: 'opponent',
+      maxTargets: Number.parseInt(selectedOpponentPokemon[2], 10),
+      zone: 'play',
+    })
+  }
+
   return rules
 }
 
@@ -31724,6 +37558,39 @@ function inferTcgBattleCounterDamage(text: string): TcgBattleCounterDamageRule[]
   const activeOpponent = text.match(/put (\d+) damage counter(?:s)? on (?:your opponent's active pokemon|the defending pokemon|that pokemon)\b/)
   if (activeOpponent) addRule(Number.parseInt(activeOpponent[1], 10) * 10, { target: 'opponent' })
 
+  if (/^count the number of cards in your opponent's hand\. put that many damage counters on (?:the )?defending pokemon\b/.test(text)) {
+    rules.push({ amountPerUnit: 10, source: { kind: 'handSize', side: 'opponent' }, target: 'opponent' })
+  }
+
+  if (/^count the number of your pokemon that have any damage counters on them\. put that many damage counters on (?:the )?defending pokemon\.$/.test(text)) {
+    rules.push({ amountPerUnit: 10, source: { kind: 'injuredPokemon', side: 'own', zone: 'play' }, target: 'opponent' })
+  }
+
+  const countersOnDamagedOpposingPokemon = text.match(/^put (\d+) damage counters? on each of your opponent's pokemon that (?:already has|has any) damage counters? on it\.$/)
+  if (countersOnDamagedOpposingPokemon) {
+    rules.push({ amount: Number(countersOnDamagedOpposingPokemon[1]) * 10, side: 'opponent', zone: 'play', onlyDamaged: true })
+  }
+
+  const countersOnPokemonWithAbilities = text.match(/^put (\d+) damage counters? on each pokemon that has an ability \(both yours and your opponent's\)\.$/)
+  if (countersOnPokemonWithAbilities) {
+    rules.push({
+      amount: Number.parseInt(countersOnPokemonWithAbilities[1], 10) * 10,
+      side: 'both',
+      zone: 'play',
+      requiresAnyAbility: true,
+    })
+  }
+
+  const countersPerOwnHandCard = text.match(/^count the number of cards in your hand\. put that many damage counters on (?:the )?defending pokemon(?:\. you can't put more than (\d+) damage counters? in this way\.)?$/)
+  if (countersPerOwnHandCard) {
+    rules.push({ amountPerUnit: 10, source: { kind: 'handSize', side: 'own' }, target: 'opponent', maxUnits: countersPerOwnHandCard[1] ? Number.parseInt(countersPerOwnHandCard[1], 10) : undefined })
+  }
+
+  const countersPerHandCard = text.match(/^place (\d+) damage counters? on your opponent's active pokemon for each card in your hand\.$/)
+  if (countersPerHandCard) {
+    rules.push({ amountPerUnit: Number.parseInt(countersPerHandCard[1], 10) * 10, source: { kind: 'handSize', side: 'own' }, target: 'opponent' })
+  }
+
   const activeSelf = text.match(/put (\d+) damage counter(?:s)? on (?:this pokemon|itself|this card)\b/)
   if (activeSelf) addRule(Number.parseInt(activeSelf[1], 10) * 10, { target: 'self' })
 
@@ -31733,8 +37600,30 @@ function inferTcgBattleCounterDamage(text: string): TcgBattleCounterDamageRule[]
   const eachOppBench = text.match(/put (\d+) damage counter(?:s)? on each of your opponent's benched pokemon\b/)
   if (eachOppBench) addRule(Number.parseInt(eachOppBench[1], 10) * 10, { side: 'opponent' })
 
+  const eachOppPokemon = text.match(/^put (\d+) damage counters? on each of your opponent's pokemon\.$/)
+  if (eachOppPokemon) {
+    rules.push({ amount: Number(eachOppPokemon[1]) * 10, side: 'opponent', zone: 'play' })
+  }
+
+  const hideNSneakCounterDamage = text.match(/^if you have (\d+) or more pokemon that have the hide 'n' sneak ability in your discard pile, place (\d+) damage counters? on each of your opponent's pokemon\.$/)
+  if (hideNSneakCounterDamage) {
+    rules.push({
+      amount: Number(hideNSneakCounterDamage[2]) * 10,
+      side: 'opponent',
+      zone: 'play',
+      requiresCount: {
+        source: { kind: 'pokemonWithAbilityInDiscard', side: 'own', abilityName: "Hide 'n' Sneak" },
+        minimum: Number(hideNSneakCounterDamage[1]),
+      },
+    })
+  }
+
   const eachOwnBench = text.match(/put (\d+) damage counter(?:s)? on each of your benched pokemon\b/)
   if (eachOwnBench) addRule(Number.parseInt(eachOwnBench[1], 10) * 10, { side: 'own' })
+
+  if (/^double the number of damage counters on each of your opponent's pokemon\.?$/.test(text)) {
+    rules.push({ amountPerTargetDamageCounter: 10, side: 'opponent', zone: 'play' })
+  }
 
   const oneOppBench = text.match(/put (\d+) damage counter(?:s)? on (?:1|one) of your opponent's benched pokemon\b/)
   if (oneOppBench) addRule(Number.parseInt(oneOppBench[1], 10) * 10, { side: 'opponent', maxTargets: 1 })
@@ -31745,16 +37634,31 @@ function inferTcgBattleCounterDamage(text: string): TcgBattleCounterDamageRule[]
   return rules
 }
 
-function inferTcgBattleHealing(text: string): TcgBattleHealingRule[] {
+function inferTcgBattleHealing(text: string, attackerName?: string): TcgBattleHealingRule[] {
   const rules: TcgBattleHealingRule[] = []
   const addRule = (
     amount: number,
     rule:
       | { target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
-      | { side: 'own' | 'opponent' | 'both'; maxTargets?: number; condition?: TcgBattleCoinCondition },
+      | { side: 'own' | 'opponent' | 'both'; maxTargets?: number; condition?: TcgBattleCoinCondition; zone?: 'bench' | 'front' | 'play' },
   ) => {
     if (!Number.isFinite(amount) || amount <= 0) return
     rules.push({ amount, ...rule } as TcgBattleHealingRule)
+  }
+
+  if (/^you and your opponent remove 1 damage counter from each of your pokemon with damage counters on them\.$/.test(text)) {
+    rules.push({ amount: 10, side: 'both', zone: 'play' })
+  }
+  const healEachPokemonBothSides = text.match(/^heal (\d+) damage from each pokemon \(both yours and your opponent's\)\.$/)
+  if (healEachPokemonBothSides) {
+    rules.push({ amount: Number.parseInt(healEachPokemonBothSides[1], 10), side: 'both', zone: 'play' })
+  }
+  if (/^heal all damage from all of your pokemon\.$/.test(text)) {
+    rules.push({ amount: 'all', side: 'own', zone: 'play' })
+  }
+  const healAllTypedOwn = text.match(/^heal all damage from all of your (grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|dragon|colorless) pokemon\.(?: \(you can't use more than 1 gx attack in a game\.\))?$/)
+  if (healAllTypedOwn) {
+    rules.push({ amount: 'all', side: 'own', zone: 'play', typeFilter: [healAllTypedOwn[1]] })
   }
 
   const damageDoneSelf =
@@ -31769,11 +37673,28 @@ function inferTcgBattleHealing(text: string): TcgBattleHealingRule[] {
   const healSelf = text.match(/heal (\d+) damage from (?:this pokemon|itself|this card)\b/)
   if (healSelf) addRule(Number.parseInt(healSelf[1], 10), { target: 'self' })
 
+  const healOneOwnBench = text.match(/heal (\d+) damage from (?:1|one) of your benched pokemon\b/)
+  if (healOneOwnBench) rules.push({ target: 'selectedOwnBench', amount: Number.parseInt(healOneOwnBench[1], 10) })
+
+  const healOneTypedOwnBench = text.match(/heal (\d+) damage from (?:1|one) of your benched \{([grwlpmdycf])\} pokemon\b/)
+  if (healOneTypedOwnBench) {
+    const type = normalizeTcgBattleEnergySymbol(healOneTypedOwnBench[2])
+    if (type) rules.push({ target: 'selectedOwnBench', amount: Number.parseInt(healOneTypedOwnBench[1], 10), typeFilter: [type] })
+  }
+
+  const healOneOwnPokemon = text.match(/heal (\d+) damage from (?:1|one) of your pokemon\b/)
+  if (healOneOwnPokemon) rules.push({ target: 'selectedOwnPokemon', amount: Number.parseInt(healOneOwnPokemon[1], 10) })
+
   const healOpp = text.match(/heal (\d+) damage from (?:your opponent's active pokemon|the defending pokemon|that pokemon)\b/)
   if (healOpp) addRule(Number.parseInt(healOpp[1], 10), { target: 'opponent' })
 
   const removeSelf = text.match(/remove (\d+) damage counter(?:s)? from (?:this pokemon|itself|this card)\b/)
   if (removeSelf) addRule(Number.parseInt(removeSelf[1], 10) * 10, { target: 'self' })
+
+  const removeNamedAttacker = text.match(/remove (\d+) damage counters? from ([a-z0-9 .'-]+?)(?:\.| \(all if there are less than \d+\)\.?$)/)
+  if (removeNamedAttacker && normalizeTcgBattleCardName(removeNamedAttacker[2]) === normalizeTcgBattleCardName(attackerName || '')) {
+    addRule(Number(removeNamedAttacker[1]) * 10, { target: 'self' })
+  }
 
   const removeOpp = text.match(/remove (\d+) damage counter(?:s)? from (?:your opponent's active pokemon|the defending pokemon|that pokemon)\b/)
   if (removeOpp) addRule(Number.parseInt(removeOpp[1], 10) * 10, { target: 'opponent' })
@@ -31781,11 +37702,28 @@ function inferTcgBattleHealing(text: string): TcgBattleHealingRule[] {
   const healEachOwnBench = text.match(/heal (\d+) damage from each of your benched pokemon\b/)
   if (healEachOwnBench) addRule(Number.parseInt(healEachOwnBench[1], 10), { side: 'own' })
 
+  const healEachOwnPokemon = text.match(/heal (\d+) damage from each of your pokemon\b/)
+  if (healEachOwnPokemon) rules.push({ amount: Number.parseInt(healEachOwnPokemon[1], 10), side: 'own', zone: 'play' })
+
+  const healSelectedOwnBench = text.match(/heal all damage from (\d+) of your benched pokemon\b/)
+  if (healSelectedOwnBench) rules.push({ amount: 'all', side: 'own', zone: 'bench', maxTargets: Number.parseInt(healSelectedOwnBench[1], 10) })
+
   const healEachOppBench = text.match(/heal (\d+) damage from each of your opponent's benched pokemon\b/)
   if (healEachOppBench) addRule(Number.parseInt(healEachOppBench[1], 10), { side: 'opponent' })
 
+  const healBothActive = text.match(/heal (\d+) damage from both active pokemon\b/)
+  if (healBothActive) addRule(Number.parseInt(healBothActive[1], 10), { side: 'both', zone: 'front' })
+
+  if (/heal all damage from (?:this pokemon|itself|this card)\b/.test(text)) rules.push({ target: 'self', amount: 'all' })
+  if (/remove all damage counters from (?:this pokemon|itself|this card)\b/.test(text)) rules.push({ target: 'self', amount: 'all' })
+
   const removeOneOwnBench = text.match(/remove (\d+) damage counter(?:s)? from (?:1|one) of your benched pokemon\b/)
   if (removeOneOwnBench) addRule(Number.parseInt(removeOneOwnBench[1], 10) * 10, { side: 'own', maxTargets: 1 })
+
+  const removeOneOwnPokemon = text.match(/remove (\d+) damage counter(?:s)? from (?:1|one) of your pokemon\b/)
+  if (removeOneOwnPokemon) {
+    rules.push({ target: 'selectedOwnPokemon', amount: Number.parseInt(removeOneOwnPokemon[1], 10) * 10 })
+  }
 
   const removeOneOppBench = text.match(/remove (\d+) damage counter(?:s)? from (?:1|one) of your opponent's benched pokemon\b/)
   if (removeOneOppBench) addRule(Number.parseInt(removeOneOppBench[1], 10) * 10, { side: 'opponent', maxTargets: 1 })
@@ -31805,14 +37743,16 @@ function calculateTcgBattleBenchDamage(
   const results: { targetSide: TcgBattleSide; targetId: string; damage: number }[] = []
   let perTargetCoinIndex = 0
 
-  const addFromSide = (targetSide: TcgBattleSide, rule: TcgBattleBenchDamageRule) => {
+  const getCandidates = (targetSide: TcgBattleSide, rule: TcgBattleBenchDamageRule) => {
     const targetCards = rule.zone === 'front'
       ? state[targetSide].front
       : rule.zone === 'play'
         ? [...state[targetSide].front, ...state[targetSide].back]
         : state[targetSide].back
-    const candidates = targetCards.filter((card) => {
+    return targetCards.filter((card) => {
       if (card.currentHp <= 0) return false
+      if (rule.onlyDamaged && card.currentHp >= card.hp) return false
+      if (rule.excludeAttacker && targetSide === sideKey && card.instanceId === attacker.instanceId) return false
       if (rule.excludeTarget && targetSide !== sideKey && card.instanceId === target.instanceId) return false
       const cardTypes = card.types.map((type) => type.toLowerCase())
       if (
@@ -31824,15 +37764,28 @@ function calculateTcgBattleBenchDamage(
       const cardSubtypes = card.subtypes.map((subtype) => subtype.toLowerCase())
       if (rule.subtypeFilter?.include?.length && !rule.subtypeFilter.include.some((subtype) => cardSubtypes.includes(subtype.toLowerCase()))) return false
       if (rule.subtypeFilter?.exclude?.some((subtype) => cardSubtypes.includes(subtype.toLowerCase()))) return false
+      if (rule.requiresAbilityTypes?.length && !(card.abilities || []).some((ability) => {
+        const abilityType = normalizeTcgBattleAbilityText(ability.type).replace(/[^a-z]/g, '')
+        return rule.requiresAbilityTypes!.includes(abilityType)
+      })) return false
+      if (rule.requiresAnyAbility && !card.abilities?.length) return false
       if (rule.nameContains?.length && !rule.nameContains.some((name) => normalizeTcgBattleCardName(card.name).includes(normalizeTcgBattleCardName(name)))) return false
       return true
     })
+  }
+
+  const addFromSide = (targetSide: TcgBattleSide, rule: TcgBattleBenchDamageRule, selectedOverride?: TcgBattleCardState[]) => {
+    const candidates = getCandidates(targetSide, rule)
     const maxTargets = rule.maxTargetsFrom
       ? getTcgBattleCount(rule.maxTargetsFrom, { state, sideKey, attacker, target, coinMode: 'actual' })
       : rule.maxTargets
-    const selected = typeof maxTargets === 'number'
-      ? pickRandomTcgBattleCards(candidates, maxTargets, random)
-      : candidates
+    const selected = selectedOverride ?? (typeof maxTargets === 'number'
+      ? rule.allowRepeatedTargets
+        ? candidates.length
+          ? Array.from({ length: Math.max(0, maxTargets) }, () => candidates[Math.floor(random() * candidates.length)]!)
+          : []
+        : pickRandomTcgBattleCards(candidates, maxTargets, random)
+      : candidates)
     for (const card of selected) {
       const isFront = state[targetSide].front.some((frontCard) => frontCard.instanceId === card.instanceId)
       const amount =
@@ -31870,6 +37823,27 @@ function calculateTcgBattleBenchDamage(
         : sideKey === 'player' ? 'opponent' : 'player'
       if (state[energySide].energy < rule.requiresEnergy.minimum) continue
     }
+    if (rule.side === 'both' && rule.randomAcrossBothSides) {
+      const ownSide = sideKey
+      const opposingSide = sideKey === 'player' ? 'opponent' : 'player'
+      const candidates = [
+        ...getCandidates(ownSide, rule).map((card) => ({ side: ownSide, card })),
+        ...getCandidates(opposingSide, rule).map((card) => ({ side: opposingSide, card })),
+      ]
+      const maxTargets = rule.maxTargetsFrom
+        ? getTcgBattleCount(rule.maxTargetsFrom, { state, sideKey, attacker, target, coinMode: 'actual' })
+        : rule.maxTargets
+      const selected = typeof maxTargets === 'number'
+        ? rule.allowRepeatedTargets
+          ? candidates.length
+            ? Array.from({ length: Math.max(0, maxTargets) }, () => candidates[Math.floor(random() * candidates.length)]!)
+            : []
+          : pickRandomTcgBattleCards(candidates, maxTargets, random)
+        : candidates
+      addFromSide(ownSide, rule, selected.filter((entry) => entry.side === ownSide).map((entry) => entry.card))
+      addFromSide(opposingSide, rule, selected.filter((entry) => entry.side === opposingSide).map((entry) => entry.card))
+      continue
+    }
     if (rule.side === 'own' || rule.side === 'both') addFromSide(sideKey, rule)
     if (rule.side === 'opponent' || rule.side === 'both') {
       addFromSide(sideKey === 'player' ? 'opponent' : 'player', rule)
@@ -31894,6 +37868,15 @@ function calculateTcgBattleCounterDamage(
   let perTargetCoinIndex = 0
   for (const rule of rules) {
     if ('condition' in rule && !doesTcgBattleConditionPass(rule.condition, coinFlips)) continue
+    if ('requiresCount' in rule && rule.requiresCount && getTcgBattleCount(rule.requiresCount.source, {
+      state,
+      sideKey,
+      attacker,
+      target,
+      paidAttackCost,
+      coinMode: 'actual',
+      choice,
+    }) < rule.requiresCount.minimum) continue
     if ('requiresTargetStatus' in rule && rule.requiresTargetStatus && !target.statusConditions?.includes(rule.requiresTargetStatus)) continue
     if ('requiresEnergy' in rule && rule.requiresEnergy) {
       const energySideKey = rule.requiresEnergy.side === 'own'
@@ -31963,6 +37946,12 @@ function calculateTcgBattleCounterDamage(
           candidates = candidates.filter((card) => !card.types.some((type) => excluded.has(normalizeType(type))))
         }
       }
+      if ('requiresChosenType' in rule && rule.requiresChosenType) {
+        const chosenType = choice?.kind === 'typeChange' ? choice.type.toLowerCase() : undefined
+        candidates = chosenType
+          ? candidates.filter((card) => card.types.some((type) => type.toLowerCase() === chosenType))
+          : []
+      }
       if ('names' in rule) {
         const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
         const names = new Set(rule.names.map(normalizeName))
@@ -31970,6 +37959,9 @@ function calculateTcgBattleCounterDamage(
       }
       if ('onlyDamaged' in rule && rule.onlyDamaged) {
         candidates = candidates.filter((card) => card.currentHp < card.hp)
+      }
+      if ('requiresAnyAbility' in rule && rule.requiresAnyAbility) {
+        candidates = candidates.filter((card) => Boolean(card.abilities?.length))
       }
       if ('excludeAttacker' in rule && rule.excludeAttacker && targetSide === sideKey) {
         candidates = candidates.filter((card) => card.instanceId !== attacker.instanceId)
@@ -31983,6 +37975,14 @@ function calculateTcgBattleCounterDamage(
       if ('amountPerTargetRetreatCost' in rule) {
         for (const card of selected) {
           const amount = rule.amountPerTargetRetreatCost * Math.max(0, card.convertedRetreatCost || 0)
+          if (amount > 0) results.push({ targetSide, targetId: card.instanceId, damage: amount })
+        }
+        return
+      }
+      if ('amountPerTargetDamageCounter' in rule) {
+        for (const card of selected) {
+          const damageCounters = Math.max(0, Math.floor((card.hp - card.currentHp) / 10))
+          const amount = rule.amountPerTargetDamageCounter * damageCounters
           if (amount > 0) results.push({ targetSide, targetId: card.instanceId, damage: amount })
         }
         return
@@ -32041,6 +38041,7 @@ function calculateTcgBattleHealing(
   coinFlips?: TcgBattleAttackResolution['coinFlips'],
   paidAttackCost?: number,
   choice?: TcgBattleAttackChoice,
+  selectedPokemonSide?: 'any',
 ): { targetSide: TcgBattleSide; targetId: string; amount: number }[] {
   const results: { targetSide: TcgBattleSide; targetId: string; amount: number }[] = []
   for (const rule of rules) {
@@ -32073,6 +38074,7 @@ function calculateTcgBattleHealing(
       const selected = state[sideKey].back.find((card) => card.instanceId === choice.cardId && card.currentHp > 0)
       if (!selected || selected.currentHp >= selected.hp) continue
       if (!doesTcgBattleSubtypeFilterMatch(selected.subtypes, rule.subtypeFilter)) continue
+      if (!doesTcgBattleTypeFilterMatch(selected.types, rule.typeFilter)) continue
       if (rule.sameTypeAsAttacker && !selected.types.some((type) => attacker.types.includes(type))) continue
       const amount = rule.amount === 'all'
         ? selected.hp - selected.currentHp
@@ -32085,11 +38087,20 @@ function calculateTcgBattleHealing(
 
     if ('target' in rule && rule.target === 'selectedOwnPokemon') {
       if (choice?.kind !== 'ownPokemon') continue
-      const selected = [...state[sideKey].front, ...state[sideKey].back]
-        .find((card) => card.instanceId === choice.cardId && card.currentHp > 0)
+      const candidateSides = selectedPokemonSide === 'any'
+        ? [sideKey, sideKey === 'player' ? 'opponent' : 'player'] as const
+        : [sideKey] as const
+      const selectedSide = candidateSides.find((candidateSide) =>
+        [...state[candidateSide].front, ...state[candidateSide].back]
+          .some((card) => card.instanceId === choice.cardId && card.currentHp > 0),
+      )
+      const selected = selectedSide
+        ? [...state[selectedSide].front, ...state[selectedSide].back]
+            .find((card) => card.instanceId === choice.cardId && card.currentHp > 0)
+        : undefined
       if (!selected || selected.currentHp >= selected.hp) continue
       const amount = rule.amount === 'all' ? selected.hp - selected.currentHp : rule.amount
-      if (amount > 0) results.push({ targetSide: sideKey, targetId: selected.instanceId, amount })
+      if (amount > 0) results.push({ targetSide: selectedSide!, targetId: selected.instanceId, amount })
       continue
     }
 
@@ -32127,6 +38138,7 @@ function calculateTcgBattleHealing(
       const candidates = cards.filter((card) =>
         card.currentHp > 0 &&
         card.currentHp < card.hp &&
+        (!rule.typeFilter?.length || rule.typeFilter.some((type) => card.types.some((cardType) => cardType.toLowerCase() === type.toLowerCase()))) &&
         (!rule.nameContains || normalizeTcgBattleCardName(card.name).includes(normalizeTcgBattleCardName(rule.nameContains))) &&
         (!rule.subtypeFilter || doesTcgBattleSubtypeFilterMatch(card.subtypes, rule.subtypeFilter)) &&
         (!rule.excludeAttacker || card.instanceId !== attacker.instanceId),
@@ -32205,6 +38217,40 @@ function matchTcgBattleCountSource(text: string):
       maxUnits?: number
     }
   | null {
+  const energyTypeByCode: Record<string, string> = {
+    '{g}': 'Grass', '{r}': 'Fire', '{w}': 'Water', '{l}': 'Lightning',
+    '{p}': 'Psychic', '{f}': 'Fighting', '{d}': 'Darkness', '{m}': 'Metal',
+    '{y}': 'Fairy', '{c}': 'Colorless',
+  }
+  const injuredOwnPokemonDamage = text.match(
+    /this attack does (\d+) damage for each of your pokemon that has any damage counters? on it\b/,
+  )
+  if (injuredOwnPokemonDamage) {
+    return {
+      mode: 'damage',
+      damage: Number.parseInt(injuredOwnPokemonDamage[1], 10),
+      source: { kind: 'injuredPokemon', side: 'own', zone: 'play' },
+    }
+  }
+
+  const typedPokemonInPlay = text.match(/this attack does (\d+) damage for each (?:of your )?(\{[grwlpfdmyc]\}) pokemon in play\b/)
+  if (typedPokemonInPlay && energyTypeByCode[typedPokemonInPlay[2]]) {
+    return {
+      mode: 'damage',
+      damage: Number.parseInt(typedPokemonInPlay[1], 10),
+      source: { kind: 'pokemonOfTypesInPlay', side: 'own', types: [energyTypeByCode[typedPokemonInPlay[2]]] },
+    }
+  }
+
+  const typedPokemonInDiscard = text.match(/this attack does (\d+) damage for each (?:of your )?(\{[grwlpfdmyc]\}) pokemon in your discard pile\b/)
+  if (typedPokemonInDiscard && energyTypeByCode[typedPokemonInDiscard[2]]) {
+    return {
+      mode: 'damage',
+      damage: Number.parseInt(typedPokemonInDiscard[1], 10),
+      source: { kind: 'pokemonOfTypesInDiscard', side: 'own', types: [energyTypeByCode[typedPokemonInDiscard[2]]] },
+    }
+  }
+
   const unusedEnergyMore = text.match(
     /(?:this attack )?does \d+ damage plus (\d+) more damage for each [a-z]+ energy attached to [a-z0-9' .&-]+ but not used to pay for this attack's energy cost\. extra [a-z]+ energy after the (\d+)(?:st|nd|rd|th) (?:doesn't|don't) count\b/,
   )
@@ -32226,6 +38272,33 @@ function matchTcgBattleCountSource(text: string):
     }
   }
 
+  const eachDifferentBenchTypeMore = text.match(/this attack does (\d+) more damage for each different type of pokemon on your bench\b/)
+  if (eachDifferentBenchTypeMore) {
+    return {
+      mode: 'more',
+      damage: Number.parseInt(eachDifferentBenchTypeMore[1], 10),
+      source: { kind: 'distinctTypesInPlay', side: 'own', zone: 'bench' },
+    }
+  }
+
+  const opponentHandCardDamage = text.match(/this attack does (\d+) damage for each card in your opponent's hand\b/)
+  if (opponentHandCardDamage) {
+    return {
+      mode: 'damage',
+      damage: Number.parseInt(opponentHandCardDamage[1], 10),
+      source: { kind: 'handSize', side: 'opponent' },
+    }
+  }
+
+  const teamPokemonBenchDamage = text.match(/this attack does (\d+) damage times the number of (team magma|team aqua) pokemon on your bench\b/)
+  if (teamPokemonBenchDamage) {
+    return {
+      mode: 'damage',
+      damage: Number.parseInt(teamPokemonBenchDamage[1], 10),
+      source: { kind: 'namedPokemonContains', side: 'own', zone: 'bench', values: [teamPokemonBenchDamage[2]] },
+    }
+  }
+
   const opponentBenchMore = text.match(
     /this attack does (\d+) more damage for each of your opponent's benched pokemon\b/,
   )
@@ -32234,6 +38307,37 @@ function matchTcgBattleCountSource(text: string):
       mode: 'more',
       damage: Number.parseInt(opponentBenchMore[1], 10),
       source: { kind: 'bench', side: 'opponent' },
+    }
+  }
+
+  const opponentAbilitiesMore = text.match(/this attack does (\d+) more damage for each of your opponent's pokemon in play that has an ability\b/)
+  if (opponentAbilitiesMore) {
+    return {
+      mode: 'more',
+      damage: Number.parseInt(opponentAbilitiesMore[1], 10),
+      source: { kind: 'pokemonWithAbilitiesInPlay', side: 'opponent', zone: 'play' },
+    }
+  }
+
+  const ownNamedBenchMore = text.match(
+    /this attack does (\d+) more damage for each of your benched ([a-z0-9' .&♀♂-]+?)\b/,
+  )
+  if (ownNamedBenchMore) {
+    return {
+      mode: 'more',
+      damage: Number.parseInt(ownNamedBenchMore[1], 10),
+      source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: [ownNamedBenchMore[2].trim()] },
+    }
+  }
+
+  const retreatCostMore = text.match(
+    /(?:this attack )?does \d+ damage plus (\d+) more damage for each (?:colorless energy|\{c\}) in (?:the )?defending pokemon's retreat cost\b/,
+  )
+  if (retreatCostMore) {
+    return {
+      mode: 'more',
+      damage: Number.parseInt(retreatCostMore[1], 10),
+      source: { kind: 'retreatCost', target: 'target' },
     }
   }
 
@@ -32312,6 +38416,17 @@ function matchTcgBattleCountSource(text: string):
     }
   }
 
+  const namedPokemonInPlayDamage = text.match(
+    /this attack does (\d+) damage for each of your ([a-z0-9' .&♀♂-]+?) in play\b/,
+  )
+  if (namedPokemonInPlayDamage) {
+    return {
+      mode: 'damage',
+      damage: Number.parseInt(namedPokemonInPlayDamage[1], 10),
+      source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: [namedPokemonInPlayDamage[2].trim()] },
+    }
+  }
+
   const ownPokemonInPlay = text.match(/this attack does (\d+) damage for each of your pokemon in play\b/)
   if (ownPokemonInPlay) {
     return {
@@ -32351,7 +38466,7 @@ function inferTcgBattleSelfDamage(text: string): TcgBattleSelfDamageRule[] {
   }
 
   const oldTailsDamage = text.match(
-    /if tails, this attack does \d+ damage(?: plus)?(?: and| plus) (?:this pokemon|[a-z0-9' .&♀♂-]+) does (\d+) damage to itself\b/,
+    /if tails, (?:this|the) attack does \d+ damage(?: plus)?(?: and| plus) (?:this pokemon|[a-z0-9' .&♀♂-]+) does (\d+) damage to itself\b/,
   )
   if (oldTailsDamage) {
     return [{ kind: 'fixed', amount: Number.parseInt(oldTailsDamage[1], 10), condition: 'tails' }]
@@ -32382,18 +38497,29 @@ function inferTcgBattleEnergyDiscard(text: string): TcgBattleEnergyDiscardRule[]
 
   for (const sentence of sentences) {
     if (!sentence || /\byou may discard\b/.test(sentence)) continue
+    if (/^discard all energy from both active pokemon\b/.test(sentence)) {
+      rules.push({ target: 'self', amount: 'all' }, { target: 'opponent', amount: 'all' })
+      continue
+    }
     const condition = inferTcgBattleCoinCondition(sentence)
     const discardMatch = sentence.match(
-      /\bdiscard (?:(all|an?|one|\d+) )?(?:[a-z]+ )?energy(?: cards?)?(?: attached to| from) ([^.]+)/,
+      /\bdiscard (?:(all|an?|one|\d+) )?(?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|dragon|colorless)) )?energy(?: cards?)?(?: attached to| from) ([^.]+)/,
     )
     if (!discardMatch) continue
 
-    const target = getTcgBattleEnergyDiscardTarget(discardMatch[2])
+    const target = getTcgBattleEnergyDiscardTarget(discardMatch[4])
     if (!target) continue
+
+    const energyType = discardMatch[2]
+      ? normalizeTcgBattleEnergySymbol(discardMatch[2]) || undefined
+      : discardMatch[3]
+        ? ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', metal: 'Metal', darkness: 'Darkness', fairy: 'Fairy', dragon: 'Dragon', colorless: 'Colorless' } as Record<string, TcgBattleEnergyType>)[discardMatch[3]]
+        : undefined
 
     rules.push({
       target,
       amount: parseTcgBattleEnergyDiscardAmount(discardMatch[1]),
+      ...(energyType ? { requiresEnergyType: energyType } : {}),
       condition,
     })
   }
@@ -32433,6 +38559,12 @@ function inferTcgBattleStatus(text: string): TcgBattleStatusRule[] {
     const statuses = getTcgBattleStatusesFromText(sentence)
     if (statuses.length === 0) continue
 
+    if (/\bboth activ(?:e|ate) pokemon\b/.test(sentence)) {
+      rules.push({ target: 'self', statuses, condition })
+      rules.push({ target: 'opponent', statuses, condition })
+      continue
+    }
+
     const target = getTcgBattleStatusTarget(sentence)
     if (!target) continue
 
@@ -32451,22 +38583,55 @@ function inferTcgBattleProtection(text: string): TcgBattleProtectionRule[] {
     const condition = inferTcgBattleCoinCondition(sentence)
     if (sentence.startsWith('if ') && !condition) continue
 
-    const preventAllSelf = /prevent all damage done to (?:this pokemon|[a-z0-9' .&-]+) during your opponent's next turn\b/.test(
-      sentence,
-    )
+    const preventAllSelf =
+      /prevent all damage done to (?:this pokemon|[a-z0-9' .&-]+) during your opponent's next turn\b/.test(sentence) ||
+      /during your opponent's next turn, prevent all damage done to (?:this pokemon|[a-z0-9' .&-]+) by attacks\b/.test(sentence) ||
+      /during your opponent's next turn, prevent all damage from[^\w]*and effects of[^\w]*attacks done to (?:this pokemon|[a-z0-9' .&-]+)\b/.test(sentence)
     if (preventAllSelf) {
       rules.push({ target: 'self', kind: 'preventAll', condition })
       continue
     }
 
+    if (/during your opponent's next turn, prevent all effects of (?:an )?attacks?, including damage, done to (?:this pokemon|[a-z0-9' .&-]+)\b/.test(sentence)) {
+      rules.push({ target: 'self', kind: 'preventAllEffects', condition })
+      continue
+    }
+
+    if (/prevent all effects of (?:an )?attacks?, including damage, done to (?:this pokemon|[a-z0-9' .&-]+) during your opponent's next turn\b/.test(sentence)) {
+      rules.push({ target: 'self', kind: 'preventAllEffects', condition })
+      continue
+    }
+
     const reduceSelf = sentence.match(
       /all damage done by attacks to (?:this pokemon|[a-z0-9' .&-]+) during your opponent's next turn is reduc(?:ed|e) by (\d+)\b/,
+    ) || sentence.match(
+      /during your opponent's next turn, any damage done to (?:this pokemon|[a-z0-9' .&-]+) by attacks is reduced by (\d+)(?: \(after applying weakness and resistance\))?\b/,
+    ) || sentence.match(
+      /during your opponent's next turn, (?:this pokemon|[a-z0-9' .&-]+) takes (\d+) less damage from attacks\b/,
+    ) || sentence.match(
+      /during your opponent's next turn, (?:this pokemon|[a-z0-9' .&-]+) takes [−-](\d+) damage from attacks\b/,
     )
     if (reduceSelf) {
       rules.push({
         target: 'self',
         kind: 'reduce',
         amount: Number.parseInt(reduceSelf[1], 10),
+        condition,
+      })
+      continue
+    }
+
+    const reduceDefendingPokemonAttacks = sentence.match(
+      /during your opponent's next turn, attacks used by (?:the )?defending pokemon do [−-](\d+) damage\b/,
+    ) || sentence.match(
+      /during your opponent's next turn, any damage done by attacks from (?:the )?defending pokemon is reduced by (\d+)(?: \(before applying weakness and resistance\))?\b/,
+    )
+    if (reduceDefendingPokemonAttacks) {
+      rules.push({
+        target: 'opponent',
+        kind: 'reduce',
+        amount: Number.parseInt(reduceDefendingPokemonAttacks[1], 10),
+        attackerOnly: true,
         condition,
       })
       continue
@@ -32611,8 +38776,42 @@ export function getTcgBattleAttackEffect(attack: TcgBattleAttack): TcgBattleAtta
       : attack.battleEffect
   }
 
+  if (effect && /you can't use more than 1 vstar power in a game/i.test(attack.text || '') && !effect.oncePerGameVstar) {
+    effect = { ...effect, oncePerGameVstar: true }
+  }
+  if (effect && /you can't use more than 1 gx attack in a game/i.test(attack.text || '') && !effect.oncePerGameGx) {
+    effect = { ...effect, oncePerGameGx: true }
+  }
+  if (effect && /^you can use this attack only if you go second, and only (?:during|on) your first turn\./.test(normalizeTcgAttackText(attack.text || '')) && !effect.secondPlayerFirstTurnOnly) {
+    effect = { ...effect, secondPlayerFirstTurnOnly: true }
+  }
   tcgBattleAttackEffectCache.set(attack, effect)
   return effect
+}
+
+export function doesTcgBattleAttackIgnoreTargetDamageModifiers(
+  state: TcgBattleState,
+  sideKey: TcgBattleSide,
+  attacker: TcgBattleCardState,
+  target: TcgBattleCardState,
+  attack: TcgBattleAttack,
+  paidAttackCost: number,
+  paidAttackCostAlreadyDeducted = false,
+): boolean {
+  const effect = getTcgBattleAttackEffect(attack)
+  if (effect?.ignoreTargetDamageModifiers) return true
+  const conditional = effect?.ignoreTargetDamageModifiersWhenCount
+  const count = conditional && getTcgBattleCount(conditional.source, {
+    state,
+    sideKey,
+    attacker,
+    target,
+    paidAttackCost,
+    coinMode: 'actual',
+  })
+  const includesEnergyCost = (conditional?.source.kind === 'energy' && conditional.source.side === 'own') ||
+    (conditional?.source.kind === 'energyOfType' && conditional.source.side === 'own' && state[sideKey].selectedEnergy === conditional.source.type)
+  return Boolean(conditional && count !== undefined && count + (paidAttackCostAlreadyDeducted && includesEnergyCost ? paidAttackCost : 0) >= conditional.minimumUnits)
 }
 
 export function getValidTcgBattleTargets(
@@ -32623,13 +38822,23 @@ export function getValidTcgBattleTargets(
 ): TcgBattleCardState[] {
   const effect = getTcgBattleAttackEffect(attack)
   if (!effect) return []
+  if (typeof effect.requiredLostZoneCount === 'number' && (state[sideKey].lostZone?.length || 0) < effect.requiredLostZoneCount) return []
+  if (effect.requiresOpenBench && getOpenTcgBattleBenchSlots(state[sideKey]) <= 0) return []
   if (effect.attackerMustBeDamaged && attacker.currentHp >= attacker.hp) return []
+  if (typeof effect.requiresPrizeTotalAtMost === 'number' &&
+    getTcgBattleRemainingPrizeCount(state, 'player') + getTcgBattleRemainingPrizeCount(state, 'opponent') > effect.requiresPrizeTotalAtMost) return []
+  if (typeof effect.requiresRemainingPrizeCount === 'number' &&
+    getTcgBattleRemainingPrizeCount(state, sideKey) !== effect.requiresRemainingPrizeCount) return []
   const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
   const scope = effect.targetScope || 'front'
   const candidates = scope === 'front'
     ? state[opponentKey].front
     : scope === 'bench'
       ? state[opponentKey].back
+      : scope === 'own'
+        ? [...state[sideKey].front, ...state[sideKey].back]
+        : scope === 'ownBench'
+          ? state[sideKey].back
       : scope === 'all'
         ? [...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back]
         : [...state[opponentKey].front, ...state[opponentKey].back]
@@ -32642,11 +38851,17 @@ export function getValidTcgBattleTargets(
     : undefined
   return candidates.filter((card) => {
     if (card.currentHp <= 0) return false
-    if (scope === 'all' && card.instanceId === attacker.instanceId) return false
+    const canTargetAttacker = effect.special?.some((rule) => rule.kind === 'devolveSelectedPokemon')
+    if (scope === 'all' && card.instanceId === attacker.instanceId && !canTargetAttacker) return false
     if (effect.targetMustBeDamaged && card.currentHp >= card.hp) return false
+    if (effect.targetMustBeEvolved && !card.evolutionStack?.length) return false
     if (effect.targetMustBeUndamaged && card.currentHp < card.hp) return false
     if (effect.targetMustHaveSubtype && !card.subtypes.some((subtype) => subtype.toLowerCase() === effect.targetMustHaveSubtype?.toLowerCase())) return false
     if (effect.targetMustHaveAnySubtype && !card.subtypes.some((subtype) => effect.targetMustHaveAnySubtype?.some((requiredSubtype) => subtype.toLowerCase() === requiredSubtype.toLowerCase()))) return false
+    if (effect.targetMustHaveAbilityTypes && !(card.abilities || []).some((ability) => {
+      const type = normalizeTcgBattleAbilityText(ability.type).replace(/[^a-z]/g, '')
+      return effect.targetMustHaveAbilityTypes?.includes(type)
+    })) return false
     if (effect.targetMustHaveRemainingHpAtMost !== undefined && card.currentHp > effect.targetMustHaveRemainingHpAtMost) return false
     if (effect.targetMustHaveDamageCounters) {
       const counters = Math.floor((card.hp - card.currentHp) / 10)
@@ -32668,6 +38883,10 @@ export function isTcgBattleAttackDisabled(card: TcgBattleCardState, attackIndex:
   return Boolean(card.temporaryEffects?.cannotAttack) || card.temporaryEffects?.disabledAttack?.attackIndex === attackIndex
 }
 
+export function isTcgBattleSideAttackLocked(state: TcgBattleState, sideKey: TcgBattleSide): boolean {
+  return state.opponentAttackLock?.blockedSide === sideKey && state.activeSide === sideKey
+}
+
 export function validateTcgBattleAttackChoice(params: {
   state: TcgBattleState
   sideKey: TcgBattleSide
@@ -32684,16 +38903,64 @@ export function validateTcgBattleAttackChoice(params: {
   if (!validTargets.some((card) => card.instanceId === target.instanceId)) return 'Invalid target for that attack.'
 
   const required = effect.choiceRequirement
+  if (required === 'topDeckPokemon') {
+    const rule = effect.special?.find((entry) => entry.kind === 'discardTopDeckChoosePokemonToHand')
+    if (rule?.kind !== 'discardTopDeckChoosePokemonToHand') return 'That attack has no top-deck choice to resolve.'
+    const topCards = state[sideKey].deck.slice(0, rule.amount)
+    if (topCards.length === 0) return choice ? 'There are no cards to choose from on top of the deck.' : null
+    return choice?.kind === 'topDeckPokemon' && topCards.some((card) => card.id === choice.cardId)
+      ? null
+      : 'Choose one of the revealed Pokémon.'
+  }
+  if (required === 'topDeckPokemonSet') {
+    const rule = effect.special?.find((entry) => entry.kind === 'chooseTopDeckPokemonToHandAndLostZone')
+    if (rule?.kind !== 'chooseTopDeckPokemonToHandAndLostZone') return 'That attack has no top-deck selection to resolve.'
+    const topCards = state[sideKey].deck.slice(0, rule.revealCount)
+    const selectedCount = Math.min(rule.handCount, topCards.length)
+    return choice?.kind === 'topDeckPokemonSet' &&
+      choice.cardIds.length === selectedCount &&
+      new Set(choice.cardIds).size === selectedCount &&
+      choice.cardIds.every((cardId) => topCards.some((card) => card.id === cardId))
+      ? null
+      : `Choose ${selectedCount} Pokémon from the revealed cards for your hand.`
+  }
+  if (required === 'playerSide') {
+    return choice?.kind === 'playerSide' && (choice.side === 'player' || choice.side === 'opponent')
+      ? null
+      : 'Choose which player shuffles their hand.'
+  }
   if (!choice && required === 'optionalBonus' && effect.damage.kind === 'handDiscardBonus' && state[sideKey].hand.length === 0) {
     return null
   }
   if (!required) return choice ? 'That attack does not accept an extra choice.' : null
   const own = state[sideKey]
   const opponent = state[sideKey === 'player' ? 'opponent' : 'player']
+  if (required === 'switchAndDeckEvolution') {
+    if (choice?.kind !== 'switchAndDeckEvolution') return 'Choose a Benched Pokémon to switch with.'
+    if (!own.back.some((card) => card.instanceId === choice.benchCardId && card.currentHp > 0)) return 'Choose a living Benched Pokémon.'
+    const rule = effect.special?.find((entry) => entry.kind === 'searchDeckPokemon' && entry.evolveAttacker)
+    if (rule?.kind !== 'searchDeckPokemon') return 'That attack has no Evolution search to resolve.'
+    const eligible = attacker.evolvedTurn === state.turnNumber ? [] : getAvailableTcgBattleDeckPokemon(own, rule, attacker, target)
+    if (choice.evolutionCardId && !eligible.some((card) => card.id === choice.evolutionCardId)) return 'Choose an eligible Evolution from your deck.'
+    if (eligible.length > 0 && !choice.evolutionCardId) return 'Choose an Evolution for the attacking Pokémon, if one is in your deck.'
+    return null
+  }
+  if (required === 'selfDamageCounters') {
+    const maximum = effect.choiceSelfDamageCountersUpToRemainingHp
+      ? Math.floor(attacker.currentHp / 10)
+      : effect.choiceSelfDamageCounterMax ?? 0
+    return choice?.kind === 'selfDamageCounters' && Number.isInteger(choice.amount) && choice.amount >= 0 && choice.amount <= maximum
+      ? null
+      : `Choose between 0 and ${maximum} damage counters to place on this Pokémon.`
+  }
   if (own.energy - paidAttackCost < (effect.minimumExtraEnergyDiscard || 0)) {
     return 'That attack needs more Energy available to pay its extra discard cost.'
   }
   if (!choice) {
+    if (required === 'ownPokemon' && effect.choiceOwnPokemonSide === 'any' &&
+      ![...own.front, ...own.back, ...opponent.front, ...opponent.back].some((card) =>
+        card.currentHp > 0 && (!effect.choiceOwnPokemonMustBeDamaged || card.currentHp < card.hp),
+      )) return null
     if (required === 'optionalOpponentBench' && opponent.back.every((card) => card.currentHp <= 0)) return null
     if (required === 'optionalOwnBench' && own.back.every((card) => card.currentHp <= 0)) return null
     if (required === 'ownBench') {
@@ -32704,6 +38971,8 @@ export function validateTcgBattleAttackChoice(params: {
       const eligibleBench = own.back.filter((card) =>
         card.currentHp > 0 &&
         (!ownBenchHealingRule || doesTcgBattleSubtypeFilterMatch(card.subtypes, ownBenchHealingRule.subtypeFilter)) &&
+        (!ownBenchHealingRule || doesTcgBattleTypeFilterMatch(card.types, ownBenchHealingRule.typeFilter)) &&
+        (!ownBenchHealingRule?.damagedOnly || card.currentHp < card.hp) &&
         (!ownBenchHealingRule?.sameTypeAsAttacker || card.types.some((type) => attacker.types.includes(type))),
       )
       if (eligibleBench.length === 0) return null
@@ -32713,12 +38982,11 @@ export function validateTcgBattleAttackChoice(params: {
       const sourceCards = transferRule?.kind === 'transferDamageCounters' && transferRule.sourceZone === 'bench'
         ? own.back
         : [...own.front, ...own.back]
-      if (sourceCards.every((card) =>
-        card.currentHp <= 0 ||
-        card.currentHp >= card.hp ||
-        (transferRule?.kind === 'transferDamageCounters' && transferRule.sourceNameContains &&
-          !card.name.toLowerCase().includes(transferRule.sourceNameContains.toLowerCase())),
-      )) return null
+      const eligibleSource = (card: TcgBattleCardState) =>
+        card.currentHp > 0 && card.currentHp < card.hp &&
+        (!transferRule?.sourceNameContains || card.name.toLowerCase().includes(transferRule.sourceNameContains.toLowerCase())) &&
+        (!transferRule?.sourceSubtypeContains || card.subtypes.some((subtype) => subtype.toLowerCase().includes(transferRule.sourceSubtypeContains!.toLowerCase())))
+      if (!sourceCards.some(eligibleSource)) return null
     }
     if (required === 'discardHandCards' && own.hand.length === 0) return null
     if (required === 'discardPokemonToHand') {
@@ -32730,6 +38998,17 @@ export function validateTcgBattleAttackChoice(params: {
           (!rule.includeNames?.length || rule.includeNames.includes(card.name)) &&
           (!rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.includes(type))),
         )) return null
+    }
+    if (required === 'discardPokemonToBench') {
+      const rule = effect.special?.find((entry) => entry.kind === 'recoverPokemonFromDiscardToBench')
+      if (rule?.kind === 'recoverPokemonFromDiscardToBench' && rule.upTo) return null
+      if (rule?.kind === 'recoverPokemonFromDiscardToBench' &&
+        (!getOpenTcgBattleBenchSlots(own) || !own.discard.some((card) =>
+          (rule.basicOnly === false || card.subtypes.includes('Basic')) && canTcgBattlePutPokemonOnBench(own, card) &&
+          (!rule.includeNames?.length || rule.includeNames.some((name) => normalizeTcgBattleCardName(card.name) === normalizeTcgBattleCardName(name))) &&
+          (!rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.some((cardType) => cardType.toLowerCase() === type.toLowerCase()))) &&
+          (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.some((cardSubtype) => cardSubtype.toLowerCase() === subtype.toLowerCase()))),
+        ))) return null
     }
     if (required === 'discardPokemon') {
       const rule = effect.special?.find((entry) => entry.kind === 'reviveDiscardPokemon')
@@ -32750,24 +39029,37 @@ export function validateTcgBattleAttackChoice(params: {
   if (required === 'counterDistribution') {
     if (choice.kind !== 'counterDistribution') return 'Assign all damage counters to opposing Pokémon.'
     const expectedCounters = effect.choiceCounterCountFrom
-      ? getTcgBattleCount(effect.choiceCounterCountFrom, { state, sideKey, attacker, target, coinMode: 'actual' })
+      ? getTcgBattleCount(effect.choiceCounterCountFrom, { state, sideKey, attacker, target, coinMode: 'actual' }) * (effect.choiceCounterCountMultiplier || 1)
       : effect.choiceCounterCount || 0
-    const livingOpponentIds = new Set(
+    const livingOpponentCards =
       [...opponent.front, ...opponent.back]
-        .filter((card) => card.currentHp > 0)
-        .map((card) => card.instanceId),
-    )
+        .filter((card) => card.currentHp > 0 &&
+          (effect.choiceCounterTargetZone !== 'bench' || opponent.back.some((benchCard) => benchCard.instanceId === card.instanceId)) &&
+          doesTcgBattleSubtypeFilterMatch(card.subtypes, effect.choiceCounterTargetSubtypeFilter))
+    const livingOpponentIds = new Set(livingOpponentCards.map((card) => card.instanceId))
     const totalCounters = choice.assignments.reduce((sum, assignment) => sum + assignment.counters, 0)
-    return (expectedCounters === 0
+    const fixedPerTarget = effect.choiceCounterCountPerTarget
+    const targetCount = effect.choiceCounterTargetDamage !== undefined && typeof effect.choiceCounterTargetCount === 'number'
+      ? Math.min(effect.choiceCounterTargetCount, livingOpponentCards.length)
+      : effect.choiceCounterTargetCount
+    const expected = effect.choiceCounterTargetDamage !== undefined && typeof targetCount === 'number'
+      ? targetCount * (fixedPerTarget || 1)
+      : expectedCounters
+    if (livingOpponentCards.length === 0 && choice.assignments.length === 0) return null
+    return (expected === 0
       ? choice.assignments.length === 0
       : choice.assignments.length > 0 &&
-        totalCounters === expectedCounters &&
-        new Set(choice.assignments.map((assignment) => assignment.cardId)).size === choice.assignments.length &&
+        totalCounters === expected &&
+        (typeof targetCount !== 'number' || choice.assignments.length === targetCount) &&
+        (effect.choiceCounterAllowRepeatedTargets || new Set(choice.assignments.map((assignment) => assignment.cardId)).size === choice.assignments.length) &&
         choice.assignments.every((assignment) =>
-          livingOpponentIds.has(assignment.cardId) && Number.isInteger(assignment.counters) && assignment.counters > 0,
+          livingOpponentIds.has(assignment.cardId) && Number.isInteger(assignment.counters) && assignment.counters > 0 &&
+          (typeof fixedPerTarget !== 'number' || assignment.counters === fixedPerTarget),
         ))
       ? null
-      : `Assign exactly ${expectedCounters} damage counters among living opposing Pokémon.`
+      : effect.choiceCounterTargetDamage !== undefined
+        ? `Choose ${targetCount} distinct living Benched Pokémon.`
+        : `Assign exactly ${expectedCounters} damage counters among living opposing Pokémon.`
   }
 
   if (required === 'damageCounterTransfer') {
@@ -32776,34 +39068,39 @@ export function validateTcgBattleAttackChoice(params: {
     const sourceCards = transferRule?.kind === 'transferDamageCounters' && transferRule.sourceZone === 'bench'
       ? own.back
       : [...own.front, ...own.back]
+    const eligibleSource = (card: TcgBattleCardState) =>
+      card.currentHp > 0 && card.currentHp < card.hp &&
+      (!transferRule?.sourceNameContains || card.name.toLowerCase().includes(transferRule.sourceNameContains.toLowerCase())) &&
+      (!transferRule?.sourceSubtypeContains || card.subtypes.some((subtype) => subtype.toLowerCase().includes(transferRule.sourceSubtypeContains!.toLowerCase())))
     if (!choice.sourceCardId) {
-      return sourceCards.some((card) =>
-        card.currentHp > 0 &&
-        card.currentHp < card.hp &&
-        (transferRule?.kind !== 'transferDamageCounters' || !transferRule.sourceNameContains ||
-          card.name.toLowerCase().includes(transferRule.sourceNameContains.toLowerCase())),
-      )
+      return sourceCards.some(eligibleSource)
         ? 'Choose a damaged Pokémon to move counters from.'
         : null
     }
-    return sourceCards.some((card) =>
-      card.instanceId === choice.sourceCardId &&
-      card.currentHp > 0 &&
-      card.currentHp < card.hp &&
-      (transferRule?.kind !== 'transferDamageCounters' || !transferRule.sourceNameContains ||
-        card.name.toLowerCase().includes(transferRule.sourceNameContains.toLowerCase())),
-    ) ? null : 'Choose a damaged Pokémon to move counters from.'
+    return sourceCards.some((card) => card.instanceId === choice.sourceCardId && eligibleSource(card))
+      ? null
+      : 'Choose a damaged Pokémon to move counters from.'
   }
 
   if (required === 'discardHandCards') {
     if (choice.kind !== 'discardHandCards') return 'Choose which Pokémon to discard from your hand.'
+    if (typeof effect.choiceHandCardMaxCount === 'number' && choice.cardIds.length > effect.choiceHandCardMaxCount) {
+      return `Choose up to ${effect.choiceHandCardMaxCount} Pokémon to discard.`
+    }
+    const handIds = new Set(own.hand
+      .filter((card) => effect.choiceHandCardRetreatCost === undefined || card.convertedRetreatCost === effect.choiceHandCardRetreatCost)
+      .filter((card) => !effect.choiceHandCardNames?.length || effect.choiceHandCardNames.some((name) => normalizeTcgBattleCardName(card.name) === normalizeTcgBattleCardName(name)))
+      .filter((card) => !effect.choiceHandCardSubtypes?.length || card.subtypes.some((subtype) => effect.choiceHandCardSubtypes!.some((name) => normalizeTcgBattleCardName(subtype) === normalizeTcgBattleCardName(name))))
+      .map((card) => card.instanceId))
     if (
       typeof effect.choiceHandCardCount === 'number' &&
-      choice.cardIds.length !== Math.min(effect.choiceHandCardCount, own.hand.length)
+      choice.cardIds.length !== Math.min(effect.choiceHandCardCount, handIds.size)
     ) {
       return `Choose ${effect.choiceHandCardCount} Pokémon to discard.`
     }
-    const handIds = new Set(own.hand.map((card) => card.instanceId))
+    if (effect.choiceHandCardRetreatCost !== undefined && choice.cardIds.some((cardId) => !handIds.has(cardId))) {
+      return `Choose Pokémon with a Retreat Cost of ${effect.choiceHandCardRetreatCost} from your hand.`
+    }
     return new Set(choice.cardIds).size === choice.cardIds.length &&
       choice.cardIds.every((cardId) => handIds.has(cardId))
       ? null
@@ -32812,9 +39109,12 @@ export function validateTcgBattleAttackChoice(params: {
 
   if (required === 'ownPokemon') {
     if (choice.kind !== 'ownPokemon') return 'Choose one of your Pokémon to heal.'
-    return [...own.front, ...own.back].some((card) =>
-      card.instanceId === choice.cardId && card.currentHp > 0,
-    ) ? null : 'Choose one of your living Pokémon.'
+    const eligibleSides = effect.choiceOwnPokemonSide === 'any' ? [own, opponent] : [own]
+    return eligibleSides.some((owner) => [...owner.front, ...owner.back].some((card) =>
+      card.instanceId === choice.cardId && card.currentHp > 0 &&
+      (effect.choiceOwnPokemonZone !== 'bench' || own.back.some((benchCard) => benchCard.instanceId === card.instanceId)) &&
+      (!effect.choiceOwnPokemonMustBeDamaged || card.currentHp < card.hp),
+    )) ? null : 'Choose a living, damaged Pokémon.'
   }
   if (required === 'discardPokemonToHand') {
     if (choice.kind !== 'discardPokemonToHand') return 'Choose a Pokémon from your discard pile.'
@@ -32834,29 +39134,54 @@ export function validateTcgBattleAttackChoice(params: {
       ? null
       : 'Choose the required number of eligible Pokémon from your discard pile.'
   }
+  if (required === 'discardPokemonToBench') {
+    if (choice.kind !== 'discardPokemonToBench') return 'Choose Pokémon from your discard pile to put onto your Bench.'
+    const rule = effect.special?.find((entry) => entry.kind === 'recoverPokemonFromDiscardToBench')
+    if (rule?.kind !== 'recoverPokemonFromDiscardToBench') return 'That attack cannot put Pokémon from the discard pile onto the Bench.'
+    const eligible = own.discard.filter((card) =>
+      (rule.basicOnly === false || card.subtypes.includes('Basic')) && canTcgBattlePutPokemonOnBench(own, card) &&
+      (!rule.includeNames?.length || rule.includeNames.some((name) => normalizeTcgBattleCardName(card.name) === normalizeTcgBattleCardName(name))) &&
+      (!rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.some((cardType) => cardType.toLowerCase() === type.toLowerCase()))) &&
+      (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.some((cardSubtype) => cardSubtype.toLowerCase() === subtype.toLowerCase()))),
+    )
+    const eligibleIds = new Set(eligible.map((card) => card.instanceId))
+    const maxCount = Math.min(rule.maxCount, getOpenTcgBattleBenchSlots(own), eligible.length)
+    return (rule.upTo ? choice.cardIds.length <= maxCount : choice.cardIds.length === maxCount) &&
+      new Set(choice.cardIds).size === choice.cardIds.length &&
+      choice.cardIds.every((cardId) => eligibleIds.has(cardId))
+      ? null
+      : 'Choose eligible Basic Pokémon that fit on your Bench.'
+  }
 
   if (required === 'deckPokemon') {
     if (choice.kind !== 'deckPokemon') return 'Choose Pokémon from your deck.'
     const rule = effect.special?.find((entry) => entry.kind === 'searchDeckPokemon')
     if (rule?.kind !== 'searchDeckPokemon') return 'That attack cannot search the deck.'
-    const available = getAvailableTcgBattleDeckPokemon(own, rule).filter((card) => rule.destination === 'hand' || canTcgBattlePutPokemonOnBench(own, card))
+    if (rule.requiresOpponentEvolved && !opponent.front.some((pokemon) => pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)))) {
+      return 'The opponent must have an Evolved Pokémon in the Active Spot.'
+    }
+    const available = getAvailableTcgBattleDeckPokemon(own, rule, attacker, target).filter((card) => rule.destination !== 'bench' || canTcgBattlePutPokemonOnBench(own, card))
     const eligibleIds = new Set(available.map((card) => card.id))
     const maxCount = Math.min(
       getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }),
-      rule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(own),
+      rule.destination !== 'bench' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(own),
     )
     if (
+      ((rule.evolveAttacker || rule.evolveTarget) && choice.cardIds.length !== Math.min(1, available.length)) ||
       choice.cardIds.length > maxCount ||
       new Set(choice.cardIds).size !== choice.cardIds.length ||
       choice.cardIds.some((cardId) => !eligibleIds.has(cardId)) ||
       (rule.oneOfEachName && new Set(
         choice.cardIds.map((cardId) => normalizeTcgBattleCardName(available.find((card) => card.id === cardId)?.name || '')),
       ).size !== choice.cardIds.length) ||
+      (rule.sameNameAsFirst && new Set(
+        choice.cardIds.map((cardId) => normalizeTcgBattleCardName(available.find((card) => card.id === cardId)?.name || '')),
+      ).size > 1) ||
       (rule.oneOfEachType && new Set(
         choice.cardIds.map((cardId) => available.find((card) => card.id === cardId)?.types[0]?.toLowerCase() || 'colorless'),
       ).size !== choice.cardIds.length)
     ) {
-      return 'Choose eligible Pokémon that fit on your Bench.'
+      return rule.destination === 'bench' ? 'Choose eligible Pokémon that fit on your Bench.' : 'Choose eligible Pokémon from your deck.'
     }
     return null
   }
@@ -32897,7 +39222,7 @@ export function validateTcgBattleAttackChoice(params: {
 
   if (required === 'copyAttack') {
     if (choice.kind !== 'copiedAttack') return 'Choose an attack to copy.'
-    const copied = getTcgBattleAvailableAttacks(state, sideKey === 'player' ? 'opponent' : 'player', target)[choice.attackIndex]
+    const copied = getTcgBattleCopyAttackOptions(state, sideKey, target, attack, attacker)[choice.attackIndex]?.attack
     const copiedEffect = copied && getTcgBattleAttackEffect(copied)
     if (!copied || !copiedEffect || copiedEffect.special?.some((rule) => rule.kind === 'copyAttack')) {
       return 'That attack cannot be copied.'
@@ -32938,6 +39263,14 @@ export function validateTcgBattleAttackChoice(params: {
     return null
   }
   if (required === 'opponentBench' || required === 'ownBench' || required === 'optionalOpponentBench' || required === 'optionalOwnBench') {
+    if (
+      required === 'opponentBench' && opponent.back.every((card) => card.currentHp <= 0) &&
+      effect.special?.some((rule) => rule.kind === 'shuffleTargetIntoDeck' && rule.targetZone === 'selectedChoice' && rule.condition)
+    ) return null
+    if (
+      required === 'ownBench' && own.back.every((card) => card.currentHp <= 0) &&
+      effect.special?.some((rule) => rule.kind === 'returnOwnBenchToDeck' && rule.condition)
+    ) return null
     const switchOnlyAfterCounterDamage = required === 'opponentBench' &&
       effect.special?.some((rule) => rule.kind === 'switch' && rule.target === 'opponent' && rule.ifCounterDamage)
     const willApplyCounterDamage = effect.counterDamage?.some((rule) =>
@@ -32968,7 +39301,8 @@ export function validateTcgBattleAttackChoice(params: {
     if (
       required === 'ownBench' &&
       selectedOwnBenchHealingRule &&
-      !doesTcgBattleSubtypeFilterMatch(selected.subtypes, selectedOwnBenchHealingRule.subtypeFilter)
+      (!doesTcgBattleSubtypeFilterMatch(selected.subtypes, selectedOwnBenchHealingRule.subtypeFilter) ||
+        !doesTcgBattleTypeFilterMatch(selected.types, selectedOwnBenchHealingRule.typeFilter))
     ) {
       return 'Choose a benched Pokémon that matches the attack effect.'
     }
@@ -32986,7 +39320,8 @@ export function validateTcgBattleAttackChoice(params: {
       Number.isInteger(choice.amount) &&
       choice.amount >= 0 &&
       choice.amount <= available &&
-      (!effect.choiceEnergyType || choice.amount === 0 || own.selectedEnergy === effect.choiceEnergyType)
+      (!effect.choiceEnergyType || choice.amount === 0 || own.selectedEnergy === effect.choiceEnergyType) &&
+      (!effect.choiceEnergyTypes?.length || choice.amount === 0 || effect.choiceEnergyTypes.includes(own.selectedEnergy!))
       ? null
       : 'Choose an available Energy amount.'
   }
@@ -33020,8 +39355,37 @@ export function chooseTcgBattleAttackChoice(params: {
   const effect = getTcgBattleAttackEffect(attack)
   const required = effect?.choiceRequirement
   if (!required) return undefined
+  if (required === 'switchAndDeckEvolution') {
+    const benchCard = state[sideKey].back.filter((card) => card.currentHp > 0)
+      .sort((a, b) => b.currentHp - a.currentHp)[0]
+    if (!benchCard) return undefined
+    const rule = effect?.special?.find((entry) => entry.kind === 'searchDeckPokemon' && entry.evolveAttacker)
+    const evolution = rule?.kind === 'searchDeckPokemon' && attacker.evolvedTurn !== state.turnNumber
+      ? getAvailableTcgBattleDeckPokemon(state[sideKey], rule, attacker, target)
+          .sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a))[0]
+      : undefined
+    return { kind: 'switchAndDeckEvolution', benchCardId: benchCard.instanceId, evolutionCardId: evolution?.id }
+  }
+  if (required === 'topDeckPokemon') {
+    const rule = effect?.special?.find((entry) => entry.kind === 'discardTopDeckChoosePokemonToHand')
+    if (rule?.kind !== 'discardTopDeckChoosePokemonToHand') return undefined
+    const selected = state[sideKey].deck.slice(0, rule.amount).sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a))[0]
+    return selected ? { kind: 'topDeckPokemon', cardId: selected.id } : undefined
+  }
+  if (required === 'topDeckPokemonSet') {
+    const rule = effect?.special?.find((entry) => entry.kind === 'chooseTopDeckPokemonToHandAndLostZone')
+    if (rule?.kind !== 'chooseTopDeckPokemonToHandAndLostZone') return undefined
+    const cardIds = state[sideKey].deck.slice(0, rule.revealCount).slice(0, rule.handCount).map((card) => card.id)
+    return { kind: 'topDeckPokemonSet', cardIds }
+  }
   if (required === 'optionalBonus' && effect?.damage.kind === 'handDiscardBonus' && state[sideKey].hand.length === 0) {
     return undefined
+  }
+  if (required === 'selfDamageCounters') {
+    const maximum = effect?.choiceSelfDamageCountersUpToRemainingHp
+      ? Math.floor(attacker.currentHp / 10)
+      : effect?.choiceSelfDamageCounterMax ?? 0
+    return { kind: 'selfDamageCounters', amount: Math.min(maximum, Math.max(0, Math.floor((attacker.currentHp - 1) / 10))) }
   }
   if (required === 'damageCounterTransfer') {
     const transferRule = effect?.special?.find((rule) => rule.kind === 'transferDamageCounters')
@@ -33029,33 +39393,53 @@ export function chooseTcgBattleAttackChoice(params: {
       ? state[sideKey].back
       : [...state[sideKey].front, ...state[sideKey].back]
     const source = sourceCards
-      .filter((card) =>
-        card.currentHp > 0 &&
-        card.currentHp < card.hp &&
-        (transferRule?.kind !== 'transferDamageCounters' || !transferRule.sourceNameContains ||
-          card.name.toLowerCase().includes(transferRule.sourceNameContains.toLowerCase())),
-      )
+      .filter((card) => card.currentHp > 0 && card.currentHp < card.hp)
+      .filter((card) => !transferRule?.sourceNameContains || card.name.toLowerCase().includes(transferRule.sourceNameContains.toLowerCase()))
+      .filter((card) => !transferRule?.sourceSubtypeContains || card.subtypes.some((subtype) => subtype.toLowerCase().includes(transferRule.sourceSubtypeContains!.toLowerCase())))
       .sort((a, b) => (b.hp - b.currentHp) - (a.hp - a.currentHp))[0]
     return { kind: 'damageCounterTransfer', sourceCardId: source?.instanceId }
   }
   if (required === 'discardHandCards') {
-    const handIds = state[sideKey].hand.map((card) => card.instanceId)
-    const count = effect?.choiceHandCardCount
+    const handIds = state[sideKey].hand
+      .filter((card) => effect?.choiceHandCardRetreatCost === undefined || card.convertedRetreatCost === effect.choiceHandCardRetreatCost)
+      .filter((card) => !effect?.choiceHandCardNames?.length || effect.choiceHandCardNames.some((name) => normalizeTcgBattleCardName(card.name) === normalizeTcgBattleCardName(name)))
+      .filter((card) => !effect?.choiceHandCardSubtypes?.length || card.subtypes.some((subtype) => effect.choiceHandCardSubtypes!.some((name) => normalizeTcgBattleCardName(subtype) === normalizeTcgBattleCardName(name))))
+      .map((card) => card.instanceId)
+    const count = effect?.choiceHandCardCount ?? effect?.choiceHandCardMaxCount
     return { kind: 'discardHandCards', cardIds: count === undefined ? handIds : handIds.slice(0, count) }
   }
   if (required === 'ownPokemon') {
-    const picked = [...state[sideKey].front, ...state[sideKey].back]
-      .filter((card) => card.currentHp > 0)
-      .sort((a, b) => (b.hp - b.currentHp) - (a.hp - a.currentHp))[0] || attacker
+    const eligible = (candidateSide: TcgBattleSide) => [...state[candidateSide].front, ...state[candidateSide].back]
+      .filter((card) => card.currentHp > 0 &&
+        (effect?.choiceOwnPokemonSide === 'any' || effect?.choiceOwnPokemonZone !== 'bench' || state[sideKey].back.some((benchCard) => benchCard.instanceId === card.instanceId)) &&
+        (!effect?.choiceOwnPokemonMustBeDamaged || card.currentHp < card.hp))
+      .sort((a, b) => (b.hp - b.currentHp) - (a.hp - a.currentHp))
+    const picked = eligible(sideKey)[0] || (effect?.choiceOwnPokemonSide === 'any'
+      ? eligible(sideKey === 'player' ? 'opponent' : 'player')[0]
+      : undefined) || attacker
     return { kind: 'ownPokemon', cardId: picked.instanceId }
   }
   if (required === 'counterDistribution') {
     const counters = effect?.choiceCounterCountFrom
-      ? getTcgBattleCount(effect.choiceCounterCountFrom, { state, sideKey, attacker, target, coinMode: 'actual' })
+      ? getTcgBattleCount(effect.choiceCounterCountFrom, { state, sideKey, attacker, target, coinMode: 'actual' }) * (effect.choiceCounterCountMultiplier || 1)
       : effect?.choiceCounterCount || 0
+    const distributionSide = sideKey === 'player' ? 'opponent' : 'player'
+    const livingTargets = [...state[distributionSide].front, ...state[distributionSide].back]
+      .filter((card) => card.currentHp > 0 &&
+        (effect?.choiceCounterTargetZone !== 'bench' || state[distributionSide].back.some((benchCard) => benchCard.instanceId === card.instanceId)) &&
+        doesTcgBattleSubtypeFilterMatch(card.subtypes, effect?.choiceCounterTargetSubtypeFilter))
+    const targetCount = effect?.choiceCounterTargetCount || 1
+    const countersPerTarget = effect?.choiceCounterCountPerTarget
     return {
       kind: 'counterDistribution',
-      assignments: counters > 0 ? [{ cardId: target.instanceId, counters }] : [],
+      assignments: counters > 0
+        ? (livingTargets.some((card) => card.instanceId === target.instanceId)
+            ? [target, ...livingTargets.filter((card) => card.instanceId !== target.instanceId)]
+            : livingTargets).slice(0, targetCount).map((card) => ({
+            cardId: card.instanceId,
+            counters: countersPerTarget ?? counters,
+          }))
+        : [],
     }
   }
   if (required === 'discardPokemonToHand') {
@@ -33073,16 +39457,38 @@ export function chooseTcgBattleAttackChoice(params: {
       ? { kind: 'discardPokemonToHand', cardIds: eligible.map((card) => card.instanceId) }
       : undefined
   }
+  if (required === 'discardPokemonToBench') {
+    const rule = effect?.special?.find((entry) => entry.kind === 'recoverPokemonFromDiscardToBench')
+    if (rule?.kind !== 'recoverPokemonFromDiscardToBench') return undefined
+    const side = state[sideKey]
+    const eligible = side.discard
+      .filter((card) => (rule.basicOnly === false || card.subtypes.includes('Basic')) && canTcgBattlePutPokemonOnBench(side, card))
+      .filter((card) => !rule.includeNames?.length || rule.includeNames.some((name) => normalizeTcgBattleCardName(card.name) === normalizeTcgBattleCardName(name)))
+      .filter((card) => !rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.some((cardType) => cardType.toLowerCase() === type.toLowerCase())))
+      .filter((card) => !rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.some((cardSubtype) => cardSubtype.toLowerCase() === subtype.toLowerCase())))
+      .sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a))
+      .slice(0, Math.min(rule.maxCount, getOpenTcgBattleBenchSlots(side)))
+    return { kind: 'discardPokemonToBench', cardIds: eligible.map((card) => card.instanceId) }
+  }
   if (required === 'deckPokemon') {
     const rule = effect?.special?.find((entry) => entry.kind === 'searchDeckPokemon')
     if (rule?.kind !== 'searchDeckPokemon') return undefined
     const side = state[sideKey]
     const maxCount = Math.min(
       getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }),
-      rule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(side),
+      rule.destination !== 'bench' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(side),
     )
-    const available = getAvailableTcgBattleDeckPokemon(side, rule).filter((card) => rule.destination === 'hand' || canTcgBattlePutPokemonOnBench(side, card))
+    const available = getAvailableTcgBattleDeckPokemon(side, rule, attacker, target).filter((card) => rule.destination !== 'bench' || canTcgBattlePutPokemonOnBench(side, card))
       .sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a) || a.name.localeCompare(b.name))
+    if (rule.sameNameAsFirst) {
+      const byName = new Map<string, typeof available>()
+      for (const card of available) {
+        const name = normalizeTcgBattleCardName(card.name)
+        byName.set(name, [...(byName.get(name) || []), card])
+      }
+      const matchingPair = [...byName.values()].find((cards) => cards.length >= 2)
+      return { kind: 'deckPokemon', cardIds: (matchingPair || available).slice(0, Math.min(maxCount, matchingPair ? 2 : 1)).map((card) => card.id) }
+    }
     const selected: typeof available = []
     const selectedNames = new Set<string>()
     const selectedTypes = new Set<string>()
@@ -33123,7 +39529,13 @@ export function chooseTcgBattleAttackChoice(params: {
       0,
     )
     const enoughEnergy = Boolean(state[sideKey] && state[sideKey].energy - (paidAttackCost || 0) >= optionalEnergyCost)
-    const enabled = enoughEnergy && (damageRule?.kind === 'optionalCoinDamage'
+    const optionalTopDeckDiscard = effect?.special?.some((rule) =>
+      rule.kind === 'millCards' && rule.position === 'top' && rule.target === 'self' && state[sideKey].deck.length > 0,
+    )
+    const optionalTopDeckHandChoice = effect?.special?.some((rule) =>
+      rule.kind === 'chooseTopDeckPokemonOrDiscardDraw' && state[sideKey].deck.length > 0,
+    )
+    const enabled = enoughEnergy && (optionalTopDeckDiscard || optionalTopDeckHandChoice || (damageRule?.kind === 'optionalCoinDamage'
       ? target.currentHp > damageRule.baseDamage
       : damageRule?.kind === 'optionalChoiceBonus' &&
         attacker.currentHp > (recoil?.kind === 'optionalChoice' ? recoil.amount : 0) &&
@@ -33134,14 +39546,14 @@ export function chooseTcgBattleAttackChoice(params: {
           target.currentHp <= damageRule.baseDamage + optionalCountBonus ||
         optionalHandDiscardBonus !== undefined && damageRule?.kind === 'handDiscardBonus' &&
           target.currentHp > damageRule.baseDamage &&
-          target.currentHp <= damageRule.baseDamage + optionalHandDiscardBonus)
+        target.currentHp <= damageRule.baseDamage + optionalHandDiscardBonus))
     return { kind: 'optionalBonus', enabled }
   }
   if (required === 'statusCondition') return { kind: 'statusCondition', status: 'paralyzed' }
   if (required === 'statusPair') return { kind: 'statusPair', first: 'poisoned', second: 'confused' }
   if (required === 'copyAttack') {
-    const candidates = target.attacks
-      .map((candidate, attackIndex) => {
+    const candidates = getTcgBattleCopyAttackOptions(state, sideKey, target, attack, attacker)
+      .map(({ attack: candidate }, attackIndex) => {
         const candidateEffect = getTcgBattleAttackEffect(candidate)
         const followUp = candidateEffect
           ? chooseTcgBattleAttackChoice({
@@ -33238,7 +39650,8 @@ export function chooseTcgBattleAttackChoice(params: {
       .filter((card) =>
         card.currentHp > 0 &&
         (!sameTypeHealing || card.types.some((type) => attacker.types.includes(type))) &&
-        (!selectedOwnBenchHealingRule || doesTcgBattleSubtypeFilterMatch(card.subtypes, selectedOwnBenchHealingRule.subtypeFilter)),
+        (!selectedOwnBenchHealingRule || doesTcgBattleSubtypeFilterMatch(card.subtypes, selectedOwnBenchHealingRule.subtypeFilter)) &&
+        (!selectedOwnBenchHealingRule || doesTcgBattleTypeFilterMatch(card.types, selectedOwnBenchHealingRule.typeFilter)),
       )
       .sort((a, b) => selectedOwnBenchHealing
         ? (b.hp - b.currentHp) - (a.hp - a.currentHp)
@@ -33246,7 +39659,8 @@ export function chooseTcgBattleAttackChoice(params: {
     return picked ? { kind: 'benchSwitch', cardId: picked.instanceId } : undefined
   }
   if (required === 'energyAmount') {
-    const selectedEnergyMatches = !effect?.choiceEnergyType || state[sideKey].selectedEnergy === effect.choiceEnergyType
+    const selectedEnergyMatches = (!effect?.choiceEnergyType || state[sideKey].selectedEnergy === effect.choiceEnergyType) &&
+      (!effect?.choiceEnergyTypes?.length || effect.choiceEnergyTypes.includes(state[sideKey].selectedEnergy!))
     return {
       kind: 'energyAmount',
       amount: selectedEnergyMatches ? Math.min(
@@ -33268,22 +39682,36 @@ export function chooseTcgBattleAttackChoice(params: {
   return undefined
 }
 
-export function clearTcgBattleTemporaryEffects(card: TcgBattleCardState) {
+export function clearTcgBattleTemporaryEffects(card: TcgBattleCardState, preserveWeaknessOverride = false, preserveBattleTypeOverride = false) {
   const originalMaxHp = card.temporaryEffects?.originalMaxHp
+  const weaknessOverride = preserveWeaknessOverride && card.temporaryEffects?.weaknessType
+    ? {
+        weaknessType: card.temporaryEffects.weaknessType,
+        weaknessValue: card.temporaryEffects.weaknessValue,
+        weaknessOverrideExpiresAtTurn: card.temporaryEffects.weaknessOverrideExpiresAtTurn,
+      }
+    : undefined
+  const battleTypeOverride = preserveBattleTypeOverride && card.temporaryEffects?.battleType
+    ? {
+        battleType: card.temporaryEffects.battleType,
+        battleTypeOverrideExpiresAtTurn: card.temporaryEffects.battleTypeOverrideExpiresAtTurn,
+      }
+    : undefined
   if (typeof originalMaxHp === 'number') {
     const damage = Math.max(0, card.hp - card.currentHp)
     card.hp = originalMaxHp
     card.currentHp = Math.max(0, originalMaxHp - damage)
   }
-  card.temporaryEffects = undefined
+  card.temporaryEffects = { ...weaknessOverride, ...battleTypeOverride }
   card.incomingAttackModifier = undefined
 }
 
 function rollTcgBattleCoins(
   count: number,
   random: () => number,
+  forceTails = false,
 ): NonNullable<TcgBattleAttackResolution['coinFlips']> {
-  const results = Array.from({ length: count }, () => (random() >= 0.5 ? 'heads' : 'tails') as TcgBattleCoinResult)
+  const results = Array.from({ length: count }, () => (forceTails ? 'tails' : random() >= 0.5 ? 'heads' : 'tails') as TcgBattleCoinResult)
   const heads = results.filter((result) => result === 'heads').length
   return {
     results,
@@ -33294,10 +39722,11 @@ function rollTcgBattleCoins(
 
 function rollTcgBattleCoinsUntilTails(
   random: () => number,
+  forceTails = false,
 ): NonNullable<TcgBattleAttackResolution['coinFlips']> {
   const results: Array<'heads' | 'tails'> = []
   while (results.length < 20) {
-    const result = random() >= 0.5 ? 'heads' : 'tails'
+    const result = forceTails ? 'tails' : random() >= 0.5 ? 'heads' : 'tails'
     results.push(result)
     if (result === 'tails') break
   }
@@ -33321,6 +39750,50 @@ function calculateTcgBattleRawDamage(
   switch (rule.kind) {
     case 'fixed':
       return rule.amount
+    case 'targetLegacyAbilityBonus':
+      return rule.baseDamage + (context.target.abilities?.some((ability) =>
+        rule.abilityTypes.includes(ability.type.toLowerCase().replace(/_/g, '-')),
+      ) ? rule.bonusDamage : 0)
+    case 'powerUseHistoryBonus': {
+      if (!context.state || !context.sideKey) return rule.baseDamage
+      const checkSide = rule.checkSide === 'own'
+        ? context.sideKey
+        : context.sideKey === 'player' ? 'opponent' : 'player'
+      const powerWasUsed = rule.powerKind === 'gx'
+        ? context.state[checkSide].usedGxAttack
+        : context.state[checkSide].usedVstarPower
+      return rule.baseDamage + (powerWasUsed ? rule.bonusDamage : 0)
+    }
+    case 'previousTurnAttackBonus': {
+      if (!context.state || !context.sideKey) return rule.baseDamage
+      const previousTurnNumber = context.state.turnNumber - 1
+      const previousTurn = context.state.attackHistoryBySide?.[context.sideKey]
+        ?.find((entry) => entry.turnNumber === previousTurnNumber)
+      return rule.baseDamage + (
+        previousTurn?.attacks.some((entry) =>
+          (!rule.sameAttacker || entry.attackerId === context.attacker.instanceId) &&
+          (!rule.excludeAttacker || entry.attackerId !== context.attacker.instanceId) &&
+          (!rule.requiredAttackName || normalizeTcgBattlePokemonName(entry.attackName) === normalizeTcgBattlePokemonName(rule.requiredAttackName)) &&
+          (!rule.requiredPokemonName || normalizeTcgBattlePokemonName(entry.cardName) === normalizeTcgBattlePokemonName(rule.requiredPokemonName)) &&
+          (!rule.requiredSubtype || entry.subtypes.some((subtype) => normalizeTcgBattlePokemonName(subtype) === normalizeTcgBattlePokemonName(rule.requiredSubtype!)))
+        )
+          ? rule.bonusDamage
+          : 0
+      )
+    }
+    case 'prizeTotalThresholdBonus': {
+      if (!context.state || !context.sideKey) return rule.baseDamage
+      const opponentKey = context.sideKey === 'player' ? 'opponent' : 'player'
+      const remainingPrizeTotal = getTcgBattleRemainingPrizeCount(context.state, context.sideKey) +
+        getTcgBattleRemainingPrizeCount(context.state, opponentKey)
+      return rule.baseDamage + (remainingPrizeTotal <= rule.maximumPrizeTotal ? rule.bonusDamage : 0)
+    }
+    case 'targetDamageState':
+      return context.target.currentHp < context.target.hp ? rule.damagedDamage : rule.undamagedDamage
+    case 'attackerBecameActiveThisTurnBonus':
+      return rule.baseDamage + (context.attacker.becameActiveTurn === context.state?.turnNumber ? rule.bonusDamage : 0)
+    case 'targetBecameActiveLastTurnBonus':
+      return rule.baseDamage + (context.target.becameActiveTurn === (context.state?.turnNumber ?? 0) - 1 ? rule.bonusDamage : 0)
     case 'coinCount': {
       const heads = context.coinMode === 'actual'
         ? (context.coinFlips?.heads ?? 0)
@@ -33425,7 +39898,8 @@ function calculateTcgBattleRawDamage(
     case 'countEqualityBonus': {
       const firstCount = getTcgBattleCount(rule.firstSource, context)
       return rule.baseDamage + (
-        firstCount === getTcgBattleCount(rule.secondSource, context) && firstCount >= (rule.minimumUnits || 0)
+        firstCount === getTcgBattleCount(rule.secondSource, context) && firstCount >= (rule.minimumUnits || 0) &&
+        (!rule.exactUnits || rule.exactUnits.includes(firstCount))
           ? rule.bonusDamage
           : 0
       )
@@ -33436,6 +39910,8 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (context.target.subtypes.some((subtype) => subtype.toLowerCase() === rule.subtype.toLowerCase()) ? rule.bonusDamage : 0)
     case 'pokemonExOrGxTargetBonus':
       return rule.baseDamage + (context.target.subtypes.some((subtype) => ['ex', 'gx'].includes(subtype.toLowerCase())) ? rule.bonusDamage : 0)
+    case 'pokemonVOrGxTargetBonus':
+      return rule.baseDamage + (context.target.subtypes.some((subtype) => ['v', 'vmax', 'vstar', 'gx'].includes(subtype.toLowerCase())) ? rule.bonusDamage : 0)
     case 'pokemonExOrVTargetBonus':
       return rule.baseDamage + (
         context.target.subtypes.some((subtype) => ['ex', 'v', 'vmax', 'vstar'].includes(subtype.toLowerCase()))
@@ -33446,6 +39922,12 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (context.target.subtypes.some((subtype) => ['v', 'vmax', 'vstar'].includes(subtype.toLowerCase())) ? rule.bonusDamage : 0)
     case 'targetTypeBonus':
       return rule.baseDamage + (context.target.types.some((type) => type.toLowerCase() === rule.targetType.toLowerCase()) ? rule.bonusDamage : 0)
+    case 'targetTypeAnyBonus':
+      return rule.baseDamage + (context.target.types.some((type) => rule.targetTypes.some((targetType) => type.toLowerCase() === targetType.toLowerCase())) ? rule.bonusDamage : 0)
+    case 'targetTypeMultiplier':
+      return context.target.types.some((type) => type.toLowerCase() === rule.targetType.toLowerCase())
+        ? rule.baseDamage * rule.multiplier
+        : rule.baseDamage
     case 'selectedEnergyTypeMatchBonus': {
       const selectedEnergy = context.state && context.sideKey
         ? context.state[context.sideKey].selectedEnergy
@@ -33464,8 +39946,19 @@ function calculateTcgBattleRawDamage(
           : 0
       )
     }
+    case 'evolvedThisTurnBonus': {
+      const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
+      return rule.baseDamage + (
+        context.attacker.evolvedTurn === context.state?.turnNumber &&
+        context.attacker.evolvesFrom && normalizeName(context.attacker.evolvesFrom) === normalizeName(rule.evolvesFrom)
+          ? rule.bonusDamage
+          : 0
+      )
+    }
     case 'retreatCostZeroBonus':
       return rule.baseDamage + ((context.target.convertedRetreatCost || 0) === 0 ? rule.bonusDamage : 0)
+    case 'targetNameContainsBonus':
+      return rule.baseDamage + (context.target.name.toLowerCase().includes(rule.nameContains.toLowerCase()) ? rule.bonusDamage : 0)
     case 'knockOutLowestRemainingHp': {
       if (!context.state || !context.sideKey) return 0
       const cards = [...context.state.player.front, ...context.state.player.back, ...context.state.opponent.front, ...context.state.opponent.back]
@@ -33479,6 +39972,10 @@ function calculateTcgBattleRawDamage(
         ? context.target.currentHp
         : 0
     }
+    case 'knockOutTargetSubtype':
+      return context.target.subtypes.some((subtype) => subtype.toLowerCase() === rule.subtype.toLowerCase())
+        ? context.target.currentHp
+        : 0
     case 'handSizeComparisonBonus': {
       if (!context.state || !context.sideKey) return rule.baseDamage
       const opponentSideKey = context.sideKey === 'player' ? 'opponent' : 'player'
@@ -33516,6 +40013,22 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (
         rule.names.every((name) => names.includes(normalizeTcgBattleCardName(name))) ? rule.bonusDamage : 0
       )
+    }
+    case 'sameNameInPlayBonus': {
+      if (!context.state || !context.sideKey) return rule.baseDamage
+      const ownSide = context.state[context.sideKey]
+      const opposingSide = context.state[context.sideKey === 'player' ? 'opponent' : 'player']
+      const ownNames = new Set(getLivingTcgBattleCards(ownSide).map((card) => normalizeTcgBattleCardName(card.name)))
+      const hasSharedName = getLivingTcgBattleCards(opposingSide).some((card) => ownNames.has(normalizeTcgBattleCardName(card.name)))
+      return rule.baseDamage + (hasSharedName ? rule.bonusDamage : 0)
+    }
+    case 'sameNameInHandsBonus': {
+      if (!context.state || !context.sideKey) return rule.baseDamage
+      const ownSide = context.state[context.sideKey]
+      const opposingSide = context.state[context.sideKey === 'player' ? 'opponent' : 'player']
+      const ownNames = new Set(ownSide.hand.map((card) => normalizeTcgBattleCardName(card.name)))
+      const hasSharedName = opposingSide.hand.some((card) => ownNames.has(normalizeTcgBattleCardName(card.name)))
+      return rule.baseDamage + (hasSharedName ? rule.bonusDamage : 0)
     }
     case 'namedPokemonBenchBonus': {
       if (!context.state || !context.sideKey) return rule.baseDamage
@@ -33558,6 +40071,8 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (context.target.subtypes.some((subtype) => subtype.toLowerCase() === 'ex') ? rule.bonusDamage : 0)
     case 'damagedTargetBonus':
       return rule.baseDamage + (context.target.currentHp < context.target.hp ? rule.bonusDamage : 0)
+    case 'wasDamagedAsActiveLastTurnBonus':
+      return rule.baseDamage + (context.attacker.temporaryEffects?.wasDamagedByAttackAsActiveLastTurn ? rule.bonusDamage : 0)
     case 'healthyTarget':
       return context.target.currentHp === context.target.hp ? rule.healthyDamage : rule.damagedDamage
     case 'headsTable': {
@@ -33582,7 +40097,8 @@ function calculateTcgBattleRawDamage(
         knockout.turnNumber === context.state?.turnNumber &&
         (!rule.knockedOutNameContains || knockout.knockedOutNames?.some((name) =>
           normalizeTcgBattleCardName(name).includes(normalizeTcgBattleCardName(rule.knockedOutNameContains || '')),
-        ))
+        )) &&
+        (!rule.knockedOutType || knockout.knockedOutTypes?.some((type) => normalizeTcgBattleCardName(type) === normalizeTcgBattleCardName(rule.knockedOutType || '')))
           ? rule.bonusDamage
           : 0
       )
@@ -33617,10 +40133,15 @@ function calculateTcgBattleRawDamage(
           ? rule.bonusDamage
           : 0
       )
-    case 'countThresholdBonus':
+    case 'countThresholdBonus': {
+      const count = getTcgBattleCount(rule.source, context)
+      const includesEnergyCost = (rule.source.kind === 'energy' && rule.source.side === 'own') ||
+        (rule.source.kind === 'energyOfType' && rule.source.side === 'own' && context.state?.[context.sideKey || 'player'].selectedEnergy === rule.source.type)
+      const adjustedCount = count + (rule.countIncludesPaidAttackCost && context.coinMode === 'actual' && includesEnergyCost ? context.paidAttackCost || 0 : 0)
       return rule.baseDamage + (
-        getTcgBattleCount(rule.source, context) >= rule.minimumUnits ? rule.bonusDamage : 0
+        adjustedCount >= rule.minimumUnits ? rule.bonusDamage : 0
       )
+    }
     case 'countAtMostBonus':
       return rule.baseDamage + (
         getTcgBattleCount(rule.source, context) <= rule.maximumUnits ? rule.bonusDamage : 0
@@ -33637,6 +40158,15 @@ function calculateTcgBattleRawDamage(
       return rule.baseDamage + (context.attacker.currentHp <= rule.maximumHp ? rule.bonusDamage : 0)
     case 'attackerHpExactBonus':
       return rule.baseDamage + (context.attacker.currentHp === rule.remainingHp ? rule.bonusDamage : 0)
+    case 'allBenchedInjuredBonus': {
+      const ownSide = context.state && context.sideKey ? context.state[context.sideKey] : undefined
+      const livingBench = ownSide?.back.filter((card) => card.currentHp > 0) || []
+      return rule.baseDamage + (
+        livingBench.length > 0 && livingBench.every((card) => card.currentHp < card.hp)
+          ? rule.bonusDamage
+          : 0
+      )
+    }
     case 'attackerFullHpBonus':
       return rule.baseDamage + (context.attacker.currentHp === context.attacker.hp ? rule.bonusDamage : 0)
     case 'attackerDamagedBonus':
@@ -33647,8 +40177,25 @@ function calculateTcgBattleRawDamage(
         : 0
     case 'knockOutAtRemainingHpAtMost':
       return context.target.currentHp <= rule.maximumHp ? context.target.currentHp : 0
+    case 'knockOutAtDamageCountersAtLeast':
+      return Math.floor((context.target.hp - context.target.currentHp) / 10) >= rule.minimumCounters
+        ? context.target.currentHp
+        : 0
     case 'optionalChoiceBonus':
       return rule.baseDamage + (context.choice?.kind === 'optionalBonus' && context.choice.enabled ? rule.bonusDamage : 0)
+    case 'ownBenchDiscardBonus':
+      if (context.choice?.kind !== 'discardOwnBenchPokemon' || !context.state || !context.sideKey) return rule.baseDamage
+      return rule.baseDamage + new Set(context.choice.cardIds.filter((id) => context.state![context.sideKey!].back.some((card) => card.instanceId === id && card.currentHp > 0))).size * rule.bonusDamagePerPokemon
+    case 'choiceDamageCounterMultiplier':
+      return context.choice?.kind === 'selfDamageCounters' ? context.choice.amount * rule.damagePerCounter : 0
+    case 'secondPlayerFirstTurnBonus': {
+      if (!context.state || !context.sideKey || typeof context.state.playerGoesSecond !== 'boolean') return rule.baseDamage
+      const secondSide = context.state.playerGoesSecond ? 'player' : 'opponent'
+      const firstTurnNumber = context.sideKey === 'player'
+        ? (context.state.playerGoesSecond ? 2 : 1)
+        : (context.state.playerGoesSecond ? 1 : 2)
+      return rule.baseDamage + (secondSide === context.sideKey && context.state.turnNumber === firstTurnNumber ? rule.bonusDamage : 0)
+    }
     case 'energyComparisonBonus': {
       if (!context.state || !context.sideKey) return rule.baseDamage
       const opponentSideKey = context.sideKey === 'player' ? 'opponent' : 'player'
@@ -33726,6 +40273,10 @@ export function getTcgBattleCount(
     return Math.max(0, Math.floor((card.hp - card.currentHp) / 10))
   }
 
+  if (source.kind === 'chosenSelfDamageCounters') {
+    return context.choice?.kind === 'selfDamageCounters' ? Math.max(0, context.choice.amount) : 0
+  }
+
   if (source.kind === 'deckSize') {
     if (!context.state || !context.sideKey) return 0
     const sideKey = source.side === 'own' ? context.sideKey : context.sideKey === 'player' ? 'opponent' : 'player'
@@ -33741,6 +40292,17 @@ export function getTcgBattleCount(
 
   if (source.kind === 'chosenHandCards') {
     return context.choice?.kind === 'discardHandCards' ? context.choice.cardIds.length : 0
+  }
+
+  if (source.kind === 'pokemonNamesInHand' || source.kind === 'distinctTypesInHand') {
+    if (!context.state || !context.sideKey) return 0
+    const sideKey = source.side === 'own' ? context.sideKey : context.sideKey === 'player' ? 'opponent' : 'player'
+    const hand = context.state[sideKey].hand
+    if (source.kind === 'pokemonNamesInHand') {
+      const names = new Set(source.names.map(normalizeTcgBattleCardName))
+      return hand.filter((card) => names.has(normalizeTcgBattleCardName(card.name))).length
+    }
+    return new Set(hand.flatMap((card) => card.types.map((type) => type.toLowerCase()))).size
   }
 
   if (source.kind === 'retreatCost') {
@@ -33778,6 +40340,25 @@ export function getTcgBattleCount(
   const own = context.state[context.sideKey]
   const opponent = context.state[context.sideKey === 'player' ? 'opponent' : 'player']
 
+  if (source.kind === 'selectedOwnPokemonDamageCounters') {
+    if (!context.choice || context.choice.kind !== 'ownPokemon') return 0
+    const selectedCardId = context.choice.cardId
+    const selected = [...own.front, ...own.back].find((card) =>
+      card.instanceId === selectedCardId && card.currentHp > 0,
+    )
+    return selected ? Math.max(0, Math.floor((selected.hp - selected.currentHp) / 10)) : 0
+  }
+
+  if (source.kind === 'pokemonWithAbilitiesInPlay') {
+    const countFor = (side: TcgBattleSideState) => {
+      const cards = source.zone === 'bench' ? side.back : [...side.front, ...side.back]
+      return cards.filter((card) => card.currentHp > 0 && Boolean(card.abilities?.length)).length
+    }
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
   if (source.kind === 'energy') {
     const amount = source.side === 'own'
       ? own.energy
@@ -33788,6 +40369,9 @@ export function getTcgBattleCount(
   }
 
   if (source.kind === 'energyOfType') {
+    if (source.side === 'both') {
+      return (own.selectedEnergy === source.type ? own.energy : 0) + (opponent.selectedEnergy === source.type ? opponent.energy : 0)
+    }
     const side = source.side === 'own' ? own : opponent
     return side.selectedEnergy === source.type ? side.energy : 0
   }
@@ -33802,6 +40386,14 @@ export function getTcgBattleCount(
         : card.subtypes.some((subtype) => subtype === 'Basic' || /^Stage [12]$/i.test(subtype)),
     ).length
     return Math.min(amount, source.max ?? Number.POSITIVE_INFINITY)
+  }
+
+  if (source.kind === 'pokemonInLostZone') {
+    const side = source.side === 'own' ? own : opponent
+    const excludedSubtypes = new Set((source.excludeSubtypes || []).map((subtype) => subtype.toLowerCase()))
+    return (side.lostZone || []).filter((card) =>
+      !card.subtypes.some((subtype) => excludedSubtypes.has(subtype.toLowerCase())),
+    ).length
   }
 
   if (source.kind === 'pokemonOfTypesInDiscard') {
@@ -33839,6 +40431,21 @@ export function getTcgBattleCount(
     ).length
   }
 
+  if (source.kind === 'pokemonExOrGxOnBench') {
+    const side = source.side === 'own' ? own : opponent
+    return side.back.filter((card) =>
+      card.currentHp > 0 && card.subtypes.some((subtype) => ['ex', 'gx', 'pokemon-ex', 'pokemon-gx'].includes(subtype.toLowerCase())),
+    ).length
+  }
+
+  if (source.kind === 'pokemonWithAbilityInDiscard') {
+    const side = source.side === 'own' ? own : opponent
+    const wantedAbility = normalizeTcgBattleCardName(source.abilityName)
+    return side.discard.filter((card) => (card.abilities || []).some((ability) =>
+      normalizeTcgBattleCardName(ability.name) === wantedAbility,
+    )).length
+  }
+
   if (source.kind === 'pokemonEvolvedInPlay') {
     const countFor = (side: TcgBattleSideState) => getLivingTcgBattleCards(side).filter((card) =>
       card.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)),
@@ -33846,6 +40453,13 @@ export function getTcgBattleCount(
     if (source.side === 'own') return countFor(own)
     if (source.side === 'opponent') return countFor(opponent)
     return countFor(own) + countFor(opponent)
+  }
+
+  if (source.kind === 'pokemonNotEvolvedInPlay') {
+    const side = source.side === 'own' ? own : opponent
+    return getLivingTcgBattleCards(side).filter((card) =>
+      !card.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)),
+    ).length
   }
 
   if (source.kind === 'pokemonEvolvedFromInPlay') {
@@ -33933,6 +40547,17 @@ export function getTcgBattleCount(
     if (source.side === 'own') return countFor(own)
     if (source.side === 'opponent') return countFor(opponent)
     return countFor(own) + countFor(opponent)
+  }
+
+  if (source.kind === 'pokemonWithAttackInDeck') {
+    if (!context.state || !context.sideKey) return 0
+    const deckSideKey = source.side === 'own' ? context.sideKey : context.sideKey === 'player' ? 'opponent' : 'player'
+    const deck = context.state[deckSideKey].deck
+    const revealed = source.position === 'top'
+      ? deck.slice(0, source.maxCards)
+      : deck.slice(Math.max(0, deck.length - source.maxCards))
+    const wantedAttackName = normalizeTcgBattleCardName(source.attackName)
+    return revealed.filter((card) => card.attacks.some((attack) => normalizeTcgBattleCardName(attack.name) === wantedAttackName)).length
   }
 
   if (source.kind === 'distinctTypesOfNamedPokemon') {
@@ -34063,6 +40688,20 @@ export function getTcgBattleCount(
     return countFor(own) + countFor(opponent)
   }
 
+  if (source.kind === 'pokemonHealedThisTurn') {
+    if (!context.state) return 0
+    const countFor = (side: TcgBattleSideState) => {
+      const cards = [...side.front, ...side.back, ...side.hand, ...side.discard]
+      return new Set(cards.filter((card) =>
+        card.temporaryEffects?.healedTurnNumber === context.state?.turnNumber &&
+        (!source.types?.length || source.types.some((type) => card.types.some((cardType) => cardType.toLowerCase() === type.toLowerCase()))),
+      ).map((card) => card.instanceId)).size
+    }
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
   if (source.kind === 'handSize') {
     const amount = (source.side === 'own' ? own : opponent).hand.length
     return Math.min(amount, source.max ?? Number.POSITIVE_INFINITY)
@@ -34113,6 +40752,17 @@ export function getTcgBattleCount(
     return countFor(own) + countFor(opponent)
   }
 
+  if (source.kind === 'damageCountersOnSubtypesInPlay') {
+    const subtypes = new Set(source.subtypes.map((subtype) => subtype.toLowerCase()))
+    const countFor = (side: TcgBattleSideState) =>
+      (source.zone === 'bench' ? side.back : [...side.front, ...side.back])
+        .filter((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtypes.has(subtype.toLowerCase())))
+        .reduce((sum, card) => sum + Math.max(0, Math.floor((card.hp - card.currentHp) / 10)), 0)
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
+
   if (source.kind === 'damageCountersOnNamedPokemon') {
     const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
     const names = new Set(source.names.map(normalizeName))
@@ -34153,6 +40803,9 @@ function calculateTcgBattleSelfDamage(
 ): number {
   if (rule.kind === 'optionalChoice') {
     return context.choice?.kind === 'optionalBonus' && context.choice.enabled ? rule.amount : 0
+  }
+  if (rule.kind === 'choiceDamageCounters') {
+    return context.choice?.kind === 'selfDamageCounters' ? context.choice.amount * 10 : 0
   }
   if (rule.kind === 'fixed') return rule.amount
   if (rule.kind === 'perTail') return rule.amount * (context.coinFlips?.tails || 0)
@@ -34195,6 +40848,12 @@ function calculateTcgBattleEnergyDiscards(
   for (const rule of rules) {
     if (rule.optional && !(context.choice?.kind === 'optionalBonus' && context.choice.enabled)) continue
     if (!doesTcgBattleConditionPass(rule.condition, context.coinFlips)) continue
+    if (typeof rule.requiresPrizeTotalAtMost === 'number') {
+      const opponentKey = context.sideKey === 'player' ? 'opponent' : 'player'
+      const remainingPrizeTotal = getTcgBattleRemainingPrizeCount(context.state, context.sideKey) +
+        getTcgBattleRemainingPrizeCount(context.state, opponentKey)
+      if (remainingPrizeTotal > rule.requiresPrizeTotalAtMost) continue
+    }
     if (rule.requiresEnergyType) {
       const energySideKey = rule.target === 'self'
         ? context.sideKey
@@ -34313,7 +40972,7 @@ function calculateTcgBattleStatusConditions(
             : rule.useChosenStatus
               ? []
               : rule.statuses
-      return statuses.length > 0 ? [{ target: rule.target, statuses }] : []
+      return statuses.length > 0 ? [{ target: rule.target, statuses, requiresExtraEnergy: rule.requiresExtraEnergy }] : []
     })
 }
 
@@ -34568,9 +41227,13 @@ export function applyTcgWeaknessAndResistance(
 
   let modifiedDamage = damage
   if (!options.ignoreWeakness && !attackerIgnoresWeaknessAndResistance) {
-    const weakness = target.temporaryEffects?.weaknessType
-      ? attackTypes.includes(target.temporaryEffects.weaknessType) && target.temporaryEffects.weaknessValue !== null
-        ? { type: target.temporaryEffects.weaknessType, value: target.temporaryEffects.weaknessValue || '×2' }
+    const temporaryWeaknessType = target.temporaryEffects?.weaknessType &&
+      (target.temporaryEffects.weaknessOverrideExpiresAtTurn === undefined || !options.state || options.state.turnNumber <= target.temporaryEffects.weaknessOverrideExpiresAtTurn)
+      ? target.temporaryEffects.weaknessType
+      : undefined
+    const weakness = temporaryWeaknessType
+      ? attackTypes.includes(temporaryWeaknessType) && target.temporaryEffects?.weaknessValue !== null
+        ? { type: temporaryWeaknessType, value: target.temporaryEffects?.weaknessValue || '×2' }
         : undefined
       : target.weaknesses.find((entry) => attackTypes.includes(entry.type))
     const weaknessType = weakness?.type

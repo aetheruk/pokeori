@@ -1,12 +1,93 @@
 Energy is modeled as a shared pool, with no Energy cards in deck, hand, or discard. Modeled searches and recoveries that would move Energy cards into hand or from discard add the printed type and amount to the pool, capped at 12. Concealed Cards and Salazzle/Ninetales Fire Energy draw Powers spend a shared-pool unit for their printed hand Energy discard costs. Effects that depend on individual attached Energy are unsupported unless explicitly mapped to another pool operation. Trainer-card effects are not implemented by this Ability/Power system.
 
-The battle table shows remaining lives as a heart count, alongside each side's deck count and shared Energy. Each Knocked Out Pokémon removes one life; reaching zero loses the match. The Hand control opens a tray of full card faces above the action dock. Automatic turn draws highlight the exact new card, including when another copy is already in hand. Tap a playable Basic to place it in the next legal front row or Bench slot. Tap an Evolution card and then a matching Pokémon on the table to evolve in place. Evolution effects use the table for Pokémon targets and a small picker for choices such as deck searches, optional effects, or mandatory costs. Basic plays, Evolution, and switching leave the turn open. Attacking or charging ends it.
+The battle table shows remaining lives as a heart count, alongside each side's deck count and shared Energy. Each Knocked Out Pokémon removes one life; reaching zero loses the match. This count is recorded for the Pokémon's owner regardless of whether it was Knocked Out by opposing damage, self-damage, or Pokémon Checkup status damage. Confusion self-KOs are compacted immediately so the knockout and any required promotion are recorded before the turn continues. The Hand control opens a tray of full card faces above the action dock. Automatic turn draws highlight the exact new card, including when another copy is already in hand. Tap a playable Basic to place it in the next legal front row or Bench slot. Tap an Evolution card and then a matching Pokémon on the table to evolve in place. Evolution effects use the table for Pokémon targets and a small picker for choices such as deck searches, optional effects, or mandatory costs. Basic plays, Evolution, and switching leave the turn open. Attacking or charging ends it.
+
+Pokémon selected by an attack's deck search are removed from the deck before they enter another zone. Searches that put a Pokémon in the Lost Zone use the same selection flow as hand, discard, and Bench searches.
+
+Baby Outing lets the player choose one of the top three cards of the Pokémon-only deck for the hand, then shuffles the remaining revealed cards back into the deck.
+
+Psychic Strategy shuffles both Pokémon-only hands into their owners' decks, then each side draws the number of cards that was in the other side's hand before the shuffle.
+
+Pull Out lets the player choose a Pokémon from the discard pile and put it on top of the deck. The deck array preserves this top-card position until a subsequent shuffle.
+
+Devour discards one card from the opponent's deck for each of the player's Durant in play, using the top-of-deck order.
+
+Deck-mill attacks that look for Energy cards now discard the stated number of top Pokémon cards from the modeled deck. Since Energy cards are absent from the deck, their Energy-based damage and attachment riders resolve to zero.
+
+Grope lets the player choose one of the top two Pokémon cards for hand and puts the other on the bottom of the deck.
+
+Dish Out draws the top and bottom Pokémon from the deck. Down Draw draws the specified number from the bottom. These effects use the deck array's actual ends rather than a random draw.
+
+Blowing Wind shuffles a selected Benched Pokémon into its owner's deck on heads; Strong Breeze does the same to a selected opposing Benched Pokémon. The attacks remain usable with no Bench target, and attached cards are omitted because they are not represented.
+
+Play Search, Baby Steps, and Dive let the player choose a Pokémon from the specified top cards for hand, then shuffle the remaining cards back into the deck.
+
+Prehistoric Wisdom lets the player select a Pokémon from hand into the Lost Zone, then draws three cards. The hand selector and follow-up draw both resolve through the normal attack flow.
+
+One Desire lets the player choose a Pokémon from the deck, shuffles the remaining deck, and puts the chosen Pokémon on top for the next draw.
+
+Spore Evolution can evolve the attacking Paras from a selected card in the deck. The shared evolution resolver preserves the same-turn re-evolution lock.
+Pull Down removes the highest-stage Evolution card from each of the opponent's evolved Pokémon and returns those cards to hand. The attack audit recognizes 30,650 of 31,296 attacks, with 646 unmatched across 550 text groups.
+Sneaky Pocket lets the player choose a Pokémon card from hand to move to the Lost Zone, then draws three cards. Attack coverage is 30,651 of 31,296, with 645 unmatched across 549 text groups.
+Make Waves shuffles both hands into their owners' decks, then each player draws four Pokémon from the modeled decks. Attack coverage is 30,652 of 31,296, with 644 unmatched across 548 text groups.
+Poké-Body damage attacks now damage only Pokémon with a Poké-Body ability, on the printed side or both sides, and ignore Weakness and Resistance when stated. Attack coverage is 30,654 of 31,296, with 642 unmatched across 546 text groups.
+Poké-Power-only board damage now filters to Pokémon with Poké-Power abilities. Thunder Fall also discards the attacker's remaining shared Energy after paying its attack cost. Attack coverage is 30,656 of 31,296, with 640 unmatched across 545 text groups.
+Poké-Power and Poké-Body board damage also supports separate or combined ability filters, with opponent-only and both-side targeting. Attack coverage is 30,659 of 31,296, with 637 unmatched across 542 text groups.
+Single-target attacks can now require the target to have a Poké-Body or Poké-Power, while preserving bench Weakness and Resistance rules. Attack coverage is 30,661 of 31,296, with 635 unmatched across 540 text groups.
+Frosty Jail resolves for its base damage because Candice is a Supporter and cannot be played in the Pokémon-only deck format; its conditional bonus and Paralyze effect therefore do not trigger. Attack coverage is 30,662 of 31,296, with 634 unmatched across 539 text groups.
+Never Ever Enough now offers the choice to take the top three Pokémon into hand or discard them and draw three cards. Attack coverage is 30,663 of 31,296, with 633 unmatched across 538 text groups.
+Energy Antics now applies Smoochum's Asleep condition. Moving the opponent's attached Energy remains unavailable because individual Energy attachments are not tracked. Attack coverage is 30,665 of 31,296, with 631 unmatched across 536 text groups.
+Eruption now mills the top Pokémon from both decks; Energy-based damage bonuses resolve to zero because Energy cards are absent from the decks. This covers three printed phrasings across six copies. Attack coverage is 30,669 of 31,296, with 627 unmatched across 533 text groups.
+Mini Eruption discards the top Pokémon from its owner's deck and keeps its base damage; its Energy-card bonus cannot trigger. Attack coverage is 30,670 of 31,296, with 626 unmatched across 532 text groups.
+Coin-gated milling now covers opponent-only discard on heads and Risk Taker's opponent-on-heads/self-on-tails result. Attack coverage is 30,672 of 31,296, with 624 unmatched across 530 text groups.
+
+Picnic Weather returns a selected Teddiursa from the discard pile to the Bench at full HP and represents the recovered Energy as one unit in the shared pool, up to the pool cap.
+
+Spit Squall returns the Defending Pokémon to its owner's hand. Individual attached cards are not represented, so they do not move with it.
+
+Sudden Delete returns one player-selected opposing Benched Pokémon to its owner's hand, using the opponent Bench chooser. Individual attached cards are not represented.
+
+Gripthrow, Repulsion, and Unown [R]'s Hidden Power use the existing coin-gated Active return effect. The printed alternate-Pokémon condition is enforced where present; attached cards remain untracked.
+
+Love Call uses the chosen opposing Pokémon's type to filter its deck search, then puts one selected matching Pokémon into hand.
+
+Cargo Jet filters the hand discard choice to Team Plasma Pokémon, then draws three cards if one was discarded.
+
+Legend Ceremony filters its deck choice to LEGEND Pokémon and requires selected cards to share a name, allowing the paired halves to enter the Pokémon-only hand together.
+
+Vanish returns the attacking Pokémon to its owner's deck and shuffles it. Individual attached cards are omitted because the battle model does not track them.
+
+Return Home uses the own Bench chooser to select a Pokémon to shuffle into its owner's deck; attached cards remain untracked.
+
+Rescue String returns up to five Pokémon from the discard pile to the deck. Eligible Pokémon are chosen automatically because this effect does not open a discard selection prompt.
+
+Carry Off resolves its opponent Bench choice first, shuffles that Pokémon into the opponent's deck, then shuffles the attacking Noctowl into its owner's deck. Attached cards are not modeled.
+
+Pilfer shuffles Aipom into its owner's deck first, then on heads returns one Pokémon from discard to the deck. The returned Pokémon is selected automatically because there is no discard picker for this effect.
+
+Wind Wave shuffles up to five Pokémon from discard into the deck and omits Supporter cards, which the battle model does not represent. Eligible Pokémon are selected automatically.
+
+Attacks that discard capped Fire or Lightning Energy for damage can spend the matching selected type from the shared pool. This approximates printed per-Pokémon or mixed-type Energy discards without adding Energy card zones or individual attachments.
+
+Max Burst and Twin Cannons use the same shared-pool spend choice, with their printed unlimited or capped counts and damage multipliers. Attacks that flip once per attached Energy use the shared pool count; typed attacks use only the selected pool type.
+
+Geomancy converts its two deck searches for Fairy Energy into two shared-pool Fairy Energy when at least two Pokémon are Benched. The chosen Energy type and minimum Bench count are retained, while individual attachment targets are omitted because attachments are not modeled.
+
+Tentacle Grip uses the selected Water pool count as its coin-flip count and draws two cards per heads.
 
 Current HP and status stay visible on the cards. Each incoming damage event shows one brief cue as HP updates. The final state, hand interactions, and PvP refreshes preserve the settled HP. Ordered attack, damage, knockout, and promotion cues use a short timeline so the next action is available promptly. Completed animation timers leave the cleanup queue when they fire, and client visual-state copies share the immutable battle-log array. PvP shares the opposing deck count while keeping private card identities and draw markers hidden.
 
 NPC turns run in bounded, lightweight steps after the player's action. The opponent evolves any legal Pokémon, then chooses an available attack, charges if it cannot attack, or ends the turn. Attack scoring uses one deterministic outcome sample per attack and target; Water Pokémon switching checks attack availability without running the scorer. Shared card-name and Ability-text normalization uses a bounded cache, while attack scoring reuses inferred effects, attack costs, and board lookups across candidate targets. Slow NPC turn resolutions log duration and board-size diagnostics, and a safety limit ends turns if automatic effects fail to make progress. Battle state keeps the 40 newest log entries. Slow client requests, server lock-held actions, encounter reads, state reads/writes, and NPC turns have separate timing diagnostics; `GAME_PERFORMANCE_LOGS=true` adds detailed state-size diagnostics.
 
 Silver Tempest Radiant Alakazam’s once-per-turn Painful Spoons Ability selects an opposing Pokémon with damage and moves up to two counters to another opposing Pokémon using the shared counter-move interface.
+Malamar’s Synchro Kinesis attack compares card names across both Pokémon hands and applies its bonus when at least one name is shared.
+Azumarill’s Glistening Bubbles makes Double-Edge cost one shared Energy when a Tera Pokémon is in play; attack checks and NPC scoring use the reduced cost.
+Delta Species Latias δ and Latios δ each reduce their named attack’s shared Energy cost from five to three when the partner is in play. Typed Energy requirements are approximated as a total shared-pool cost.
+Dragon Frontiers Rayquaza ex δ’s Rage Aura reduces Special Circuit and Sky-high Claws to one and two shared Energy respectively while its side has the Prize advantage; Knockout counts stand in for Prizes.
+Slaking’s Dynamic Swing offers its extra damage and applies the matching next-turn incoming attack damage increase only when that optional bonus is chosen.
+Astral Radiance Mantine’s Borne Ashore selects a Basic Pokémon from either player’s discard pile and puts it on its owner’s Bench, subject to open Bench space.
+POP Series 7 Mothim’s Silver Wind marks the Defending Pokémon for 40 extra damage from an attack during the player’s next turn; the bonus is applied after Weakness and Resistance.
+Southern Islands Vileplume’s Paradise Pollen heals Vileplume on heads, then offers a damaged Benched Pokémon for a second heal; the Bench selection is omitted when no damaged target is available.
 Banette ex, Typhlosion δ, and Cresselia LV.X have once-per-turn damage-counter movement across either player's board. Banette ex and Typhlosion δ require the source to be Active; all three effects are blocked by Special Conditions and use the existing source/target selection flow.
 Paldea Evolved Shinx’s Active-only forced-switch Ability uses the shared opponent-forced-switch action in PvE and PvP. The Ability is once per turn and the opposing replacement is resolved through the current switch flow.
 Deoxys Ninjask’s Fast Protection checks whether the attacker is a Basic Pokémon, then blocks both attack effects and damage to Ninjask. Ability suppression and attacks that ignore target effects are respected.
@@ -26,11 +107,40 @@ Lost Origin Drapion VSTAR's Venomous Vortex applies Paralysis and Poison to a se
 
 # TCG System
 
+The attack resolver supports recovery of a fixed number of Pokémon of a specified type from the discard pile into the Pokémon-only hand, using the existing filtered recovery choice.
+Effects that recover any one discard card into hand use the same choice for a Pokémon card; coin-gated variants only offer the choice on heads.
+Discard-to-deck attacks can shuffle a fixed number of Pokémon from the Pokémon-only discard into the deck, with printed Pokémon-type filters applied before selection.
+Fast Evolution-style attacks can search the deck for an Evolution Pokémon and put it into the Pokémon-only hand, including Stage 1, Stage 2, BREAK, Level-Up, VMAX, VSTAR, and MEGA subtypes.
+Attacks that flip once per attached Energy of a printed type use that type’s shared Energy count for both the flip count and damage calculation.
+Attacks that search for two named Pokémon can add those Pokémon to the Pokémon-only hand through the existing filtered deck-search choice.
+Lucario’s once-per-turn Aura ability spends two of its HP as damage counters to search for Fighting Energy and add one Fighting Energy to the shared pool, subject to the pool cap. This models the Energy attachment without an individual Pokémon attachment zone.
+Pokémon GO Blastoise’s Energy search adds up to six units of the selected type to the shared pool, up to the format cap, and ends the turn as printed. The shared pool cannot distribute those units among individual Pokémon.
+Electrode’s Bench-only Ability adds up to two Lightning Energy units to the shared pool and Knocks Out Electrode if any Energy is added. The shared Energy model omits the individual Lightning Pokémon attachment choice.
+Attacks that shuffle the opposing Active Pokémon and attached cards into the opponent’s deck resolve the Pokémon movement and any no-Bench condition. Attached cards are omitted because their identities and zones are not modeled.
+
+Attacks that search for an Evolution of the attacking Pokémon can now evolve it directly from the deck. The player selects an eligible next-stage card by evolution relationship or printed card name; the shared evolution routine carries over damage, clears or preserves status as defined by battle effects, applies evolution Abilities, and shuffles the deck. Multi-target searches and attacks with additional conditional requirements remain unsupported.
+
+Coin-gated effects that shuffle the opposing Active Pokémon into its deck resolve through the existing front-row shuffle rule. The Pokémon-only battle state does not represent cards attached to that Pokémon.
+
+Blind and random hand-card attacks now use the opponent Pokémon-only hand for selection, then shuffle the selected Pokémon into the deck or discard it. Coin-gated forms check the attack's recorded flip before applying the effect.
+
 Set-independent attack text that deals a fixed amount to one selected opposing Pokémon is now recognized across the catalog, including the optional damaged-target restriction and the printed Benched Weakness/Resistance exception. This covers modern Skill Dive and Blindside prints without relying on set-specific attack-name mappings. The resolver also recognizes Active-target damage bonuses that require the opponent's Active Pokémon to already have damage counters, such as Mega Golisopod ex's Finishing Blow.
 
 Bench-scaled attacks now recognize printed type-specific Bench counts and counts of Benched Pokémon with a named attack, covering Circle Circuit and Let's All Rollout without card-specific mappings.
 
-Prize-scaling attack damage, exact/threshold Prize-count damage bonuses, passive personal attack boosts, and Colorless cost reductions use the battle's KO count as a one-Prize-per-KO approximation. Actual Prize-card operations and Prize-card reward modifiers remain unsupported.
+Generic attack text now also handles Poisoned Active damage bonuses, bonuses for injured or entirely injured Benches and an opposing Active Ability, damage-counter scaling from the attacker, damage scaling from typed Pokémon or Pokémon with a named attack in the discard pile, scaling from named Benched Pokémon, and bonuses after a Knock Out during the opponent's previous turn.
+
+The resolver also supports attacks that select any opposing Pokémon for fixed damage, apply coin-until-tails damage, or deal coin-scaled damage to every opposing Pokémon.
+
+Wisdom of Sea and Sky Xatu's Life Drain is supported: on heads, it reduces the opposing Active Pokémon to 10 HP, without applying Weakness or Resistance.
+
+Prize-count Ability and attack rules now use the battle's KO count as a one-Prize-per-KO approximation where the engine has a comparable effect: attacks can be locked at specified remaining-Prize counts, Prize advantage can gate attack boosts and damage reduction, and attacks can scale damage by the gap in remaining Prizes. Exact/threshold Prize-count damage bonuses, passive personal attack boosts, and Colorless cost reductions use the same mapping. Actual Prize-card operations and Prize-card reward modifiers remain unsupported.
+
+Expedition Gengar's once-per-turn damage-counter move is available when the opponent has three or fewer approximated Prize cards remaining. It may move the counter between any two Pokémon, including causing a Knock Out, and cannot be used while Gengar has a Special Condition.
+
+Paldean Wonders Baxcalibur and Genetic Apex Gardevoir can use their once-per-turn Water or Psychic Energy Zone effects when their controller has the matching Active Pokémon; each adds one typed Energy to the shared pool and validates the required target in player, PvP, and NPC flows.
+
+Triumphant Light Crobat's Arceus condition enables its once-per-turn 30 damage to the opponent's Active Pokémon in player, PvP, and NPC battles.
 
 Secret Wonders Unown [Z]'s ZERO moves Unown Z from the Bench to the top of its owner's deck once per turn when that deck is empty. The action is available in PvE and PvP.
 Holon Phantoms Crawdaunt ex's Splash Back returns a selected opposing Benched Pokémon and its Evolution stack to its owner's hand once per turn when the opponent has at least four Benched Pokémon. Crawdaunt ex must be free of Special Conditions; player, PvP, and automatic NPC paths validate the target and usage limit.
@@ -376,6 +486,28 @@ The Carddex preserves an artwork-first index and organizes unlocked expansions a
 - Every battle uses a 15-card Pokémon deck with a shared cost cap of 60. Each player saves one deck per series; legacy format-based saved decks are cleared when deck management is opened.
 - All battles use the same Energy pacing: 5 starting Energy, 12 pool cap, and +2 Energy for a Charge turn.
 - TCG Battle deals a three-card opening hand from a shuffled Pokémon deck and reshuffles/redraws until it contains a Basic Pokémon. Players choose one to three Basic Pokémon for the three-slot front row; unselected cards remain in hand, and Bench placement is locked until all three front slots are filled.
+- Damage-scaling attacks that count Benched Pokémon across both players use the combined count of both Benches.
+- Damage reductions phrased as “N damage minus M per damage counter” scale from the attacking Pokémon's counters.
+- Attacks can reduce damage from the Defending Pokémon's attacks for the opponent's next turn through the per-attacker protection modifier.
+- Conditional attacks can choose their damage based on whether the Defending Pokémon already has damage counters.
+- Antler Swipe resolves its coin flip into Active damage on heads or a selectable opposing Bench target on tails; both outcomes ignore Weakness and Resistance.
+- Roar handles the optional opposing Bench switch wording, letting the player select the new Active Pokémon when the opponent has a Benched Pokémon.
+- Tempting Eyes supports the choose-and-switch wording for an opposing Benched Pokémon and skips the effect when there is no Bench target.
+- Matcha Spin checks for six Pokémon with Hide 'n' Sneak in the player's discard pile before placing four damage counters on each opposing Pokémon.
+- Supernatural Dance derives the required counter count from the opponent's Pokémon discard pile and opens the existing counter-distribution choice across living opposing Pokémon.
+- Kaboom Doll places counters to leave the opposing Active Pokémon at 10 HP and applies its 120 recoil only when that placement adds counters.
+- Shining Currents checks current-turn healing recorded on each Pokémon and adds damage when at least one of the player's Water Pokémon recovered HP.
+- Bench-to-front switch and promotion history supports Surprise Strike's current-turn bonus and Stakeout Headbutt's opposing-Active previous-turn bonus.
+- Rock Polish records a one-turn zero Retreat Cost for the attacking Pokémon, expiring after its next turn.
+- Retreat-cost damage scaling recognizes older “plus M for each Colorless Energy” wording as well as newer text.
+- Multiplying damage by Colorless units in the opposing Active Pokémon's Retreat Cost is also supported.
+- Coin-until-tails attacks can draw the printed number of cards per heads.
+- Bench-healing choices enforce printed Pokémon type restrictions.
+- Conditional Knock Out attacks can check for a minimum number of counters on the opposing Active Pokémon.
+- Coin-flip attacks can resolve separate Active damage and self-recoil outcomes for heads and tails.
+- Coin-flip draw effects are applied only when the required heads result occurs.
+- Attacks that shuffle a deck randomize that side's Pokémon deck for future draws.
+- Damage can scale from typed Pokémon in the owner's discard pile when the attack uses legacy “base plus” wording.
 - Each side tracks Pokémon Knockouts independently. The sixth Pokémon Knocked Out immediately loses the battle; this limit applies alongside the existing loss condition for having no living Pokémon. The header shows each side's KO progress toward 6, and simultaneous sixth Knockouts result in a tie.
 - Playing a Basic from hand is a free action and fills the front row first, then the Bench. Evolution requires the matching evolution card in hand and is free; retreating is also free apart from its Energy cost. Attacking or using Charge ends the player's turn; at the Energy cap, Charge is labeled “End Turn.” After opening setup, the first active side draws one card to begin its turn; each side then draws one card at the start of each turn when its deck is not empty, in both PvE and PvP.
 - Charge remains available as the turn-ending Energy action; automatic turn-start draws apply separately. Reaching Energy cap does not force the player to attack before ending the turn.
@@ -726,6 +858,8 @@ Sudden Shearing discards the top card of the opponent's Pokémon-only deck when 
 Hand-reveal Powers support the optional “before your attack” timing phrase and record a once-per-turn use. Player and PvP actions show the opponent's modeled hand in the battle log; the PvE opponent uses the Power and logs the player's modeled hand.
 
 Pidgeot's Active-only shuffle Power can return a chosen Benched Pokémon to its owner's Pokémon deck, and Suicune-GX can return itself from the Bench. Modeled Evolution cards return with the Pokémon and the deck is shuffled. Tools and Energy attached to individual Pokémon are not represented in this battle mode, so they cannot be moved by these effects.
+
+Lost Origin Pidgeot V can use its once-per-turn Ability from the Bench to shuffle itself into its owner's Pokémon deck. The player action uses the existing self-shuffle flow and shuffles modeled Evolution cards with it; the PvE opponent uses it when Pidgeot V is damaged or its Bench is full. Attached Tools and Energy remain outside the battle model.
 
 Once-per-turn Abilities can return their own card from the discard pile to the bottom of its owner's Pokémon deck. Plasma Blast's Exeggcute Propagation also returns itself from the discard pile to its owner's hand. Player and PvP sides can activate both effects, while the PvE opponent uses them automatically. Per-card use is retained for the turn after the card leaves the discard pile.
 
@@ -1125,7 +1259,7 @@ Flashfire Shiftry's Leaf Draw spends one shared Grass Energy and draws three car
 
 Furious Fists Hawlucha's Shining Spirit makes its attacks ignore Weakness and Resistance. Ability suppression disables the effect.
 
-Furious Fists Ludicolo's Captivating Rhythm flips a coin once per turn and, on heads, lets the player choose an opposing Benched Pokémon to bring Active. Ability suppression applies.
+Furious Fists Ludicolo's Captivating Rhythm flips a coin once per turn and, on heads, lets the player choose an opposing Benched Pokémon to bring Active. Both legacy and modern pronouns are recognized, and the NPC opponent can use the Ability when it has a Benched target. Ability suppression applies.
 
 Furious Fists Bouffalant's Sap Sipper adds 40 damage to its attacks against opposing Grass Pokémon before Weakness and Resistance. Ability suppression applies.
 
@@ -1753,7 +1887,7 @@ Space-Time Smackdown Regice prevents effects of attacks from opposing Pokémon; 
 Temporal Forces Rabsca prevents both damage and effects from opposing attacks to your Benched Pokémon. The protection is limited to the Bench and does not block your own attacks.
 Temporal Forces Kecleon changes type to match its attached Basic Energy. Because the battle engine tracks Energy in a shared pool, it uses the selected Energy type when representing this Ability; multiple attached types cannot be represented independently.
 Cosmic Eclipse Jolteon's Speed Cheer reduces the Colorless attack cost of your in-play Pokémon-GX that evolve from Eevee by one, while respecting Ability suppression.
-Cosmic Eclipse Hakamo-o can evolve on the turn it was played when the opponent's Active Pokémon is Pokémon-GX or Pokémon-EX. This exception does not grant first-turn evolution permission.
+Cosmic Eclipse Hakamo-o's opponent-Active Pokémon-GX/EX condition no longer overrides the engine's same-turn entry restriction. Evolution remains blocked on the turn Hakamo-o enters the Active Spot or Bench.
 Destined Rivals Team Rocket's Articuno protects your Basic Team Rocket's Pokémon from effects of opposing attacks. Attack damage is not blocked, and existing effects are not removed.
 Paradox Rift Jirachi prevents opposing Basic Pokémon's attacks from placing damage counters on Benched Pokémon. This uses the shared Bench damage-counter protection check; attack damage and non-counter effects are unaffected.
 Dragon Frontiers Cloyster δ prevents damage and other effects of opposing attacks to Benched Pokémon marked δ. The protection is checked against the target card name and does not affect Active Pokémon.
@@ -1949,3 +2083,539 @@ Aquapolis Wobbuffet's Mirror Coat reflects Poison or Burn applied by an opposing
 SM Black Star Promo Greninja-GX and Vivid Voltage Beedrill can play themselves from hand onto the Bench when either is the only card in hand, then draw up to three Pokémon cards. The player and PvP actions validate the hand and board conditions; the NPC can use the effect automatically. All flows retain the three-front-slots-before-Bench rule.
 
 Power Keepers Claydol ex, POP Series 9 Rotom, and Dragon Frontiers Salamence ex δ add temporary Fighting, Psychic, and Fire type-change Powers to the shared player, PvP, and NPC type-change flow.
+
+
+The trainer deck editor only offers series where the player owns at least one card and uses the selected series artwork in its header. The TCG battle header centers the round and Energy Cap indicators, and the evolution energy notice reads “Surge of power increases the Energy Cap.”
+
+The set-aware TCG attack resolver also covers generic attack text for drawing and hand refills, simple Special Conditions, damage based on the opponent's Bench or Evolution subtype, exact damage-counter or subtype-gated Knock Outs, full self-healing, card hand discards/shuffles, damage-counter transfers, selected opposing-Pokémon damage that ignores defensive effects, and fixed damage to a stated number of opposing Pokémon. Multi-target bench damage uses random target selection when no explicit player target choice is modeled. Effects that require Prize state, Stadium/Trainer/Tool zones, or Energy attached to a specific Pokémon remain classified in the generated attack and Ability audits instead of being repeatedly reviewed as implementable.
+
+The attack resolver also handles Knock Outs gated on the opponent's Active Pokémon having a Special Condition. Coin-flip attacks that continue until tails use the existing coin resolution flow.
+Fixed-count coin attacks that multiply printed damage by the number of heads support the common “times the number of heads” wording.
+Damage-counter attacks can scale by the attacker's hand size, with printed maximum counter limits enforced.
+Damage bonuses can count living opposing Pokémon with printed Abilities in play.
+Family Attack style damage counts living Pokémon with the printed matching name across the user's Active and Bench rows.
+Fighting Sword style bonuses check the opposing Active Pokémon for either the Pokémon ex or Pokémon V subtype. Burning Voice style damage reductions subtract the printed amount for each damage counter on the attacker, with damage floored at zero. The attack audit marks bonuses conditioned on the attacker moving from the Bench unsupported because that turn history is not recorded.
+Damage bonuses check Pokémon V, VMAX, and VSTAR subtypes. Star Protection and Rigidify use the existing one-opponent-turn damage prevention and reduction modifiers. Cavern Counter adds its bonus when the Bench is nonempty and all living Benched Pokémon have damage counters; Berserk adds its bonus if any living Benched Pokémon is injured. Lovestrike counts living Benched Nidoking. The attack audit classifies missing prior-turn history, later coin-result changes, delayed retaliation, opponent hand prompts, selected Bench discards, and persistent dynamic Ability or Weakness changes as unsupported.
+Group Beatdown flips one coin per living Pokémon in play. Energy Zone attachment attacks add their typed Energy to the shared pool when the required Bench is available; Oceanic Gift requires two living Benched Pokémon. Charm and Hide apply the existing one-opponent-turn damage modifier, with Hide's prevention gated on heads.
+Generic attack text also supports healing a fixed amount from each of the attacker's Pokémon in play and choosing one injured Benched Pokémon for fixed healing. Life Drain uses a heads flip to set the opponent's Active Pokémon to 10 remaining HP. Coin-gated attacks that state their base and bonus damage together use the printed base and bonus values.
+Healing a stated number of Benched Pokémon is supported with random target selection when no player target prompt is modeled.
+Attacks can also scale damage by the number of damage counters on the attacking Pokémon.
+Generic attack text supports damage to every opposing Pokémon, with subtype filters for Pokémon V, Pokémon-GX, and Pokémon-EX when printed.
+Painful Sword-style attacks double the existing damage counters on every opposing Pokémon through the normal counter-damage resolution and Knock Out flow.
+Conditional attack damage can also count a named Pokémon on the owner's Bench, using the same board-name matcher as other named-Pokémon effects.
+Celesteela's Ultra Beast Switch lets an Active Ultra Beast trade places with a Benched Ultra Beast once per turn. The switch is available in player/PvP play and the NPC opponent uses it when its Active Pokémon cannot attack.
+Attacks can scale their bonus damage by the opposing Active Pokémon's modeled Retreat Cost, including Celesteela-GX's Rocket Fall.
+Attack text can directly switch the attacking Pokémon with a selected friendly Benched Pokémon or gust an opposing Benched Pokémon into the Active Spot, using the existing attack choice and switch resolution.
+Attacks can place a fixed number of damage counters on one selected opposing Pokémon anywhere in play, and threshold bonuses can check the Defending Pokémon's existing counter count.
+“Each player draws” attack effects resolve for both sides using the current deck and hand state.
+Attacks that reveal any number of Pokémon from hand use all eligible cards automatically when that maximizes damage and has no downside; damage can count distinct types or eligible named cards.
+Attacks that choose one opposing Pokémon and deal fixed damage to it use the existing target selector, including the printed rule to skip Weakness and Resistance on Benched targets.
+Attacker Special Conditions can gate a damage bonus, and attacks can heal both Active Pokémon. Damage Change's counter swap uses the existing damage-counter exchange rule. Full-width plus symbols in printed damage values are normalized for bonus damage matching.
+Attacks can also pair an optional damage bonus with self-damage, and coin multipliers can target one chosen opposing Pokémon.
+Conditional draw attacks can count a named Pokémon on the attacker’s Bench to determine whether, or how many, cards to draw.
+Generic attacks can place a fixed number of damage counters on a chosen opposing Pokémon, switch either Active Pokémon with a selected Benched Pokémon, and move all damage counters from a chosen friendly Benched Pokémon to the Defending Pokémon.
+Attacks can shuffle the hand into the deck and then draw according to the opponent's hand size.
+Shuffle-and-draw attacks with a fixed draw count also use that hand-zone flow and preserve a printed self Special Condition. Team Magma and Team Aqua attacks count matching Pokémon names on the Bench or across play; Team Aqua coin attacks flip once per matching Pokémon.
+The audits mark attack rules based on the previous turn, per-card evolution timing, per-card use history, opponent response windows, and dynamic attack-cost changes as unsupported when those values are not represented.
+The Ability audit also excludes Poké-Power response windows, Poké-Body rule suppression, and effects tied to the source remaining Active when those lifecycle rules are unavailable.
+The generated attack audit classifies dynamic attack copying, repeated random target picks, extra turns, and delayed turn-end Knock Outs as unsupported because the battle flow cannot represent those choices or timing.
+All Benched Pokémon injury bonuses also recognize the wording variant that omits “of.” The audits classify card-hand/discard contents, deck order, Tool attachment state, Special Energy identity, extra attack windows, and alternate win-condition thresholds as unsupported where the current battle state does not represent them.
+Hone Claws grants a +30 buff to the Pokémon's next attack through the existing temporary attack modifier. Attack audit rows that require Trainer-play locks, multi-turn type changes, or truncated source text are classified unsupported.
+Entrap-style attack text that prevents the Defending Pokémon from retreating during the opponent's next turn uses the existing temporary retreat lock.
+Juxtapose-style heads effects can swap the attacker's and Defending Pokémon's damage counters through the existing counter-swap rule.
+Focus doubles Rocket's Scizor's next Agility damage through the existing named-attack multiplier. Attack audits mark counterless coin attacks with missing damage values, opponent-assigned markers, and attack-triggered retaliation as unsupported.
+Next-turn named attack base-damage overrides also use the temporary attack buff when the card states an explicit replacement value.
+Next-turn bonuses can also name one of the Pokémon's attacks and add the printed damage amount.
+Ancestral Memory and Hyper Needle roll for their printed damage, then lock that attack for the Pokémon's remaining time in play. Moving it to the Bench does not clear the lock; the lock follows its Evolution stack and resets when a fresh Pokémon enters play.
+Now You're in My Power and Ticking Terror change the Defending Pokémon's Weakness through the end of the attacker's next turn while preserving its printed Weakness amount. The override follows the Pokémon to the Bench and expires when that turn ends.
+Hyper Tail and Metallic Blow check the Defending Pokémon's recorded legacy Poké-Power and Poké-Body types when applying their printed damage bonuses.
+Ace Spark and Ambushing Spark check the recorded per-side VSTAR Power usage before applying their damage bonuses. Calm Strike checks whether its owner has already used a GX attack.
+Lost March and Dimension Sphere scale damage by Pokémon stored in the owner's Lost Zone; Lost March excludes Pokémon with the Prism Star subtype.
+Type Switch offers its printed type choices and changes the attacking Pokémon's type through the end of its owner's next turn. The override persists when that Pokémon moves to the Bench and expires by turn number.
+Lost Mine checks its Lost Zone threshold and uses the counter assignment flow to distribute its damage counters across the opponent's Pokémon.
+Lock-on records the Defending Pokémon and the next-turn window for Magnemite's Electric Bolt coin override. The override ends if either Pokémon switches or evolves.
+Dragon Dance gives Haxorus a capped attack damage bonus while it is Active. The bonus applies before Weakness and Resistance and clears when Haxorus switches.
+Poison Up adds three damage counters to the Poisoned Defending Pokémon's between-turn Poison damage each time it is used. The bonus stacks and clears when Poison is removed or the Pokémon leaves play.
+Attacks that assign a fixed total of damage counters across opposing Pokémon use the battle UI's exact-total counter distribution choice.
+The audit marks effects requiring the same fixed counter amount on each of a chosen number of Pokémon unsupported because the current assignment rule enforces only a total.
+Typed Energy thresholds for attack damage use the selected type and shared Energy pool as the engine's Energy state approximation.
+Generic attacks can count cards in the opponent's hand when placing damage counters and can scale damage by the Defending Pokémon's Retreat Cost.
+Random Pokémon searches from the deck into the hand use the existing deck search and random selection flow. The audits classify effects requiring an opponent response prompt as unsupported.
+Generic Find a Friend and Call for Family text uses the deck selection flow for Pokémon searches into hand or onto the Bench, including coin-gated and random variants.
+Ice Path style attacks can move all damage counters from the attacker to the Defending Pokémon. The audit classifies flexible counter redistribution among several chosen Pokémon as unsupported.
+Zzzap targets all Pokémon whose printed Ability type is Poké-Body or Poké-Power, ignoring Weakness and Resistance as printed.
+Energy Zone attacks such as Stoke and Inferno Dance add matching typed Energy to the shared pool; per-Pokémon attachments are represented by that pool.
+Conditional attack draws such as Cosmic Draw only resolve when the opponent has a living Stage 1 or Stage 2 Pokémon in play.
+Fixed-count hand shuffle-and-draw attacks preserve printed self Special Conditions. Team Magma and Team Aqua attacks can count matching Pokémon in play or gain damage against a matching opposing Active Pokémon. Retreat-cost damage and coin-multiplier wording variants also resolve through the shared Energy and coin-flip approximations.
+Legacy Defending Pokémon damage-bonus wording and multi-coin attacks that repeat their printed base damage now use the existing damage-counter and coin-flip rules. The attack audit labels deck-order effects and VSTAR or multi-target limitations unsupported when their required state or choices are not modeled.
+Hand-size draw attacks can refill to match the opponent, and equality bonuses use the modeled hand counts. Evolution-triggered switch-in Abilities now include the Mega Evolution Hariyama wording and reuse the existing opposing Bench selection flow. The refreshed audits recognize 28,878 attack occurrences and 3,551 Ability records; 2,418 attack occurrences remain unresolved and 20 Ability texts remain in review.
+Attacks can inspect or reveal an opponent's hand and recover a fixed number of Pokémon from the discard pile to hand. Flareon ★ and Jolteon ★ bench-entry effects now handle the star-symbol card text in PvE and PvP; Jolteon's counter damage records normal Ability damage events. Audits now classify hidden opponent-hand choices, opponent-controlled switch choices, random targets, and unavailable top/bottom-deck order as unsupported. The current audit recognizes 28,902 attack occurrences and 3,553 Ability records; 2,394 attack occurrences remain unresolved and no Ability texts remain in the review queue.
+Magneton's once-per-turn Energy Zone Ability adds Lightning Energy to the shared pool from either the Active Spot or Bench and can only be used once per turn.
+Mega Rising Hydreigon's once-per-turn Energy Zone Ability adds up to two Darkness Energy to the shared pool and applies its 30 damage recoil.
+The attack audit marks board-wide attack locks, board-wide HP-threshold Knock Outs, and recoil conditional on a target being Knocked Out as unsupported by the current per-target effect model.
+Linoone can switch from the Bench to the Active Spot once per turn while its side has a Mega Evolution Pokémon ex in play. NPC opponents use the same condition when choosing an Active Pokémon that cannot attack.
+Drifblim can switch an Active TAG TEAM Pokémon with a living Pokémon on its Bench once per turn; NPC opponents use the Ability when the Active TAG TEAM cannot attack.
+Venusaur's and Florges' coin-flip gust Abilities also apply their printed Special Conditions to the new opposing Active Pokémon on heads, with the same status protections and NPC handling as other battle effects.
+Flareon ★'s Bench-entry Power applies Burn to both Active Pokémon through the standard Ability status protections.
+Single-Pokémon healing attacks can target any living, damaged Pokémon on the player's Front Row or Bench.
+Next-turn self-protection attacks with the modern “takes −N damage from attacks” wording resolve as temporary damage reduction.
+Attack parsing now handles draw-until-eight wording, attacker damage-counter subtraction, and an additional Retreat Cost damage variant. Thumping Fall-style attacks select eligible Pokémon from hand by Retreat Cost and scale damage from the chosen count. The attack audit explicitly excludes dynamic attack copying and evolution-stack removal; the current audit recognizes 28,912 attack occurrences, with 2,384 unresolved.
+The attack resolver now handles hand-size-gated damage bonuses and damage scaling by the opponent's modeled hand size. The refreshed audit recognizes 28,914 attack occurrences, with 2,382 unresolved across 1,975 text groups.
+Coin-gated healing can target one of the player's Pokémon and remove the specified damage counters. The audit classifies Tool discard, random evolution-card selection, and attacks that depend on untracked Bench-to-Active history as unsupported. It now recognizes 28,916 attack occurrences, with 2,380 unresolved across 1,973 text groups.
+Attacks can gate card draws on the attacking Pokémon's Confused condition, using the same status state as battle resolution. The refreshed audit recognizes 28,917 attack occurrences, with 2,379 unresolved across 1,972 text groups.
+The attack resolver also supports Hidden Power variants that count injured Pokémon for counter damage or heal damage counters from Unown. Audit matching now normalizes accented Poké-Power and Poké-Body text and marks those effects plus Technical Machine attachment effects unsupported. It recognizes 28,920 attack occurrences, with 2,376 unresolved across 1,969 text groups.
+Additional Hidden Power text now swaps damage counters on heads and places counters on all opposing Pokémon that are already damaged. The refreshed audit recognizes 28,922 attack occurrences, with 2,374 unresolved across 1,967 text groups.
+Attack damage can also gain a printed bonus when the player has at least one Pokémon of a specified type on the Bench. The refreshed audit recognizes 28,924 occurrences, with 2,372 unresolved across 1,965 text groups.
+Attacks can clear all modeled Special Conditions from the attacker and apply the existing next-turn Retreat lock through the longer wording variant. The refreshed audit recognizes 28,926 occurrences, with 2,370 unresolved across 1,963 text groups.
+The opposing Bench switch choice now also recognizes legacy wording that refers to the opponent's Active Pokémon. The refreshed audit recognizes 28,927 occurrences, with 2,369 unresolved across 1,962 text groups.
+The Delta Draw attack variant scales its draw by the player's in-play δ Pokémon count. The refreshed audit recognizes 28,928 occurrences, with 2,368 unresolved across 1,961 text groups.
+Damage rules can now check a threshold of existing counters on the opposing Active Pokémon and resolve a conditional Knock Out. The refreshed audit recognizes 28,930 attack occurrences, with 2,366 unresolved across 1,959 text groups.
+Draw effects can use the opponent's Basic Pokémon count and enforce a printed maximum hand size while drawing. The refreshed audit recognizes 28,931 occurrences, with 2,365 unresolved across 1,958 text groups.
+Coin-gated next-turn protection can prevent all attack effects, including damage. Unsupported audit categories now include arbitrary counter redistribution, attached-card and deck-order effects, Evolution stack checks, delayed attack history, Trainer locks, and optional repeated coin loops. The audit recognizes 28,933 attacks, with 2,363 unresolved across 1,956 text groups.
+Shuffle-hand attacks that draw up to a printed card limit now use the common shuffle and draw rule. The refreshed audit recognizes 28,942 attack occurrences, with 2,354 unresolved across 1,947 text groups.
+Blot can remove one damage counter from its own Pokémon, and the audit explicitly tags attack-attempt response windows, Evolution stack mutation, and Energy card searches in discard as unsupported. The refreshed audit recognizes 28,943 attack occurrences, with 2,353 unresolved across 1,946 text groups.
+Counter effects can place a fixed number of damage counters on each opposing Pokémon across both rows. The refreshed audit recognizes 28,944 attacks, with 2,352 unresolved across 1,945 text groups.
+Draw attacks can scale by the number of friendly Pokémon of a specified type in play. Coin-gated self-recoil attacks also handle tails that suppress the opponent damage and damage the attacker instead. The audit recognizes 28,949 occurrences, with 2,347 unresolved across 1,940 text groups.
+Poisoned attackers can add conditional damage while their attack Poisons the Defending Pokémon, and multi-coin attacks can require all flips to be heads. The refreshed audit recognizes 28,951 attack occurrences, with 2,345 unresolved across 1,938 text groups.
+Attack damage can be doubled when the Defending Pokémon matches a specified type. Audit exclusions now include per-Pokémon previous-turn attack history, coin-dependent target choices across both sides, freeform counter transfers, and deck-only shuffle effects. The audit recognizes 28,956 attacks, with 2,340 unresolved across 1,933 text groups.
+Named-Pokémon Bench conditions can add their printed attack damage bonus. The refreshed audit recognizes 28,958 attack occurrences, with 2,338 unresolved across 1,931 text groups.
+Damage scaling can count the Defending Pokémon's damage counters, as in Hydro Crunch. The refreshed audit recognizes 28,959 attack occurrences, with 2,337 unresolved across 1,930 text groups.
+Sticky Liquid-style next-turn Retreat Cost increases are explicitly marked unsupported because temporary Retreat Cost modifiers are not represented in battle state.
+Coin-flip Disable attacks now offer the existing opposing-attack selection and apply the lock on heads for the next opponent turn. The audit recognizes 28,961 attacks, with 2,335 unresolved across 1,928 text groups.
+Retaliatory Claw-style attacks now check the attacker's remaining HP threshold, and coin-flip Pull-style attacks can switch a chosen opposing Benched Pokémon into the Active Spot. The audit recognizes 28,987 attacks, with 2,309 unresolved across 1,904 text groups.
+All Out-style damage bonuses now check whether the player's hand is empty using the modeled hand state. The attack audit recognizes 28,989 attacks, with 2,307 unresolved across 1,902 text groups.
+The Best Collection! is marked unsupported because the physical Pokémon TCG Collection it searches is unavailable to the battle engine.
+Coin-flip damage bonuses now recognize the legacy “If heads this attack does N more damage” wording and apply the printed bonus through the shared coin resolution. The audit recognizes 28,990 attacks, with 2,306 unresolved across 1,901 text groups.
+Mind Ruler-style attacks now deal the printed damage for each card in the opponent's modeled hand. The attack audit recognizes 28,992 attacks, with 2,304 unresolved across 1,899 text groups.
+Screech-style attacks use the existing temporary damage-taken modifier for the next turn. Cry of Destruction is marked unsupported because the battle model lacks Special Energy identities and per-Pokémon attachment state. The audit recognizes 28,995 attacks, with 2,301 unresolved across 1,896 text groups.
+Confusion Wave-style effects now apply their printed Special Condition to both Active Pokémon through the standard status resolver. The audit recognizes 28,998 attacks, with 2,298 unresolved across 1,893 text groups.
+Dragon Launcher-style effects are classified unsupported because paired multi-Pokémon discards and distinct direct-damage target assignments are not represented by the current choice flow.
+Generic Active Pokémon bonus damage checks now cover one or more target Pokémon types, type-symbol wording, Basic Pokémon, and Pokémon ex conditions. The audit recognizes 29,011 attacks, with 2,285 unresolved across 1,880 text groups.
+Attacker damage bonuses now recognize both “has any damage counters on it” and “has damage on it” wording, preserving separate damage-modifier sentences. The audit recognizes 29,018 attacks, with 2,278 unresolved across 1,873 text groups.
+Status-conditioned attack bonuses now recognize explicit Asleep, Burned, Confused, Paralyzed, and Poisoned checks on the opponent's Active Pokémon or the attacker. The audit recognizes 29,021 attacks, with 2,275 unresolved across 1,870 text groups.
+Hand-size damage comparisons now accept the shorter bonus wording, and total Energy thresholds can add their printed damage bonus using the shared Energy pool. The attack audit recognizes 29,029 attacks, with 2,267 unresolved across 1,862 text groups.
+Remaining-HP comparison and healed-this-turn damage bonuses now use the matching current battle state. The audit recognizes 29,034 attacks, with 2,262 unresolved across 1,857 text groups.
+Bench damage bonuses now count distinct Pokémon types, and named Benched Pokémon injury conditions use their tracked damage state. The audit recognizes 29,037 attacks, with 2,259 unresolved across 1,854 text groups.
+The audit marks Helping Hand unsupported because linked arbitrary counter removal and drawing are not modeled, and Primal Scythe unsupported because Fossil Trainer cards are not present in the Pokémon-only battle hand.
+Generic deck-to-hand attack searches now map to selectable Pokémon-only deck searches, including “up to N” and coin-gated wordings. This follows the battle deck format, which contains Pokémon only; it does not imply support for Trainer or Energy card searches. Discard damage scaling now recognizes Ancient, Single Strike, Rapid Strike, Fusion Strike, and Team subtypes on Pokémon in the modeled discard pile. Abyss Eye supports a Special Condition-gated Active Knock Out, Bring Down enforces the lowest-remaining-HP target rule across both fields (including the tied-target wording), Nullifying Zero flips separately for each opposing Pokémon, Deadly Whip adds damage only when both flips are heads, Mind Ruler scales damage by the opponent's hand size, Group Therapy heals one damage counter from every damaged Pokémon on both sides, Ominous Eyes places five counters on a selected opposing Pokémon, and coin-gated protection handles both singular and plural “attack” wording. New rules add Ability-count damage, Ability-filtered spread damage, selectable type-based counter placement, named-Pokémon damage/status conditions, selected friendly healing, and a counter hit followed by a conditional forced switch. The refreshed audit recognizes 29,059 of 31,296 attack occurrences, leaving 2,237 unresolved across 1,832 set-specific text groups.
+Damage can now scale by matching Pokémon types in play or in the discard pile, and injury among named Benched Pokémon can trigger the printed attack bonus. The refreshed audit recognizes 29,045 of 31,296 attack occurrences, leaving 2,251 unresolved across 1,846 set-specific text groups.
+Attack damage can also scale by the number of injured friendly Pokémon across both rows. The refreshed audit recognizes 29,048 of 31,296 attack occurrences, leaving 2,248 unresolved across 1,843 set-specific text groups.
+The attack audit explicitly marks first-turn-order bonuses and temporary per-Pokémon attack locks unsupported because the battle state does not track those conditions. A further injured-Pokémon damage wording is now recognized; the audit recognizes 29,049 of 31,296 attacks, leaving 2,247 unresolved across 1,842 text groups.
+Knockout history now retains the types of Pokémon knocked out by attack damage. Attacks can use that history for matching-type damage bonuses on the following turn. The audit recognizes 29,055 of 31,296 attacks, leaving 2,241 unresolved across 1,836 text groups.
+Counter attacks that spread additional counters across already-damaged opposing Pokémon now accept the “has any damage counters” wording variant as well. The refreshed audit recognizes 29,057 attacks, leaving 2,239 unresolved across 1,834 text groups.
+Spread damage supports the legacy “does N damage to each of your opponent’s Pokémon” wording used by Aqua Shower. The audit explicitly marks individual Energy attachment effects, future-turn coin overrides, delayed attack-specific coin counts, and player-selected draw-or-discard hand effects unsupported. It recognizes 29,058 attacks, leaving 2,238 unresolved across 1,833 text groups.
+Attacks can target any injured opposing Pokémon, including the Bench, for direct damage while ignoring Weakness and Resistance for Benched targets, covering Brine. The audit recognizes 29,059 of 31,296 attacks, leaving 2,237 unresolved across 1,832 text groups. The latest ability audit still reports zero records in the implementation review queue.
+Coin-gated attacks can Knock Out the opponent's Active Pokémon on two heads or return it to the opponent's hand on heads, covering Superpowered Hug and Spin Storm. The audit recognizes 29,062 attacks, leaving 2,234 unresolved across 1,829 text groups.
+Coin-gated opponent Bench switching now supports selecting a Benched Pokémon and bringing it Active, covering Luring Glow. The audit classifies Breakcore's Active-Pokémon discard as unsupported because the engine cannot resolve that removal separately from its Knock Out and promotion flow. It recognizes 29,063 attacks, leaving 2,233 unresolved across 1,828 text groups.
+Generic attack parsing now recognizes opposing Pokémon-GX/EX bonus damage, typed Energy thresholds through the selected shared Energy pool, bonuses for having no Pokémon-GX/EX on the Bench, Ability-name counts in the discard pile, and opponent non-evolved-Pokémon-scaled draws. This covers Bullet Uppercut, High-Heat Blast, Fossil Fangs, Vengeful Anchor, and Count and Draw. The audit recognizes 29,074 attack occurrences, leaving 2,222 unresolved across 1,817 text groups.
+Hand effects can discard one Pokémon from the modeled hand before drawing a fixed number of cards, or shuffle the hand into the deck and draw according to the opponent's hand size. The audit recognizes 29,070 of 31,296 attacks, leaving 2,226 unresolved across 1,821 text groups.
+Selected-target counter effects can leave an opposing Pokémon at a printed remaining-HP value, covering Libra Horn. Because the effect places damage counters, it bypasses normal damage modifiers. The audit recognizes 29,071 attacks, leaving 2,225 unresolved across 1,820 text groups.
+Mirror Pain-style counter attacks use a selected damaged Pokémon on the player's Bench as the counter source and place that many counters on the opponent's Active Pokémon. The attack audit recognizes 29,074 of 31,296 occurrences, leaving 2,222 unresolved across 1,817 text groups.
+Attacks can select an opposing Benched Pokémon, switch it Active before damage, and hit the new Active Pokémon, supporting Drag Off and Magnetic Tension wordings. The audit recognizes 29,078 attacks, leaving 2,218 unresolved across 1,813 text groups. The refreshed Ability audit has zero implementation-review records.
+Counter distribution can now require a total scaled from a source count, allowing Spreading Spite to assign two counters for each damage counter on the attacker. The audit recognizes 29,081 of 31,296 attacks, leaving 2,215 unresolved across 1,810 text groups.
+Healing effects can restore 30 damage to every damaged Pokémon on both sides, covering Noble Light. The audit recognizes 29,082 attacks, leaving 2,214 unresolved across 1,809 text groups. The refreshed Ability audit still has zero implementation-review records.
+The all-counter transfer flow also accepts effects that move counters from a selected Benched Pokémon to the opponent's Active Pokémon, covering Magical Echo. The attack audit recognizes 29,083 occurrences, leaving 2,213 unresolved across 1,808 text groups.
+Attacks can require the attacker to be undamaged or deal no damage, covering Adrena-Tackle. The audit marks Copy a Friend unsupported because runtime attack copying from a friendly Benched Pokémon is not available in the selection flow. The attack audit recognizes 29,084 of 31,296 occurrences, leaving 2,212 unresolved across 1,807 text groups.
+Stockpile now changes the named Spit Up and Swallow attacks' base damage for the following turn. Pop Series 8 Magical Leaf applies its extra damage and healing together on heads. The attack audit recognizes 29,086 occurrences, with 2,210 unresolved across 1,805 text groups.
+Unsupported attack classifications now cover multi-target damage choice, temporary Weakness changes, attached-card movement, delayed subtype-gated Knock Outs, future Energy-attachment triggers, source-lifetime cost modifiers, and opponent-selected hand-to-deck-bottom effects. These remain counted as unresolved resolver mappings but are excluded from implementation review by their explicit engine-gap reasons.
+Board-wide counter placement now supports attacks that put six damage counters on every Pokémon with an Ability on either side, covering Law of the Underworld. The audit recognizes 29,085 attacks, leaving 2,211 unresolved across 1,806 text groups; the Ability audit remains at zero implementation-review records.
+Spread damage can target every already-damaged opposing Pokémon and honor the printed rule to ignore Weakness and Resistance on the Bench, covering Spiky Storm GX. The audit recognizes 29,087 attacks, leaving 2,209 unresolved across 1,804 text groups.
+Reply Strongly now checks whether the attacker took attack damage as the Active Pokémon during the opponent's prior turn. Battle state clears this hit history when that player's turn ends. The refreshed audit recognizes 29,090 of 31,296 occurrences, leaving 2,206 unresolved across 1,801 text groups.
+Hand-discard attacks now support discarding up to a stated maximum from the Pokémon-only hand and scaling damage by the number discarded, covering Bye-Bye Throw and Chuck Away. The attack audit recognizes 29,092 of 31,296 occurrences, with 2,204 unresolved across 1,799 text groups.
+Attacks that search for Energy and attach it, or add it to hand, now grant that amount to the shared Energy pool, preserving the engine's generic Energy model. The refreshed audit recognizes 29,143 of 31,296 attacks, leaving 2,153 unresolved across 1,754 set-specific text groups.
+Energy-search Abilities now also have a generic typed or untyped deck-search path that converts the found Energy into shared pool Energy. The current ability audit remains at 3,553 recognized, 984 unmatched, and zero in implementation review. The latest attack audit recognizes 29,153 of 31,296 attacks, leaving 2,143 unresolved across 1,744 text groups.
+Active turn Abilities that inspect the top of the Pokémon deck for Energy now convert the eligible find into shared pool Energy, including Energy attachments and Energy put into hand. The refreshed Ability audit recognizes 3,557 of 4,537 text-bearing records; 980 remain unmatched (974 engine-mechanic skips and six format-equivalent records). The latest attack audit recognizes 29,168 of 31,296 attacks, with 2,128 unresolved across 1,730 text groups.
+Damage-counter transfer choices can require the source Pokémon to match a printed name or subtype, and can move all counters from a selected Benched Pokémon to the opposing Active Pokémon. This covers Rocket Mirror and Perplexing Transfer. The attack audit remains at 29,090 of 31,296 occurrences, with 2,206 unresolved across 1,801 text groups.
+The attack audit classifies linked self-damage and opposing damage-counter effects as unsupported: the current choice flow cannot select and apply the same counter amount to both Pokémon. Counting Song is no longer in the implementation review queue. The attack audit recognizes 29,092 of 31,296 occurrences, leaving 2,204 unresolved across 1,799 text groups.
+Hidden Power attacks that put damage counters on the Defending Pokémon until it has 10 HP remaining on heads now resolve through target-to-remaining-HP damage with Weakness and Resistance ignored. The set-aware attack audit recognizes 29,143 of 31,296 occurrences, leaving 2,153 unmatched across 1,754 text groups.
+Coin-gated single-target attacks can select any opposing Pokémon and apply their printed damage on heads while ignoring Weakness and Resistance, covering Sacred Fire. The attack audit recognizes 29,144 of 31,296 occurrences, leaving 2,152 unmatched across 1,753 text groups.
+Everyone Discharge now scales its damage by the number of Benched Lightning Pokémon and ignores Weakness, using the typed-Bench counter already available in battle state. The refreshed audit recognizes 29,145 attacks, leaving 2,151 unmatched across 1,752 text groups.
+Grand Echo GX and Prominence GX heal all damage from all of the user's Pokémon. The battle state does not track prior GX attack use, so it cannot enforce the once-per-game limit printed on those attacks. The audit recognizes 29,150 of 31,296 attacks, leaving 2,146 unresolved across 1,747 text groups.
+Power Lariat scales by the number of evolved Pokémon on the user's Bench, adding 50 damage for each. It uses the existing evolved-Bench count and brings the attack audit to 29,151 recognized occurrences, with 2,145 unmatched across 1,746 text groups.
+Pop Series 4 Nap heals 20 damage from Wobbuffet. Tongue Stretch uses the coin-gated arbitrary-target damage flow and ignores Weakness and Resistance. The audit recognizes 29,153 of 31,296 attacks, leaving 2,143 unmatched across 1,744 text groups.
+Evo-Lariat now scales by the number of Evolution Pokémon on the user's field, adding 40 damage for each. The battle state already tracks evolved Pokémon in play; the audit now recognizes 29,154 attacks, with 2,142 unmatched across 1,743 text groups.
+Beastly Fang now counts all opposing Pokémon-EX for its 50-damage-per-Pokémon bonus. The audit recognizes 29,155 of 31,296 attacks, leaving 2,141 unresolved across 1,742 text groups. Attack rows based on Energy cards in the opponent's discard pile or total hand size are now marked unsupported because the Pokémon-only battle state lacks those card identities.
+Resolute Claws now applies its 70-damage bonus against an opposing Active Pokémon-GX or Pokémon-EX. The mapping accepts the printed parenthetical that the bonus is calculated before Weakness and Resistance. The attack audit recognizes 29,156 occurrences, leaving 2,140 unmatched across 1,741 text groups.
+Fighting Fangs checks whether the opposing Active Pokémon is a Pokémon V or Pokémon-GX and adds 90 damage when true. The audit recognizes 29,157 of 31,296 occurrences, with 2,139 unmatched across 1,740 text groups.
+Four as One checks for all three printed Pokémon names on the user's Bench before applying its bonus, covering the Cobalion, Terrakion, Keldeo and Virizion variants. The attack audit recognizes 29,159 occurrences, leaving 2,137 unmatched across 1,738 text groups.
+Full Retaliation scales by the damage-counter total on all of your Benched Magikarp, adding 30 damage per counter. It uses the existing named-Pokémon counter count; the refreshed audit recognizes 29,160 of 31,296 attacks, with 2,136 unmatched across 1,737 text groups.
+Release Rage counts Tatsugiri Pokémon in the user's discard pile and deals 50 damage for each. Attack audit rows requiring Energy to be discarded from individual Pokémon are now marked unsupported because the engine models a shared Energy pool without per-card attachment identities. The audit recognizes 29,166 occurrences, leaving 2,130 unmatched across 1,732 text groups.
+Angry Fang counts damage counters across Benched Single Strike Pokémon and deals 10 damage per counter. This uses a new subtype-filtered counter source; the audit recognizes 29,167 attacks, with 2,129 unmatched across 1,731 text groups.
+Tantrum Blast now scales by the number of Special Conditions affecting the attacker, dealing 100 damage per condition. It uses the existing status-count effect; the audit recognizes 29,168 occurrences, with 2,128 unmatched across 1,730 text groups.
+The audit now classifies attack effects that require choosing self-placed damage counters and scaling damage from that choice as unsupported. It also classifies attacks dependent on prior GX or VSTAR Power use as unsupported because that history is not tracked. The Ability audit has 0 records in its implementation review queue (3,557 of 4,537 records recognized).
+Mirror Step now checks for at least one shared living Pokémon name across both fields and adds 70 damage when found. The set-aware attack audit recognizes 29,169 occurrences, with 2,127 unmatched across 1,729 text groups.
+Audit classifications now mark arbitrary hand-card discards, counting Item cards in revealed hands, Rock-Paper-Scissors, and later-attack interruption effects unsupported. The battle hand contains Pokémon only, and attack resolution has no opponent-turn response window for interrupting a future attack.
+Chain of Spirits counts Spiritomb cards in the user's discard pile for its 60-damage-per-card bonus. The audit recognizes 29,176 attacks, leaving 2,120 unmatched across 1,722 text groups. Attacks that count Energy cards in the opponent's discard pile are now marked unsupported because those identities are absent from battle state.
+Hand-discard choices can now filter by Pokémon name. Egg Splat discards any number of Exeggcute from the modeled hand and scales damage by the number chosen. The attack audit recognizes 29,184 of 31,296 occurrences, with 2,112 unmatched across 1,715 text groups.
+In the simplified battle format, remaining Prize counts are derived from the opponent's Knockout count (six minus KOs). Supported passive HP abilities can use those thresholds. Effects that modify the number of Prizes awarded or move face-down Prize cards are not represented.
+Hand-discard attacks can draw once for each Pokémon discarded up to the attack's stated limit, using the battle's Pokémon-only hand. Hidden Power is supported by this rule.
+Conditional attack draws can add a card when a named partner is in play, with a one-card bonus cap so multiple copies do not exceed the printed draw amount. This covers the Plusle and Minun Cheer Up attacks.
+An attack can also draw until the Pokémon-only hand has one more card than the opponent, with the printed hand-size condition checked before drawing.
+Prize-gated Energy recovery Abilities that specify a type can grant that Energy to the shared pool when the opponent reaches the printed KO-derived threshold. Player and NPC use both check the same threshold.
+Team healing attacks can restrict the healing to the attacker's printed Pokémon type, such as Cure Shower GX healing Water Pokémon without affecting other types.
+Energy attachment attacks that specify a typed amount from hand or discard now grant that type to the shared Energy pool; unbounded “any number” effects grant up to the pool cap.
+Once-per-turn Abilities that attach a typed Energy from hand to a supported Active, Benched, named, or own Pokémon target map that Energy to the shared pool while retaining their printed turn and status restrictions.
+Lick Wounds now flips once, then lets the player choose any damaged Pokémon on either side and heals 20 damage on heads. The player choice and server-side attack resolver use the same selected target.
+Borne Ashore now lets the player select a Basic Pokémon from either discard pile and returns it to its owner's Bench at full HP.
+Paradise Pollen flips once and, on heads, heals 20 damage from Vileplume and a selected damaged Benched Pokémon.
+Energy recovered from the discard pile and added to hand or attached to a Pokémon converts to generic shared-pool Energy, following the battle format's zone abstraction. This now covers the V-UNION Union Gain attacks and the Free Diving and Rev attacks.
+
+Eevee's Be Prepared attack converts its one Basic Energy attachment from hand into one shared-pool Energy. Flaaffy's printed `{L}` Dynamotor wording uses the same Lightning shared-pool handling as its spelled-out wording.
+
+Sol Burst GX and Aero Unit GX convert their printed five-Energy deck or discard attachment effects into shared-pool Energy. The engine does not enforce the once-per-game GX attack limit. Aero Unit's extra protection rider remains unsupported because the battle model does not track Energy attached to individual Pokémon.
+
+Rillaboom's `{G}` symbol variant is recognized by the existing once-per-turn Grass Energy search handler and grants up to two Grass units to the shared pool.
+
+Energy recovery attacks that return cards to hand can add the equivalent amount to the shared pool while retaining self-damage riders, as with Gastly's Energy Conversion. Typed recoveries retain their Energy type. Top-deck attachment attacks convert the number of inspected cards into the shared-pool amount, with printed type choices applied through the selected Energy type.
+
+Static Electricity converts its Mareep-counted Lightning search into one pool unit per Mareep in play on either side. Lt. Surge's Electabuzz's Charge converts up to two Lightning Energy from discard. Leafeon LV.X's once-per-turn hand Energy Ability uses the selected pool type and keeps its Special Condition gate.
+
+Mud Stock grants one Fighting pool unit per Benched Pokémon. Energy Hunt grants one shared-pool Energy for each heads from three coins when the player has a Benched Pokémon-EX.
+Starmie δ can use its once-per-turn Metal Energy search while free of Special Conditions; because this battle engine has no Energy cards in deck, the searched Metal Energy becomes one shared-pool unit. Discard-pile Energy recovery with a printed type also keeps that type in the pool, including Turtonator-GX's five Fire Energy from Nitro Tank GX.
+Unown [Y]'s heads-only Psychic Energy search uses the coin-flip Energy action and remains usable under its printed Special Conditions exception.
+Gale Thrust's XY and Sword & Shield text variants now use the existing “became Active this turn” damage check. The turn marker is preserved for either retreat or a switch effect, so both printings can receive their conditional damage bonus.
+Previous-turn Knock Out damage bonuses now accept equivalent printed wording for an opponent's attack, including Grass Pokémon conditions. Grudge Dive uses the recorded Knock Out event for its damage bonus and applies Confusion to the opposing Active Pokémon only when that Knock Out condition is met.
+Random-target attacks can sample from the opponent's Active and Benched Pokémon, or from both players' Pokémon while excluding the attacker. Pop Out Throughout selects three times with replacement, so one Pokémon can receive multiple hits; Spring Out selects once. Spurt Fire and Heavy Thunder use the shared two-sided candidate pool for their random selection.
+Evolution actions now record the turn in which each Pokémon most recently evolved. Conditional attack damage can check that turn together with the printed predecessor Pokémon, covering Raid, Aura Strike, Assaulting Kick, and Strike It Rich variants.
+
+Attacks that place a fixed number of damage counters on each of a chosen number of distinct opposing Pokémon use the counter-allocation UI. The server verifies the exact target count, unique living targets, and counters per target; Astral Barrage is covered by this resolver.
+
+Frenzied Gouging resolves its Active-target Knock Out and 200 recoil rider together. The recoil rule is gated on the attack's unconditional `knockOutTarget` effect, and the audit now recognizes this exact text instead of labeling target-Knock-Out riders unsupported.
+
+Repeated-target attacks use counter allocation as a hit assignment: the player can add the same target multiple times, and each hit applies the printed direct damage without Weakness or Resistance. Target subtype filters support Devilish Hands GX's Pokémon-GX or Pokémon-EX restriction; Oil Salvo uses the same flow without a subtype restriction.
+
+Lightning Storm Star uses this repeated-hit choice flow as well. Its damage effect is supported, while the once-per-game VSTAR Power limit remains untracked.
+
+Fixed multi-target Bench damage uses a distinct-target selection flow. Double Shot and Electro Star select up to the printed number of eligible Benched Pokémon and deal the printed damage to each without Weakness or Resistance; the player can still resolve the effect when fewer eligible Pokémon are present. Electro Star's once-per-game VSTAR limit is not enforced.
+
+Sky-Scorching Light GX derives both players' remaining Prize counts from the opposing Knock Out totals already tracked by this battle format. It becomes usable when their combined remaining count is six or fewer and then places six damage counters on each opposing Pokémon. Its GX once-per-game limit is not enforced.
+
+Attacks that count Energy attached to all opposing Pokémon can use the opponent's shared-pool Energy total directly. This supports Aura Star, Energy Crush, and Energy Spiral; the once-per-game VSTAR limit on Aura Star is not enforced.
+
+Rampaging Star counts the user's Pokémon in the modeled discard pile and deals 30 damage for each. Its once-per-game VSTAR limit remains untracked.
+
+Victory Symbol ends the battle for its user when their KO-derived remaining Prize count is exactly one. The PVE and PVP action settlement paths preserve this special win instead of advancing the turn.
+
+Absorption GX and Beauty GX scale damage from Prize counts derived from Knock Outs: remaining Prizes on the user’s side, or Prizes taken by the opponent. The once-per-game GX usage limit is not tracked.
+
+Assembly GX and other Prize-scaled attacks support both per-Prize bonus damage and damage multiplied by remaining or taken Prize counts, using Knock Out totals. GX once-per-game limits remain untracked.
+
+Prize-gated attack damage bonuses can also apply the printed Special Condition to the opposing Active Pokémon when the Prize threshold is met.
+
+Exact Prize-count attack damage bonuses accept both “Prize cards remaining” and “Prize cards left” wording and use Knock Out totals for the threshold.
+
+Prize-gated bonuses that print an explicit base damage and a conditional bonus preserve both values in the damage calculation.
+
+Attacks that add fixed bonus damage for each of the user's remaining Prize cards use the opposing side's Knock Out count to derive that Prize count.
+
+Prize-gated attack bonuses can require both sides to have an exact remaining Prize count; the damage effect checks each side's Knock Out-derived count.
+
+Win-on-attack effects that require exactly one remaining Prize accept both “remaining” and “left” wording and use the battle's Knock Out total.
+
+An Ability that awards an extra Prize when its attack Knocks Out a Pokémon adds an extra point to the defeated side's KO counter, preserving the battle's six-KO loss condition. Basic-only and named-attacker clauses are checked, and suppressed Abilities do not apply.
+
+Attack damage can count more than one typed Energy pool source in a single formula, such as damage for each Fire Energy and each Lightning Energy across the player's Pokémon.
+
+Attacks that return up to three cards from the discard pile to the hand use the Pokémon recovery choice flow. Because this battle format stores only Pokémon cards in its discard pile and hand, these attacks recover up to three Pokémon. GX usage limits remain untracked.
+
+Stormfront Infernape's evolution-triggered coin flip adds up to four Fire Energy to the shared pool on heads, preserving the printed amount, type, and coin gate.
+
+Stakataka's maximum HP increase at a remaining Prize threshold is supported using the opponent's Knock Out count. The Ability audit recognizes this existing runtime behavior as supported.
+
+Drifblim FB's HP bonus and Charizard's attack damage bonus when the opponent has three or fewer Prizes now accept “less/left” wording and use the opponent's Knock Out count to derive the remaining Prize threshold.
+
+Brambleghast's HP bonus scales with the opponent's Knock Out count, matching the number of Prizes they have taken.
+
+Luxray's hand-to-Bench Ability checks whether its owner has more remaining Prizes than the opponent, derived from Knock Out totals. It is available once per turn when the three front slots are filled and a legal Bench slot is open; the server validates the condition and records the Ability use.
+
+Ultra Necrozma cannot attack while the opponent has more than two Prizes remaining. The restriction uses the opponent's Knock Out count to derive remaining Prizes.
+
+Regigigas's “can't attack until” restriction checks the opponent's remaining Prize count from Knock Outs and permits attacks at the printed threshold.
+
+Garchomp's Prize-advantage Ability adds its printed attack damage bonus while its owner has more remaining Prizes than the opponent, derived from Knock Out totals. Both the conditional “if you have” wording and the “as long as” wording are handled by the damage resolver.
+
+Shining Burst supports a combined remaining-Prize threshold derived from both players' Knock Out counts. When the total is at or below the printed limit, it discards the attacker's Energy remaining after paying the attack cost and adds its conditional damage bonus.
+
+Strong-Arm Lariat's optional damage bonus uses the standard optional-choice flow. Choosing the bonus also marks Strong-Arm Lariat unavailable for the attacker's next turn through the temporary per-attack lock.
+
+Tail Whip attacks support coin-gated attack prevention: on heads, the opposing Defending Pokémon cannot attack during its next turn.
+
+Hustle supports a heads-gated base-damage override for Spheal's Rollout during the next turn, using the named-attack buff state.
+
+Ticking Knock Out and Allergic Shock apply a one-turn delayed Knock Out marker to the Defending Pokémon. If the attacking side damages that Pokémon during its next turn, the attack Knocks it Out; the marker expires when that turn ends if it was not triggered.
+
+Iron Rule GX applies a side-wide attack lock for the opponent's next turn, including Pokémon played during that turn. Attack selection and server-side attack resolution both enforce the lock, which clears at the end of the locked turn.
+
+Graffiti supports its combined Sleep and next-turn attack-cost increase, and Sticky Liquid supports its next-turn Retreat Cost increase. The modifiers are stored on the affected Pokémon and expire after its next turn.
+
+The delayed Knock Out marker supports an optional required attacker subtype. Two-Hit KO uses this to Knock Out the marked Defending Pokémon only when a Rapid Strike Pokémon damages it during the next turn.
+
+Solar Power supports a next-turn attack-cost override for Grass and Fire Pokémon on the affected side. The side-level effect also applies to Pokémon that enter play during that turn and expires after that turn ends.
+
+Source-linked attack effects can now raise the Defending Pokémon's attack costs until the source leaves the Active Spot. Octolock pairs this with the existing source-linked Retreat lock, and repeated uses keep the same increase instead of stacking it.
+
+Abilities that prevent an opponent from taking a Prize after a Knock Out reduce the defeated side's KO-equivalent credit by one when their condition is met. This covers the printed attacker-subtype and status gates, Munkidori ex while its owner has Pecharunt ex in play, and Mega Gengar ex's non-stacking team effect. The defeated Pokémon still counts as Knocked Out for board compaction and empty-board defeat checks. Prize reduction is stored on the fainted Pokémon and composed with extra-KO credit before the defeated side's KO total is updated.
+
+Thunder-Clad's “go first” deck search for an Energy attached to itself adds one unit to the shared Energy pool. The battle engine does not track physical Energy cards or attachments, so the printed search is represented as a pool gain.
+
+Deck searches that attach Energy to Pokémon also map to shared-pool gains where their other effects are supported. Breath of Life grants up to three pool Energy for its multi-type Basic Energy search; Power Move grants one and keeps its optional self-switch.
+
+Marnie's Grimmsnarl ex converts its evolution-triggered search for up to five Basic Darkness Energy into up to five Darkness Energy in the shared pool.
+
+Poison Cultivation supports a one-checkup Poison damage replacement on an already Poisoned Defending Pokémon. The bonus is consumed after the next Poison/Burn checkup, so it does not persist for later turns.
+
+Scorching Heater and Counter Punch support fixed next-turn damage retaliation, while Crosscounter supports heads-gated double retaliation. The existing attack reflection resolves before Knock Out cleanup, so retaliation still occurs when the protected Pokémon is Knocked Out by the triggering attack.
+
+Dragon Dance supports a conditional next-turn +40 damage bonus after one of the player's current Active Pokémon has dealt attack damage during that turn. The existing named-attack buff applies the bonus before Weakness and Resistance and expires with the next-turn window.
+
+Exciting Shake supports a next-turn coin-count override for a named attack. The override affects both projected damage and actual coin resolution, is consumed when that attack is used, and expires with its turn window.
+
+Lunala's Cosmic Eclipse Ability supports searching for up to two Energy when Solgaleo is in play. Since battle Energy is held in one shared pool rather than attached to Pokémon or stored in the deck, the effect grants up to two units to that pool.
+
+Colorful Catch supports its search for up to three Basic Energy cards of different types by adding three units to the shared Energy pool, consistent with the battle model's single selected Energy type and lack of Energy cards in deck or hand.
+
+Signs of Evolution supports a heads-only search for an Evolution that evolves from Magikarp and places the card in hand for a later evolution. Oricorio's Bench-entry Energy search converts up to two Basic Energy cards into up to two units in the shared pool.
+
+Clefable and Bronzong support their hand-to-deck cost before searching for Basic Energy. The selected hand card returns to the deck and the searched Energy converts into one or up to two shared-pool Energy. Their printed Special Condition restriction is enforced.
+
+Attacks that search the Pokémon deck for an Evolution card and add it to hand filter by the specified Pokémon's `evolvesFrom` metadata. Supported forms include fixed and up-to counts, coin gates, and random matching Evolution selection.
+
+Attacks that search only for Energy and put it into hand convert that amount to shared-pool Energy. If the card specifies an Energy type, the gain follows the selected pool type. Blaine's Vulpix retains its Fire type check and three-coin amount.
+
+Pokémon-only attack searches can select matching cards from the deck into hand by name, type, Basic status, or Pokémon-ex subtype. Pokémon-ex exclusions are also applied during selection.
+
+Pokémon-only attack searches can also place selected or randomly selected Pokémon from the deck onto the Bench, with name, type, and Basic filters applied before the current Bench-capacity rules.
+
+Lucario LV.X's Active-only evolution protection recognizes both `LV.X` spellings in source ability text. It prevents attack effects, including damage, during the opponent's next turn and ends if Lucario leaves the Active Spot. The ability audit recognizes 3,629 of 4,537 records with printed text; 908 remain unmatched, with none in the implementation review queue.
+
+Fates Collide Tyranitar's evolution Ability converts the opponent's Knockout credit into Darkness Energy added to the shared pool, approximating its “Prize cards taken” count. The effect respects the battle Energy cap and selected Energy type. The ability audit now recognizes 3,631 of 4,537 records with printed text; 906 remain unmatched, with none in the implementation review queue.
+
+Wonder Kiss now reacts when its owner's attack Knocks Out the opponent's Active Pokémon. One unsuppressed Wonder Kiss source flips a coin; heads adds one extra KO credit to the fainted Pokémon, matching the battle's Prize-equivalent counter. Multiple Wonder Kiss copies do not stack. The ability audit recognizes 3,634 of 4,537 records with printed text; 903 remain unmatched, with none in the implementation review queue.
+
+Infernape's once-per-turn Energy Ability can add one shared-pool Fire or Fighting Energy when that type is selected. The simplified battle does not track Energy cards in hand or attachments to individual Pokémon, so it cannot represent the printed “one of each” choice. The ability audit recognizes 3,641 of 4,537 records with printed text; 896 remain unmatched, with none in the implementation review queue.
+
+Dusknoir and Glimmora now flip a coin when Knocked Out; heads prevents the opponent's Prize or point credit. This is recorded as a one-credit KO reduction, matching the simplified battle's Prize-equivalent counter. Their text is no longer unmatched. The ability audit recognizes 3,643 of 4,537 records; 894 remain unmatched, with none in the implementation review queue.
+
+Celebi's Knockout Ability now flips once when it is Knocked Out. Heads prevents the opponent's Prize-equivalent credit and shuffles Celebi and any modeled Evolution stack back into its owner's deck. Attached Energy and Pokémon Tools are not tracked by this battle model. The ability audit recognizes 3,644 of 4,537 records; 893 remain unmatched, with none in the implementation review queue.
+
+Attack Energy-discard parsing now preserves printed Energy type, including `{R}`. It supports attacks such as Firefighting by removing one Energy from the opponent's shared pool only when that pool is selected as Fire. Special Energy discards remain Unsupported because the shared pool cannot represent Special Energy identity or individual attachments. The attack audit recognizes 29,738 of 31,296 occurrences; 1,558 remain unmatched across 1,300 text groups, with none in the implementation review queue.
+
+Darkrai ◇ and Giratina ◇ now support their optional Bench-entry Energy abilities. When selected after playing either Pokémon from hand to the Bench, the effect adds up to two Darkness or Psychic Energy to the shared pool and sets its type. The opponent AI also applies the matching effect after a hand-to-Bench play. Individual attachments and the Energy cards in hand remain untracked.
+
+Salazzle's Sudden Scorching now randomly discards one card from the opponent's simulated hand, plus two more if Salazzle evolved from Salandit during the current turn. Its evolution timing uses the attacker's recorded evolution turn and stack. Remaining unmatched mechanics retain their Unsupported classifications where the current battle state lacks the needed zones or choices.
+
+Basic Pokémon deck searches now accept printed type-first wording such as “Fighting Basic Pokémon,” and coin-gated searches for a Basic Pokémon with a named trainer in its name resolve with the correct type, Bench destination, and heads condition. Call for Friends can search for either a Baby Pokémon or a Basic Pokémon by applying the search rule's `includeBasic` OR `includeSubtypes` filter. The refreshed attack audit recognizes 29,773 of 31,296 occurrences; 1,523 remain unmatched across 1,269 text groups, with none in the implementation review queue.
+
+The Darkrai ◇ and Giratina ◇ Bench-entry Energy handlers now match the catalog's actual “attach … to it” wording. These abilities add up to two matching Energy to the shared pool, for the player and opponent AI. The refreshed Ability audit recognizes 3,646 of 4,537 records with printed text; 891 remain unmatched, with none in the implementation review queue. The pool still approximates individual Energy attachments.
+
+Burning Magma GX now discards the top five cards of the opponent's modeled deck. Its GX once-per-game restriction remains untracked, and the deck contains Pokémon records rather than Trainer and physical Energy identities. The attack audit now recognizes 29,781 of 31,296 occurrences; 1,515 remain unmatched across 1,264 text groups, with none awaiting implementation review.
+
+Twilight GX now reaches its existing discard-to-deck effect through the corrected printed attack name. It returns up to ten Pokémon from the owner's discard pile to the modeled deck; card selection is random because the battle flow has no selection prompt for this rule. The GX once-per-game restriction remains untracked. The attack audit recognizes 29,793 of 31,296 occurrences; 1,503 remain unmatched across 1,257 text groups, with none awaiting implementation review.
+
+Scrape Down now mills four cards from the opponent's modeled deck only when the attacking Pokémon has damage counters. The Pokémon-only deck limitation still applies. The attack audit recognizes 29,794 of 31,296 occurrences; 1,502 remain unmatched across 1,256 text groups, with none awaiting implementation review.
+
+Strongarm Impact now presents its optional +30 damage choice and mills the top three cards of both modeled decks only when the bonus is taken. Decks contain Pokémon records, so discarded Trainer and physical Energy cards are not represented. The attack audit recognizes 29,798 of 31,296 occurrences; 1,498 remain unmatched across 1,253 text groups, with none awaiting implementation review.
+
+Electrical GX now supports searching for up to seven Pokémon into the Pokémon-only hand. GX once-per-game usage is not tracked. Current audits recognize 29,765 of 31,296 attacks and 3,644 of 4,537 Abilities; 1,531 attacks and 893 Abilities remain unmatched, with no items awaiting implementation review.
+
+Attacks that return a Basic Pokémon from either discard pile to its owner’s Bench now resolve through the discard selection flow and restore that Pokémon at full HP. Generic Pokémon wording is constrained to Basics by the battle rules. Attack coverage is now 29,773 of 31,296; Ability coverage is 3,646 of 4,537, with 891 unmatched and none awaiting implementation review.
+
+Multi-card discard-to-Bench attacks now support name, type, and GX/EX subtype filters, with the player and battle AI selecting only eligible Basic Pokémon that fit on the Bench. This covers Booming Call, Dragonporter GX, King’s Order, Come and Get You, and Eternal Flame GX. The audit recognizes 29,803 of 31,296 attacks and 3,646 of 4,537 Abilities; 1,493 attacks and 891 Abilities remain unmatched.
+
+Ruler’s Roar now supports its optional Bench-entry Basic Energy search as one shared-pool Energy. The ability retains its play-from-hand-to-Bench trigger and works for both the player and the opponent AI. The latest audits recognize 29,803 attacks and 3,649 Abilities; 1,493 attacks and 888 Abilities remain unmatched, with none awaiting implementation review.
+
+Toy Box GX now lets the player choose up to five Pokémon from the Pokémon-only deck into their hand. This approximates its generic card search in the current deck model. Coin-gated searches for named Pokémon now resolve only on heads, including Axew’s Signs of Evolution. The Dratini/Dragonair/Dragonite search allows one of each into hand. GX once-per-game limits remain untracked. The attack audit recognizes 29,833 of 31,296 attacks and the Ability audit recognizes 3,649 of 4,537 records.
+
+Attacks with a printed extra-Energy threshold now calculate their bonus from the shared Energy pool, requiring the selected type when the text specifies one and including the attack’s base cost in the threshold. Twinkle Gathering searches Pokémon into hand up to the number of different Pokémon types in play. The latest audits recognize 29,863 attacks and 3,649 Abilities.
+
+Farigiraf's Either Face attack lets the player choose either side to shuffle its modeled Pokémon hand into its deck and draw up to four Pokémon. Trainer and Energy cards are not represented in this battle hand model.
+
+Look for Friends reveals the Pokémon-only deck until it finds the first Basic Pokémon and puts that card into hand, then shuffles the other revealed Pokémon back. If no Basic Pokémon is found, all revealed cards return to the shuffled deck. The resolver supports its FireRed & LeafGreen and Power Keepers printings.
+
+Lightning Ride GX lets the player choose a Benched Pokémon to switch into the Active Spot and adds its 100-damage bonus when the selected shared Energy pool meets the attack cost plus two Lightning Energy. Individual Energy attachments and GX once-per-game usage are not modeled.
+
+Serperior VSTAR's Star Winder deals 60 damage per unit in the shared Energy pool, then lets the player choose a Benched Pokémon to switch into the Active Spot. Individual Energy attachments and VSTAR once-per-game usage are not modeled.
+
+Morpeko's Select a Snack reveals and discards the top three Pokémon, then lets the player add one of them to hand. The PvE opponent selects its highest-scoring card.
+
+Summoning Gate and Cinnabar Lure reveal the top eight or ten Pokémon-only deck cards and allow any number of eligible Pokémon to be put onto the Bench. Cinnabar Lure only allows Basic Pokémon. Unchosen revealed cards are shuffled back into the deck; the PvE opponent selects its highest-scoring eligible options.
+
+Top-card searches that select one card into hand expose the top Pokémon as selectable cards and shuffle the unchosen cards back. Generic card searches are approximated as Pokémon-only searches because battle decks do not represent Trainer or Energy cards.
+
+Finest Selection lets the player choose up to one Pokémon from the Pokémon-only discard pile for each of three coin flips that land heads.
+
+Evolution eligibility blocks a Pokémon from evolving on the turn it entered the Active Spot or Bench, including effect-driven Evolution, and blocks a second Evolution on the same turn. Printed same-turn Evolution permissions do not override these engine rules.
+
+Undersea Tunnel discards three Pokémon from the modeled opponent deck for each coin flip that lands heads. The deck contains only Pokémon, and its top-card order is not tracked.
+
+Rendezvous adds the modeled top Pokémon to hand and draws two more. The conditional Pokémon check always passes in the Pokémon-only battle deck.
+
+Bug Out counts cards with a matching attack among the bottom seven modeled Pokémon for damage, then shuffles the deck. Other card types are not represented, and deck order is approximate.
+
+Brighten and Burn exposes an optional choice to discard the modeled top Pokémon card from the Pokémon-only deck.
+
+Selfish Draw lets the player add the modeled top Pokémon to hand or discard it and draw another. The PvE opponent keeps the top Pokémon.
+
+Devolution attacks can remove the highest Evolution card from a selected evolved opponent Pokémon or from every evolved opponent Pokémon, returning cards to hand or shuffling them into the deck. Coin-gated variants resolve on heads. A devolution-caused Knock Out is recorded as an attack Knock Out without triggering effects that specifically require damage. The Pokémon keeps its evolution turn marker after devolution.
+
+Swinging Sphene resolves its coin flip as a Knock Out of the opposing Active Basic Pokémon on heads or the selected Benched Basic Pokémon on tails. These Knock Outs count for attack Knock Out handling but do not count as damage Knock Outs.
+
+Precocious Evolution searches the deck for the next Evolution of the attacker and evolves it, including when its printed effect permits use during the first turn. The ordinary evolution stack validation still prevents a Pokémon that evolved this turn from evolving again that turn.
+
+Devolution Beam can target an evolved Pokémon on either side, return its highest Evolution card to that side's hand, and clear represented attack effects such as Special Conditions and temporary attack modifiers. Its coin-gated variant applies the effect only on heads. A devolution-caused Knock Out is handled through the attack Knock Out flow.
+
+Evolution-search attacks can let the player select one of their own Pokémon, select its next Evolution from the deck, and evolve that target using the shared evolution stack logic.
+
+Waterfall Evolution randomly selects a matching Evolution from the modeled deck and evolves the attacker. It leaves the remaining deck order unchanged.
+
+Mysterious Evolution only offers the attacker's deck Evolution when its named partner Pokémon is in play.
+
+Soul Destroyer applies its remaining-HP Knock Out threshold to each opposing Pokémon independently, respecting per-Pokémon protection. These direct Knock Outs enter attack Knock Out handling but are not treated as damage Knock Outs.
+
+Evolution Wish and Time Call can target one of the player's Pokémon and evolve it from the deck. Coin-gated versions resolve the evolution only on heads; one attack restricts the selected target to the Bench.
+
+Let's Play! searches for a Baby Pokémon subtype and puts it on the Bench. The server rejects the attack when no Bench slot is open.
+
+Coin-gated discard recovery attacks let the player select up to one Pokémon from the modeled discard pile per heads.
+# Attack effects
+
+Queen's Orders lets the player choose any number of their Benched Pokémon to discard before the attack resolves. It adds 40 damage per selected Pokémon and discards each Pokémon's full Evolution stack.
+
+Roar style attacks that let the opponent choose a replacement now switch the opponent's Active Pokémon with their highest-HP living Benched Pokémon.
+
+Call In can check a Pokémon's recorded Evolution stack for Chingling and draw two additional cards when it is present.
+
+Attacks that place a chosen number of damage counters on the attacker can use the selected counter count for both self-damage and attack damage.
+
+Coin-until-tails attacks that draw cards support both singular and plural “for each head(s)” wording and draw once per head.
+
+Coin-until-tails attacks that search for Energy add one unit to the shared Energy pool per head. This represents the Energy gain without individual Energy cards or attachment targets.
+
+Deck searches can filter by Pokémon V or Pokémon-GX subtype, and searches that require different names exclude duplicate-name selections.
+
+Valiant Evolution combines switching the attacker with selecting its next Evolution from the deck. The Evolution can be applied after the switch, while the battle's same-turn re-evolution restriction remains enforced.
+
+Evolution is blocked for a Pokémon on the turn it enters the Active Spot or Bench, and a Pokémon that evolves cannot evolve again that turn. The shared application function enforces both restrictions as well as the option builder, including attack-driven Evolutions; the evolved-this-turn marker survives devolution.
+
+The attack audit classifies Super Growth as unsupported because its printed two-stage chain would evolve one Pokémon twice in a turn, which the shared Evolution rule forbids.
+Energy-scaled deck-mill attacks now retain their modeled mill effect while Energy-card damage bonuses resolve as zero in Pokémon-only decks. Rushing Magma, Hammer-lanche, and Mega Tidal Wave are recognized. Magma Mantle offers its optional top-Pokémon discard, with its Fire Energy bonus inactive. Coverage is 30,682 of 31,296 attacks, with 614 unmatched across 522 text groups.
+
+Deck search can send selected Pokémon directly to the discard pile or put eligible Basic Grass Pokémon onto the Bench. Both flows shuffle the deck after resolving the search.
+
+First-turn attack conditions use the correct side's turn order: Spoil the Fun's damage bonus applies only during the second player's first turn, and Quick Sign can search up to two Basic Pokémon to the Bench during the first player's first turn.
+
+Genome Hacking lets the player choose an eligible attack printed on the opposing Active Pokémon and resolves that attack through the copied-attack engine flow.
+
+Counting Song uses the self-damage counter choice to place up to three counters on Duskull and repeats that counter count on the Defending Pokémon. The second placement is counter damage, so Weakness and Resistance do not modify it.
+
+Ghost Head uses the same linked-counter flow with a dynamic limit based on Banette's remaining HP.
+
+The 2023 McDonald's Cetitan has truncated Sweeping Tackle source text. Its set-specific resolver uses the printed 200− damage value and the surviving clause to subtract 20 for each damage counter on Cetitan, never below zero.
+
+Attackers retain all attack names used during their current turn. At the start of a later turn, same-Pokémon attack bonuses can check that history, including Spiky Rolling, Heavy Choke, All-Out Attack, and Crazy Blast.
+
+Turn history also records Pokémon identity and subtypes for each side, allowing the next turn's attack to check whether a named teammate or a Pokémon with a specified subtype attacked. This supports Pheromone Catch, Pika Strike, Spark Duo, Coordinated Bolt, and Unrelenting Onslaught.
+
+Abyss Seeking reveals the top four Pokémon in the modeled deck, lets the player select two for hand, and sends the others to the Lost Zone. Since the deck contains Pokémon only, the real card-type choices are approximated.
+
+Star Requiem is available only with at least ten cards in its owner's Lost Zone. It Knocks Out the opposing Active Pokémon and consumes that side's once-per-game VSTAR Power.
+
+Night Joker lists each attack from a living Benched N’s Pokémon as a selectable attack for N’s Zoroark ex. Each copied attack uses Night Joker’s printed Energy cost and its own attack effect.
+
+Attack history stores the full attack used by each side on its previous turn. Supported history-copy attacks offer those attacks as choices while charging the copier's printed Energy cost; non-GX copying excludes GX attacks, and Smeargle's Sketch only offers an attack from the current Defending Pokémon when Smeargle was already in play. Active copy attacks can restrict choices to Tera or non-GX attacks, and coin-gated variants offer the copied attack on heads.
+
+Attacks with named previous-turn prerequisites can also use the recorded attacker and attack names to gate availability. Earthdrill, for example, is available only if Brock's Dugtrio used Lie Low on its preceding turn.
+
+Cross Fusion Strike offers attacks from living Benched Fusion Strike Pokémon and charges the copying attack's printed Energy cost, using the same dynamic attack list as Night Joker with a subtype filter.
+
+Evolution-stack copying exposes attacks from a Pokémon's recorded earlier Evolution cards. Recall and Secret Attack charge their own attack cost; Genetic Memory variants that explicitly waive Energy use no Energy for the copied attack.
+
+Foul Play uses the existing Active copy choice to select an eligible attack from the Defending Pokémon.
+
+Trickster GX can select an attack from any living opposing Pokémon. Its copy picker shows the source Pokémon for each option; the copied attack still resolves against the selected Defending Pokémon.
+
+Skill Thief uses the same opponent-wide copy picker only when the modeled hand is empty. The battle hand contains Pokémon cards only, so Trainer-card presence is outside this condition's current representation.
+
+Apex Dragon exposes attacks from Dragon Pokémon in its owner's discard pile and charges Apex Dragon's printed attack cost.
+
+Re-creation exposes eligible attacks from the opponent's discard pile and does not charge Energy for the copied attack.
+
+Rainbow Moves selects attacks only from the opponent's Bench and waives the copied attack's Energy cost while preserving its other attack effects.
+
+Dark Link copies an attack from another own Pokémon with “Dark” in its name on heads, waiving the copied attack's Energy cost.
+
+Assist uses the same source-aware copy picker for one of the player's Benched Pokémon, gated on heads.
+
+Pendulum Influence uses the opponent-wide copy picker on heads. Coin-gated copies roll the coin before resolving the selected attack; tails resolves the copying attack with no copied effect.
+
+Copy Anything and Mew's Copy require enough Energy to use the selected attack. The check uses the shared Energy pool and selected type; Energy attached to individual Pokémon is not tracked.
+
+GX attacks that print the once-per-game restriction share a per-side use flag, separate from VSTAR Powers. Altered Creation GX adds 30 damage to the owner's attacks against the opposing Active Pokémon for the rest of the game. Its extra Water Energy rider uses the selected shared Energy type as an approximation and grants an additional Prize equivalent for attack damage Knock Outs. Clear Vision GX locks the opposing side out of GX attacks for the rest of the game.
+
+Double Blaze GX checks for three Fire Energy beyond its three-Energy attack cost using the shared pool approximation. When the check passes, it adds 100 damage and ignores effects on the opposing Active Pokémon.
+
+Crimson Flame Pillar GX represents its five discard-pile Energy attachments as five units added to the shared Energy pool. Its Burn and Confusion rider applies only when at least one Energy remains after paying the attack cost. Individual attached Energy and discard identities are not represented.
+
+Dark Union GX lets the player choose up to two Darkness Pokémon-GX/EX cards in the discard pile and put them onto the Bench. When at least one Energy remains after the attack cost, it adds two shared Energy units per revived Pokémon. The model does not track those Energy attachments on individual Pokémon.
+
+Stone Throw lets the player choose two living Benched Pokémon and deals 10 damage to each, without applying Weakness or Resistance.
+
+Overthink and Sinister Suggestion make all coin flips for the opponent's next turn count as tails. The override covers attack, Ability, and status-check flips and expires when that turn ends.
+
+Coin-gated Ultra Evolution attacks can search for their named Evolution and evolve the attacker on heads. Normal entry-turn and same-turn re-evolution restrictions still apply.
+
+Bad-Influence Evolution now offers the attacker's Evolutions only when the player has a living Darkness Pokémon on the Bench.
+
+Restored the omitted printed base damage on 13 coin-fail attacks from Base Set, Gym Heroes, and Gym Challenge. Their existing coin/tails damage inference now recognizes the attacks instead of treating them as blank-damage effects.
+
+
+Quick Hunt and Smart Service can search the Pokémon-only battle deck for one card and put it into hand. Their first-turn permission when going first is recognized alongside the shared search effect.
+
+
+Restored missing card and attack text for Arceus AR1 and Piplup DP03. Prize Count uses the existing Prize-count comparison, while Peck and Water Splash resolve through fixed and coin-based damage.
+
+
+Restored omitted attack names and text for Arceus AR1/AR5, Piplup DP03, and Buizel DP13. Corrected Delta Species Magnemite’s Magnetic Blast to its printed 10 damage, which the existing resolver now recognizes. Ripple Swell and Splash About still depend on Basic Energy deck cards or individual Pokémon Energy attachments, which are not represented in the battle model.
+
+
+Ember Star resolves to 0 damage in the Pokémon-only battle format because its damage counts Energy cards in the discard pile, and Energy cards are not represented there. Its VSTAR Power still consumes the side’s once-per-game VSTAR use.
+
+
+Damage formulas that count Energy or Trainer cards in the battle hand or discard now resolve against the Pokémon-only card zones: absent card types contribute zero while printed base damage remains. This covers discard and hand formulas such as Ember Star, Poltergeist, Shadow Chant, and Riptide; VSTAR Power limits remain enforced.
+
+
+Fishing Tail now recovers an eligible Pokémon from the Pokémon-only discard when its printed choices also include Basic Energy. Energy-only discard-to-deck shuffles resolve as empty operations. The audit recognizes 30,217 of 31,296 attacks, with 1,079 unmatched across 931 text groups.
+
+Supporter-play damage bonuses now resolve to printed base damage, because the battle hand does not contain Supporter cards. Inquire draws three cards for the same reason: its “if you didn't play any Supporter” condition is always met. Colluding Tentacles does nothing because Xerosic's Machinations is absent from the modeled hand, and Shinobi Mastery's named Supporter bonuses remain inactive. Attacks that use a Supporter from the modeled hand or discard, retrieve a named Supporter, or lock Trainer card play now resolve as empty effects when those cards are absent. Fossil Item cards in the hand or discard likewise resolve as absent for damage bonuses and retrieval effects. Psyloop uses printed base damage because Trainer cards aren't represented in play. Pokémon Tool-dependent damage bonuses use printed base damage; Tool counts resolve to zero because Tool attachments are not modeled. Tool discards from play or hand, Tool recovery from discard, and searches for absent Tools or Trainer cards resolve as empty operations, including dependent damage bonuses and follow-on switches. Standalone Trainer, Supporter, Item, Stadium, and Pokémon Tool searches and recoveries resolve as empty operations when those card types are absent from their zones. Stadium-dependent damage bonuses use printed base damage because no Stadium is in play. Hand-based counts of absent Trainer, Supporter, Item, Pokémon Tool, Stadium, and Energy cards resolve to zero, including Sweet Honey cards. Special Energy conditions are false, counts are zero, and standalone discard or move effects are empty because card identities aren't represented in the shared Energy pool. The audit recognizes 30,530 of 31,296 attacks, with 766 unmatched across 663 text groups.
+Attacks that are restricted to the second player's first turn now enforce that timing in the available-attack list. Scream and Bawl resolve their Trainer-play lock as an empty effect because those card types are absent from the modeled hand. Both “during” and “on your first turn” wording are recognized, including on persisted battle records.
+Rummage is supported with its Pokémon-only deck behavior: no Trainer can be selected, so the top cards return to the deck and the printed shuffle resolves.
+Threaten preserves its coin flip while resolving its Trainer-only opponent-hand selection as empty in the Pokémon-only hand model.
+Swipe records its coin flip and resolves the Trainer-attachment discard as empty because Trainer cards are not represented as attached cards.
+Milk Cannon resolves to 0 damage in the Pokémon-only hand model because Moomoo Milk Item cards cannot be revealed there.
+Clairvoyance reveals the opponent's modeled hand in the battle log. Baleful Wind uses the existing random hand discard for its blind selection; its extra discard rider is inactive because the modeled hand has no Trainer, Supporter, or Stadium cards.
+Destructive Sound reveals the opponent's Pokémon-only hand and has no Item cards to discard. Moomoo Squeeze resolves an empty Moomoo Milk search, then performs its printed deck shuffle.
+Solar Coiling and Rocket Tail resolve their named Supporter discard-pile conditions as false, retaining only their printed base damage.
+Item Maniac GX searches an Item-free deck, shuffles it, and consumes the side's once-per-game GX use. Salvage has no Item cards to shuffle from discard in the Pokémon-only format.
+Gathering Food preserves its deck shuffle after Trainer-only searches find no cards. Clobber's Item discard and damage bonus resolve as unavailable in the Pokémon-only hand.
+Errand-Running, Revelation, and Gift Delivery preserve coin-gated deck shuffles when their Trainer or Item searches find no cards. Conditional deck shuffles check the attack's coin result.
+Big Hammer counts Pokémon cards in the modeled hand for its per-card damage formula.
+Find and Scavenge resolve searches for absent Trainer or Supporter cards from discard as empty effects. Take Back preserves its coin flip; the Trainer search has no eligible card.
+Data Sort preserves its coin flip; no Trainer card can be selected from the Pokémon-only discard pile.
+Pickup and Mixed Call expose their available Pokémon selection while non-Pokémon search options resolve as absent in the Pokémon-only discard and deck.
+Copy a Friend lets the player select an attack from a living Benched Pokémon, excludes Pokémon ex, and checks that the shared Energy remaining after paying Copy a Friend's cost can cover the copied attack.
+Crescent Glow and Flare Starter add one unit to the shared Energy pool, or three when used by the second player on their first turn; individual Energy cards and attachment targets are not tracked.
+Overflowing Wishes adds one unit to the shared Energy pool per living Benched Pokémon, approximating the Energy search while leaving individual attachment targets untracked.
+Cheerful Charge adds up to two units to the shared Energy pool based on the living Bench and is restricted to the second player's first turn.
+Victory Sign adds two units for its two Basic Energy searches; the shared pool does not preserve distinct Energy types or individual attachment targets.
+Dragon Bond searches its listed Gyarados cards from the Pokémon-only deck into hand.
+Aqua Call searches up to three Pokémon whose names include Team Aqua from the Pokémon-only deck into hand.
+Nab ’n’ Dash searches up to the number of living Benched Pokémon, using the Pokémon-only deck and hand model.
+Rally searches up to three Basic Pokémon from the deck to the Bench and enforces distinct types.
+Nocturnal Maneuvers GX searches any number of Basic Pokémon to the Bench, shuffles the deck, and retains the one-GX-attack-per-game limit.
+Jellyfish Pod searches any number of the listed Tentacool and Tentacruel cards, including Misty's versions, into hand.
+Invisible Hand is offered only when the opponent has an Evolved Pokémon in the Active Spot; it searches a Pokémon from the modeled deck into hand.
+Critical Error GX discards up to ten Pokémon from the modeled deck, shuffles, and keeps its once-per-game GX limit; other card types are absent from this deck model.
+Hidden Power selects one Pokémon from the deck into the Pokémon-only discard pile, then shuffles.
+Search and Escape resolves the absent Trainer search as empty and returns Chatot G to its owner's deck, which is shuffled.
+Slightly Simmer searches up to two Pokémon from the deck into the Pokémon-only discard pile and then shuffles.
+Healing Circle heals all damaged Benched Pokémon and conditionally returns its attacker to the deck only when the attack actually healed damage.

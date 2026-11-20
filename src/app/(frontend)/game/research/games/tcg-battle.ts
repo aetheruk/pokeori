@@ -49,10 +49,12 @@ import {
   getTcgBattlePokemonSwapPower,
   getTcgBattleAbilityDamageCounterEffect,
   getTcgBattleAbilityDamageCounterMoveEffect,
+  getTcgBattleRemainingPrizeCount,
   getTcgBattleCoinFlipStatusPower,
   isTcgBattleCradilySelectiveSlime,
   isTcgBattleVileplumeChoiceStatus,
   hasTcgBattleKlinklangEmergencyRotation,
+  hasTcgBattleLuxrayPrizeBenchAbility,
   isTcgBattleDarkCrobatPoison,
   isTcgBattleDarkHoundoomFireBreath,
   isTcgBattleVenusaurMiracleAroma,
@@ -72,9 +74,11 @@ import {
   dealTcgBattleOpeningHand,
   drawTcgBattleCards,
   doesTcgBattleConditionPass,
+  doesTcgBattleAttackIgnoreTargetDamageModifiers,
   getAllowedTcgBattleAttackCost,
   getEffectiveTcgBattleAttackCost,
   getTcgBattleAttackEffect,
+  getTcgBattleAttackUsageKey,
   getTcgBattleCount,
   getValidTcgBattleTargets,
   getTcgBattleCardUnlockTurnForCard,
@@ -82,6 +86,11 @@ import {
   getTcgBattleDeckSearchMaxCount,
   getOpenTcgBattleBenchSlots,
   hasTcgBattleRecentRuleBoxKnockout,
+  hasTcgBattleExtraPrizeForAttackKnockout,
+  hasTcgBattleWonderKiss,
+  getTcgBattleKnockoutPrizeReduction,
+  hasTcgBattleCoinFlipKnockoutPrizeReduction,
+  hasTcgBattleShuffleIntoDeckOnKnockout,
   canTcgBattlePutPokemonOnBench,
   getTcgBattleAbilityRetreatCost,
   canTcgBattleUseElectricStart,
@@ -109,6 +118,7 @@ import {
   validateTcgBattleDeck,
   validateTcgBattleAttackChoice,
   isTcgBattleAttackDisabled,
+  isTcgBattleSideAttackLocked,
   isTcgBattleAbilityAttackAllowed,
   isTcgBattleAttackEffectBlockedByAbility,
   toTcgPvpPerspectiveState,
@@ -775,6 +785,8 @@ function toTcgBattleCardSummary(card: TcgBattleCardState): TcgBattleCardSummary 
     transformOriginal: _transformOriginal,
     playedToBenchTurn: _playedToBenchTurn,
     playedToFrontTurn: _playedToFrontTurn,
+    becameActiveTurn: _becameActiveTurn,
+    evolvedTurn: _evolvedTurn,
     ...summary
   } = card
   summary.hp = Math.max(1, summary.hp - (card.temporaryEffects?.abilityHpBonus || 0))
@@ -917,6 +929,8 @@ function useTcgBattleDamageCounterAbility(
   if (effect.specialConditionGate && source.statusConditions?.length) return `${source.name} cannot use ${ability.name} while affected by a Special Condition.`
   if (effect.discardHandForSelfCounters && targetId !== sourceId) return 'Choose Banette as the target of Temper Tantrum.'
   if (effect.requiresOtherActiveName && !side.front.some((card) => card.instanceId !== source.instanceId && card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name).includes(effect.requiresOtherActiveName!))) return `Another Active Pokémon must be ${effect.requiresOtherActiveName}.`
+  if (effect.requiresNameInPlay && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name).includes(effect.requiresNameInPlay!))) return `You need ${effect.requiresNameInPlay} in play to use this Ability.`
+  if (effect.requiresNameInPlay && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name).includes(effect.requiresNameInPlay!))) return `You need ${effect.requiresNameInPlay} in play to use this Ability.`
   if (effect.benchToActiveOnly && !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === sideKey && event.targetId === source.instanceId)) return 'That Ability can only be used when this Pokémon moves from the Bench to the Active Spot.'
   const energyTypes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'fighting', d: 'darkness', y: 'metal', c: 'colorless', f: 'fairy' }
   if (effect.energyType && (side.energy < 1 || side.selectedEnergy?.toLowerCase() !== energyTypes[effect.energyType])) return `You need a Basic ${energyTypes[effect.energyType]} Energy in the shared Energy pool.`
@@ -948,7 +962,7 @@ function useTcgBattleDamageCounterAbility(
     side.discard.push(discardedSingleCard[0])
   }
   if (effect.mysteriousPotion) {
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
     if (result === 'heads') {
@@ -971,7 +985,7 @@ function useTcgBattleDamageCounterAbility(
   let coinResult: 'heads' | 'tails' | undefined
   if (effect.coinFlip) {
     clearDamageEvents(state)
-    coinResult = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    coinResult = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: sideKey, results: [coinResult], heads: coinResult === 'heads' ? 1 : 0, tails: coinResult === 'tails' ? 1 : 0, purpose: 'effect' })
     if (coinResult === 'tails') {
       source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
@@ -1031,6 +1045,7 @@ function useTcgBattleDamageCounterMoveAbility(state: TcgBattleState, sideKey: Tc
   const absolCursedEyes = normalizeTcgBattleAbilityCardName(source.name) === 'absol' && ability.text.replace(/[’]/g, "'").toLowerCase().replace(/\s+/g, ' ').trim() === "when you play this pokemon from your hand onto your bench, you may move 3 damage counters from 1 of your opponent's pokemon to another of his or her pokemon."
   if (absolCursedEyes && source.playedToBenchTurn !== state.turnNumber) return 'Cursed Eyes can only be used when Absol is played from hand onto the Bench.'
   if (effect.blockedStatuses ? source.statusConditions?.some((status) => effect.blockedStatuses!.includes(status)) : effect.blockedBySpecialCondition && source.statusConditions?.length) return 'This Pokémon cannot use this Ability while affected by a Special Condition.'
+  if (effect.opponentRemainingPrizesAtMost !== undefined && getTcgBattleRemainingPrizeCount(state, sideKey === 'player' ? 'opponent' : 'player') > effect.opponentRemainingPrizesAtMost) return 'Your opponent has too many Prize cards remaining for this Ability.'
   if (effect.minimumSourceHp && source.currentHp < effect.minimumSourceHp) return 'This Pokémon needs more than 10 HP remaining to use this Ability.'
   if (effect.activeOnly && !side.front.some((card) => card.instanceId === sourceId)) return 'That Pokémon must be Active to use this Ability.'
   if (effect.requiredName && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiredName!))) return `You need ${effect.requiredName} in play to use this Ability.`
@@ -1117,15 +1132,18 @@ function applyTcgBattleIonoEnergyAbility(state: TcgBattleState, sideKey: TcgBatt
   const ionoAbility = /^as often as you like during your turn, you may attach a basic \{l\} energy card from your hand to 1 of your iono's pokemon\.$/.test(normalized || '')
   const hydrappleAbility = /^once during your turn, you may attach a basic \{g\} energy card from your hand to 1 of your pokemon\. if you attached energy to a pokemon in this way, heal 30 damage from that pokemon\.$/.test(normalized || '')
   const houndoomAbility = /^once during your turn, you may search your deck for a single strike energy card and attach it to 1 of your single strike pokemon\. then, shuffle your deck\. if you attached energy to a pokemon in this way, put 2 damage counters on that pokemon\.$/.test(normalized || '')
-  if (!source || !ability || (!ionoAbility && !hydrappleAbility && !houndoomAbility)) return 'That Energy Ability is unavailable.'
-  if ((hydrappleAbility || houndoomAbility) && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return 'That Ability has already been used this turn.'
-  const energyType = hydrappleAbility ? 'grass' : houndoomAbility ? side.selectedEnergy?.toLowerCase() : 'lightning'
+  const infernapeAbility = /^once during your turn, you may attach a basic \{r\} energy card, a basic \{f\} energy card, or 1 of each from your hand to your pokemon in any way you like\.$/.test(normalized || '')
+  if (!source || !ability || (!ionoAbility && !hydrappleAbility && !houndoomAbility && !infernapeAbility)) return 'That Energy Ability is unavailable.'
+  if ((hydrappleAbility || houndoomAbility || infernapeAbility) && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return 'That Ability has already been used this turn.'
+  const energyType = hydrappleAbility ? 'grass' : houndoomAbility || infernapeAbility ? side.selectedEnergy?.toLowerCase() : 'lightning'
   if (houndoomAbility && energyType !== 'darkness' && energyType !== 'fighting') return 'Select Darkness or Fighting Energy to use Single Strike Energy.'
-  const energyLabel = energyType === 'grass' ? 'Grass' : energyType === 'lightning' ? 'Lightning' : energyType === 'darkness' ? 'Darkness' : 'Fighting'
+  if (infernapeAbility && energyType !== 'fire' && energyType !== 'fighting') return 'Select Fire or Fighting Energy for Infernape.'
+  const energyLabel = energyType === 'grass' ? 'Grass' : energyType === 'lightning' ? 'Lightning' : energyType === 'fire' ? 'Fire' : energyType === 'darkness' ? 'Darkness' : 'Fighting'
   if (side.selectedEnergy?.toLowerCase() !== energyType || side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap) return `You need room for ${energyLabel} Energy in the shared Energy pool.`
-  const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId && card.currentHp > 0 && (hydrappleAbility ? card.currentHp < card.hp : houndoomAbility ? card.subtypes.some((subtype) => subtype.toLowerCase() === 'single strike') : card.name.toLowerCase().includes("iono's")))
-  if (!target) return hydrappleAbility ? 'Choose one of your damaged Pokémon to heal.' : houndoomAbility ? 'Choose one of your Single Strike Pokémon.' : "Choose one of your Iono's Pokémon to receive the Energy."
+  const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId && card.currentHp > 0 && (hydrappleAbility ? card.currentHp < card.hp : houndoomAbility ? card.subtypes.some((subtype) => subtype.toLowerCase() === 'single strike') : ionoAbility ? card.name.toLowerCase().includes("iono's") : true))
+  if (!target) return hydrappleAbility ? 'Choose one of your damaged Pokémon to heal.' : houndoomAbility ? 'Choose one of your Single Strike Pokémon.' : ionoAbility ? "Choose one of your Iono's Pokémon to receive the Energy." : 'Choose one of your Pokémon to receive the Energy.'
   side.energy += 1
+  if (infernapeAbility) source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
   if (hydrappleAbility && !isTcgBattleHealingPrevented(state)) {
     target.currentHp = Math.min(target.hp, target.currentHp + 30)
     source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
@@ -1137,7 +1155,9 @@ function applyTcgBattleIonoEnergyAbility(state: TcgBattleState, sideKey: TcgBatt
     clearDamageEvents(state)
     recordDamageEvent(state, { sourceId, targetId, targetSide: sideKey, damage: 20, reason: 'ability', targetHadFullHp })
   }
-  state.log.unshift(hydrappleAbility
+  state.log.unshift(infernapeAbility
+    ? `${source.name}'s ${ability.name} attached ${energyLabel} Energy to the shared pool (+1 Energy); individual Pokémon attachments are not tracked.`
+    : hydrappleAbility
     ? `${source.name}'s ${ability.name} attached Grass Energy to ${target.name} (+1 shared Energy) and healed 30 damage.`
     : houndoomAbility ? `${source.name}'s ${ability.name} attached Single Strike Energy to ${target.name} (+1 ${energyType} Energy) and put 2 damage counters on it.`
       : `${source.name}'s ${ability.name} attached Lightning Energy to ${target.name} (+1 shared Energy).`)
@@ -1174,7 +1194,13 @@ function applyTcgBattleFrosmothEnergyAbility(state: TcgBattleState, sideKey: Tcg
 
 function isTcgBattleBaxcaliburEnergyAbility(text?: string) {
   const normalized = text?.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
-  return /^as often as you like during your turn, you may attach a basic \{w\} energy card from your hand to 1 of your pokemon\.$/.test(normalized || '')
+  return /^as often as you like during your turn, you may attach a basic \{w\} energy card from your hand to 1 of your pokemon\.$/.test(normalized || '') || Boolean(getTcgBattleEnergyZoneAbilityConfig(normalized))
+}
+
+function getTcgBattleEnergyZoneAbilityConfig(text?: string | null): { energyType: 'water' | 'psychic'; pokemonType: 'water' | 'psychic' } | null {
+  if (text === 'once during your turn, you may take a water energy from your energy zone and attach it to the water pokemon in the active spot.') return { energyType: 'water', pokemonType: 'water' }
+  if (text === 'once during your turn, you may take 1 {p} energy from your energy zone and attach it to the {p} pokemon in the active spot.') return { energyType: 'psychic', pokemonType: 'psychic' }
+  return null
 }
 
 function applyTcgBattleBaxcaliburEnergyAbility(state: TcgBattleState, sideKey: TcgBattleSide, sourceId: string, targetId: string, abilityIndex: number): string | undefined {
@@ -1183,10 +1209,14 @@ function applyTcgBattleBaxcaliburEnergyAbility(state: TcgBattleState, sideKey: T
   const ability = source?.abilities?.[abilityIndex]
   if (source && isTcgBattleAbilitySuppressedByShadyTail(source, [state.player, state.opponent])) return 'This Pokémon has no usable Abilities while an opposing Ability suppresses it.'
   if (!source || !ability || !isTcgBattleBaxcaliburEnergyAbility(ability.text)) return 'That Baxcalibur Energy Ability is unavailable.'
-  if (side.selectedEnergy?.toLowerCase() !== 'water' || side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap) return 'You need room for Water Energy in the shared Energy pool.'
-  const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId && card.currentHp > 0)
+  const normalizedAbilityText = ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
+  const energyZoneConfig = getTcgBattleEnergyZoneAbilityConfig(normalizedAbilityText)
+  if (side.selectedEnergy?.toLowerCase() !== (energyZoneConfig?.energyType || 'water') || side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap) return `You need room for ${energyZoneConfig?.energyType || 'Water'} Energy in the shared Energy pool.`
+  if (energyZoneConfig && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return 'That Ability has already been used this turn.'
+  const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId && card.currentHp > 0 && (!energyZoneConfig || side.front.some((active) => active.instanceId === card.instanceId) && card.types.some((type) => type.toLowerCase() === energyZoneConfig.pokemonType)))
   if (!target) return 'Choose one of your Pokémon to receive the Energy.'
   side.energy += 1
+  if (energyZoneConfig) source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
   state.log.unshift(`${source.name}'s ${ability.name} attached Water Energy to ${target.name} (+1 shared Energy).`)
   state.lastAction = { id: randomUUID(), side: sideKey, kind: 'ability', frontId: sourceId, targetId, abilityName: ability.name, abilityEffect: 'energyAttach' }
   return undefined
@@ -1386,7 +1416,7 @@ function applyTcgBattlePorygonZDiscardEnergyAbility(state: TcgBattleState, sideK
   if (isTcgBattleAbilitySuppressedByShadyTail(source, [state.player, state.opponent])) return 'This Pokémon has no usable Abilities while an opposing Ability suppresses it.'
   if (source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return 'Porygon-Z has already used this Ability this turn.'
   if (!side.selectedEnergy) return 'Choose an Energy type before using Porygon-Z’s Ability.'
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   let recovered = 0
   let discarded = 0
@@ -1608,7 +1638,7 @@ function applyTcgBattleEnergyAttachmentAbilities(state: TcgBattleState, sideKey:
   }))
   for (const { source, ability } of ironShellSources) {
     for (let attachment = 0; attachment < energyAttached; attachment += 1) {
-      const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
       recordCoinFlipEvent(state, { sourceId: source.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
       if (result === 'heads') {
         state.log.unshift(`${source.name}'s ${ability.name} flipped heads; no damage counters were placed.`)
@@ -1843,14 +1873,50 @@ function applyTcgBattleEnergyAttachmentAbilities(state: TcgBattleState, sideKey:
   }
 }
 
-function applyTcgBattleBothActiveConfusedAndPoisoned(state: TcgBattleState, sideKey: TcgBattleSide, statuses: ('confused' | 'poisoned')[] = ['confused', 'poisoned']) {
+function applyTcgBattleBothActiveStatuses(state: TcgBattleState, sideKey: TcgBattleSide, statuses: ('asleep' | 'burned' | 'confused' | 'paralyzed' | 'poisoned')[] = ['confused', 'poisoned'], sourceId?: string) {
   const opposingSideKey = sideKey === 'player' ? 'opponent' : 'player'
   const ownActive = state[sideKey].front.find((card) => card.currentHp > 0)
   const opposingActive = state[opposingSideKey].front.find((card) => card.currentHp > 0)
   if (!ownActive || !opposingActive) return []
-  const ownEvents = applyTcgBattleStatusConditions(state, sideKey, ownActive.instanceId, ownActive.instanceId, [{ target: 'self', statuses: [...statuses] }], true)
-  const opponentEvents = applyTcgBattleStatusConditions(state, sideKey, ownActive.instanceId, opposingActive.instanceId, [{ target: 'opponent', statuses: [...statuses] }], true)
+  const effectSourceId = sourceId || ownActive.instanceId
+  const ownEvents = applyTcgBattleStatusConditions(state, sideKey, effectSourceId, ownActive.instanceId, [{ target: 'self', statuses: [...statuses] }], true)
+  const opponentEvents = applyTcgBattleStatusConditions(state, sideKey, effectSourceId, opposingActive.instanceId, [{ target: 'opponent', statuses: [...statuses] }], true)
   return [...ownEvents, ...opponentEvents]
+}
+
+function applyTcgBattleFlareonStarBenchEntry(state: TcgBattleState, sideKey: TcgBattleSide, playedPokemon: TcgBattleCardState) {
+  const abilityIndex = playedPokemon.abilities?.findIndex((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/[☆★]/g, 'star').replace(/\s+/g, ' ').trim() === "once during your turn, when you put flareon star from your hand onto your bench, you may use this power. each active pokemon (both yours and your opponent's) is now burned.") ?? -1
+  const ability = playedPokemon.abilities?.[abilityIndex]
+  if (!ability || !playedPokemon.name.toLowerCase().startsWith('flareon') || !state[sideKey].back.some((card) => card.instanceId === playedPokemon.instanceId) || playedPokemon.playedToBenchTurn !== state.turnNumber || isTcgBattleAbilitySuppressedByShadyTail(playedPokemon, [state.player, state.opponent])) return
+  const usageKey = `${abilityIndex}:${ability.name}`
+  if (playedPokemon.abilityUses?.[usageKey] === state.turnNumber) return
+  const events = applyTcgBattleBothActiveStatuses(state, sideKey, ['burned'], playedPokemon.instanceId)
+  playedPokemon.abilityUses = { ...playedPokemon.abilityUses, [usageKey]: state.turnNumber }
+  state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
+  state.log.unshift(events.length ? `${playedPokemon.name}'s ${ability.name} Burned both Active Pokémon.` : `${playedPokemon.name}'s ${ability.name} affected neither Active Pokémon.`)
+}
+
+function applyTcgBattleJolteonStarBenchEntry(state: TcgBattleState, sideKey: TcgBattleSide, playedPokemon: TcgBattleCardState) {
+  const abilityIndex = playedPokemon.abilities?.findIndex((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/[☆★]/g, 'star').replace(/\s+/g, ' ').trim() === "once during your turn, when you put jolteon star from your hand onto your bench, you may put 1 damage counter on each active pokemon (both yours and your opponent's).") ?? -1
+  const ability = playedPokemon.abilities?.[abilityIndex]
+  if (!ability || !playedPokemon.name.toLowerCase().startsWith('jolteon') || !state[sideKey].back.some((card) => card.instanceId === playedPokemon.instanceId) || playedPokemon.playedToBenchTurn !== state.turnNumber || isTcgBattleAbilitySuppressedByShadyTail(playedPokemon, [state.player, state.opponent])) return
+  const usageKey = `${abilityIndex}:${ability.name}`
+  if (playedPokemon.abilityUses?.[usageKey] === state.turnNumber) return
+  const opposingSideKey: TcgBattleSide = sideKey === 'player' ? 'opponent' : 'player'
+  const targets = [
+    { card: state[sideKey].front.find((card) => card.currentHp > 0), targetSide: sideKey },
+    { card: state[opposingSideKey].front.find((card) => card.currentHp > 0), targetSide: opposingSideKey },
+  ].filter((entry): entry is { card: TcgBattleCardState; targetSide: TcgBattleSide } => Boolean(entry.card))
+  let affected = 0
+  for (const { card, targetSide } of targets) {
+    if (isTcgBattleAbilityEffectBlockedByTeamAbility(card, targetSide, state)) continue
+    card.currentHp = Math.max(0, card.currentHp - 10)
+    recordDamageEvent(state, { sourceId: playedPokemon.instanceId, targetId: card.instanceId, targetSide, damage: 10, reason: 'ability' })
+    affected += 1
+  }
+  playedPokemon.abilityUses = { ...playedPokemon.abilityUses, [usageKey]: state.turnNumber }
+  state.lastAction = { id: randomUUID(), side: sideKey, kind: 'ability', frontId: playedPokemon.instanceId, abilityName: ability.name, abilityEffect: 'counterDamage' }
+  state.log.unshift(affected ? `${playedPokemon.name}'s ${ability.name} put 1 damage counter on each affected Active Pokémon.` : `${playedPokemon.name}'s ${ability.name} could not affect either Active Pokémon.`)
 }
 
 function isEspeonStarBenchPower(source: TcgBattleCardState | undefined, text: string | undefined) {
@@ -1958,6 +2024,7 @@ function promoteOpponentIfNeeded(state: TcgBattleState) {
   while (state.opponent.front.length < 3 && state.opponent.back.length > 0) {
     const [promoted] = state.opponent.back.splice(0, 1)
     delete promoted.temporaryEffects?.pokemonPowerSuppression
+    promoted.becameActiveTurn = state.turnNumber
     state.opponent.front.push(promoted)
     state.log.unshift(`${promoted.name} moved to the opponent front row.`)
   }
@@ -2026,6 +2093,7 @@ function drawTcgBattleTurnStartCard(state: TcgBattleState, sideKey: TcgBattleSid
 
 function advanceTurn(state: TcgBattleState, nextSide: TcgBattleSide) {
   const endingSide = state.activeSide
+  if (state.opponentAttackLock?.blockedSide === endingSide) state.opponentAttackLock = undefined
   if (state.lastAction?.side === endingSide && state.lastAction.kind === 'attack') {
     const side = state[endingSide]
     for (const pokemon of [...side.front, ...side.back]) {
@@ -2084,6 +2152,7 @@ function advanceTurn(state: TcgBattleState, nextSide: TcgBattleSide) {
   }
   for (const card of [...state[state.activeSide].front, ...state[state.activeSide].back]) {
     delete card.temporaryEffects?.lastIncomingAttackDamage
+    delete card.temporaryEffects?.wasDamagedByAttackAsActiveLastTurn
   }
   state.turnNumber = getNextTcgBattleTurnNumber(
     state.turnNumber,
@@ -2091,7 +2160,27 @@ function advanceTurn(state: TcgBattleState, nextSide: TcgBattleSide) {
     nextSide,
   )
   for (const sideKey of ['player', 'opponent'] as const) {
+    for (const card of [...state[sideKey].front, ...state[sideKey].back]) {
+      const effects = card.temporaryEffects
+      if (!effects) continue
+      if (effects?.weaknessOverrideExpiresAtTurn !== undefined && effects.weaknessOverrideExpiresAtTurn < state.turnNumber) {
+        delete effects.weaknessType
+        delete effects.weaknessValue
+        delete effects.weaknessOverrideExpiresAtTurn
+      }
+      if (effects?.battleTypeOverrideExpiresAtTurn !== undefined && effects.battleTypeOverrideExpiresAtTurn < state.turnNumber) {
+        delete effects.battleType
+        delete effects.battleTypeOverrideExpiresAtTurn
+      }
+      if (effects?.lockOnCoinOverride && effects.lockOnCoinOverride.expiresTurn < state.turnNumber) delete effects.lockOnCoinOverride
+      if (Object.keys(effects).length === 0) card.temporaryEffects = undefined
+    }
+  }
+  for (const sideKey of ['player', 'opponent'] as const) {
     state[sideKey].temporaryAttackDamageBoosts = state[sideKey].temporaryAttackDamageBoosts?.filter((boost) => boost.turnNumber >= state.turnNumber)
+    if (state[sideKey].temporaryCoinFlipOverride && state[sideKey].temporaryCoinFlipOverride.turnNumber < state.turnNumber) {
+      state[sideKey].temporaryCoinFlipOverride = undefined
+    }
   }
   state.activeSide = nextSide
   drawTcgBattleTurnStartCard(state, nextSide)
@@ -2177,7 +2266,7 @@ function applyTcgBattleSinkholeAfterRetreat(
       continue
     }
 
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, {
       sourceId: source.instanceId,
       side: retreatingSide,
@@ -2213,7 +2302,7 @@ function applyTcgBattleSlimySlidingBeforeRetreat(state: TcgBattleState, retreati
     ) ?? -1
     if (abilityIndex < 0) continue
     const ability = source.abilities![abilityIndex]
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: abilitySide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     state.log.unshift(result === 'tails'
       ? `${source.name}'s ${ability.name} flipped tails; the retreat failed and no Energy was discarded.`
@@ -2236,7 +2325,7 @@ function applyTcgBattleUnownChaseAfterRetreat(
     )
     if (!chase || retreating.currentHp <= 0) continue
 
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, {
       sourceId: source.instanceId,
       side: retreatingSide,
@@ -2404,7 +2493,7 @@ function applyAttackDamageToCard(
     target.temporaryEffects?.endure &&
     target.currentHp - damage <= 0
   ) {
-    const result = Math.random() >= 0.5 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, targetSide)
     recordCoinFlipEvent(state, {
       sourceId: target.instanceId,
       side: targetSide,
@@ -2480,7 +2569,7 @@ function applyTcgBattleReactiveAbilities(
         const attackerOwner = state[attackerSide]
         if (!providerIsActive || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
         if (lugiaExEnergyPunishment) {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           if (result === 'tails') {
             state.log.unshift(`${provider.name}'s ${ability.name} flipped tails; no Energy was returned.`)
@@ -2540,7 +2629,7 @@ function applyTcgBattleReactiveAbilities(
       const enteiSelfShuffle = normalizeTcgBattleAbilityCardName(provider.name) === 'entei' && text.replace(/\s+/g, ' ').trim() === "whenever your opponent's attack damages entei, unless that attack knocks out entei, flip a coin. if heads, shuffle entei and all cards attached to it into your deck. this power can't be used if entei is already asleep, confused, or paralyzed when it is damaged."
       if (enteiSelfShuffle) {
         if (event.damage <= 0 || provider.currentHp <= 0 || provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         if (result === 'heads') {
           const frontIndex = state[damagedSide].front.findIndex((card) => card.instanceId === provider.instanceId)
@@ -2576,7 +2665,7 @@ function applyTcgBattleReactiveAbilities(
         ].includes(text.replace(/\s+/g, ' ').trim())
         if (reactiveConfusion) {
           if (!providerIsActive || event.damage <= 0 || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           if (result === 'heads') {
             const statusEvents = applyTcgBattleStatusConditions(state, damagedSide, provider.instanceId, attacker.instanceId, [{ target: 'opponent', statuses: ['confused'] }], true)
@@ -2588,7 +2677,7 @@ function applyTcgBattleReactiveAbilities(
       const faintingSpell = text.replace(/\s+/g, ' ').trim() === "once during your opponent's turn, if gengar would be knocked out by damage from an attack, you may flip a coin. if heads, the defending pokemon is knocked out."
       if (faintingSpell) {
         if (providerIsActive && provider.currentHp <= 0 && event.damage > 0 && !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           if (result === 'heads') {
             attacker.currentHp = 0
@@ -2634,7 +2723,7 @@ function applyTcgBattleReactiveAbilities(
           provider.abilityUses?.[usageKey] === state.turnNumber ||
           isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
         provider.abilityUses = { ...provider.abilityUses, [usageKey]: state.turnNumber }
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const statusEvents = result === 'heads'
           ? applyTcgBattleStatusConditions(state, damagedSide, provider.instanceId, attacker.instanceId, [{ target: 'opponent', statuses: ['poisoned'] }], true)
@@ -2688,7 +2777,7 @@ function applyTcgBattleReactiveAbilities(
       const fluffyWool = text.replace(/\s+/g, ' ').trim() === "during your opponent's turn, if light piloswine is your active pokemon and is damaged by your opponent's attack (even if it's knocked out), flip a coin. if heads, the attacking pokemon is now asleep. this power stops working if light piloswine is already asleep, confused, or paralyzed when your opponent attacks."
       if (fluffyWool) {
         if (!providerIsActive || provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const statusEvents = result === 'heads' && attacker.currentHp > 0
           ? applyTcgBattleStatusConditions(state, damagedSide, provider.instanceId, attacker.instanceId, [{ target: 'opponent', statuses: ['asleep'] }], true)
@@ -2738,7 +2827,7 @@ function applyTcgBattleReactiveAbilities(
       const energyShark = text.replace(/\s+/g, ' ').trim() === "if sharpedo is your active pokemon and is damaged by an opponent's attack (even if sharpedo is knocked out), flip a coin. if heads, discard an energy card attached to the attacking pokemon."
       if (energyShark) {
         if (!providerIsActive || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const attackerOwner = state[attackerSide]
         if (result === 'heads' && attackerOwner.energy > 0) {
@@ -2754,7 +2843,7 @@ function applyTcgBattleReactiveAbilities(
         if (!providerIsActive || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
         const results: ('heads' | 'tails')[] = []
         while (true) {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           results.push(result)
           if (result === 'tails') break
         }
@@ -2770,7 +2859,7 @@ function applyTcgBattleReactiveAbilities(
       const counterattackKerzap = text.replace(/\s+/g, ' ').trim() === "if this pokemon is in the active spot and is damaged by an opponent's attack (even if it is knocked out), flip 3 coins. for each heads, put 3 damage counters on the attacking pokemon."
       if (counterattackKerzap) {
         if (!providerIsActive || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const results = Array.from({ length: 3 }, () => randomInt(0, 2) === 0 ? 'heads' as const : 'tails' as const)
+        const results = Array.from({ length: 3 }, () => flipTcgBattleCoinForSide(state, state.activeSide))
         const heads = results.filter((result) => result === 'heads').length
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results, heads, tails: 3 - heads, purpose: 'effect' })
         const damage = heads * 30
@@ -2784,7 +2873,7 @@ function applyTcgBattleReactiveAbilities(
       const finalBeam = text.replace(/\s+/g, ' ').trim() === "when dark gyarados is knocked out by an attack, flip a coin. if heads, this power does 20 damage for each water energy attached to dark gyarados to the pokemon that knocked out dark gyarados. apply weakness and resistance. this power doesn't work if dark gyarados is asleep, confused, or paralyzed."
       if (finalBeam) {
         if (provider.currentHp > 0 || provider.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const sharedWaterCount = state[damagedSide].selectedEnergy?.toLowerCase() === 'water' ? state[damagedSide].energy : 0
         const baseDamage = result === 'heads' ? sharedWaterCount * 20 : 0
@@ -2839,7 +2928,7 @@ function applyTcgBattleReactiveAbilities(
       const knockoutCoinRetaliation = /^if this pokemon (?:(?:is in the active spot|is your active pokemon) and )?is knocked out by damage from (?:an opponent's attack|an attack from your opponent's pokemon), flip a coin\. if heads, the attacking pokemon is knocked out\.$/.test(text.replace(/\s+/g, ' ').trim())
       if (knockoutCoinRetaliation) {
         if ((text.includes('is in the active spot') || text.includes('is your active pokemon')) && !providerIsActive || provider.currentHp > 0 || event.damage <= 0 || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         if (result === 'heads' && attacker.currentHp > 0) {
           const remainingHp = attacker.currentHp
@@ -2854,7 +2943,7 @@ function applyTcgBattleReactiveAbilities(
       const destinyBurst = text.replace(/\s+/g, ' ').trim() === "if this pokemon is your active pokemon and is knocked out by damage from an opponent's attack, flip a coin. if heads, put 5 damage counters on the attacking pokemon."
       if (destinyBurst) {
         if (!providerIsActive || provider.currentHp > 0 || event.damage <= 0 || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         let damage = 0
         if (result === 'heads' && attacker.currentHp > 0) {
@@ -2868,7 +2957,7 @@ function applyTcgBattleReactiveAbilities(
       const shockBlast = text === "if lt. surge's electrode is your active pokemon and gets damaged (even if it's knocked out), flip a coin. if tails, this power does 20 damage to each active pokemon. this power works even if lt. surge's electrode is already asleep, confused, or paralyzed when it takes damage."
       if (shockBlast) {
         if (!providerIsActive || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         if (result === 'tails') {
           let targetsHit = 0
@@ -2888,7 +2977,7 @@ function applyTcgBattleReactiveAbilities(
       const pollenDefense = /^if an attack does damage to erika's vileplume while it's your active pokemon \(even if it's knocked out\), flip a coin\. if heads, your opponent's active pokemon is now confused\. this power works even while erika's vileplume is asleep, confused, or paralyzed\.$/.test(text)
       if (pollenDefense) {
         if (!providerIsActive || isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent])) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: provider.instanceId, side: damagedSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const activeTarget = state[attackerSide].front.find((card) => card.currentHp > 0)
         if (result === 'heads' && activeTarget) {
@@ -3060,6 +3149,11 @@ function recordCoinFlipEvent(
   ]
 }
 
+function flipTcgBattleCoinForSide(state: TcgBattleState, sideKey: TcgBattleSide): 'heads' | 'tails' {
+  if (state[sideKey].temporaryCoinFlipOverride?.turnNumber === state.turnNumber) return 'tails'
+  return Math.random() >= 0.5 ? 'heads' : 'tails'
+}
+
 function recordStatusEvent(
   state: TcgBattleState,
   event: Omit<NonNullable<TcgBattleState['lastStatusEvents']>[number], 'id'>,
@@ -3135,6 +3229,11 @@ function clearSourceLinkedControlsForInactiveSources(state: TcgBattleState) {
         retreatSourceId &&
         !state[sideKey].front.some((card) => card.instanceId === retreatSourceId && card.currentHp > 0)
       ) delete effects?.cannotRetreat
+      const attackCostSourceId = effects?.attackCostIncrease?.sourceId
+      if (
+        attackCostSourceId &&
+        !state[sideKey].front.some((card) => card.instanceId === attackCostSourceId && card.currentHp > 0)
+      ) delete effects?.attackCostIncrease
       const switchSourceId = effects?.cannotSwitch?.sourceId
       if (
         switchSourceId &&
@@ -3164,15 +3263,17 @@ function swapTcgBattleCards(
   if (frontCard.incomingAttackModifier?.kind === 'preventAllEffects' && frontCard.incomingAttackModifier.activeOnly) frontCard.incomingAttackModifier = undefined
   delete replacement.temporaryEffects?.pokemonPowerSuppression
   clearTcgBattleStatuses(frontCard)
-  clearTcgBattleTemporaryEffects(frontCard)
+      clearTcgBattleTemporaryEffects(frontCard, true, true)
   const opponentSide = state[sideKey === 'player' ? 'opponent' : 'player']
   for (const card of [...opponentSide.front, ...opponentSide.back]) {
     if (card.temporaryEffects?.cannotTarget?.targetId === frontCard.instanceId) {
       delete card.temporaryEffects.cannotTarget
     }
     if (card.temporaryEffects?.cannotRetreat?.sourceId === frontCard.instanceId) delete card.temporaryEffects.cannotRetreat
+    if (card.temporaryEffects?.attackCostIncrease?.sourceId === frontCard.instanceId) delete card.temporaryEffects.attackCostIncrease
     if (card.temporaryEffects?.cannotSwitch?.sourceId === frontCard.instanceId) delete card.temporaryEffects.cannotSwitch
   }
+  replacement.becameActiveTurn = state.turnNumber
   side.front[frontIndex] = replacement
   side.back[benchIndex] = frontCard
   recordEffectEvent(state, {
@@ -3192,17 +3293,21 @@ function applyTcgBattleSpecialEffects(params: {
   attacker: TcgBattleCardState
   target: TcgBattleCardState
   paidAttackCost: number
+  attackName: string
+  attackIgnoresTargetEffects: boolean
   choice?: TcgBattleAttackChoice
   resolution: ReturnType<typeof resolveTcgBattleAttack>
   blockTargetEffects: boolean
-}) {
-  const { state, sideKey, attacker, target, paidAttackCost, resolution, blockTargetEffects } =
+  healedByAttack: boolean
+}): Set<string> {
+  const { state, sideKey, attacker, target, paidAttackCost, attackName, attackIgnoresTargetEffects, resolution, blockTargetEffects, healedByAttack } =
     params
   const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
   const choice =
     resolution.copiedAttackName && params.choice?.kind === 'copiedAttack'
       ? params.choice.followUp
       : params.choice
+  const specialEffectKnockoutIds = new Set<string>()
 
   if (resolution.copiedAttackName) {
     recordEffectEvent(state, {
@@ -3214,6 +3319,262 @@ function applyTcgBattleSpecialEffects(params: {
   }
 
   for (const rule of resolution.specialEffects || []) {
+    if (rule.kind === 'forceOpponentCoinFlipsToTails') {
+      state[opponentKey].temporaryCoinFlipOverride = { result: 'tails', turnNumber: state.turnNumber + 1 }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `all ${opponentKey === 'player' ? "your" : "your opponent's"} coin flips are tails next turn`,
+      })
+      continue
+    }
+    if (rule.kind === 'poisonCheckupBonus') {
+      if (!target.statusConditions?.includes('poisoned')) continue
+      const effects = getTemporaryEffects(target)
+      effects.poisonCheckupBonus = (effects.poisonCheckupBonus || 0) + rule.amount
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${target.name} takes ${rule.amount} more Poison damage between turns`,
+      })
+      continue
+    }
+    if (rule.kind === 'activeAttackDamageBonus') {
+      if (normalizeTcgBattleAbilityCardName(attacker.name) !== normalizeTcgBattleAbilityCardName(rule.cardName)) continue
+      const effects = getTemporaryEffects(attacker)
+      effects.activeAttackDamageBonus = Math.min(rule.maximum, (effects.activeAttackDamageBonus || 0) + rule.amount)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `${attacker.name}'s Active attacks do up to ${rule.maximum} more damage before Weakness and Resistance`,
+      })
+      continue
+    }
+    if (rule.kind === 'lockOnCoinOverride') {
+      getTemporaryEffects(attacker).lockOnCoinOverride = {
+        ownerSide: sideKey,
+        targetId: target.instanceId,
+        targetEvolvedTurn: target.evolvedTurn,
+        targetBecameActiveTurn: target.becameActiveTurn,
+        expiresTurn: state.turnNumber + 2,
+      }
+      recordEffectEvent(state, {
+        kind: 'type',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: "tails count as heads for Magnemite's Electric Bolt on this Pokémon next turn",
+      })
+      continue
+    }
+    if (rule.kind === 'changeWeakness' && rule.fixedType) {
+      const effects = getTemporaryEffects(target)
+      effects.weaknessValue = effects.weaknessType
+        ? effects.weaknessValue ?? '×2'
+        : target.weaknesses[0]?.value ?? null
+      effects.weaknessType = rule.fixedType
+      effects.weaknessOverrideExpiresAtTurn = state.turnNumber + (rule.expiresAfterTurns || 0)
+      recordEffectEvent(state, {
+        kind: 'type',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${rule.fixedType} Weakness until the end of your next turn`,
+      })
+      continue
+    }
+    if (rule.kind === 'buffSideAttackDamage') {
+      const side = state[sideKey]
+      side.temporaryAttackDamageBoosts = [
+        ...(side.temporaryAttackDamageBoosts || []),
+        { damageBonus: rule.damageBonus, turnNumber: state.turnNumber, duration: 'game', targetActiveOnly: rule.targetActiveOnly },
+      ]
+      const hasExtraEnergy = !rule.requiresExtraEnergyType || (
+        side.selectedEnergy === rule.requiresExtraEnergyType && side.energy >= (rule.minimumExtraEnergy || 0)
+      )
+      if (hasExtraEnergy && rule.extraPrizeOnDamageKnockout) side.extraPrizeForDamageKnockout = true
+      recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: attacker.instanceId, label: `Your Pokémon’s attacks do ${rule.damageBonus} more damage to the opposing Active Pokémon for the rest of the game` })
+      continue
+    }
+    if (rule.kind === 'lockOpponentGxAttacks') {
+      state[opponentKey].gxAttacksLocked = true
+      recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: attacker.instanceId, label: 'The opponent can no longer use GX attacks this game' })
+      continue
+    }
+    if (rule.kind === 'discardSelectedOwnBenchPokemon' && choice?.kind === 'discardOwnBenchPokemon') {
+      const ownSide = state[sideKey]
+      const selectedIds = new Set(choice.cardIds)
+      const discarded = ownSide.back.filter((card) => selectedIds.has(card.instanceId) && card.currentHp > 0)
+      ownSide.back = ownSide.back.filter((card) => !discarded.some((entry) => entry.instanceId === card.instanceId))
+      for (const card of discarded) {
+        const stack = card.evolutionStack || []
+        ownSide.discard.push(
+          ...stack.map((entry, index) => createTcgBattleCardState(entry, ownSide.discard.length + index)),
+          createTcgBattleCardState(toTcgBattleCardSummary(card), ownSide.discard.length + stack.length),
+        )
+      }
+      if (discarded.length) recordEffectEvent(state, {
+        kind: 'control', sourceId: attacker.instanceId, targetId: attacker.instanceId,
+        label: `${discarded.map((card) => card.name).join(', ')} discarded from the Bench`,
+      })
+      continue
+    }
+    if (rule.kind === 'knockOutTargetsAtRemainingHpAtMost') {
+      for (const victim of [...state[opponentKey].front, ...state[opponentKey].back]) {
+        if (victim.currentHp <= 0 || victim.currentHp > rule.maximumHp) continue
+        const blockedByIncomingEffect = victim.incomingAttackModifier?.kind === 'preventAllEffects' &&
+          (!victim.incomingAttackModifier.activeOnly || state[opponentKey].front.some((card) => card.instanceId === victim.instanceId))
+        if (blockedByIncomingEffect || isTcgBattleAttackEffectBlockedByAbility(victim, attacker, state, sideKey, attackName, attackIgnoresTargetEffects)) continue
+        victim.currentHp = 0
+        specialEffectKnockoutIds.add(victim.instanceId)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: victim.instanceId,
+          label: `${victim.name} was Knocked Out by the attack effect`,
+        })
+      }
+      continue
+    }
+    if (rule.kind === 'devolveSelectedPokemon') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      const ownerKey = [...state.player.front, ...state.player.back].some((card) => card.instanceId === target.instanceId) ? 'player' : 'opponent'
+      const owner = state[ownerKey]
+      const evolved = [...owner.front, ...owner.back].find((card) => card.instanceId === target.instanceId && card.currentHp > 0)
+      const previousStage = evolved?.evolutionStack?.at(-1)
+      if (!evolved || !previousStage) continue
+      const returnedCard = toTcgBattleCardSummary(evolved)
+      const damage = evolved.hp - evolved.currentHp
+      const restoredStack = evolved.evolutionStack!.slice(0, -1)
+      Object.assign(evolved, previousStage, {
+        instanceId: evolved.instanceId,
+        currentHp: Math.max(0, previousStage.hp - damage),
+        playedToBenchTurn: evolved.playedToBenchTurn,
+        playedToFrontTurn: evolved.playedToFrontTurn,
+        evolvedTurn: evolved.evolvedTurn,
+        statusConditions: undefined,
+        incomingAttackModifier: undefined,
+        temporaryEffects: undefined,
+        markers: undefined,
+        evolutionStack: restoredStack,
+        abilityUses: evolved.abilityUses,
+      })
+      if (evolved.currentHp <= 0) specialEffectKnockoutIds.add(evolved.instanceId)
+      owner.hand.push(createTcgBattleCardState(returnedCard, owner.hand.length))
+      state.log.unshift(`${evolved.name} was devolved; its highest Evolution card returned to its owner's hand.`)
+      recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: evolved.instanceId, label: `${evolved.name} was devolved` })
+      continue
+    }
+    if (rule.kind === 'coinFlipKnockOutActiveOrSelectedBenchBasic') {
+      const opponent = state[opponentKey]
+      const heads = resolution.coinFlips?.results[0] === 'heads'
+      const victim = heads
+        ? opponent.front.find((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic'))
+        : opponent.back.find((card) => card.instanceId === target.instanceId && card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic'))
+      if (!victim) continue
+      victim.currentHp = 0
+      specialEffectKnockoutIds.add(victim.instanceId)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: victim.instanceId,
+        label: `${victim.name} was Knocked Out by ${attacker.name}'s attack`,
+      })
+      continue
+    }
+    if (rule.kind === 'devolveOpponentPokemon') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      const opponent = state[opponentKey]
+      const candidates = [...opponent.front, ...opponent.back].filter((card) => card.currentHp > 0 && card.evolutionStack?.length)
+      const targets = rule.all ? candidates : candidates.filter((card) => card.instanceId === target.instanceId).slice(0, 1)
+      for (const evolved of targets) {
+        const previousStage = evolved.evolutionStack?.at(-1)
+        if (!previousStage) continue
+        const returnedCard = toTcgBattleCardSummary(evolved)
+        const damage = evolved.hp - evolved.currentHp
+        const restoredStack = evolved.evolutionStack!.slice(0, -1)
+        Object.assign(evolved, previousStage, {
+          instanceId: evolved.instanceId,
+          currentHp: Math.max(0, previousStage.hp - damage),
+          playedToBenchTurn: evolved.playedToBenchTurn,
+          playedToFrontTurn: evolved.playedToFrontTurn,
+          evolvedTurn: evolved.evolvedTurn,
+          statusConditions: evolved.statusConditions,
+          incomingAttackModifier: evolved.incomingAttackModifier,
+          temporaryEffects: evolved.temporaryEffects,
+          markers: evolved.markers,
+          evolutionStack: restoredStack,
+          abilityUses: evolved.abilityUses,
+        })
+        if (evolved.currentHp <= 0) specialEffectKnockoutIds.add(evolved.instanceId)
+        if (rule.destination === 'hand') {
+          opponent.hand.push(createTcgBattleCardState(returnedCard, opponent.hand.length))
+        } else {
+          opponent.deck.push(returnedCard)
+          shuffleTcgBattleDeck(opponent)
+        }
+        recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: evolved.instanceId, label: `${evolved.name} was devolved` })
+      }
+      continue
+    }
+    if (rule.kind === 'chooseTopDeckPokemonOrDiscardDraw') {
+      const destination = state[sideKey]
+      const topCards = destination.deck.splice(0, rule.amount || 1)
+      if (topCards.length === 0) continue
+      if (choice?.kind === 'optionalBonus' && choice.enabled) {
+        destination.hand.push(...topCards.map((card, index) => createTcgBattleCardState(card, destination.hand.length + index)))
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: attacker.instanceId,
+          label: `${topCards.length} Pokémon were added from the top of the deck to the attacker's hand`,
+        })
+      } else {
+        destination.discard.push(...topCards.map((card, index) => createTcgBattleCardState(card, destination.discard.length + index)))
+        const drawn = drawTcgBattleCards(destination.deck, Math.min(rule.drawCount, destination.deck.length))
+        const drawnIds = new Set(drawn.map((card) => card.id))
+        destination.deck = destination.deck.filter((card) => !drawnIds.has(card.id))
+        destination.hand.push(...drawn)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: attacker.instanceId,
+          label: `${topCards.length} Pokémon were discarded from the top of the deck and ${drawn.length} card${drawn.length === 1 ? '' : 's'} drawn`,
+        })
+      }
+      continue
+    }
+    if (rule.kind === 'winIfRemainingPrizes') {
+      if (getTcgBattleRemainingPrizeCount(state, sideKey) === rule.count) {
+        state.winner = sideKey
+        state.phase = 'finished'
+        state.outcomeReason = 'knockout'
+        state.log.unshift(`${sideKey === 'player' ? 'You' : 'Opponent'} won the game with a special attack.`)
+      }
+      continue
+    }
+    if (rule.kind === 'armKnockOutOnNextDamage') {
+      target.temporaryEffects = {
+        ...target.temporaryEffects,
+        knockOutOnNextAttackDamage: {
+          ownerSide: sideKey,
+          remainingTurns: 2,
+          requiredAttackerSubtype: rule.requiredAttackerSubtype,
+        },
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${target.name} will be Knocked Out if damaged during the next turn`,
+      })
+      continue
+    }
+    if (rule.kind === 'knockOutTarget' && rule.consumeDelayedKnockOut) {
+      delete target.temporaryEffects?.knockOutOnNextAttackDamage
+    }
+    if (rule.kind === 'buffDefendingPokemon' && rule.requiresOptionalChoice && !(choice?.kind === 'optionalBonus' && choice.enabled)) continue
     const targetsOpponent =
       [
         'disableAttack',
@@ -3221,6 +3582,11 @@ function applyTcgBattleSpecialEffects(params: {
         'swapDamageCounters',
         'returnTargetToHand',
         'knockOutTarget',
+        'armKnockOutOnNextDamage',
+        'lockOpponentAttacksForNextTurn',
+        'increaseDefendingAttackCost',
+        'increaseDefendingRetreatCost',
+        'increasePoisonCheckupDamageOnce',
         'changeWeakness',
         'changeType',
         'placeMarker',
@@ -3231,12 +3597,16 @@ function applyTcgBattleSpecialEffects(params: {
         'transferDamageCountersFromOwnSide',
         'transferAllDamageCounters',
         'shuffleTargetIntoDeck',
+        'devolveOpponentPokemon',
+        'devolveSelectedPokemon',
+        'coinFlipKnockOutActiveOrSelectedBenchBasic',
       ].includes(rule.kind) ||
+      (rule.kind === 'shuffleDeck' && rule.target === 'opponent') ||
       (rule.kind === 'switch' && rule.target === 'opponent') ||
       (rule.kind === 'preventRetreat' && (rule.target || 'opponent') === 'opponent') ||
       (rule.kind === 'cannotAttack' && rule.target !== 'self') ||
       (rule.kind === 'buffAttack' && rule.target === 'opponent') ||
-      (rule.kind === 'drawCards' && rule.target === 'opponent') ||
+      (rule.kind === 'drawCards' && (rule.target === 'opponent' || rule.target === 'choice' && choice?.kind === 'playerSide' && choice.side === opponentKey)) ||
       (rule.kind === 'shuffleRandomHandCardIntoDeck' && rule.target === 'opponent') ||
       (rule.kind === 'discardRandomHandCard' && rule.target === 'opponent') ||
       (rule.kind === 'revealHand' && rule.target === 'opponent') ||
@@ -3246,6 +3616,182 @@ function applyTcgBattleSpecialEffects(params: {
       (rule.kind === 'setStatus' && rule.target === 'opponent') ||
       (rule.kind === 'preventStatus' && rule.target === 'opponent')
     if (blockTargetEffects && targetsOpponent) continue
+
+    if (rule.kind === 'lockOpponentAttacksForNextTurn') {
+      state.opponentAttackLock = { blockedSide: opponentKey, sourceSide: sideKey }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: 'All opposing Pokémon cannot attack during their next turn',
+      })
+      continue
+    }
+    if (rule.kind === 'increaseDefendingAttackCost') {
+      target.temporaryEffects = {
+        ...target.temporaryEffects,
+        attackCostIncrease: rule.untilSourceLeaves
+          ? { amount: rule.amount, remainingTurns: 99, sourceId: attacker.instanceId, untilSourceLeaves: true }
+          : { amount: rule.amount, remainingTurns: 2 },
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${target.name}'s attacks cost ${rule.amount} more Energy during its next turn`,
+      })
+      continue
+    }
+    if (rule.kind === 'increaseDefendingRetreatCost') {
+      target.temporaryEffects = {
+        ...target.temporaryEffects,
+        retreatCostIncrease: { amount: rule.amount, remainingTurns: 2 },
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: target.instanceId,
+        label: `${target.name}'s Retreat Cost increases by ${rule.amount} during its next turn`,
+      })
+      continue
+    }
+    if (rule.kind === 'increasePoisonCheckupDamageOnce') {
+      if (target.statusConditions?.includes('poisoned')) {
+        target.temporaryEffects = {
+          ...target.temporaryEffects,
+          poisonCheckupBonus: rule.amount,
+          poisonCheckupBonusTurns: 1,
+        }
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: target.instanceId,
+          label: `${target.name}'s next Poison checkup damage increases by ${rule.amount}`,
+        })
+      }
+      continue
+    }
+    if (rule.kind === 'ignoreOwnAttackCostsForTypes') {
+      state.temporaryAttackCostIgnores = {
+        side: sideKey,
+        types: rule.types.map((type) => type.toLowerCase()),
+        remainingTurns: 2,
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `${rule.types.join(' and ')} Pokémon ignore attack Energy costs during your next turn`,
+      })
+      continue
+    }
+    if (rule.kind === 'armAttackBuffAfterPriorActiveDamage') {
+      attacker.temporaryEffects = {
+        ...attacker.temporaryEffects,
+        nextAttackBuff: {
+          attackName: rule.attackName,
+          damageBonus: rule.damageBonus,
+          remainingTurns: 2,
+          requiresOwnCurrentActiveAttackDamageEvent: true,
+        },
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `${rule.attackName} gets +${rule.damageBonus} damage next turn after one of your Active Pokémon damages an opponent`,
+      })
+      continue
+    }
+    if (rule.kind === 'armAttackCoinCountOverride') {
+      attacker.temporaryEffects = {
+        ...attacker.temporaryEffects,
+        attackCoinCountOverride: {
+          attackName: rule.attackName,
+          coinFlipCount: rule.coinFlipCount,
+          remainingTurns: 2,
+        },
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `${rule.attackName} flips ${rule.coinFlipCount} coins during your next turn`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'shuffleDeck') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      shuffleTcgBattleDeck(state[rule.target === 'self' ? sideKey : opponentKey])
+      continue
+    }
+
+    if (rule.kind === 'discardTopDeckChoosePokemonToHand') {
+      const destination = state[sideKey]
+      const revealed = destination.deck.splice(0, Math.min(rule.amount, destination.deck.length))
+      const selectedId = choice?.kind === 'topDeckPokemon' ? choice.cardId : revealed[0]?.id
+      const selectedIndex = revealed.findIndex((card) => card.id === selectedId)
+      if (selectedIndex >= 0) {
+        const [selected] = revealed.splice(selectedIndex, 1)
+        destination.hand.push(createTcgBattleCardState(selected, destination.hand.length))
+      }
+      destination.discard.push(...revealed.map((card, index) => createTcgBattleCardState(card, destination.discard.length + index)))
+      state.log.unshift(selectedIndex >= 0
+        ? `${attacker.name}'s Select a Snack discarded ${revealed.length + 1} Pokémon and put one into the hand.`
+        : `${attacker.name}'s Select a Snack discarded ${revealed.length} Pokémon and found none to add to the hand.`)
+      continue
+    }
+
+    if (rule.kind === 'chooseTopDeckPokemonToHandAndLostZone') {
+      const destination = state[sideKey]
+      destination.lostZone ||= []
+      const revealed = destination.deck.splice(0, Math.min(rule.revealCount, destination.deck.length))
+      const selectedIds = new Set(choice?.kind === 'topDeckPokemonSet' ? choice.cardIds : [])
+      let addedToHand = 0
+      for (const card of revealed) {
+        const battleCard = createTcgBattleCardState(card, destination.hand.length + destination.lostZone.length)
+        if (selectedIds.has(card.id) && addedToHand < rule.handCount) {
+          destination.hand.push(battleCard)
+          addedToHand += 1
+        } else {
+          destination.lostZone.push(battleCard)
+        }
+      }
+      state.log.unshift(`${attacker.name} put ${addedToHand} Pokémon into the hand and ${revealed.length - addedToHand} into the Lost Zone.`)
+      continue
+    }
+
+    if (rule.kind === 'revealUntilBasicPokemonToHand') {
+      const destination = state[sideKey]
+      const revealed: typeof destination.deck = []
+      let basicPokemon: (typeof destination.deck)[number] | undefined
+      while (destination.deck.length) {
+        const card = destination.deck.shift()!
+        if (card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) {
+          basicPokemon = card
+          break
+        }
+        revealed.push(card)
+      }
+      if (basicPokemon) {
+        destination.hand.push(createTcgBattleCardState(basicPokemon, destination.hand.length))
+        destination.deck.push(...revealed)
+        shuffleTcgBattleDeck(destination)
+        state.log.unshift(`${attacker.name}'s Look for Friends revealed ${basicPokemon.name} and put it into the hand.`)
+      } else {
+        destination.deck.push(...revealed)
+        shuffleTcgBattleDeck(destination)
+        state.log.unshift(`${attacker.name}'s Look for Friends revealed no Basic Pokémon and shuffled the revealed cards back into the deck.`)
+      }
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: basicPokemon ? `Revealed ${basicPokemon.name} and added it to hand` : 'Revealed no Basic Pokémon; shuffled the deck',
+      })
+      continue
+    }
 
     if (rule.kind === 'revealTopDeckPokemon') {
       const destination = state[sideKey]
@@ -3273,32 +3819,146 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
 
-    if (rule.kind === 'searchDeckPokemon' && (choice?.kind === 'deckPokemon' || rule.random)) {
+    if (rule.kind === 'searchDeckPokemon' && (choice?.kind === 'deckPokemon' || choice?.kind === 'switchAndDeckEvolution' || rule.random)) {
       const destination = state[sideKey]
-      const availableCards = getAvailableTcgBattleDeckPokemon(destination, rule).filter((card) => rule.destination === 'hand' || canTcgBattlePutPokemonOnBench(destination, card))
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      if (rule.requiresNameInPlay && ![...destination.front, ...destination.back].some((card) => card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name) === normalizeTcgBattleAbilityCardName(rule.requiresNameInPlay!))) continue
+      const availableCards = getAvailableTcgBattleDeckPokemon(destination, rule, attacker, target).filter((card) => rule.destination !== 'bench' || canTcgBattlePutPokemonOnBench(destination, card))
       const availableById = new Map(availableCards.map((card) => [card.id, card]))
+      const revealedTop = typeof rule.topCardCount === 'number' ? destination.deck.splice(0, rule.topCardCount) : undefined
       const maxCount = Math.min(
         getTcgBattleDeckSearchMaxCount({ state, sideKey, attacker, target, rule }),
-        rule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(destination),
+        rule.destination !== 'bench' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(destination),
       )
       const selectedIds = choice?.kind === 'deckPokemon'
         ? choice.cardIds.slice(0, maxCount)
-        : drawTcgBattleCards(availableCards, maxCount).map((card) => card.id)
+        : choice?.kind === 'switchAndDeckEvolution'
+          ? choice.evolutionCardId ? [choice.evolutionCardId] : []
+          : drawTcgBattleCards(availableCards, maxCount).map((card) => card.id)
+      const topDeckCards: typeof destination.deck = []
       for (const [index, cardId] of selectedIds.entries()) {
         const cardSummary = availableById.get(cardId)
         if (!cardSummary) continue
-        const newPokemon = createTcgBattleCardState(cardSummary, destination.back.length + destination.hand.length + index)
+        let deckCard: (typeof destination.deck)[number] | undefined
+        let deckIndex = -1
+        if (revealedTop) {
+          const revealedIndex = revealedTop.findIndex((card) => card.id === cardId)
+          if (revealedIndex < 0) continue
+          ;[deckCard] = revealedTop.splice(revealedIndex, 1)
+        } else {
+          deckIndex = destination.deck.findIndex((card) => card.id === cardId)
+          if (deckIndex < 0) continue
+          ;[deckCard] = destination.deck.splice(deckIndex, 1)
+        }
+        if (!deckCard) continue
+        if (rule.evolveAttacker || rule.evolveTarget) {
+          const evolutionCard = createTcgBattleCardState(deckCard, destination.hand.length + index)
+          destination.hand.push(evolutionCard)
+          const evolutionTarget = rule.evolveTarget ? target : attacker
+          const evolved = applyTcgBattleEvolution(
+            destination,
+            evolutionTarget.instanceId,
+            evolutionCard.instanceId,
+            state.turnNumber,
+            sideKey,
+            state[opponentKey],
+            state.playerGoesSecond,
+            state,
+            true,
+          )
+          if (!evolved) {
+            const handIndex = destination.hand.findIndex((card) => card.instanceId === evolutionCard.instanceId)
+            if (handIndex >= 0) destination.hand.splice(handIndex, 1)
+            if (revealedTop) revealedTop.push(deckCard)
+            else destination.deck.splice(deckIndex, 0, deckCard)
+            continue
+          }
+          recordEffectEvent(state, {
+            kind: 'control',
+            sourceId: attacker.instanceId,
+            targetId: attacker.instanceId,
+            label: `${evolved.previousName} evolved into ${evolved.evolution.name} from the deck`,
+          })
+          continue
+        }
+        if (rule.destination === 'topDeck') {
+          topDeckCards.push(deckCard)
+          recordEffectEvent(state, {
+            kind: 'control',
+            sourceId: attacker.instanceId,
+            targetId: attacker.instanceId,
+            label: `${deckCard.name} was put on top of your deck`,
+          })
+          continue
+        }
+        const newPokemon = createTcgBattleCardState(deckCard, destination.back.length + destination.hand.length + index)
         if (rule.treatAsBasic) newPokemon.subtypes = ['Basic']
         if (rule.damageCountersOnSearch) {
           newPokemon.currentHp = Math.max(0, newPokemon.currentHp - rule.damageCountersOnSearch * 10)
         }
         if (rule.destination === 'hand') destination.hand.push(newPokemon)
-        else destination.back.push(newPokemon)
+        else if (rule.destination === 'discard') destination.discard.push(newPokemon)
+        else if (rule.destination === 'lostZone') {
+          destination.lostZone ||= []
+          destination.lostZone.push(newPokemon)
+        } else destination.back.push(newPokemon)
         recordEffectEvent(state, {
           kind: 'control',
           sourceId: attacker.instanceId,
           targetId: newPokemon.instanceId,
-          label: rule.destination === 'hand' ? `${newPokemon.name} joined your hand` : `${newPokemon.name} joined the Bench`,
+          label: rule.destination === 'hand' ? `${newPokemon.name} joined your hand` : rule.destination === 'discard' ? `${newPokemon.name} was discarded` : rule.destination === 'lostZone' ? `${newPokemon.name} was put in the Lost Zone` : `${newPokemon.name} joined the Bench`,
+        })
+      }
+      if (revealedTop) {
+        destination.deck.push(...revealedTop)
+        if (rule.shuffleAfterReveal !== false) shuffleTcgBattleDeck(destination)
+      }
+      if (topDeckCards.length > 0) {
+        if (rule.shuffleAfterSearch) shuffleTcgBattleDeck(destination)
+        destination.deck.unshift(...topDeckCards)
+      }
+      if ((rule.evolveAttacker || rule.evolveTarget) && rule.shuffleAfterEvolution !== false) shuffleTcgBattleDeck(destination)
+      continue
+    }
+
+    if (rule.kind === 'shuffleBothHandsAndDrawOpponentHandCount') {
+      const ownSide = state[sideKey]
+      const opposingSide = state[opponentKey]
+      const ownDrawCount = opposingSide.hand.length
+      const opposingDrawCount = ownSide.hand.length
+      ownSide.deck.push(...ownSide.hand.map(toTcgBattleCardSummary))
+      opposingSide.deck.push(...opposingSide.hand.map(toTcgBattleCardSummary))
+      ownSide.hand = []
+      opposingSide.hand = []
+      shuffleTcgBattleDeck(ownSide)
+      shuffleTcgBattleDeck(opposingSide)
+      const ownDrawn = ownSide.deck.splice(0, Math.min(ownDrawCount, ownSide.deck.length))
+      const opposingDrawn = opposingSide.deck.splice(0, Math.min(opposingDrawCount, opposingSide.deck.length))
+      ownSide.hand.push(...ownDrawn.map((card, index) => createTcgBattleCardState(card, index)))
+      opposingSide.hand.push(...opposingDrawn.map((card, index) => createTcgBattleCardState(card, index)))
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `Both hands were shuffled and redrawn to the other player's previous hand size`,
+      })
+      continue
+    }
+
+    if (rule.kind === 'drawDeckEndCards') {
+      const destination = state[sideKey]
+      const drawn: TcgBattleCardState[] = []
+      for (const position of rule.positions) {
+        const card = position === 'top' ? destination.deck.shift() : destination.deck.pop()
+        if (card) drawn.push(createTcgBattleCardState(card, destination.hand.length + drawn.length))
+      }
+      destination.hand.push(...drawn)
+      if (drawn.length > 0) {
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: attacker.instanceId,
+          label: `${drawn.length} Pokémon drawn from the ${rule.positions.join(' and ')} of the deck`,
         })
       }
       continue
@@ -3306,14 +3966,20 @@ function applyTcgBattleSpecialEffects(params: {
 
     if (rule.kind === 'drawCards') {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      if (rule.onlyIfOwnHandAtMostOpponent && state[sideKey].hand.length > state[opponentKey].hand.length) continue
+      if (rule.requiresAttackerStatus && !attacker.statusConditions?.includes(rule.requiresAttackerStatus)) continue
+      if (rule.requiresOpponentEvolved && ![...state[opponentKey].front, ...state[opponentKey].back].some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => /^stage [12]$/i.test(subtype)))) continue
       if (
         rule.requiresDiscardChoice &&
         !(
           choice?.kind === 'discardHandCards' &&
-          choice.cardIds.some((cardId) => state[sideKey].discard.some((card) => card.instanceId === cardId))
+          choice.cardIds.some((cardId) => state[sideKey].discard.some((card) => card.instanceId === cardId) ||
+            (state[sideKey].lostZone || []).some((card) => cardId.startsWith(`${card.id}:`)))
         )
       ) continue
-      const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
+      const destinationSideKey = rule.target === 'choice'
+        ? choice?.kind === 'playerSide' ? choice.side : sideKey
+        : rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
       if (rule.shuffleHandIntoDeck) {
         destination.deck.push(...destination.hand.map(toTcgBattleCardSummary))
@@ -3327,21 +3993,29 @@ function applyTcgBattleSpecialEffects(params: {
               : 0
           )
         : 0
-      const amount = typeof rule.untilHandSize === 'number'
+      let amount = typeof rule.untilHandSize === 'number'
         ? Math.max(0, rule.untilHandSize - destination.hand.length)
         : rule.untilHandSizeMatches === 'opponent'
           ? Math.max(0, state[destinationSideKey === 'player' ? 'opponent' : 'player'].hand.length - destination.hand.length)
+          : rule.untilHandSizeMatches === 'opponentPlusOne'
+            ? Math.max(0, state[destinationSideKey === 'player' ? 'opponent' : 'player'].hand.length + 1 - destination.hand.length)
         : Math.max(
             0,
             (rule.amount || 0) +
               (rule.amountPerHead || 0) * (resolution.coinFlips?.heads || 0) +
-              (rule.amountPerUnit || 0) * units,
+            (rule.amountPerUnit || 0) * Math.min(rule.maxUnits ?? Number.POSITIVE_INFINITY, units),
           )
+      if (rule.amountIfEvolutionUnder && (attacker.evolutionStack || []).some((card) =>
+        normalizeTcgBattleAbilityCardName(card.name) === normalizeTcgBattleAbilityCardName(rule.amountIfEvolutionUnder!.name),
+      )) amount += rule.amountIfEvolutionUnder.amount
+      const handSizeLimitedAmount = typeof rule.maxHandSize === 'number'
+        ? Math.min(amount, Math.max(0, rule.maxHandSize - destination.hand.length))
+        : amount
       const inUseIds = new Set(
         [...destination.hand, ...destination.front, ...destination.back, ...destination.discard].map((card) => card.id),
       )
       const available = destination.deck.filter((card) => !inUseIds.has(card.id))
-      const drawn = drawTcgBattleCards(available, amount)
+      const drawn = drawTcgBattleCards(available, handSizeLimitedAmount)
       destination.hand.push(...drawn)
       if (drawn.length > 0 || rule.shuffleHandIntoDeck) {
         recordEffectEvent(state, {
@@ -3357,6 +4031,7 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'shuffleRandomHandCardIntoDeck') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
       const count = rule.amount ?? (rule.amountPerHead === undefined
@@ -3394,7 +4069,11 @@ function applyTcgBattleSpecialEffects(params: {
           : rule.amountPerTail
             ? rule.amountPerTail * (resolution.coinFlips?.tails || 0)
             : 1
-      for (let count = 0; count < discardCount && destination.hand.length > 0; count += 1) {
+      const evolutionBonus = rule.extraAmountIfAttackerEvolvedFromThisTurn
+      const extraDiscardCount = evolutionBonus && attacker.evolvedTurn === state.turnNumber && attacker.evolutionStack?.some((card) => normalizeTcgBattleAbilityCardName(card.name) === normalizeTcgBattleAbilityCardName(evolutionBonus.name))
+        ? evolutionBonus.amount
+        : 0
+      for (let count = 0; count < discardCount + extraDiscardCount && destination.hand.length > 0; count += 1) {
         const index = Math.floor(Math.random() * destination.hand.length)
         const [discardedCard] = destination.hand.splice(index, 1)
         destination.discard.push(discardedCard)
@@ -3412,13 +4091,20 @@ function applyTcgBattleSpecialEffects(params: {
       const selectedIds = new Set(choice.cardIds)
       const discarded = state[sideKey].hand.filter((card) => selectedIds.has(card.instanceId))
       state[sideKey].hand = state[sideKey].hand.filter((card) => !selectedIds.has(card.instanceId))
-      state[sideKey].discard.push(...discarded)
+      if (rule.destination === 'lostZone') {
+        state[sideKey].lostZone ||= []
+        state[sideKey].lostZone.push(...discarded.map(toTcgBattleCardSummary))
+      } else {
+        state[sideKey].discard.push(...discarded)
+      }
       if (discarded.length > 0) {
         recordEffectEvent(state, {
           kind: 'control',
           sourceId: attacker.instanceId,
           targetId: attacker.instanceId,
-          label: `${discarded.map((card) => card.name).join(', ')} discarded from the attacker's hand`,
+          label: rule.destination === 'lostZone'
+            ? `${discarded.map((card) => card.name).join(', ')} moved from the attacker's hand to the Lost Zone`
+            : `${discarded.map((card) => card.name).join(', ')} discarded from the attacker's hand`,
         })
       }
       continue
@@ -3464,7 +4150,12 @@ function applyTcgBattleSpecialEffects(params: {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const discard = state[sideKey].discard
       const selectedIds = choice.cardIds || (choice.cardId ? [choice.cardId] : [])
-      const maxCount = rule.maxCount ?? 1
+      const maxCount = Math.min(
+        rule.maxCount ?? 1,
+        rule.amountPerHead === undefined
+          ? Number.POSITIVE_INFINITY
+          : rule.amountPerHead * (resolution.coinFlips?.heads || 0),
+      )
       const recovered: TcgBattleCardState[] = []
       for (const cardId of selectedIds.slice(0, maxCount)) {
         const card = discard.find((entry) => entry.instanceId === cardId)
@@ -3477,13 +4168,55 @@ function applyTcgBattleSpecialEffects(params: {
         recovered.push(card)
       }
       if (recovered.length > 0) {
-        state[sideKey].hand.push(...recovered)
+        if (rule.destination === 'topDeck') {
+          state[sideKey].deck.unshift(...recovered.map(toTcgBattleCardSummary))
+        } else {
+          state[sideKey].hand.push(...recovered)
+        }
         recordEffectEvent(state, {
           kind: 'control',
           sourceId: attacker.instanceId,
           targetId: recovered[0].instanceId,
-          label: `${recovered.map((card) => card.name).join(', ')} returned from the discard pile to the attacker's hand`,
+          label: rule.destination === 'topDeck'
+            ? `${recovered.map((card) => card.name).join(', ')} was put on top of the attacker's deck`
+            : `${recovered.map((card) => card.name).join(', ')} returned from the discard pile to the attacker's hand`,
         })
+      }
+      continue
+    }
+
+    if (rule.kind === 'recoverPokemonFromDiscardToBench' && choice?.kind === 'discardPokemonToBench') {
+      const destination = state[sideKey]
+      const maxCount = Math.min(rule.maxCount, getOpenTcgBattleBenchSlots(destination))
+      const attachEnergy = rule.energyPerPokemon && destination.energy >= (rule.requiresExtraEnergy || 0)
+      for (const cardId of choice.cardIds.slice(0, maxCount)) {
+        const cardIndex = destination.discard.findIndex((entry) => entry.instanceId === cardId)
+        const card = cardIndex >= 0 ? destination.discard[cardIndex] : undefined
+        const eligible = card && (rule.basicOnly === false || card.subtypes.includes('Basic')) && canTcgBattlePutPokemonOnBench(destination, card) &&
+          (!rule.includeNames?.length || rule.includeNames.some((name) => normalizeTcgBattleAbilityCardName(card.name) === normalizeTcgBattleAbilityCardName(name))) &&
+          (!rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.some((cardType) => cardType.toLowerCase() === type.toLowerCase()))) &&
+          (!rule.includeSubtypes?.length || rule.includeSubtypes.some((subtype) => card.subtypes.some((cardSubtype) => cardSubtype.toLowerCase() === subtype.toLowerCase())))
+        if (!card || !eligible || getOpenTcgBattleBenchSlots(destination) === 0) continue
+        const [revived] = destination.discard.splice(cardIndex, 1)
+        clearTcgBattleTemporaryEffects(revived)
+        clearTcgBattleStatuses(revived)
+        revived.currentHp = revived.hp
+        revived.markers = undefined
+        destination.back.push(revived)
+        recordEffectEvent(state, {
+          kind: 'control',
+          sourceId: attacker.instanceId,
+          targetId: revived.instanceId,
+          label: `${revived.name} returned from the discard pile to the Bench at full HP`,
+        })
+      }
+      if (attachEnergy && rule.energyPerPokemon) {
+        const requestedEnergy = Math.min(choice.cardIds.length, maxCount) * rule.energyPerPokemon
+        const energyAdded = Math.min(requestedEnergy, TCG_BATTLE_FORMATS[state.format].energyCap - destination.energy)
+        if (energyAdded > 0) {
+          destination.energy += energyAdded
+          recordEffectEvent(state, { kind: 'energy', side: sideKey, sourceId: attacker.instanceId, amount: energyAdded })
+        }
       }
       continue
     }
@@ -3508,8 +4241,30 @@ function applyTcgBattleSpecialEffects(params: {
       continue
     }
 
+    if (rule.kind === 'returnOpponentBenchToHand' && choice?.kind === 'benchSwitch') {
+      const opponentSide = state[opponentKey]
+      const cardIndex = opponentSide.back.findIndex(
+        (card) => card.instanceId === choice.cardId && card.currentHp > 0,
+      )
+      if (cardIndex < 0) continue
+      const [card] = opponentSide.back.splice(cardIndex, 1)
+      clearTcgBattleTemporaryEffects(card)
+      clearTcgBattleStatuses(card)
+      card.currentHp = card.hp
+      card.markers = undefined
+      opponentSide.hand.push(card)
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: card.instanceId,
+        label: `${card.name} returned from the opponent's Bench to their hand`,
+      })
+      continue
+    }
+
     if (rule.kind === 'returnOwnPokemonToDeck') {
       if (rule.requiresOptionalChoice && !(choice?.kind === 'optionalBonus' && choice.enabled)) continue
+      if (rule.requiresHealing && !healedByAttack) continue
       const cardIndex = state[sideKey].front.findIndex((card) => card.instanceId === attacker.instanceId)
       if (cardIndex < 0) continue
       const [card] = state[sideKey].front.splice(cardIndex, 1)
@@ -3525,6 +4280,7 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'returnOwnBenchToDeck') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       if (choice?.kind !== 'benchSwitch') continue
       const cardIndex = state[sideKey].back.findIndex((card) => card.instanceId === choice.cardId)
       if (cardIndex < 0) continue
@@ -3541,6 +4297,9 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'returnTargetToHand') {
+      const opponent = state[opponentKey]
+      if (rule.requiresAlternateOpponentPokemon &&
+        ![...opponent.front.filter((card) => card.instanceId !== target.instanceId), ...opponent.back].some((card) => card.currentHp > 0)) continue
       const cardIndex = state[opponentKey].front.findIndex(
         (card) => card.instanceId === target.instanceId && card.currentHp > 0,
       )
@@ -3577,15 +4336,18 @@ function applyTcgBattleSpecialEffects(params: {
     }
 
     if (rule.kind === 'transferDamageCounters') {
-      if (choice?.kind !== 'damageCounterTransfer' || !choice.sourceCardId) continue
+      if (!rule.sourceAttacker && (choice?.kind !== 'damageCounterTransfer' || !choice.sourceCardId)) continue
       const ownCards = rule.sourceZone === 'bench'
         ? state[sideKey].back
         : [...state[sideKey].front, ...state[sideKey].back]
-      const source = ownCards.find((card) =>
-        card.instanceId === choice.sourceCardId &&
-        card.currentHp > 0 &&
-        (!rule.sourceNameContains || card.name.toLowerCase().includes(rule.sourceNameContains.toLowerCase())),
-      )
+      const source = rule.sourceAttacker
+        ? attacker
+        : choice?.kind === 'damageCounterTransfer' ? ownCards.find((card) =>
+            card.instanceId === choice.sourceCardId &&
+            card.currentHp > 0 &&
+            (!rule.sourceNameContains || card.name.toLowerCase().includes(rule.sourceNameContains.toLowerCase())) &&
+            (!rule.sourceSubtypeContains || card.subtypes.some((subtype) => subtype.toLowerCase().includes(rule.sourceSubtypeContains!.toLowerCase()))),
+          ) : undefined
       const defendingCard = [...state[opponentKey].front, ...state[opponentKey].back]
         .find((card) => card.instanceId === target.instanceId && card.currentHp > 0)
       if (!source || !defendingCard) continue
@@ -3646,14 +4408,18 @@ function applyTcgBattleSpecialEffects(params: {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       if (rule.requiresOpponentBench && state[opponentKey].back.every((card) => card.currentHp <= 0)) continue
       const defendingSide = state[opponentKey]
-      const targetZone = rule.targetZone === 'selected'
+      const selectedChoiceId = rule.targetZone === 'selectedChoice' && choice?.kind === 'benchSwitch' ? choice.cardId : undefined
+      const targetZone = rule.targetZone === 'selectedChoice'
+        ? defendingSide.back
+        : rule.targetZone === 'selected'
         ? defendingSide.back.some((card) => card.instanceId === target.instanceId)
           ? defendingSide.back
           : defendingSide.front
         : rule.targetZone === 'bench'
           ? defendingSide.back
           : defendingSide.front
-      const targetIndex = targetZone.findIndex((card) => card.instanceId === target.instanceId)
+      const targetId = selectedChoiceId || target.instanceId
+      const targetIndex = targetZone.findIndex((card) => card.instanceId === targetId && card.currentHp > 0)
       if (targetIndex < 0) continue
       const [card] = targetZone.splice(targetIndex, 1)
       defendingSide.deck.push(toTcgBattleCardSummary(card))
@@ -3661,17 +4427,25 @@ function applyTcgBattleSpecialEffects(params: {
       recordEffectEvent(state, {
         kind: 'control',
         sourceId: attacker.instanceId,
-        targetId: target.instanceId,
-        label: `${target.name} was shuffled into the opposing deck`,
+        targetId: card.instanceId,
+        label: `${card.name} was shuffled into the opposing deck`,
       })
       continue
     }
 
     if (rule.kind === 'shuffleDiscardPokemonIntoDeck') {
+      if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
       const discard = state[sideKey].discard
-      const count = Math.min(rule.maxCount, discard.length)
+      const eligible = discard.filter((card) =>
+        !rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.includes(type)),
+      )
+      const count = Math.min(rule.maxCount, eligible.length)
       for (let index = 0; index < count; index += 1) {
-        const cardIndex = Math.floor(Math.random() * discard.length)
+        const remainingEligible = discard.filter((card) =>
+          !rule.includeTypes?.length || rule.includeTypes.some((type) => card.types.includes(type)),
+        )
+        const chosen = remainingEligible[Math.floor(Math.random() * remainingEligible.length)]
+        const cardIndex = discard.findIndex((card) => card.instanceId === chosen.instanceId)
         const [card] = discard.splice(cardIndex, 1)
         state[sideKey].deck.push(toTcgBattleCardSummary(card))
       }
@@ -3704,13 +4478,16 @@ function applyTcgBattleSpecialEffects(params: {
 
     if (rule.kind === 'millCards') {
       if (!doesTcgBattleConditionPass(rule.condition, resolution.coinFlips)) continue
+      if (rule.requiresAttackerDamaged && attacker.currentHp >= attacker.hp) continue
       if (rule.requiresOptionalChoice && !(choice?.kind === 'optionalBonus' && choice.enabled)) continue
       const destinationSideKey = rule.target === 'self' ? sideKey : opponentKey
       const destination = state[destinationSideKey]
       const inUseIds = new Set(
         [...destination.hand, ...destination.front, ...destination.back, ...destination.discard].map((card) => card.id),
       )
-      const available = destination.deck.filter((card) => !inUseIds.has(card.id))
+      const available = rule.position === 'top'
+        ? destination.deck
+        : destination.deck.filter((card) => !inUseIds.has(card.id))
       const sourceUnits = rule.source
         ? getTcgBattleCount(rule.source, { state, sideKey, attacker, target, paidAttackCost, coinMode: 'actual' })
         : 0
@@ -3721,7 +4498,9 @@ function applyTcgBattleSpecialEffects(params: {
           (rule.amountPerOwnEnergy || 0) * state[sideKey].energy +
           (rule.amountPerUnit || 0) * sourceUnits,
       )
-      const milled = drawTcgBattleCards(available, amount)
+      const milled = rule.position === 'top'
+        ? destination.deck.splice(0, amount).map((card, index) => createTcgBattleCardState(card, destination.discard.length + index))
+        : drawTcgBattleCards(available, amount)
       destination.discard.push(...milled)
       if (milled.length > 0) {
         recordEffectEvent(state, {
@@ -3741,21 +4520,27 @@ function applyTcgBattleSpecialEffects(params: {
       rule.ifCounterDamage &&
       !resolution.counterDamage?.some((hit) => hit.targetId === target.instanceId && hit.damage > 0)
     ) continue
-    if (rule.kind === 'switch' && choice?.kind === 'benchSwitch') {
+    if (rule.kind === 'switch' && (choice?.kind === 'benchSwitch' || choice?.kind === 'switchAndDeckEvolution' || rule.opponentChooses)) {
+      if (rule.opponentChooses && target.currentHp <= 0) continue
+      const switchingSideKey = rule.target === 'self' ? sideKey : opponentKey
+      const forcedChoice = rule.opponentChooses
+        ? [...state[switchingSideKey].back].filter((card) => card.currentHp > 0)
+            .sort((a, b) => b.currentHp - a.currentHp || b.hp - a.hp)[0]?.instanceId
+        : undefined
+      const benchCardId = choice?.kind === 'benchSwitch' ? choice.cardId : choice?.kind === 'switchAndDeckEvolution' ? choice.benchCardId : forcedChoice
+      if (!benchCardId) continue
       const switched = swapTcgBattleCards(
         state,
-        rule.target === 'self' ? sideKey : opponentKey,
+        switchingSideKey,
         rule.target === 'self' ? attacker : target,
-        choice.cardId,
+        benchCardId,
       )
       if (switched)
         state.log.unshift(
           `${rule.target === 'self' ? attacker.name : target.name} switched with a benched card.`,
         )
       if (switched && rule.poisonAfterSwitch) {
-        const switchedTargetId = state[opponentKey].front.find(
-          (card) => card.instanceId === choice.cardId,
-        )?.instanceId
+        const switchedTargetId = state[switchingSideKey].front[0]?.instanceId
         if (switchedTargetId) {
           const statusEvents = applyTcgBattleStatusConditions(
             state,
@@ -3909,6 +4694,16 @@ function applyTcgBattleSpecialEffects(params: {
       })
       continue
     }
+    if (rule.kind === 'freeRetreat') {
+      attacker.freeRetreatTurn = state.turnNumber + 2
+      recordEffectEvent(state, {
+        kind: 'control',
+        sourceId: attacker.instanceId,
+        targetId: attacker.instanceId,
+        label: `${attacker.name} has no Retreat Cost during its next turn`,
+      })
+      continue
+    }
     if (rule.kind === 'preventSwitch') {
       getTemporaryEffects(target).cannotSwitch = {
         remainingTurns: 2,
@@ -4046,7 +4841,9 @@ function applyTcgBattleSpecialEffects(params: {
       const [revived] = destination.discard.splice(cardIndex, 1)
       clearTcgBattleTemporaryEffects(revived)
       clearTcgBattleStatuses(revived)
-      revived.currentHp = Math.max(1, revived.hp - Math.floor(revived.hp / 20) * 10)
+      revived.currentHp = rule.restoreFullHp
+        ? revived.hp
+        : Math.max(1, revived.hp - Math.floor(revived.hp / 20) * 10)
       revived.markers = undefined
       destination.back.push(revived)
       recordEffectEvent(state, {
@@ -4063,7 +4860,7 @@ function applyTcgBattleSpecialEffects(params: {
         rule.kind === 'changeType') &&
       choice?.kind === 'typeChange'
     ) {
-      const affected = rule.kind === 'changeResistance' ? attacker : target
+      const affected = rule.kind === 'changeResistance' || rule.kind === 'changeType' && rule.target === 'attacker' ? attacker : target
       const effects = getTemporaryEffects(affected)
       if (rule.kind === 'changeWeakness') {
         effects.weaknessValue = effects.weaknessType
@@ -4072,7 +4869,10 @@ function applyTcgBattleSpecialEffects(params: {
         effects.weaknessType = choice.type
       }
       if (rule.kind === 'changeResistance') effects.resistanceType = choice.type
-      if (rule.kind === 'changeType') effects.battleType = choice.type
+      if (rule.kind === 'changeType') {
+        effects.battleType = choice.type
+        if (rule.expiresAfterTurns !== undefined) effects.battleTypeOverrideExpiresAtTurn = state.turnNumber + rule.expiresAfterTurns
+      }
       recordEffectEvent(state, {
         kind: 'type',
         sourceId: attacker.instanceId,
@@ -4141,6 +4941,7 @@ function applyTcgBattleSpecialEffects(params: {
       })
     }
   }
+  return specialEffectKnockoutIds
 }
 
 function formatEnergyDiscardSummary(
@@ -4362,7 +5163,10 @@ function applyEndOfRoundStatusDamage(state: TcgBattleState) {
         )
         return !eligibleRecovery
       })
-      if (!card.statusConditions.includes('poisoned') && card.temporaryEffects) delete card.temporaryEffects.poisonCheckupBonus
+      if (!card.statusConditions.includes('poisoned') && card.temporaryEffects) {
+        delete card.temporaryEffects.poisonCheckupBonus
+        delete card.temporaryEffects.poisonCheckupBonusTurns
+      }
       if (!card.statusConditions.includes('burned') && card.temporaryEffects) delete card.temporaryEffects.burnCheckupBonus
       if (card.statusConditions.length < statusesBeforeImmunity.length) {
         state.log.unshift(`${card.name} recovered from a Special Condition due to an Ability.`)
@@ -4379,6 +5183,10 @@ function applyEndOfRoundStatusDamage(state: TcgBattleState) {
       if (damage <= 0) continue
 
       card.currentHp = Math.max(0, card.currentHp - damage)
+      if (card.temporaryEffects?.poisonCheckupBonusTurns) {
+        delete card.temporaryEffects.poisonCheckupBonus
+        delete card.temporaryEffects.poisonCheckupBonusTurns
+      }
       recordDamageEvent(state, {
         sourceId: card.instanceId,
         targetId: card.instanceId,
@@ -4401,7 +5209,7 @@ function applyEndOfRoundStatusDamage(state: TcgBattleState) {
           !isTcgBattleAbilitySuppressedByShadyTail(provider, [state.player, state.opponent]) &&
           (provider.abilities || []).some((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim() === heatranBurnLockText),
         )
-        const result = heatranBurnLock ? 'tails' : randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = heatranBurnLock ? 'tails' : flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: card.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'status-check' })
         if (result === 'heads' && !overheater && !heatranBurnLock) {
           card.statusConditions = card.statusConditions.filter((status) => status !== 'burned')
@@ -4423,7 +5231,7 @@ function applyWishiwashiTidalWaveAtOpponentTurnEnd(state: TcgBattleState, ownerS
     if (source.currentHp <= 0 || source.currentHp >= source.hp || normalizeTcgBattleAbilityCardName(source.name) !== 'wishiwashi' || isTcgBattleAbilitySuppressedByShadyTail(source, [state.player, state.opponent])) continue
     const ability = source.abilities?.find((candidate) => candidate.text.replace(/[’]/g, "'").toLowerCase().replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim() === "at the end of your opponent's turn, if this pokemon has any damage counters on it, flip a coin. if tails, shuffle this pokemon and all cards attached to it into your deck.")
     if (!ability) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: ownerSideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     if (result === 'heads') {
       state.log.unshift(`${source.name}'s ${ability.name} flipped heads and stayed in play.`)
@@ -4460,7 +5268,7 @@ function applyTcgBattleDarkGengarDeepSleep(state: TcgBattleState, sleepingSideKe
 
   const source = providers[0]
   for (const sleeper of [...state[sleepingSideKey].front, ...state[sleepingSideKey].back].filter((card) => card.currentHp > 0 && card.statusConditions?.includes('asleep'))) {
-    const results = [0, 1].map(() => randomInt(0, 2) === 0 ? 'heads' as const : 'tails' as const)
+    const results = [0, 1].map(() => flipTcgBattleCoinForSide(state, state.activeSide))
     const heads = results.filter((result) => result === 'heads').length
     recordCoinFlipEvent(state, {
       sourceId: source.card.instanceId,
@@ -4490,7 +5298,7 @@ function applyTcgBattleSnorlaxStirAndSnooze(state: TcgBattleState, sleepingSideK
   )) {
     const ability = sleeper.abilities?.find((entry) => [twoCoinSleepText, slakingSleepText].includes(normalizeTcgBattleAbilityText(entry.text).replace(/\s+/g, ' ').trim()))
     if (!ability) continue
-    const results = [0, 1].map(() => randomInt(0, 2) === 0 ? 'heads' as const : 'tails' as const)
+    const results = [0, 1].map(() => flipTcgBattleCoinForSide(state, state.activeSide))
     const heads = results.filter((result) => result === 'heads').length
     recordCoinFlipEvent(state, { sourceId: sleeper.instanceId, side: sleepingSideKey, results, heads, tails: results.length - heads, purpose: 'effect' })
     if (heads === 2) {
@@ -4894,6 +5702,9 @@ function applyAttack(
   const side = state[sideKey]
   const attack = getTcgBattleAvailableAttacks(state, sideKey, attacker)[attackIndex]
   if (!attack) throw new Error('Invalid attack.')
+  if (isTcgBattleSideAttackLocked(state, sideKey)) {
+    throw new Error(`${attacker.name} cannot attack during this turn.`)
+  }
   if (isTcgBattleAttackDisabled(attacker, attackIndex)) {
     throw new Error(`${attack.name} is disabled this turn.`)
   }
@@ -4948,7 +5759,7 @@ function applyAttack(
   const existingKnockoutIsSameTurn = existingDefenderTurnKnockout?.turnNumber === defendingSideTurnNumber
   state.lastOpponentAttackKnockout = {
     ...state.lastOpponentAttackKnockout,
-    [defendingSide]: existingKnockoutIsSameTurn ? existingDefenderTurnKnockout : { turnNumber: defendingSideTurnNumber, knockedOut: false, knockedOutNames: [], knockedOutRuleBox: false, knockedOutGrassPokemon: false },
+    [defendingSide]: existingKnockoutIsSameTurn ? existingDefenderTurnKnockout : { turnNumber: defendingSideTurnNumber, knockedOut: false, knockedOutNames: [], knockedOutTypes: [], knockedOutRuleBox: false, knockedOutGrassPokemon: false },
   }
   state.lastAction = {
     id: randomUUID(),
@@ -4958,11 +5769,40 @@ function applyAttack(
     attackIndex,
     targetId: target.instanceId,
   }
-  getTemporaryEffects(attacker).lastAttackTurnNumber = state.turnNumber
+  const attackerTemporaryEffects = getTemporaryEffects(attacker)
+  attackerTemporaryEffects.lastAttackTurnNumber = state.turnNumber
+  const sideAttackHistory = state.attackHistoryBySide?.[sideKey] || []
+  const currentTurnHistory = sideAttackHistory.find((entry) => entry.turnNumber === state.turnNumber)
+  const attackHistoryEntry = {
+    attackerId: attacker.instanceId,
+    cardName: attacker.name,
+    subtypes: [...attacker.subtypes],
+    attackName: attack.name,
+    attack: { ...attack, cost: [...attack.cost] },
+  }
+  const updatedSideAttackHistory = currentTurnHistory
+    ? sideAttackHistory.map((entry) => entry.turnNumber === state.turnNumber
+      ? { ...entry, attacks: [...entry.attacks, attackHistoryEntry] }
+      : entry)
+    : [...sideAttackHistory, { turnNumber: state.turnNumber, attacks: [attackHistoryEntry] }]
+  state.attackHistoryBySide = {
+    ...state.attackHistoryBySide,
+    [sideKey]: updatedSideAttackHistory.slice(-2),
+  }
+  const onceWhilePokemonInPlay = getTcgBattleAttackEffect(attack)?.onceWhilePokemonInPlay
+  if (onceWhilePokemonInPlay) {
+    const requiredPokemon = normalizeTcgBattleAbilityText(onceWhilePokemonInPlay).replace(/[^a-z0-9]/g, '')
+    const sourceRemainsInPlay = normalizeTcgBattleAbilityText(attacker.name).replace(/[^a-z0-9]/g, '') === requiredPokemon ||
+      (attacker.evolutionStack || []).some((stage) => normalizeTcgBattleAbilityText(stage.name).replace(/[^a-z0-9]/g, '') === requiredPokemon)
+    if (sourceRemainsInPlay) {
+      const usedAttack = getTcgBattleAttackUsageKey(attack)
+      attacker.attacksUsedWhileInPlay = [...new Set([...(attacker.attacksUsedWhileInPlay || []), usedAttack])]
+    }
+  }
 
   const statusCheck = resolveTcgBattleStatusAttackCheck(
     attacker,
-    Math.random,
+    state[sideKey].temporaryCoinFlipOverride?.turnNumber === state.turnNumber ? () => 0 : Math.random,
     getTcgBattleAttackEffect(attack)?.allowWhileAsleep,
   )
   if (statusCheck.coinFlips) {
@@ -4988,7 +5828,7 @@ function applyAttack(
       return text === "whenever misty's gyarados attacks, flip 2 coins. if both of them are tails, that attack does nothing. instead, shuffle misty's gyarados and all cards attached to it into your deck. (this power works even if misty's gyarados is confused.)"
     })
   if (mistyGyaradosRebellion) {
-    const results = [0, 1].map(() => Math.random() >= 0.5 ? 'heads' as const : 'tails' as const)
+    const results = [0, 1].map(() => flipTcgBattleCoinForSide(state, state.activeSide))
     recordCoinFlipEvent(state, {
       sourceId: attacker.instanceId,
       side: sideKey,
@@ -5032,6 +5872,11 @@ function applyAttack(
         damage: confusionDamage,
         reason: 'confusion',
       })
+      if (attacker.currentHp <= 0) {
+        compactTcgBattleBoard(side)
+        if (sideKey === 'opponent') promoteOpponentIfNeeded(state)
+        else requirePlayerPromotionIfNeeded(state)
+      }
     }
     state.consecutivePasses = 0
     const damageSummary =
@@ -5044,9 +5889,18 @@ function applyAttack(
     return
   }
 
+  if (getTcgBattleAttackEffect(attack)?.oncePerGameVstar) {
+    if (side.usedVstarPower) throw new Error('You have already used a VSTAR Power this game.')
+    side.usedVstarPower = true
+  }
+  if (getTcgBattleAttackEffect(attack)?.oncePerGameGx) {
+    if (side.usedGxAttack || side.gxAttacksLocked) throw new Error('A GX attack has already been used or locked this game.')
+    side.usedGxAttack = true
+  }
+
   if (attacker.temporaryEffects?.attackFailsOnTails) {
-    const result = Math.random() >= 0.5 ? 'heads' : 'tails'
     const flippingSide = sideKey === 'player' ? 'opponent' : 'player'
+    const result = flipTcgBattleCoinForSide(state, flippingSide)
     recordCoinFlipEvent(state, {
       sourceId: attacker.instanceId,
       side: flippingSide,
@@ -5062,7 +5916,7 @@ function applyAttack(
     }
   }
 
-  const attackIgnoresTargetEffects = Boolean(getTcgBattleAttackEffect(attack)?.ignoreTargetDamageModifiers)
+  const attackIgnoresTargetEffects = doesTcgBattleAttackIgnoreTargetDamageModifiers(state, sideKey, attacker, target, attack, energyCost)
   const incomingEffectsBlocked = (pokemon: TcgBattleCardState) => pokemon.incomingAttackModifier?.kind === 'preventAllEffects' &&
     (!pokemon.incomingAttackModifier.activeOnly || state[sideKey === 'player' ? 'opponent' : 'player'].front.some((card) => card.instanceId === pokemon.instanceId))
   let blockTargetEffects =
@@ -5091,10 +5945,10 @@ function applyAttack(
     (target.abilities || []).some((ability) => ["whenever an attack does anything to haunter, flip a coin. if heads, prevent all effects of that attack, including damage, done to haunter. this power stops working while haunter is affected by a special condition.", "whenever an attack does anything to haunter, flip a coin. if heads, prevent all effects of that attack, including damage, done to haunter. this power stops working while haunter is asleep."].includes(normalizedHaunterText(ability.text)))
   let transparencyBlocked = false
   if (hasTransparency) {
-    const result = Math.random() >= 0.5 ? 'heads' : 'tails'
     const targetSide = [...side.front, ...side.back].some((card) => card.instanceId === target.instanceId)
       ? sideKey
       : sideKey === 'player' ? 'opponent' : 'player'
+    const result = flipTcgBattleCoinForSide(state, targetSide)
     recordCoinFlipEvent(state, {
       sourceId: target.instanceId,
       side: targetSide,
@@ -5133,6 +5987,9 @@ function applyAttack(
     ? resolution.energyDiscards?.filter((discard) => discard.target === 'self')
     : resolution.energyDiscards
   applyTcgBattleEnergyDiscards(state, sideKey, applicableEnergyDiscards)
+  resolution.statusConditions = resolution.statusConditions?.filter((status) =>
+    status.requiresExtraEnergy === undefined || side.energy >= status.requiresExtraEnergy,
+  )
   for (const gain of resolution.energyGains || []) {
     if (
       gain.requiresSourceSurvival &&
@@ -5190,6 +6047,7 @@ function applyAttack(
     : opponentSideKey
   const redirectedTargetDamage = redirectTcgBattleBenchGuardDamage(state, sideKey, targetSideKey, target, resolution.targetDamage, attacker.instanceId)
   const targetDamageApplied = Math.max(0, resolution.targetDamage - redirectedTargetDamage)
+  const targetWasActive = state[targetSideKey].front.some((card) => card.instanceId === target.instanceId)
   applyAttackDamageToCard(state, sideKey, attacker.instanceId, targetSideKey, target, targetDamageApplied)
   if (
     resolution.targetDamage > 0 &&
@@ -5199,6 +6057,9 @@ function applyAttack(
     target.incomingAttackModifier = undefined
   }
   getTemporaryEffects(target).lastIncomingAttackDamage = targetDamageApplied
+  if (targetDamageApplied > 0 && targetWasActive) {
+    getTemporaryEffects(target).wasDamagedByAttackAsActiveLastTurn = true
+  }
   if (attack.name.toLowerCase() === 'night eyes') {
     const history = getTemporaryEffects(target).lastNightEyesAttackBySide || {}
     history[sideKey] = 2
@@ -5275,6 +6136,7 @@ function applyAttack(
       if (counterHit.damage > 0) recordTcgBattleAttackHit(hitCard, sideKey)
     }
   }
+  let healedByAttack = false
   if (resolution.healing && resolution.healing.length > 0) {
     for (const heal of resolution.healing) {
       if (blockTargetEffects && heal.targetSide !== sideKey && heal.targetId === target.instanceId) continue
@@ -5294,6 +6156,7 @@ function applyAttack(
       }
       }
       if (healCard.currentHp > previousHp) {
+        healedByAttack = true
         getTemporaryEffects(healCard).healedTurnNumber = state.turnNumber
         getTemporaryEffects(healCard).healedBySide = sideKey
       }
@@ -5332,7 +6195,7 @@ function applyAttack(
   ) {
     let reflectDamage = true
     if (targetReflectDamage.coinGate) {
-      const result = Math.random() >= 0.5 ? 'heads' : 'tails'
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
       recordCoinFlipEvent(state, {
         sourceId: target.instanceId,
         side: sideKey,
@@ -5399,15 +6262,18 @@ function applyAttack(
       protectedCard.incomingAttackModifier = protection.modifier
     }
   }
-  applyTcgBattleSpecialEffects({
+  const specialEffectKnockoutIds = applyTcgBattleSpecialEffects({
     state,
     sideKey,
     attacker,
     target,
     paidAttackCost: energyCost,
+    attackName: attack.name,
+    attackIgnoresTargetEffects,
     choice,
     resolution,
     blockTargetEffects,
+    healedByAttack,
   })
   const attackDamageEvents = (state.lastDamageEvents || []).slice(damageEventStartIndex)
   const attackStatusEvents = (state.lastStatusEvents || []).slice(statusEventStartIndex)
@@ -5436,7 +6302,7 @@ function applyAttack(
       event.targetSide === defendingSide &&
       event.reason === 'attack' &&
       defendingCards.some((card) => card.instanceId === event.targetId && card.currentHp <= 0),
-    ) || (
+    ) || specialEffectKnockoutIds.size > 0 || (
       resolution.specialEffects?.some((rule) => rule.kind === 'knockOutTarget') === true &&
       defendingCards.some((card) => card.instanceId === target.instanceId && card.currentHp <= 0)
     )
@@ -5446,8 +6312,50 @@ function applyAttack(
       .filter((event) => event.targetSide === defendingSide && event.reason === 'attack')
       .map((event) => event.targetId),
   )
+  for (const id of specialEffectKnockoutIds) knockedOutByAttackIds.add(id)
   if (resolution.specialEffects?.some((rule) => rule.kind === 'knockOutTarget') && target.currentHp <= 0) {
     knockedOutByAttackIds.add(target.instanceId)
+  }
+  const knockedOutByDamageIds = new Set((state.lastDamageEvents || []).slice(damageEventStartIndex)
+    .filter((event) => event.targetSide === defendingSide && event.reason === 'attack' && event.damage > 0)
+    .map((event) => event.targetId))
+  const extraPrizeAbilityActive = !isTcgBattleAbilitySuppressedByShadyTail(attacker, [state.player, state.opponent])
+  for (const card of defendingCards) {
+    const extraPrizeFromAbility = extraPrizeAbilityActive && hasTcgBattleExtraPrizeForAttackKnockout(attacker, card)
+    if (!knockedOutByDamageIds.has(card.instanceId) || card.currentHp > 0 || !(extraPrizeFromAbility || state[sideKey].extraPrizeForDamageKnockout)) continue
+    card.temporaryEffects = { ...card.temporaryEffects, extraKnockoutCountOnFaint: 1 }
+  }
+  const wonderKissTargetIsActiveKnockout = knockedOutByAttackIds.has(target.instanceId) && target.currentHp <= 0 && state[defendingSide].front.some((card) => card.instanceId === target.instanceId)
+  if (wonderKissTargetIsActiveKnockout) {
+    const wonderKissSource = [...state[sideKey].front, ...state[sideKey].back].find((card) =>
+      card.currentHp > 0 && hasTcgBattleWonderKiss(card) && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]),
+    )
+    if (wonderKissSource) {
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
+      recordCoinFlipEvent(state, { sourceId: wonderKissSource.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
+      if (result === 'heads') {
+        target.temporaryEffects = { ...target.temporaryEffects, extraKnockoutCountOnFaint: (target.temporaryEffects?.extraKnockoutCountOnFaint || 0) + 1 }
+        state.log.unshift(`${wonderKissSource.name}'s Wonder Kiss flipped heads; the Knock Out awards 1 extra Prize equivalent.`)
+      } else {
+        state.log.unshift(`${wonderKissSource.name}'s Wonder Kiss flipped tails; no extra Prize was awarded.`)
+      }
+    }
+  }
+  for (const card of defendingCards) {
+    if (!knockedOutByDamageIds.has(card.instanceId) || card.currentHp > 0) continue
+    const allSides = [state.player, state.opponent]
+    let coinPrizeReduction = 0
+    if (hasTcgBattleCoinFlipKnockoutPrizeReduction(card) && !isTcgBattleAbilitySuppressedByShadyTail(card, allSides)) {
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
+      recordCoinFlipEvent(state, { sourceId: card.instanceId, side: defendingSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
+      if (result === 'heads') {
+        coinPrizeReduction = 1
+        if (hasTcgBattleShuffleIntoDeckOnKnockout(card)) card.temporaryEffects = { ...card.temporaryEffects, returnToDeckOnKnockout: true }
+      }
+      state.log.unshift(`${card.name}'s Knockout Ability flipped ${result}${result === 'heads' ? '; the opponent takes no Prize equivalent.' : '; the opponent takes the normal Prize equivalent.'}`)
+    }
+    const prizeReduction = Math.max(getTcgBattleKnockoutPrizeReduction(attacker, card, state[defendingSide], allSides), coinPrizeReduction)
+    if (prizeReduction > 0) card.temporaryEffects = { ...card.temporaryEffects, knockoutPrizeReductionOnFaint: prizeReduction }
   }
   const hasLostZoneKnockoutAbility = !isTcgBattleAbilitySuppressedByShadyTail(attacker, [state.player, state.opponent]) && (attacker.abilities || []).some((ability) =>
     ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim() === "if your opponent's pokemon is knocked out by damage from this pokemon's attacks, put that pokemon and all cards attached to it in the lost zone instead of the discard pile.",
@@ -5503,6 +6411,10 @@ function applyAttack(
   const knockedOutNames = defendingCards
     .filter((card) => knockedOutByAttackIds.has(card.instanceId) && card.currentHp <= 0)
     .map((card) => card.name)
+  const knockedOutTypes = [...new Set(defendingCards
+    .filter((card) => knockedOutByAttackIds.has(card.instanceId) && card.currentHp <= 0 &&
+      (state.lastDamageEvents || []).slice(damageEventStartIndex).some((event) => event.targetId === card.instanceId && event.targetSide === defendingSide && event.reason === 'attack' && event.damage > 0))
+    .flatMap((card) => card.types))]
   const knockedOutRuleBox = defendingCards.some((card) => knockedOutByAttackIds.has(card.instanceId) && card.currentHp <= 0 && card.subtypes.some((subtype) => ['ex', 'gx'].includes(subtype.toLowerCase())))
   const knockedOutGrassPokemon = defendingCards.some((card) => card.types.some((type) => normalizeTcgBattleAbilityText(type) === 'grass') && knockedOutByAttackIds.has(card.instanceId) && card.currentHp <= 0 &&
     (state.lastDamageEvents || []).slice(damageEventStartIndex).some((event) => event.targetId === card.instanceId && event.targetSide === defendingSide && event.reason === 'attack' && event.damage > 0))
@@ -5513,6 +6425,7 @@ function applyAttack(
       turnNumber: defendingSideTurnNumber,
       knockedOut: Boolean(previousTurnKnockout?.knockedOut || knockedOutByAttack),
       knockedOutNames: [...new Set([...(previousTurnKnockout?.knockedOutNames || []), ...knockedOutNames])],
+      knockedOutTypes: [...new Set([...(previousTurnKnockout?.knockedOutTypes || []), ...knockedOutTypes])],
       knockedOutRuleBox: Boolean(previousTurnKnockout?.knockedOutRuleBox || knockedOutRuleBox),
       knockedOutGrassPokemon: Boolean(previousTurnKnockout?.knockedOutGrassPokemon || knockedOutGrassPokemon),
     },
@@ -5525,6 +6438,9 @@ function applyAttack(
     attacker.temporaryEffects?.nextAttackBuff?.attackNames?.some((name) => name.toLowerCase() === attack.name.toLowerCase())
   ) {
     delete attacker.temporaryEffects.nextAttackBuff
+  }
+  if (attacker.temporaryEffects?.attackCoinCountOverride?.attackName.toLowerCase() === attack.name.toLowerCase()) {
+    delete attacker.temporaryEffects.attackCoinCountOverride
   }
   if (attacker.temporaryEffects?.lastIncomingAttackDamage !== undefined) {
     delete attacker.temporaryEffects.lastIncomingAttackDamage
@@ -5612,7 +6528,7 @@ function applyTcgBattleEvolutionStatusEffect(state: TcgBattleState, sideKey: Tcg
   const effect = getTcgBattleEvolutionStatusEffect(evolvedCard)
   if (!effect || isTcgBattleAbilitySuppressedByShadyTail(evolvedCard, [state.player, state.opponent])) return false
   if (effect.coinFlip) {
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     if (result === 'tails') {
       state.log.unshift(`${evolvedCard.name}'s ${effect.abilityName} flipped tails.`)
@@ -5668,6 +6584,7 @@ function applyTcgBattleEvolutionDevolution(state: TcgBattleState, sideKey: TcgBa
       currentHp: Math.max(0, previousStage.hp - damage),
       playedToBenchTurn: target.playedToBenchTurn,
       playedToFrontTurn: target.playedToFrontTurn,
+      evolvedTurn: target.evolvedTurn,
       statusConditions: target.statusConditions,
       incomingAttackModifier: target.incomingAttackModifier,
       temporaryEffects: target.temporaryEffects,
@@ -5692,7 +6609,7 @@ function applyTcgBattleEvolutionShuffle(state: TcgBattleState, sideKey: TcgBattl
   const opposingSide = state[opposingSideKey]
   const target = [...opposingSide.front, ...opposingSide.back].find((card) => card.instanceId === targetId && card.currentHp > 0)
   if (!target) return false
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   if (result === 'tails') {
     state.log.unshift(`${evolvedCard.name}'s ${effect.abilityName} flipped tails; ${target.name} stayed in play.`)
@@ -5715,7 +6632,7 @@ function applyTcgBattleEvolutionDiscard(state: TcgBattleState, sideKey: TcgBattl
   const opposingSide = state[opposingSideKey]
   const target = opposingSide.front.find((card) => card.currentHp > 0)
   if (!effect || !target || isTcgBattleAbilitySuppressedByShadyTail(evolvedCard, [state.player, state.opponent])) return false
-  const results: ('heads' | 'tails')[] = [randomInt(0, 2) === 0 ? 'heads' : 'tails', randomInt(0, 2) === 0 ? 'heads' : 'tails']
+  const results: ('heads' | 'tails')[] = [flipTcgBattleCoinForSide(state, state.activeSide), flipTcgBattleCoinForSide(state, state.activeSide)]
   recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results, heads: results.filter((result) => result === 'heads').length, tails: results.filter((result) => result === 'tails').length, purpose: 'effect' })
   if (results.every((result) => result === 'heads')) {
     opposingSide.front = opposingSide.front.filter((card) => card.instanceId !== target.instanceId)
@@ -5747,7 +6664,7 @@ function applyTcgBattleEvolutionDamageAbility(
   const opposingSide = sideKey === 'player' ? 'opponent' : 'player'
   if (effect?.coinSpreadCount) {
     if (isTcgBattleAbilitySuppressedByShadyTail(evolvedCard, [state.player, state.opponent])) return false
-    const results = Array.from({ length: effect.coinSpreadCount }, () => randomInt(0, 2) === 0 ? 'heads' as const : 'tails' as const)
+    const results = Array.from({ length: effect.coinSpreadCount }, () => flipTcgBattleCoinForSide(state, state.activeSide))
     recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results, heads: results.filter((result) => result === 'heads').length, tails: results.filter((result) => result === 'tails').length, purpose: 'effect' })
     const heads = results.filter((result) => result === 'heads').length
     const targets = state[opposingSide].back.filter((card) => card.currentHp > 0)
@@ -5808,7 +6725,7 @@ function applyTcgBattleEvolutionDeckDiscardAbility(state: TcgBattleState, sideKe
   }
   const coinDiscard = abilityText.match(/must flip a coin\. if heads, discard the top (\d+) cards (?:of|from) your opponent's deck\. if tails, discard the top (\d+) cards (?:of|from) your deck\./)
   if (coinDiscard) {
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     const deckSideKey = result === 'heads' ? opponentKey : sideKey
     const discarded = state[deckSideKey].deck.splice(0, Number(coinDiscard[result === 'heads' ? 1 : 2]))
@@ -6091,7 +7008,7 @@ function isTcgBattleSlakingLazyBlowAbility(card: TcgBattleCardState, abilityInde
 }
 
 function applyTcgBattleSlakingLazyBlow(state: TcgBattleState, sideKey: TcgBattleSide, source: TcgBattleCardState, abilityIndex: number, abilityName: string) {
-  const heads = randomInt(2) === 0
+  const heads = flipTcgBattleCoinForSide(state, state.activeSide) === 'heads'
   if (heads) {
     source.temporaryEffects = {
       ...source.temporaryEffects,
@@ -6302,7 +7219,7 @@ function useOpponentMetagrossMagneticReversal(state: TcgBattleState): boolean {
       if (text !== textExpected) continue
       const usageKey = `${abilityIndex}:${ability.name}`
       if (source.abilityUses?.[usageKey] === state.turnNumber) continue
-      const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
       recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
       if (result === 'heads' && !swapTcgBattleCards(state, 'player', activeTarget, benchTarget.instanceId, true)) continue
       source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
@@ -6348,7 +7265,7 @@ function useOpponentKabutoReviveFriends(state: TcgBattleState): boolean {
     if (!ability || source.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) || source.abilityUses?.[usageKey] === state.turnNumber || getOpenTcgBattleBenchSlots(side) < 1) continue
     const deckIndex = side.deck.findIndex((card) => card.name.toLowerCase() === 'kabuto' && canTcgBattlePutPokemonOnBench(side, card))
     if (deckIndex < 0) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
     if (result === 'heads') {
@@ -6377,7 +7294,7 @@ function useOpponentOmanyteFossil(state: TcgBattleState): boolean {
     if (!ability || source.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)) || source.abilityUses?.[usageKey] === state.turnNumber || getOpenTcgBattleBenchSlots(side) < 1) continue
     const deckIndex = side.deck.findIndex((card) => normalizeTcgBattleAbilityCardName(card.evolvesFrom || '').replace(/[^a-z0-9]/g, '') === 'mysteriousfossil' && canTcgBattlePutPokemonOnBench(side, card))
     if (deckIndex < 0) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
     let targetId: string | undefined
@@ -6408,7 +7325,7 @@ function useOpponentBeldumMagneticCall(state: TcgBattleState): boolean {
     if (!ability || source.statusConditions?.length || source.abilityUses?.[usageKey] === state.turnNumber || getOpenTcgBattleBenchSlots(side) < 1) continue
     const deckIndex = side.deck.findIndex((card) => card.subtypes.includes('Basic') && card.types.some((type) => type.toLowerCase() === 'metal') && canTcgBattlePutPokemonOnBench(side, card))
     if (deckIndex < 0) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
     let targetId: string | undefined
@@ -6455,7 +7372,7 @@ function useOpponentIgglybuffDreamDance(state: TcgBattleState): boolean {
     const abilityIndex = source.abilities?.findIndex((ability) => normalizeTcgBattleAbilityCardName(source.name) === 'igglybuff' && getTcgBattleCoinFlipStatusPower(ability.text) === 'asleep' && ability.text.toLowerCase().includes('if you use this ability, your turn ends')) ?? -1
     const ability = source.abilities?.[abilityIndex]
     if (!ability || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     const events = result === 'heads' ? applyTcgBattleStatusConditions(state, 'opponent', source.instanceId, target.instanceId, [{ target: 'opponent', statuses: ['asleep'] }], true) : []
     state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
@@ -6477,7 +7394,7 @@ function useOpponentElekidPlayfulPunch(state: TcgBattleState): boolean {
     const ability = source.abilities?.[abilityIndex]
     const usageKey = `${abilityIndex}:${ability?.name || ''}`
     if (!ability || source.abilityUses?.[usageKey] === state.turnNumber) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     let damage = 0
     if (result === 'heads') {
@@ -6518,7 +7435,7 @@ function useOpponentDarkHoundoomFireBreath(state: TcgBattleState): boolean {
   if (!target) return false
   for (const [abilityIndex, ability] of (source.abilities || []).entries()) {
     if (!isTcgBattleDarkHoundoomFireBreath(ability.text) || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     if (result === 'heads') {
       const events = applyTcgBattleStatusConditions(state, 'opponent', source.instanceId, target.instanceId, [{ target: 'opponent', statuses: ['burned'] }], true)
@@ -6625,7 +7542,7 @@ function useOpponentVanilluxeBitterCold(state: TcgBattleState): boolean {
   if (!source || !target) return false
   for (const [abilityIndex, ability] of (source.abilities || []).entries()) {
     if (getTcgBattleCoinFlipStatusPower(ability.text) !== 'paralyzed' || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     const events = result === 'heads' ? applyTcgBattleStatusConditions(state, 'opponent', source.instanceId, target.instanceId, [{ target: 'opponent', statuses: ['paralyzed'] }], true) : []
     state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
@@ -6643,7 +7560,7 @@ function useOpponentVenusaurMiracleAroma(state: TcgBattleState): boolean {
   for (const source of state.opponent.front.filter((card) => card.currentHp > 0 && !card.statusConditions?.length && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.opponent, state.player]))) {
     for (const [abilityIndex, ability] of (source.abilities || []).entries()) {
       if (!isTcgBattleVenusaurMiracleAroma(ability.text) || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) continue
-      const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
       recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
       const status: TcgBattleStatusCondition = target.statusConditions?.includes('asleep') ? target.statusConditions.includes('burned') ? 'poisoned' : 'burned' : 'asleep'
       if (result === 'heads') {
@@ -6670,7 +7587,7 @@ function useOpponentVileplumeChoiceStatus(state: TcgBattleState): boolean {
     for (const [abilityIndex, ability] of (source.abilities || []).entries()) {
       const usageKey = `${abilityIndex}:${ability.name}`
       if (!isTcgBattleVileplumeChoiceStatus(ability.text) || source.abilityUses?.[usageKey] === state.turnNumber) continue
-      const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
       recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
       const events = result === 'heads'
         ? applyTcgBattleStatusConditions(state, 'opponent', source.instanceId, target.instanceId, [{ target: 'opponent', statuses: [status] }], true)
@@ -6726,6 +7643,10 @@ function useOpponentBenchShuffleAbility(state: TcgBattleState): boolean {
       const suicunePower = /^once during your turn \(before your attack\), if this pokemon is on your bench, you may shuffle it and all cards attached to it into your deck\.$/.test(text)
         && normalize(source.name).startsWith('suicune')
         && side.back.some((card) => card.instanceId === source.instanceId)
+      const pidgeotVBenchShuffle = text === 'once during your turn, if this pokemon is on your bench, you may shuffle it and all attached cards into your deck.'
+        && normalize(source.name) === 'pidgeot v'
+        && side.back.some((card) => card.instanceId === source.instanceId)
+        && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber
       const toxicroakGReturn = normalize(source.name).replace(/[^a-z0-9]/g, '') === 'toxicroakg' && text === "once during your turn (before your attack), if toxicroak is your active pokemon, you may flip a coin. if heads, return toxicroak and all cards attached to it to your hand. this power can't be used if toxicroak is affected by a special condition."
       const umbreonActiveReturn = normalize(source.name) === 'umbreon' && text === "once during your turn (before your attack), if umbreon is your active pokemon, you may flip a coin. if heads, return umbreon and all cards attached to it to your hand. this power can't be used if umbreon is affected by a special condition."
       const activeCoinReturn = (toxicroakGReturn || umbreonActiveReturn) && side.front.some((card) => card.instanceId === source.instanceId) && !source.statusConditions?.length && source.currentHp <= 30 && [...side.front, ...side.back].some((card) => card.instanceId !== source.instanceId && card.currentHp > 0) && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber
@@ -6770,6 +7691,7 @@ function useOpponentBenchShuffleAbility(state: TcgBattleState): boolean {
         if (target && !useTcgBattleBenchShuffleAbility(state, 'opponent', source.instanceId, abilityIndex, target.instanceId)) return true
       }
       if (suicunePower && (source.currentHp < source.hp || side.back.length >= 5) && !useTcgBattleBenchShuffleAbility(state, 'opponent', source.instanceId, abilityIndex, source.instanceId)) return true
+      if (pidgeotVBenchShuffle && (source.currentHp < source.hp || side.back.length >= 5) && !useTcgBattleBenchShuffleAbility(state, 'opponent', source.instanceId, abilityIndex, source.instanceId)) return true
       if (activeCoinReturn && !useTcgBattleBenchShuffleAbility(state, 'opponent', source.instanceId, abilityIndex, source.instanceId)) return true
       if (wishiwashiCowardice && (source.currentHp < source.hp || side.back.length >= 5) && !useTcgBattleBenchShuffleAbility(state, 'opponent', source.instanceId, abilityIndex, source.instanceId)) return true
       if (starmiePower && source.currentHp <= 30 && [...side.front, ...side.back].some((card) => card.instanceId !== source.instanceId && card.currentHp > 0) && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber && !useTcgBattleBenchShuffleAbility(state, 'opponent', source.instanceId, abilityIndex, source.instanceId)) return true
@@ -7011,10 +7933,12 @@ function useOpponentAbilityDeckSearch(state: TcgBattleState): boolean {
       if (!effect) continue
       const mapsEnergyToPool = Boolean(effect.energyCard)
       if (mapsEnergyToPool) effect.energyCard = false
+      if (effect.benchOnly && !side.back.some((card) => card.instanceId === source.instanceId && card.currentHp > 0)) continue
+      if (mapsEnergyToPool && effect.selfKnockoutIfEnergyAdded && side.energy === 0) side.selectedEnergy = 'Lightning'
       if (effect.activeOnly && !side.front.some((card) => card.instanceId === source.instanceId) || effect.requiresEmptyHand && side.hand.length > 0 || effect.putOnBench && getOpenTcgBattleBenchSlots(side) < 1) continue
       if (effect.requiredActiveAbilityName && !side.front.some((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]) && card.abilities?.some((entry) => entry.name.toLowerCase() === effect.requiredActiveAbilityName))) continue
       const usageKey = `shared:${effect.sharedKey}`
-      if (!mapsEnergyToPool && side.deck.length === 0 || mapsEnergyToPool && (!side.selectedEnergy || side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || effect.requiredEnergyType && side.selectedEnergy.toLowerCase() !== effect.requiredEnergyType) || effect.handDiscardCount && side.hand.length < effect.handDiscardCount || effect.attachEnergyFromDeck && (side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || (effect.benchToActiveOnly ? !side.front.some((card) => card.instanceId === source.instanceId) || !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === 'opponent' && event.targetId === source.instanceId) && !(state.lastAction?.kind === 'retreat' && state.lastAction.side === 'opponent' && state.lastAction.backId === source.instanceId) : !side.back.some((card) => card.currentHp > 0))) || effect.firstTurnOnly && state.turnNumber !== 1 || effect.onlyIfGoesSecond && state.playerGoesSecond === true || effect.requiredNames && effect.requiredNames.some((name) => !side.deck.some((card) => card.name.toLowerCase() === name)) || effect.knockoutGate && !hasTcgBattleRecentRuleBoxKnockout(state, 'opponent') || effect.knockoutAnyGate && !(state.lastOpponentAttackKnockout?.opponent?.knockedOut && state.lastOpponentAttackKnockout.opponent.turnNumber === state.turnNumber) || effect.requiredName && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiredName!)) || effect.nameContains && !side.deck.some((card) => card.name.toLowerCase().includes(effect.nameContains!)) || effect.requiredSubtype && !side.deck.some((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === effect.requiredSubtype) && (!effect.excludedName || !card.name.toLowerCase().includes(effect.excludedName))) || effect.attackNameContains && !side.deck.some((card) => card.attacks.some((attack) => attack.name.toLowerCase().includes(effect.attackNameContains!))) || effect.specialConditionGate && source.statusConditions?.length || effect.blockedStatuses && source.statusConditions?.some((status) => effect.blockedStatuses!.includes(status)) || effect.sharedLimit !== false && [...side.front, ...side.back].some((pokemon) => pokemon.abilityUses?.[usageKey] === state.turnNumber) || effect.sharedLimit === false && source.abilityUses?.[usageKey] === state.turnNumber) continue
+      if (!mapsEnergyToPool && side.deck.length === 0 || mapsEnergyToPool && (side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || effect.selfDamageCost ? side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || source.currentHp <= (effect.selfDamageCost || 0) * 10 : !side.selectedEnergy || effect.requiredEnergyType && side.selectedEnergy.toLowerCase() !== effect.requiredEnergyType) || effect.handDiscardCount && side.hand.length < effect.handDiscardCount || effect.attachEnergyFromDeck && (side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || (effect.benchToActiveOnly ? !side.front.some((card) => card.instanceId === source.instanceId) || !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === 'opponent' && event.targetId === source.instanceId) && !(state.lastAction?.kind === 'retreat' && state.lastAction.side === 'opponent' && state.lastAction.backId === source.instanceId) : !side.back.some((card) => card.currentHp > 0))) || effect.firstTurnOnly && state.turnNumber !== 1 || effect.onlyIfGoesSecond && state.playerGoesSecond === true || effect.requiredNames && effect.requiredNames.some((name) => !side.deck.some((card) => card.name.toLowerCase() === name)) || effect.knockoutGate && !hasTcgBattleRecentRuleBoxKnockout(state, 'opponent') || effect.knockoutAnyGate && !(state.lastOpponentAttackKnockout?.opponent?.knockedOut && state.lastOpponentAttackKnockout.opponent.turnNumber === state.turnNumber) || effect.requiredName && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiredName!)) || effect.nameContains && !side.deck.some((card) => card.name.toLowerCase().includes(effect.nameContains!)) || effect.requiredSubtype && !side.deck.some((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === effect.requiredSubtype) && (!effect.excludedName || !card.name.toLowerCase().includes(effect.excludedName))) || effect.attackNameContains && !side.deck.some((card) => card.attacks.some((attack) => attack.name.toLowerCase().includes(effect.attackNameContains!))) || effect.specialConditionGate && source.statusConditions?.length || effect.blockedStatuses && source.statusConditions?.some((status) => effect.blockedStatuses!.includes(status)) || effect.sharedLimit !== false && [...side.front, ...side.back].some((pokemon) => pokemon.abilityUses?.[usageKey] === state.turnNumber) || effect.sharedLimit === false && source.abilityUses?.[usageKey] === state.turnNumber) continue
       if (effect.requiredOpponentEnergyLead && state.player.energy <= state.opponent.energy || effect.activeOnly && !side.front.some((card) => card.instanceId === source.instanceId)) continue
       if (effect.benchPlayOnly && (source.playedToBenchTurn !== state.turnNumber || state.lastAction?.kind !== 'bench' || state.lastAction.side !== 'opponent' || state.lastAction.frontId !== source.instanceId)) continue
       const indices = mapsEnergyToPool ? [] : effect.requiredNames
@@ -7025,7 +7949,7 @@ function useOpponentAbilityDeckSearch(state: TcgBattleState): boolean {
         ? side.deck.map((card, index) => ({ card, index })).filter(({ card }) => card.hp <= effect.maxHp! && card.types.some((type) => type.toLowerCase() === effect.subtype)).slice(0, effect.count).map(({ index }) => index)
         : [side.deck.findIndex((candidate) => (!effect.subtype || (effect.energyCard ? candidate.name.toLowerCase().includes(`${effect.requiredEnergyType || ''} energy`) && (!effect.basicEnergyOnly || candidate.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) : effect.subtype === 'pokemon' ? candidate.types.length > 0 : candidate.subtypes.some((subtype) => subtype.toLowerCase() === effect.subtype))) && (!effect.evolutionOnly || Boolean(candidate.evolvesFrom)) && (!effect.requiredType || candidate.types.some((type) => type.toLowerCase() === effect.requiredType)) && (!effect.requiredTypes || effect.requiredTypes.some((requiredType) => candidate.types.some((type) => type.toLowerCase() === requiredType))) && (!effect.nameContains || candidate.name.toLowerCase().includes(effect.nameContains)) && (!effect.attackNameContains || candidate.attacks.some((attack) => attack.name.toLowerCase().includes(effect.attackNameContains!))) && (!effect.noRuleBox || !hasTcgBattleRuleBox(candidate)))]
       if (!mapsEnergyToPool && (indices.length === 0 || indices.some((index) => index < 0))) continue
-      const searchCoinResult = effect.coinFlip ? randomInt(0, 2) === 0 ? 'heads' : 'tails' : undefined
+      const searchCoinResult = effect.coinFlip ? flipTcgBattleCoinForSide(state, state.activeSide) : undefined
       if (searchCoinResult) recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [searchCoinResult], heads: searchCoinResult === 'heads' ? 1 : 0, tails: searchCoinResult === 'tails' ? 1 : 0, purpose: 'effect' })
       const selected = mapsEnergyToPool || searchCoinResult === 'tails' ? [] : [...indices].sort((a, b) => b - a).map((index) => side.deck.splice(index, 1)[0]).reverse()
       if (effect.handDiscardCount) {
@@ -7040,6 +7964,8 @@ function useOpponentAbilityDeckSearch(state: TcgBattleState): boolean {
         shuffleTcgBattleDeck(side)
         side.deck.unshift(...selected)
       } else side.hand.push(...selected.map((card) => createTcgBattleCardState(card, side.hand.length)))
+      if (effect.selfDamageCost) source.currentHp -= effect.selfDamageCost * 10
+      if (effect.selfKnockoutIfEnergyAdded && side.energy > energyBeforeSearch) source.currentHp = 0
       source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
       if (searchCoinResult !== 'tails' && !effect.putOnTop) shuffleTcgBattleDeck(side)
       state.log.unshift(searchCoinResult ? `Opponent used ${source.name}'s ${ability.name}; the coin landed ${searchCoinResult}${searchCoinResult === 'heads' ? ` and it found ${selected[0]?.name || 'no Pokémon'}` : ', so it found nothing'}.` : effect.putOnBench ? `Opponent used ${source.name}'s ${ability.name} to put ${selected.length} Pokémon VMAX from its deck onto the Bench.` : mapsEnergyToPool ? `Opponent used ${source.name}'s ${ability.name} to add ${side.energy - energyBeforeSearch} ${effect.requiredEnergyType || side.selectedEnergy || ''} Energy to the shared pool.` : effect.attachEnergyFromDeck ? `Opponent used ${source.name}'s ${ability.name} to attach ${selected.length} Energy to the shared pool for its Bench.` : effect.putOnTop ? `Opponent used ${source.name}'s ${ability.name} to put ${selected[0].name} on top of its deck.` : `Opponent used ${source.name}'s ${ability.name} to search ${selected.length} ${effect.subtype ? `${effect.subtype} ` : ''}Pokémon into hand.`)
@@ -7296,13 +8222,17 @@ function useOpponentFragranceTrapAbility(state: TcgBattleState): boolean {
       const text = ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
       const unownMGust = source.name.replace(/[^a-z0-9]/gi, '').toLowerCase() === 'unownm' && text === "once during your turn (before your attack), if unown m is your active pokemon, you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with 1 of the defending pokemon. this power can't be used if unown m is affected by a special condition."
       const aquapolisVictreebel = text === "once during your turn (before your attack), you may flip a coin. if heads, choose 1 of your opponent's benched pokemon and switch the defending pokemon with it. this power can't be used if victreebel is affected by a special condition."
-      if (!unownMGust && !aquapolisVictreebel && text !== "once during your turn (before your attack), you may flip a coin. if heads, and if your opponent has any benched pokemon, choose 1 of them and switch it with his or her active pokemon. this power can't be used if erika's victreebel is asleep, confused, or paralyzed.") continue
+      const captivatingRhythm = source.name.toLowerCase() === 'ludicolo' && ability.name === 'Captivating Rhythm' && ["once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon.", "once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with his or her active pokemon."].includes(text)
+      const venusaurSleepPoison = source.name.toLowerCase() === 'venusaur' && text === "once during your turn, you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon, and the new active pokemon is now asleep and poisoned."
+      const florgesConfusionSwitch = source.name.toLowerCase() === 'florges' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot, and the new active pokemon is now confused."
+      const erikaVictreebel = text === "once during your turn (before your attack), you may flip a coin. if heads, and if your opponent has any benched pokemon, choose 1 of them and switch it with his or her active pokemon. this power can't be used if erika's victreebel is asleep, confused, or paralyzed."
+      if (!unownMGust && !aquapolisVictreebel && !captivatingRhythm && !venusaurSleepPoison && !florgesConfusionSwitch && !erikaVictreebel) continue
       if (aquapolisVictreebel && source.statusConditions?.length || !aquapolisVictreebel && !unownMGust && source.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) continue
       if (unownMGust && (!state.opponent.front.some((card) => card.instanceId === source.instanceId) || source.statusConditions?.length)) continue
       const usageKey = `${abilityIndex}:${ability.name}`
       if (source.abilityUses?.[usageKey] === state.turnNumber) continue
       clearDamageEvents(state)
-      const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
       recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
       source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
       if (result === 'tails') {
@@ -7311,7 +8241,12 @@ function useOpponentFragranceTrapAbility(state: TcgBattleState): boolean {
         return true
       }
       if (!swapTcgBattleCards(state, 'player', active, target.instanceId, true)) continue
-      state.log.unshift(`Opponent used ${source.name}'s ${ability.name} to flip heads and switch ${target.name} into your Active Spot.`)
+      if (venusaurSleepPoison || florgesConfusionSwitch) {
+        const statuses = venusaurSleepPoison ? ['asleep', 'poisoned'] as const : ['confused'] as const
+        const events = applyTcgBattleStatusConditions(state, 'opponent', source.instanceId, target.instanceId, [{ target: 'opponent', statuses: [...statuses] }], true)
+        state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
+      }
+      state.log.unshift(`Opponent used ${source.name}'s ${ability.name} to flip heads and switch ${target.name} into your Active Spot${venusaurSleepPoison ? ', leaving it Asleep and Poisoned' : florgesConfusionSwitch ? ', leaving it Confused' : ''}.`)
       state.lastAction = { id: randomUUID(), side: 'opponent', kind: 'ability', frontId: source.instanceId, targetId: target.instanceId, abilityName: ability.name, abilityEffect: 'switch' }
       return true
     }
@@ -7326,7 +8261,7 @@ function useOpponentAzumarillFrolic(state: TcgBattleState): boolean {
     const ability = source.abilities?.[abilityIndex]
     const usageKey = `${abilityIndex}:${ability?.name || ''}`
     if (!ability || normalizeTcgBattleAbilityCardName(source.name) !== 'azumarill' || source.abilityUses?.[usageKey] === state.turnNumber) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
     if (result === 'heads') {
@@ -7399,7 +8334,7 @@ function useOpponentForcedSwitchAbility(state: TcgBattleState): boolean {
       const usageKey = `${abilityIndex}:${ability.name}`
       if (source.abilityUses?.[usageKey] === state.turnNumber || driveOff && source.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status))) continue
       if (nidoqueenMaternalCall) {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
         if (result === 'tails') {
@@ -7446,6 +8381,64 @@ function useOpponentWaterActiveSwitchAbility(state: TcgBattleState): boolean {
     if (active.abilityUses?.[usageKey] === state.turnNumber) continue
     const replacement = side.back.find((card) => canTcgBattlePokemonAttack(state, 'opponent', card, true))
     if (!replacement || !swapTcgBattleCards(state, 'opponent', active, replacement.instanceId)) continue
+    active.abilityUses = { ...active.abilityUses, [usageKey]: state.turnNumber }
+    state.log.unshift(`Opponent used ${active.name}'s ${ability.name} to switch ${replacement.name} into the Active Spot.`)
+    state.lastAction = { id: randomUUID(), side: 'opponent', kind: 'ability', frontId: active.instanceId, targetId: replacement.instanceId, abilityName: ability.name, abilityEffect: 'switch' }
+    return true
+  }
+  return false
+}
+
+function useOpponentUltraBeastActiveSwitchAbility(state: TcgBattleState): boolean {
+  const side = state.opponent
+  for (const active of side.front.filter((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast'))) {
+    if (active.temporaryEffects?.cannotSwitch || canTcgBattlePokemonAttack(state, 'opponent', active) || isTcgBattleAbilitySuppressedByShadyTail(active, [state.player, side])) continue
+    const replacement = side.back.find((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast') && canTcgBattlePokemonAttack(state, 'opponent', card, true))
+    if (!replacement) continue
+    for (const [abilityIndex, ability] of (active.abilities || []).entries()) {
+      const text = ability.text.replace(/[’]/g, "'").toLowerCase().replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim()
+      if (text !== 'once during your turn, you may switch your active ultra beast with 1 of your benched ultra beasts.') continue
+      const usageKey = `${abilityIndex}:${ability.name}`
+      if (active.abilityUses?.[usageKey] === state.turnNumber || !swapTcgBattleCards(state, 'opponent', active, replacement.instanceId)) continue
+      active.abilityUses = { ...active.abilityUses, [usageKey]: state.turnNumber }
+      state.log.unshift(`Opponent used ${active.name}'s ${ability.name} to switch ${replacement.name} into the Active Spot.`)
+      state.lastAction = { id: randomUUID(), side: 'opponent', kind: 'ability', frontId: active.instanceId, targetId: replacement.instanceId, abilityName: ability.name, abilityEffect: 'switch' }
+      return true
+    }
+  }
+  return false
+}
+
+function useOpponentLinooneMegaSwitchAbility(state: TcgBattleState): boolean {
+  const side = state.opponent
+  const active = side.front.find((card) => card.currentHp > 0)
+  if (!active || active.temporaryEffects?.cannotSwitch || canTcgBattlePokemonAttack(state, 'opponent', active) || !hasTcgBattleMegaEvolutionEx(side)) return false
+  const source = side.back.find((card) => card.currentHp > 0 && card.name.toLowerCase() === 'linoone' && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, side]))
+  if (!source) return false
+  for (const [abilityIndex, ability] of (source.abilities || []).entries()) {
+    const text = ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim()
+    if (text !== 'once during your turn, if this pokemon is on your bench, and if you have any mega evolution pokemon ex in play, you may use this ability. switch this pokemon with your active pokemon.') continue
+    const usageKey = `${abilityIndex}:${ability.name}`
+    if (source.abilityUses?.[usageKey] === state.turnNumber || !swapTcgBattleCards(state, 'opponent', active, source.instanceId)) continue
+    source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
+    state.log.unshift(`Opponent used ${source.name}'s ${ability.name} to switch it into the Active Spot.`)
+    state.lastAction = { id: randomUUID(), side: 'opponent', kind: 'ability', frontId: source.instanceId, targetId: active.instanceId, abilityName: ability.name, abilityEffect: 'switch' }
+    return true
+  }
+  return false
+}
+
+function useOpponentDrifblimTagTeamSwitch(state: TcgBattleState): boolean {
+  const side = state.opponent
+  const active = side.front.find((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'tag team'))
+  if (!active || active.temporaryEffects?.cannotSwitch || canTcgBattlePokemonAttack(state, 'opponent', active) || isTcgBattleAbilitySuppressedByShadyTail(active, [state.player, side])) return false
+  const replacement = side.back.find((card) => card.currentHp > 0 && canTcgBattlePokemonAttack(state, 'opponent', card, true))
+  if (!replacement) return false
+  for (const [abilityIndex, ability] of (active.abilities || []).entries()) {
+    const text = ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/pokémon/g, 'pokemon').replace(/\s+/g, ' ').trim()
+    if (active.name.toLowerCase() !== 'drifblim' || text !== 'once during your turn (before your attack), you may switch your active tag team pokemon with 1 of your benched pokemon.') continue
+    const usageKey = `${abilityIndex}:${ability.name}`
+    if (active.abilityUses?.[usageKey] === state.turnNumber || !swapTcgBattleCards(state, 'opponent', active, replacement.instanceId)) continue
     active.abilityUses = { ...active.abilityUses, [usageKey]: state.turnNumber }
     state.log.unshift(`Opponent used ${active.name}'s ${ability.name} to switch ${replacement.name} into the Active Spot.`)
     state.lastAction = { id: randomUUID(), side: 'opponent', kind: 'ability', frontId: active.instanceId, targetId: replacement.instanceId, abilityName: ability.name, abilityEffect: 'switch' }
@@ -7553,7 +8546,7 @@ function useOpponentDirectDrawAbility(state: TcgBattleState): 'used' | false {
       }
       const talonflameSkyHunt = normalizeTcgBattleAbilityCardName(source.name) === 'talonflame' && text === "once during your turn, you may use this ability. flip a coin. if heads, discard a random card from your opponent's hand."
       if (talonflameSkyHunt && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber) {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const discarded = result === 'heads' && state.player.hand.length ? state.player.hand.splice(randomInt(0, state.player.hand.length), 1)[0] : undefined
         if (discarded) state.player.discard.push(discarded)
@@ -7871,7 +8864,7 @@ function useOpponentHandRevealAbility(state: TcgBattleState): boolean {
         return true
       }
       if (unownQuicken) {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const protectedNames = result === 'heads' ? applyTcgBattleUnownQuicken(side) : []
         state.log.unshift(result === 'heads'
@@ -7881,7 +8874,7 @@ function useOpponentHandRevealAbility(state: TcgBattleState): boolean {
         return true
       }
       if (unownTell || unownLaugh || unownGive || darkSlowkingCunning) {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         const cunningTopCard = darkSlowkingCunning && result === 'heads' ? state.player.deck[0]?.name : undefined
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         if (result === 'heads' && unownLaugh) {
@@ -7956,7 +8949,7 @@ function useOpponentActiveEnergyDiscardAbility(state: TcgBattleState): boolean {
     const rampardosPower = source.name.toLowerCase() === 'rampardos ex' && text === "once during your turn, if this pokemon is in the active spot, you may use this ability. flip a coin. if heads, discard an energy from your opponent's active pokemon."
     const krookodilePower = source.name.toLowerCase() === 'krookodile' && text === "once during your turn (before your attack), if this pokemon is your active pokemon, you may flip a coin. if heads, discard an energy attached to your opponent's active pokemon."
     if (!rampardosPower && !krookodilePower || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     const discarded = result === 'heads' ? Math.min(1, state.player.energy) : 0
     if (discarded) state.player.energy -= discarded
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
@@ -7975,12 +8968,14 @@ function useOpponentDiscardEnergyAttachAbility(state: TcgBattleState): boolean {
     if (abilityIndex < 0) continue
     const ability = source.abilities![abilityIndex]
     const discardAttachEffect = getTcgBattleDiscardEnergyAttachEffect(ability.text)
+    if (discardAttachEffect?.noAutomaticUse) continue
     if (discardAttachEffect) {
       discardAttachEffect.requiredHandEnergy = undefined
       discardAttachEffect.requiredHandBasicEnergy = undefined
       discardAttachEffect.recoverBasicEnergy = undefined
       discardAttachEffect.requiredDiscardEnergy = undefined
     }
+    if (discardAttachEffect?.opponentRemainingPrizesAtMost !== undefined && getTcgBattleRemainingPrizeCount(state, 'player') > discardAttachEffect.opponentRemainingPrizesAtMost) continue
     if (side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap && !discardAttachEffect?.discardAttachedEnergy) continue
     const handEnergy = discardAttachEffect?.requiredHandEnergy ? side.hand.find((card) => card.name.toLowerCase().includes(`${discardAttachEffect.energyType} energy`)) : discardAttachEffect?.requiredHandBasicEnergy ? side.hand.find((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && card.name.toLowerCase().includes(`${discardAttachEffect.energyType === 'any' ? side.selectedEnergy?.toLowerCase() : discardAttachEffect.energyType} energy`)) : undefined
     const handEnergyCards = discardAttachEffect?.requiredHandBasicEnergy ? side.hand.filter((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && card.name.toLowerCase().includes(`${discardAttachEffect.energyType === 'any' ? side.selectedEnergy?.toLowerCase() : discardAttachEffect.energyType} energy`)).slice(0, Math.min(discardAttachEffect.count || 1, TCG_BATTLE_FORMATS[state.format].energyCap - side.energy)) : handEnergy ? [handEnergy] : []
@@ -7993,7 +8988,7 @@ function useOpponentDiscardEnergyAttachAbility(state: TcgBattleState): boolean {
     const usageKey = shared ? `shared:${discardAttachEffect?.sharedKey}` : `${abilityIndex}:${ability.name}`
     if (discardAttachEffect?.energyType !== 'any' && !discardAttachEffect?.requiredDiscardEnergy && !discardAttachEffect?.requiredDiscardBasicEnergy && !discardAttachEffect?.recoverBasicEnergy && !discardAttachEffect?.requiredHandBasicEnergy && !discardAttachEffect?.requiredHandEnergy && side.selectedEnergy?.toLowerCase() !== energyType || discardAttachEffect?.coinFlip && !discardAttachEffect.requiredDiscardEnergy && !discardAttachEffect.requiredDiscardBasicEnergy && !discardAttachEffect.recoverBasicEnergy && !discardAttachEffect.requiredHandBasicEnergy && !discardAttachEffect.requiredHandEnergy && !side.selectedEnergy || (discardAttachEffect?.requiredHandBasicEnergy || discardAttachEffect?.requiredHandEnergy) && !handEnergy || discardAttachEffect?.requiredHandBasicEnergy && (!handEnergyType || side.selectedEnergy?.toLowerCase() !== handEnergyType) || discardAttachEffect?.requiredDiscardBasicEnergy && (!basicDiscardEnergy || side.energy < 1 || source.statusConditions?.length) || discardAttachEffect?.recoverBasicEnergy && (!basicDiscardEnergy || !side.selectedEnergy || side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || side.selectedEnergy.toLowerCase() !== energyType) || discardAttachEffect?.allowedTypes && !discardAttachEffect.allowedTypes.includes(side.selectedEnergy?.toLowerCase() || '') || discardAttachEffect?.requiredDiscardEnergy && !side.discard.some((card) => card.name.toLowerCase().includes(`${discardAttachEffect.requiredDiscardEnergy} energy`)) || discardAttachEffect?.activeOnly && !side.front.some((card) => card.instanceId === source.instanceId) || discardAttachEffect?.benchToActiveOnly && !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === 'opponent' && event.targetId === source.instanceId) || discardAttachEffect?.target === 'bench' && !side.back.some((card) => card.currentHp > 0 && (!discardAttachEffect.requiredTargetType || card.types.some((type) => type.toLowerCase() === discardAttachEffect.requiredTargetType))) || discardAttachEffect?.requiredTargetType && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === discardAttachEffect.requiredTargetType)) || discardAttachEffect?.requiredMegaFirePokemon && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ex') && card.name.toLowerCase().includes('mega') && card.types.some((type) => type.toLowerCase() === 'fire')) || discardAttachEffect?.requiredEthanBench && !side.back.some((card) => card.currentHp > 0 && card.name.toLowerCase().replace(/[’']/g, '').startsWith('ethans')) || discardAttachEffect?.requiredName && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes(discardAttachEffect.requiredName!)) || discardAttachEffect?.noRuleBoxTarget && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && !hasTcgBattleRuleBox(card)) || discardAttachEffect?.specialConditionGate && source.statusConditions?.length || !discardAttachEffect?.repeatable && (shared && [...side.front, ...side.back].some((card) => card.abilityUses?.[usageKey] === state.turnNumber) || source.abilityUses?.[usageKey] === state.turnNumber)) continue
     const before = side.energy
-    const coinResult = discardAttachEffect?.coinFlip ? (randomInt(0, 2) === 0 ? 'heads' : 'tails') : undefined
+    const coinResult = discardAttachEffect?.coinFlip ? (flipTcgBattleCoinForSide(state, state.activeSide)) : undefined
     if (coinResult) recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [coinResult], heads: coinResult === 'heads' ? 1 : 0, tails: coinResult === 'tails' ? 1 : 0, purpose: 'effect' })
     if (!coinResult || coinResult === 'heads') {
       if (discardAttachEffect?.requiredDiscardEnergy) {
@@ -8074,23 +9069,31 @@ function useOpponentEnergyZoneAttachAbility(state: TcgBattleState): boolean {
         ? text === 'once during your turn, you may take a {p} energy from your energy zone and attach it to this pokemon. if you use this ability, your turn ends.'
         : source.name.toLowerCase() === 'gardevoir'
           ? text === 'once during your turn, you may take a {p} energy from your energy zone and attach it to the {p} pokemon in the active spot.'
-        : /^once during your turn, if this pokemon is in the active spot, you may take a \{g\} energy from your energy zone and attach it to 1 of your \{g\} pokemon\.$/.test(text)
+        : normalizeTcgBattleAbilityCardName(source.name) === 'magneton'
+          ? text === 'once during your turn, you may take a {l} energy from your energy zone and attach it to this pokemon.'
+          : normalizeTcgBattleAbilityCardName(source.name) === 'hydreigon'
+            ? text === 'once during your turn, you may take 2 {d} energy from your energy zone and attach it to this pokemon. if you do, do 30 damage to this pokemon.'
+          : /^once during your turn, if this pokemon is in the active spot, you may take a \{g\} energy from your energy zone and attach it to 1 of your \{g\} pokemon\.$/.test(text)
     }) ?? -1
     if (abilityIndex < 0) continue
     const ability = source.abilities![abilityIndex]
     const giratinaBrokenSpaceBellow = source.name.toLowerCase() === 'giratina ex'
     const gardevoirPsyShadow = source.name.toLowerCase() === 'gardevoir'
-    const requiredType = giratinaBrokenSpaceBellow || gardevoirPsyShadow ? 'psychic' : 'grass'
-    const validTarget = (giratinaBrokenSpaceBellow ? [...side.front, ...side.back] : side.front).some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === requiredType))
+    const magnetonEnergyZoneAttach = normalizeTcgBattleAbilityCardName(source.name) === 'magneton'
+    const hydreigonEnergyZoneAttach = normalizeTcgBattleAbilityCardName(source.name) === 'hydreigon'
+    const requiredType = giratinaBrokenSpaceBellow || gardevoirPsyShadow ? 'psychic' : magnetonEnergyZoneAttach ? 'lightning' : hydreigonEnergyZoneAttach ? 'darkness' : 'grass'
+    const validTarget = (giratinaBrokenSpaceBellow || magnetonEnergyZoneAttach || hydreigonEnergyZoneAttach ? [...side.front, ...side.back] : side.front).some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === requiredType))
     if (side.selectedEnergy?.toLowerCase() !== requiredType || !validTarget) continue
-    if (!giratinaBrokenSpaceBellow && !gardevoirPsyShadow && !side.front.some((card) => card.instanceId === source.instanceId)) continue
+    if (!giratinaBrokenSpaceBellow && !gardevoirPsyShadow && !magnetonEnergyZoneAttach && !hydreigonEnergyZoneAttach && !side.front.some((card) => card.instanceId === source.instanceId)) continue
     const usageKey = `${abilityIndex}:${ability.name}`
     if (source.abilityUses?.[usageKey] === state.turnNumber) continue
-    side.energy += 1
-    applyTcgBattleOpponentEnergyAttachmentDamage(state, 'opponent', 1)
+    const attachedEnergy = hydreigonEnergyZoneAttach ? Math.min(2, TCG_BATTLE_FORMATS[state.format].energyCap - side.energy) : 1
+    side.energy += attachedEnergy
+    if (hydreigonEnergyZoneAttach) source.currentHp -= 30
+    applyTcgBattleOpponentEnergyAttachmentDamage(state, 'opponent', attachedEnergy)
     source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
-    state.log.unshift(`Opponent used ${source.name}'s ${ability.name} to attach ${requiredType === 'psychic' ? 'Psychic' : 'Grass'} Energy (+1 shared Energy).`)
-    state.lastAction = { id: randomUUID(), side: 'opponent', kind: 'ability', frontId: source.instanceId, abilityName: ability.name, abilityEffect: giratinaBrokenSpaceBellow ? 'turnEnd' : 'energyAttach' }
+    state.log.unshift(`Opponent used ${source.name}'s ${ability.name} to attach ${attachedEnergy} ${requiredType === 'psychic' ? 'Psychic' : requiredType === 'lightning' ? 'Lightning' : requiredType === 'darkness' ? 'Darkness' : 'Grass'} Energy to the shared pool${hydreigonEnergyZoneAttach ? ' and put 30 damage on itself' : ''}.`)
+    state.lastAction = { id: randomUUID(), side: 'opponent', kind: 'ability', frontId: source.instanceId, abilityName: ability.name, abilityEffect: giratinaBrokenSpaceBellow ? 'turnEnd' : hydreigonEnergyZoneAttach ? 'counterDamage' : 'energyAttach' }
     return true
   }
   return false
@@ -8112,7 +9115,7 @@ function useOpponentCoinHealAbility(state: TcgBattleState): boolean {
       if (goodNeighborHeal) {
         const activeTargets = [...side.front.map((card) => ({ card, side: 'opponent' as const })), ...state.player.front.map((card) => ({ card, side: 'player' as const }))].filter(({ card, side: targetSide }) => card.currentHp > 0 && card.currentHp < card.hp && !isTcgBattleHealingPreventedForTarget(state, targetSide, card)).map(({ card }) => card)
         if (!activeTargets.length) continue
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
         let healedTotal = 0
@@ -8128,7 +9131,7 @@ function useOpponentCoinHealAbility(state: TcgBattleState): boolean {
         return true
       }
       if (!target) continue
-      const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
       recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
       source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
       let healed = 0
@@ -8427,8 +9430,9 @@ function useOpponentGalarianBirdBenchEnergy(state: TcgBattleState): boolean {
   const side = state.opponent
   if (side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap) return false
   for (const source of side.back.filter((card) => card.currentHp > 0 && card.playedToBenchTurn === state.turnNumber && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, side]))) {
-    const energyType = source.name.toLowerCase() === 'galarian articuno' ? 'psychic' : source.name.toLowerCase() === 'galarian zapdos' ? 'fighting' : source.name.toLowerCase() === 'galarian moltres' ? 'darkness' : null
-    const abilityIndex = source.abilities?.findIndex((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim() === `when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 ${energyType} energy cards from your hand to this pokemon.`) ?? -1
+    const energyType = source.name.toLowerCase() === 'galarian articuno' || source.name.toLowerCase() === 'giratina ◇' ? 'psychic' : source.name.toLowerCase() === 'galarian zapdos' ? 'fighting' : source.name.toLowerCase() === 'galarian moltres' || source.name.toLowerCase() === 'darkrai ◇' ? 'darkness' : null
+    const targetPhrase = ['darkrai ◇', 'giratina ◇'].includes(source.name.toLowerCase()) ? 'it' : 'this pokemon'
+    const abilityIndex = source.abilities?.findIndex((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim() === `when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 ${energyType} energy cards from your hand to ${targetPhrase}.`) ?? -1
     const ability = source.abilities?.[abilityIndex]
     if (!energyType || abilityIndex < 0 || !ability || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) continue
     const added = Math.min(2, TCG_BATTLE_FORMATS[state.format].energyCap - side.energy)
@@ -8498,12 +9502,19 @@ function useOpponentFrosmothEnergyAbility(state: TcgBattleState): boolean {
 
 function useOpponentBaxcaliburEnergyAbility(state: TcgBattleState): boolean {
   const side = state.opponent
-  if (side.selectedEnergy?.toLowerCase() !== 'water' || side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap) return false
-  const target = [...side.front, ...side.back].find((card) => card.currentHp > 0)
-  if (!target) return false
+  if (side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap) return false
   for (const source of [...side.front, ...side.back].filter((card) => card.currentHp > 0 && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, side]))) {
     const abilityIndex = source.abilities?.findIndex((ability) => isTcgBattleBaxcaliburEnergyAbility(ability.text)) ?? -1
     if (abilityIndex < 0) continue
+    const ability = source.abilities?.[abilityIndex]
+    const normalized = ability?.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
+    const energyZoneConfig = getTcgBattleEnergyZoneAbilityConfig(normalized)
+    const energyZoneAbility = Boolean(energyZoneConfig)
+    if (!energyZoneConfig && side.selectedEnergy?.toLowerCase() !== 'water') continue
+    if (energyZoneAbility && source.abilityUses?.[`${abilityIndex}:${ability?.name}`] === state.turnNumber) continue
+    if (energyZoneConfig && side.selectedEnergy?.toLowerCase() !== energyZoneConfig.energyType) continue
+    const target = (energyZoneAbility ? side.front : [...side.front, ...side.back]).find((card) => card.currentHp > 0 && (!energyZoneConfig || card.types.some((type) => type.toLowerCase() === energyZoneConfig.pokemonType)))
+    if (!target) continue
     if (!applyTcgBattleBaxcaliburEnergyAbility(state, 'opponent', source.instanceId, target.instanceId, abilityIndex)) return true
   }
   return false
@@ -8681,6 +9692,7 @@ function useOpponentDamageCounterMoveAbility(state: TcgBattleState): 'used' | 'p
     for (const [abilityIndex, ability] of (source.abilities || []).entries()) {
       const effect = getTcgBattleAbilityDamageCounterMoveEffect(ability.text)
       if (!effect || effect.activeOnly && !state.opponent.front.some((card) => card.instanceId === source.instanceId)) continue
+      if (effect.opponentRemainingPrizesAtMost !== undefined && getTcgBattleRemainingPrizeCount(state, 'player') > effect.opponentRemainingPrizesAtMost) continue
       const absolCursedEyes = normalizeTcgBattleAbilityCardName(source.name) === 'absol' && ability.text.replace(/[’]/g, "'").toLowerCase().replace(/\s+/g, ' ').trim() === "when you play this pokemon from your hand onto your bench, you may move 3 damage counters from 1 of your opponent's pokemon to another of his or her pokemon."
       if (absolCursedEyes && source.playedToBenchTurn !== state.turnNumber) continue
       if (effect.blockedStatuses ? source.statusConditions?.some((status) => effect.blockedStatuses!.includes(status)) : effect.blockedBySpecialCondition && source.statusConditions?.length) continue
@@ -8788,8 +9800,8 @@ function useOpponentShuffleDamageCounterAbility(state: TcgBattleState): 'used' |
       const usageKey = `${abilityIndex}:${ability.name}`
       const energyTypes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'fighting', d: 'darkness', y: 'metal', c: 'colorless', f: 'fairy' }
       if (effect?.fixedTargetCount && effect.energyType && state.opponent.energy > 0) state.opponent.selectedEnergy = normalizeTcgBattleEnergyType(energyTypes[effect.energyType]) || 'Colorless'
-      if (!effect || (!effect.shuffleSource && !effect.spreadToAllOpponents && !effect.selfKnockout && !effect.energyType && !effect.coinFlip && !effect.ownTargets && !effect.damagedTargetOnly) || effect.energyType && (state.opponent.energy < 1 || state.opponent.selectedEnergy?.toLowerCase() !== energyTypes[effect.energyType]) || effect.specialConditionGate && source.statusConditions?.length || effect.activeOnly && !state.opponent.front.some((card) => card.instanceId === source.instanceId) || effect.sourceBenchOnly && !state.opponent.back.some((card) => card.instanceId === source.instanceId) || effect.requiresOtherActiveName && !state.opponent.front.some((card) => card.instanceId !== source.instanceId && card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiresOtherActiveName!)) || source.abilityUses?.[usageKey] === state.turnNumber) continue
-      const targets = (effect.ownTargets ? ownTargets : effect.benchOnly ? state.player.back.filter((card) => card.currentHp > 0) : opposingTargets).filter((target) => !effect.damagedTargetOnly || target.currentHp < target.hp)
+      if (!effect || (!effect.shuffleSource && !effect.spreadToAllOpponents && !effect.selfKnockout && !effect.energyType && !effect.coinFlip && !effect.ownTargets && !effect.damagedTargetOnly && !effect.directDamage) || effect.energyType && (state.opponent.energy < 1 || state.opponent.selectedEnergy?.toLowerCase() !== energyTypes[effect.energyType]) || effect.specialConditionGate && source.statusConditions?.length || effect.activeOnly && !state.opponent.front.some((card) => card.instanceId === source.instanceId) || effect.sourceBenchOnly && !state.opponent.back.some((card) => card.instanceId === source.instanceId) || effect.requiresOtherActiveName && !state.opponent.front.some((card) => card.instanceId !== source.instanceId && card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiresOtherActiveName!)) || effect.requiresNameInPlay && ![...state.opponent.front, ...state.opponent.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiresNameInPlay!)) || source.abilityUses?.[usageKey] === state.turnNumber) continue
+      const targets = (effect.ownTargets ? ownTargets : effect.defendingOnly ? state.player.front.filter((card) => card.currentHp > 0) : effect.benchOnly ? state.player.back.filter((card) => card.currentHp > 0) : opposingTargets).filter((target) => !effect.damagedTargetOnly || target.currentHp < target.hp)
       if (!targets.length || effect.fixedTargetCount && targets.length < effect.fixedTargetCount) continue
       const tantrumCount = effect.discardHandForSelfCounters ? Math.min(state.opponent.hand.length, Math.floor((source.currentHp - 1) / 10)) : 0
       if (effect.discardHandForSelfCounters && tantrumCount < 1) continue
@@ -8880,6 +9892,8 @@ function playOpponentBasicToBench(state: TcgBattleState): boolean {
     applyDarkMagcargoHotPlate(state, 'opponent', played)
   }
   applyTcgBattleAmoongussSporeTrigger(state, 'opponent', played)
+  applyTcgBattleFlareonStarBenchEntry(state, 'opponent', played)
+  applyTcgBattleJolteonStarBenchEntry(state, 'opponent', played)
   state.consecutivePasses = 0
   state.log.unshift(`Opponent played ${played.name} from hand into the ${goesToFront && !lastCardBenchDraw ? 'front row' : 'Bench'}.`)
   if (lastCardBenchDraw) {
@@ -9016,7 +10030,7 @@ function useOpponentGloomHandBench(state: TcgBattleState): boolean {
   const ability = source?.abilities?.[abilityIndex]
   const target = state.player.hand.find((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic'))
   if (!source || !ability || !target || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return false
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
   if (result === 'heads' && target) {
@@ -9241,7 +10255,7 @@ function useOpponentDirectHealAbility(state: TcgBattleState): boolean {
       )
       if (!candidates.length) continue
       const targets = effect.each ? candidates : [candidates.sort((a, b) => (b.hp - b.currentHp) - (a.hp - a.currentHp))[0]]
-      const coinResult = effect.coin ? randomInt(0, 2) === 0 ? 'heads' : 'tails' : undefined
+      const coinResult = effect.coin ? flipTcgBattleCoinForSide(state, state.activeSide) : undefined
       if (coinResult) recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [coinResult], heads: coinResult === 'heads' ? 1 : 0, tails: coinResult === 'tails' ? 1 : 0, purpose: 'effect' })
       let totalHealed = 0
       if (fightingEnergyFromDiscard) {
@@ -9331,7 +10345,7 @@ function useOpponentNihilegoBenchAbility(state: TcgBattleState): boolean {
     const ability = source.abilities?.[abilityIndex]
     if (!ability || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) continue
     if (!side.front.some((card) => card.currentHp > 0) || !state.player.front.some((card) => card.currentHp > 0)) continue
-    const events = applyTcgBattleBothActiveConfusedAndPoisoned(state, 'opponent')
+    const events = applyTcgBattleBothActiveStatuses(state, 'opponent')
     source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
     state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
     state.log.unshift(`Opponent used ${source.name}'s ${ability.name} to Confuse and Poison both Active Pokémon.`)
@@ -9345,7 +10359,7 @@ function useOpponentEspeonStarConfusion(state: TcgBattleState): boolean {
   const source = state.opponent.back.find((card) => card.currentHp > 0 && card.playedToBenchTurn === state.turnNumber && !isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]) && card.abilities?.some((ability) => isEspeonStarBenchPower(card, ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim())))
   const ability = source?.abilities?.find((candidate) => isEspeonStarBenchPower(source, candidate.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()))
   if (!source || !ability || !state.opponent.front.some((card) => card.currentHp > 0) || !state.player.front.some((card) => card.currentHp > 0)) return false
-  const events = applyTcgBattleBothActiveConfusedAndPoisoned(state, 'opponent', ['confused'])
+  const events = applyTcgBattleBothActiveStatuses(state, 'opponent', ['confused'])
   source.abilityUses = { ...source.abilityUses, [`${source.abilities!.indexOf(ability)}:${ability.name}`]: state.turnNumber }
   state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
   state.log.unshift(`Opponent used Espeon Star's ${ability.name} to Confuse both Active Pokémon.`)
@@ -9364,7 +10378,7 @@ function useOpponentUnownVanish(state: TcgBattleState): boolean {
     .filter((card) => card.currentHp > 0 && card.instanceId !== source?.instanceId && card.name.toLowerCase().includes('unown'))
     .sort((a, b) => a.currentHp - b.currentHp)[0]
   if (!source || !ability || !target) return false
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   if (result === 'heads') {
     const returnedCards = [...(target.evolutionStack || []), toTcgBattleCardSummary(target)]
@@ -9464,7 +10478,7 @@ function useOpponentArticunoFreezingScreech(state: TcgBattleState): boolean {
   const abilityIndex = source.abilities?.findIndex((ability) => ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim() === 'once during your turn, when you put articuno from your hand onto your bench, you may flip a coin. if heads, choose 1 of the defending pokemon. that pokemon is now paralyzed.') ?? -1
   const ability = source.abilities?.[abilityIndex]
   if (!ability || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return false
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   const events = result === 'heads' ? applyTcgBattleStatusConditions(state, 'opponent', source.instanceId, target.instanceId, [{ target: 'opponent', statuses: ['paralyzed'] }], true) : []
   state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
@@ -9483,7 +10497,7 @@ function useOpponentZapdosSheetLightning(state: TcgBattleState): boolean {
   const ability = source.abilities?.[abilityIndex]
   const targets = [...state.player.front, ...state.player.back].filter((card) => card.currentHp > 0)
   if (!ability || targets.length === 0 || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return false
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   if (result === 'heads') {
     clearDamageEvents(state)
@@ -9553,7 +10567,7 @@ function useOpponentDrapionPoisonClaws(state: TcgBattleState): boolean {
     const ability = source.abilities?.[index]
     const key = ability && `${index}:${ability.name}`
     if (!ability || !key || source.abilityUses?.[key] === state.turnNumber) continue
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'opponent', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     const events = result === 'heads' ? applyTcgBattleStatusConditions(state, 'opponent', source.instanceId, target.instanceId, [{ target: 'opponent', statuses: ['poisoned'] }], true) : []
     if (events.length) target.temporaryEffects = { ...target.temporaryEffects, poisonCheckupBonus: 20 }
@@ -9706,7 +10720,7 @@ function runOpponentTurn(state: TcgBattleState) {
     runOpponentTurn(state)
     return
   }
-  if (useOpponentUnownUndo(state) || useOpponentKogaKakunaEmerge(state) || useOpponentVenomothShift(state) || useOpponentDiscardRecoveryAbility(state) || useOpponentBenchShuffleAbility(state) || useOpponentPokemonSwapPower(state) || useOpponentMetagrossMagneticReversal(state) || useOpponentBenchSearchAbility(state) || useOpponentKabutoReviveFriends(state) || useOpponentOmanyteFossil(state) || useOpponentBeldumMagneticCall(state) || useOpponentIgglybuffGaze(state) || useOpponentIgglybuffDreamDance(state) || useOpponentElekidPlayfulPunch(state) || useOpponentDarkCrobatBlackBeam(state) || useOpponentBlazikenFireBreath(state) || useOpponentHisuianTyphlosionHex(state) || useOpponentDelphoxMysticalTorch(state) || useOpponentMareepFluffyPillow(state) || useOpponentVanilluxeBitterCold(state) || useOpponentDarkHoundoomFireBreath(state) || useOpponentVenusaurMiracleAroma(state) || useOpponentVileplumeChoiceStatus(state) || useOpponentXatuPsychicShift(state) || useOpponentAbilityDeckSearch(state) || useOpponentLugiaVstarAbility(state) || useOpponentAlomomolaGentleFin(state) || useOpponentLeafeonVstarSwitch(state) || useOpponentMawileStarRondo(state) || useOpponentDynamotor(state) || useOpponentMetalLinks(state) || useOpponentRegidragoVstar(state) || useOpponentRotomVstar(state) || useOpponentZacianPsychicEnergy(state) || useOpponentZamazentaShieldStar(state) || useOpponentHandDeckSwapAbility(state) || useOpponentDamagedBenchGustAbility(state) || useOpponentFragranceTrapAbility(state) || useOpponentSalamenceDragonWind(state) || useOpponentFeraligatrDoubleSwitch(state) || useOpponentHattereneAbility(state) || useOpponentForcedSwitchAbility(state) || useOpponentRegiMove(state) || useOpponentWaterActiveSwitchAbility(state) || useOpponentActiveStatusRecoveryAbility(state) || useOpponentTentacoolCowardice(state) || useOpponentKarrablastShellOn(state) || useOpponentSableyeExcavation(state)) {
+  if (useOpponentUnownUndo(state) || useOpponentKogaKakunaEmerge(state) || useOpponentVenomothShift(state) || useOpponentDiscardRecoveryAbility(state) || useOpponentBenchShuffleAbility(state) || useOpponentPokemonSwapPower(state) || useOpponentMetagrossMagneticReversal(state) || useOpponentBenchSearchAbility(state) || useOpponentKabutoReviveFriends(state) || useOpponentOmanyteFossil(state) || useOpponentBeldumMagneticCall(state) || useOpponentIgglybuffGaze(state) || useOpponentIgglybuffDreamDance(state) || useOpponentElekidPlayfulPunch(state) || useOpponentDarkCrobatBlackBeam(state) || useOpponentBlazikenFireBreath(state) || useOpponentHisuianTyphlosionHex(state) || useOpponentDelphoxMysticalTorch(state) || useOpponentMareepFluffyPillow(state) || useOpponentVanilluxeBitterCold(state) || useOpponentDarkHoundoomFireBreath(state) || useOpponentVenusaurMiracleAroma(state) || useOpponentVileplumeChoiceStatus(state) || useOpponentXatuPsychicShift(state) || useOpponentAbilityDeckSearch(state) || useOpponentLugiaVstarAbility(state) || useOpponentAlomomolaGentleFin(state) || useOpponentLeafeonVstarSwitch(state) || useOpponentMawileStarRondo(state) || useOpponentDynamotor(state) || useOpponentMetalLinks(state) || useOpponentRegidragoVstar(state) || useOpponentRotomVstar(state) || useOpponentZacianPsychicEnergy(state) || useOpponentZamazentaShieldStar(state) || useOpponentHandDeckSwapAbility(state) || useOpponentDamagedBenchGustAbility(state) || useOpponentFragranceTrapAbility(state) || useOpponentSalamenceDragonWind(state) || useOpponentFeraligatrDoubleSwitch(state) || useOpponentHattereneAbility(state) || useOpponentForcedSwitchAbility(state) || useOpponentRegiMove(state) || useOpponentWaterActiveSwitchAbility(state) || useOpponentUltraBeastActiveSwitchAbility(state) || useOpponentLinooneMegaSwitchAbility(state) || useOpponentDrifblimTagTeamSwitch(state) || useOpponentActiveStatusRecoveryAbility(state) || useOpponentTentacoolCowardice(state) || useOpponentKarrablastShellOn(state) || useOpponentSableyeExcavation(state)) {
     if (state.lastAction?.abilityEffect === 'turnEnd') finishOpponentTurn(state)
     else runOpponentTurn(state)
     return
@@ -9934,7 +10948,7 @@ function runOpponentTurn(state: TcgBattleState) {
     const canAttackTwice = hasTcgBattleAttackTwiceAbility(state, 'opponent', attacker)
     const targetWasActive = state.player.front.some((card) => card.instanceId === target.instanceId)
     applyAttack(state, 'opponent', attacker, attackIndex, target, choice)
-    const grantsExtraAttack = canAttackTwice && (!hasTcgBattleRaichuLinkLightning(attacker) || attacker.attacks[attackIndex]?.name === 'Voltage Shoot') && (!hasTcgBattleKnockoutGatedAttackTwiceAbility(attacker) || targetWasActive && target.currentHp <= 0)
+    const grantsExtraAttack = attacker.currentHp > 0 && canAttackTwice && (!hasTcgBattleRaichuLinkLightning(attacker) || attacker.attacks[attackIndex]?.name === 'Voltage Shoot') && (!hasTcgBattleKnockoutGatedAttackTwiceAbility(attacker) || targetWasActive && target.currentHp <= 0)
     if (grantsExtraAttack) state.extraAttackPending = { side: 'opponent', attackerId: attacker.instanceId }
     finishOpponentTurn(state, grantsExtraAttack)
     return
@@ -10078,6 +11092,10 @@ function runOpponentTurn(state: TcgBattleState) {
 }
 
 function afterPlayerAction(state: TcgBattleState) {
+  if (state.winner) {
+    state.phase = 'finished'
+    return
+  }
   state.extraAttackPending = undefined
   applyWishiwashiTidalWaveAtOpponentTurnEnd(state, 'opponent')
   promoteOpponentIfNeeded(state)
@@ -10212,7 +11230,7 @@ function resolveKogaKakunaEmerge(
   side.hand.pop()
   if (!legalEvolution) return `${source.name} cannot evolve right now.`
 
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
   if (result === 'tails') {
@@ -10252,7 +11270,7 @@ function resolveClefableMoonGuidanceFlip(state: TcgBattleState, sideKey: TcgBatt
   })
   if (!hasLegalEvolution) return 'There is no legal Evolution card in your deck for your Pokémon in play.'
 
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
   if (result === 'tails') {
@@ -10557,7 +11575,7 @@ function applyTcgBattleMeganiumHerbalScent(state: TcgBattleState, sideKey: TcgBa
   if (abilityIndex < 0) return false
   if (isTcgBattleAbilitySuppressedByShadyTail(evolvedCard, [state.player, state.opponent])) return true
   const ability = evolvedCard.abilities![abilityIndex]
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   const healingPrevented = isTcgBattleHealingPrevented(state)
   if (result === 'heads' && !healingPrevented) {
@@ -10580,7 +11598,7 @@ function applyTcgBattleFeraligatrBerserk(state: TcgBattleState, sideKey: TcgBatt
   })
   if (!ability) return false
   if (isTcgBattleAbilitySuppressedByShadyTail(evolvedCard, [state.player, state.opponent])) return true
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   const discardSideKey = result === 'heads' ? sideKey === 'player' ? 'opponent' : 'player' : sideKey
   const discardSide = state[discardSideKey]
@@ -10596,7 +11614,7 @@ function applyTcgBattleEvolutionEnergyEffect(state: TcgBattleState, sideKey: Tcg
   if (!effect) return false
   const ability = evolvedCard.abilities?.find((entry) => {
     const text = entry.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
-    return text.includes('search your deck for up to') && (text.includes('energy cards and attach them to typhlosion') || text.includes('attach them to your pokemon in any way you like')) || text.includes('look at the top') && text.includes('energy cards') && text.includes('shuffle the other cards back into your deck') || text.includes('discard an energy attached to your opponent\'s active pokemon') || text.includes('discard an energy from your opponent\'s active pokemon') || text.includes('attach a water energy card from your discard pile to 1 of your pokemon') || text.includes('attach a grass energy card from your discard pile to 1 of your pokemon') || text.includes('basic {m} energy cards from your discard pile')
+    return text.includes('search your deck for up to') && (text.includes('energy cards and attach them to typhlosion') || text.includes('attach them to your pokemon in any way you like') || text.includes("attach them to your marnie's pokemon in any way you like") || text.includes("attach them to marnie's pokemon in any way you like")) || text.includes('look at the top') && text.includes('energy cards') && text.includes('shuffle the other cards back into your deck') || text.includes('discard an energy attached to your opponent\'s active pokemon') || text.includes('discard an energy from your opponent\'s active pokemon') || text.includes('attach a water energy card from your discard pile to 1 of your pokemon') || text.includes('attach a grass energy card from your discard pile to 1 of your pokemon') || text.includes('basic {m} energy cards from your discard pile') || text.includes('for each prize card your opponent has taken') && text.includes('darkness energy from your discard pile')
   })
   if (!ability || isTcgBattleAbilitySuppressedByShadyTail(evolvedCard, [state.player, state.opponent])) return true
 
@@ -10606,7 +11624,9 @@ function applyTcgBattleEvolutionEnergyEffect(state: TcgBattleState, sideKey: Tcg
     if (side.energy >= cap) return true
     const energyName = ({ g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', m: 'Fighting', d: 'Darkness', y: 'Metal', c: 'Colorless', f: 'Fairy' } as Record<string, string>)[effect.energyType]
     if (side.energy > 0 && side.selectedEnergy?.toLowerCase() !== energyName.toLowerCase()) return true
-    const gained = Math.min(effect.count, cap - side.energy)
+    const opposingSide = state[sideKey === 'player' ? 'opponent' : 'player']
+    const requestedEnergy = effect.opponentPrizeScaling ? opposingSide.knockoutCount || 0 : effect.count
+    const gained = Math.min(requestedEnergy, cap - side.energy)
     side.energy += gained
     side.selectedEnergy = energyName as NonNullable<typeof side.selectedEnergy>
     state.log.unshift(`${evolvedCard.name}'s ${ability.name} added ${gained} ${energyName} Energy to the shared pool.`)
@@ -10617,7 +11637,7 @@ function applyTcgBattleEvolutionEnergyEffect(state: TcgBattleState, sideKey: Tcg
     const opposingActive = opposingSide.front.find((card) => card.currentHp > 0)
     if (!opposingActive) return true
     if (effect.coinFlipDiscard) {
-      const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+      const result = flipTcgBattleCoinForSide(state, state.activeSide)
       recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
       if (result === 'heads' && opposingSide.energy > 0) {
         opposingSide.energy -= 1
@@ -10641,7 +11661,7 @@ function applyTcgBattleEvolutionEnergyEffect(state: TcgBattleState, sideKey: Tcg
 
   let result: 'heads' | 'tails' | undefined
   if (effect.coinFlip) {
-    result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   }
   if (!result || result === 'heads') {
@@ -10670,10 +11690,11 @@ function applyTcgBattleEvolutionEnergyEffect(state: TcgBattleState, sideKey: Tcg
 function canApplyTcgBattleEvolutionEnergyEffect(state: TcgBattleState, sideKey: TcgBattleSide, effect: NonNullable<ReturnType<typeof getTcgBattleEvolutionEnergyEffect>>): boolean {
   const side = state[sideKey]
   if (effect.discardOpponentActive) return effect.coinFlipDiscard || state[sideKey === 'player' ? 'opponent' : 'player'].energy > 0
+  const requestedEnergy = effect.opponentPrizeScaling ? state[sideKey === 'player' ? 'opponent' : 'player'].knockoutCount || 0 : effect.count
   const energyName = effect.energyType === 'any'
     ? side.selectedEnergy ? side.selectedEnergy.charAt(0).toUpperCase() + side.selectedEnergy.slice(1) : ''
     : ({ g: 'Grass', r: 'Fire', w: 'Water', l: 'Lightning', p: 'Psychic', m: 'Fighting', d: 'Darkness', y: 'Metal', c: 'Colorless', f: 'Fairy' } as Record<string, string>)[effect.energyType]
-  if (effect.discardPile || effect.searchDeck || effect.topDeckCount) return Boolean(energyName) && side.energy < TCG_BATTLE_FORMATS[state.format].energyCap && (side.energy === 0 || !side.selectedEnergy || side.selectedEnergy.toLowerCase() === energyName.toLowerCase())
+  if (effect.discardPile || effect.searchDeck || effect.topDeckCount) return requestedEnergy > 0 && Boolean(energyName) && side.energy < TCG_BATTLE_FORMATS[state.format].energyCap && (side.energy === 0 || !side.selectedEnergy || side.selectedEnergy.toLowerCase() === energyName.toLowerCase())
   return side.selectedEnergy?.toLowerCase() === energyName.toLowerCase()
 }
 
@@ -10683,7 +11704,7 @@ function applyTcgBattleBlisseySoftboiled(state: TcgBattleState, sideKey: TcgBatt
   const ability = evolvedCard.abilities?.find((entry) => entry.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim().startsWith('when you play blissey from your hand, you may flip a coin.'))
   if (!ability || evolvedCard.currentHp >= evolvedCard.hp || isTcgBattleAbilitySuppressedByShadyTail(evolvedCard, [state.player, state.opponent])) return true
 
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: evolvedCard.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   const requestedHealing = (result === 'heads' ? effect.headsCounters : effect.tailsCounters) * 10
   const actualHealing = isTcgBattleHealingPrevented(state) ? 0 : Math.min(evolvedCard.hp - evolvedCard.currentHp, requestedHealing)
@@ -10855,6 +11876,11 @@ function settleTcgPvpAction(
   preserveExtraAttack = false,
   preserveTurn = false,
 ) {
+  if (state.winner) {
+    state.phase = 'finished'
+    state.extraAttackPending = undefined
+    return
+  }
   applyTcgBattleReactivePowerDamage(state)
   if (syncTcgBattleFloetteFlowerVeil(state)) {
     compactTcgBattleBoard(state.player)
@@ -11690,8 +12716,9 @@ export async function tcgBattleAttack(
           const targetWasActive = state[targetSide].front.some((card) => card.instanceId === target.instanceId)
           clearDamageEvents(state)
           applyAttack(state, viewerSide, attacker, attackIndex, target, choice)
-          const grantsExtraAttack = canAttackTwice && (!hasTcgBattleRaichuLinkLightning(attacker) || attack.name === 'Voltage Shoot') && (!hasTcgBattleKnockoutGatedAttackTwiceAbility(attacker) || targetWasActive && target.currentHp <= 0)
+          const grantsExtraAttack = attacker.currentHp > 0 && canAttackTwice && (!hasTcgBattleRaichuLinkLightning(attacker) || attack.name === 'Voltage Shoot') && (!hasTcgBattleKnockoutGatedAttackTwiceAbility(attacker) || targetWasActive && target.currentHp <= 0)
           state.log[0] = `${getTcgPvpSideName(state, viewerSide)} used ${attacker.name}'s ${attack.name}.`
+          if (state.winner === viewerSide) state.log.unshift(`${getTcgPvpSideName(state, viewerSide)} won the game with a special attack.`)
           state.lastAction = {
             id: randomUUID(),
             side: viewerSide,
@@ -11732,7 +12759,7 @@ export async function tcgBattleAttack(
       const targetWasActive = state.opponent.front.some((card) => card.instanceId === target.instanceId)
       clearDamageEvents(state)
       applyAttack(state, 'player', attacker, attackIndex, target, choice)
-      const grantsExtraAttack = canAttackTwice && (!hasTcgBattleRaichuLinkLightning(attacker) || attacker.attacks[attackIndex]?.name === 'Voltage Shoot') && (!hasTcgBattleKnockoutGatedAttackTwiceAbility(attacker) || targetWasActive && target.currentHp <= 0)
+      const grantsExtraAttack = attacker.currentHp > 0 && canAttackTwice && (!hasTcgBattleRaichuLinkLightning(attacker) || attacker.attacks[attackIndex]?.name === 'Voltage Shoot') && (!hasTcgBattleKnockoutGatedAttackTwiceAbility(attacker) || targetWasActive && target.currentHp <= 0)
       if (pendingExtraAttack) {
         state.extraAttackPending = undefined
         afterPlayerAction(state)
@@ -11813,7 +12840,7 @@ export async function tcgBattleRetreat(
             }
           }
           clearTcgBattleStatuses(retreating)
-          clearTcgBattleTemporaryEffects(retreating)
+          clearTcgBattleTemporaryEffects(retreating, true, true)
           side.front[frontIndex] = side.back[backIndex]
           side.back[backIndex] = retreating
           applyTcgBattleMetalGravityAfterRetreat(state, viewerSide, retreating)
@@ -11883,7 +12910,7 @@ export async function tcgBattleRetreat(
         }
       }
       clearTcgBattleStatuses(retreating)
-      clearTcgBattleTemporaryEffects(retreating)
+      clearTcgBattleTemporaryEffects(retreating, true, true)
       state.player.front[frontIndex] = state.player.back[backIndex]
       state.player.back[backIndex] = retreating
       applyTcgBattleMetalGravityAfterRetreat(state, 'player', retreating)
@@ -11935,6 +12962,7 @@ export async function tcgBattlePromote(
           if (backIndex < 0) return 'Invalid promotion card.'
           const [promoted] = side.back.splice(backIndex, 1)
           delete promoted.temporaryEffects?.pokemonPowerSuppression
+          promoted.becameActiveTurn = state.turnNumber
           side.front.push(promoted)
           clearDamageEvents(state)
           state.log.unshift(
@@ -11986,6 +13014,7 @@ export async function tcgBattlePromote(
         return { success: false, error: 'Invalid promotion card.' }
       const [promoted] = state.player.back.splice(backIndex, 1)
       delete promoted.temporaryEffects?.pokemonPowerSuppression
+      promoted.becameActiveTurn = state.turnNumber
       const previousActiveSide = state.activeSide
       const resumeSide = state.resumeSideAfterPromotion
       const resumeSameTurn = state.resumeTurnAfterPromotion
@@ -12053,7 +13082,7 @@ function applyTcgBattleServineSerpentineStrangle(state: TcgBattleState, sideKey:
   const opposingSideKey: TcgBattleSide = sideKey === 'player' ? 'opponent' : 'player'
   const target = state[opposingSideKey].front.find((card) => card.currentHp > 0)
   if (!target) return
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: source.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   if (result === 'heads') {
     const statusEvents = applyTcgBattleStatusConditions(state, sideKey, source.instanceId, target.instanceId, [{ target: 'opponent', statuses: ['paralyzed'] }], true)
@@ -12432,7 +13461,7 @@ function resolveTcgBattleElekidPlayfulPunch(state: TcgBattleState, sideKey: TcgB
   const usageKey = `${abilityIndex}:${ability.name}`
   if (source.abilityUses?.[usageKey] === state.turnNumber) return `${ability.name} has already been used this turn.`
   clearDamageEvents(state)
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId: source.instanceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   let damage = 0
   if (result === 'heads') {
@@ -12564,7 +13593,7 @@ function resolveTcgBattleUnownVanish(state: TcgBattleState, sideKey: TcgBattleSi
   const target = [...side.front, ...side.back].find((card) => card.instanceId === targetId && card.currentHp > 0)
   if (!target || target.instanceId === source.instanceId || !target.name.toLowerCase().includes('unown')) return 'Choose another living Pokémon with Unown in its name.'
 
-  const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+  const result = flipTcgBattleCoinForSide(state, state.activeSide)
   recordCoinFlipEvent(state, { sourceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
   if (result === 'heads') {
     const returnedCards = [...(target.evolutionStack || []), toTcgBattleCardSummary(target)]
@@ -12666,13 +13695,16 @@ export async function tcgBattlePlayBasicToBench(cardInstanceId: string, expected
         const lastCardBenchDrawIndex = getLastCardBenchDrawAbilityIndex(card)
         const lastCardBenchDraw = lastCardBenchDrawIndex >= 0
         const opposingSide = state[viewerSide === 'player' ? 'opponent' : 'player']
+        const prizeAdvantageBench = Boolean(card && hasTcgBattleLuxrayPrizeBenchAbility(card) && !isTcgBattleAbilitySuppressed(card, [state.player, state.opponent]) &&
+          getTcgBattleRemainingPrizeCount(state, viewerSide) > getTcgBattleRemainingPrizeCount(state, viewerSide === 'player' ? 'opponent' : 'player'))
         const teamRocketArbok = opposingSide.front.some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityCardName(pokemon.name).startsWith("team rocket's arbok") && !isTcgBattleAbilitySuppressedByShadyTail(pokemon, [state.player, state.opponent]) && pokemon.abilities?.some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as this pokemon is in the active spot, your opponent can't play any pokemon that has an ability from their hand, except for team rocket's pokemon."))
         if (card && teamRocketArbok && card.abilities?.length && !normalizeTcgBattleAbilityCardName(card.name).includes("team rocket's")) return "Team Rocket's Arbok prevents playing Pokémon with Abilities from your hand."
         const opponentHasStage2 = [...opposingSide.front, ...opposingSide.back].some((pokemon) => pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2'))
-        if (!card || !card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && !(emergencyRotation && opponentHasStage2) && !lastCardBenchDraw) return 'Choose a Basic Pokémon from your hand, or use a legal hand-play Ability.'
+        const handToBenchAbility = Boolean(emergencyRotation && opponentHasStage2) || prizeAdvantageBench
+        if (!card || !card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && !handToBenchAbility && !lastCardBenchDraw) return 'Choose a Basic Pokémon from your hand, or use a legal hand-play Ability.'
         if (lastCardBenchDraw && (side.hand.length !== 1 || side.front.filter((pokemon) => pokemon.currentHp > 0).length < 3 || getOpenTcgBattleBenchSlots(side) < 1 || !canTcgBattlePutPokemonOnBench(side, card) || isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]))) return 'This Ability requires this to be your only hand card, three occupied front slots, and an open Bench slot.'
-        if (emergencyRotation && (side.front.filter((pokemon) => pokemon.currentHp > 0).length < 3 || getOpenTcgBattleBenchSlots(side) < 1 || !canTcgBattlePutPokemonOnBench(side, card))) return 'Emergency Rotation requires all 3 front slots filled and an open legal Bench slot.'
-        const goesToFront = !emergencyRotation && !lastCardBenchDraw && side.front.length < 3
+        if (handToBenchAbility && (side.front.filter((pokemon) => pokemon.currentHp > 0).length < 3 || getOpenTcgBattleBenchSlots(side) < 1 || !canTcgBattlePutPokemonOnBench(side, card))) return 'This hand-play Ability requires all 3 front slots filled and an open legal Bench slot.'
+        const goesToFront = !handToBenchAbility && !lastCardBenchDraw && side.front.length < 3
         if (!goesToFront && (getOpenTcgBattleBenchSlots(side) < 1 || !canTcgBattlePutPokemonOnBench(side, card))) return 'Fill all 3 front slots before playing Pokémon onto the Bench.'
         side.hand = side.hand.filter((entry) => entry.instanceId !== cardInstanceId)
         const played = createTcgBattleCardState(card, side.front.length + side.back.length + side.discard.length + side.hand.length)
@@ -12686,8 +13718,8 @@ export async function tcgBattlePlayBasicToBench(cardInstanceId: string, expected
             const ability = played.abilities?.[lastCardBenchDrawIndex]
             if (ability) played.abilityUses = { ...played.abilityUses, [`${lastCardBenchDrawIndex}:${ability.name}`]: state.turnNumber }
           }
-          if (emergencyRotation) {
-            const abilityIndex = played.abilities?.findIndex((ability) => hasTcgBattleKlinklangEmergencyRotation({ ...played, abilities: [ability] })) ?? -1
+          if (handToBenchAbility) {
+            const abilityIndex = played.abilities?.findIndex((ability) => hasTcgBattleKlinklangEmergencyRotation({ ...played, abilities: [ability] }) || hasTcgBattleLuxrayPrizeBenchAbility({ ...played, abilities: [ability] })) ?? -1
             const ability = abilityIndex >= 0 ? played.abilities?.[abilityIndex] : undefined
             if (ability) played.abilityUses = { ...played.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
           }
@@ -12695,6 +13727,8 @@ export async function tcgBattlePlayBasicToBench(cardInstanceId: string, expected
           applyDarkMagcargoHotPlate(state, viewerSide, played)
         }
         applyTcgBattleAmoongussSporeTrigger(state, viewerSide, played)
+        applyTcgBattleFlareonStarBenchEntry(state, viewerSide, played)
+        applyTcgBattleJolteonStarBenchEntry(state, viewerSide, played)
         state.consecutivePasses = 0
         state.log.unshift(`${getTcgPvpSideName(state, viewerSide)} played ${played.name} from hand into the ${goesToFront ? 'front row' : 'Bench'}.`)
         if (lastCardBenchDraw) {
@@ -12716,15 +13750,18 @@ export async function tcgBattlePlayBasicToBench(cardInstanceId: string, expected
       if (state.phase !== 'battle' || state.activeSide !== 'player') return { success: false, error: 'It is not your turn.' }
       const card = state.player.hand.find((entry) => entry.instanceId === cardInstanceId)
       const emergencyRotation = Boolean(card && hasTcgBattleKlinklangEmergencyRotation(card))
+      const prizeAdvantageBench = Boolean(card && hasTcgBattleLuxrayPrizeBenchAbility(card) && !isTcgBattleAbilitySuppressed(card, [state.player, state.opponent]) &&
+        getTcgBattleRemainingPrizeCount(state, 'player') > getTcgBattleRemainingPrizeCount(state, 'opponent'))
       const lastCardBenchDrawIndex = getLastCardBenchDrawAbilityIndex(card)
       const lastCardBenchDraw = lastCardBenchDrawIndex >= 0
       const teamRocketArbok = state.opponent.front.some((pokemon) => pokemon.currentHp > 0 && normalizeTcgBattleAbilityCardName(pokemon.name).startsWith("team rocket's arbok") && !isTcgBattleAbilitySuppressedByShadyTail(pokemon, [state.player, state.opponent]) && pokemon.abilities?.some((ability) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "as long as this pokemon is in the active spot, your opponent can't play any pokemon that has an ability from their hand, except for team rocket's pokemon."))
       if (card && teamRocketArbok && card.abilities?.length && !normalizeTcgBattleAbilityCardName(card.name).includes("team rocket's")) return { success: false, error: "Team Rocket's Arbok prevents playing Pokémon with Abilities from your hand." }
       const opponentHasStage2 = [...state.opponent.front, ...state.opponent.back].some((pokemon) => pokemon.currentHp > 0 && pokemon.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2'))
-      if (!card || !card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && !(emergencyRotation && opponentHasStage2) && !lastCardBenchDraw) return { success: false, error: 'Choose a Basic Pokémon from your hand, or use a legal hand-play Ability.' }
+      const handToBenchAbility = Boolean(emergencyRotation && opponentHasStage2) || prizeAdvantageBench
+      if (!card || !card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && !handToBenchAbility && !lastCardBenchDraw) return { success: false, error: 'Choose a Basic Pokémon from your hand, or use a legal hand-play Ability.' }
       if (lastCardBenchDraw && (state.player.hand.length !== 1 || state.player.front.filter((pokemon) => pokemon.currentHp > 0).length < 3 || getOpenTcgBattleBenchSlots(state.player) < 1 || !canTcgBattlePutPokemonOnBench(state.player, card) || isTcgBattleAbilitySuppressedByShadyTail(card, [state.player, state.opponent]))) return { success: false, error: 'This Ability requires this to be your only hand card, three occupied front slots, and an open Bench slot.' }
-      if (emergencyRotation && (state.player.front.filter((pokemon) => pokemon.currentHp > 0).length < 3 || getOpenTcgBattleBenchSlots(state.player) < 1 || !canTcgBattlePutPokemonOnBench(state.player, card))) return { success: false, error: 'Emergency Rotation requires all 3 front slots filled and an open legal Bench slot.' }
-      const goesToFront = !emergencyRotation && !lastCardBenchDraw && state.player.front.length < 3
+      if (handToBenchAbility && (state.player.front.filter((pokemon) => pokemon.currentHp > 0).length < 3 || getOpenTcgBattleBenchSlots(state.player) < 1 || !canTcgBattlePutPokemonOnBench(state.player, card))) return { success: false, error: 'This hand-play Ability requires all 3 front slots filled and an open legal Bench slot.' }
+      const goesToFront = !handToBenchAbility && !lastCardBenchDraw && state.player.front.length < 3
       if (!goesToFront && (getOpenTcgBattleBenchSlots(state.player) < 1 || !canTcgBattlePutPokemonOnBench(state.player, card))) return { success: false, error: 'Fill all 3 front slots before playing Pokémon onto the Bench.' }
       state.player.hand = state.player.hand.filter((entry) => entry.instanceId !== cardInstanceId)
       const played = createTcgBattleCardState(card, state.player.front.length + state.player.back.length + state.player.discard.length + state.player.hand.length)
@@ -12738,8 +13775,8 @@ export async function tcgBattlePlayBasicToBench(cardInstanceId: string, expected
           const ability = played.abilities?.[lastCardBenchDrawIndex]
           if (ability) played.abilityUses = { ...played.abilityUses, [`${lastCardBenchDrawIndex}:${ability.name}`]: state.turnNumber }
         }
-        if (emergencyRotation) {
-          const abilityIndex = played.abilities?.findIndex((ability) => hasTcgBattleKlinklangEmergencyRotation({ ...played, abilities: [ability] })) ?? -1
+        if (handToBenchAbility) {
+          const abilityIndex = played.abilities?.findIndex((ability) => hasTcgBattleKlinklangEmergencyRotation({ ...played, abilities: [ability] }) || hasTcgBattleLuxrayPrizeBenchAbility({ ...played, abilities: [ability] })) ?? -1
           const ability = abilityIndex >= 0 ? played.abilities?.[abilityIndex] : undefined
           if (ability) played.abilityUses = { ...played.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
         }
@@ -12747,6 +13784,8 @@ export async function tcgBattlePlayBasicToBench(cardInstanceId: string, expected
         applyDarkMagcargoHotPlate(state, 'player', played)
       }
       applyTcgBattleAmoongussSporeTrigger(state, 'player', played)
+      applyTcgBattleFlareonStarBenchEntry(state, 'player', played)
+      applyTcgBattleJolteonStarBenchEntry(state, 'player', played)
       state.consecutivePasses = 0
       state.log.unshift(`You played ${played.name} from hand into the ${goesToFront ? 'front row' : 'Bench'}.`)
       if (lastCardBenchDraw) {
@@ -12765,6 +13804,10 @@ export async function tcgBattlePlayBasicToBench(cardInstanceId: string, expected
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : 'Unable to play that Basic Pokémon.' }
   }
+}
+
+function hasTcgBattleMegaEvolutionEx(side: TcgBattleState['player']): boolean {
+  return [...side.front, ...side.back].some((card) => card.currentHp > 0 && /^mega\b/i.test(card.name) && /\bex\b/i.test(card.name))
 }
 
 function hasTcgBattleMegaGrassEx(side: TcgBattleState['player']): boolean {
@@ -12958,7 +14001,7 @@ export async function tcgBattleHealActiveAbility(
         const targets = (healEffect.bothActive ? bothActiveTargets : healEffect.each ? eligibleTargets : target && !isTcgBattleHealingPreventedForTarget(state, viewerSide, target) && (!healEffect.activeTargetOnly || side.front.some((active) => active.instanceId === target.instanceId)) && (!healEffect.activeEvolutionOnly || Boolean(target.evolutionStack?.length)) && (!healEffect.benchTargetOnly || side.back.some((benched) => benched.instanceId === target.instanceId)) && (!healEffect.basicTargetOnly || target.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) && (!healEffect.type || target.types.some((type) => type.toLowerCase() === healEffect.type)) && isArbolivaExTarget(target) ? [target] : []).filter((card) => card.currentHp < card.hp || healEffect.specialConditionRecovery && card.statusConditions?.length || healEffect.energyFromDiscard)
         if (!targets.length) return healEffect.specialConditionRecovery ? 'The chosen Active Pokémon has no Special Condition to remove.' : 'There is no damage to heal.'
         if (healEffect.coin) {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           if (result === 'tails') {
             source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
@@ -13050,7 +14093,7 @@ export async function tcgBattleHealActiveAbility(
       const targets = (healEffect.bothActive ? bothActiveTargets : healEffect.each ? eligibleTargets : target && !isTcgBattleHealingPreventedForTarget(state, 'player', target) && (!healEffect.activeTargetOnly || state.player.front.some((active) => active.instanceId === target.instanceId)) && (!healEffect.activeEvolutionOnly || Boolean(target.evolutionStack?.length)) && (!healEffect.benchTargetOnly || state.player.back.some((benched) => benched.instanceId === target.instanceId)) && (!healEffect.type || target.types.some((type) => type.toLowerCase() === healEffect.type)) ? [target] : []).filter((card) => card.currentHp < card.hp || healEffect.specialConditionRecovery && card.statusConditions?.length || healEffect.energyFromDiscard)
       if (!targets.length) return { success: false, error: healEffect.specialConditionRecovery ? 'The chosen Active Pokémon has no Special Condition to remove.' : 'There is no damage to heal.' }
       if (healEffect.coin) {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         if (result === 'tails') {
           source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
@@ -13235,7 +14278,7 @@ export async function tcgBattleUseActiveStatusAbility(
         }
       if (coinFlipStatus || darkHoundoomFireBreath || miracleAroma || selectiveSlime || vileplumeChoiceStatus) {
           if ((drapionPoisonClaws && source.statusConditions?.length) || (golduckPsyduckStep && source.statusConditions?.length) || ((miracleAroma || poisonPollen || text?.includes('affected by a special condition')) ? source.statusConditions?.length : !selectiveSlime && !vileplumeChoiceStatus && !igglybuffDreamDance && source.statusConditions?.some((condition) => ['asleep', 'confused', 'paralyzed'].includes(condition)))) return `${source.name} cannot use ${ability.name} while affected by a Special Condition.`
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           const affectsStatus = drapionPoisonClaws || poisonPollen || selectiveSlime || vileplumeChoiceStatus || vanilluxeBitterCold || golduckPsyduckStep ? result === 'heads' : !darkHoundoomFireBreath && !miracleAroma || result === 'heads'
           const affectedSide = miracleAroma || poisonPollen || selectiveSlime || result === 'heads' ? targetSide : viewerSide
@@ -13388,7 +14431,7 @@ export async function tcgBattleUseActiveStatusAbility(
       }
       if (coinFlipStatus || darkHoundoomFireBreath || miracleAroma || selectiveSlime || vileplumeChoiceStatus) {
         if ((drapionPoisonClaws && source.statusConditions?.length) || (golduckPsyduckStep && source.statusConditions?.length) || ((miracleAroma || poisonPollen) ? source.statusConditions?.length : !selectiveSlime && !vileplumeChoiceStatus && !igglybuffDreamDance && source.statusConditions?.some((condition) => ['asleep', 'confused', 'paralyzed'].includes(condition)))) return { success: false, error: `${source.name} cannot use ${ability.name} while affected by a Special Condition.` }
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const affectsStatus = drapionPoisonClaws || houndoomFireBreath || poisonPollen || selectiveSlime || vileplumeChoiceStatus || vanilluxeBitterCold || golduckPsyduckStep ? result === 'heads' : !darkHoundoomFireBreath && !miracleAroma || result === 'heads'
         const affectedTarget = affectsStatus ? drapionPoisonClaws ? target : (houndoomFireBreath || poisonPollen || selectiveSlime || result === 'heads' ? state.opponent.front : state.player.front).find((card) => card.currentHp > 0) : undefined
@@ -13534,7 +14577,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
         const usageKey = effect === 'curseBreath' ? 'shared:curse breath' : `${abilityIndex}:${ability.name}`
         if (source.abilityUses?.[usageKey] === state.turnNumber) return 'That ability has already been used this turn.'
         if (effect === 'gloomHandBench') {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
           if (result === 'heads' && gloomCard) {
@@ -13596,7 +14639,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
           state.log.unshift(`${source.name}'s ${ability.name} put 1 damage counter on ${curseBreathTargets.length} damaged Pokémon.`)
           state.lastAction = { id: randomUUID(), side: viewerSide, kind: 'ability', frontId: sourceId, abilityName: ability.name, abilityEffect: 'counterDamage' }
         } else if (effect === 'coinDamage') {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           const target = result === 'heads' ? coinDamageOpponentTarget! : coinDamageOwnTarget!
           const targetSide: TcgBattleSide = result === 'heads' ? viewerSide === 'player' ? 'opponent' : 'player' : viewerSide
@@ -13608,7 +14651,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
           state.lastAction = { id: randomUUID(), side: viewerSide, kind: 'ability', frontId: sourceId, targetId: target.instanceId, abilityName: ability.name, abilityEffect: 'directDamage' }
           settleTcgPvpAction(state, viewerSide, false, true)
         } else if (effect === 'magneticReversal') {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           if (result === 'heads' && !swapTcgBattleCards(state, viewerSide === 'player' ? 'opponent' : 'player', magneticActiveTarget!, magneticBenchTarget!.instanceId, true)) return 'The opponent cannot switch Pokémon right now.'
           source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
@@ -13628,7 +14671,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
           state.log.unshift(`${getTcgPvpSideName(state, viewerSide)} used Darkrai's ${ability.name} to make ${sleepTarget!.name} Asleep.`)
           state.lastAction = { id: randomUUID(), side: viewerSide, kind: 'ability', frontId: sourceId, targetId: sleepTarget!.instanceId, abilityName: ability.name, abilityEffect: 'status', abilityStatus: 'asleep' }
         } else if (effect === 'coinParalyze') {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           const events = result === 'heads' ? applyTcgBattleStatusConditions(state, viewerSide, sourceId, paralyzeTarget!.instanceId, [{ target: 'opponent', statuses: ['paralyzed'] }], true) : []
           state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
@@ -13636,7 +14679,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
           state.log.unshift(`${getTcgPvpSideName(state, viewerSide)} used Articuno's ${ability.name}; ${result}${events.length ? ` made ${paralyzeTarget!.name} Paralyzed` : ''}.`)
           state.lastAction = { id: randomUUID(), side: viewerSide, kind: 'ability', frontId: sourceId, targetId: events.length ? paralyzeTarget!.instanceId : undefined, abilityName: ability.name, abilityEffect: 'status', abilityStatus: 'paralyzed' }
         } else if (effect === 'coinBurn') {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           const events = result === 'heads' ? applyTcgBattleStatusConditions(state, viewerSide, sourceId, burnTarget!.instanceId, [{ target: 'opponent', statuses: ['burned'] }], true) : []
           state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
@@ -13665,7 +14708,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
         } else if (effect === 'status') {
           if (espeonStarConfusion && !(state.lastAction?.kind === 'bench' && state.lastAction.side === viewerSide && state.lastAction.frontId === source.instanceId)) return 'Espeon Star can only use this Power when played from hand onto the Bench.'
           source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
-          const events = applyTcgBattleBothActiveConfusedAndPoisoned(state, viewerSide, espeonStarConfusion ? ['confused'] : undefined)
+          const events = applyTcgBattleBothActiveStatuses(state, viewerSide, espeonStarConfusion ? ['confused'] : undefined)
           state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
           state.log.unshift(`${getTcgPvpSideName(state, viewerSide)} used ${source.name}'s ${ability.name} to ${espeonStarConfusion ? 'Confuse' : 'Confuse and Poison'} both Active Pokémon.`)
           state.lastAction = { id: randomUUID(), side: viewerSide, kind: 'ability', frontId: sourceId, abilityName: ability.name, abilityEffect: 'status' }
@@ -13711,7 +14754,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
           state.lastAction = { id: randomUUID(), side: viewerSide, kind: 'ability', frontId: sourceId, targetId: requestedTargets[0], abilityName: ability.name, abilityEffect: 'directDamage' }
           settleTcgPvpAction(state, viewerSide, false, true)
         } else if (effect === 'coinSpreadDamage') {
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           if (result === 'heads') {
             clearDamageEvents(state)
@@ -13857,7 +14900,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
       const usageKey = effect === 'curseBreath' ? 'shared:curse breath' : `${abilityIndex}:${ability.name}`
       if (source.abilityUses?.[usageKey] === state.turnNumber) return { success: false, error: 'That ability has already been used this turn.' }
       if (effect === 'gloomHandBench') {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
         if (result === 'heads' && gloomCard) {
@@ -13919,7 +14962,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
         state.log.unshift(`${source.name}'s ${ability.name} put 1 damage counter on ${curseBreathTargets.length} damaged Pokémon.`)
         state.lastAction = { id: randomUUID(), side: 'player', kind: 'ability', frontId: sourceId, abilityName: ability.name, abilityEffect: 'counterDamage' }
       } else if (effect === 'coinDamage') {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const target = result === 'heads' ? coinDamageOpponentTarget! : coinDamageOwnTarget!
         const targetSide = result === 'heads' ? 'opponent' : 'player'
@@ -13932,7 +14975,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
         afterPlayerFreeEvolution(state)
         finishByStallIfNeeded(state)
       } else if (effect === 'magneticReversal') {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         if (result === 'heads' && !swapTcgBattleCards(state, 'opponent', magneticActiveTarget!, magneticBenchTarget!.instanceId, true)) return { success: false, error: 'The opponent cannot switch Pokémon right now.' }
         source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
@@ -13951,7 +14994,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
         state.log.unshift(`Darkrai's ${ability.name} made ${sleepTarget!.name} Asleep.`)
         state.lastAction = { id: randomUUID(), side: 'player', kind: 'ability', frontId: sourceId, targetId: sleepTarget!.instanceId, abilityName: ability.name, abilityEffect: 'status', abilityStatus: 'asleep' }
       } else if (effect === 'coinParalyze') {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const events = result === 'heads' ? applyTcgBattleStatusConditions(state, 'player', sourceId, paralyzeTarget!.instanceId, [{ target: 'opponent', statuses: ['paralyzed'] }], true) : []
         state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
@@ -13959,7 +15002,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
         state.log.unshift(`Articuno's ${ability.name} flipped ${result}${events.length ? ` and made ${paralyzeTarget!.name} Paralyzed` : ''}.`)
         state.lastAction = { id: randomUUID(), side: 'player', kind: 'ability', frontId: sourceId, targetId: events.length ? paralyzeTarget!.instanceId : undefined, abilityName: ability.name, abilityEffect: 'status', abilityStatus: 'paralyzed' }
       } else if (effect === 'coinBurn') {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const events = result === 'heads' ? applyTcgBattleStatusConditions(state, 'player', sourceId, burnTarget!.instanceId, [{ target: 'opponent', statuses: ['burned'] }], true) : []
         state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
@@ -13988,7 +15031,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
       } else if (effect === 'status') {
         if (espeonStarConfusion && !(state.lastAction?.kind === 'bench' && state.lastAction.side === 'player' && state.lastAction.frontId === source.instanceId)) return { success: false, error: 'Espeon Star can only use this Power when played from hand onto the Bench.' }
         source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
-        const events = applyTcgBattleBothActiveConfusedAndPoisoned(state, 'player', espeonStarConfusion ? ['confused'] : undefined)
+        const events = applyTcgBattleBothActiveStatuses(state, 'player', espeonStarConfusion ? ['confused'] : undefined)
         state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
         state.log.unshift(`${source.name}'s ${ability.name} ${espeonStarConfusion ? 'Confused' : 'Confused and Poisoned'} both Active Pokémon.`)
         state.lastAction = { id: randomUUID(), side: 'player', kind: 'ability', frontId: sourceId, abilityName: ability.name, abilityEffect: 'status' }
@@ -14034,7 +15077,7 @@ export async function tcgBattleUseBenchEntryAbility(sourceId: string, abilityInd
         afterPlayerFreeEvolution(state)
         finishByStallIfNeeded(state)
       } else if (effect === 'coinSpreadDamage') {
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         if (result === 'heads') {
           clearDamageEvents(state)
@@ -14122,11 +15165,14 @@ export async function tcgBattleUseBenchSwitchAbility(
         const ability = sourceCard?.abilities?.[abilityIndex]
         const text = ability?.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
         const waterActiveSourceSwitch = text === 'once during your turn, you may switch your active {w} pokemon with 1 of your benched pokemon.'
+        const ultraBeastActiveSwitch = text === 'once during your turn, you may switch your active ultra beast with 1 of your benched ultra beasts.'
+        const tagTeamActiveSwitch = sourceCard?.name.toLowerCase() === 'drifblim' && text === 'once during your turn (before your attack), you may switch your active tag team pokemon with 1 of your benched pokemon.'
+        const linooneMegaSwitch = sourceCard?.name.toLowerCase() === 'linoone' && text === 'once during your turn, if this pokemon is on your bench, and if you have any mega evolution pokemon ex in play, you may use this ability. switch this pokemon with your active pokemon.'
         const politoedLeapFrog = sourceCard?.name.toLowerCase() === 'politoed' && text === 'once during your turn (before your attack), you may choose a water pokemon on your bench and switch it with your active pokemon. this power can\'t be used if politoed is affected by a special condition.'
         const magneticWarp = text === 'once during your turn (before your attack), you may switch your active pokemon with 1 of your benched pokemon. if you do, your opponent switches his or her active pokemon with 1 of his or her benched pokemon.' || text === 'once during your turn, you may switch your active pokemon with 1 of your benched pokemon. if you do, your opponent switches their active pokemon with 1 of their benched pokemon.'
         const decidueyeTotalFreedom = normalizeTcgBattleAbilityCardName(sourceCard?.name || '') === 'decidueye ex' && text === 'once during your turn, you may use this ability. if this pokemon is on the bench, switch it with your active pokemon. or, if this pokemon is in the active spot, switch it with 1 of your benched pokemon.'
         const mawileStarRondo = normalizeTcgBattleAbilityCardName(sourceCard?.name || '') === 'mawile vstar' && text === "during your turn, if this pokemon is on your bench, you may switch it with your active pokemon. if you do, switch 1 of your opponent's benched pokemon with their active pokemon. (you can't use more than 1 vstar power in a game.)"
-        const activeSourceSwitch = Boolean(text && (/^once during your turn(?: \(before your attack\))?, (?:you may use this ability\. switch|you may switch) your active pokemon with 1 of your benched pokemon\.$/.test(text) || waterActiveSourceSwitch)) || decidueyeTotalFreedom
+        const activeSourceSwitch = Boolean(text && (/^once during your turn(?: \(before your attack\))?, (?:you may use this ability\. switch|you may switch) your active pokemon with 1 of your benched pokemon\.$/.test(text) || waterActiveSourceSwitch || ultraBeastActiveSwitch || tagTeamActiveSwitch)) || decidueyeTotalFreedom
         const gardevoirTeleportation = text === "once during your turn (before your attack), choose 1 of your active pokemon or 1 of your benched pokemon and switch gardevoir with that pokemon. this power can't be used if gardevoir is affected by a special condition."
         const lumineonGust = sourceCard?.name.toLowerCase() === 'lumineon' && text === "once during your turn (before your attack), if lumineon is your active pokemon, you may choose 1 of your opponent's benched pokemon that has maximum hp of 100 or more and switch it with 1 of the defending pokemon. this power can't be used if lumineon is affected by a special condition."
         const weavileDarkCut = sourceCard?.name.toLowerCase() === 'weavile' && text === "once during your turn, when this pokemon moves from your bench to the active spot, you may switch in 1 of your opponent's benched basic pokemon to the active spot."
@@ -14144,24 +15190,29 @@ export async function tcgBattleUseBenchSwitchAbility(
         const unownMGust = sourceCard?.name.replace(/[^a-z0-9]/gi, '').toLowerCase() === 'unownm' && text === "once during your turn (before your attack), if unown m is your active pokemon, you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with 1 of the defending pokemon. this power can't be used if unown m is affected by a special condition."
         const fragranceTrap = unownMGust || text === "once during your turn (before your attack), you may flip a coin. if heads, and if your opponent has any benched pokemon, choose 1 of them and switch it with his or her active pokemon. this power can't be used if erika's victreebel is asleep, confused, or paralyzed." || text === "once during your turn (before your attack), you may flip a coin. if heads, choose 1 of your opponent's benched pokemon and switch the defending pokemon with it. this power can't be used if victreebel is affected by a special condition."
         const nidoqueenMaternalCall = sourceCard?.name.toLowerCase() === 'nidoqueen' && text === "once during your turn, you may use this ability. flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot."
-        const appletunAroma = text === "once during your turn, you may flip a coin. if heads, switch 1 of your opponent's benched basic pokemon with their active pokemon." || sourceCard?.name.toLowerCase() === 'rillaboom' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot." || nidoqueenMaternalCall
-        const captivatingRhythm = sourceCard?.name.toLowerCase() === 'ludicolo' && ability?.name === 'Captivating Rhythm' && text === "once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon."
+        const venusaurSleepPoison = sourceCard?.name.toLowerCase() === 'venusaur' && text === "once during your turn, you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon, and the new active pokemon is now asleep and poisoned."
+        const florgesConfusionSwitch = sourceCard?.name.toLowerCase() === 'florges' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot, and the new active pokemon is now confused."
+        const appletunAroma = text === "once during your turn, you may flip a coin. if heads, switch 1 of your opponent's benched basic pokemon with their active pokemon." || sourceCard?.name.toLowerCase() === 'rillaboom' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot." || nidoqueenMaternalCall || venusaurSleepPoison || florgesConfusionSwitch
+        const captivatingRhythm = sourceCard?.name.toLowerCase() === 'ludicolo' && ability?.name === 'Captivating Rhythm' && ["once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon.", "once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with his or her active pokemon."].includes(text || '')
         const regiMove = sourceCard?.name.toLowerCase() === 'regice' && text === "once during your turn (before your attack), you may use this power. discard 2 cards from your hand and choose 1 of your opponent's active pokemon that isn't an evolved pokemon. then, your opponent switches that pokemon with 1 of his or her benched pokemon. this power can't be used if regice is affected by a special condition."
         const subjugatingChains = text === "once during your turn, you may switch 1 of your benched {d} pokemon, except any pecharunt ex, with your active pokemon. if you do, the new active pokemon is now poisoned. you can't use more than 1 subjugating chains ability each turn."
         const opponentSideKey = viewerSide === 'player' ? 'opponent' : 'player'
         const source = mawileStarRondo || decidueyeTotalFreedom || politoedLeapFrog || regiMove || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm || magneticWarp || gardevoirTeleportation || swellowDriveOff || arbolivaDriveOff || swellowBasicForcedSwitch ? [...side.front, ...side.back].find((card) => card.instanceId === sourceId && card.currentHp > 0) : ironBundleSwitch ? side.back.find((card) => card.instanceId === sourceId && card.currentHp > 0) : activeSourceSwitch || opponentGust || dragonWind || opponentForcedSwitch ? side.front.find((card) => card.instanceId === sourceId && card.currentHp > 0) : side.back.find((card) => card.instanceId === sourceId && card.currentHp > 0)
         const other = mawileStarRondo ? state[opponentSideKey].back.find((card) => card.instanceId === activeId && card.currentHp > 0) : decidueyeTotalFreedom ? (side.front.some((card) => card.instanceId === sourceId) ? side.back : side.front).find((card) => card.instanceId === activeId && card.currentHp > 0) : politoedLeapFrog || activeSourceSwitch || magneticWarp ? side.back.find((card) => card.instanceId === activeId && card.currentHp > 0) : gardevoirTeleportation ? [...side.front, ...side.back].find((card) => card.instanceId === activeId && card.currentHp > 0) : regiMove ? state[opponentSideKey].front.find((card) => card.instanceId === activeId && card.currentHp > 0) : opponentGust || dragonWind || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm ? state[opponentSideKey].back.find((card) => card.instanceId === activeId && card.currentHp > 0) : opponentForcedSwitch ? state[opponentSideKey].back.find((card) => card.currentHp > 0) : side.front.find((card) => card.instanceId === activeId && card.currentHp > 0)
-        const isSupported = isTcgBattleBenchToActiveAbility(text, sourceCard?.name || '') || activeSourceSwitch || decidueyeTotalFreedom || mawileStarRondo || opponentGust || dragonWind || opponentForcedSwitch || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm || magneticWarp || subjugatingChains || gardevoirTeleportation || regiMove || politoedLeapFrog
+        const isSupported = isTcgBattleBenchToActiveAbility(text, sourceCard?.name || '') || linooneMegaSwitch || activeSourceSwitch || decidueyeTotalFreedom || mawileStarRondo || opponentGust || dragonWind || opponentForcedSwitch || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm || magneticWarp || subjugatingChains || gardevoirTeleportation || regiMove || politoedLeapFrog
         if (!source || !other || !ability || !isSupported) return 'That switching ability cannot be used here.'
         if (magneticWarp && (!side.front.some((card) => card.currentHp > 0) || !state[opponentSideKey].front.some((card) => card.currentHp > 0) || !state[opponentSideKey].back.some((card) => card.currentHp > 0))) return 'Magnetic Warp requires an Active Pokémon and a Benched Pokémon on each side.'
-        if (appletunAroma && !['appletun', 'rillaboom', 'nidoqueen'].includes(source.name.toLowerCase())) return 'This coin switch Ability has an invalid source Pokémon.'
+        if (appletunAroma && !['appletun', 'rillaboom', 'nidoqueen', 'venusaur', 'florges'].includes(source.name.toLowerCase())) return 'This coin switch Ability has an invalid source Pokémon.'
         if (appletunAroma && text?.includes('benched basic pokemon') && !other.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) return 'Choose an opposing Benched Basic Pokémon.'
         if (captivatingRhythm && (source.name.toLowerCase() !== 'ludicolo' || !source.abilities?.[abilityIndex] || source.abilities[abilityIndex].name !== 'Captivating Rhythm')) return 'Captivating Rhythm requires Ludicolo and an opposing Benched Pokémon.'
         const regiMoveDiscard = regiMove ? side.hand.filter((card) => discardCardIds?.includes(card.instanceId)) : []
         if (regiMove && (source.statusConditions?.length || !other || other.subtypes.some((subtype) => ['stage 1', 'stage 2', 'stage 3', 'level-up'].includes(subtype.toLowerCase())) || state[opponentSideKey].back.filter((card) => card.currentHp > 0).length === 0 || regiMoveDiscard.length !== 2 || new Set(discardCardIds).size !== 2)) return 'Regi Move needs two cards in hand, an eligible opposing Active Pokémon, and an opposing Benched Pokémon.'
         if (gardevoirTeleportation && (source.name.toLowerCase() !== 'gardevoir lv.x' || source.statusConditions?.length || side.front.some((card) => card.instanceId === source.instanceId) === side.front.some((card) => card.instanceId === other.instanceId))) return 'Teleportation requires Gardevoir LV.X and a Pokémon in the opposite row, while Gardevoir is free of Special Conditions.'
         if (waterActiveSourceSwitch && !source.types.some((type) => type.toLowerCase() === 'water')) return 'Only an Active Water Pokémon can use this Ability.'
+        if (ultraBeastActiveSwitch && (!side.front.some((card) => card.instanceId === sourceId && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast')) || !side.back.some((card) => card.instanceId === activeId && card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast')))) return 'Ultra Beast Switch requires an Active Ultra Beast and a Benched Ultra Beast.'
+        if (tagTeamActiveSwitch && (!side.front.some((card) => card.instanceId === source.instanceId && card.subtypes.some((subtype) => subtype.toLowerCase() === 'tag team')) || !side.back.some((card) => card.instanceId === other.instanceId && card.currentHp > 0))) return 'Drifblim can switch only an Active TAG TEAM Pokémon with a living Benched Pokémon.'
         if (politoedLeapFrog && (source.statusConditions?.length || !other.types.some((type) => type.toLowerCase() === 'water'))) return 'Leap Frog requires Politoed to be free of Special Conditions and a Benched Water Pokémon.'
+        if (linooneMegaSwitch && (!state[viewerSide].back.some((card) => card.instanceId === source.instanceId) || !hasTcgBattleMegaEvolutionEx(state[viewerSide]))) return 'Linoone can use this Ability from the Bench only while you have a Mega Evolution Pokémon ex in play.'
         if ((opponentVstarSwitch || mawileStarRondo) && side.usedVstarPower) return 'A VSTAR Power has already been used this game.'
         if (mawileStarRondo && (side.front.some((card) => card.instanceId === source.instanceId) || !side.front.some((card) => card.currentHp > 0) || !state[opponentSideKey].front.some((card) => card.currentHp > 0) || !other || !state[opponentSideKey].back.some((card) => card.instanceId === other.instanceId))) return 'Star Rondo requires Mawile VSTAR on the Bench and a Benched Pokémon on your opponent’s side.'
         if (bigWing && !side.front.some((card) => card.instanceId === source.instanceId)) return 'Big Wing requires Braviary to be Active.'
@@ -14183,7 +15234,7 @@ export async function tcgBattleUseBenchSwitchAbility(
         if (alreadyUsed) return 'That ability has already been used this turn.'
         if (fragranceTrap || appletunAroma || captivatingRhythm) {
           clearDamageEvents(state)
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId: source.instanceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
           if (result === 'tails') {
@@ -14215,6 +15266,11 @@ export async function tcgBattleUseBenchSwitchAbility(
           const events = applyTcgBattleStatusConditions(state, viewerSide, sourceId, sourceId, [{ target: 'self', statuses: ['poisoned'] }], true)
           state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
         }
+        if (venusaurSleepPoison || florgesConfusionSwitch) {
+          const statuses = venusaurSleepPoison ? ['asleep', 'poisoned'] as const : ['confused'] as const
+          const events = applyTcgBattleStatusConditions(state, viewerSide, source.instanceId, other.instanceId, [{ target: 'opponent', statuses: [...statuses] }], true)
+          state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
+        }
         if (ironBundleSwitch) {
           const sourceIndex = side.back.findIndex((card) => card.instanceId === source.instanceId)
           if (sourceIndex >= 0) side.discard.push(...side.back.splice(sourceIndex, 1))
@@ -14234,11 +15290,14 @@ export async function tcgBattleUseBenchSwitchAbility(
       const ability = sourceCard?.abilities?.[abilityIndex]
       const text = ability?.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
       const waterActiveSourceSwitch = text === 'once during your turn, you may switch your active {w} pokemon with 1 of your benched pokemon.'
+      const ultraBeastActiveSwitch = text === 'once during your turn, you may switch your active ultra beast with 1 of your benched ultra beasts.'
+        const tagTeamActiveSwitch = sourceCard?.name.toLowerCase() === 'drifblim' && text === 'once during your turn (before your attack), you may switch your active tag team pokemon with 1 of your benched pokemon.'
+        const linooneMegaSwitch = sourceCard?.name.toLowerCase() === 'linoone' && text === 'once during your turn, if this pokemon is on your bench, and if you have any mega evolution pokemon ex in play, you may use this ability. switch this pokemon with your active pokemon.'
       const politoedLeapFrog = sourceCard?.name.toLowerCase() === 'politoed' && text === 'once during your turn (before your attack), you may choose a water pokemon on your bench and switch it with your active pokemon. this power can\'t be used if politoed is affected by a special condition.'
       const magneticWarp = text === 'once during your turn (before your attack), you may switch your active pokemon with 1 of your benched pokemon. if you do, your opponent switches his or her active pokemon with 1 of his or her benched pokemon.' || text === 'once during your turn, you may switch your active pokemon with 1 of your benched pokemon. if you do, your opponent switches their active pokemon with 1 of their benched pokemon.'
       const decidueyeTotalFreedom = normalizeTcgBattleAbilityCardName(sourceCard?.name || '') === 'decidueye ex' && text === 'once during your turn, you may use this ability. if this pokemon is on the bench, switch it with your active pokemon. or, if this pokemon is in the active spot, switch it with 1 of your benched pokemon.'
       const mawileStarRondo = normalizeTcgBattleAbilityCardName(sourceCard?.name || '') === 'mawile vstar' && text === "during your turn, if this pokemon is on your bench, you may switch it with your active pokemon. if you do, switch 1 of your opponent's benched pokemon with their active pokemon. (you can't use more than 1 vstar power in a game.)"
-      const activeSourceSwitch = Boolean(text && (/^once during your turn(?: \(before your attack\))?, (?:you may use this ability\. switch|you may switch) your active pokemon with 1 of your benched pokemon\.$/.test(text) || waterActiveSourceSwitch)) || decidueyeTotalFreedom
+      const activeSourceSwitch = Boolean(text && (/^once during your turn(?: \(before your attack\))?, (?:you may use this ability\. switch|you may switch) your active pokemon with 1 of your benched pokemon\.$/.test(text) || waterActiveSourceSwitch || ultraBeastActiveSwitch || tagTeamActiveSwitch)) || decidueyeTotalFreedom
       const gardevoirTeleportation = text === "once during your turn (before your attack), choose 1 of your active pokemon or 1 of your benched pokemon and switch gardevoir with that pokemon. this power can't be used if gardevoir is affected by a special condition."
         const lumineonGust = sourceCard?.name.toLowerCase() === 'lumineon' && text === "once during your turn (before your attack), if lumineon is your active pokemon, you may choose 1 of your opponent's benched pokemon that has maximum hp of 100 or more and switch it with 1 of the defending pokemon. this power can't be used if lumineon is affected by a special condition."
         const weavileDarkCut = sourceCard?.name.toLowerCase() === 'weavile' && text === "once during your turn, when this pokemon moves from your bench to the active spot, you may switch in 1 of your opponent's benched basic pokemon to the active spot."
@@ -14255,24 +15314,29 @@ export async function tcgBattleUseBenchSwitchAbility(
       const unownMGust = sourceCard?.name.replace(/[^a-z0-9]/gi, '').toLowerCase() === 'unownm' && text === "once during your turn (before your attack), if unown m is your active pokemon, you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with 1 of the defending pokemon. this power can't be used if unown m is affected by a special condition."
       const fragranceTrap = unownMGust || text === "once during your turn (before your attack), you may flip a coin. if heads, and if your opponent has any benched pokemon, choose 1 of them and switch it with his or her active pokemon. this power can't be used if erika's victreebel is asleep, confused, or paralyzed." || text === "once during your turn (before your attack), you may flip a coin. if heads, choose 1 of your opponent's benched pokemon and switch the defending pokemon with it. this power can't be used if victreebel is affected by a special condition."
       const nidoqueenMaternalCall = sourceCard?.name.toLowerCase() === 'nidoqueen' && text === "once during your turn, you may use this ability. flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot."
-      const appletunAroma = text === "once during your turn, you may flip a coin. if heads, switch 1 of your opponent's benched basic pokemon with their active pokemon." || sourceCard?.name.toLowerCase() === 'rillaboom' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot." || nidoqueenMaternalCall
-      const captivatingRhythm = sourceCard?.name.toLowerCase() === 'ludicolo' && ability?.name === 'Captivating Rhythm' && text === "once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon."
+      const venusaurSleepPoison = sourceCard?.name.toLowerCase() === 'venusaur' && text === "once during your turn, you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon, and the new active pokemon is now asleep and poisoned."
+      const florgesConfusionSwitch = sourceCard?.name.toLowerCase() === 'florges' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot, and the new active pokemon is now confused."
+      const appletunAroma = text === "once during your turn, you may flip a coin. if heads, switch 1 of your opponent's benched basic pokemon with their active pokemon." || sourceCard?.name.toLowerCase() === 'rillaboom' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot." || nidoqueenMaternalCall || venusaurSleepPoison || florgesConfusionSwitch
+      const captivatingRhythm = sourceCard?.name.toLowerCase() === 'ludicolo' && ability?.name === 'Captivating Rhythm' && ["once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon.", "once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with his or her active pokemon."].includes(text || '')
       const regiMove = sourceCard?.name.toLowerCase() === 'regice' && text === "once during your turn (before your attack), you may use this power. discard 2 cards from your hand and choose 1 of your opponent's active pokemon that isn't an evolved pokemon. then, your opponent switches that pokemon with 1 of his or her benched pokemon. this power can't be used if regice is affected by a special condition."
       const subjugatingChains = text === "once during your turn, you may switch 1 of your benched {d} pokemon, except any pecharunt ex, with your active pokemon. if you do, the new active pokemon is now poisoned. you can't use more than 1 subjugating chains ability each turn."
       const dragonWind = sourceCard?.name.toLowerCase() === 'salamence' && text === "if this pokemon is your active pokemon, once during your turn (before your attack), you may switch 1 of your opponent's benched pokemon with their active pokemon."
         const source = mawileStarRondo || decidueyeTotalFreedom || politoedLeapFrog || regiMove || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm || magneticWarp || gardevoirTeleportation || swellowDriveOff || arbolivaDriveOff || swellowBasicForcedSwitch ? [...state.player.front, ...state.player.back].find((card) => card.instanceId === sourceId && card.currentHp > 0) : ironBundleSwitch ? state.player.back.find((card) => card.instanceId === sourceId && card.currentHp > 0) : activeSourceSwitch || opponentGust || dragonWind || opponentForcedSwitch ? state.player.front.find((card) => card.instanceId === sourceId && card.currentHp > 0) : state.player.back.find((card) => card.instanceId === sourceId && card.currentHp > 0)
       const other = mawileStarRondo ? state.opponent.back.find((card) => card.instanceId === activeId && card.currentHp > 0) : decidueyeTotalFreedom ? (state.player.front.some((card) => card.instanceId === sourceId) ? state.player.back : state.player.front).find((card) => card.instanceId === activeId && card.currentHp > 0) : politoedLeapFrog || activeSourceSwitch || magneticWarp ? state.player.back.find((card) => card.instanceId === activeId && card.currentHp > 0) : gardevoirTeleportation ? [...state.player.front, ...state.player.back].find((card) => card.instanceId === activeId && card.currentHp > 0) : regiMove ? state.opponent.front.find((card) => card.instanceId === activeId && card.currentHp > 0) : opponentGust || dragonWind || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm ? state.opponent.back.find((card) => card.instanceId === activeId && card.currentHp > 0) : opponentForcedSwitch ? state.opponent.back.find((card) => card.currentHp > 0) : state.player.front.find((card) => card.instanceId === activeId && card.currentHp > 0)
-      const isSupported = isTcgBattleBenchToActiveAbility(text, sourceCard?.name || '') || activeSourceSwitch || decidueyeTotalFreedom || mawileStarRondo || opponentGust || dragonWind || opponentForcedSwitch || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm || magneticWarp || subjugatingChains || gardevoirTeleportation || regiMove || politoedLeapFrog
+      const isSupported = isTcgBattleBenchToActiveAbility(text, sourceCard?.name || '') || linooneMegaSwitch || activeSourceSwitch || decidueyeTotalFreedom || mawileStarRondo || opponentGust || dragonWind || opponentForcedSwitch || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm || magneticWarp || subjugatingChains || gardevoirTeleportation || regiMove || politoedLeapFrog
       if (!source || !other || !ability || !isSupported) return { success: false, error: 'That switching ability cannot be used here.' }
       if (magneticWarp && (!state.player.front.some((card) => card.currentHp > 0) || !state.opponent.front.some((card) => card.currentHp > 0) || !state.opponent.back.some((card) => card.currentHp > 0))) return { success: false, error: 'Magnetic Warp requires an Active Pokémon and a Benched Pokémon on each side.' }
-      if (appletunAroma && !['appletun', 'rillaboom', 'nidoqueen'].includes(source.name.toLowerCase())) return { success: false, error: 'This coin switch Ability has an invalid source Pokémon.' }
+      if (appletunAroma && !['appletun', 'rillaboom', 'nidoqueen', 'venusaur', 'florges'].includes(source.name.toLowerCase())) return { success: false, error: 'This coin switch Ability has an invalid source Pokémon.' }
       if (appletunAroma && text?.includes('benched basic pokemon') && !other.subtypes.some((subtype) => subtype.toLowerCase() === 'basic')) return { success: false, error: 'Choose an opposing Benched Basic Pokémon.' }
       if (captivatingRhythm && (source.name.toLowerCase() !== 'ludicolo' || !source.abilities?.[abilityIndex] || source.abilities[abilityIndex].name !== 'Captivating Rhythm')) return { success: false, error: 'Captivating Rhythm requires Ludicolo and an opposing Benched Pokémon.' }
       const regiMoveDiscard = regiMove ? state.player.hand.filter((card) => discardCardIds?.includes(card.instanceId)) : []
       if (regiMove && (source.statusConditions?.length || !other || other.subtypes.some((subtype) => ['stage 1', 'stage 2', 'stage 3', 'level-up'].includes(subtype.toLowerCase())) || state.opponent.back.filter((card) => card.currentHp > 0).length === 0 || regiMoveDiscard.length !== 2 || new Set(discardCardIds).size !== 2)) return { success: false, error: 'Regi Move needs two cards in hand, an eligible opposing Active Pokémon, and an opposing Benched Pokémon.' }
       if (gardevoirTeleportation && (source.name.toLowerCase() !== 'gardevoir lv.x' || source.statusConditions?.length || state.player.front.some((card) => card.instanceId === source.instanceId) === state.player.front.some((card) => card.instanceId === other.instanceId))) return { success: false, error: 'Teleportation requires Gardevoir LV.X and a Pokémon in the opposite row, while Gardevoir is free of Special Conditions.' }
       if (waterActiveSourceSwitch && !source.types.some((type) => type.toLowerCase() === 'water')) return { success: false, error: 'Only an Active Water Pokémon can use this Ability.' }
+      if (ultraBeastActiveSwitch && (!state.player.front.some((card) => card.instanceId === sourceId && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast')) || !state.player.back.some((card) => card.instanceId === activeId && card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast')))) return { success: false, error: 'Ultra Beast Switch requires an Active Ultra Beast and a Benched Ultra Beast.' }
+      if (tagTeamActiveSwitch && (!state.player.front.some((card) => card.instanceId === source.instanceId && card.subtypes.some((subtype) => subtype.toLowerCase() === 'tag team')) || !state.player.back.some((card) => card.instanceId === other.instanceId && card.currentHp > 0))) return { success: false, error: 'Drifblim can switch only an Active TAG TEAM Pokémon with a living Benched Pokémon.' }
       if (politoedLeapFrog && (source.statusConditions?.length || !other.types.some((type) => type.toLowerCase() === 'water'))) return { success: false, error: 'Leap Frog requires Politoed to be free of Special Conditions and a Benched Water Pokémon.' }
+      if (linooneMegaSwitch && (!state.player.back.some((card) => card.instanceId === source.instanceId) || !hasTcgBattleMegaEvolutionEx(state.player))) return { success: false, error: 'Linoone can use this Ability from the Bench only while you have a Mega Evolution Pokémon ex in play.' }
       if ((opponentVstarSwitch || mawileStarRondo) && state.player.usedVstarPower) return { success: false, error: 'A VSTAR Power has already been used this game.' }
       if (mawileStarRondo && (state.player.front.some((card) => card.instanceId === source.instanceId) || !state.player.front.some((card) => card.currentHp > 0) || !state.opponent.front.some((card) => card.currentHp > 0) || !other || !state.opponent.back.some((card) => card.instanceId === other.instanceId))) return { success: false, error: 'Star Rondo requires Mawile VSTAR on the Bench and a Benched Pokémon on your opponent’s side.' }
       if (bigWing && !state.player.front.some((card) => card.instanceId === source.instanceId)) return { success: false, error: 'Big Wing requires Braviary to be Active.' }
@@ -14295,7 +15359,7 @@ export async function tcgBattleUseBenchSwitchAbility(
       if (alreadyUsed) return { success: false, error: 'That ability has already been used this turn.' }
       if (fragranceTrap || appletunAroma || captivatingRhythm) {
         clearDamageEvents(state)
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId: source.instanceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
         if (result === 'tails') {
@@ -14326,6 +15390,11 @@ export async function tcgBattleUseBenchSwitchAbility(
       if (opponentVstarSwitch || mawileStarRondo) state.player.usedVstarPower = true
       if (subjugatingChains) {
         const events = applyTcgBattleStatusConditions(state, 'player', sourceId, sourceId, [{ target: 'self', statuses: ['poisoned'] }], true)
+        state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
+      }
+      if (venusaurSleepPoison || florgesConfusionSwitch) {
+        const statuses = venusaurSleepPoison ? ['asleep', 'poisoned'] as const : ['confused'] as const
+        const events = applyTcgBattleStatusConditions(state, 'player', source.instanceId, other.instanceId, [{ target: 'opponent', statuses: [...statuses] }], true)
         state.lastStatusEvents = events.map((event) => ({ ...event, id: randomUUID() }))
       }
       if (ironBundleSwitch) {
@@ -14473,7 +15542,7 @@ function hasTcgBattleRuleBox(card: Pick<TcgBattleCardState, 'subtypes'>) {
   return card.subtypes.some((subtype) => ['ex', 'gx', 'v', 'vmax', 'vstar'].includes(subtype.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-z]/g, '')))
 }
 
-function getTcgBattleAbilityDeckSearchEffect(text?: string): { sharedKey: string; subtype?: string; requiredSubtype?: string; requiredType?: string; requiredTypes?: string[]; requiredEnergyType?: string; basicEnergyOnly?: boolean; requiredOpponentEnergyLead?: boolean; nameContains?: string; requiredNames?: string[]; requiredBenchNames?: string[]; excludedName?: string; attackNameContains?: string; noRuleBox?: boolean; evolutionOnly?: boolean; count: number; maxHp?: number; firstTurnOnly?: boolean; onlyIfGoesSecond?: boolean; knockoutGate?: boolean; upToCount?: boolean; requiredName?: string; requiredActiveAbilityName?: string; sharedLimit?: boolean; endsTurn?: boolean; putOnTop?: boolean; putOnBench?: boolean; activeOnly?: boolean; benchPlayOnly?: boolean; benchToActiveOnly?: boolean; specialConditionGate?: boolean; blockedStatuses?: string[]; energyCard?: boolean; handDiscardCount?: number; attachEnergyFromDeck?: boolean; requiresEmptyHand?: boolean; knockoutAnyGate?: boolean; coinFlip?: boolean } | null {
+function getTcgBattleAbilityDeckSearchEffect(text?: string): { sharedKey: string; subtype?: string; requiredSubtype?: string; requiredType?: string; requiredTypes?: string[]; requiredEnergyType?: string; basicEnergyOnly?: boolean; requiredOpponentEnergyLead?: boolean; nameContains?: string; requiredNames?: string[]; requiredBenchNames?: string[]; excludedName?: string; attackNameContains?: string; noRuleBox?: boolean; evolutionOnly?: boolean; count: number; maxHp?: number; firstTurnOnly?: boolean; onlyIfGoesSecond?: boolean; knockoutGate?: boolean; upToCount?: boolean; requiredName?: string; requiredActiveAbilityName?: string; sharedLimit?: boolean; endsTurn?: boolean; putOnTop?: boolean; putOnBench?: boolean; activeOnly?: boolean; benchPlayOnly?: boolean; benchToActiveOnly?: boolean; benchOnly?: boolean; specialConditionGate?: boolean; blockedStatuses?: string[]; energyCard?: boolean; handDiscardCount?: number; attachEnergyFromDeck?: boolean; requiresEmptyHand?: boolean; knockoutAnyGate?: boolean; coinFlip?: boolean; selfDamageCost?: number; selfKnockoutIfEnergyAdded?: boolean } | null {
   if (!text) return null
   const normalized = text.replace(/<[^>]*>/g, ' ').replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
   if (/search (?:your deck|your discard pile|your opponent's discard pile) for .*\b(?:trainer|supporter|stadium|item|pokemon tool)\b/.test(normalized)) return null
@@ -14481,9 +15550,34 @@ function getTcgBattleAbilityDeckSearchEffect(text?: string): { sharedKey: string
   if (normalized === 'once during your turn (before your attack), you may search your deck for a basic pokemon or evolution card, show it to your opponent, and put it into your hand. shuffle your deck afterward. this power can\'t be used if nidoqueen is affected by a special condition.') return { sharedKey: 'nidoqueen basic or evolution search', subtype: 'pokemon', count: 1, specialConditionGate: true }
   if (normalized === "once during your turn (before your attack), if any of your pokemon were knocked out during your opponent's last turn, search your deck for any 1 card and put it into your hand. shuffle your deck afterward. this power can't be used if slowking is affected by a special condition.") return { sharedKey: 'slowking knockout search', count: 1, knockoutAnyGate: true, specialConditionGate: true }
   if (normalized === 'once during your turn (before your attack), you may search your deck for a basic energy card, show it to your opponent, and put it into your hand. shuffle your deck afterward. this power can\'t be used if aerodactyl is affected by a special condition.') return { sharedKey: 'aerodactyl basic energy search', subtype: 'energy', energyCard: true, basicEnergyOnly: true, count: 1, specialConditionGate: true }
+  const basicEnergyToHand = normalized.match(/^once during your turn(?: \(before your attack\))?, (?:(if this pokemon is (?:in the active spot|your active pokemon)), )?you may search your deck for (?:(?:up to (\d+))|(?:(?:a|an|one|1) ))? ?(basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless))? energy cards?, (?:(?:reveal|show) (?:it|them)(?: to your opponent)?,? and )?put (?:it|them) into your hand\. (?:then, )?shuffle your deck(?: afterward)?\.(?: this power can't be used if .+ is affected by a special condition\.)?$/)
+  if (basicEnergyToHand) {
+    const energyTypes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', d: 'darkness', m: 'metal', y: 'fairy', c: 'colorless' }
+    return { sharedKey: 'basic Energy search to hand', subtype: 'energy', energyCard: true, basicEnergyOnly: Boolean(basicEnergyToHand[3]), requiredEnergyType: basicEnergyToHand[4] ? energyTypes[basicEnergyToHand[4]] : basicEnergyToHand[5], count: Number(basicEnergyToHand[2] || 1), upToCount: normalized.includes('up to'), activeOnly: Boolean(basicEnergyToHand[1]), specialConditionGate: /can't be used if .* is affected by a special condition/.test(normalized), sharedLimit: false }
+  }
+  const damageForTypedEnergy = normalized.match(/^once during your turn(?: \(before your attack\))?, you may put (\d+) damage counters? on this pokemon\. if you do, search your deck for (?:a )?(?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless)) energy card and attach it to this pokemon\. (?:then, )?shuffle your deck(?: afterward)?\.$/)
+  if (damageForTypedEnergy) {
+    const energyTypes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', d: 'darkness', m: 'metal', y: 'fairy', c: 'colorless' }
+    return {
+      sharedKey: 'damage for typed Energy search',
+      energyCard: true,
+      requiredEnergyType: damageForTypedEnergy[2] ? energyTypes[damageForTypedEnergy[2]] : damageForTypedEnergy[3],
+      count: 1,
+      sharedLimit: false,
+      selfDamageCost: Number(damageForTypedEnergy[1]),
+    }
+  }
+  if (normalized === 'once during your turn, you may search your deck for up to 6 energy cards and attach them to your pokemon in any way you like. then, shuffle your deck. if you use this ability, your turn ends.') {
+    return { sharedKey: 'blastoise energy search', energyCard: true, count: 6, upToCount: true, endsTurn: true, sharedLimit: false }
+  }
+  if (normalized === 'once during your turn, if this pokemon is on your bench, you may search your deck for up to 2 lightning energy cards and attach them to your lightning pokemon in any way you like. then, shuffle your deck. if you searched your deck in this way, this pokemon is knocked out.') {
+    return { sharedKey: 'electrode lightning energy search', energyCard: true, requiredEnergyType: 'lightning', count: 2, upToCount: true, benchOnly: true, selfKnockoutIfEnergyAdded: true, sharedLimit: false }
+  }
   if (normalized === 'once during your turn (before your attack), you may search your deck for a card. shuffle your deck, then put that card on top of your deck. this power can\'t be used if magcargo is affected by a special condition.') return { sharedKey: 'magcargo top deck search', count: 1, specialConditionGate: true, putOnTop: true }
   if (normalized === 'once during your turn (before your attack), you may search your deck for an evolution card. show it to your opponent and put it into your hand. shuffle your deck afterward. this power can\'t be used if dark dragonair is affected by a special condition.') return { sharedKey: 'dark dragonair evolution search', subtype: 'pokemon', evolutionOnly: true, count: 1, activeOnly: true, specialConditionGate: true }
   if (normalized === 'once during your turn (before your attack), you may search your deck for up to 2 basic energy cards, reveal them, and put them into your hand. then, shuffle your deck.') return { sharedKey: 'ribombee basic energy search', subtype: 'energy', energyCard: true, basicEnergyOnly: true, count: 2, upToCount: true }
+  if (normalized === 'once during your turn (before your attack), you may put a card from your hand back on your deck. if you do, search your deck for a basic energy card, show it to your opponent, and put it into your hand. shuffle your deck afterward. this power can\'t be used if clefable is affected by a special condition.') return { sharedKey: 'clefable basic energy search', subtype: 'energy', energyCard: true, basicEnergyOnly: true, count: 1, handDiscardCount: 1, specialConditionGate: true }
+  if (normalized === 'once during your turn (before your attack), you may choose a card from your hand and put it on top of your deck. then, search your deck for up to 2 basic energy cards, show them to your opponent, and put them into your hand. shuffle your deck afterward. this power can\'t be used if bronzong is affected by a special condition.') return { sharedKey: 'bronzong basic energy search', subtype: 'energy', energyCard: true, basicEnergyOnly: true, count: 2, upToCount: true, handDiscardCount: 1, specialConditionGate: true }
   if (normalized === 'once during your turn (before your attack), you may search your deck for a pokemon tool card, show it to your opponent, and put it into your hand. shuffle your deck afterward. this power can\'t be used if slowking is affected by a special condition.') return { sharedKey: 'slowking tool search', subtype: 'pokemon tool', count: 1, specialConditionGate: true }
   if (normalized === 'when you play this pokemon from your hand onto your bench during your turn, you may search your deck for up to 2 item cards that have the word "rotom" in their name, reveal them, and put them into your hand. then, shuffle your deck.') return { sharedKey: 'rotom item search', subtype: 'item', nameContains: 'rotom', count: 2, upToCount: true, sharedLimit: false, benchPlayOnly: true }
   if (normalized === 'once during your turn, if you have no cards in your hand, you may use this ability. search your deck for a supporter card, reveal it, and put it into your hand. then, shuffle your deck.') return { sharedKey: 'silvally empty hand supporter search', subtype: 'supporter', count: 1, sharedLimit: false, requiresEmptyHand: true }
@@ -14491,6 +15585,8 @@ function getTcgBattleAbilityDeckSearchEffect(text?: string): { sharedKey: string
   if (normalized === 'once during your turn, you may search your deck for a stadium card, reveal it, and put it into your hand. then, shuffle your deck.') return { sharedKey: 'sawsbuck stadium search', subtype: 'stadium', count: 1, sharedLimit: false }
   if (normalized === 'once during your turn, you may search your deck for a supporter card, reveal it, shuffle your deck, then put that card on top of it.') return { sharedKey: 'altaria supporter top deck', subtype: 'supporter', count: 1, sharedLimit: false, putOnTop: true }
   if (normalized === 'when you play this pokemon from your hand onto your bench, you may search your deck for a supporter card, reveal it, and put it into your hand. shuffle your deck afterward.') return { sharedKey: 'jirachi ex supporter search', subtype: 'supporter', count: 1, sharedLimit: false, benchPlayOnly: true }
+  if (normalized === 'when you play this pokemon from your hand onto your bench during your turn, you may search your deck for up to 2 basic energy cards, reveal them, and put them into your hand. then, shuffle your deck.') return { sharedKey: 'oricorio bench basic energy search', subtype: 'energy', energyCard: true, basicEnergyOnly: true, count: 2, upToCount: true, sharedLimit: false, benchPlayOnly: true }
+  if (normalized === 'once during your turn, when you play this pokemon from your hand onto your bench, you may use this ability. look at the top 4 cards of your deck and attach a basic energy card you find there to this pokemon. shuffle the other cards and put them on the bottom of your deck.') return { sharedKey: 'rulers roar bench energy search', subtype: 'energy', energyCard: true, basicEnergyOnly: true, attachEnergyFromDeck: true, count: 1, sharedLimit: false, benchPlayOnly: true }
   if (normalized === 'once during your turn (before your attack), you may search your deck for a supporter card, reveal it, and put it into your hand. then, shuffle your deck.') return { sharedKey: 'dragonite supporter search', subtype: 'supporter', count: 1, sharedLimit: false }
   if (normalized === 'once during your turn (before your attack), you may search your deck for a supporter card, show it to your opponent, and put it into your hand. shuffle your deck afterward. this power can\'t be used if staraptor fb is affected by a special condition.') return { sharedKey: 'staraptor fb supporter search', subtype: 'supporter', count: 1, sharedLimit: false, activeOnly: true, specialConditionGate: true }
   if (normalized === 'once during your turn, when you put lapras onto your bench from your hand, you may search your deck for a supporter card, show it to your opponent, and put it into your hand. shuffle your deck afterward.') return { sharedKey: 'lapras supporter search', subtype: 'supporter', count: 1, sharedLimit: false, benchPlayOnly: true }
@@ -14507,6 +15603,7 @@ function getTcgBattleAbilityDeckSearchEffect(text?: string): { sharedKey: string
   if (normalized === 'once during your turn, you may search your deck for a pokemon, reveal it, and put it into your hand. then, shuffle your deck.') return { sharedKey: 'mammoth hauler', count: 1, sharedLimit: false }
   if (normalized === 'search your deck for an energy card and attach it to 1 of your benched pokemon. then, shuffle your deck.') return { sharedKey: 'bouncy-bounce charge', subtype: 'energy', energyCard: true, attachEnergyFromDeck: true, count: 1 }
   if (normalized === 'once during your turn, when this pokemon moves from your bench to the active spot, you may search your deck for up to 3 basic {g} energy cards and attach them to this pokemon. then, shuffle your deck.') return { sharedKey: 'buzzing boost', subtype: 'energy', requiredEnergyType: 'grass', energyCard: true, attachEnergyFromDeck: true, count: 3, upToCount: true, sharedLimit: false, benchToActiveOnly: true }
+  if (normalized === 'once during your turn (before your attack), if you have solgaleo in play, you may search your deck for up to 2 energy cards and attach them to your solgaleo or lunala in any way you like. then, shuffle your deck.') return { sharedKey: 'lunala solgaleo energy search', subtype: 'energy', energyCard: true, attachEnergyFromDeck: true, count: 2, upToCount: true, requiredName: 'solgaleo' }
   if (normalized === "once during your turn (before your attack), you may count the total number of energy cards attached to all of your pokemon and all of your opponent's pokemon. if your opponent has more total energy cards attached, you may search your deck for 1 fire energy card and attach it to 1 of your benched pokemon, if any. shuffle your deck afterward. this power can't be used if typhlosion is affected by a special condition.") return { sharedKey: 'energy gap', subtype: 'energy', requiredEnergyType: 'fire', energyCard: true, attachEnergyFromDeck: true, count: 1, sharedLimit: false, specialConditionGate: true, requiredOpponentEnergyLead: true }
   if (normalized === "once during your turn (before your attack), you may put 2 cards from your hand into your deck. then, search your deck for an energy card, show it to your opponent, and put it into your hand. shuffle your deck afterward. this power can't be used if furret is affected by a special condition.") return { sharedKey: 'furret energy search', subtype: 'energy', energyCard: true, handDiscardCount: 2, count: 1, sharedLimit: false, specialConditionGate: true }
   if (normalized === 'once during your turn, you may use this ability. flip a coin. if heads, search your deck for a pokemon, reveal it, and put it into your hand. then, shuffle your deck.') return { sharedKey: 'guiding dance', subtype: 'pokemon', count: 1, sharedLimit: false, coinFlip: true }
@@ -14577,9 +15674,41 @@ function getTcgBattleTopDeckSearchSubtype(text?: string) {
   return undefined
 }
 
-function getTcgBattleDiscardEnergyAttachEffect(text?: string): { energyType: string; target: 'bench' | 'self' | 'anyOwn'; sharedKey?: string; requiredName?: string; specialConditionGate?: boolean; allowedTypes?: string[]; count?: number; benchToActiveOnly?: boolean; activeOnly?: boolean; repeatable?: boolean; noRuleBoxTarget?: boolean; damageCounterTarget?: boolean; coinFlip?: boolean; requiredDiscardEnergy?: string; requiredDiscardBasicEnergy?: boolean; recoverBasicEnergy?: boolean; discardAttachedEnergy?: boolean; requiredHandBasicEnergy?: boolean; requiredHandEnergy?: boolean; requiredMegaFirePokemon?: boolean; requiredTargetType?: string; requiredEthanBench?: boolean; selfKnockout?: boolean } | null {
+function getTcgBattleDiscardEnergyAttachEffect(text?: string): { energyType: string; target: 'bench' | 'self' | 'anyOwn'; sharedKey?: string; requiredName?: string; specialConditionGate?: boolean; allowedTypes?: string[]; count?: number; benchToActiveOnly?: boolean; activeOnly?: boolean; repeatable?: boolean; noRuleBoxTarget?: boolean; noAutomaticUse?: boolean; damageCounterTarget?: boolean; coinFlip?: boolean; requiredDiscardEnergy?: string; requiredDiscardBasicEnergy?: boolean; recoverBasicEnergy?: boolean; discardAttachedEnergy?: boolean; requiredHandBasicEnergy?: boolean; requiredHandEnergy?: boolean; requiredMegaFirePokemon?: boolean; requiredTargetType?: string; requiredEthanBench?: boolean; selfKnockout?: boolean; opponentRemainingPrizesAtMost?: number } | null {
   if (!text) return null
   const normalized = text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
+  if (normalized === "once during your turn, if your opponent has 4 or fewer prize cards remaining, you may attach a basic {f} energy card from your discard pile to this pokemon.") return { energyType: 'fighting', target: 'self', recoverBasicEnergy: true, opponentRemainingPrizesAtMost: 4 }
+  if (normalized === "once during your turn (before your attack), you may flip a coin. if heads, search your deck for a psychic energy card and attach it to 1 of your pokemon with unown in its name. shuffle your deck afterward. this power can be used even if unown is asleep, confused, or paralyzed.") return { energyType: 'psychic', target: 'anyOwn', requiredName: 'unown', coinFlip: true }
+  const genericDeckEnergySearch = normalized.match(/^once during your turn(?: \(before your attack\))?, (?:(if this pokemon is (?:in the active spot|your active pokemon)), )?(?:you may (?:use this ability\. )?)?search your deck for (?:up to )?(?:(\d+) )?(?:a )?(?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless))? energy cards?,? (?:reveal (?:it|them),? and )?(?:attach (?:it|them) to (?:this pokemon|1 of your (?:benched )?pokemon|your pokemon in any way you like)|put (?:it|them) into your hand)\. (?:then,? )?shuffle your deck(?: afterward)?\.$/)
+  if (genericDeckEnergySearch) {
+    const typeCodes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+    const energyType = genericDeckEnergySearch[3] ? typeCodes[genericDeckEnergySearch[3]] : genericDeckEnergySearch[4] || 'any'
+    return {
+      energyType,
+      target: normalized.includes('attach it to this pokemon') || normalized.includes('attach them to this pokemon') ? 'self' : 'anyOwn',
+      count: Number.parseInt(genericDeckEnergySearch[2] || '1', 10),
+      activeOnly: Boolean(genericDeckEnergySearch[1]),
+      noAutomaticUse: true,
+    }
+  }
+  const topDeckEnergySearch = normalized.match(/^once during your turn(?: \(before your attack\))?, (?:(if this pokemon is (?:in the active spot|your active pokemon)), )?you may (?:use this ability\. )?(?:look at|reveal) (?:the )?top (\d+) cards? (?:of|in) your deck\b([\s\S]*)$/)
+  const topDeckEnergyTail = topDeckEnergySearch?.[3] || ''
+  const topDeckEnergyTypeText = topDeckEnergyTail.match(/\{([grwlpmdycf])\} energy cards?|\b(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless) energy cards?/)
+  const topDeckEnergyAttach = Boolean(topDeckEnergySearch && /energy cards?/.test(topDeckEnergyTail) && /attach /.test(topDeckEnergyTail) && /\bto (?:this pokemon|1 of your|your pokemon|your [a-z0-9{}' -]+ pokemon)/.test(topDeckEnergyTail))
+  const topDeckEnergyHand = Boolean(topDeckEnergySearch && /energy cards?/.test(topDeckEnergyTail) && /put (?:it|them|those cards) into your hand/.test(topDeckEnergyTail))
+  if (topDeckEnergySearch && (topDeckEnergyAttach || topDeckEnergyHand)) {
+    const typeCodes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+    const maximumFromText = Number.parseInt(topDeckEnergyTail.match(/(?:up to|choose up to) (\d+) (?:basic )?(?:\{[grwlpmdycf]\}|grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)? energy cards?/)?.[1] || '', 10)
+    const energyCount = topDeckEnergyHand && /(?:an|a|one) energy card/.test(topDeckEnergyTail) ? 1 : Math.min(Number.parseInt(topDeckEnergySearch[2], 10), maximumFromText || Number.parseInt(topDeckEnergySearch[2], 10))
+    return {
+      energyType: topDeckEnergyTypeText?.[1] ? typeCodes[topDeckEnergyTypeText[1]] : topDeckEnergyTypeText?.[2] || 'any',
+      target: 'anyOwn',
+      count: energyCount,
+      activeOnly: Boolean(topDeckEnergySearch[1]),
+      specialConditionGate: /can't be used if .* is affected by a special condition/.test(normalized),
+      noAutomaticUse: true,
+    }
+  }
   if (normalized === 'once during your turn, you may attach up to 3 basic energy cards from your discard pile to your {l} pokemon in any way you like. if you use this ability, this pokemon is knocked out.') return { energyType: 'lightning', target: 'anyOwn', count: 3, recoverBasicEnergy: true, requiredTargetType: 'lightning', selfKnockout: true }
   if (normalized === 'once during your turn (before your attack), you may flip a coin. if heads, search your deck for a basic energy card and attach it to 1 of your pokemon. shuffle your deck afterward.') return { energyType: 'any', target: 'anyOwn', coinFlip: true }
   if (normalized === "once during your turn (before your attack), if electrode is your active pokemon, you may flip a coin. if heads, choose a lightning energy card from your discard pile and attach it to 1 of your pokemon. this power can't be used if electrode is affected by a special condition.") return { energyType: 'lightning', target: 'anyOwn', requiredName: 'electrode', specialConditionGate: true, activeOnly: true, coinFlip: true, requiredDiscardEnergy: 'lightning' }
@@ -14595,6 +15724,24 @@ function getTcgBattleDiscardEnergyAttachEffect(text?: string): { energyType: str
   if (normalized === "once during your turn, you may attach up to 2 basic {r} energy cards from your hand to 1 of your benched ethan's pokemon.") return { energyType: 'fire', target: 'bench', count: 2, requiredHandBasicEnergy: true, requiredEthanBench: true }
   if (normalized === 'once during your turn, you may use this ability. attach a basic lightning energy card from your discard pile to 1 of your pokemon.') return { energyType: 'lightning', target: 'anyOwn', recoverBasicEnergy: true }
   if (normalized === 'once during your turn (before your attack), if this pokemon is your active pokemon, you may attach a fire energy card from your hand to 1 of your dragon pokemon.') return { energyType: 'fire', target: 'anyOwn', requiredName: 'dragon', activeOnly: true }
+  const handEnergyAttach = normalized.match(/^once during your turn(?: \(before your attack\))?, (?:(if this pokemon is (?:in the active spot|your active pokemon)), )?(?:you may (?:use this ability\. )?)?attach (?:up to (\d+) )?(?:a |an |one )?(basic )?(?:(?:\{[grwlpmdycf]\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)) )?energy cards? from your hand to (this pokemon|your active pokemon|1 of your (?:benched )?(?:\{[grwlpmdycf]\} )?pokemon|your pokemon in any way you like|1 of your [a-z0-9' -]+)\.(?: this power can't be used if .* is affected by a special condition\.)?$/)
+  if (handEnergyAttach) {
+    const energyTypeCodes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless' }
+    const energyType = handEnergyAttach[4] ? energyTypeCodes[handEnergyAttach[4]] : handEnergyAttach[5] || 'any'
+    const targetText = handEnergyAttach[6]
+    const target = targetText === 'this pokemon' ? 'self' : targetText.includes('benched') ? 'bench' : 'anyOwn'
+    const namedTarget = targetText.match(/^1 of your ([a-z0-9' -]+)$/)?.[1]
+    const requiredName = namedTarget && !/^(?:benched )?(?:\{[grwlpmdycf]\} )?pokemon$/.test(namedTarget) ? namedTarget.replace(/^benched /, '').replace(/^\{[grwlpmdycf]\} /, '') : undefined
+    return {
+      energyType,
+      target,
+      count: Number(handEnergyAttach[2] || 1),
+      requiredHandBasicEnergy: true,
+      activeOnly: Boolean(handEnergyAttach[1]),
+      specialConditionGate: /this power can't be used if .* is affected by a special condition/.test(normalized),
+      requiredName,
+    }
+  }
   if (normalized === "once during your turn (before your attack), you may search your discard pile for a fire energy card and attach it to 1 of your pokemon. if you do, put 1 damage counter on that pokemon. this power can't be used if typhlosion is affected by a special condition.") return { energyType: 'fire', target: 'anyOwn', requiredName: 'typhlosion', specialConditionGate: true, damageCounterTarget: true }
   if (normalized === 'once during your turn, you may attach a basic lightning energy card from your discard pile to 1 of your pokemon.') return { energyType: 'lightning', target: 'anyOwn', recoverBasicEnergy: true }
   if (/^as often as you like during your turn(?: \(before your attack\))?, you may attach (?:a darkness energy card|a \{d\} energy card) from your hand to 1 of your pokemon\.$/.test(normalized)) return { energyType: 'darkness', target: 'self', repeatable: true, requiredHandEnergy: true }
@@ -15014,7 +16161,7 @@ export async function tcgBattleUseDrawAbility(
           const expected = "once during your turn, you may use this ability. flip a coin. if heads, discard a random card from your opponent's hand."
           const otherSide = state[viewerSide === 'player' ? 'opponent' : 'player']
           if (!source || !ability || normalizeTcgBattleAbilityCardName(source.name) !== 'talonflame' || text?.replace(/\s+/g, ' ').trim() !== expected || ![...side.front, ...side.back].some((card) => card.instanceId === sourceId) || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return 'Sky Hunt is unavailable this turn.'
-          const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          const result = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId, side: viewerSide, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
           const discarded = result === 'heads' && otherSide.hand.length ? otherSide.hand.splice(randomInt(0, otherSide.hand.length), 1)[0] : undefined
           if (discarded) otherSide.discard.push(discarded)
@@ -15248,24 +16395,27 @@ export async function tcgBattleUseDrawAbility(
         if (abilityDeckSearch?.benchPlayOnly && (source?.playedToBenchTurn !== state.turnNumber || state.lastAction?.kind !== 'bench' || state.lastAction.side !== viewerSide || state.lastAction.frontId !== sourceId)) return 'This Ability can only be used when its Pokémon is played from your hand onto the Bench.'
         const searchCount = vstarSearchCount ?? (abilityDeckSearch?.count ?? null)
         const searchDeck = searchCount !== null
-        const energyAttachFromDeck = text?.match(/^once during your turn, you may search your deck for a basic \{([grwlpmdycf])\} energy card and attach it to this pokemon\. then, shuffle your deck\.$/)
+        const energyAttachFromDeckMatch = text?.match(/^once during your turn(?: \(before your attack\))?, you may search your deck for (?:a )?(?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)) energy card and attach it to (?:this pokemon|starmie)\. then, shuffle your deck(?: afterward)?\.(?: this power can't be used if starmie is affected by a special condition\.)?$/)
+        const energyAttachFromDeck = energyAttachFromDeckMatch ? [energyAttachFromDeckMatch[0], energyAttachFromDeckMatch[1] || ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', fighting: 'f', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c' } as Record<string, string>)[energyAttachFromDeckMatch[2]] ] as RegExpMatchArray : null
         const clefairyMoonWatch = normalizeTcgBattleAbilityCardName(source?.name || '') === 'clefairy' && text === 'once during your turn, if this pokemon is in the active spot, for each of your benched clefairy, you may search your deck for a psychic energy card and attach it to that clefairy. then, shuffle your deck.' && side.front.some((card) => card.instanceId === source?.instanceId) && side.back.some((card) => card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name) === 'clefairy')
         const charizardEnergySearch = text === 'once during your turn (before your attack), you may put 2 damage counters on this pokemon. if you do, search your deck for up to 2 fire energy cards and attach them to this pokemon. then, shuffle your deck.'
         const incineroarEnergySearch = normalizeTcgBattleAbilityCardName(source?.name || '') === 'incineroar-gx' && text === 'once during your turn (before your attack), you may put 3 damage counters on this pokemon. if you do, search your deck for up to 3 darkness energy cards and attach them to this pokemon. then, shuffle your deck.'
         const delphoxEnergySearch = Boolean(useEnergySearch && source?.name.toLowerCase() === 'delphox break' && text === 'once during your turn (before your attack), you may search your deck for a fire energy card and attach it to 1 of your pokemon. shuffle your deck afterward.')
         const leafeonEnergySearch = Boolean(useEnergySearch && source?.name.toLowerCase() === 'leafeon v' && text === 'once during your turn, you may search your deck for a grass energy card and attach it to 1 of your pokemon. then, shuffle your deck. if you use this ability, your turn ends.')
-        const rillaboomEnergySearch = text === 'once during your turn, you may search your deck for up to 2 grass energy cards and attach them to 1 of your pokemon. then, shuffle your deck.'
+        const rillaboomEnergySearch = /^once during your turn, you may search your deck for up to 2 (?:grass|\{g\}) energy cards and attach them to 1 of your pokemon\. then, shuffle your deck\.$/.test(text || '')
         const forretressEnergySearch = text === 'once during your turn, you may search your deck for up to 5 basic {g} energy cards and attach them to your pokemon in any way you like. then, shuffle your deck. if you searched your deck in this way, this pokemon is knocked out.'
         const aromatissePsychicEnergySearch = source?.name.toLowerCase() === 'aromatisse' && text === 'once during your turn, you may use this ability. search your deck for up to 2 basic {p} energy cards, reveal them, and put them into your hand. then, shuffle your deck.'
         const eldegossBasicEnergySearch = source?.name.toLowerCase() === 'eldegoss' && text === 'once during your turn, you may search your deck for up to 2 basic energy cards, reveal them, and put them into your hand. then, shuffle your deck.'
-        const galarianBirdEnergy = source?.name.toLowerCase() === 'galarian moltres' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 darkness energy cards from your hand to this pokemon.' ? 'darkness' : source?.name.toLowerCase() === 'galarian zapdos' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 fighting energy cards from your hand to this pokemon.' ? 'fighting' : source?.name.toLowerCase() === 'galarian articuno' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 psychic energy cards from your hand to this pokemon.' ? 'psychic' : null
+        const galarianBirdEnergy = source?.name.toLowerCase() === 'galarian moltres' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 darkness energy cards from your hand to this pokemon.' || source?.name.toLowerCase() === 'darkrai ◇' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach 2 darkness energy cards from your hand to it.' ? 'darkness' : source?.name.toLowerCase() === 'galarian zapdos' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 fighting energy cards from your hand to this pokemon.' ? 'fighting' : source?.name.toLowerCase() === 'galarian articuno' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 psychic energy cards from your hand to this pokemon.' || source?.name.toLowerCase() === 'giratina ◇' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach 2 psychic energy cards from your hand to it.' ? 'psychic' : null
         const galarianBirdBenchPower = Boolean(galarianBirdEnergy && source?.playedToBenchTurn === state.turnNumber && state.lastAction?.kind === 'bench' && state.lastAction.side === viewerSide && state.lastAction.frontId === sourceId)
         const ribombeeHoneyGather = source?.name.toLowerCase() === 'ribombee' && text === 'once during your turn (before your attack), you may search your deck for up to 2 basic energy cards, reveal them, and put them into your hand. then, shuffle your deck.'
         const solgaleoMetalEnergySearch = source?.name.toLowerCase() === 'solgaleo' && text === 'once during your turn, if this pokemon is on your bench, you may use this ability. search your deck for up to 2 basic metal energy cards and attach them to this pokemon. then, shuffle your deck.'
         const giratinaBrokenSpaceBellow = source?.name.toLowerCase() === 'giratina ex' && text === 'once during your turn, you may take a {p} energy from your energy zone and attach it to this pokemon. if you use this ability, your turn ends.'
         const gardevoirPsyShadow = source?.name.toLowerCase() === 'gardevoir' && text === 'once during your turn, you may take a {p} energy from your energy zone and attach it to the {p} pokemon in the active spot.'
-        const energyZoneAttach = text?.match(/^once during your turn, if this pokemon is in the active spot, you may take a \{([grwlpmdycf])\} energy from your energy zone and attach it to 1 of your \{([grwlpmdycf])\} pokemon\.$/) || (giratinaBrokenSpaceBellow || gardevoirPsyShadow ? [giratinaBrokenSpaceBellow ? 'broken-space-bellow' : 'psy-shadow', 'p', 'p'] as RegExpMatchArray : null)
-        const energySearchMatch = text?.match(/^once during your turn, if this pokemon is (?:in the active spot|your active pokemon), you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards?, reveal them, and put them into your hand\. then, shuffle your deck\.$/) || (galarianBirdBenchPower ? ['galarian bird bench energy', '2', ({ psychic: 'p', fighting: 'f', darkness: 'd' } as Record<string, string>)[galarianBirdEnergy!] ] as RegExpMatchArray : ribombeeHoneyGather ? ['ribombee honey gather', '2', ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c', fighting: 'f' } as Record<string, string>)[side.selectedEnergy?.toLowerCase() || ''] || 'c'] as RegExpMatchArray : clefairyMoonWatch ? ['clefairy moon watch', String(side.back.filter((card) => card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name) === 'clefairy').length), 'p'] as RegExpMatchArray : energyAttachFromDeck ? [energyAttachFromDeck[0], '1', energyAttachFromDeck[1]] as RegExpMatchArray : energyZoneAttach ? [energyZoneAttach[0], '1', energyZoneAttach[1]] as RegExpMatchArray : delphoxEnergySearch ? ['delphox energy acceleration', '1', 'r'] as RegExpMatchArray : leafeonEnergySearch ? ['leafeon energy acceleration', '1', 'g'] as RegExpMatchArray : charizardEnergySearch ? ['charizard energy acceleration', '2', 'r'] as RegExpMatchArray : incineroarEnergySearch ? ['incineroar energy acceleration', '3', 'd'] as RegExpMatchArray : rillaboomEnergySearch ? ['rillaboom energy acceleration', '2', 'g'] as RegExpMatchArray : forretressEnergySearch ? ['forretress energy acceleration', '5', 'g'] as RegExpMatchArray : null)
+        const magnetonEnergyZoneAttach = normalizeTcgBattleAbilityCardName(source?.name || '') === 'magneton' && text === 'once during your turn, you may take a {l} energy from your energy zone and attach it to this pokemon.'
+        const hydreigonEnergyZoneAttach = normalizeTcgBattleAbilityCardName(source?.name || '') === 'hydreigon' && text === 'once during your turn, you may take 2 {d} energy from your energy zone and attach it to this pokemon. if you do, do 30 damage to this pokemon.'
+        const energyZoneAttach = text?.match(/^once during your turn, if this pokemon is in the active spot, you may take a \{([grwlpmdycf])\} energy from your energy zone and attach it to 1 of your \{([grwlpmdycf])\} pokemon\.$/) || (giratinaBrokenSpaceBellow || gardevoirPsyShadow || magnetonEnergyZoneAttach || hydreigonEnergyZoneAttach ? [giratinaBrokenSpaceBellow ? 'broken-space-bellow' : gardevoirPsyShadow ? 'psy-shadow' : magnetonEnergyZoneAttach ? 'magneton-energy-zone-attach' : 'hydreigon-energy-zone-attach', magnetonEnergyZoneAttach ? 'l' : hydreigonEnergyZoneAttach ? 'd' : 'p', magnetonEnergyZoneAttach ? 'l' : hydreigonEnergyZoneAttach ? 'd' : 'p'] as RegExpMatchArray : null)
+        const energySearchMatch = text?.match(/^once during your turn, if this pokemon is (?:in the active spot|your active pokemon), you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards?, reveal them, and put them into your hand\. then, shuffle your deck\.$/) || (galarianBirdBenchPower ? ['galarian bird bench energy', '2', ({ psychic: 'p', fighting: 'f', darkness: 'd' } as Record<string, string>)[galarianBirdEnergy!] ] as RegExpMatchArray : ribombeeHoneyGather ? ['ribombee honey gather', '2', ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c', fighting: 'f' } as Record<string, string>)[side.selectedEnergy?.toLowerCase() || ''] || 'c'] as RegExpMatchArray : clefairyMoonWatch ? ['clefairy moon watch', String(side.back.filter((card) => card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name) === 'clefairy').length), 'p'] as RegExpMatchArray : energyAttachFromDeck ? [energyAttachFromDeck[0], '1', energyAttachFromDeck[1]] as RegExpMatchArray : energyZoneAttach ? [energyZoneAttach[0], hydreigonEnergyZoneAttach ? '2' : '1', energyZoneAttach[1]] as RegExpMatchArray : delphoxEnergySearch ? ['delphox energy acceleration', '1', 'r'] as RegExpMatchArray : leafeonEnergySearch ? ['leafeon energy acceleration', '1', 'g'] as RegExpMatchArray : charizardEnergySearch ? ['charizard energy acceleration', '2', 'r'] as RegExpMatchArray : incineroarEnergySearch ? ['incineroar energy acceleration', '3', 'd'] as RegExpMatchArray : rillaboomEnergySearch ? ['rillaboom energy acceleration', '2', 'g'] as RegExpMatchArray : forretressEnergySearch ? ['forretress energy acceleration', '5', 'g'] as RegExpMatchArray : null)
         const energySearch = useEnergySearch ? energySearchMatch || (aromatissePsychicEnergySearch ? ['aromatisse psychic pool energy', '2', 'p'] as RegExpMatchArray : eldegossBasicEnergySearch ? ['eldegoss cotton lift', '2', 'c'] as RegExpMatchArray : solgaleoMetalEnergySearch ? ['solgaleo metal pool energy', '2', 'm'] as RegExpMatchArray : null) : null
         const energyAttachEffect = useEnergySearch ? getTcgBattleDiscardEnergyAttachEffect(text) : null
         if (energyAttachEffect) {
@@ -15480,6 +16630,8 @@ export async function tcgBattleUseDrawAbility(
         if (topDeckPickCount && text?.includes("this power can't be used if") && source.statusConditions?.length) return 'This Pokémon cannot use this Power while affected by a Special Condition.'
         if ((topDeckSearchSubtype || topDeckPickCount && text?.includes('if this pokemon is in the active spot')) && !side.front.some((card) => card.instanceId === source.instanceId)) return 'That Pokémon must be Active to use this Ability.'
         const charizardEnergyCount = charizardEnergySearch || incineroarEnergySearch ? Math.min(incineroarEnergySearch ? 3 : 2, TCG_BATTLE_FORMATS[state.format].energyCap - side.energy) : 0
+        if (abilityDeckSearch?.selfDamageCost && source.currentHp <= abilityDeckSearch.selfDamageCost * 10) return `${source.name} must survive the damage counters to use this Ability.`
+        if (abilityDeckSearch?.benchOnly && !side.back.some((card) => card.instanceId === source.instanceId && card.currentHp > 0)) return `${source.name} must be on your Bench to use this Ability.`
         if ((charizardEnergySearch || incineroarEnergySearch) && source.currentHp <= (incineroarEnergySearch ? 30 : 20)) return `${source.name} must survive the damage counters to use this Ability.`
         if (charizardEnergySearch && side.selectedEnergy?.toLowerCase() !== 'fire') return 'Select Fire Energy to use this Ability.'
         if (incineroarEnergySearch && side.selectedEnergy?.toLowerCase() !== 'darkness') return 'Select Darkness Energy to use this Ability.'
@@ -15489,11 +16641,12 @@ export async function tcgBattleUseDrawAbility(
         if (dragoniteDrawTop && (!side.front.some((card) => card.instanceId === source.instanceId) || source.statusConditions?.some((status) => ['asleep', 'confused', 'paralyzed'].includes(status)))) return 'Dragonite must be Active and free of Special Conditions to use this Power.'
         if (directDraw?.activeOnly && !side.front.some((card) => card.instanceId === source.instanceId)) return 'That Pokémon must be Active to use this ability.'
         if (directDraw?.benchPlayOnly && source.playedToBenchTurn !== state.turnNumber) return `${source.name}'s bench-entry draw can only be used when it is played from hand onto the Bench.`
-        if (energySearch && !energyAttachFromDeck && !delphoxEnergySearch && !leafeonEnergySearch && !charizardEnergySearch && !rillaboomEnergySearch && !forretressEnergySearch && !aromatissePsychicEnergySearch && !eldegossBasicEnergySearch && !solgaleoMetalEnergySearch && !ribombeeHoneyGather && !galarianBirdBenchPower && !side.front.some((card) => card.instanceId === source.instanceId)) return 'That Pokémon must be Active to use this ability.'
+        if (energySearch && !energyAttachFromDeck && !delphoxEnergySearch && !leafeonEnergySearch && !charizardEnergySearch && !rillaboomEnergySearch && !forretressEnergySearch && !aromatissePsychicEnergySearch && !eldegossBasicEnergySearch && !solgaleoMetalEnergySearch && !ribombeeHoneyGather && !galarianBirdBenchPower && !magnetonEnergyZoneAttach && !hydreigonEnergyZoneAttach && !side.front.some((card) => card.instanceId === source.instanceId)) return 'That Pokémon must be Active to use this ability.'
         if (solgaleoMetalEnergySearch && !side.back.some((card) => card.instanceId === source.instanceId && card.currentHp > 0)) return 'Solgaleo must be on your Bench to use this Ability.'
         if (ribombeeHoneyGather && !side.selectedEnergy) return 'Select an Energy type for Honey Gather.'
       if (delphoxEnergySearch && side.selectedEnergy?.toLowerCase() !== 'fire') return 'Select Fire Energy to use Flare Witch.'
         if (energyAttachFromDeck && side.selectedEnergy?.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyAttachFromDeck[1]]) return 'Select the matching Energy type for this attachment.'
+        if (energyAttachFromDeck && text?.includes('this power can\'t be used if starmie is affected by a special condition') && source.statusConditions?.length) return 'This Ability cannot be used while Starmie is affected by a Special Condition.'
         if (energyZoneAttach && (side.selectedEnergy?.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyZoneAttach[1]] || ![...side.front, ...side.back].some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyZoneAttach[2]])))) return 'You need a matching Pokémon in play and the matching Energy selected.'
         if (giratinaBrokenSpaceBellow && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return 'Giratina ex has already used Broken-Space Bellow this turn.'
         if (gardevoirPsyShadow && (source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber || !side.front.some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === 'psychic')))) return 'Psy Shadow requires an unused Ability and an Active Psychic Pokémon.'
@@ -15506,6 +16659,7 @@ export async function tcgBattleUseDrawAbility(
         if (energyAttachEffect?.noRuleBoxTarget && ![...side.front, ...side.back].some((card) => card.currentHp > 0 && !hasTcgBattleRuleBox(card))) return 'Choose a Pokémon without a Rule Box for Spring Bloom.'
         if (energyAttachEffect?.specialConditionGate && source.statusConditions?.length) return 'This Pokémon cannot use its Ability while affected by a Special Condition.'
         if (energyAttachEffect?.activeOnly && !side.front.some((card) => card.instanceId === source.instanceId && card.currentHp > 0)) return 'This Pokémon must be Active to use this Energy Ability.'
+        if (energyAttachEffect?.opponentRemainingPrizesAtMost !== undefined && getTcgBattleRemainingPrizeCount(state, 'opponent') > energyAttachEffect.opponentRemainingPrizesAtMost) return 'Your opponent has too many Prize cards remaining for this Ability.'
         if (energyAttachEffect?.benchToActiveOnly && !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === viewerSide && event.targetId === source.instanceId)) return 'Libero can only be used when Cinderace moves from the Bench to the Active Spot.'
         if (energyAttachEffect?.allowedTypes && !energyAttachEffect.allowedTypes.includes(side.selectedEnergy?.toLowerCase() || '')) return 'Select Fire or Fighting Energy for Tar Generator.'
         if (floatzelWaterAttach && source?.statusConditions?.length) return 'Floatzel cannot use its Power while affected by a Special Condition.'
@@ -15591,7 +16745,7 @@ export async function tcgBattleUseDrawAbility(
         if (discardHandDraw) side.discard.push(...side.hand.splice(0))
         const energyBeforeSearch = side.energy
         const energyAttachAmount = Math.min(energyAttachEffect?.count || 1, TCG_BATTLE_FORMATS[state.format].energyCap - side.energy)
-        const energyAttachCoinResult = energyAttachEffect?.coinFlip ? (randomInt(0, 2) === 0 ? 'heads' : 'tails') : undefined
+        const energyAttachCoinResult = energyAttachEffect?.coinFlip ? (flipTcgBattleCoinForSide(state, state.activeSide)) : undefined
         if (energyAttachCoinResult) recordCoinFlipEvent(state, { sourceId, side: viewerSide, results: [energyAttachCoinResult], heads: energyAttachCoinResult === 'heads' ? 1 : 0, tails: energyAttachCoinResult === 'tails' ? 1 : 0, purpose: 'effect' })
         if (delphoxEnergySearch) {
           side.energy = Math.min(TCG_BATTLE_FORMATS[state.format].energyCap, side.energy + 1)
@@ -15603,7 +16757,8 @@ export async function tcgBattleUseDrawAbility(
           shuffleTcgBattleDeck(side)
         } else if (energySearch) {
           side.energy = Math.min(TCG_BATTLE_FORMATS[state.format].energyCap, side.energy + energySearchCount)
-          if (giratinaBrokenSpaceBellow || gardevoirPsyShadow) source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
+          if (giratinaBrokenSpaceBellow || gardevoirPsyShadow || magnetonEnergyZoneAttach || hydreigonEnergyZoneAttach) source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
+          if (hydreigonEnergyZoneAttach) source.currentHp -= 30
           if (clefairyMoonWatch || aromatissePsychicEnergySearch) side.selectedEnergy = 'Psychic'
         if (galarianBirdBenchPower) side.selectedEnergy = normalizeTcgBattleEnergyType(galarianBirdEnergy) || side.selectedEnergy || 'Colorless'
           if (solgaleoMetalEnergySearch) side.selectedEnergy = 'Metal'
@@ -15712,7 +16867,7 @@ export async function tcgBattleUseDrawAbility(
             return unownIncrease ? !card.name.toLowerCase().includes('unown') || !card.subtypes.includes('Basic') || !canTcgBattlePutPokemonOnBench(side, card) : !card.subtypes.includes('Basic') || !card.types.some((type) => type.toLowerCase() === benchSearchType) || !canTcgBattlePutPokemonOnBench(side, card)
           })) return 'Choose only matching Basic Pokémon for the Bench.'
           if (fossilBenchSearchPower) {
-            kabutoReviveResult = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+            kabutoReviveResult = flipTcgBattleCoinForSide(state, state.activeSide)
             recordCoinFlipEvent(state, { sourceId, side: viewerSide, results: [kabutoReviveResult], heads: kabutoReviveResult === 'heads' ? 1 : 0, tails: kabutoReviveResult === 'tails' ? 1 : 0, purpose: 'effect' })
             if (kabutoReviveResult === 'heads') {
               const isValidFossilTarget = (card: TcgBattleCardSummary | undefined) => Boolean(card && canTcgBattlePutPokemonOnBench(side, card) && (kabutoReviveFriends ? card.name.toLowerCase() === 'kabuto' : omanyteFossil ? normalizeTcgBattleAbilityCardName(card.evolvesFrom || '').replace(/[^a-z0-9]/g, '') === 'mysteriousfossil' : isTcgBattleUnownCSearch(source.name, text) ? card.name.toLowerCase().includes('unown') && card.subtypes.includes('Basic') : card.subtypes.includes('Basic') && card.types.some((type) => type.toLowerCase() === 'metal')))
@@ -15727,7 +16882,7 @@ export async function tcgBattleUseDrawAbility(
               shuffleTcgBattleDeck(side)
             }
           } else {
-            abilityDeckSearchCoinResult = abilityDeckSearch?.coinFlip ? randomInt(0, 2) === 0 ? 'heads' : 'tails' : undefined
+            abilityDeckSearchCoinResult = abilityDeckSearch?.coinFlip ? flipTcgBattleCoinForSide(state, state.activeSide) : undefined
             if (abilityDeckSearchCoinResult) recordCoinFlipEvent(state, { sourceId, side: viewerSide, results: [abilityDeckSearchCoinResult], heads: abilityDeckSearchCoinResult === 'heads' ? 1 : 0, tails: abilityDeckSearchCoinResult === 'tails' ? 1 : 0, purpose: 'effect' })
             searchedCards = abilityDeckSearchCoinResult === 'tails' ? [] : [...indices].sort((a, b) => b - a).map((index) => side.deck.splice(index, 1)[0]).reverse()
             if (benchSearch || abilityDeckSearch?.putOnBench) side.back.push(...searchedCards.map((card, index) => ({ ...createTcgBattleCardState(card, side.back.length + index), playedToBenchTurn: state.turnNumber })))
@@ -15751,7 +16906,7 @@ export async function tcgBattleUseDrawAbility(
         if (refillDrawEnergyCost && (side.energy < 1 || text?.includes('basic {l}') && side.selectedEnergy?.toLowerCase() !== 'lightning')) return 'You need the required Energy in the shared Energy pool to use this Ability.'
         if (refillDrawEnergyCost) side.energy -= 1
         if (directDraw?.energyType) side.energy -= 1
-        const unownDDrawResult = unownDDraw ? randomInt(0, 2) === 0 ? 'heads' : 'tails' : undefined
+        const unownDDrawResult = unownDDraw ? flipTcgBattleCoinForSide(state, state.activeSide) : undefined
         if (unownDDrawResult) recordCoinFlipEvent(state, { sourceId, side: viewerSide, results: [unownDDrawResult], heads: unownDDrawResult === 'heads' ? 1 : 0, tails: unownDDrawResult === 'tails' ? 1 : 0, purpose: 'effect' })
         if (opponentHandShuffleDraw) {
           otherSide.deck.push(...otherSide.hand.map(toTcgBattleCardSummary))
@@ -15809,7 +16964,7 @@ export async function tcgBattleUseDrawAbility(
           otherDrawnCount = otherDrawn.length
         }
         if (!energyAttachEffect?.repeatable && !(mankeyPeek && source.name.toLowerCase() === 'lanturn')) source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
-        const tellResult = unownTell || unownLaugh || unownQuicken || unownGive || darkSlowkingCunning || krookodileEnergyDiscard ? randomInt(0, 2) === 0 ? 'heads' : 'tails' : undefined
+        const tellResult = unownTell || unownLaugh || unownQuicken || unownGive || darkSlowkingCunning || krookodileEnergyDiscard ? flipTcgBattleCoinForSide(state, state.activeSide) : undefined
         if (tellResult) recordCoinFlipEvent(state, { sourceId, side: viewerSide, results: [tellResult], heads: tellResult === 'heads' ? 1 : 0, tails: tellResult === 'tails' ? 1 : 0, purpose: 'effect' })
         const krookodileEnergyDiscarded = krookodileEnergyDiscard && tellResult === 'heads' ? Math.min(1, otherSide.energy) : 0
         if (krookodileEnergyDiscarded) otherSide.energy -= krookodileEnergyDiscarded
@@ -15901,7 +17056,7 @@ export async function tcgBattleUseDrawAbility(
       if (mankeyPeekChoice === 'talonflameSkyHunt') {
         const expected = "once during your turn, you may use this ability. flip a coin. if heads, discard a random card from your opponent's hand."
         if (!source || !ability || normalizeTcgBattleAbilityCardName(source.name) !== 'talonflame' || text?.replace(/\s+/g, ' ').trim() !== expected || ![...side.front, ...side.back].some((card) => card.instanceId === sourceId) || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return { success: false, error: 'Sky Hunt is unavailable this turn.' }
-        const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+        const result = flipTcgBattleCoinForSide(state, state.activeSide)
         recordCoinFlipEvent(state, { sourceId, side: 'player', results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
         const discarded = result === 'heads' && state.opponent.hand.length ? state.opponent.hand.splice(randomInt(0, state.opponent.hand.length), 1)[0] : undefined
         if (discarded) state.opponent.discard.push(discarded)
@@ -16127,24 +17282,27 @@ export async function tcgBattleUseDrawAbility(
       if (abilityDeckSearch?.benchPlayOnly && (source?.playedToBenchTurn !== state.turnNumber || state.lastAction?.kind !== 'bench' || state.lastAction.side !== 'player' || state.lastAction.frontId !== sourceId)) return { success: false, error: 'This Ability can only be used when its Pokémon is played from your hand onto the Bench.' }
       const searchCount = vstarSearchCount ?? (abilityDeckSearch?.count ?? null)
       const searchDeck = searchCount !== null
-      const energyAttachFromDeck = text?.match(/^once during your turn, you may search your deck for a basic \{([grwlpmdycf])\} energy card and attach it to this pokemon\. then, shuffle your deck\.$/)
+      const energyAttachFromDeckMatch = text?.match(/^once during your turn(?: \(before your attack\))?, you may search your deck for (?:a )?(?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)) energy card and attach it to (?:this pokemon|starmie)\. then, shuffle your deck(?: afterward)?\.(?: this power can't be used if starmie is affected by a special condition\.)?$/)
+      const energyAttachFromDeck = energyAttachFromDeckMatch ? [energyAttachFromDeckMatch[0], energyAttachFromDeckMatch[1] || ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', fighting: 'f', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c' } as Record<string, string>)[energyAttachFromDeckMatch[2]] ] as RegExpMatchArray : null
       const clefairyMoonWatch = normalizeTcgBattleAbilityCardName(source?.name || '') === 'clefairy' && text === 'once during your turn, if this pokemon is in the active spot, for each of your benched clefairy, you may search your deck for a psychic energy card and attach it to that clefairy. then, shuffle your deck.' && side.front.some((card) => card.instanceId === source?.instanceId) && side.back.some((card) => card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name) === 'clefairy')
       const charizardEnergySearch = text === 'once during your turn (before your attack), you may put 2 damage counters on this pokemon. if you do, search your deck for up to 2 fire energy cards and attach them to this pokemon. then, shuffle your deck.'
       const incineroarEnergySearch = normalizeTcgBattleAbilityCardName(source?.name || '') === 'incineroar-gx' && text === 'once during your turn (before your attack), you may put 3 damage counters on this pokemon. if you do, search your deck for up to 3 darkness energy cards and attach them to this pokemon. then, shuffle your deck.'
       const delphoxEnergySearch = Boolean(useEnergySearch && source?.name.toLowerCase() === 'delphox break' && text === 'once during your turn (before your attack), you may search your deck for a fire energy card and attach it to 1 of your pokemon. shuffle your deck afterward.')
       const leafeonEnergySearch = Boolean(useEnergySearch && source?.name.toLowerCase() === 'leafeon v' && text === 'once during your turn, you may search your deck for a grass energy card and attach it to 1 of your pokemon. then, shuffle your deck. if you use this ability, your turn ends.')
-        const rillaboomEnergySearch = text === 'once during your turn, you may search your deck for up to 2 grass energy cards and attach them to 1 of your pokemon. then, shuffle your deck.'
+        const rillaboomEnergySearch = /^once during your turn, you may search your deck for up to 2 (?:grass|\{g\}) energy cards and attach them to 1 of your pokemon\. then, shuffle your deck\.$/.test(text || '')
         const forretressEnergySearch = text === 'once during your turn, you may search your deck for up to 5 basic {g} energy cards and attach them to your pokemon in any way you like. then, shuffle your deck. if you searched your deck in this way, this pokemon is knocked out.'
       const aromatissePsychicEnergySearch = source?.name.toLowerCase() === 'aromatisse' && text === 'once during your turn, you may use this ability. search your deck for up to 2 basic {p} energy cards, reveal them, and put them into your hand. then, shuffle your deck.'
         const eldegossBasicEnergySearch = source?.name.toLowerCase() === 'eldegoss' && text === 'once during your turn, you may search your deck for up to 2 basic energy cards, reveal them, and put them into your hand. then, shuffle your deck.'
-        const galarianBirdEnergy = source?.name.toLowerCase() === 'galarian moltres' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 darkness energy cards from your hand to this pokemon.' ? 'darkness' : source?.name.toLowerCase() === 'galarian zapdos' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 fighting energy cards from your hand to this pokemon.' ? 'fighting' : source?.name.toLowerCase() === 'galarian articuno' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 psychic energy cards from your hand to this pokemon.' ? 'psychic' : null
+        const galarianBirdEnergy = source?.name.toLowerCase() === 'galarian moltres' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 darkness energy cards from your hand to this pokemon.' || source?.name.toLowerCase() === 'darkrai ◇' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach 2 darkness energy cards from your hand to it.' ? 'darkness' : source?.name.toLowerCase() === 'galarian zapdos' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 fighting energy cards from your hand to this pokemon.' ? 'fighting' : source?.name.toLowerCase() === 'galarian articuno' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach up to 2 psychic energy cards from your hand to this pokemon.' || source?.name.toLowerCase() === 'giratina ◇' && text === 'when you play this pokemon from your hand onto your bench during your turn, you may attach 2 psychic energy cards from your hand to it.' ? 'psychic' : null
         const galarianBirdBenchPower = Boolean(galarianBirdEnergy && source?.playedToBenchTurn === state.turnNumber && state.lastAction?.kind === 'bench' && state.lastAction.side === 'player' && state.lastAction.frontId === sourceId)
       const ribombeeHoneyGather = source?.name.toLowerCase() === 'ribombee' && text === 'once during your turn (before your attack), you may search your deck for up to 2 basic energy cards, reveal them, and put them into your hand. then, shuffle your deck.'
         const solgaleoMetalEnergySearch = source?.name.toLowerCase() === 'solgaleo' && text === 'once during your turn, if this pokemon is on your bench, you may use this ability. search your deck for up to 2 basic metal energy cards and attach them to this pokemon. then, shuffle your deck.'
       const giratinaBrokenSpaceBellow = source?.name.toLowerCase() === 'giratina ex' && text === 'once during your turn, you may take a {p} energy from your energy zone and attach it to this pokemon. if you use this ability, your turn ends.'
       const gardevoirPsyShadow = source?.name.toLowerCase() === 'gardevoir' && text === 'once during your turn, you may take a {p} energy from your energy zone and attach it to the {p} pokemon in the active spot.'
-      const energyZoneAttach = text?.match(/^once during your turn, if this pokemon is in the active spot, you may take a \{([grwlpmdycf])\} energy from your energy zone and attach it to 1 of your \{([grwlpmdycf])\} pokemon\.$/) || (giratinaBrokenSpaceBellow || gardevoirPsyShadow ? [giratinaBrokenSpaceBellow ? 'broken-space-bellow' : 'psy-shadow', 'p', 'p'] as RegExpMatchArray : null)
-      const energySearchMatch = text?.match(/^once during your turn, if this pokemon is (?:in the active spot|your active pokemon), you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards?, reveal them, and put them into your hand\. then, shuffle your deck\.$/) || (galarianBirdBenchPower ? ['galarian bird bench energy', '2', ({ psychic: 'p', fighting: 'f', darkness: 'd' } as Record<string, string>)[galarianBirdEnergy!] ] as RegExpMatchArray : ribombeeHoneyGather ? ['ribombee honey gather', '2', ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c', fighting: 'f' } as Record<string, string>)[side.selectedEnergy?.toLowerCase() || ''] || 'c'] as RegExpMatchArray : energyAttachFromDeck ? [energyAttachFromDeck[0], '1', energyAttachFromDeck[1]] as RegExpMatchArray : energyZoneAttach ? [energyZoneAttach[0], '1', energyZoneAttach[1]] as RegExpMatchArray : delphoxEnergySearch ? ['delphox energy acceleration', '1', 'r'] as RegExpMatchArray : leafeonEnergySearch ? ['leafeon energy acceleration', '1', 'g'] as RegExpMatchArray : charizardEnergySearch ? ['charizard energy acceleration', '2', 'r'] as RegExpMatchArray : incineroarEnergySearch ? ['incineroar energy acceleration', '3', 'd'] as RegExpMatchArray : rillaboomEnergySearch ? ['rillaboom energy acceleration', '2', 'g'] as RegExpMatchArray : forretressEnergySearch ? ['forretress energy acceleration', '5', 'g'] as RegExpMatchArray : null)
+      const magnetonEnergyZoneAttach = normalizeTcgBattleAbilityCardName(source?.name || '') === 'magneton' && text === 'once during your turn, you may take a {l} energy from your energy zone and attach it to this pokemon.'
+      const hydreigonEnergyZoneAttach = normalizeTcgBattleAbilityCardName(source?.name || '') === 'hydreigon' && text === 'once during your turn, you may take 2 {d} energy from your energy zone and attach it to this pokemon. if you do, do 30 damage to this pokemon.'
+      const energyZoneAttach = text?.match(/^once during your turn, if this pokemon is in the active spot, you may take a \{([grwlpmdycf])\} energy from your energy zone and attach it to 1 of your \{([grwlpmdycf])\} pokemon\.$/) || (giratinaBrokenSpaceBellow || gardevoirPsyShadow || magnetonEnergyZoneAttach || hydreigonEnergyZoneAttach ? [giratinaBrokenSpaceBellow ? 'broken-space-bellow' : gardevoirPsyShadow ? 'psy-shadow' : magnetonEnergyZoneAttach ? 'magneton-energy-zone-attach' : 'hydreigon-energy-zone-attach', magnetonEnergyZoneAttach ? 'l' : hydreigonEnergyZoneAttach ? 'd' : 'p', magnetonEnergyZoneAttach ? 'l' : hydreigonEnergyZoneAttach ? 'd' : 'p'] as RegExpMatchArray : null)
+      const energySearchMatch = text?.match(/^once during your turn, if this pokemon is (?:in the active spot|your active pokemon), you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards?, reveal them, and put them into your hand\. then, shuffle your deck\.$/) || (galarianBirdBenchPower ? ['galarian bird bench energy', '2', ({ psychic: 'p', fighting: 'f', darkness: 'd' } as Record<string, string>)[galarianBirdEnergy!] ] as RegExpMatchArray : ribombeeHoneyGather ? ['ribombee honey gather', '2', ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c', fighting: 'f' } as Record<string, string>)[side.selectedEnergy?.toLowerCase() || ''] || 'c'] as RegExpMatchArray : energyAttachFromDeck ? [energyAttachFromDeck[0], '1', energyAttachFromDeck[1]] as RegExpMatchArray : energyZoneAttach ? [energyZoneAttach[0], hydreigonEnergyZoneAttach ? '2' : '1', energyZoneAttach[1]] as RegExpMatchArray : delphoxEnergySearch ? ['delphox energy acceleration', '1', 'r'] as RegExpMatchArray : leafeonEnergySearch ? ['leafeon energy acceleration', '1', 'g'] as RegExpMatchArray : charizardEnergySearch ? ['charizard energy acceleration', '2', 'r'] as RegExpMatchArray : incineroarEnergySearch ? ['incineroar energy acceleration', '3', 'd'] as RegExpMatchArray : rillaboomEnergySearch ? ['rillaboom energy acceleration', '2', 'g'] as RegExpMatchArray : forretressEnergySearch ? ['forretress energy acceleration', '5', 'g'] as RegExpMatchArray : null)
         const energySearch = useEnergySearch ? energySearchMatch || (aromatissePsychicEnergySearch ? ['aromatisse psychic pool energy', '2', 'p'] as RegExpMatchArray : eldegossBasicEnergySearch ? ['eldegoss cotton lift', '2', 'c'] as RegExpMatchArray : solgaleoMetalEnergySearch ? ['solgaleo metal pool energy', '2', 'm'] as RegExpMatchArray : null) : null
       const energyAttachEffect = useEnergySearch ? getTcgBattleDiscardEnergyAttachEffect(text) : null
       if (energyAttachEffect) {
@@ -16339,6 +17497,8 @@ export async function tcgBattleUseDrawAbility(
       if (metagrossDeltaTopPick && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return { success: false, error: 'Metagross has already used this Power this turn.' }
       if ((topDeckSearchSubtype || topDeckPickCount && text?.includes('if this pokemon is in the active spot')) && !side.front.some((card) => card.instanceId === source.instanceId)) return { success: false, error: 'That Pokémon must be Active to use this Ability.' }
       const charizardEnergyCount = charizardEnergySearch || incineroarEnergySearch ? Math.min(incineroarEnergySearch ? 3 : 2, TCG_BATTLE_FORMATS[state.format].energyCap - side.energy) : 0
+      if (abilityDeckSearch?.selfDamageCost && source.currentHp <= abilityDeckSearch.selfDamageCost * 10) return { success: false, error: `${source.name} must survive the damage counters to use this Ability.` }
+      if (abilityDeckSearch?.benchOnly && !side.back.some((card) => card.instanceId === source.instanceId && card.currentHp > 0)) return { success: false, error: `${source.name} must be on your Bench to use this Ability.` }
       if ((charizardEnergySearch || incineroarEnergySearch) && source.currentHp <= (incineroarEnergySearch ? 30 : 20)) return { success: false, error: `${source.name} must survive the damage counters to use this Ability.` }
       if (charizardEnergySearch && side.selectedEnergy?.toLowerCase() !== 'fire') return { success: false, error: 'Select Fire Energy to use this Ability.' }
       if (incineroarEnergySearch && side.selectedEnergy?.toLowerCase() !== 'darkness') return { success: false, error: 'Select Darkness Energy to use this Ability.' }
@@ -16354,11 +17514,12 @@ export async function tcgBattleUseDrawAbility(
       if (abilityDeckSearch?.requiresEmptyHand && side.hand.length > 0) return { success: false, error: 'You must have no cards in your hand to use this Ability.' }
       if (abilityDeckSearch?.requiredBenchNames && abilityDeckSearch.requiredBenchNames.some((name) => !side.back.some((card) => card.currentHp > 0 && normalizeTcgBattleAbilityCardName(card.name).replace(/[^a-z0-9]/g, '') === name))) return { success: false, error: 'Unown I needs Unown I, T, E, and M on your Bench to use ITEM.' }
       if (activeDrawToSeven && !side.front.some((card) => card.instanceId === source.instanceId)) return { success: false, error: 'That Pokémon must be Active to use this Ability.' }
-        if (energySearch && !energyAttachFromDeck && !delphoxEnergySearch && !leafeonEnergySearch && !charizardEnergySearch && !incineroarEnergySearch && !rillaboomEnergySearch && !forretressEnergySearch && !aromatissePsychicEnergySearch && !eldegossBasicEnergySearch && !solgaleoMetalEnergySearch && !ribombeeHoneyGather && !galarianBirdBenchPower && !side.front.some((card) => card.instanceId === source.instanceId)) return { success: false, error: 'That Pokémon must be Active to use this ability.' }
+        if (energySearch && !energyAttachFromDeck && !delphoxEnergySearch && !leafeonEnergySearch && !charizardEnergySearch && !incineroarEnergySearch && !rillaboomEnergySearch && !forretressEnergySearch && !aromatissePsychicEnergySearch && !eldegossBasicEnergySearch && !solgaleoMetalEnergySearch && !ribombeeHoneyGather && !galarianBirdBenchPower && !magnetonEnergyZoneAttach && !hydreigonEnergyZoneAttach && !side.front.some((card) => card.instanceId === source.instanceId)) return { success: false, error: 'That Pokémon must be Active to use this ability.' }
       if (solgaleoMetalEnergySearch && !side.back.some((card) => card.instanceId === source.instanceId && card.currentHp > 0)) return { success: false, error: 'Solgaleo must be on your Bench to use this Ability.' }
       if (ribombeeHoneyGather && !side.selectedEnergy) return { success: false, error: 'Select an Energy type for Honey Gather.' }
       if (delphoxEnergySearch && side.selectedEnergy?.toLowerCase() !== 'fire') return { success: false, error: 'Select Fire Energy to use Flare Witch.' }
       if (energyAttachFromDeck && side.selectedEnergy?.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyAttachFromDeck[1]]) return { success: false, error: 'Select the matching Energy type for this attachment.' }
+      if (energyAttachFromDeck && text?.includes('this power can\'t be used if starmie is affected by a special condition') && source.statusConditions?.length) return { success: false, error: 'This Ability cannot be used while Starmie is affected by a Special Condition.' }
       if (energyZoneAttach && (side.selectedEnergy?.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyZoneAttach[1]] || ![...side.front, ...side.back].some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyZoneAttach[2]])))) return { success: false, error: 'You need a matching Pokémon in play and the matching Energy selected.' }
         if (giratinaBrokenSpaceBellow && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return { success: false, error: 'Giratina ex has already used Broken-Space Bellow this turn.' }
         if (gardevoirPsyShadow && (source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber || !side.front.some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === 'psychic')))) return { success: false, error: 'Psy Shadow requires an unused Ability and an Active Psychic Pokémon.' }
@@ -16375,6 +17536,7 @@ export async function tcgBattleUseDrawAbility(
       if (energyAttachEffect?.activeOnly && !side.front.some((card) => card.instanceId === source.instanceId && card.currentHp > 0)) return { success: false, error: 'Trapinch must be Active to use Gather Sand.' }
       if (energyAttachEffect?.benchToActiveOnly && !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === 'player' && event.targetId === source.instanceId)) return { success: false, error: 'Libero can only be used when Cinderace moves from the Bench to the Active Spot.' }
       if (energyAttachEffect?.allowedTypes && !energyAttachEffect.allowedTypes.includes(side.selectedEnergy?.toLowerCase() || '')) return { success: false, error: 'Select Fire or Fighting Energy for Tar Generator.' }
+      if (energyAttachEffect?.opponentRemainingPrizesAtMost !== undefined && getTcgBattleRemainingPrizeCount(state, 'opponent') > energyAttachEffect.opponentRemainingPrizesAtMost) return { success: false, error: 'Your opponent has too many Prize cards remaining for this Ability.' }
       if (floatzelWaterAttach && source?.statusConditions?.length) return { success: false, error: 'Floatzel cannot use its Power while affected by a Special Condition.' }
       if (celebiGrassAttach && (source?.statusConditions?.length || !side.front.some((card) => card.instanceId === source.instanceId && card.currentHp > 0))) return { success: false, error: 'Celebi must be Active and free of Special Conditions to use its Power.' }
       if (energyAttachEffect?.recoverBasicEnergy) energyAttachEffect.recoverBasicEnergy = false
@@ -16454,7 +17616,7 @@ export async function tcgBattleUseDrawAbility(
       if (discardHandDraw) side.discard.push(...side.hand.splice(0))
       const energyBeforeSearch = side.energy
       const energyAttachAmount = Math.min(energyAttachEffect?.count || 1, TCG_BATTLE_FORMATS[state.format].energyCap - side.energy)
-      const energyAttachCoinResult = energyAttachEffect?.coinFlip ? (randomInt(0, 2) === 0 ? 'heads' : 'tails') : undefined
+      const energyAttachCoinResult = energyAttachEffect?.coinFlip ? (flipTcgBattleCoinForSide(state, state.activeSide)) : undefined
       if (energyAttachCoinResult) recordCoinFlipEvent(state, { sourceId, side: 'player', results: [energyAttachCoinResult], heads: energyAttachCoinResult === 'heads' ? 1 : 0, tails: energyAttachCoinResult === 'tails' ? 1 : 0, purpose: 'effect' })
       if (delphoxEnergySearch) {
         side.energy = Math.min(TCG_BATTLE_FORMATS[state.format].energyCap, side.energy + 1)
@@ -16466,7 +17628,8 @@ export async function tcgBattleUseDrawAbility(
         shuffleTcgBattleDeck(side)
       } else if (energySearch) {
         side.energy = Math.min(TCG_BATTLE_FORMATS[state.format].energyCap, side.energy + energySearchCount)
-        if (giratinaBrokenSpaceBellow || gardevoirPsyShadow) source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
+        if (giratinaBrokenSpaceBellow || gardevoirPsyShadow || magnetonEnergyZoneAttach || hydreigonEnergyZoneAttach) source.abilityUses = { ...source.abilityUses, [`${abilityIndex}:${ability.name}`]: state.turnNumber }
+        if (hydreigonEnergyZoneAttach) source.currentHp -= 30
         if (clefairyMoonWatch || aromatissePsychicEnergySearch) side.selectedEnergy = 'Psychic'
         if (galarianBirdBenchPower) side.selectedEnergy = normalizeTcgBattleEnergyType(galarianBirdEnergy) || side.selectedEnergy || 'Colorless'
           if (solgaleoMetalEnergySearch) side.selectedEnergy = 'Metal'
@@ -16569,7 +17732,8 @@ export async function tcgBattleUseDrawAbility(
           if (selectedIds.length !== abilityDeckSearch.handDiscardCount || new Set(selectedIds).size !== selectedIds.length || selectedIds.some((id) => !side.hand.some((card) => card.instanceId === id))) return { success: false, error: 'Choose two cards from your hand to return to your deck.' }
           if (!abilityDeckSearch.energyCard && indices.some((index) => !side.deck[index]?.name.toLowerCase().includes('energy'))) return { success: false, error: 'Choose an Energy card from your deck.' }
         }
-        if (abilityDeckSearch?.energyCard && (!side.selectedEnergy || side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || abilityDeckSearch.requiredEnergyType && side.selectedEnergy.toLowerCase() !== abilityDeckSearch.requiredEnergyType)) return { success: false, error: `Select ${abilityDeckSearch.requiredEnergyType || 'an'} Energy type and make sure there is room in the shared Energy pool.` }
+        if (abilityDeckSearch?.energyCard && ((!abilityDeckSearch.selfDamageCost && !side.selectedEnergy) || side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || side.selectedEnergy && abilityDeckSearch.requiredEnergyType && side.selectedEnergy.toLowerCase() !== abilityDeckSearch.requiredEnergyType)) return { success: false, error: `Select ${abilityDeckSearch.requiredEnergyType || 'an'} Energy type and make sure there is room in the shared Energy pool.` }
+        if (abilityDeckSearch?.selfDamageCost && abilityDeckSearch.requiredEnergyType) side.selectedEnergy = ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as const)[abilityDeckSearch.requiredEnergyType as 'grass' | 'fire' | 'water' | 'lightning' | 'psychic' | 'fighting' | 'darkness' | 'metal' | 'fairy' | 'colorless']
         if (abilityDeckSearch?.requiredOpponentEnergyLead && state.opponent.energy <= side.energy) return { success: false, error: 'Your opponent must have more Energy in the shared pool for Typhlosion to use Evolutionary Thunder.' }
         if (abilityDeckSearch?.attachEnergyFromDeck && (side.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || (abilityDeckSearch.benchToActiveOnly ? !side.front.some((card) => card.instanceId === source.instanceId && card.currentHp > 0) || !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === 'player' && event.targetId === source.instanceId) && !(state.lastAction?.kind === 'retreat' && state.lastAction.side === 'player' && state.lastAction.backId === source.instanceId) : !side.back.some((card) => card.currentHp > 0)))) return { success: false, error: abilityDeckSearch.benchToActiveOnly ? 'Buzzing Boost requires Yanmega ex to move from the Bench to the Active Spot.' : 'Bouncy-Bounce Charge requires a Benched Pokémon and room in the shared Energy pool.' }
         if (abilityDeckSearch && !abilityDeckSearch.energyCard && !abilityDeckSearch.requiredNames && (abilityDeckSearch.upToCount ? indices.length > abilityDeckSearch.count : abilityDeckSearch.maxHp ? indices.length < 1 || indices.length > abilityDeckSearch.count : indices.length !== 1)) return { success: false, error: abilityDeckSearch.upToCount || abilityDeckSearch.maxHp ? `Choose up to ${abilityDeckSearch.count} qualifying Pokémon.` : `Choose one ${abilityDeckSearch.subtype ? `${abilityDeckSearch.subtype} ` : ''}card from your deck.` }
@@ -16594,7 +17758,7 @@ export async function tcgBattleUseDrawAbility(
         return unownIncrease ? !card.name.toLowerCase().includes('unown') || !card.subtypes.includes('Basic') || !canTcgBattlePutPokemonOnBench(side, card) : !card.subtypes.includes('Basic') || !card.types.some((type) => type.toLowerCase() === benchSearchType) || !canTcgBattlePutPokemonOnBench(side, card)
         })) return { success: false, error: 'Choose only matching Basic Pokémon for the Bench.' }
         if (fossilBenchSearchPower) {
-          kabutoReviveResult = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+          kabutoReviveResult = flipTcgBattleCoinForSide(state, state.activeSide)
           recordCoinFlipEvent(state, { sourceId, side: 'player', results: [kabutoReviveResult], heads: kabutoReviveResult === 'heads' ? 1 : 0, tails: kabutoReviveResult === 'tails' ? 1 : 0, purpose: 'effect' })
           if (kabutoReviveResult === 'heads') {
               const isValidFossilTarget = (card: TcgBattleCardSummary | undefined) => Boolean(card && canTcgBattlePutPokemonOnBench(side, card) && (kabutoReviveFriends ? card.name.toLowerCase() === 'kabuto' : omanyteFossil ? normalizeTcgBattleAbilityCardName(card.evolvesFrom || '').replace(/[^a-z0-9]/g, '') === 'mysteriousfossil' : isTcgBattleUnownCSearch(source.name, text) ? card.name.toLowerCase().includes('unown') && card.subtypes.includes('Basic') : card.subtypes.includes('Basic') && card.types.some((type) => type.toLowerCase() === 'metal')))
@@ -16609,15 +17773,18 @@ export async function tcgBattleUseDrawAbility(
             shuffleTcgBattleDeck(side)
           }
         } else {
-          abilityDeckSearchCoinResult = abilityDeckSearch?.coinFlip ? randomInt(0, 2) === 0 ? 'heads' : 'tails' : undefined
+          abilityDeckSearchCoinResult = abilityDeckSearch?.coinFlip ? flipTcgBattleCoinForSide(state, state.activeSide) : undefined
           if (abilityDeckSearchCoinResult) recordCoinFlipEvent(state, { sourceId, side: 'player', results: [abilityDeckSearchCoinResult], heads: abilityDeckSearchCoinResult === 'heads' ? 1 : 0, tails: abilityDeckSearchCoinResult === 'tails' ? 1 : 0, purpose: 'effect' })
           searchedCards = abilityDeckSearchCoinResult === 'tails' ? [] : [...indices].sort((a, b) => b - a).map((index) => side.deck.splice(index, 1)[0]).reverse()
           if (benchSearch || abilityDeckSearch?.putOnBench) side.back.push(...searchedCards.map((card, index) => ({ ...createTcgBattleCardState(card, side.back.length + index), playedToBenchTurn: state.turnNumber })))
           else if (abilityDeckSearch?.energyCard) {
+            if (abilityDeckSearch.selfDamageCost && abilityDeckSearch.requiredEnergyType) side.selectedEnergy = ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as const)[abilityDeckSearch.requiredEnergyType as 'grass' | 'fire' | 'water' | 'lightning' | 'psychic' | 'fighting' | 'darkness' | 'metal' | 'fairy' | 'colorless']
             if (!side.selectedEnergy || abilityDeckSearch.requiredEnergyType && side.selectedEnergy.toLowerCase() !== abilityDeckSearch.requiredEnergyType) return { success: false, error: `Select ${abilityDeckSearch.requiredEnergyType || 'an'} Energy type in the shared pool.` }
             const energyCount = Math.min(abilityDeckSearch.count, TCG_BATTLE_FORMATS[state.format].energyCap - side.energy)
             side.energy += energyCount
             if (energyCount > 0 && abilityDeckSearch.requiredEnergyType) side.selectedEnergy = ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as const)[abilityDeckSearch.requiredEnergyType as 'grass' | 'fire' | 'water' | 'lightning' | 'psychic' | 'fighting' | 'darkness' | 'metal' | 'fairy' | 'colorless']
+            if (abilityDeckSearch.selfDamageCost) source.currentHp -= abilityDeckSearch.selfDamageCost * 10
+            if (abilityDeckSearch.selfKnockoutIfEnergyAdded && energyCount > 0) source.currentHp = 0
           }
           else if (abilityDeckSearch?.attachEnergyFromDeck) { side.energy = Math.min(TCG_BATTLE_FORMATS[state.format].energyCap, side.energy + abilityDeckSearch.count); if (abilityDeckSearch.requiredEnergyType) side.selectedEnergy = ({ grass: 'Grass', fire: 'Fire', water: 'Water', lightning: 'Lightning', psychic: 'Psychic', fighting: 'Fighting', darkness: 'Darkness', metal: 'Metal', fairy: 'Fairy', colorless: 'Colorless' } as const)[abilityDeckSearch.requiredEnergyType as 'grass' | 'fire' | 'water' | 'lightning' | 'psychic' | 'fighting' | 'darkness' | 'metal' | 'fairy' | 'colorless'] }
           else if (!abilityDeckSearch?.putOnTop) side.hand.push(...searchedCards.map((card) => ({ ...card, instanceId: randomUUID(), currentHp: card.hp })))
@@ -16648,7 +17815,7 @@ export async function tcgBattleUseDrawAbility(
       if (refillDrawEnergyCost && (side.energy < 1 || text?.includes('basic {l}') && side.selectedEnergy?.toLowerCase() !== 'lightning')) return { success: false, error: 'You need the required Energy in the shared Energy pool to use this Ability.' }
       if (refillDrawEnergyCost) side.energy -= 1
       if (directDraw?.energyType) side.energy -= 1
-      const unownDDrawResult = unownDDraw ? randomInt(0, 2) === 0 ? 'heads' : 'tails' : undefined
+      const unownDDrawResult = unownDDraw ? flipTcgBattleCoinForSide(state, state.activeSide) : undefined
       if (unownDDrawResult) recordCoinFlipEvent(state, { sourceId, side: 'player', results: [unownDDrawResult], heads: unownDDrawResult === 'heads' ? 1 : 0, tails: unownDDrawResult === 'tails' ? 1 : 0, purpose: 'effect' })
       if (opponentHandShuffleDraw) {
         state.opponent.deck.push(...state.opponent.hand.map(toTcgBattleCardSummary))
@@ -16711,7 +17878,7 @@ export async function tcgBattleUseDrawAbility(
         otherDrawnCount = otherDrawn.length
       }
       if (!energyAttachEffect?.repeatable && !(mankeyPeek && source.name.toLowerCase() === 'lanturn')) source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
-      const tellResult = unownTell || unownLaugh || unownQuicken || unownGive || darkSlowkingCunning || krookodileEnergyDiscard ? randomInt(0, 2) === 0 ? 'heads' : 'tails' : undefined
+      const tellResult = unownTell || unownLaugh || unownQuicken || unownGive || darkSlowkingCunning || krookodileEnergyDiscard ? flipTcgBattleCoinForSide(state, state.activeSide) : undefined
       if (tellResult) recordCoinFlipEvent(state, { sourceId, side: 'player', results: [tellResult], heads: tellResult === 'heads' ? 1 : 0, tails: tellResult === 'tails' ? 1 : 0, purpose: 'effect' })
       const krookodileEnergyDiscarded = krookodileEnergyDiscard && tellResult === 'heads' ? Math.min(1, state.opponent.energy) : 0
       if (krookodileEnergyDiscarded) state.opponent.energy -= krookodileEnergyDiscarded
@@ -16830,6 +17997,8 @@ function useTcgBattleBenchShuffleAbility(
     && normalize(source?.name || '') === 'pidgeot'
   const suicunePower = /^once during your turn \(before your attack\), if this pokemon is on your bench, you may shuffle it and all cards attached to it into your deck\.$/.test(text)
     && normalize(source?.name || '').startsWith('suicune')
+  const pidgeotVBenchShuffle = text === 'once during your turn, if this pokemon is on your bench, you may shuffle it and all attached cards into your deck.'
+    && normalize(source?.name || '') === 'pidgeot v'
   const jumpluffPower = text === 'once during your turn (before your attack), you may return this pokemon and all cards attached to it to your hand.'
     && normalize(source?.name || '') === 'jumpluff'
   const azumarillReturn = normalize(source?.name || '') === 'azumarill' && text === 'once during your turn (before your attack), if azumarill is on your bench, you may flip a coin. if heads, return azumarill and all cards attached to it to your hand.'
@@ -16856,7 +18025,7 @@ function useTcgBattleBenchShuffleAbility(
   const unownZTopDeck = normalize(source?.name || '').replace(/[^a-z0-9]/g, '') === 'unownz' && text === 'once during your turn (before your attack), if unown z is on your bench and you have no cards in your deck, you may discard all cards attached to unown z and put unown z on top of your deck.'
   const aipomSnappyMove = normalize(source?.name || '') === 'aipom' && text === "once during your turn (before your attack), if aipom is on your bench, you may draw a card. then, discard all cards attached to aipom and put aipom on the bottom of your deck. you can't use more than 1 snappy move poké-power each turn."
   const mistysPsyduckReturn = normalize(source?.name || '') === "misty's psyduck" && text === 'once during your turn, if this pokemon is on your bench, you may discard the bottom card of your deck. if you do, discard all cards from this pokemon and put this pokemon on top of your deck.'
-  if (!source || !ability || (!pidgeotPower && !suicunePower && !jumpluffPower && !azumarillReturn && !activeCoinReturn && !wishiwashiCowardice && !starmiePower && !undevelop && !unownRDraw && !unownFarewellLetter && !unownZTopDeck && !gengarDevolution && !archeopsDevolution && !dusknoirPower && !crawdauntExReturn && !aipomSnappyMove && !mistysPsyduckReturn)) return 'That Bench shuffle Ability is unavailable.'
+  if (!source || !ability || (!pidgeotPower && !suicunePower && !pidgeotVBenchShuffle && !jumpluffPower && !azumarillReturn && !activeCoinReturn && !wishiwashiCowardice && !starmiePower && !undevelop && !unownRDraw && !unownFarewellLetter && !unownZTopDeck && !gengarDevolution && !archeopsDevolution && !dusknoirPower && !crawdauntExReturn && !aipomSnappyMove && !mistysPsyduckReturn)) return 'That Bench shuffle Ability is unavailable.'
   const undevelopUsageKey = `${abilityIndex}:${ability.name}`
   if (undevelop && source.abilityUses?.[undevelopUsageKey] === state.turnNumber) return 'Undevelop has already been used this turn.'
   if (gengarDevolution && source.abilityUses?.[undevelopUsageKey] === state.turnNumber) return 'Gengar LV.X has already used this Power this turn.'
@@ -16881,6 +18050,7 @@ function useTcgBattleBenchShuffleAbility(
   }
   if (pidgeotPower && (!sourceIsActive || source.statusConditions?.length)) return 'Pidgeot must be Active and free of Special Conditions to use this Ability.'
   if (suicunePower && !sourceIsBenched) return 'Suicune-GX must be on the Bench to use this Ability.'
+  if (pidgeotVBenchShuffle && (!sourceIsBenched || targetId !== sourceId)) return 'Pidgeot V must be on the Bench to use this Ability.'
   if (jumpluffPower && targetId !== sourceId) return 'Jumpluff can only return itself to your hand.'
   if (azumarillReturn && (!sourceIsBenched || targetId !== sourceId)) return 'Azumarill must be on the Bench to use this Power.'
   if (activeCoinReturn && (!sourceIsActive || targetId !== sourceId || source.statusConditions?.length)) return `${source.name} must be Active and free of Special Conditions to use this Power.`
@@ -16991,7 +18161,7 @@ function useTcgBattleBenchShuffleAbility(
   if (wishiwashiCowardice && ![...side.front, ...side.back].some((card) => card.instanceId !== sourceId && card.currentHp > 0)) return 'Wishiwashi cannot return to your hand while it is your last Pokémon in play.'
   if (azumarillReturn) {
     const usageKey = `${abilityIndex}:${ability.name}`
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
     if (result === 'tails') {
@@ -17012,7 +18182,7 @@ function useTcgBattleBenchShuffleAbility(
   if (activeCoinReturn) {
     const usageKey = `${abilityIndex}:${ability.name}`
     if (source.abilityUses?.[usageKey] === state.turnNumber) return `${source.name}'s Power has already been used this turn.`
-    const result = randomInt(0, 2) === 0 ? 'heads' : 'tails'
+    const result = flipTcgBattleCoinForSide(state, state.activeSide)
     recordCoinFlipEvent(state, { sourceId, side: sideKey, results: [result], heads: result === 'heads' ? 1 : 0, tails: result === 'tails' ? 1 : 0, purpose: 'effect' })
     source.abilityUses = { ...source.abilityUses, [usageKey]: state.turnNumber }
     if (result === 'tails') {
@@ -17150,8 +18320,8 @@ function useTcgBattleBenchShuffleAbility(
     compactTcgBattleBoard(side)
     return null
   }
-  if (starmiePower) {
-    if (targetId !== sourceId) return 'Starmie can only shuffle itself into the deck.'
+  if (starmiePower || pidgeotVBenchShuffle) {
+    if (targetId !== sourceId) return `${source.name} can only shuffle itself into the deck.`
     const zone = sourceIsActive ? side.front : side.back
     const index = zone.findIndex((card) => card.instanceId === sourceId)
     if (index < 0) return 'Starmie is no longer in play.'

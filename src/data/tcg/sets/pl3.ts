@@ -3883,7 +3883,7 @@ const setData: TcgSet = {
     },
     {
       "id": "pl3-AR1",
-      "name": "",
+      "name": "Arceus",
       "number": "AR1",
       "artist": "kawayoo",
       "rarity": "Rare",
@@ -3983,7 +3983,7 @@ const setData: TcgSet = {
     },
     {
       "id": "pl3-AR5",
-      "name": "",
+      "name": "Arceus",
       "number": "AR5",
       "artist": "Mitsuhiro Arita",
       "rarity": "Rare",

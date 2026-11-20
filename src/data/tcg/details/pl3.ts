@@ -9697,7 +9697,7 @@ const cardDetails: TcgCardDetail[] = [
   },
   {
     "id": "pl3-AR1",
-    "name": "",
+    "name": "Arceus",
     "number": "AR1",
     "artist": "kawayoo",
     "rarity": "Rare",
@@ -9723,14 +9723,14 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "",
+        "name": "Prize Count",
         "cost": [
           "Darkness",
           "Colorless"
         ],
         "convertedEnergyCost": 2,
         "damage": "20+",
-        "text": ""
+        "text": "If you have more Prize cards left than your opponent, this attack does 20 damage plus 60 more damage."
       }
     ],
     "weaknesses": [
@@ -9919,7 +9919,7 @@ const cardDetails: TcgCardDetail[] = [
   },
   {
     "id": "pl3-AR5",
-    "name": "",
+    "name": "Arceus",
     "number": "AR5",
     "artist": "Mitsuhiro Arita",
     "rarity": "Rare",
@@ -9945,22 +9945,22 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "",
+        "name": "Ripple Swell",
         "cost": [],
         "convertedEnergyCost": 0,
         "damage": "",
-        "text": ""
+        "text": "If you have 6 Arceus in play and each of them is a different type, search your deck for up to 6 basic Energy cards. Attach each of those Energy cards to a different Pokémon you have in play. Shuffle your deck afterward."
       },
       {
-        "name": "",
+        "name": "Sky Spear",
         "cost": [
           "Colorless",
           "Colorless",
           "Colorless"
         ],
         "convertedEnergyCost": 3,
-        "damage": "",
-        "text": ""
+        "damage": "80",
+        "text": "Choose 1 of your opponent's Pokémon. This attack does 80 damage to that Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.) Remove all Energy cards attached to Arceus and put them in the Lost Zone."
       }
     ],
     "weaknesses": [

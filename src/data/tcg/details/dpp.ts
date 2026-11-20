@@ -154,21 +154,21 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "",
+        "name": "Peck",
         "cost": [],
         "convertedEnergyCost": 0,
         "damage": "10",
         "text": ""
       },
       {
-        "name": "",
+        "name": "Water Splash",
         "cost": [
           "Water",
           "Colorless"
         ],
         "convertedEnergyCost": 2,
         "damage": "20+",
-        "text": ""
+        "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage."
       }
     ],
     "weaknesses": [
@@ -775,13 +775,13 @@ const cardDetails: TcgCardDetail[] = [
     "abilities": [],
     "attacks": [
       {
-        "name": "",
+        "name": "Splash About",
         "cost": [
           "Water"
         ],
         "convertedEnergyCost": 1,
         "damage": "10+",
-        "text": ""
+        "text": "If Buizel has less Energy attached to it than the Defending Pokémon, this attack does 10 damage plus 10 more damage."
       }
     ],
     "weaknesses": [

@@ -14,6 +14,7 @@ import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard } from '@/data/tcg/types'
 import { APP_VERSION } from '@/utilities/app-version'
 import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
+import { getTcgCardSeriesById } from '@/utilities/tcg/tcg'
 import {
   calculateTcgBattleCardCost,
   type TcgBattleEnergyType,
@@ -56,15 +57,24 @@ export function TcgDecksPanel({
   const hasDeckBox = (inventory['deck-box'] || 0) > 0
 
   const generationOptions = useMemo(() => {
-    const series = getTcgSeriesInReleaseOrder(tcgSetSummaries)
+    const ownedSeries = new Set(
+      (gameData?.tcg || [])
+        .filter((card) => card.quantity > 0)
+        .map((card) => getTcgCardSeriesById(card.cardId))
+        .filter((value): value is string => Boolean(value)),
+    )
+    const series = getTcgSeriesInReleaseOrder(tcgSetSummaries).filter((value) => ownedSeries.has(value))
     return series.map((entry) => ({
       id: entry,
       label: entry.replace('&', 'and'),
     }))
-  }, [])
+  }, [gameData?.tcg])
 
   useEffect(() => {
-    if (!selectedGeneration && generationOptions.length > 0) {
+    if (
+      generationOptions.length > 0 &&
+      !generationOptions.some((option) => option.id === selectedGeneration)
+    ) {
       setSelectedGeneration(generationOptions[0].id)
     }
   }, [selectedGeneration, generationOptions])
@@ -142,6 +152,7 @@ export function TcgDecksPanel({
     return activeValidation?.totalCost || 0
   }, [activeDeck, activeValidation?.totalCost, cardsById])
   const costLimit = 60
+  const seriesSet = tcgSetSummaries.find((set) => set.series === selectedGeneration)
   const energyOptions = useMemo(
     () =>
       [
@@ -208,12 +219,22 @@ export function TcgDecksPanel({
 
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
-      <div className="game-paper-background space-y-4 rounded-xl border border-game-border bg-game-surface p-4 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-game-border bg-game-surface-raised px-3 py-2">
-          <span className="text-sm font-semibold text-game-ink">
-            {selectedGeneration} Deck
-          </span>
-          <span className="text-xs font-bold uppercase tracking-[0.12em] text-game-muted">
+      <div className="game-paper-background min-h-full space-y-5 bg-game-surface/75 p-4 md:p-6">
+        <header className="relative isolate flex min-h-32 items-end overflow-hidden rounded-2xl bg-gradient-to-br from-game-moss/90 via-game-moss/70 to-game-ink px-5 py-4 text-game-cream shadow-md md:min-h-40 md:px-8">
+          {seriesSet?.images.logo && (
+            <Image
+              src={seriesSet.images.logo}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, 70vw"
+              className="-z-10 object-contain object-right p-4 opacity-30"
+            />
+          )}
+          <div className="relative">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-game-cream/75">Trading Card Game</p>
+            <h2 className="mt-1 text-2xl font-black tracking-tight md:text-3xl">{selectedGeneration || 'Choose a series'}</h2>
+          </div>
+          <span className="relative ml-auto text-right text-xs font-bold uppercase tracking-[0.12em] text-game-cream/90">
             {activeDeck.length}/15 cards · Cost{' '}
             <span
               className={
@@ -225,7 +246,7 @@ export function TcgDecksPanel({
               {activeCost}/{costLimit}
             </span>
           </span>
-        </div>
+        </header>
         <PremiumSelect
           label="Turn 15 Energy Type"
           value={activeEnergy}
@@ -243,8 +264,8 @@ export function TcgDecksPanel({
         />
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-8">
           {activeDeck.length === 0 ? (
-            <span className="col-span-full rounded-md border border-dashed border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-muted">
-              No cards selected. Add cards from the CardDex or use Auto Fill.
+            <span className="col-span-full px-2 py-5 text-sm text-game-muted">
+              No cards yet. Add cards from the CardDex or use Auto Fill.
             </span>
           ) : (
             activeDeck.map((cardId, index) => {
