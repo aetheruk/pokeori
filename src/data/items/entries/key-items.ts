@@ -3,6 +3,7 @@ import { DEED_POLL_ITEM_ID, FUJI_GLASSES_ITEM_ID } from '../special-item-ids'
 import {
   BOOK_OF_CHANNELING_ITEM_ID,
   FISHER_SECRET_BOOKS,
+  FORTUNE_CHANNELING_CONTENT,
   SPIRIT_CHANNELING_INCENSE_ITEMS,
 } from '@/data/spirit-channeling-public'
 
@@ -156,6 +157,15 @@ const spiritChannelingItems: Item[] = [
     id: book.itemId,
     name: book.name,
     description: book.description,
+    category: 'books' as const,
+    spriteId: 'guide-book',
+    unique: true,
+    consume: false,
+  })),
+  ...FORTUNE_CHANNELING_CONTENT.map((ritual) => ({
+    id: ritual.bookItemId,
+    name: ritual.bookName,
+    description: ritual.bookDescription,
     category: 'books' as const,
     spriteId: 'guide-book',
     unique: true,

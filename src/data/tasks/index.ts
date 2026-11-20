@@ -34,6 +34,7 @@ import { ceruleanCaveTasks } from './entries/cerulean-cave'
 import { specialEventTasks } from './entries/special-events'
 import { recipeManualTasks } from './entries/recipe-manuals'
 import { gymLeaderChronicleTasks } from './entries/gym-leader-chronicles'
+import { fortuneExchangeTasks } from './entries/fortune-exchange'
 
 export * from '../types'
 export * from '../tasks/types'
@@ -73,4 +74,5 @@ export const tasks: Task[] = [
   ...specialEventTasks,
   ...recipeManualTasks,
   ...gymLeaderChronicleTasks,
+  ...fortuneExchangeTasks,
 ]
