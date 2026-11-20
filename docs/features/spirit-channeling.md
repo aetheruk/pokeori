@@ -4,6 +4,7 @@ Spirit Channeling is a gated side activity launched from eligible memento items 
 
 - The player must own the Book of Channeling before channeling actions appear.
 - Only owned memento items with authored channeling configs can be selected.
+- Valuable-category treasure mementos are grouped under Inventory → Key Items and their quick action opens Spirit Channeling instead of Artisan crafting.
 - The client receives the memento ID list and display catalogs, while incense answers, offering totals, channeler rules, and rewards stay in the server action's config.
 - Incense items are reusable key items; configs hide the correct incense from the player. Fortune Incense is the answer for the eleven Treasure Fortune rituals.
 - The active memento's item sprite appears in the page header. Incense, offering, and channeler pickers open directly into full-width Explore-style cards without visible screen titles, back buttons, close icons, or introductory copy; dialog titles remain available to assistive technology. Picker entries suppress automatic haptics so touch scrolling remains uninterrupted. Pokemon search and the materials/gems toggle stay pinned below their scrolling lists with safe-area spacing. Pokemon levels and owned offering quantities (`x{qty}`) appear in orange beside the name in each charcoal title tab. Offering slots stay in a three-column mobile row with compact quantity controls. The Inventory action for a channelable memento uses a Gastly icon.
