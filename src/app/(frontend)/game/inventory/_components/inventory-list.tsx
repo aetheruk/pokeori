@@ -253,7 +253,18 @@ function getItemActionLabel(
 }
 
 function isArtisanIngredientItem(item: (typeof items)[number]) {
-  return getInventoryDisplayPlacement(item).group === 'crafting'
+  return (
+    !isSpiritChannelingMementoItem(item.id) &&
+    getInventoryDisplayPlacement(item).group === 'crafting'
+  )
+}
+
+function getInventoryItemPlacement(item: (typeof items)[number]) {
+  if (item.category === 'valuable' && isSpiritChannelingMementoItem(item.id)) {
+    return { group: 'key-items' as const, subCategory: 'key-items' as const }
+  }
+
+  return getInventoryDisplayPlacement(item)
 }
 
 function canChannelItem(
@@ -437,7 +448,7 @@ export function InventoryList() {
             return null
           }
 
-          const placement = getInventoryDisplayPlacement(itemDetails)
+          const placement = getInventoryItemPlacement(itemDetails)
 
           return {
             ...invItem,
@@ -660,7 +671,7 @@ export function InventoryList() {
   }, [activeGroup, activeSubCategory, currencyBalances, searchQuery])
 
   const selectedItemDisplayPlacement = useMemo(
-    () => (selectedItem ? getInventoryDisplayPlacement(selectedItem) : null),
+    () => (selectedItem ? getInventoryItemPlacement(selectedItem) : null),
     [selectedItem],
   )
   const isTmOrHmItem = useMemo(
