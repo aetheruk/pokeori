@@ -59,6 +59,7 @@ import {
   canTcgBattleUseElectricStart,
   chooseTcgBattleAttackChoice,
   doesTcgBattleSubtypeFilterMatch,
+  doesTcgBattleTypeFilterMatch,
   getAvailableTcgBattleDeckPokemon,
   getTcgBattleDeckSearchMaxCount,
   getEffectiveTcgBattleAttackCost,
@@ -72,6 +73,7 @@ import {
   getTcgBattleCardUnlockTurnForCard,
   getTcgBattleEvolutionOptions,
   getTcgBattleAvailableAttacks,
+  getTcgBattleCopyAttackOptions,
   getTcgBattleEvolutionDamageEffect,
   getTcgBattleEvolutionAttackBoost,
   getTcgBattleEvolutionDamageTargetCount,
@@ -102,6 +104,7 @@ import {
   getTcgBattlePokemonSwapPower,
   getTcgBattleAbilityDamageCounterEffect,
   getTcgBattleAbilityDamageCounterMoveEffect,
+  getTcgBattleRemainingPrizeCount,
   getTcgBattleEffectiveTypes,
   getTcgBattleCount,
   getValidTcgBattleTargets,
@@ -115,6 +118,7 @@ import {
   isTcgBattleCradilySelectiveSlime,
   isTcgBattleVileplumeChoiceStatus,
   hasTcgBattleKlinklangEmergencyRotation,
+  hasTcgBattleLuxrayPrizeBenchAbility,
   isTcgBattleDarkCrobatPoison,
   isTcgBattleDarkHoundoomFireBreath,
   isTcgBattleVenusaurMiracleAroma,
@@ -2308,6 +2312,7 @@ export function TcgBattleGame({ encounter, actions = battleActions }: TcgBattleG
       effect?.choiceRequirement ||
       effect?.targetScope === 'bench' ||
       effect?.targetScope === 'any' ||
+      effect?.targetScope === 'all' ||
       !currentTarget
     ) {
       setChoiceAttackIndex(attackIndex)
@@ -3368,6 +3373,7 @@ function AttackChoiceDrawer({
     ? defaultTargetId
     : validTargets[0]?.instanceId || ''
   const [selectedTargetId, setSelectedTargetId] = useState(initialTarget)
+  const [selectedPlayerSide, setSelectedPlayerSide] = useState<'player' | 'opponent'>('player')
   const [selectedCardId, setSelectedCardId] = useState('')
   const [selectedDiscardPokemon, setSelectedDiscardPokemon] = useState<
     { side: 'player' | 'opponent'; cardId: string } | null
@@ -3377,6 +3383,7 @@ function AttackChoiceDrawer({
   const [selectedDiscardHandPokemonIds, setSelectedDiscardHandPokemonIds] = useState<string[]>([])
   const [selectedOwnPokemonId, setSelectedOwnPokemonId] = useState('')
   const [selectedRecoveryPokemonIds, setSelectedRecoveryPokemonIds] = useState<string[]>([])
+  const [selectedOwnBenchDiscardIds, setSelectedOwnBenchDiscardIds] = useState<string[]>([])
   const [selectedAttackIndex, setSelectedAttackIndex] = useState<number | null>(
     null,
   )
@@ -3384,10 +3391,13 @@ function AttackChoiceDrawer({
     null,
   )
   const [energyAmount, setEnergyAmount] = useState(0)
+  const [selectedSelfDamageCounters, setSelectedSelfDamageCounters] = useState(0)
   const [selectedStatus, setSelectedStatus] = useState<TcgBattleStatusCondition>('asleep')
   const [selectedFirstPairStatus, setSelectedFirstPairStatus] = useState<'burned' | 'poisoned'>('poisoned')
   const [selectedSecondPairStatus, setSelectedSecondPairStatus] = useState<'asleep' | 'confused'>('asleep')
   const [selectedDeckPokemonIds, setSelectedDeckPokemonIds] = useState<string[]>([])
+  const [selectedTopDeckPokemonId, setSelectedTopDeckPokemonId] = useState('')
+  const [selectedTopDeckPokemonIds, setSelectedTopDeckPokemonIds] = useState<string[]>([])
   const [useOptionalBonus, setUseOptionalBonus] = useState(false)
   const [skipOptionalBenchSwitch, setSkipOptionalBenchSwitch] = useState(false)
   const [selectedType, setSelectedType] = useState<TcgBattleEnergyType>('Grass')
@@ -3397,6 +3407,7 @@ function AttackChoiceDrawer({
   const target = validTargets.find(
     (card) => card.instanceId === selectedTargetId,
   )
+  const ownBenchDiscardChoices = state.player.back.filter((card) => card.currentHp > 0)
   const requirement = effect?.choiceRequirement === 'optionalBonus' &&
     effect.damage.kind === 'handDiscardBonus' &&
     state.player.hand.length === 0
@@ -3404,22 +3415,28 @@ function AttackChoiceDrawer({
     : effect?.choiceRequirement
   const attackCost = attack ? getAttackCost(attack, state, attacker, 'player') : 0
   const availableEnergy = Math.max(0, state.player.energy - attackCost)
-  const energyTypeAllowed = !effect?.choiceEnergyType || state.player.selectedEnergy === effect.choiceEnergyType
+  const energyTypeAllowed = (!effect?.choiceEnergyType || state.player.selectedEnergy === effect.choiceEnergyType) &&
+    (!effect?.choiceEnergyTypes?.length || effect.choiceEnergyTypes.includes(state.player.selectedEnergy!))
   const availableChoiceEnergy = energyTypeAllowed
     ? Math.min(availableEnergy, effect?.choiceEnergyMax ?? Number.POSITIVE_INFINITY)
     : 0
+  const copyAttackRule = effect?.special?.find((rule) => rule.kind === 'copyAttack')
   const copiedAttack =
     requirement === 'copyAttack' && target && selectedAttackIndex !== null
-      ? getTcgBattleAvailableAttacks(state, 'opponent', target)[selectedAttackIndex]
+      ? getTcgBattleCopyAttackOptions(state, 'player', target, attack, attacker)[selectedAttackIndex]?.attack
       : undefined
   const copiedEffect = copiedAttack
     ? getTcgBattleAttackEffect(copiedAttack)
     : null
   const activeEffect = requirement === 'copyAttack' ? copiedEffect : effect
+  const handCardGoesToLostZone = activeEffect?.special?.some(
+    (rule) => rule.kind === 'discardSelectedHandPokemon' && rule.destination === 'lostZone',
+  )
   const optionalBonusEnergyDiscardAmount = (activeEffect?.energyDiscard || []).reduce(
     (total, rule) => total + (rule.optional && rule.target === 'self' && typeof rule.amount === 'number' ? rule.amount : 0),
     0,
   )
+  const optionalDamageBonus = activeEffect && 'bonusDamage' in activeEffect.damage ? activeEffect.damage.bonusDamage : 0
   const optionalBonusHasEnoughEnergy = state.player.energy - (requirement === 'copyAttack' ? 0 : attackCost) >= optionalBonusEnergyDiscardAmount
   const constrainedStatusChoices = activeEffect?.status
     ?.filter((rule) => rule.useChosenStatus)
@@ -3440,11 +3457,44 @@ function AttackChoiceDrawer({
   const maxRecoverySelection = recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand'
     ? recoveryPokemonRule.maxCount ?? 1
     : 1
+  const discardBenchRecoveryRule = activeEffect?.special?.find(
+    (rule) => rule.kind === 'recoverPokemonFromDiscardToBench',
+  )
+  const recoverableDiscardBenchChoices = discardBenchRecoveryRule?.kind === 'recoverPokemonFromDiscardToBench'
+    ? state.player.discard.filter((card) =>
+        (discardBenchRecoveryRule.basicOnly === false || card.subtypes.includes('Basic')) &&
+        canTcgBattlePutPokemonOnBench(state.player, card) &&
+        (!discardBenchRecoveryRule.includeNames?.length || discardBenchRecoveryRule.includeNames.some((name) => card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === name.toLowerCase().replace(/[^a-z0-9]/g, ''))) &&
+        (!discardBenchRecoveryRule.includeTypes?.length || discardBenchRecoveryRule.includeTypes.some((type) => card.types.some((cardType) => cardType.toLowerCase() === type.toLowerCase()))) &&
+        (!discardBenchRecoveryRule.includeSubtypes?.length || discardBenchRecoveryRule.includeSubtypes.some((subtype) => card.subtypes.some((cardSubtype) => cardSubtype.toLowerCase() === subtype.toLowerCase()))),
+      )
+    : []
+  const maxDiscardBenchRecoverySelection = discardBenchRecoveryRule?.kind === 'recoverPokemonFromDiscardToBench'
+    ? Math.min(discardBenchRecoveryRule.maxCount, getOpenTcgBattleBenchSlots(state.player))
+    : 0
   const deckPokemonRule = activeEffect?.special?.find(
     (rule) => rule.kind === 'searchDeckPokemon',
   )
+  const topDeckPokemonRule = activeEffect?.special?.find(
+    (rule) => rule.kind === 'discardTopDeckChoosePokemonToHand',
+  )
+  const topDeckPokemonChoices = topDeckPokemonRule?.kind === 'discardTopDeckChoosePokemonToHand'
+    ? state.player.deck.slice(0, topDeckPokemonRule.amount)
+    : []
+  const topDeckHandLostZoneRule = activeEffect?.special?.find(
+    (rule) => rule.kind === 'chooseTopDeckPokemonToHandAndLostZone',
+  )
+  const topDeckHandLostZoneChoices = topDeckHandLostZoneRule?.kind === 'chooseTopDeckPokemonToHandAndLostZone'
+    ? state.player.deck.slice(0, topDeckHandLostZoneRule.revealCount)
+    : []
+  const topDeckHandLostZoneCount = topDeckHandLostZoneRule?.kind === 'chooseTopDeckPokemonToHandAndLostZone'
+    ? Math.min(topDeckHandLostZoneRule.handCount, topDeckHandLostZoneChoices.length)
+    : 0
+  const topDeckHandLostZoneChoiceKey = topDeckHandLostZoneChoices.map((card) => card.id).join(',')
   const availableDeckPokemon = deckPokemonRule?.kind === 'searchDeckPokemon'
-    ? getAvailableTcgBattleDeckPokemon(state.player, deckPokemonRule).filter((card) => deckPokemonRule.destination === 'hand' || canTcgBattlePutPokemonOnBench(state.player, card))
+    ? (requirement === 'switchAndDeckEvolution' && attacker.evolvedTurn === state.turnNumber
+        ? []
+        : getAvailableTcgBattleDeckPokemon(state.player, deckPokemonRule, attacker, target || attacker)).filter((card) => deckPokemonRule.destination !== 'bench' || canTcgBattlePutPokemonOnBench(state.player, card))
     : []
   const maxDeckPokemonSelection = deckPokemonRule?.kind === 'searchDeckPokemon'
     ? Math.min(
@@ -3455,7 +3505,7 @@ function AttackChoiceDrawer({
           target: target || attacker,
           rule: deckPokemonRule,
         }),
-        deckPokemonRule.destination === 'hand' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(state.player),
+        deckPokemonRule.destination !== 'bench' ? Number.POSITIVE_INFINITY : getOpenTcgBattleBenchSlots(state.player),
         availableDeckPokemon.length,
       )
     : 0
@@ -3467,6 +3517,8 @@ function AttackChoiceDrawer({
         ? undefined
         : copiedEffect?.choiceRequirement
       : requirement
+  const activeRecoveryChoices = activeRequirement === 'discardPokemonToBench' ? recoverableDiscardBenchChoices : recoverablePokemonChoices
+  const activeRecoveryMaxSelection = activeRequirement === 'discardPokemonToBench' ? maxDiscardBenchRecoverySelection : maxRecoverySelection
   const optionalSwitchTarget =
     activeRequirement === 'optionalOwnBench'
       ? 'self'
@@ -3485,16 +3537,20 @@ function AttackChoiceDrawer({
       )
     : undefined
   const benchChoices =
-    activeRequirement === 'ownBench'
-      ? state.player.back.filter((card) =>
-          !ownBenchHealingRule ||
-          doesTcgBattleSubtypeFilterMatch(
-            card.subtypes,
-            'subtypeFilter' in ownBenchHealingRule
-              ? ownBenchHealingRule.subtypeFilter
-              : undefined,
-          ),
-        )
+    activeRequirement === 'ownBench' || activeRequirement === 'switchAndDeckEvolution'
+      ? state.player.back.filter((card) => {
+          if (!ownBenchHealingRule) return true
+          return (
+            doesTcgBattleSubtypeFilterMatch(
+              card.subtypes,
+              'subtypeFilter' in ownBenchHealingRule ? ownBenchHealingRule.subtypeFilter : undefined,
+            ) &&
+            ('typeFilter' in ownBenchHealingRule
+              ? doesTcgBattleTypeFilterMatch(card.types, ownBenchHealingRule.typeFilter)
+              : true) &&
+            (!('damagedOnly' in ownBenchHealingRule) || !ownBenchHealingRule.damagedOnly || card.currentHp < card.hp)
+          )
+        })
       : activeRequirement === 'optionalOwnBench'
         ? state.player.back
       : activeRequirement === 'opponentBench' || activeRequirement === 'optionalOpponentBench'
@@ -3518,19 +3574,42 @@ function AttackChoiceDrawer({
   const transferDamageSourceNameContains = transferDamageCountersRule?.kind === 'transferDamageCounters'
     ? transferDamageCountersRule.sourceNameContains
     : undefined
+  const transferDamageSourceSubtypeContains = transferDamageCountersRule?.kind === 'transferDamageCounters'
+    ? transferDamageCountersRule.sourceSubtypeContains
+    : undefined
   const damageCounterSourceChoices = damageCounterSourceCards
     .filter((card) =>
       card.currentHp > 0 &&
       card.currentHp < card.hp &&
       (!transferDamageSourceNameContains ||
-        card.name.toLowerCase().includes(transferDamageSourceNameContains.toLowerCase())),
+        card.name.toLowerCase().includes(transferDamageSourceNameContains.toLowerCase())) &&
+      (!transferDamageSourceSubtypeContains || card.subtypes.some((subtype) =>
+        subtype.toLowerCase().includes(transferDamageSourceSubtypeContains.toLowerCase()),
+      )),
     )
-  const handPokemonChoices = state.player.hand
-  const ownPokemonChoices = [...state.player.front, ...state.player.back]
-    .filter((card) => card.currentHp > 0)
+  const handPokemonChoices = state.player.hand.filter((card) =>
+    (activeEffect?.choiceHandCardRetreatCost === undefined || card.convertedRetreatCost === activeEffect.choiceHandCardRetreatCost) &&
+    (!activeEffect?.choiceHandCardNames?.length || activeEffect.choiceHandCardNames.some((name) =>
+      card.name.toLowerCase().replace(/[^a-z0-9]/g, '') === name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+    )) &&
+    (!activeEffect?.choiceHandCardSubtypes?.length || card.subtypes.some((subtype) =>
+      activeEffect.choiceHandCardSubtypes!.some((name) => subtype.toLowerCase().replace(/[^a-z0-9]/g, '') === name.toLowerCase().replace(/[^a-z0-9]/g, '')),
+    )),
+  )
+  const ownPokemonChoices = (activeEffect?.choiceOwnPokemonSide === 'any'
+    ? [...state.player.front, ...state.player.back, ...state.opponent.front, ...state.opponent.back]
+    : [...state.player.front, ...state.player.back])
+    .filter((card) => card.currentHp > 0 &&
+      (activeEffect?.choiceOwnPokemonSide === 'any' || activeEffect?.choiceOwnPokemonZone !== 'bench' || state.player.back.some((benchCard) => benchCard.instanceId === card.instanceId)) &&
+      (!activeEffect?.choiceOwnPokemonMustBeDamaged || card.currentHp < card.hp))
   const counterDistributionChoices = [...state.opponent.front, ...state.opponent.back]
-    .filter((card) => card.currentHp > 0)
+    .filter((card) => card.currentHp > 0 &&
+      (activeEffect?.choiceCounterTargetZone !== 'bench' || state.opponent.back.some((benchCard) => benchCard.instanceId === card.instanceId)) &&
+      doesTcgBattleSubtypeFilterMatch(card.subtypes, activeEffect?.choiceCounterTargetSubtypeFilter))
   const counterDistributionCardIds = counterDistributionChoices.map((card) => card.instanceId).join('|')
+  const counterDistributionTargetCount = activeEffect?.choiceCounterTargetDamage !== undefined && typeof activeEffect.choiceCounterTargetCount === 'number'
+    ? Math.min(activeEffect.choiceCounterTargetCount, counterDistributionChoices.length)
+    : activeEffect?.choiceCounterTargetCount
   const counterDistributionCount = activeEffect?.choiceCounterCountFrom
     ? getTcgBattleCount(activeEffect.choiceCounterCountFrom, {
         state,
@@ -3538,9 +3617,12 @@ function AttackChoiceDrawer({
         attacker,
         target: target || attacker,
         coinMode: 'actual',
-      })
-    : activeEffect?.choiceCounterCount || 0
+      }) * (activeEffect.choiceCounterCountMultiplier || 1)
+    : activeEffect?.choiceCounterTargetDamage !== undefined && typeof counterDistributionTargetCount === 'number'
+      ? counterDistributionTargetCount * (activeEffect.choiceCounterCountPerTarget || 1)
+      : activeEffect?.choiceCounterCount || 0
   const assignedCounterCount = Object.values(selectedCounterAssignments).reduce((sum, count) => sum + count, 0)
+  const counterDistributionStep = activeEffect?.choiceCounterCountPerTarget || 1
 
   useEffect(() => {
     if (canSkipBenchSwitch && skipOptionalBenchSwitch) return
@@ -3569,6 +3651,24 @@ function AttackChoiceDrawer({
       Object.entries(current).filter(([cardId, counters]) => eligibleIds.has(cardId) && counters > 0),
     ))
   }, [counterDistributionCardIds])
+
+  useEffect(() => {
+    if (!topDeckPokemonChoices.some((card) => card.id === selectedTopDeckPokemonId)) {
+      setSelectedTopDeckPokemonId(topDeckPokemonChoices[0]?.id || '')
+    }
+  }, [topDeckPokemonChoices, selectedTopDeckPokemonId])
+
+  useEffect(() => {
+    const eligibleIds = topDeckHandLostZoneChoiceKey ? topDeckHandLostZoneChoiceKey.split(',') : []
+    setSelectedTopDeckPokemonIds((current) => {
+      const selected = current.filter((id) => eligibleIds.includes(id)).slice(0, topDeckHandLostZoneCount)
+      for (const id of eligibleIds) {
+        if (selected.length >= topDeckHandLostZoneCount) break
+        if (!selected.includes(id)) selected.push(id)
+      }
+      return selected
+    })
+  }, [topDeckHandLostZoneChoiceKey, topDeckHandLostZoneCount])
 
   useEffect(() => {
     if (activeRequirement === 'energyAmount') setEnergyAmount(availableChoiceEnergy)
@@ -3601,6 +3701,15 @@ function AttackChoiceDrawer({
   }, [attacker.instanceId, attackIndex])
 
   useEffect(() => {
+    setSelectedSelfDamageCounters(0)
+  }, [attacker.instanceId, attackIndex])
+
+  useEffect(() => {
+    const eligibleIds = new Set(ownBenchDiscardChoices.map((card) => card.instanceId))
+    setSelectedOwnBenchDiscardIds((selected) => selected.filter((id) => eligibleIds.has(id)))
+  }, [attacker.instanceId, attackIndex, state.player.back])
+
+  useEffect(() => {
     if (!ownPokemonChoices.some((card) => card.instanceId === selectedOwnPokemonId)) {
       const mostInjured = [...ownPokemonChoices]
         .sort((a, b) => (b.hp - b.currentHp) - (a.hp - a.currentHp))[0]
@@ -3609,20 +3718,29 @@ function AttackChoiceDrawer({
   }, [ownPokemonChoices, selectedOwnPokemonId])
 
   useEffect(() => {
-    const eligibleIds = new Set(recoverablePokemonChoices.map((card) => card.instanceId))
+    const activeChoices = discardBenchRecoveryRule?.kind === 'recoverPokemonFromDiscardToBench'
+      ? recoverableDiscardBenchChoices
+      : recoverablePokemonChoices
+    const maxCount = discardBenchRecoveryRule?.kind === 'recoverPokemonFromDiscardToBench'
+      ? maxDiscardBenchRecoverySelection
+      : maxRecoverySelection
+    const eligibleIds = new Set(activeChoices.map((card) => card.instanceId))
     const selected = selectedRecoveryPokemonIds
       .filter((cardId) => eligibleIds.has(cardId))
-      .slice(0, maxRecoverySelection)
-    if (recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo) {
+      .slice(0, maxCount)
+    if (
+      recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo ||
+      discardBenchRecoveryRule?.kind === 'recoverPokemonFromDiscardToBench' && discardBenchRecoveryRule.upTo
+    ) {
       if (selected.length !== selectedRecoveryPokemonIds.length) setSelectedRecoveryPokemonIds(selected)
       return
     }
-    if (selected.length > 0 || recoverablePokemonChoices.length === 0) {
+    if (selected.length > 0 || activeChoices.length === 0) {
       if (selected.length !== selectedRecoveryPokemonIds.length) setSelectedRecoveryPokemonIds(selected)
       return
     }
-    setSelectedRecoveryPokemonIds(recoverablePokemonChoices.slice(0, maxRecoverySelection).map((card) => card.instanceId))
-  }, [recoverablePokemonChoices, selectedRecoveryPokemonIds, maxRecoverySelection, recoveryPokemonRule])
+    setSelectedRecoveryPokemonIds(activeChoices.slice(0, maxCount).map((card) => card.instanceId))
+  }, [recoverablePokemonChoices, recoverableDiscardBenchChoices, selectedRecoveryPokemonIds, maxRecoverySelection, maxDiscardBenchRecoverySelection, recoveryPokemonRule, discardBenchRecoveryRule])
 
   if (!attack || !effect) return null
 
@@ -3635,6 +3753,14 @@ function AttackChoiceDrawer({
     if (required === 'disableAttack' && attackChoiceIndex !== null) {
       return { kind: 'disabledAttack', attackIndex: attackChoiceIndex }
     }
+    if (required === 'topDeckPokemon' && selectedTopDeckPokemonId) {
+      return { kind: 'topDeckPokemon', cardId: selectedTopDeckPokemonId }
+    }
+    if (required === 'topDeckPokemonSet') {
+      const eligibleIds = new Set(topDeckHandLostZoneChoices.map((card) => card.id))
+      return { kind: 'topDeckPokemonSet', cardIds: selectedTopDeckPokemonIds.filter((id) => eligibleIds.has(id)).slice(0, topDeckHandLostZoneCount) }
+    }
+    if (required === 'playerSide') return { kind: 'playerSide', side: selectedPlayerSide }
     if (required === 'damageCounterTransfer') {
       return {
         kind: 'damageCounterTransfer',
@@ -3648,6 +3774,21 @@ function AttackChoiceDrawer({
         cardIds: selectedDiscardHandPokemonIds.filter((cardId) => handIds.has(cardId)),
       }
     }
+    if (required === 'discardOwnBenchPokemon') {
+      const eligibleIds = new Set(ownBenchDiscardChoices.map((card) => card.instanceId))
+      return { kind: 'discardOwnBenchPokemon', cardIds: selectedOwnBenchDiscardIds.filter((id) => eligibleIds.has(id)) }
+    }
+    if (required === 'selfDamageCounters') {
+      return { kind: 'selfDamageCounters', amount: selectedSelfDamageCounters }
+    }
+    if (required === 'switchAndDeckEvolution') {
+      const availableIds = new Set(availableDeckPokemon.map((card) => card.id))
+      return {
+        kind: 'switchAndDeckEvolution',
+        benchCardId: selectedCardId,
+        evolutionCardId: selectedDeckPokemonIds.find((id) => availableIds.has(id)),
+      }
+    }
     if (required === 'ownPokemon' && selectedOwnPokemonId) {
       return { kind: 'ownPokemon', cardId: selectedOwnPokemonId }
     }
@@ -3658,6 +3799,13 @@ function AttackChoiceDrawer({
           .filter(([, counters]) => counters > 0)
           .map(([cardId, counters]) => ({ cardId, counters })),
       }
+    }
+    if (
+      required === 'discardPokemonToBench' &&
+      discardBenchRecoveryRule?.kind === 'recoverPokemonFromDiscardToBench' &&
+      (selectedRecoveryPokemonIds.length > 0 || discardBenchRecoveryRule.upTo)
+    ) {
+      return { kind: 'discardPokemonToBench', cardIds: selectedRecoveryPokemonIds.slice(0, maxDiscardBenchRecoverySelection) }
     }
     if (
       required === 'discardPokemonToHand' &&
@@ -3721,12 +3869,22 @@ function AttackChoiceDrawer({
 
   const activeChoiceReady =
     !activeRequirement ||
-    (activeRequirement === 'disableAttack'
+    (activeRequirement === 'playerSide'
+      ? true
+      : activeRequirement === 'topDeckPokemon'
+        ? topDeckPokemonChoices.length === 0 || topDeckPokemonChoices.some((card) => card.id === selectedTopDeckPokemonId)
+      : activeRequirement === 'topDeckPokemonSet'
+        ? selectedTopDeckPokemonIds.length === topDeckHandLostZoneCount && selectedTopDeckPokemonIds.every((id) => topDeckHandLostZoneChoices.some((card) => card.id === id))
+      : activeRequirement === 'disableAttack'
       ? (requirement === 'copyAttack'
           ? followUpAttackIndex
           : selectedAttackIndex) !== null
       : activeRequirement === 'opponentBench'
-        ? Boolean(selectedCardId)
+        ? benchChoices.every((card) => card.currentHp <= 0) && activeEffect?.special?.some((rule) =>
+            rule.kind === 'shuffleTargetIntoDeck' && rule.targetZone === 'selectedChoice' && Boolean(rule.condition),
+          ) || Boolean(selectedCardId)
+      : activeRequirement === 'switchAndDeckEvolution'
+        ? Boolean(selectedCardId) && (availableDeckPokemon.length === 0 || selectedDeckPokemonIds.some((id) => availableDeckPokemon.some((card) => card.id === id)))
         : activeRequirement === 'ownBench'
           ? benchChoices.every((card) => card.currentHp <= 0) || Boolean(selectedCardId)
         : activeRequirement === 'optionalOpponentBench' || activeRequirement === 'optionalOwnBench'
@@ -3739,14 +3897,23 @@ function AttackChoiceDrawer({
           ? effect.choiceHandCardCount === undefined ||
             handPokemonChoices.length === 0 ||
             selectedDiscardHandPokemonIds.length === Math.min(effect.choiceHandCardCount, handPokemonChoices.length)
+        : activeRequirement === 'discardOwnBenchPokemon'
+          ? true
+        : activeRequirement === 'selfDamageCounters'
+          ? Number.isInteger(selectedSelfDamageCounters) && selectedSelfDamageCounters >= 0 && selectedSelfDamageCounters <= (activeEffect?.choiceSelfDamageCountersUpToRemainingHp ? Math.floor(attacker.currentHp / 10) : activeEffect?.choiceSelfDamageCounterMax ?? 0)
         : activeRequirement === 'ownPokemon'
           ? Boolean(selectedOwnPokemonId)
         : activeRequirement === 'counterDistribution'
-          ? assignedCounterCount === counterDistributionCount
+          ? counterDistributionChoices.length === 0 || assignedCounterCount === counterDistributionCount &&
+            (typeof counterDistributionTargetCount !== 'number' || Object.keys(selectedCounterAssignments).length === counterDistributionTargetCount)
         : activeRequirement === 'discardPokemonToHand'
           ? recoverablePokemonChoices.length === 0 || (recoveryPokemonRule?.kind === 'recoverPokemonFromDiscardToHand' && recoveryPokemonRule.upTo
               ? selectedRecoveryPokemonIds.length <= Math.min(maxRecoverySelection, recoverablePokemonChoices.length)
               : selectedRecoveryPokemonIds.length === Math.min(maxRecoverySelection, recoverablePokemonChoices.length))
+        : activeRequirement === 'discardPokemonToBench'
+          ? recoverableDiscardBenchChoices.length === 0 || (discardBenchRecoveryRule?.kind === 'recoverPokemonFromDiscardToBench' && discardBenchRecoveryRule.upTo
+              ? selectedRecoveryPokemonIds.length <= Math.min(maxDiscardBenchRecoverySelection, recoverableDiscardBenchChoices.length)
+              : selectedRecoveryPokemonIds.length === Math.min(maxDiscardBenchRecoverySelection, recoverableDiscardBenchChoices.length))
         : activeRequirement === 'discardPokemon'
           ? Boolean(selectedDiscardPokemon)
         : activeRequirement === 'statusCondition'
@@ -3828,7 +3995,7 @@ function AttackChoiceDrawer({
         className="border-game-border bg-game-surface-raised text-game-ink"
       >
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
-          {(effect.targetScope === 'bench' || effect.targetScope === 'any') && (
+          {(effect.targetScope === 'bench' || effect.targetScope === 'any' || effect.targetScope === 'all' || effect.targetScope === 'own' || effect.targetScope === 'ownBench') && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
                 Target
@@ -3842,11 +4009,12 @@ function AttackChoiceDrawer({
           )}
           {(activeRequirement === 'opponentBench' ||
             activeRequirement === 'ownBench' ||
+            activeRequirement === 'switchAndDeckEvolution' ||
             activeRequirement === 'optionalOpponentBench' ||
             activeRequirement === 'optionalOwnBench') && benchChoices.some((card) => card.currentHp > 0) && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
-                {activeRequirement === 'ownBench' || activeRequirement === 'optionalOwnBench'
+                {activeRequirement === 'ownBench' || activeRequirement === 'switchAndDeckEvolution' || activeRequirement === 'optionalOwnBench'
                   ? 'Switch with'
                   : 'Bring forward'}
               </h3>
@@ -3897,15 +4065,28 @@ function AttackChoiceDrawer({
           {activeRequirement === 'counterDistribution' && (
             <section className="space-y-2">
               <div>
-                <h3 className="text-sm font-semibold text-game-ink">Place damage counters</h3>
+                <h3 className="text-sm font-semibold text-game-ink">
+                  {activeEffect?.choiceCounterAllowRepeatedTargets || activeEffect?.choiceCounterTargetDamage !== undefined
+                    ? 'Select damage targets'
+                    : 'Place damage counters'}
+                </h3>
                 <p className="text-xs text-game-muted">
-                  Assign all {counterDistributionCount} counters. {assignedCounterCount}/{counterDistributionCount} assigned.
+                  {activeEffect?.choiceCounterAllowRepeatedTargets
+                    ? `Choose ${counterDistributionCount} hits. You may select the same Pokémon more than once.`
+                    : activeEffect?.choiceCounterTargetDamage !== undefined
+                      ? `Choose ${counterDistributionTargetCount} distinct Benched Pokémon. Each takes ${activeEffect.choiceCounterTargetDamage} damage.`
+                    : typeof counterDistributionTargetCount === 'number'
+                    ? `Choose ${counterDistributionTargetCount} Pokémon and put ${counterDistributionStep} counters on each.`
+                    : `Assign all ${counterDistributionCount} counters.`} {assignedCounterCount}/{counterDistributionCount} assigned.
                 </p>
               </div>
               <div className="space-y-2">
                 {counterDistributionChoices.map((card) => {
                   const counters = selectedCounterAssignments[card.instanceId] || 0
-                  const canAddCounter = assignedCounterCount < counterDistributionCount
+                  const selectedTargetCount = Object.keys(selectedCounterAssignments).length
+                  const canAddCounter = assignedCounterCount + counterDistributionStep <= counterDistributionCount &&
+                    (counters > 0 || typeof counterDistributionTargetCount !== 'number' || selectedTargetCount < counterDistributionTargetCount) &&
+                    (activeEffect?.choiceCounterAllowRepeatedTargets || counters + counterDistributionStep <= counterDistributionStep)
                   return (
                     <div key={card.instanceId} className="flex items-center justify-between gap-3 rounded-md border border-game-border/60 bg-game-surface-raised px-3 py-2">
                       <div className="min-w-0">
@@ -3915,10 +4096,14 @@ function AttackChoiceDrawer({
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          aria-label={`Remove a damage counter from ${card.name}`}
+                          aria-label={activeEffect?.choiceCounterAllowRepeatedTargets
+                            ? `Remove a hit from ${card.name}`
+                            : activeEffect?.choiceCounterTargetDamage !== undefined
+                              ? `Remove ${card.name} as a damage target`
+                            : `Remove ${counterDistributionStep} damage counters from ${card.name}`}
                           disabled={counters === 0}
                           onClick={() => setSelectedCounterAssignments((current) => {
-                            const nextCount = (current[card.instanceId] || 0) - 1
+                            const nextCount = (current[card.instanceId] || 0) - counterDistributionStep
                             if (nextCount <= 0) {
                               const remaining = { ...current }
                               delete remaining[card.instanceId]
@@ -3933,12 +4118,18 @@ function AttackChoiceDrawer({
                         <span className="w-5 text-center font-mono text-sm font-semibold text-game-ink">{counters}</span>
                         <button
                           type="button"
-                          aria-label={`Add a damage counter to ${card.name}`}
+                          aria-label={activeEffect?.choiceCounterAllowRepeatedTargets
+                            ? `Add a hit to ${card.name}`
+                            : activeEffect?.choiceCounterTargetDamage !== undefined
+                              ? `Choose ${card.name} as a damage target`
+                            : `Add a damage counter to ${card.name}`}
                           disabled={!canAddCounter}
                           onClick={() => setSelectedCounterAssignments((current) => {
                             const total = Object.values(current).reduce((sum, count) => sum + count, 0)
-                            if (total >= counterDistributionCount) return current
-                            return { ...current, [card.instanceId]: (current[card.instanceId] || 0) + 1 }
+                            if (total + counterDistributionStep > counterDistributionCount) return current
+                            if (!current[card.instanceId] && typeof counterDistributionTargetCount === 'number' && Object.keys(current).length >= counterDistributionTargetCount) return current
+                            if (!activeEffect?.choiceCounterAllowRepeatedTargets && (current[card.instanceId] || 0) + counterDistributionStep > counterDistributionStep) return current
+                            return { ...current, [card.instanceId]: (current[card.instanceId] || 0) + counterDistributionStep }
                           })}
                           className="game-focus-ring h-9 w-9 rounded-md border border-game-border/60 text-lg font-semibold text-game-ink disabled:opacity-40"
                         >
@@ -3953,18 +4144,76 @@ function AttackChoiceDrawer({
           )}
           {activeRequirement === 'ownPokemon' && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-ink">Choose a Pokémon to heal</h3>
+              <h3 className="text-sm font-semibold text-game-ink">
+                {activeEffect?.choiceOwnPokemonSide === 'any' ? 'Choose a damaged Pokémon to heal' : 'Choose a Pokémon to heal'}
+              </h3>
               {renderCardChoices(ownPokemonChoices, selectedOwnPokemonId, setSelectedOwnPokemonId)}
             </section>
           )}
-          {activeRequirement === 'discardPokemonToHand' && (
+          {activeRequirement === 'playerSide' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Choose which player shuffles their Pokémon hand and draws 4</h3>
+              <div className="flex flex-wrap gap-2">
+                {(['player', 'opponent'] as const).map((side) => (
+                  <Button key={side} type="button" variant={selectedPlayerSide === side ? 'default' : 'outline'} onClick={() => setSelectedPlayerSide(side)} className="game-focus-ring">
+                    {side === 'player' ? 'You' : 'Opponent'}
+                  </Button>
+                ))}
+              </div>
+            </section>
+          )}
+          {activeRequirement === 'topDeckPokemon' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Choose one of the top three Pokémon for your hand</h3>
+              {topDeckPokemonChoices.length ? (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {topDeckPokemonChoices.map((card) => (
+                    <Button key={card.id} type="button" variant={selectedTopDeckPokemonId === card.id ? 'default' : 'outline'} onClick={() => setSelectedTopDeckPokemonId(card.id)} className="game-focus-ring justify-start">
+                      {card.name}
+                    </Button>
+                  ))}
+                </div>
+              ) : <p className="text-sm text-game-muted">Your deck is empty.</p>}
+            </section>
+          )}
+          {activeRequirement === 'topDeckPokemonSet' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Choose {topDeckHandLostZoneCount} Pokémon for your hand ({selectedTopDeckPokemonIds.length} selected)</h3>
+              <p className="text-xs text-game-muted">The other revealed Pokémon will go to the Lost Zone.</p>
+              {topDeckHandLostZoneChoices.length ? (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {topDeckHandLostZoneChoices.map((card) => {
+                    const selected = selectedTopDeckPokemonIds.includes(card.id)
+                    return (
+                      <Button
+                        key={card.id}
+                        type="button"
+                        variant={selected ? 'default' : 'outline'}
+                        aria-pressed={selected}
+                        disabled={!selected && selectedTopDeckPokemonIds.length >= topDeckHandLostZoneCount}
+                        onClick={() => setSelectedTopDeckPokemonIds((current) => selected
+                          ? current.filter((id) => id !== card.id)
+                          : [...current, card.id])}
+                        className="game-focus-ring justify-start"
+                      >
+                        {card.name}
+                      </Button>
+                    )
+                  })}
+                </div>
+              ) : <p className="text-sm text-game-muted">Your deck is empty.</p>}
+            </section>
+          )}
+          {(activeRequirement === 'discardPokemonToHand' || activeRequirement === 'discardPokemonToBench') && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
-                {maxRecoverySelection > 1 ? `Pokémon to recover (${selectedRecoveryPokemonIds.length} selected)` : 'Pokémon to recover'}
+                {activeRequirement === 'discardPokemonToBench'
+                  ? `Pokémon to put on the Bench (${selectedRecoveryPokemonIds.length} selected)`
+                  : maxRecoverySelection > 1 ? `Pokémon to recover (${selectedRecoveryPokemonIds.length} selected)` : 'Pokémon to recover'}
               </h3>
-              {recoverablePokemonChoices.length > 0 ? (
+              {activeRecoveryChoices.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {recoverablePokemonChoices.map((card) => {
+                  {activeRecoveryChoices.map((card) => {
                     const selected = selectedRecoveryPokemonIds.includes(card.instanceId)
                     return (
                       <button
@@ -3974,7 +4223,7 @@ function AttackChoiceDrawer({
                         onClick={() => setSelectedRecoveryPokemonIds((current) =>
                           selected
                             ? current.filter((cardId) => cardId !== card.instanceId)
-                            : current.length < maxRecoverySelection ? [...current, card.instanceId] : current,
+                            : current.length < activeRecoveryMaxSelection ? [...current, card.instanceId] : current,
                         )}
                         className={cn(
                           'game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left text-sm font-semibold transition-colors',
@@ -3989,19 +4238,37 @@ function AttackChoiceDrawer({
                   })}
                 </div>
               ) : (
-                <p className="text-sm text-game-muted">No eligible Pokémon are in your discard pile.</p>
+                <p className="text-sm text-game-muted">{activeRequirement === 'discardPokemonToBench' ? 'No eligible Pokémon are in your discard pile or your Bench is full.' : 'No eligible Pokémon are in your discard pile.'}</p>
               )}
+            </section>
+          )}
+          {activeRequirement === 'discardOwnBenchPokemon' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Benched Pokémon to discard ({selectedOwnBenchDiscardIds.length} selected)</h3>
+              <p className="text-xs text-game-muted">Each selected Pokémon adds 40 damage. You may select any number.</p>
+              {ownBenchDiscardChoices.length ? <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{ownBenchDiscardChoices.map((card) => {
+                const selected = selectedOwnBenchDiscardIds.includes(card.instanceId)
+                return <button key={card.instanceId} type="button" aria-pressed={selected} onClick={() => setSelectedOwnBenchDiscardIds((current) => selected ? current.filter((id) => id !== card.instanceId) : [...current, card.instanceId])} className={cn('game-focus-ring min-h-11 rounded-md border px-3 py-2 text-left text-sm font-semibold transition-colors', selected ? 'border-game-moss bg-game-moss/25 text-game-ink' : 'border-game-border/60 bg-game-surface-raised text-game-muted hover:border-game-moss/60')}>{card.name}</button>
+              })}</div> : <p className="text-sm text-game-muted">No Benched Pokémon can be discarded.</p>}
             </section>
           )}
           {activeRequirement === 'discardHandCards' && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
-                Pokémon to discard ({selectedDiscardHandPokemonIds.length})
+                {handCardGoesToLostZone ? 'Pokémon to put in the Lost Zone' : 'Pokémon to discard'} ({selectedDiscardHandPokemonIds.length})
               </h3>
               <p className="text-xs text-game-muted">
-                {effect.choiceHandCardCount === undefined
-                  ? 'Choose any number. Each Pokémon adds 30 damage.'
-                  : `Choose ${effect.choiceHandCardCount} Pokémon to discard.`}
+                {handCardGoesToLostZone
+                  ? `Choose ${effect.choiceHandCardCount || 1} Pokémon from your hand to put in the Lost Zone.`
+                  : effect.choiceHandCardNames?.length
+                  ? `Choose any number of ${effect.choiceHandCardNames.join(' or ')}. Each adds ${effect.damage.kind === 'count' ? effect.damage.perUnitDamage : 0} damage.`
+                  : effect.choiceHandCardSubtypes?.length
+                  ? `Choose ${effect.choiceHandCardCount || 'a'} ${effect.choiceHandCardSubtypes.join(' or ')} Pokémon to discard.`
+                  : effect.choiceHandCardRetreatCost !== undefined
+                  ? `Choose any number with Retreat Cost ${effect.choiceHandCardRetreatCost}. Each adds ${effect.damage.kind === 'count' ? effect.damage.perUnitDamage : 0} damage.`
+                  : effect.choiceHandCardCount === undefined
+                    ? 'Choose any number. Each Pokémon adds 30 damage.'
+                    : `Choose ${effect.choiceHandCardCount} Pokémon to discard.`}
               </p>
               {handPokemonChoices.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -4070,21 +4337,27 @@ function AttackChoiceDrawer({
               )}
             </section>
           )}
-          {activeRequirement === 'deckPokemon' && deckPokemonRule?.kind === 'searchDeckPokemon' && (
+          {(activeRequirement === 'deckPokemon' || activeRequirement === 'switchAndDeckEvolution') && deckPokemonRule?.kind === 'searchDeckPokemon' && (
             <section className="space-y-2">
               <div>
-                <h3 className="text-sm font-semibold text-game-ink">Choose Pokémon from your deck</h3>
+                <h3 className="text-sm font-semibold text-game-ink">{activeRequirement === 'switchAndDeckEvolution' || deckPokemonRule.evolveAttacker || deckPokemonRule.evolveTarget ? 'Choose an Evolution for this Pokémon' : 'Choose Pokémon from your deck'}</h3>
                 <p className="text-xs text-game-muted">
-                  {deckPokemonRule.oneOfEachType
+                  {activeRequirement === 'switchAndDeckEvolution'
+                    ? `Choose the next Evolution for ${attacker.name} if one is in your deck.`
+                    : deckPokemonRule.evolveAttacker || deckPokemonRule.evolveTarget
+                    ? `Choose a Pokémon that evolves from ${(deckPokemonRule.evolveTarget ? target : attacker)?.name || attacker.name} to evolve it.`
+                    : deckPokemonRule.oneOfEachType
                     ? `Select up to ${maxDeckPokemonSelection} Pokémon, each with a different type.`
                     : deckPokemonRule.destination === 'hand'
                     ? `Select up to ${maxDeckPokemonSelection} Pokémon to add to your hand.`
+                    : deckPokemonRule.destination === 'discard'
+                    ? `Select up to ${maxDeckPokemonSelection} Pokémon to discard.`
                     : `Select up to ${maxDeckPokemonSelection}. You may leave some or all Bench spaces open.`}
                 </p>
               </div>
               {availableDeckPokemon.length === 0 ? (
                 <p className="text-sm text-game-muted">No eligible Pokémon remain in your deck.</p>
-              ) : maxDeckPokemonSelection === 0 && deckPokemonRule.destination !== 'hand' ? (
+              ) : maxDeckPokemonSelection === 0 && deckPokemonRule.destination === 'bench' ? (
                 <p className="text-sm text-game-muted">Your Bench is full.</p>
               ) : (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -4093,11 +4366,14 @@ function AttackChoiceDrawer({
                     const duplicateNameSelected = Boolean(deckPokemonRule.oneOfEachName && !selected && selectedDeckPokemonIds.some((cardId) =>
                       availableDeckPokemon.find((candidate) => candidate.id === cardId)?.name.toLowerCase() === card.name.toLowerCase(),
                     ))
+                    const mismatchedLegendNameSelected = Boolean(deckPokemonRule.sameNameAsFirst && !selected && selectedDeckPokemonIds.some((cardId) =>
+                      availableDeckPokemon.find((candidate) => candidate.id === cardId)?.name.toLowerCase() !== card.name.toLowerCase(),
+                    ))
                     const cardType = card.types[0]?.toLowerCase() || 'colorless'
                     const duplicateTypeSelected = Boolean(deckPokemonRule.oneOfEachType && !selected && selectedDeckPokemonIds.some((cardId) =>
                       (availableDeckPokemon.find((candidate) => candidate.id === cardId)?.types[0]?.toLowerCase() || 'colorless') === cardType,
                     ))
-                    const disabled = !selected && (selectedDeckPokemonIds.length >= maxDeckPokemonSelection || duplicateNameSelected || duplicateTypeSelected)
+                    const disabled = !selected && (selectedDeckPokemonIds.length >= maxDeckPokemonSelection || duplicateNameSelected || duplicateTypeSelected || mismatchedLegendNameSelected)
                     return (
                       <button
                         type="button"
@@ -4129,19 +4405,21 @@ function AttackChoiceDrawer({
           )}
           {activeRequirement === 'optionalBonus' &&
             activeEffect &&
-            (activeEffect.damage.kind === 'optionalChoiceBonus' ||
+            (activeEffect.optionalBonusPrompt ||
+              activeEffect.damage.kind === 'optionalChoiceBonus' ||
               activeEffect.damage.kind === 'optionalCoinDamage' ||
-              activeEffect.damage.kind === 'handDiscardBonus') && (
+              activeEffect.damage.kind === 'handDiscardBonus' ||
+              activeEffect.damage.kind === 'count' && activeEffect.damage.optional) && (
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-game-ink">Optional attack bonus</h3>
+                <h3 className="text-sm font-semibold text-game-ink">Optional attack effect</h3>
                 <p className="text-sm text-game-muted">
                   {activeEffect.optionalBonusPrompt || (activeEffect.damage.kind === 'optionalCoinDamage'
                     ? `Flip for ${activeEffect.damage.successDamage} damage? Tails does ${activeEffect.damage.failureDamage} damage.`
                     : optionalBonusEnergyDiscardAmount > 0
-                      ? `Discard ${optionalBonusEnergyDiscardAmount} Energy to take +${activeEffect.damage.bonusDamage} damage?`
+                      ? `Discard ${optionalBonusEnergyDiscardAmount} Energy to take +${optionalDamageBonus} damage?`
                       : activeEffect.selfDamage?.some((rule) => rule.kind === 'optionalChoice')
-                        ? `Take +${activeEffect.damage.bonusDamage} damage and accept the recoil?`
-                        : `Take +${activeEffect.damage.bonusDamage} damage?`)}
+                        ? `Take +${optionalDamageBonus} damage and accept the recoil?`
+                        : `Take +${optionalDamageBonus} damage?`)}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -4154,7 +4432,7 @@ function AttackChoiceDrawer({
                         : 'border-game-border/60 bg-game-surface-raised text-game-muted',
                     )}
                   >
-                    {activeEffect.damage.kind === 'optionalCoinDamage' ? 'Do not flip' : 'No bonus'}
+                    {activeEffect.optionalBonusNoLabel || (activeEffect.damage.kind === 'optionalCoinDamage' ? 'Do not flip' : 'No bonus')}
                   </button>
                   <button
                     type="button"
@@ -4169,7 +4447,7 @@ function AttackChoiceDrawer({
                         : 'border-game-border/60 bg-game-surface-raised text-game-muted',
                     )}
                   >
-                    {activeEffect.damage.kind === 'optionalCoinDamage' ? 'Flip a coin' : 'Take bonus'}
+                    {activeEffect.optionalBonusYesLabel || (activeEffect.damage.kind === 'optionalCoinDamage' ? 'Flip a coin' : 'Take bonus')}
                   </button>
                 </div>
               </section>
@@ -4246,7 +4524,7 @@ function AttackChoiceDrawer({
                 Attack to copy
               </h3>
               <div className="grid gap-2">
-                {getTcgBattleAvailableAttacks(state, 'opponent', target).map((candidate, index) => {
+                {getTcgBattleCopyAttackOptions(state, 'player', target, attack, attacker).map(({ attack: candidate, source }, index) => {
                   const candidateEffect = getTcgBattleAttackEffect(candidate)
                   const isRecursive = candidateEffect?.special?.some(
                     (rule) => rule.kind === 'copyAttack',
@@ -4279,6 +4557,9 @@ function AttackChoiceDrawer({
                       <span className="block text-sm font-semibold">
                         {candidate.name}
                       </span>
+                      {copyAttackRule?.kind === 'copyAttack' && (copyAttackRule.sourceScope === 'any' || copyAttackRule.sourceScope === 'bench' || copyAttackRule.sourceScope === 'ownBench' || copyAttackRule.sourceScope === 'ownPlay') && (
+                        <span className="block text-xs text-game-muted">From {source.name}</span>
+                      )}
                       <span className="text-xs text-game-muted">
                         {candidate.text || `${candidate.damage || 0} damage`}
                       </span>
@@ -4327,7 +4608,7 @@ function AttackChoiceDrawer({
           {activeRequirement === 'energyAmount' && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-ink">
-                {effect.choiceEnergyType ? `Extra ${effect.choiceEnergyType} Energy` : 'Extra Energy'}
+                {effect.choiceEnergyType ? `Extra ${effect.choiceEnergyType} Energy` : effect.choiceEnergyTypes?.length ? `Extra ${effect.choiceEnergyTypes.join(' or ')} Energy` : 'Extra Energy'}
               </h3>
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
                 {Array.from({ length: availableChoiceEnergy + 1 }, (_, amount) => (
@@ -4346,6 +4627,17 @@ function AttackChoiceDrawer({
                   </button>
                 ))}
               </div>
+            </section>
+          )}
+          {activeRequirement === 'selfDamageCounters' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-ink">Damage counters to place on {attacker.name}</h3>
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                {Array.from({ length: (activeEffect?.choiceSelfDamageCountersUpToRemainingHp ? Math.floor(attacker.currentHp / 10) : activeEffect?.choiceSelfDamageCounterMax ?? 0) + 1 }, (_, amount) => (
+                  <button key={amount} type="button" aria-pressed={selectedSelfDamageCounters === amount} onClick={() => setSelectedSelfDamageCounters(amount)} className={cn('game-focus-ring min-h-11 rounded-md border font-mono text-sm', selectedSelfDamageCounters === amount ? 'border-game-moss bg-game-moss/25 text-game-ink' : 'border-game-border bg-game-canvas/50 text-game-muted')}>{amount}</button>
+                ))}
+              </div>
+              <p className="text-xs text-game-muted">{activeEffect?.damage.kind === 'choiceDamageCounterMultiplier' ? `Each counter adds ${activeEffect.damage.damagePerCounter} attack damage and is placed on the attacking Pokémon.` : 'Each selected counter is placed on the attacking Pokémon and used by the attack’s linked counter effect.'}</p>
             </section>
           )}
           {activeRequirement === 'typeChange' &&
@@ -4665,6 +4957,11 @@ function getTcgBattleAbilityDeckSearchEffect(text: string): { sharedKey: string;
   if (normalized === 'once during your turn (before your attack), you may search your deck for a basic pokemon or evolution card, show it to your opponent, and put it into your hand. shuffle your deck afterward. this power can\'t be used if nidoqueen is affected by a special condition.') return { sharedKey: 'nidoqueen basic or evolution search', subtype: 'pokemon', count: 1, specialConditionGate: true }
   if (normalized === "once during your turn (before your attack), if any of your pokemon were knocked out during your opponent's last turn, search your deck for any 1 card and put it into your hand. shuffle your deck afterward. this power can't be used if slowking is affected by a special condition.") return { sharedKey: 'slowking knockout search', count: 1, knockoutAnyGate: true, specialConditionGate: true }
   if (normalized === 'once during your turn (before your attack), you may search your deck for a basic energy card, show it to your opponent, and put it into your hand. shuffle your deck afterward. this power can\'t be used if aerodactyl is affected by a special condition.') return { sharedKey: 'aerodactyl basic energy search', subtype: 'energy', energyCard: true, basicEnergyOnly: true, count: 1, specialConditionGate: true }
+  const basicEnergyToHand = normalized.match(/^once during your turn(?: \(before your attack\))?, (?:(if this pokemon is (?:in the active spot|your active pokemon)), )?you may search your deck for (?:(?:up to (\d+))|(?:(?:a|an|one|1) ))? ?(basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|darkness|metal|fairy|colorless))? energy cards?, (?:(?:reveal|show) (?:it|them)(?: to your opponent)?,? and )?put (?:it|them) into your hand\. (?:then, )?shuffle your deck(?: afterward)?\.(?: this power can't be used if .+ is affected by a special condition\.)?$/)
+  if (basicEnergyToHand) {
+    const energyTypes: Record<string, string> = { g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', f: 'fighting', d: 'darkness', m: 'metal', y: 'fairy', c: 'colorless' }
+    return { sharedKey: 'basic Energy search to hand', subtype: 'energy', energyCard: true, basicEnergyOnly: Boolean(basicEnergyToHand[3]), requiredEnergyType: basicEnergyToHand[4] ? energyTypes[basicEnergyToHand[4]] : basicEnergyToHand[5], count: Number(basicEnergyToHand[2] || 1), upToCount: normalized.includes('up to'), activeOnly: Boolean(basicEnergyToHand[1]), specialConditionGate: /can't be used if .* is affected by a special condition/.test(normalized), sharedLimit: false }
+  }
   if (normalized === 'once during your turn (before your attack), you may search your deck for a card. shuffle your deck, then put that card on top of your deck. this power can\'t be used if magcargo is affected by a special condition.') return { sharedKey: 'magcargo top deck search', count: 1, specialConditionGate: true, putOnTop: true }
   if (normalized === 'once during your turn (before your attack), you may search your deck for an evolution card. show it to your opponent and put it into your hand. shuffle your deck afterward. this power can\'t be used if dark dragonair is affected by a special condition.') return { sharedKey: 'dark dragonair evolution search', subtype: 'pokemon', evolutionOnly: true, count: 1, activeOnly: true, specialConditionGate: true }
   if (normalized === 'once during your turn (before your attack), you may search your deck for up to 2 basic energy cards, reveal them, and put them into your hand. then, shuffle your deck.') return { sharedKey: 'ribombee basic energy search', subtype: 'energy', energyCard: true, basicEnergyOnly: true, count: 2, upToCount: true }
@@ -4776,14 +5073,17 @@ function getUsableDrawAbilities(state: TcgBattleState) {
       const abilityDeckSearch = getTcgBattleAbilityDeckSearchEffect(text)
       const searchCount = vstarSearchCount || (abilityDeckSearch?.count ?? 0)
       const searchDeck = searchCount > 0
-      const energyAttachFromDeck = text.match(/^once during your turn, you may search your deck for a basic \{([grwlpmdycf])\} energy card and attach it to this pokemon\. then, shuffle your deck\.$/)
+      const energyAttachFromDeckMatch = text.match(/^once during your turn(?: \(before your attack\))?, you may search your deck for (?:a )?(?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)) energy card and attach it to (?:this pokemon|starmie)\. then, shuffle your deck(?: afterward)?\.(?: this power can't be used if starmie is affected by a special condition\.)?$/)
+      const energyAttachFromDeck = energyAttachFromDeckMatch ? [energyAttachFromDeckMatch[0], energyAttachFromDeckMatch[1] || ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', fighting: 'f', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c' } as Record<string, string>)[energyAttachFromDeckMatch[2]] ] as RegExpMatchArray : null
       const clefairyMoonWatch = source.name.toLowerCase() === 'clefairy' && text === 'once during your turn, if this pokemon is in the active spot, for each of your benched clefairy, you may search your deck for a psychic energy card and attach it to that clefairy. then, shuffle your deck.' && state.player.front.some((card) => card.instanceId === source.instanceId) && state.player.back.some((card) => card.currentHp > 0 && card.name.toLowerCase() === 'clefairy')
       const giratinaBrokenSpaceBellow = source.name.toLowerCase() === 'giratina ex' && text === 'once during your turn, you may take a {p} energy from your energy zone and attach it to this pokemon. if you use this ability, your turn ends.'
       const gardevoirPsyShadow = source.name.toLowerCase() === 'gardevoir' && text === 'once during your turn, you may take a {p} energy from your energy zone and attach it to the {p} pokemon in the active spot.'
-      const energyZoneAttach = text.match(/^once during your turn, if this pokemon is in the active spot, you may take a \{([grwlpmdycf])\} energy from your energy zone and attach it to 1 of your \{([grwlpmdycf])\} pokemon\.$/) || (giratinaBrokenSpaceBellow || gardevoirPsyShadow ? [giratinaBrokenSpaceBellow ? 'broken-space-bellow' : 'psy-shadow', 'p', 'p'] as RegExpMatchArray : null)
+      const magnetonEnergyZoneAttach = source.name.toLowerCase() === 'magneton' && text === 'once during your turn, you may take a {l} energy from your energy zone and attach it to this pokemon.'
+      const hydreigonEnergyZoneAttach = source.name.toLowerCase() === 'hydreigon' && text === 'once during your turn, you may take 2 {d} energy from your energy zone and attach it to this pokemon. if you do, do 30 damage to this pokemon.'
+      const energyZoneAttach = text.match(/^once during your turn, if this pokemon is in the active spot, you may take a \{([grwlpmdycf])\} energy from your energy zone and attach it to 1 of your \{([grwlpmdycf])\} pokemon\.$/) || (giratinaBrokenSpaceBellow || gardevoirPsyShadow || magnetonEnergyZoneAttach || hydreigonEnergyZoneAttach ? [giratinaBrokenSpaceBellow ? 'broken-space-bellow' : gardevoirPsyShadow ? 'psy-shadow' : magnetonEnergyZoneAttach ? 'magneton-energy-zone-attach' : 'hydreigon-energy-zone-attach', magnetonEnergyZoneAttach ? 'l' : hydreigonEnergyZoneAttach ? 'd' : 'p', magnetonEnergyZoneAttach ? 'l' : hydreigonEnergyZoneAttach ? 'd' : 'p'] as RegExpMatchArray : null)
       const modeledEnergyZoneAttach = energyZoneAttach
-      if ((giratinaBrokenSpaceBellow || gardevoirPsyShadow) && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return []
-      const rillaboomEnergySearch = /^once during your turn, you may search your deck for up to 2 grass energy cards and attach them to 1 of your pokemon\. then, shuffle your deck\.$/.test(text)
+      if ((giratinaBrokenSpaceBellow || gardevoirPsyShadow || magnetonEnergyZoneAttach || hydreigonEnergyZoneAttach) && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return []
+      const rillaboomEnergySearch = /^once during your turn, you may search your deck for up to 2 (?:grass|\{g\}) energy cards and attach them to 1 of your pokemon\. then, shuffle your deck\.$/.test(text)
       const forretressEnergySearch = /^once during your turn, you may search your deck for up to 5 basic \{g\} energy cards and attach them to your pokemon in any way you like\. then, shuffle your deck\. if you searched your deck in this way, this pokemon is knocked out\.$/.test(text)
       const aromatissePsychicEnergySearch = source.name.toLowerCase() === 'aromatisse' && text === 'once during your turn, you may use this ability. search your deck for up to 2 basic {p} energy cards, reveal them, and put them into your hand. then, shuffle your deck.'
       const eldegossBasicEnergySearch = source.name.toLowerCase() === 'eldegoss' && text === 'once during your turn, you may search your deck for up to 2 basic energy cards, reveal them, and put them into your hand. then, shuffle your deck.'
@@ -4793,7 +5093,7 @@ function getUsableDrawAbilities(state: TcgBattleState) {
       const solgaleoMetalEnergySearch = source.name.toLowerCase() === 'solgaleo' && text === 'once during your turn, if this pokemon is on your bench, you may use this ability. search your deck for up to 2 basic metal energy cards and attach them to this pokemon. then, shuffle your deck.'
       const delphoxEnergySearch = source.name.toLowerCase() === 'delphox break' && text === 'once during your turn (before your attack), you may search your deck for a fire energy card and attach it to 1 of your pokemon. shuffle your deck afterward.'
       const leafeonEnergySearch = source.name.toLowerCase() === 'leafeon v' && text === 'once during your turn, you may search your deck for a grass energy card and attach it to 1 of your pokemon. then, shuffle your deck. if you use this ability, your turn ends.'
-      const energySearch = text.match(/^once during your turn, if this pokemon is (?:in the active spot|your active pokemon), you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards?, reveal them, and put them into your hand\. then, shuffle your deck\.$/) || (galarianBirdBenchPower ? ['galarian bird bench energy', '2', ({ psychic: 'p', fighting: 'f', darkness: 'd' } as Record<string, string>)[galarianBirdEnergy!] ] as RegExpMatchArray : ribombeeHoneyGather ? ['ribombee honey gather', '2', ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c', fighting: 'f' } as Record<string, string>)[state.player.selectedEnergy?.toLowerCase() || ''] || 'c'] as RegExpMatchArray : solgaleoMetalEnergySearch ? ['solgaleo metal pool energy', '2', 'm'] as RegExpMatchArray : eldegossBasicEnergySearch ? ['eldegoss cotton lift', '2', 'c'] as RegExpMatchArray : clefairyMoonWatch ? ['clefairy moon watch', String(state.player.back.filter((card) => card.currentHp > 0 && card.name.toLowerCase() === 'clefairy').length), 'p'] as RegExpMatchArray : energyAttachFromDeck ? [energyAttachFromDeck[0], '1', energyAttachFromDeck[1]] as RegExpMatchArray : modeledEnergyZoneAttach ? [modeledEnergyZoneAttach[0], '1', modeledEnergyZoneAttach[1]] as RegExpMatchArray : delphoxEnergySearch ? ['delphox energy acceleration', '1', 'r'] as RegExpMatchArray : leafeonEnergySearch ? ['leafeon energy acceleration', '1', 'g'] as RegExpMatchArray : null)
+      const energySearch = text.match(/^once during your turn, if this pokemon is (?:in the active spot|your active pokemon), you may search your deck for up to (\d+) basic \{([grwlpmdycf])\} energy cards?, reveal them, and put them into your hand\. then, shuffle your deck\.$/) || (galarianBirdBenchPower ? ['galarian bird bench energy', '2', ({ psychic: 'p', fighting: 'f', darkness: 'd' } as Record<string, string>)[galarianBirdEnergy!] ] as RegExpMatchArray : ribombeeHoneyGather ? ['ribombee honey gather', '2', ({ grass: 'g', fire: 'r', water: 'w', lightning: 'l', psychic: 'p', metal: 'm', darkness: 'd', fairy: 'y', colorless: 'c', fighting: 'f' } as Record<string, string>)[state.player.selectedEnergy?.toLowerCase() || ''] || 'c'] as RegExpMatchArray : solgaleoMetalEnergySearch ? ['solgaleo metal pool energy', '2', 'm'] as RegExpMatchArray : eldegossBasicEnergySearch ? ['eldegoss cotton lift', '2', 'c'] as RegExpMatchArray : clefairyMoonWatch ? ['clefairy moon watch', String(state.player.back.filter((card) => card.currentHp > 0 && card.name.toLowerCase() === 'clefairy').length), 'p'] as RegExpMatchArray : energyAttachFromDeck ? [energyAttachFromDeck[0], '1', energyAttachFromDeck[1]] as RegExpMatchArray : modeledEnergyZoneAttach ? [modeledEnergyZoneAttach[0], hydreigonEnergyZoneAttach ? '2' : '1', modeledEnergyZoneAttach[1]] as RegExpMatchArray : delphoxEnergySearch ? ['delphox energy acceleration', '1', 'r'] as RegExpMatchArray : leafeonEnergySearch ? ['leafeon energy acceleration', '1', 'g'] as RegExpMatchArray : null)
       const charizardEnergySearch = /^once during your turn \(before your attack\), you may put 2 damage counters on this pokemon\. if you do, search your deck for up to 2 fire energy cards and attach them to this pokemon\. then, shuffle your deck\.$/.test(text)
       const incineroarEnergySearch = source.name.toLowerCase().replace(/[^a-z0-9-]/g, '') === 'incineroar-gx' && text === 'once during your turn (before your attack), you may put 3 damage counters on this pokemon. if you do, search your deck for up to 3 darkness energy cards and attach them to this pokemon. then, shuffle your deck.'
       const resolvedEnergySearch = energySearch || (charizardEnergySearch ? ['charizard energy acceleration', '2', 'r'] as RegExpMatchArray : incineroarEnergySearch ? ['incineroar energy acceleration', '3', 'd'] as RegExpMatchArray : rillaboomEnergySearch ? ['rillaboom energy acceleration', '2', 'g'] as RegExpMatchArray : forretressEnergySearch ? ['forretress energy acceleration', '5', 'g'] as RegExpMatchArray : null)
@@ -4806,13 +5106,13 @@ function getUsableDrawAbilities(state: TcgBattleState) {
       const electrodeEnergyGrounding = source.name.toLowerCase() === 'electrode' && text === "once during your turn (before your attack), if electrode is your active pokemon, you may flip a coin. if heads, choose a lightning energy card from your discard pile and attach it to 1 of your pokemon. this power can't be used if electrode is affected by a special condition."
       const bellossomCoinAttach = source.name.toLowerCase() === 'bellossom' && text === "once during your turn (before your attack), you may flip a coin. if heads, attach 1 basic energy card from your hand to 1 of your benched pokemon. this power can't be used if bellossom is affected by a special condition."
       const magnetonMagneticCircuit = source.name.toLowerCase() === 'magneton' && text === 'once during your turn, you may attach up to 3 basic energy cards from your discard pile to your {l} pokemon in any way you like. if you use this ability, this pokemon is knocked out.'
-      const handEnergyAttachMatch = text.match(/^as often as you like during your turn(?: \(before your attack\))?, you may attach (?:a )?(?:basic )?(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)) energy card from your hand to 1 of your pokemon\.$/)
+      const handEnergyAttachMatch = text.match(/^(?:as often as you like during your turn|once during your turn)(?: \(before your attack\))?, you may attach (?:a|an) (?:basic )?(?:(?:\{([grwlpmdycf])\}|(grass|fire|water|lightning|psychic|fighting|metal|darkness|fairy|colorless)) )?energy card from your hand to (?:1 of your (?:benched )?pokemon|your active pokemon)\.(?: this power can't be used if .* is affected by a special condition\.)?$/)
       const handEnergyAttach = Boolean(handEnergyAttachMatch)
       const hydreigonDarkTrance = /^as often as you like during your turn(?: \(before your attack\))?, you may attach (?:a darkness energy card|a \{d\} energy card) from your hand to 1 of your pokemon\.$/.test(text)
       const cherrimSpringBloom = text === "as often as you like during your turn, you may attach a grass energy card from your hand to 1 of your pokemon that doesn't have a rule box (pokemon v, pokemon-gx, etc. have rule boxes)."
       const turboblaze = source.name.toLowerCase() === 'reshiram' && text === 'once during your turn (before your attack), if this pokemon is your active pokemon, you may attach a fire energy card from your hand to 1 of your dragon pokemon.'
       const pawmotEnergyAttach = text === 'once during your turn, you may use this ability. attach a basic lightning energy card from your discard pile to 1 of your pokemon.'
-      const flaaffyDynamotor = text === 'once during your turn (before your attack), you may attach a lightning energy card from your discard pile to 1 of your benched pokemon.'
+      const flaaffyDynamotor = /^once during your turn \(before your attack\), you may attach (?:a lightning|a \{l\}) energy card from your discard pile to 1 of your benched pokemon\.$/.test(text)
       const burmyWearCloak = ['burmy plant cloak', 'burmy sandy cloak'].includes(source.name.toLowerCase()) && /^once during your turn \(before your attack\), if burmy (?:plant|sandy) cloak is your active pokemon, you may search your discard pile for a basic (?:grass|fighting) energy card and attach it to burmy (?:plant|sandy) cloak\.$/.test(text)
       const discardBasicEnergyAttach = text === 'once during your turn, you may attach a basic energy card from your discard pile to 1 of your pokemon.'
       const basicEnergyHandAttach = text === 'once during your turn, you may attach a basic energy card from your hand to 1 of your pokemon.'
@@ -4830,7 +5130,7 @@ function getUsableDrawAbilities(state: TcgBattleState) {
         : cherrimSpringBloom ? 'grass'
         : electrodeEnergyGrounding ? 'lightning'
         : bellossomCoinAttach ? 'any'
-        : handEnergyAttachMatch ? energyTypes[handEnergyAttachMatch[1] || ''] || handEnergyAttachMatch[2]
+        : handEnergyAttachMatch ? energyTypes[handEnergyAttachMatch[1] || ''] || handEnergyAttachMatch[2] || 'any'
         : vivillonEnergyColor ? 'any'
         : turboblaze ? 'fire'
         : energyAttach && text.includes('darkness energy') ? 'darkness'
@@ -4970,7 +5270,7 @@ function getUsableDrawAbilities(state: TcgBattleState) {
       if (solgaleoMetalEnergySearch && !state.player.back.some((card) => card.instanceId === source.instanceId && card.currentHp > 0)) return []
       if (energySearch && (!galarianBirdBenchPower && !ribombeeHoneyGather && !gardevoirPsyShadow && !eldegossBasicEnergySearch && !solgaleoMetalEnergySearch && !rillaboomEnergySearch && !forretressEnergySearch && !delphoxEnergySearch && !leafeonEnergySearch && !text.includes('attach it to this pokemon') && !state.player.front.some((card) => card.instanceId === source.instanceId) || state.player.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || (energyAttachFromDeck || energyZoneAttach) && state.player.selectedEnergy?.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[(energyAttachFromDeck || energyZoneAttach)![1]] || delphoxEnergySearch && state.player.selectedEnergy?.toLowerCase() !== 'fire' || leafeonEnergySearch && state.player.selectedEnergy?.toLowerCase() !== 'grass' || (rillaboomEnergySearch || forretressEnergySearch) && state.player.selectedEnergy?.toLowerCase() !== 'grass' || energyZoneAttach && ![...state.player.front, ...state.player.back].some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyZoneAttach[2]])))) return []
       if (gardevoirPsyShadow && !state.player.front.some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === 'psychic'))) return []
-      if (energyAttachFromDeck && state.player.selectedEnergy?.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyAttachFromDeck[1]]) return []
+      if (energyAttachFromDeck && (state.player.selectedEnergy?.toLowerCase() !== ({ g: 'grass', r: 'fire', w: 'water', l: 'lightning', p: 'psychic', m: 'metal', d: 'darkness', y: 'fairy', c: 'colorless', f: 'fighting' } as Record<string, string>)[energyAttachFromDeck[1]] || text.includes('this power can\'t be used if starmie is affected by a special condition') && source.statusConditions?.length)) return []
       if (energyAttach && ((energyAttachType !== 'any' && state.player.selectedEnergy?.toLowerCase() !== energyAttachType) || coalossalTarGenerator && !['fire', 'fighting'].includes(state.player.selectedEnergy?.toLowerCase() || '') || state.player.energy >= TCG_BATTLE_FORMATS[state.format].energyCap || text.includes('benched pokemon') && !state.player.back.some((card) => card.currentHp > 0))) return []
       if (oricorioFirestarter && (![...state.player.front, ...state.player.back].some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ex') && card.name.toLowerCase().includes('mega') && card.types.some((type) => type.toLowerCase() === 'fire')) || !state.player.back.some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === 'fire')))) return []
       if (cinderaceLibero && !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === 'player' && event.targetId === source.instanceId)) return []
@@ -5048,6 +5348,9 @@ function getUsableBenchShuffleAbilities(state: TcgBattleState) {
       const suicunePower = /^once during your turn \(before your attack\), if this pokemon is on your bench, you may shuffle it and all cards attached to it into your deck\.$/.test(text)
         && normalize(source.name).startsWith('suicune')
         && state.player.back.some((card) => card.instanceId === source.instanceId)
+      const pidgeotVBenchShuffle = text === 'once during your turn, if this pokemon is on your bench, you may shuffle it and all attached cards into your deck.'
+        && normalize(source.name) === 'pidgeot v'
+        && state.player.back.some((card) => card.instanceId === source.instanceId)
       const jumpluffPower = text === 'once during your turn (before your attack), you may return this pokemon and all cards attached to it to your hand.' && normalize(source.name) === 'jumpluff'
       const azumarillReturn = normalize(source.name) === 'azumarill' && text === 'once during your turn (before your attack), if azumarill is on your bench, you may flip a coin. if heads, return azumarill and all cards attached to it to your hand.'
       const toxicroakGReturn = normalize(source.name).replace(/[^a-z0-9]/g, '') === 'toxicroakg' && text === "once during your turn (before your attack), if toxicroak is your active pokemon, you may flip a coin. if heads, return toxicroak and all cards attached to it to your hand. this power can't be used if toxicroak is affected by a special condition."
@@ -5068,7 +5371,7 @@ function getUsableBenchShuffleAbilities(state: TcgBattleState) {
       const unownFarewellLetter = normalize(source.name).replace(/[^a-z0-9]/g, '') === 'unown' && text === 'once during your turn (before your attack), if this pokemon is on your bench, you may discard this pokemon and all cards attached to it (this does not count as a knocked out pokemon). if you do, draw a card.'
       const unownZTopDeck = normalize(source.name).replace(/[^a-z0-9]/g, '') === 'unownz' && text === 'once during your turn (before your attack), if unown z is on your bench and you have no cards in your deck, you may discard all cards attached to unown z and put unown z on top of your deck.' && state.player.back.some((card) => card.instanceId === source.instanceId) && state.player.deck.length === 0
       const mistysPsyduckReturn = normalize(source.name) === "misty's psyduck" && text === 'once during your turn, if this pokemon is on your bench, you may discard the bottom card of your deck. if you do, discard all cards from this pokemon and put this pokemon on top of your deck.'
-      if (!pidgeotPower && !suicunePower && !jumpluffPower && !azumarillReturn && !activeCoinReturn && !wishiwashiCowardice && !starmiePower && !undevelop && !unownRDraw && !unownFarewellLetter && !unownZTopDeck && !gengarDevolution && !archeopsDevolution && !dusknoirPower && !crawdauntExReturn && !aipomSnappyMove && !mistysPsyduckReturn || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber || mistysPsyduckReturn && (state.player.deck.length === 0 || !state.player.back.some((card) => card.instanceId === source.instanceId) || state.player.abilityUses?.[`flustered leap:${source.id}`] === state.turnNumber)) return []
+      if (!pidgeotPower && !suicunePower && !pidgeotVBenchShuffle && !jumpluffPower && !azumarillReturn && !activeCoinReturn && !wishiwashiCowardice && !starmiePower && !undevelop && !unownRDraw && !unownFarewellLetter && !unownZTopDeck && !gengarDevolution && !archeopsDevolution && !dusknoirPower && !crawdauntExReturn && !aipomSnappyMove && !mistysPsyduckReturn || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber || mistysPsyduckReturn && (state.player.deck.length === 0 || !state.player.back.some((card) => card.instanceId === source.instanceId) || state.player.abilityUses?.[`flustered leap:${source.id}`] === state.turnNumber)) return []
       if (dusknoirPower && (source.statusConditions?.length || state.opponent.back.filter((card) => card.currentHp > 0).length < 4)) return []
       if (crawdauntExReturn && (source.statusConditions?.length || state.opponent.back.filter((card) => card.currentHp > 0).length < 4)) return []
       if (gengarDevolution && (source.statusConditions?.length || ![...state.opponent.front, ...state.opponent.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes('lv.x') && card.evolutionStack?.length))) return []
@@ -5082,7 +5385,7 @@ function getUsableBenchShuffleAbilities(state: TcgBattleState) {
       if (wishiwashiCowardice && (source.playedToBenchTurn === state.turnNumber || state.turnNumber === (state.playerGoesSecond ? 2 : 1) || ![...state.player.front, ...state.player.back].some((card) => card.instanceId !== source.instanceId && card.currentHp > 0))) return []
       if (starmiePower && ![...state.player.front, ...state.player.back].some((card) => card.instanceId !== source.instanceId && card.currentHp > 0)) return []
       const targets = pidgeotPower ? state.player.back.filter((card) => card.currentHp > 0) : gengarDevolution || archeopsDevolution ? [...state.opponent.front, ...state.opponent.back].filter((card) => card.currentHp > 0 && card.evolutionStack?.length && (!gengarDevolution || card.name.toLowerCase().includes('lv.x'))) : dusknoirPower || crawdauntExReturn ? state.opponent.back.filter((card) => card.currentHp > 0) : [source]
-      return targets.map((target) => ({ source, ability, abilityIndex, target, selfReturn: suicunePower, returnToHand: jumpluffPower || azumarillReturn || activeCoinReturn, azumarillReturn, activeCoinReturn, wishiwashiCowardice, selfShuffle: starmiePower, unownFarewellLetter, unownZTopDeck, undevelop, gengarDevolution, archeopsDevolution, dusknoirPower, crawdauntExReturn, aipomSnappyMove, mistysPsyduckReturn }))
+      return targets.map((target) => ({ source, ability, abilityIndex, target, selfReturn: suicunePower, returnToHand: jumpluffPower || azumarillReturn || activeCoinReturn, azumarillReturn, activeCoinReturn, wishiwashiCowardice, selfShuffle: starmiePower || pidgeotVBenchShuffle, unownFarewellLetter, unownZTopDeck, undevelop, gengarDevolution, archeopsDevolution, dusknoirPower, crawdauntExReturn, aipomSnappyMove, mistysPsyduckReturn }))
     }))
 }
 
@@ -5120,13 +5423,19 @@ function isTcgBattleBenchToActiveAbility(text: string, sourceName: string) {
   return normalize(namedSource) === normalize(sourceName)
 }
 
+function hasTcgBattleMegaEvolutionEx(side: TcgBattleState['player']): boolean {
+  return [...side.front, ...side.back].some((card) => card.currentHp > 0 && /^mega\b/i.test(card.name) && /\bex\b/i.test(card.name))
+}
+
 function getUsableBenchSwitchAbilities(state: TcgBattleState, active?: TcgBattleCardState) {
   if (!active || active.temporaryEffects?.cannotSwitch || state.phase !== 'battle' || state.activeSide !== 'player') return []
   return state.player.back
     .filter((source) => source.currentHp > 0 && !isTcgBattleAbilitySuppressed(source, [state.player, state.opponent]))
     .flatMap((source) => (source.abilities || []).flatMap((ability, abilityIndex) => {
       const text = ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').trim()
+      const linooneMegaSwitch = source.name.toLowerCase() === 'linoone' && text === 'once during your turn, if this pokemon is on your bench, and if you have any mega evolution pokemon ex in play, you may use this ability. switch this pokemon with your active pokemon.'
       const supported = isTcgBattleBenchToActiveAbility(text, source.name) ||
+        linooneMegaSwitch ||
         text === "once during your turn, you may switch 1 of your benched {d} pokemon, except any pecharunt ex, with your active pokemon. if you do, the new active pokemon is now poisoned. you can't use more than 1 subjugating chains ability each turn."
       const isSubjugatingChains = text.includes('subjugating chains ability')
       if (isSubjugatingChains && (!source.types.some((type) => type.toLowerCase() === 'darkness') || source.name.toLowerCase().includes('pecharunt ex'))) return []
@@ -5134,7 +5443,7 @@ function getUsableBenchSwitchAbilities(state: TcgBattleState, active?: TcgBattle
       const alreadyUsed = isSubjugatingChains
         ? [...state.player.front, ...state.player.back].some((card) => card.abilityUses?.[usageKey] === state.turnNumber)
         : source.abilityUses?.[usageKey] === state.turnNumber
-      if (!supported || alreadyUsed) return []
+      if (!supported || alreadyUsed || linooneMegaSwitch && !hasTcgBattleMegaEvolutionEx(state.player)) return []
       return [{ source, ability, abilityIndex }]
     }))
 }
@@ -5160,15 +5469,19 @@ function getUsableActiveSwitchAbilities(state: TcgBattleState) {
       const unownMGust = source.name.replace(/[^a-z0-9]/gi, '').toLowerCase() === 'unownm' && text === "once during your turn (before your attack), if unown m is your active pokemon, you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with 1 of the defending pokemon. this power can't be used if unown m is affected by a special condition."
       const fragranceTrap = unownMGust || /^once during your turn \(before your attack\), you may flip a coin\. if heads, and if your opponent has any benched pokemon, choose 1 of them and switch it with his or her active pokemon\. this power can't be used if erika's victreebel is asleep, confused, or paralyzed\.$/.test(text) || text === "once during your turn (before your attack), you may flip a coin. if heads, choose 1 of your opponent's benched pokemon and switch the defending pokemon with it. this power can't be used if victreebel is affected by a special condition."
       const nidoqueenMaternalCall = source.name.toLowerCase() === 'nidoqueen' && text === "once during your turn, you may use this ability. flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot."
-      const appletunAroma = text === 'once during your turn, you may flip a coin. if heads, switch 1 of your opponent\'s benched basic pokemon with their active pokemon.' || source.name.toLowerCase() === 'rillaboom' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot." || nidoqueenMaternalCall
-      const captivatingRhythm = source.name.toLowerCase() === 'ludicolo' && ability.name === 'Captivating Rhythm' && text === 'once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent\'s benched pokemon with their active pokemon.'
+      const venusaurSleepPoison = source.name.toLowerCase() === 'venusaur' && text === "once during your turn, you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon, and the new active pokemon is now asleep and poisoned."
+      const florgesConfusionSwitch = source.name.toLowerCase() === 'florges' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot, and the new active pokemon is now confused."
+      const appletunAroma = text === 'once during your turn, you may flip a coin. if heads, switch 1 of your opponent\'s benched basic pokemon with their active pokemon.' || source.name.toLowerCase() === 'rillaboom' && text === "once during your turn, you may flip a coin. if heads, switch in 1 of your opponent's benched pokemon to the active spot." || nidoqueenMaternalCall || venusaurSleepPoison || florgesConfusionSwitch
+      const captivatingRhythm = source.name.toLowerCase() === 'ludicolo' && ability.name === 'Captivating Rhythm' && ["once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with their active pokemon.", "once during your turn (before your attack), you may flip a coin. if heads, switch 1 of your opponent's benched pokemon with his or her active pokemon."].includes(text)
       const regiMove = source.name.toLowerCase() === 'regice' && text === "once during your turn (before your attack), you may use this power. discard 2 cards from your hand and choose 1 of your opponent's active pokemon that isn't an evolved pokemon. then, your opponent switches that pokemon with 1 of his or her benched pokemon. this power can't be used if regice is affected by a special condition."
       const waterActiveSwitch = text === 'once during your turn, you may switch your active {w} pokemon with 1 of your benched pokemon.'
+      const ultraBeastActiveSwitch = text === 'once during your turn, you may switch your active ultra beast with 1 of your benched ultra beasts.'
+      const tagTeamActiveSwitch = source.name.toLowerCase() === 'drifblim' && text === 'once during your turn (before your attack), you may switch your active tag team pokemon with 1 of your benched pokemon.'
       const politoedLeapFrog = source.name.toLowerCase() === 'politoed' && text === 'once during your turn (before your attack), you may choose a water pokemon on your bench and switch it with your active pokemon. this power can\'t be used if politoed is affected by a special condition.'
       const magneticWarp = text === 'once during your turn (before your attack), you may switch your active pokemon with 1 of your benched pokemon. if you do, your opponent switches his or her active pokemon with 1 of his or her benched pokemon.' || text === 'once during your turn, you may switch your active pokemon with 1 of your benched pokemon. if you do, your opponent switches their active pokemon with 1 of their benched pokemon.'
       const mawileStarRondo = source.name.toLowerCase() === 'mawile vstar' && text === "during your turn, if this pokemon is on your bench, you may switch it with your active pokemon. if you do, switch 1 of your opponent's benched pokemon with their active pokemon. (you can't use more than 1 vstar power in a game.)"
       const decidueyeTotalFreedom = source.name.toLowerCase() === 'decidueye ex' && text === 'once during your turn, you may use this ability. if this pokemon is on the bench, switch it with your active pokemon. or, if this pokemon is in the active spot, switch it with 1 of your benched pokemon.'
-      const ownSwitch = /^once during your turn(?: \(before your attack\))?, (?:you may use this ability\. switch|you may switch) your active pokemon with 1 of your benched pokemon\.$/.test(text) || waterActiveSwitch
+      const ownSwitch = /^once during your turn(?: \(before your attack\))?, (?:you may use this ability\. switch|you may switch) your active pokemon with 1 of your benched pokemon\.$/.test(text) || waterActiveSwitch || ultraBeastActiveSwitch || tagTeamActiveSwitch
       const gardevoirTeleportation = text === 'once during your turn (before your attack), choose 1 of your active pokemon or 1 of your benched pokemon and switch gardevoir with that pokemon. this power can\'t be used if gardevoir is affected by a special condition.'
       const supported = ownSwitch || decidueyeTotalFreedom || mawileStarRondo || opponentGust || dragonWind || opponentForcedSwitch || opponentVstarSwitch || bigWing || fragranceTrap || appletunAroma || captivatingRhythm || magneticWarp || gardevoirTeleportation || regiMove || politoedLeapFrog
       if (opponentVstarSwitch && state.player.usedVstarPower) return []
@@ -5181,9 +5494,11 @@ function getUsableActiveSwitchAbilities(state: TcgBattleState) {
       if (swellowDriveOff && text.includes('if this pokemon is your active pokemon') && !state.player.front.some((card) => card.instanceId === source.instanceId)) return []
       if (swellowBasicForcedSwitch && !state.opponent.front.some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic'))) return []
       if (waterActiveSwitch && (!state.player.front.some((card) => card.instanceId === source.instanceId) || !source.types.some((type) => type.toLowerCase() === 'water'))) return []
+      if (ultraBeastActiveSwitch && (!state.player.front.some((card) => card.instanceId === source.instanceId && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast')) || !state.player.back.some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast')))) return []
+      if (tagTeamActiveSwitch && (!state.player.front.some((card) => card.instanceId === source.instanceId && card.subtypes.some((subtype) => subtype.toLowerCase() === 'tag team')) || !state.player.back.some((card) => card.currentHp > 0))) return []
       if (politoedLeapFrog && (source.statusConditions?.length || !state.player.front.some((card) => card.currentHp > 0) || !state.player.back.some((card) => card.currentHp > 0 && card.types.some((type) => type.toLowerCase() === 'water')))) return []
       if (gardevoirTeleportation && (source.name.toLowerCase() !== 'gardevoir lv.x' || source.statusConditions?.length)) return []
-      if (appletunAroma && !['appletun', 'rillaboom', 'nidoqueen'].includes(source.name.toLowerCase())) return []
+      if (appletunAroma && !['appletun', 'rillaboom', 'nidoqueen', 'venusaur', 'florges'].includes(source.name.toLowerCase())) return []
       if (regiMove && (source.statusConditions?.length || state.player.hand.length < 2 || !state.opponent.back.some((card) => card.currentHp > 0))) return []
       if (magneticWarp && (!state.player.front.some((card) => card.currentHp > 0) || !state.opponent.front.some((card) => card.currentHp > 0) || !state.opponent.back.some((card) => card.currentHp > 0))) return []
       if (regiMove) return state.opponent.front.filter((target) => target.currentHp > 0 && !target.subtypes.some((subtype) => ['stage 1', 'stage 2', 'stage 3', 'level-up'].includes(subtype.toLowerCase()))).map((target) => ({ source, target, ability, abilityIndex, opponentTarget: true, opponentForcedSwitch: false, opponentVstarSwitch: false, bigWing: false, ironBundleSwitch: false, fragranceTrap: false, appletunAroma: false, dragonWind: false, regiMove: true }))
@@ -5201,6 +5516,7 @@ function getUsableActiveSwitchAbilities(state: TcgBattleState) {
       }
       if (gardevoirTeleportation) return [...state.player.front, ...state.player.back].filter((target) => target.currentHp > 0 && target.instanceId !== source.instanceId && state.player.front.some((card) => card.instanceId === source.instanceId) !== state.player.front.some((card) => card.instanceId === target.instanceId)).map((target) => ({ source, target, ability, abilityIndex, opponentTarget: false, opponentForcedSwitch: false, opponentVstarSwitch: false, bigWing: false, ironBundleSwitch: false, fragranceTrap: false, appletunAroma: false, dragonWind: false }))
       if (politoedLeapFrog) return state.player.back.filter((target) => target.currentHp > 0 && target.types.some((type) => type.toLowerCase() === 'water')).map((target) => ({ source, target, ability, abilityIndex, opponentTarget: false, opponentForcedSwitch: false, opponentVstarSwitch: false, bigWing: false, ironBundleSwitch: false, fragranceTrap: false, appletunAroma: false, dragonWind: false, politoedLeapFrog: true }))
+      if (ultraBeastActiveSwitch) return state.player.back.filter((target) => target.currentHp > 0 && target.subtypes.some((subtype) => subtype.toLowerCase() === 'ultra beast')).map((target) => ({ source, target, ability, abilityIndex, opponentTarget: false, opponentForcedSwitch: false, opponentVstarSwitch: false, bigWing: false, ironBundleSwitch: false, fragranceTrap: false, appletunAroma: false, dragonWind: false }))
       if (source.temporaryEffects?.cannotSwitch) return []
       return state.player.back
         .filter((target) => target.currentHp > 0)
@@ -5504,7 +5820,7 @@ function getUsableDamageCounterAbilities(state: TcgBattleState) {
     .flatMap((source) => (source.abilities || []).flatMap((ability, abilityIndex): Array<{ source: TcgBattleCardState; target: TcgBattleCardState; distributionTargets?: TcgBattleCardState[]; ability: NonNullable<TcgBattleCardState['abilities']>[number]; abilityIndex: number; effect: NonNullable<ReturnType<typeof getTcgBattleAbilityDamageCounterEffect>> }> => {
       const effect = getTcgBattleAbilityDamageCounterEffect(ability.text)
       if (effect?.vstar && state.player.usedVstarPower) return []
-      if (!effect || effect.energyType && (state.player.energy < 1 || types[effect.energyType] !== energyType) || effect.activeOnly && !state.player.front.some((card) => card.instanceId === source.instanceId) || effect.sourceBenchOnly && !state.player.back.some((card) => card.instanceId === source.instanceId) || effect.specialConditionGate && source.statusConditions?.length || effect.requiresOtherActiveName && !state.player.front.some((card) => card.instanceId !== source.instanceId && card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiresOtherActiveName!))) return []
+      if (!effect || effect.energyType && (state.player.energy < 1 || types[effect.energyType] !== energyType) || effect.activeOnly && !state.player.front.some((card) => card.instanceId === source.instanceId) || effect.sourceBenchOnly && !state.player.back.some((card) => card.instanceId === source.instanceId) || effect.specialConditionGate && source.statusConditions?.length || effect.requiresOtherActiveName && !state.player.front.some((card) => card.instanceId !== source.instanceId && card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiresOtherActiveName!)) || effect.requiresNameInPlay && ![...state.player.front, ...state.player.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiresNameInPlay!))) return []
       if (effect.benchToActiveOnly && !state.lastEffectEvents?.some((event) => event.kind === 'switch' && event.side === 'player' && event.targetId === source.instanceId)) return []
       if (source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return []
       const targetSide = effect.ownTargets ? state.player : state.opponent
@@ -5526,7 +5842,7 @@ function getUsableDamageCounterMoveAbilities(state: TcgBattleState) {
       if (effect?.benchPlayOnly && (source.playedToBenchTurn !== state.turnNumber || state.lastAction?.kind !== 'bench' || state.lastAction.side !== 'player' || state.lastAction.frontId !== source.instanceId)) return []
       const absolCursedEyes = source.name.toLowerCase() === 'absol' && ability.text.replace(/[’]/g, "'").toLowerCase().replace(/\s+/g, ' ').trim() === "when you play this pokemon from your hand onto your bench, you may move 3 damage counters from 1 of your opponent's pokemon to another of his or her pokemon."
       if (absolCursedEyes && source.playedToBenchTurn !== state.turnNumber) return []
-      if (!effect || effect.activeOnly && !state.player.front.some((card) => card.instanceId === source.instanceId) || (effect.blockedStatuses ? source.statusConditions?.some((status) => effect.blockedStatuses!.includes(status)) : effect.blockedBySpecialCondition && source.statusConditions?.length) || effect.minimumSourceHp && source.currentHp < effect.minimumSourceHp || effect.requiresDarknessEnergy && (state.player.energy < 1 || state.player.selectedEnergy?.toLowerCase() !== 'darkness') || effect.requiredName && ![...state.player.front, ...state.player.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiredName!)) || !effect.repeatable && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return []
+      if (!effect || effect.activeOnly && !state.player.front.some((card) => card.instanceId === source.instanceId) || (effect.blockedStatuses ? source.statusConditions?.some((status) => effect.blockedStatuses!.includes(status)) : effect.blockedBySpecialCondition && source.statusConditions?.length) || effect.opponentRemainingPrizesAtMost !== undefined && getTcgBattleRemainingPrizeCount(state, 'opponent') > effect.opponentRemainingPrizesAtMost || effect.minimumSourceHp && source.currentHp < effect.minimumSourceHp || effect.requiresDarknessEnergy && (state.player.energy < 1 || state.player.selectedEnergy?.toLowerCase() !== 'darkness') || effect.requiredName && ![...state.player.front, ...state.player.back].some((card) => card.currentHp > 0 && card.name.toLowerCase().includes(effect.requiredName!)) || !effect.repeatable && source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber) return []
       const ownCards = [...state.player.front, ...state.player.back]
       const opponentCards = [...state.opponent.front, ...state.opponent.back]
       const sources = (effect.opponentToOpponent ? opponentCards : effect.ownToOpponent || effect.ownToOwn ? ownCards : allCards).filter((card) => card.currentHp < card.hp && (!effect.pokemonSpOnly || card.subtypes.some((subtype) => ['sp', 'pokemon sp'].includes(subtype.toLowerCase()))) && (!effect.pokemonType || card.types.some((type) => type.toLowerCase() === effect.pokemonType)) && (!effect.sourceNameContains || card.name.toLowerCase().includes(effect.sourceNameContains)) && (!effect.sourceSelf || card.instanceId === source.instanceId))
@@ -5570,7 +5886,8 @@ function getUsableIonoEnergyAbilities(state: TcgBattleState) {
   const ionoTargets = state.player.selectedEnergy?.toLowerCase() === 'lightning' ? [...state.player.front, ...state.player.back].filter((card) => card.currentHp > 0 && card.name.toLowerCase().includes("iono's")) : []
   const hydrappleTargets = state.player.selectedEnergy?.toLowerCase() === 'grass' ? [...state.player.front, ...state.player.back].filter((card) => card.currentHp > 0 && card.currentHp < card.hp) : []
   const houndoomTargets = ['darkness', 'fighting'].includes(state.player.selectedEnergy?.toLowerCase() || '') ? [...state.player.front, ...state.player.back].filter((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'single strike')) : []
-  if (!ionoTargets.length && !hydrappleTargets.length && !houndoomTargets.length) return []
+  const infernapeAvailable = ['fire', 'fighting'].includes(state.player.selectedEnergy?.toLowerCase() || '')
+  if (!ionoTargets.length && !hydrappleTargets.length && !houndoomTargets.length && !infernapeAvailable) return []
   return [...state.player.front, ...state.player.back]
     .filter((source) => source.currentHp > 0 && !isTcgBattleAbilitySuppressed(source, [state.player, state.opponent]))
     .flatMap((source) => (source.abilities || []).flatMap((ability, abilityIndex) => {
@@ -5578,9 +5895,11 @@ function getUsableIonoEnergyAbilities(state: TcgBattleState) {
       const ionoAbility = /^as often as you like during your turn, you may attach a basic \{l\} energy card from your hand to 1 of your iono's pokemon\.$/.test(normalized)
       const hydrappleAbility = /^once during your turn, you may attach a basic \{g\} energy card from your hand to 1 of your pokemon\. if you attached energy to a pokemon in this way, heal 30 damage from that pokemon\.$/.test(normalized)
       const houndoomAbility = /^once during your turn, you may search your deck for a single strike energy card and attach it to 1 of your single strike pokemon\. then, shuffle your deck\. if you attached energy to a pokemon in this way, put 2 damage counters on that pokemon\.$/.test(normalized)
-      if (ionoAbility) return ionoTargets.map((target) => ({ source, target, ability, abilityIndex, hydrapple: false, houndoom: false }))
-      if (hydrappleAbility && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber) return hydrappleTargets.map((target) => ({ source, target, ability, abilityIndex, hydrapple: true, houndoom: false }))
-      if (houndoomAbility && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber) return houndoomTargets.map((target) => ({ source, target, ability, abilityIndex, hydrapple: false, houndoom: true }))
+      const infernapeAbility = /^once during your turn, you may attach a basic \{r\} energy card, a basic \{f\} energy card, or 1 of each from your hand to your pokemon in any way you like\.$/.test(normalized)
+      if (ionoAbility) return ionoTargets.map((target) => ({ source, target, ability, abilityIndex, hydrapple: false, houndoom: false, infernape: false }))
+      if (hydrappleAbility && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber) return hydrappleTargets.map((target) => ({ source, target, ability, abilityIndex, hydrapple: true, houndoom: false, infernape: false }))
+      if (houndoomAbility && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber) return houndoomTargets.map((target) => ({ source, target, ability, abilityIndex, hydrapple: false, houndoom: true, infernape: false }))
+      if (infernapeAbility && infernapeAvailable && source.abilityUses?.[`${abilityIndex}:${ability.name}`] !== state.turnNumber) return [{ source, target: source, ability, abilityIndex, hydrapple: false, houndoom: false, infernape: true }]
       return []
     }))
 }
@@ -5614,15 +5933,20 @@ function getUsableFrosmothEnergyAbilities(state: TcgBattleState) {
 }
 
 function getUsableBaxcaliburEnergyAbilities(state: TcgBattleState) {
-  if (state.phase !== 'battle' || state.activeSide !== 'player' || state.player.selectedEnergy?.toLowerCase() !== 'water' || state.player.energy >= TCG_BATTLE_FORMATS[state.format].energyCap) return []
+  if (state.phase !== 'battle' || state.activeSide !== 'player' || state.player.energy >= TCG_BATTLE_FORMATS[state.format].energyCap) return []
   const targets = [...state.player.front, ...state.player.back].filter((card) => card.currentHp > 0)
   if (!targets.length) return []
   return [...state.player.front, ...state.player.back]
     .filter((source) => source.currentHp > 0 && !isTcgBattleAbilitySuppressed(source, [state.player, state.opponent]))
     .flatMap((source) => (source.abilities || []).flatMap((ability, abilityIndex) => {
       const normalized = ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim()
-      if (!/^as often as you like during your turn, you may attach a basic \{w\} energy card from your hand to 1 of your pokemon\.$/.test(normalized)) return []
-      return targets.map((target) => ({ source, target, ability, abilityIndex }))
+      const handAttachment = /^as often as you like during your turn, you may attach a basic \{w\} energy card from your hand to 1 of your pokemon\.$/.test(normalized)
+      const energyZoneType = normalized === 'once during your turn, you may take a water energy from your energy zone and attach it to the water pokemon in the active spot.'
+        ? 'water'
+        : normalized === 'once during your turn, you may take 1 {p} energy from your energy zone and attach it to the {p} pokemon in the active spot.' ? 'psychic' : null
+      if (!handAttachment && !energyZoneType || energyZoneType && (state.player.selectedEnergy?.toLowerCase() !== energyZoneType || source.abilityUses?.[`${abilityIndex}:${ability.name}`] === state.turnNumber)) return []
+      const eligibleTargets = energyZoneType ? state.player.front.filter((target) => target.currentHp > 0 && target.types.some((type) => type.toLowerCase() === energyZoneType)) : targets
+      return eligibleTargets.map((target) => ({ source, target, ability, abilityIndex }))
     }))
 }
 
@@ -5921,7 +6245,11 @@ function BattleCommandControls({
   const atCap = state.player.energy >= formatConfig.energyCap
   const basicHand = state.player.hand.filter((card) => card.subtypes.some((subtype) => subtype.toLowerCase() === 'basic') && (state.player.front.length < 3 || canTcgBattlePutPokemonOnBench(state.player, card)))
   const opponentHasStage2 = [...state.opponent.front, ...state.opponent.back].some((card) => card.currentHp > 0 && card.subtypes.some((subtype) => subtype.toLowerCase() === 'stage 2'))
-  const emergencyRotationHand = state.player.hand.filter((card) => hasTcgBattleKlinklangEmergencyRotation(card) && opponentHasStage2 && state.player.front.filter((pokemon) => pokemon.currentHp > 0).length === 3 && getOpenTcgBattleBenchSlots(state.player) > 0 && canTcgBattlePutPokemonOnBench(state.player, card))
+  const emergencyRotationHand = state.player.hand.filter((card) =>
+    ((hasTcgBattleKlinklangEmergencyRotation(card) && opponentHasStage2) ||
+      (hasTcgBattleLuxrayPrizeBenchAbility(card) && !isTcgBattleAbilitySuppressed(card, [state.player, state.opponent]) && getTcgBattleRemainingPrizeCount(state, 'player') > getTcgBattleRemainingPrizeCount(state, 'opponent'))) &&
+    state.player.front.filter((pokemon) => pokemon.currentHp > 0).length === 3 && getOpenTcgBattleBenchSlots(state.player) > 0 && canTcgBattlePutPokemonOnBench(state.player, card),
+  )
   const lastCardBenchDrawHand = state.player.hand.length === 1 && state.player.front.filter((pokemon) => pokemon.currentHp > 0).length === 3 && getOpenTcgBattleBenchSlots(state.player) > 0
     ? state.player.hand.filter((card) => canTcgBattlePutPokemonOnBench(state.player, card) && !isTcgBattleAbilitySuppressed(card, [state.player, state.opponent]) && card.abilities?.some((ability) => /^once during your turn(?: \(before your attack\))?, if this pokemon is the last card in your hand, you may play it onto your bench\. if you do, draw 3 cards\.$/.test(ability.text.replace(/[’]/g, "'").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ').trim())))
     : []
@@ -6479,9 +6807,9 @@ function BattleCommandControls({
               {ability.text.toLowerCase().includes('lightning energy card from your discard pile') ? `Recover Lightning Energy to Benched ${target.name} · ${ability.name}` : ability.text.toLowerCase().includes('metal energy card from your discard pile') ? `Recover Metal Energy to Benched ${target.name} · ${ability.name}` : ability.text.toLowerCase().includes('benched pokemon') ? `Attach Psychic Energy to Benched ${target.name} · ${ability.name}` : ability.text.toLowerCase().startsWith('once during your turn') ? `Attach ${state.player.selectedEnergy} Energy to Active · ${ability.name}` : `Attach Psychic Energy · 20 damage to ${target.name} · ${ability.name}`}
             </Button>
           ))}
-          {usableIonoEnergyAbilities.map(({ source, target, ability, abilityIndex, hydrapple, houndoom }) => (
+          {usableIonoEnergyAbilities.map(({ source, target, ability, abilityIndex, hydrapple, houndoom, infernape }) => (
             <Button key={`${source.instanceId}:${abilityIndex}:${target.instanceId}`} type="button" variant="outline" disabled={isPending || Boolean(resolution)} onClick={() => onUseIonoEnergyAbility(source.instanceId, target.instanceId, abilityIndex, ability.name)} className="game-focus-ring h-9 rounded-md border border-game-ochre/45 bg-game-surface-raised px-3 text-[10px] font-black uppercase tracking-wide text-game-ink hover:bg-game-ochre/10">
-              {houndoom ? `Attach ${state.player.selectedEnergy} · 2 counters on ${target.name}` : hydrapple ? `Attach Grass · Heal 30 from ${target.name}` : `Attach Lightning Energy · ${target.name}`} · {ability.name}
+              {houndoom ? `Attach ${state.player.selectedEnergy} · 2 counters on ${target.name}` : hydrapple ? `Attach Grass · Heal 30 from ${target.name}` : infernape ? `Add +1 ${state.player.selectedEnergy} Energy to shared pool` : `Attach Lightning Energy · ${target.name}`} · {ability.name}
             </Button>
           ))}
           {usableFlareonEnergyAbilities.map(({ source, ability, abilityIndex }) => (

@@ -301,7 +301,7 @@ const cardDetails: TcgCardDetail[] = [
           "Colorless"
         ],
         "convertedEnergyCost": 4,
-        "damage": "",
+        "damage": "70",
         "text": "Flip a coin. If tails, this attack does nothing."
       }
     ],
@@ -483,7 +483,7 @@ const cardDetails: TcgCardDetail[] = [
           "Psychic"
         ],
         "convertedEnergyCost": 2,
-        "damage": "",
+        "damage": "40",
         "text": "Flip a coin. If tails, this attack does nothing."
       }
     ],
@@ -1939,7 +1939,7 @@ const cardDetails: TcgCardDetail[] = [
           "Fire"
         ],
         "convertedEnergyCost": 4,
-        "damage": "",
+        "damage": "80",
         "text": "Flip a coin. If tails, this attack does nothing."
       }
     ],
@@ -5377,7 +5377,7 @@ const cardDetails: TcgCardDetail[] = [
           "Grass"
         ],
         "convertedEnergyCost": 1,
-        "damage": "",
+        "damage": "30",
         "text": "Flip a coin. If tails, this attack does nothing."
       }
     ],

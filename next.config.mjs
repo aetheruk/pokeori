@@ -122,6 +122,8 @@ const nextConfig = {
   },
   serverExternalPackages: [
     'payload',
+    '@payloadcms/next',
+    '@payloadcms/graphql',
     '@payloadcms/db-mongodb',
     '@payloadcms/email-resend',
     'graphql',
