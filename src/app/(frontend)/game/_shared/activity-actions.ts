@@ -3676,6 +3676,7 @@ export async function completeGameActivity(
       if (
         (actualSuccess || isEndlessWin) &&
         encounter.gameType !== 'fishing' &&
+        encounter.gameType !== 'slots' &&
         !isDailyExcludedGameType(encounter.gameType)
       ) {
         await recordDailyActivityProgress(user.id, {

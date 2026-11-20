@@ -2619,3 +2619,4 @@ Hidden Power selects one Pokémon from the deck into the Pokémon-only discard p
 Search and Escape resolves the absent Trainer search as empty and returns Chatot G to its owner's deck, which is shuffled.
 Slightly Simmer searches up to two Pokémon from the deck into the Pokémon-only discard pile and then shuffles.
 Healing Circle heals all damaged Benched Pokémon and conditionally returns its attacker to the deck only when the attack actually healed damage.
+The deck editor obtains owned-series options from the authenticated deck-loading action rather than assuming that the Trainer route includes the TCG collection in client data. Selected-series artwork remains visible in the editor header, and the TCG battle header centers the round and Energy Cap indicators.

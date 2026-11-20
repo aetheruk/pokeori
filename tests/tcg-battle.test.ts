@@ -473,7 +473,7 @@ describe('TCG battle utilities', () => {
       }),
     ])
 
-    expect(attacks).toHaveLength(4)
+    expect(attacks).toHaveLength(5)
     expect(attacks.every((attack) => attack.battleEffect)).toBe(true)
   })
 
@@ -1555,35 +1555,22 @@ describe('TCG battle utilities', () => {
         .map((attack) => ({ cardId: card.id, name: attack.name })),
     )
     const intentionallyUnsupported = new Set([
-      'Call for Family',
-      'Call for Friend',
-      'Devolution Beam',
-      'Dizziness',
-      'Eek',
       'Energy Control',
-      'Energy Conversion',
-      'Fetch',
       'Fling',
-      'Headache',
-      "Let's Play!",
-      'Mischief',
       'Prophecy',
-      'Rapid Evolution',
       'Scavenge',
-      'Sprout',
       'Third Eye',
-      'Vanish',
       'Wildfire',
     ])
 
     expect(cards).toHaveLength(406)
-    expect(unsupported).toHaveLength(31)
+    expect(unsupported).toHaveLength(9)
     expect(new Set(unsupported.map((attack) => attack.name))).toEqual(
       intentionallyUnsupported,
     )
     expect(
       cards.filter((card) => !isTcgBattleCardLegal(card)).map((card) => card.id),
-    ).toEqual(['base3-3', 'base3-18', 'basep-31', 'basep-35'])
+    ).toEqual(['base3-3', 'base3-18'])
   })
 
   test('resolves classic counter, shared-energy, and remaining-HP formulas', () => {
@@ -1672,9 +1659,9 @@ describe('TCG battle utilities', () => {
     const target = makeBattleCard('copy-target', 1)
     const bench = makeBattleCard('copy-bench', 1)
     const unsupported = makeAttack({
-      name: 'Fetch',
+      name: 'Energy Transfer',
       damage: '',
-      text: 'Draw a card.',
+      text: 'Move an Energy from this Pokémon to 1 of your Benched Pokémon.',
     })
     const lure = makeAttack({
       name: 'Lure',
@@ -1705,7 +1692,7 @@ describe('TCG battle utilities', () => {
 
     expect(choice).toEqual({
       kind: 'copiedAttack',
-      attackIndex: 1,
+      attackIndex: 0,
       followUp: { kind: 'benchSwitch', cardId: bench.instanceId },
     })
     expect(

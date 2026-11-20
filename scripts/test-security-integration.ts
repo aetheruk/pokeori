@@ -387,7 +387,11 @@ try {
     const wheelRestore = await invoke('/game/games/prize-wheel', wheelStartId, [spinRequest], ownerToken)
     assert.ok(wheelRestore.body.includes('"success":true'), wheelRestore.body)
     assert.deepEqual(await redis.get(wheelKey), paidSpin)
-    assert.equal((await payload.findByID({collection: 'users', id: owner.id})).currency?.['league-ticket'], 98)
+    const wheelCost = wheelGame.settings.cost
+    assert.equal(
+      (await payload.findByID({collection: 'users', id: owner.id})).currency?.[wheelCost.currencyType],
+      (wheelCost.currencyType === 'league-ticket' ? 100 : 1000) - wheelCost.amount,
+    )
     const wheelInventory = await getUserInventoryMap(payload, owner.id)
     assert.ok((await invoke('/game/games/prize-wheel', wheelClaimId, [wheelGame.id], ownerToken)).body.includes('"success":true'))
     await redis.del(wheelClaimKey)
