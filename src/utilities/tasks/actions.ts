@@ -210,8 +210,8 @@ export async function completeTask(
     return { success: false, message: 'Requirements not met' }
   }
 
-  // Criteria-gated tasks use criteria for visibility; requirements gate action.
-  if (!task.criteriaGateVisibility && !checkTaskCriteria(userData, task)) {
+  // 2. Check Criteria (Have they done it?)
+  if (!checkTaskCriteria(userData, task)) {
     return { success: false, message: 'Criteria not met' }
   }
 

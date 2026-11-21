@@ -566,7 +566,6 @@ export function useExploreActions(
       }
 
       if (
-        !task.criteriaGateVisibility &&
         !isCompletedExpeditionReplay &&
         task.criteria &&
         task.criteria.length > 0 &&

@@ -427,11 +427,6 @@ export function ExploreDetailsModal({
       }
       rewards={rewards}
       criteria={criteria}
-      criteriaSectionTitle={
-        item.type === 'task' && item.originalData?.criteriaGateVisibility
-          ? 'CRITERIA'
-          : undefined
-      }
       properties={properties}
       stats={stats}
       taskProgress={taskProgress}
