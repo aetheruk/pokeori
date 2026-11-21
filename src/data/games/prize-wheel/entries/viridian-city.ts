@@ -194,7 +194,34 @@ const badgePremiums = [
   { badgeId: 'badge-kanto-earth', itemId: 'up-grade' },
 ] as const
 
-const slots: PrizeWheelSlot[] = [
+const goldPrizeColor = '#F7CF05'
+
+function spreadGoldPrizeSlots(slots: PrizeWheelSlot[]): PrizeWheelSlot[] {
+  const goldSlots = slots.filter((slot) => slot.color === goldPrizeColor)
+  const otherSlots = slots.filter((slot) => slot.color !== goldPrizeColor)
+
+  if (goldSlots.length === 0 || otherSlots.length === 0) return slots
+
+  const spreadSlots: PrizeWheelSlot[] = []
+  let nextGoldIndex = 0
+
+  otherSlots.forEach((slot, index) => {
+    spreadSlots.push(slot)
+
+    const goldSlotsToAdd = Math.floor(
+      ((index + 1) * goldSlots.length) / otherSlots.length,
+    )
+
+    while (nextGoldIndex < goldSlotsToAdd) {
+      spreadSlots.push(goldSlots[nextGoldIndex])
+      nextGoldIndex += 1
+    }
+  })
+
+  return spreadSlots
+}
+
+const authoredSlots: PrizeWheelSlot[] = [
   ...ballTiers.map((tier) =>
     makeItemSlot({
       id: `pokeball-${tier.id}`,
@@ -266,7 +293,7 @@ const slots: PrizeWheelSlot[] = [
   {
     id: 'shiny-egg',
     label: 'Shiny Pokemon Egg',
-    color: '#F7CF05',
+    color: goldPrizeColor,
     percentage: 0.05,
     fixedPercentage: 0.05,
     icon: { type: 'local', id: '/sprites/items/egg.avif' },
@@ -283,7 +310,7 @@ const slots: PrizeWheelSlot[] = [
   ...badgePremiums.map(({ badgeId, itemId }) => ({
     id: `premium-${badgeId}`,
     label: itemNames.get(itemId) || itemId,
-    color: '#F7CF05',
+    color: goldPrizeColor,
     percentage: 0.5,
     fixedPercentage: 0.5,
     icon: { type: 'item' as const, id: itemId },
@@ -291,6 +318,8 @@ const slots: PrizeWheelSlot[] = [
     rewards: [{ type: 'item' as const, targetId: itemId, quantity: 1, dropChance: 100 }],
   })),
 ]
+
+const slots = spreadGoldPrizeSlots(authoredSlots)
 
 export const viridianCitychanseyEntries: PrizeWheelGameConfig[] = [
   {
