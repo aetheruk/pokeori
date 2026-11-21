@@ -223,6 +223,8 @@ export interface Task {
   icon: TaskIcon
   repeatable: boolean
   secret?: boolean
+  /** Use criteria, rather than requirements, to control Explore visibility. */
+  criteriaGateVisibility?: boolean
   completionTrigger?: 'manual' | 'auto'
   requirements: TaskCondition[]
   criteria: TaskCondition[]
