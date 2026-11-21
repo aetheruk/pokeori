@@ -35318,8 +35318,6 @@ export function getTcgBattleEvolutionOptions(
         options.push({ targetId: target.instanceId, targetName: target.name, card, effect: 'pichuHeal', abilityIndex: pichuPower.abilityIndex, abilityName: pichuPower.ability.name })
         continue
       }
-      const subtypeSet = new Set((card.subtypes || []).map((entry) => entry.toUpperCase()))
-      const stageUnlockTurn = subtypeSet.has('STAGE 2') ? 5 : subtypeSet.has('STAGE 1') ? 3 : 1
       const costUnlockTurn = getTcgBattleCardUnlockTurn(card.cost)
       const hasEarlyEvolutionPermission = (abilities: TcgCardAbility[] | undefined, isActive: boolean) =>
         (abilities || []).some((ability) => {
@@ -35333,7 +35331,7 @@ export function getTcgBattleEvolutionOptions(
         hasEarlyEvolutionPermission(card.abilities, false) || hasEarlyEvolutionPermission(target.abilities, targetIsActive)
         || secondPlayerEvolutionPermission
       )
-      if (!attackEvolution && (turnNumber < costUnlockTurn || turnNumber < stageUnlockTurn) && !canEvolveOnFirstTurn) continue
+      if (!attackEvolution && turnNumber < costUnlockTurn && !canEvolveOnFirstTurn) continue
       const frothAbility = targetIsActive && normalizeTcgBattlePokemonName(card.name) === 'azumarill'
         ? (card.abilities || []).map((ability, abilityIndex) => ({ ability, abilityIndex })).find(({ ability }) => normalizeTcgBattleAbilityText(ability.text).replace(/\s+/g, ' ').trim() === "once during your turn, when you play azumarill from your hand to evolve 1 of your active pokemon, you may use this power. each defending pokemon is now paralyzed.")
         : undefined

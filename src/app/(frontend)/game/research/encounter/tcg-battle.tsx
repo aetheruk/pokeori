@@ -71,6 +71,7 @@ import {
   isTcgBattleHealingPreventedForTarget,
   isTcgBattleRetreatBlockedByStatus,
   getTcgBattleCardUnlockTurnForCard,
+  getTcgBattleCardUnlockTurn,
   getTcgBattleEvolutionOptions,
   getTcgBattleAvailableAttacks,
   getTcgBattleCopyAttackOptions,
@@ -7075,7 +7076,7 @@ function BattleCommandControls({
                 const playable = canAct && !isPending && (basicPlay || evolution)
                 const action = emergencyRotation ? 'Emergency Rotation' : lastCardBenchPlay ? 'Bench and draw 3'
                   : basicPlay ? `Play to ${basicPlayDestination}` : 'Choose Evolution target'
-                const unlockTurn = getTcgBattleCardUnlockTurnForCard(card)
+                const unlockTurn = getTcgBattleCardUnlockTurn(card.cost)
                 const detail = playable ? action
                   : !canAct || isPending ? 'Wait for your turn to play this card.'
                   : card.evolvesFrom && unlockTurn > state.turnNumber ? `Evolution unlocks on round ${unlockTurn} unless an Ability lets you evolve early.`

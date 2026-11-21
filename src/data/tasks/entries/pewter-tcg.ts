@@ -118,7 +118,7 @@ export const pewterTcgTasks: Task[] = [
       {
         title: 'TCG Instructor',
         message:
-          '“Stage 1 cards unlock on turn 3 and Stage 2 on turn 5. Cards costing 10 unlock on turn 7; cards costing 15 wait until turn 10.” The strongest cards are apparently very committed to dramatic entrances.',
+          '“You can evolve as soon as you have a legal match, but not on the turn that Pokémon entered play or evolved. Cards costing 10 unlock on turn 7; cards costing 15 wait until turn 10.” The strongest cards are apparently very committed to dramatic entrances.',
         button: 'How does a turn end?',
       },
       {
