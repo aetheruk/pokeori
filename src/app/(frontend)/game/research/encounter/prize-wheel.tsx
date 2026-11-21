@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { Button } from '@/components/ui/button'
@@ -48,6 +49,36 @@ function formatPrizePercentage(percentage: number) {
   return percentage.toFixed(3).replace(/0+$/, '').replace(/\.$/, '')
 }
 
+function PrizeWheelSlotIcon({
+  slot,
+  className,
+}: {
+  slot: PrizeWheelSlot
+  className: string
+}) {
+  if (slot.id === 'shiny-egg') {
+    return (
+      <PokemonRarityEggSprite
+        rarity="shiny"
+        alt={slot.label}
+        className={className}
+        sizes="48px"
+      />
+    )
+  }
+
+  return (
+    <TaskIconDisplay
+      icon={
+        typeof slot.icon === 'string'
+          ? { type: 'item', id: slot.icon }
+          : slot.icon || { type: 'lucide', id: 'star' }
+      }
+      className={className}
+    />
+  )
+}
+
 function PrizesModal({ slots }: { slots: PrizeWheelSlot[] }) {
   return (
     <Dialog>
@@ -83,14 +114,7 @@ function PrizesModal({ slots }: { slots: PrizeWheelSlot[] }) {
                     className="flex h-10 w-10 items-center justify-center rounded bg-game-canvas p-1"
                     style={{ borderBottom: `2px solid ${slot.color}` }}
                   >
-                    <TaskIconDisplay
-                      icon={
-                        typeof slot.icon === 'string'
-                          ? { type: 'item', id: slot.icon }
-                          : slot.icon || { type: 'lucide', id: 'star' }
-                      }
-                      className="w-full h-full"
-                    />
+                    <PrizeWheelSlotIcon slot={slot} className="w-full h-full" />
                   </div>
                 </div>
 
@@ -435,14 +459,7 @@ export function PrizeWheelGame({
                   }}
                 >
                   <div className="relative h-9 w-9 drop-shadow-md">
-                    <TaskIconDisplay
-                      icon={
-                        (typeof slot.icon === 'string'
-                          ? { type: 'item', id: slot.icon }
-                          : slot.icon) || { type: 'lucide', id: 'star' }
-                      }
-                      className="w-full h-full"
-                    />
+                    <PrizeWheelSlotIcon slot={slot} className="w-full h-full" />
                   </div>
                   {showSlotLabels ? (
                     <span className="max-w-16 text-center text-[10px] font-black leading-none drop-shadow-md">
