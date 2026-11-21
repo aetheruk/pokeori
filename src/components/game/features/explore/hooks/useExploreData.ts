@@ -202,8 +202,16 @@ export function useExploreData(
         if (isHidden) return false
       }
 
-      // Check requirements
-      const reqs = item.requirements
+      // Tasks can opt into criteria-controlled visibility when their
+      // requirements are action costs (for example, an item to exchange).
+      const taskData =
+        item.type === 'task' ? (item.originalData as any) : undefined
+      const visibilityConditions = taskData?.criteriaGateVisibility
+        ? taskData.criteria
+        : item.requirements
+
+      // Check visibility conditions
+      const reqs = visibilityConditions
       let ownReqsMet =
         !reqs ||
         reqs.length === 0 ||

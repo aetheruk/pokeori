@@ -34,7 +34,7 @@ Each Kanto Gym Badge is also an authored memento. Every badge ritual uses Memory
 | Volcano | The Last Question | 43 Fire (Cinder Shard and/or Fire Gem) | Any Level 35+ |
 | Earth | Dinner at Eight | 91 Ground (Terra Dust and/or Ground Gem) | Any Level 40+ |
 
-The eleven classic treasure items are Fortune Incense mementos only. Channeling each one awards a unique Book of Fortune whose inventory description gives a clue to its buyer task. The memento remains in the inventory; successful channeling consumes only the selected standard material/Gem offerings, and each memento can be channeled once. Channeler requirements and required energy are:
+The eleven classic treasure items are Fortune Incense mementos only. Channeling each one awards a unique Book of Fortune whose inventory description gives a clue to its buyer task; Fortune books use the shared guide-book sprite. The memento remains in the inventory; successful channeling consumes only the selected standard material/Gem offerings, and each memento can be channeled once. Channeler requirements and required energy are:
 
 | Treasure | Offering energy | Channeler |
 | --- | ---: | --- |
@@ -50,4 +50,4 @@ The eleven classic treasure items are Fortune Incense mementos only. Channeling 
 | Comet Shard | 77 Psychic | Fairy type, Level 35+ |
 | Balm Mushroom | 52 Grass | Grass type, Level 25+ |
 
-Each matching Book of Fortune points to a secret repeatable Kanto buyer task, revealed while the player owns that book. The task consumes one matching treasure and pays Pokédollars at its authored exchange value; it is grouped under the existing task subcategory for its supported location. The Kanto Plant Store Room buyer is grouped under Cerulean City, matching that location's authored subcategory.
+Each matching Book of Fortune points to a repeatable Kanto buyer task. Owning the book meets the task's visibility criteria; exchanging requires and consumes one matching treasure, then pays Pokédollars at its authored exchange value. The task is grouped under the existing task subcategory for its supported location. The Kanto Plant Store Room buyer is grouped under Cerulean City, matching that location's authored subcategory.
