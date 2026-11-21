@@ -12,10 +12,10 @@ export const fortuneExchangeTasks: Task[] = FORTUNE_CHANNELING_CONTENT.map(
     background: ritual.background,
     repeatable: true,
     secret: false,
-    criteriaGateVisibility: true,
     completionTrigger: 'manual',
     completeButtonText: 'Exchange Item',
-    requirements: [
+    requirements: [],
+    criteria: [
       {
         type: 'item_owned',
         targetId: ritual.mementoItemId,
@@ -23,7 +23,6 @@ export const fortuneExchangeTasks: Task[] = FORTUNE_CHANNELING_CONTENT.map(
         consume: true,
       },
     ],
-    criteria: [{ type: 'item_owned', targetId: ritual.bookItemId }],
     rewards: [
       {
         type: 'currency',
