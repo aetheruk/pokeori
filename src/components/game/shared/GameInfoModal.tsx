@@ -104,6 +104,7 @@ interface GameInfoModalProps {
   children?: ReactNode
   afterProperties?: ReactNode
   propertiesSectionTitle?: string
+  criteriaSectionTitle?: string
   actionButton?: ReactNode
   className?: string
   isCaught?: boolean
@@ -139,6 +140,7 @@ export function GameInfoModal({
   children,
   afterProperties,
   propertiesSectionTitle = 'RULES',
+  criteriaSectionTitle = 'REQUIREMENTS',
   actionButton,
   className,
   isCaught,
@@ -349,7 +351,7 @@ export function GameInfoModal({
             criteria &&
             criteria.length > 0 && (
               <div className="space-y-4">
-                <SectionDivider>REQUIREMENTS</SectionDivider>
+                <SectionDivider>{criteriaSectionTitle}</SectionDivider>
                 <RewardCarousel
                   rewards={criteria}
                   autoScroll={autoScrollRewards}

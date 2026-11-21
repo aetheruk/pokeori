@@ -1259,6 +1259,7 @@ export function ActionButton({
   if (item.type === 'task') {
     const task = item.originalData
     const { isCompleted, criteriaMet } = getTaskProgress(userData, task)
+    const completionCriteriaMet = task.criteriaGateVisibility || criteriaMet
     const requirementsMet =
       !task.requirements ||
       task.requirements.length === 0 ||
@@ -1275,11 +1276,11 @@ export function ActionButton({
 
     let canComplete = false
     if (task.category === 'Daily') {
-      canComplete = requirementsMet && criteriaMet && !isCompleted
+      canComplete = requirementsMet && completionCriteriaMet && !isCompleted
     } else if (task.repeatable) {
-      canComplete = requirementsMet && criteriaMet
+      canComplete = requirementsMet && completionCriteriaMet
     } else {
-      canComplete = requirementsMet && criteriaMet && !isDone
+      canComplete = requirementsMet && completionCriteriaMet && !isDone
     }
 
     if (task.completionTrigger === 'auto') canComplete = false

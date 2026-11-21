@@ -6,6 +6,8 @@ export const SPIRIT_CHANNELING_ACTIVITY_PREFIX = 'spirit-channeling'
 
 export interface FortuneChannelingContent {
   mementoItemId: string
+  trainerIconId: string
+  background: string
   bookItemId: string
   bookName: string
   bookDescription: string
@@ -22,6 +24,8 @@ export interface FortuneChannelingContent {
 export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   {
     mementoItemId: 'nugget',
+    trainerIconId: 'pokefan-m',
+    background: '/backgrounds/cerulean.avif',
     bookItemId: 'fortune-book-gilded-life',
     bookName: 'Book of Fortune: Gilded Life',
     bookDescription:
@@ -38,6 +42,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'big-nugget',
+    trainerIconId: 'rich-boy',
+    background: '/backgrounds/celadon-game-corner-prize-exchange.avif',
     bookItemId: 'fortune-book-golden-life',
     bookName: 'Book of Fortune: Golden Life',
     bookDescription:
@@ -55,6 +61,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'pearl',
+    trainerIconId: 'sailor',
+    background: '/backgrounds/vermillion.avif',
     bookItemId: 'fortune-book-aquatic-gift',
     bookName: 'Book of Fortune: Aquatic Gift',
     bookDescription:
@@ -72,6 +80,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'big-pearl',
+    trainerIconId: 'beauty',
+    background: '/backgrounds/artisan-workshop.avif',
     bookItemId: 'fortune-book-aquatic-blessing',
     bookName: 'Book of Fortune: Aquatic Blessing',
     bookDescription:
@@ -89,6 +99,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'stardust',
+    trainerIconId: 'psychic-f',
+    background: '/backgrounds/lavender.avif',
     bookItemId: 'fortune-book-skys-boon',
     bookName: 'Book of Fortune: Skys Boon',
     bookDescription:
@@ -106,6 +118,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'star-piece',
+    trainerIconId: 'gamer',
+    background: '/backgrounds/celadon-game-corner-prize-exchange.avif',
     bookItemId: 'fortune-book-skys-gift',
     bookName: 'Book of Fortune: Skys Gift',
     bookDescription:
@@ -123,6 +137,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'rare-bone',
+    trainerIconId: 'researcher-f',
+    background: '/backgrounds/museum.avif',
     bookItemId: 'fortune-book-earths-blessing',
     bookName: 'Book of Fortune: Earths Blessing',
     bookDescription:
@@ -140,6 +156,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'big-mushroom',
+    trainerIconId: 'breeder-f',
+    background: '/backgrounds/forest.avif',
     bookItemId: 'fortune-book-natures-gift',
     bookName: 'Book of Fortune: Natures Gift',
     bookDescription:
@@ -157,6 +175,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'tiny-mushroom',
+    trainerIconId: 'school-kid-f',
+    background: '/backgrounds/forest.avif',
     bookItemId: 'fortune-book-natures-boon',
     bookName: 'Book of Fortune: Natures Boon',
     bookDescription:
@@ -174,6 +194,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'comet-shard',
+    trainerIconId: 'super-nerd',
+    background: '/backgrounds/mt-moon.avif',
     bookItemId: 'fortune-book-skys-blessing',
     bookName: 'Book of Fortune: Skys Blessing',
     bookDescription:
@@ -191,6 +213,8 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
   },
   {
     mementoItemId: 'balmmushroom',
+    trainerIconId: 'breeder-m',
+    background: '/backgrounds/power-plant.avif',
     bookItemId: 'fortune-book-natures-blessing',
     bookName: 'Book of Fortune: Natures Blessing',
     bookDescription:

@@ -50,4 +50,4 @@ The eleven classic treasure items are Fortune Incense mementos only. Channeling 
 | Comet Shard | 77 Psychic | Fairy type, Level 35+ |
 | Balm Mushroom | 52 Grass | Grass type, Level 25+ |
 
-Each matching Book of Fortune points to a repeatable Kanto buyer task. Owning the book meets the task's visibility criteria; exchanging requires and consumes one matching treasure, then pays Pokédollars at its authored exchange value. The task is grouped under the existing task subcategory for its supported location. The Kanto Plant Store Room buyer is grouped under Cerulean City, matching that location's authored subcategory.
+Each matching Book of Fortune points to a repeatable Kanto buyer task. Owning the book meets the task's visibility criteria and is not rechecked on exchange; the only action requirement is one matching treasure, which is consumed for the authored Pokédollar payout. Task and exit modal backgrounds match their locations, and trainer-class icons match each buyer's role. Tasks use the existing task subcategory for their supported location. The Kanto Plant Store Room buyer is grouped under Cerulean City, matching that location's authored subcategory.
