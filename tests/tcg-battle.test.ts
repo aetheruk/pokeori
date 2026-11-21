@@ -400,14 +400,13 @@ describe('TCG battle utilities', () => {
       discard: [],
       energy: 5,
     }
-    expect(getTcgBattleEvolutionOptions(stage1Side, 2)).toHaveLength(0)
-    expect(getTcgBattleEvolutionOptions(stage1Side, 3)).toHaveLength(1)
+    expect(getTcgBattleEvolutionOptions(stage1Side, 2)).toHaveLength(1)
 
     const firstEvolution = applyTcgBattleEvolution(
       stage1Side,
       activePikachu.instanceId,
       raichu.id,
-      3,
+      2,
     )
     expect(firstEvolution?.target).toMatchObject({
       instanceId: 'pikachu-active',
@@ -418,14 +417,14 @@ describe('TCG battle utilities', () => {
     })
     expect(firstEvolution?.target.evolutionStack?.map((card) => card.name)).toEqual(['Pikachu'])
     expect(stage1Side.hand.map((card) => card.id)).toEqual([raichuPrime.id])
-    expect(getTcgBattleEvolutionOptions(stage1Side, 4)).toHaveLength(0)
-    expect(getTcgBattleEvolutionOptions(stage1Side, 5)).toHaveLength(1)
+    expect(getTcgBattleEvolutionOptions(stage1Side, 2)).toHaveLength(0)
+    expect(getTcgBattleEvolutionOptions(stage1Side, 3)).toHaveLength(1)
 
     const secondEvolution = applyTcgBattleEvolution(
       stage1Side,
       activePikachu.instanceId,
       raichuPrime.id,
-      5,
+      3,
     )
     expect(secondEvolution?.target.currentHp).toBe(130)
     expect(secondEvolution?.target.evolutionStack?.map((card) => card.name)).toEqual([

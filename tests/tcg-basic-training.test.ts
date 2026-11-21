@@ -487,7 +487,10 @@ describe('TCG Basic Training content', () => {
     expect(taskDialogue(deckLesson)).toContain('fifteen unique Pokémon cards')
     expect(taskDialogue(deckLesson)).toContain('60 or less')
     expect(taskDialogue(energyLesson)).toContain(
-      'Stage 1 cards unlock on turn 3',
+      'evolve as soon as you have a legal match',
+    )
+    expect(taskDialogue(energyLesson)).toContain(
+      'not on the turn that Pokémon entered play or evolved',
     )
     expect(taskDialogue(energyLesson)).toContain(
       'From turn 10, any attack cost is allowed',
