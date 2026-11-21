@@ -14,7 +14,7 @@ export const fortuneExchangeTasks: Task[] = FORTUNE_CHANNELING_CONTENT.map(
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Exchange Item',
-    requirements: [],
+    requirements: [{ type: 'item_owned', targetId: ritual.bookItemId }],
     criteria: [
       {
         type: 'item_owned',
