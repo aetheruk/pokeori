@@ -27,17 +27,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'pokefan-m',
     background: '/backgrounds/cerulean.avif',
     bookItemId: 'fortune-book-gilded-life',
-    bookName: 'Book of Fortune: Gilded Life',
+    bookName: 'Fortune: Gilded Life',
     bookDescription:
       'Gold brings luck to the one who knows where it belongs. On Cerulean’s bridge, a collector waits for a Nugget to turn a small fortune into a larger one.',
     taskId: 'fortune-exchange-nugget',
-    taskName: 'A Nugget for the Collector',
-    taskDescription: 'A collector on Nugget Bridge offers to buy any Nugget you bring.',
+    taskName: 'Fortune: Nugget',
+    taskDescription:
+      'Hey looks like the fortune was right! I could make good money selling Nugget here.',
     subCategory: 'Cerulean City',
     payout: 5000,
     exitTitle: 'A Gilded Deal',
     exitMessage:
-      'A fine Nugget, and a fair payment for it. Bring me another whenever you find one.',
+      'Not bad 5,000 Pokedollars for a Nugget I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -45,18 +46,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'rich-boy',
     background: '/backgrounds/celadon-game-corner-prize-exchange.avif',
     bookItemId: 'fortune-book-golden-life',
-    bookName: 'Book of Fortune: Golden Life',
+    bookName: 'Fortune: Golden Life',
     bookDescription:
       'A great weight of gold deserves a great welcome. Seek the buyer at Celadon Game Corner; a Big Nugget will earn a generous offer.',
     taskId: 'fortune-exchange-big-nugget',
-    taskName: 'A Nugget Worth Keeping',
+    taskName: 'Fortune: Big Nugget',
     taskDescription:
-      'A valuables buyer at Celadon Game Corner is looking for Big Nuggets to add to a private collection.',
+      'Hey looks like the fortune was right! I could make good money selling Big Nugget here.',
     subCategory: 'Celadon Game Corner',
     payout: 20000,
     exitTitle: 'A Golden Offer',
     exitMessage:
-      'Now that is a treasure worth celebrating. I’ll gladly make the same offer for another.',
+      'Not bad 20,000 Pokedollars for a Big Nugget I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -64,18 +65,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'sailor',
     background: '/backgrounds/vermillion.avif',
     bookItemId: 'fortune-book-aquatic-gift',
-    bookName: 'Book of Fortune: Aquatic Gift',
+    bookName: 'Fortune: Aquatic Gift',
     bookDescription:
       'The sea gives small treasures to patient hands. At Vermilion Harbor, a trader listens for the clink of a Pearl brought in from the water.',
     taskId: 'fortune-exchange-pearl',
-    taskName: 'A Pearl from the Sea',
+    taskName: 'Fortune: Pearl',
     taskDescription:
-      'A harbor trader buys Pearls brought in by sailors and travelers.',
+      'Hey looks like the fortune was right! I could make good money selling Pearl here.',
     subCategory: 'Vermilion City',
     payout: 700,
     exitTitle: 'A Harbor Exchange',
     exitMessage:
-      'A Pearl from the sea. Here’s your payment; I’m always interested in another.',
+      'Not bad 700 Pokedollars for a Pearl I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -83,18 +84,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'beauty',
     background: '/backgrounds/artisan-workshop.avif',
     bookItemId: 'fortune-book-aquatic-blessing',
-    bookName: 'Book of Fortune: Aquatic Blessing',
+    bookName: 'Fortune: Aquatic Blessing',
     bookDescription:
       'A pearl fit for a queen should find a worthy setting. Look for the Fuchsia artisan near the Safari Zone; a Big Pearl will earn a generous offer.',
     taskId: 'fortune-exchange-big-pearl',
-    taskName: 'A Pearl for the Artisan',
+    taskName: 'Fortune: Big Pearl',
     taskDescription:
-      'An artisan in Fuchsia City will buy a Big Pearl for a jewelry commission.',
+      'Hey looks like the fortune was right! I could make good money selling Big Pearl here.',
     subCategory: 'Fuchsia City',
     payout: 3750,
     exitTitle: 'A Rare Find',
     exitMessage:
-      'This Big Pearl will make a fine piece. If you find another, you know where to bring it.',
+      'Not bad 3,750 Pokedollars for a Big Pearl I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -102,18 +103,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'psychic-f',
     background: '/backgrounds/lavender.avif',
     bookItemId: 'fortune-book-skys-boon',
-    bookName: 'Book of Fortune: Skys Boon',
+    bookName: 'Fortune: Skys Boon',
     bookDescription:
       'A star’s dust is still a piece of the sky. The sky watcher in Lavender Town keeps a little fund for Stardust brought in for study.',
     taskId: 'fortune-exchange-stardust',
-    taskName: 'Stardust for Study',
+    taskName: 'Fortune: Stardust',
     taskDescription:
-      'A researcher studying the night sky will pay for Stardust samples.',
+      'Hey looks like the fortune was right! I could make good money selling Stardust here.',
     subCategory: 'Lavender Town',
     payout: 1000,
     exitTitle: 'A Piece of the Sky',
     exitMessage:
-      'Just what I needed for my observations. I’ll pay for any more Stardust you find.',
+      'Not bad 1,000 Pokedollars for a Stardust I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -121,18 +122,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'gamer',
     background: '/backgrounds/celadon-game-corner-prize-exchange.avif',
     bookItemId: 'fortune-book-skys-gift',
-    bookName: 'Book of Fortune: Skys Gift',
+    bookName: 'Fortune: Skys Gift',
     bookDescription:
       'A fallen star’s bright fragment belongs in careful hands. At Celadon Game Corner, ask the collector who buys Star Pieces.',
     taskId: 'fortune-exchange-star-piece',
-    taskName: 'A Star Piece for the Collector',
+    taskName: 'Fortune: Star Piece',
     taskDescription:
-      'A collector at Celadon Game Corner is willing to pay for Star Pieces.',
+      'Hey looks like the fortune was right! I could make good money selling Star Piece here.',
     subCategory: 'Celadon Game Corner',
     payout: 4900,
     exitTitle: 'A Star’s Worth',
     exitMessage:
-      'A Star Piece like this belongs in a collection. I’ll buy another if you come across one.',
+      'Not bad 4,900 Pokedollars for a Star Piece I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -140,18 +141,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'researcher-f',
     background: '/backgrounds/museum.avif',
     bookItemId: 'fortune-book-earths-blessing',
-    bookName: 'Book of Fortune: Earths Blessing',
+    bookName: 'Fortune: Earths Blessing',
     bookDescription:
       'The earth keeps its oldest treasures beneath the stone. Show a Rare Bone to the Pewter museum researcher; their study fund rewards good finds.',
     taskId: 'fortune-exchange-rare-bone',
-    taskName: 'A Rare Bone for the Museum',
+    taskName: 'Fortune: Rare Bone',
     taskDescription:
-      'A museum researcher buys Rare Bones for the fossil collection.',
+      'Hey looks like the fortune was right! I could make good money selling Rare Bone here.',
     subCategory: 'Pewter City',
     payout: 5000,
     exitTitle: 'A Priceless Specimen',
     exitMessage:
-      'A remarkable find. The museum can put it to good use, and you’ll be paid for it.',
+      'Not bad 5,000 Pokedollars for a Rare Bone I’ll be rich in no time!',
     closeButtonText: 'Accept Payment',
   },
   {
@@ -159,18 +160,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'breeder-f',
     background: '/backgrounds/forest.avif',
     bookItemId: 'fortune-book-natures-gift',
-    bookName: 'Book of Fortune: Natures Gift',
+    bookName: 'Fortune: Natures Gift',
     bookDescription:
       'A giant mushroom is a marvel of the forest. Find the botanist in Viridian Forest; they will pay for a Big Mushroom to study its growth.',
     taskId: 'fortune-exchange-big-mushroom',
-    taskName: 'A Mushroom for the Botanist',
+    taskName: 'Fortune: Big Mushroom',
     taskDescription:
-      'A botanist in Viridian Forest is looking for Big Mushrooms to study.',
+      'Hey looks like the fortune was right! I could make good money selling Big Mushroom here.',
     subCategory: 'Viridian Forest',
     payout: 2500,
     exitTitle: 'A Wonderful Specimen',
     exitMessage:
-      'This will be a fine addition to my study. Bring me another if you find one.',
+      'Not bad 2,500 Pokedollars for a Big Mushroom I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -178,18 +179,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'school-kid-f',
     background: '/backgrounds/forest.avif',
     bookItemId: 'fortune-book-natures-boon',
-    bookName: 'Book of Fortune: Natures Boon',
+    bookName: 'Fortune: Natures Boon',
     bookDescription:
       'Small things can be precious to the right student. Near Viridian Forest’s entrance, a young naturalist collects Tiny Mushrooms for a lesson in woodland life.',
     taskId: 'fortune-exchange-tiny-mushroom',
-    taskName: 'A Small Find for a Student',
+    taskName: 'Fortune: Tiny Mushroom',
     taskDescription:
-      'A young naturalist is collecting Tiny Mushrooms for a forest study.',
+      'Hey looks like the fortune was right! I could make good money selling Tiny Mushroom here.',
     subCategory: 'Viridian Forest',
     payout: 500,
     exitTitle: 'A Useful Little Find',
     exitMessage:
-      'That’s just what I needed for my notes. I’ll take another whenever you find one.',
+      'Not bad 500 Pokedollars for a Tiny Mushroom I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -197,18 +198,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'super-nerd',
     background: '/backgrounds/mt-moon.avif',
     bookItemId: 'fortune-book-skys-blessing',
-    bookName: 'Book of Fortune: Skys Blessing',
+    bookName: 'Fortune: Skys Blessing',
     bookDescription:
       'A shard from beyond the clouds carries a rare fortune. Find the Mt. Moon researcher; they will pay for a Comet Shard for the collection.',
     taskId: 'fortune-exchange-comet-shard',
-    taskName: 'A Shard from the Heavens',
+    taskName: 'Fortune: Comet Shard',
     taskDescription:
-      'A researcher studying the strange lights above Mt. Moon will buy Comet Shards.',
+      'Hey looks like the fortune was right! I could make good money selling Comet Shard here.',
     subCategory: 'Mt. Moon',
     payout: 12500,
     exitTitle: 'A Celestial Find',
     exitMessage:
-      'A Comet Shard! This is a rare discovery. I’ll pay for any others you uncover.',
+      'Not bad 12,500 Pokedollars for a Comet Shard I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
   {
@@ -216,18 +217,18 @@ export const FORTUNE_CHANNELING_CONTENT: FortuneChannelingContent[] = [
     trainerIconId: 'breeder-m',
     background: '/backgrounds/power-plant.avif',
     bookItemId: 'fortune-book-natures-blessing',
-    bookName: 'Book of Fortune: Natures Blessing',
+    bookName: 'Fortune: Natures Blessing',
     bookDescription:
       'The sweetest mushroom is prized by growers and healers alike. In the Kanto Plant Store Room, a grower makes a standing offer for each Balm Mushroom.',
     taskId: 'fortune-exchange-balm-mushroom',
-    taskName: 'A Balm Mushroom for the Grower',
+    taskName: 'Fortune: Balm Mushroom',
     taskDescription:
-      'A plant grower in the Kanto Plant Store Room buys Balm Mushrooms for their unusual fragrance.',
+      'Hey looks like the fortune was right! I could make good money selling Balm Mushroom here.',
     subCategory: 'Cerulean City',
     payout: 6250,
     exitTitle: 'A Fragrant Treasure',
     exitMessage:
-      'This will be perfect for my collection. Bring me another Balm Mushroom any time.',
+      'Not bad 6,250 Pokedollars for a Balm Mushroom I’ll be rich in no time!',
     closeButtonText: 'Take the Payment',
   },
 ]

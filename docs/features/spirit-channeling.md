@@ -34,7 +34,7 @@ Each Kanto Gym Badge is also an authored memento. Every badge ritual uses Memory
 | Volcano | The Last Question | 43 Fire (Cinder Shard and/or Fire Gem) | Any Level 35+ |
 | Earth | Dinner at Eight | 91 Ground (Terra Dust and/or Ground Gem) | Any Level 40+ |
 
-The eleven classic treasure items are Fortune Incense mementos only. Channeling each one awards a unique Book of Fortune whose inventory description gives a clue to its buyer task; Fortune books use the shared guide-book sprite. The memento remains in the inventory; successful channeling consumes only the selected standard material/Gem offerings, and each memento can be channeled once. Channeler requirements and required energy are:
+The eleven classic treasure items are Fortune Incense mementos only. Channeling each one awards a unique Fortune item whose inventory description gives a clue to its buyer task; Fortune items use the shared guide-book sprite. The memento remains in the inventory; successful channeling consumes only the selected standard material/Gem offerings, and each memento can be channeled once. Channeler requirements and required energy are:
 
 | Treasure | Offering energy | Channeler |
 | --- | ---: | --- |
@@ -50,4 +50,4 @@ The eleven classic treasure items are Fortune Incense mementos only. Channeling 
 | Comet Shard | 77 Psychic | Fairy type, Level 35+ |
 | Balm Mushroom | 52 Grass | Grass type, Level 25+ |
 
-Each matching Book of Fortune provides a clue to a repeatable Kanto buyer task and unlocks that task. The task modal lists the matching treasure as the exchange requirement and consumes it for the authored Pokédollar payout, following the same task pattern as Koban Kash. Task and exit modal backgrounds match their locations, and trainer-class icons match each buyer's role. Tasks use the existing task subcategory for their supported location. The Kanto Plant Store Room buyer is grouped under Cerulean City, matching that location's authored subcategory.
+Each matching Fortune item provides a clue to a repeatable Kanto buyer task and unlocks that task. Tasks are named `Fortune: {Item}` and use the shared fortune-based description. The task modal lists the matching treasure as the exchange requirement and consumes it for the authored Pokédollar payout, following the same task pattern as Koban Kash. The exit message states the item's payout. Task and exit modal backgrounds match their locations, and trainer-class icons match each buyer's role. Tasks use the existing task subcategory for their supported location. The Kanto Plant Store Room buyer is grouped under Cerulean City, matching that location's authored subcategory.
