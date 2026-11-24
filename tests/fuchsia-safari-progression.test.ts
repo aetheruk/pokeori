@@ -1269,7 +1269,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     const hall = safariZoneShops[0]
     expect(hall).toMatchObject({
       id: "fuchsia-research-guild-hall",
-      guildId: "fuchsia-research-guild",
+      guildCharterId: "fuchsia-research-guild",
       subCategory: 'Fuchsia City',
       background: '/backgrounds/lab.avif',
       icon: { type: 'item', id: 'safari-ball' },

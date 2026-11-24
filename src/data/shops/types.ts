@@ -21,7 +21,8 @@ export interface ShopItem {
 
 export interface ShopConfig {
   id: string
-  guildId?: string
+  /** Render this Explore entry as a read-only guild charter, not a purchase shop. */
+  guildCharterId?: string
   hide?: string
   name: string
   description: string

@@ -23,7 +23,9 @@ export function ShopModal({ shop, open, onOpenChange }: ShopModalProps) {
       open={open}
       onOpenChange={onOpenChange}
       title={shop.name}
-      category={shop.guildId ? 'Guild charter' : shop.subCategory || 'SHOP'}
+      category={
+        shop.guildCharterId ? 'Guild charter' : shop.subCategory || 'SHOP'
+      }
       background={shop.background}
       icon={
         <TaskIconDisplay
@@ -35,9 +37,9 @@ export function ShopModal({ shop, open, onOpenChange }: ShopModalProps) {
       }
       presentation="drawer"
     >
-      {shop.guildId ? (
+      {shop.guildCharterId ? (
         <GuildProgressContent
-          guildId={shop.guildId}
+          guildId={shop.guildCharterId}
           guilds={((user as any)?.guilds || {}) as GuildsData}
         />
       ) : (

@@ -4,7 +4,6 @@ import { UNDERGROUND_SOCIETY_GUILD_ID } from '@/data/guilds/underground-society'
 export const undergroundTccgShops: ShopConfig[] = [
   {
     id: 'underground-society-promo-counter',
-    guildId: UNDERGROUND_SOCIETY_GUILD_ID,
     name: 'The Promo Counter',
     description: 'A small counter for cards that are not supposed to be in circulation yet.',
     category: 'Underground',

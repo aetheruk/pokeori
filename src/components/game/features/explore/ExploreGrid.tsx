@@ -93,7 +93,7 @@ function ExploreGridComponent({
       if (item.type === 'task' && item.isChallenge) {
         groupType = 'challenge'
       }
-      if (item.type === 'shop' && (item.originalData as any).guildId) {
+      if (item.type === 'shop' && (item.originalData as any).guildCharterId) {
         groupType = 'guild'
       }
       if (

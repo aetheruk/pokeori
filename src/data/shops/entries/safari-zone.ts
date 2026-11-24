@@ -1,10 +1,10 @@
 import type { ShopConfig } from '../types'
 
-/** Explore compatibility entry: guildId selects the read-only Institute charter. */
+/** Explore compatibility entry for the read-only Institute charter. */
 export const safariZoneShops: ShopConfig[] = [
   {
     id: 'fuchsia-research-guild-hall',
-    guildId: 'fuchsia-research-guild',
+    guildCharterId: 'fuchsia-research-guild',
     name: 'Fuchsia Research Institute',
     description:
       'Review submitted field notes, Institute Rank, and charter unlocks.',

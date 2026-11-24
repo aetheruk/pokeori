@@ -23,6 +23,50 @@ const baseRequirementData = {
 } as unknown as RequirementData
 
 describe('shop requirements', () => {
+  test('Underground promo cards open as a rank-gated shop', () => {
+    const shop = shops.find(
+      (entry) => entry.id === 'underground-society-promo-counter',
+    )
+
+    expect(shop).toBeDefined()
+    expect(shop?.guildCharterId).toBeUndefined()
+    expect(shop?.requirements).toEqual([
+      {
+        type: 'guild_rank',
+        targetId: 'underground-society',
+        count: 2,
+      },
+    ])
+    expect(shop?.items.map((item) => item.cost)).toEqual([
+      [{ type: 'currency', id: 'crystals', amount: 50000 }],
+      [{ type: 'currency', id: 'crystals', amount: 50000 }],
+      [{ type: 'currency', id: 'crystals', amount: 50000 }],
+    ])
+    expect(
+      shop?.items.map(
+        (item) => item.rewards[0]?.cardDrawParams?.allowedCardIds,
+      ),
+    ).toEqual([['basep-24'], ['basep-25'], ['basep-28']])
+
+    const rankOneData = {
+      ...baseRequirementData,
+      user: {
+        id: 'user-1',
+        guilds: { 'underground-society': { rank: 1, xp: 0 } },
+      },
+    } as unknown as RequirementData
+    const rankTwoData = {
+      ...baseRequirementData,
+      user: {
+        id: 'user-1',
+        guilds: { 'underground-society': { rank: 2, xp: 10000 } },
+      },
+    } as unknown as RequirementData
+
+    expect(checkShopRequirements(rankOneData, shop!)).toBe(false)
+    expect(checkShopRequirements(rankTwoData, shop!)).toBe(true)
+  })
+
   test('time range requirements use the shop region timezone', () => {
     const shop = {
       id: 'kanto-morning-shop',
