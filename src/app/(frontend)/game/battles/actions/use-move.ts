@@ -874,6 +874,57 @@ export async function useMove(
     }
 
     const enemyHpAtPrimaryStart = enemyMon.currentHp
+    let enemyBattleAction = normalizeResolvedBattleAction({
+      stance: enemyStance,
+      moveChoice: enemyAiMove,
+    })
+    let enemyCanMove =
+      !enemySwapped &&
+      !enemyRechargeMsg &&
+      !trainerItemResult.skipsEnemyAction
+    let enemyStatusMsg = ''
+
+    logger.debug(
+      `Enemy Check: Status=${enemyMon.status?.id}, Counter=${enemyMon.status?.counter}`,
+    )
+    if (enemyCanMove) {
+      const enemyStatusCheck = resolveBeforeMoveStatus(enemyMon)
+      const enemyAbilityCheck = enemyStatusCheck.canMove
+        ? resolveBattleAbilityBeforeMove(enemyMon, state.turn)
+        : { canMove: true, message: '' }
+      const enemySecondaryStatusCheck =
+        enemyStatusCheck.canMove && enemyAbilityCheck.canMove
+          ? processBeforeMoveSecondaryStatuses({
+              state,
+              pokemon: enemyMon,
+              side: 'enemy',
+              move: enemyBattleAction.move,
+              attackType: enemyBattleAction.attackType,
+            })
+          : { canMove: true, message: '' }
+      const enemyMoveCheck = !enemyStatusCheck.canMove
+        ? enemyStatusCheck
+        : !enemyAbilityCheck.canMove
+          ? enemyAbilityCheck
+          : enemySecondaryStatusCheck
+      if (!enemyMoveCheck.canMove) {
+        enemyCanMove = false
+        enemyStatusMsg = `\n${enemyMoveCheck.message}`
+      } else if (enemyStatusCheck.message) {
+        enemyStatusMsg = `\n${enemyStatusCheck.message}`
+      } else if (enemyAbilityCheck.message) {
+        enemyStatusMsg = `\n${enemyAbilityCheck.message}`
+      } else if (enemySecondaryStatusCheck.message) {
+        enemyStatusMsg = `\n${enemySecondaryStatusCheck.message}`
+      }
+    }
+
+    if (!enemyCanMove && enemyAiMove) {
+      enemyAiMove = undefined
+      enemyBattleAction = normalizeResolvedBattleAction({
+        stance: enemyStance,
+      })
+    }
 
     const resolution = resolveStance(resolvedMoveStance, enemyStance)
     const contest = resolveMoveContest({
@@ -929,10 +980,6 @@ export async function useMove(
         !enemyRechargeMsg &&
         !trainerItemResult.skipsEnemyAction,
     )
-    let enemyBattleAction = normalizeResolvedBattleAction({
-      stance: enemyStance,
-      moveChoice: enemyAiMove,
-    })
     let moveFailed =
       Boolean(calledMoveFailedMessage || battleConditionFailedMessage) ||
       contest.failMove ||
@@ -1851,12 +1898,7 @@ export async function useMove(
       !suppressesBattleCounterPreventionByAbility(playerMon) &&
       (contest.preventCounter ||
         (move.preventCounterOnStanceWin && resolution.result === 'win'))
-    let enemyCanMove =
-      !preventEnemyCounter &&
-      !enemySwapped &&
-      !enemyRechargeMsg &&
-      !trainerItemResult.skipsEnemyAction
-    let enemyStatusMsg = ''
+    enemyCanMove = enemyCanMove && !preventEnemyCounter
 
     if (preventEnemyCounter && !enemySwapped && !trainerItemResult.used) {
       const enemyStanceOutcome =
@@ -1866,41 +1908,6 @@ export async function useMove(
             ? 'win'
             : 'tie'
       recordPokemonStanceResult(state, enemyMon, enemyStanceOutcome)
-    }
-
-    logger.debug(
-      `Enemy Check: Status=${enemyMon.status?.id}, Counter=${enemyMon.status?.counter}`,
-    )
-    if (enemyCanMove) {
-      const enemyStatusCheck = resolveBeforeMoveStatus(enemyMon)
-      const enemyAbilityCheck = enemyStatusCheck.canMove
-        ? resolveBattleAbilityBeforeMove(enemyMon, state.turn)
-        : { canMove: true, message: '' }
-      const enemySecondaryStatusCheck =
-        enemyStatusCheck.canMove && enemyAbilityCheck.canMove
-          ? processBeforeMoveSecondaryStatuses({
-              state,
-              pokemon: enemyMon,
-              side: 'enemy',
-              move: enemyBattleAction.move,
-              attackType: enemyBattleAction.attackType,
-            })
-          : { canMove: true, message: '' }
-      const enemyMoveCheck = !enemyStatusCheck.canMove
-        ? enemyStatusCheck
-        : !enemyAbilityCheck.canMove
-          ? enemyAbilityCheck
-          : enemySecondaryStatusCheck
-      if (!enemyMoveCheck.canMove) {
-        enemyCanMove = false
-        enemyStatusMsg = `\n${enemyMoveCheck.message}`
-      } else if (enemyStatusCheck.message) {
-        enemyStatusMsg = `\n${enemyStatusCheck.message}`
-      } else if (enemyAbilityCheck.message) {
-        enemyStatusMsg = `\n${enemyAbilityCheck.message}`
-      } else if (enemySecondaryStatusCheck.message) {
-        enemyStatusMsg = `\n${enemySecondaryStatusCheck.message}`
-      }
     }
 
     if (
