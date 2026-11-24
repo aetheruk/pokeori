@@ -1753,6 +1753,7 @@ function MountedPokemonDetailsDialog({
                                 <button
                                   key={item.id}
                                   type="button"
+                                  data-haptic-disabled="true"
                                   onClick={() => handleSelectHeldItem(item.id)}
                                   disabled={
                                     isSavingHeldItem !== null ||
