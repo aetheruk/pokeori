@@ -10,6 +10,8 @@ interface SafariBallControlProps {
   ball?: Item
   quantity: number
   targetRef: React.RefObject<HTMLElement | null>
+  ringScale: number
+  aimReady: boolean
   disabled?: boolean
   onThrow: (input: CaptureThrowPayload) => void
 }
@@ -18,6 +20,8 @@ export function SafariBallControl({
   ball,
   quantity,
   targetRef,
+  ringScale,
+  aimReady,
   disabled = false,
   onThrow,
 }: SafariBallControlProps) {
@@ -28,7 +32,8 @@ export function SafariBallControl({
       <div className="h-14 w-14 sm:h-16 sm:w-16">
         <DraggablePokeball
           targetRef={targetRef}
-          disabled={disabled}
+          ringScale={ringScale}
+          disabled={disabled || !aimReady}
           onThrow={onThrow}
         >
           <div className="h-full w-full cursor-grab active:cursor-grabbing">

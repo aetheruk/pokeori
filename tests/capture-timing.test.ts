@@ -1,9 +1,14 @@
 import { expect, test } from 'bun:test'
 import { getCaptureRingScale, isCaptureAimSessionValid, verifyCaptureRingScale, type CaptureAimTiming } from '../src/utilities/pokemon/capture-timing'
+import { getThrowQuality } from '../src/utilities/pokemon/catch-balance'
 
 const timing: CaptureAimTiming = { id: 'challenge', startedAt: 1000, serverNow: 1000, periodMs: 2200, attempt: 0 }
-test('capture phase comes from a live server challenge, with legacy scalar unable to grant a bonus', () => {
-  expect(verifyCaptureRingScale(timing, undefined, 0, 3100)).toBe(1)
+test('missing timing proof defaults to neutral nice quality', () => {
+  const ringScale = verifyCaptureRingScale(timing, undefined, 0, 3100)
+  expect(ringScale).toBe(0.5)
+  expect(getThrowQuality({ ringScale })).toBe('nice')
+})
+test('capture phase comes from a live server challenge', () => {
   expect(verifyCaptureRingScale(timing, { challengeId: timing.id, elapsedMs: 2100 }, 0, 3200)).toBe(getCaptureRingScale(2100))
   expect(getCaptureRingScale(2200)).toBe(1)
 })
