@@ -1,9 +1,13 @@
 import { revalidatePath } from 'next/cache'
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
 import type { BattleState, BattleStance } from '@/utilities/battle/types'
 import { getUser } from '../helpers/user'
 import { BATTLE_TTL, getActiveBattleState, getBattleConfigForState } from '../helpers/state-management'
 import { processEnemyAttackOnly } from '../pve/enemy-attack'
 import { recalculateBattlePokemonStats } from '@/utilities/battle/battle-logic'
+import { handleBattleLoss } from '../helpers/loss-handler'
+import { recordPokemonKO } from '../helpers/pokemon-ko-credit'
 import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
 import { redis } from '@/utilities/redis'
 import {
@@ -12,7 +16,9 @@ import {
   needsPlayerMoveSwitch,
   processBattleAbilitySwitchOut,
   resetPlayerPowerStateForReplacement,
+  resolvePlayerSwitchInFaint,
 } from '@/utilities/battle/switching'
+import { decrementFaintedPokemonFriendship } from '@/utilities/battle/friendship'
 import { markPlayerPokemonInvolved } from '@/utilities/battle/participants'
 import { buildWildBattleSelectedTeam } from '@/utilities/battle/lead-selection'
 import { clearZMoveCharge } from '@/utilities/battle/z-move'
@@ -215,6 +221,17 @@ export async function swapPokemon(
         pokemon: newPokemon,
         ownerName: state.playerName,
       })
+      const switchInFaint = resolvePlayerSwitchInFaint(state)
+      if (switchInFaint) {
+        recordPokemonKO(state, 'player')
+        const payload = await getPayload({ config: configPromise })
+        await decrementFaintedPokemonFriendship({
+          payload,
+          pokemon: switchInFaint.pokemon,
+          userId: user.id,
+          eventId: `${state.economyActionId || state.battleId}:${state.turn}:${switchInFaint.pokemon.id}`,
+        })
+      }
       const message = [
         isMoveSwitch
           ? `${oldPokemon.name}, come back! Go, ${newPokemon.name}!`
@@ -224,6 +241,7 @@ export async function swapPokemon(
         ...suppressionMessages,
         ...weatherMessages,
         ...terrainMessages,
+        ...(switchInFaint?.messages ?? []),
       ].join('\n')
       state.history.unshift({
         turn: state.turn,
@@ -235,6 +253,9 @@ export async function swapPokemon(
         message,
       })
 
+      if (switchInFaint?.battleLost) {
+        await handleBattleLoss(state, user, battleConfig)
+      }
       finalizeBattlePresentation(state)
       await redis.set(`battle:${user.id}`, state, { ex: BATTLE_TTL })
       if (state.status !== 'ongoing') {

@@ -91,6 +91,8 @@ Astral Radiance Radiant Greninja can use Concealed Cards once per turn by discar
 Lost Origin Drapion VSTAR can use Venomous Vortex once per game to Paralyze and Poison an opposing Active Pokémon, dealing 30 Poison damage during Pokémon Checkup. The shared VSTAR Power limit is enforced in PvE and PvP.
 # Current Game State
 
+Battle replacement entry effects resolve immediately. If an incoming player Pokémon is reduced to zero HP by a switch-in effect such as Storm Cloud, it faints before the player can take another action; the player must choose another reserve, or the battle ends if none remain.
+
 TCG deck building now has one deck per card series. Each deck contains 15 unique Pokémon cards and has a shared cost limit of 60; the Baby, Champions, and Masters tiers and the battle-entry `deckFormat` setting are removed. Opening deck management clears saved decks from the old tiered structure. Existing NPC opponent lists remain unchanged and are validated against the unified rules. Trainer and CardDex now offer one Add to deck flow, with the selected series, card count, and cost shown directly. All TCG battles share the same Energy pacing (5 starting, 12 maximum, +2 on Charge).
 
 The Viridian Chansey Pokemon Center Wheel is now repeatable without a daily attempt limit. Each spin costs 3 League Tickets; its existing unlocks and prize pool are unchanged.

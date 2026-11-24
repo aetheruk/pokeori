@@ -12,7 +12,8 @@ import {
   processBattleAbilityWeatherSet,
   restoreBattleAbilityMutationOnSwitchOut,
 } from './abilities'
-import { applyBattleFormChange } from './stats-calc'
+import { applyBattleFormChange, resetBattleStatStages } from './stats-calc'
+import { formatPokemonFaintedMessage } from './messages'
 import {
   clearPokemonSecondaryStatuses,
   clearSourceLinkedTrapSecondaryStatuses,
@@ -86,6 +87,45 @@ export function resetPlayerPowerStateForReplacement(state: BattleState): void {
     activePokemon.formId = activePokemon.originalFormId
   }
   activePokemon.originalFormId = undefined
+}
+
+export function resolvePlayerSwitchInFaint(
+  state: BattleState,
+): { pokemon: BattlePokemon; messages: string[]; battleLost: boolean } | undefined {
+  const pokemon = state.playerTeam[state.activePlayerIndex]
+  if (!pokemon || pokemon.currentHp > 0) return undefined
+
+  resetBattleStatStages(pokemon)
+  state.moveHistory ??= {}
+  state.moveHistory.lastFainted ??= {}
+  state.moveHistory.lastFainted.player = {
+    turn: state.turn,
+    pokemonId: pokemon.id,
+  }
+
+  const messages = [
+    formatPokemonFaintedMessage(state.playerName, pokemon.name),
+  ]
+
+  const battleLost = !hasAvailableReplacement(
+    state.playerTeam,
+    state.activePlayerIndex,
+  )
+
+  if (!battleLost) {
+    state.pendingPlayerSwitch = true
+    state.pendingPlayerSwitchReason = 'fainted'
+    resetPlayerPowerStateForReplacement(state)
+    messages.push('Choose your next Pokemon!')
+  } else {
+    state.status = 'lost'
+    state.pendingPlayerSwitch = false
+    state.pendingPlayerSwitchReason = undefined
+    state.pendingSketchedMoves = undefined
+    messages.push(`You were defeated by ${state.enemyName}...`)
+  }
+
+  return { pokemon, messages, battleLost }
 }
 
 export function processBattleAbilitySwitchOut(
