@@ -6,11 +6,106 @@ import {
 import { formatBattleStatName } from '@/utilities/battle/stat-labels'
 import { generateBattleEvents } from '@/utilities/battle/engine/event-generator'
 import { getCombinedImpactDamage } from '@/utilities/battle/engine/impact-group'
+import { processSecondaryStatusesForSwitch } from '@/utilities/battle/secondary-statuses'
+import { resolvePlayerSwitchInFaint } from '@/utilities/battle/switching'
 import type { BattlePresentationEvent } from '@/utilities/battle/types'
 import { flipPvpState } from '@/app/(frontend)/game/battles/pvp/state-utils'
-import { makePvpBattleState } from './helpers/battle-fixtures'
+import {
+  makeBattlePokemon,
+  makePveBattleState,
+  makePvpBattleState,
+} from './helpers/battle-fixtures'
 
 describe('battle presentation timeline', () => {
+  test('faints a replacement immediately when switch-in damage reaches zero HP', () => {
+    const fainted = makeBattlePokemon({
+      id: 'fainted-player',
+      name: 'Fainted Mon',
+      currentHp: 0,
+    })
+    const entrant = makeBattlePokemon({
+      id: 'storm-cloud-target',
+      name: 'Storm Cloud Target',
+      currentHp: 13,
+      maxHp: 100,
+    })
+    const reserve = makeBattlePokemon({
+      id: 'player-reserve',
+      name: 'Player Reserve',
+    })
+    const state = makePveBattleState({
+      playerTeam: [fainted, entrant, reserve],
+      activePlayerIndex: 0,
+      pendingPlayerSwitch: true,
+      pendingPlayerSwitchReason: 'fainted',
+      secondaryStatuses: [
+        {
+          id: 'storm-cloud',
+          name: 'Storm Cloud',
+          triggers: ['switch'],
+          effects: [{ type: 'damage', percentMaxHp: 12.5 }],
+          sourceSide: 'enemy',
+          target: 'side',
+          targetSide: 'player',
+        },
+      ],
+    })
+    beginBattlePresentation(state)
+
+    state.activePlayerIndex = 1
+    state.pendingPlayerSwitch = false
+    state.pendingPlayerSwitchReason = undefined
+    const entryMessages = processSecondaryStatusesForSwitch(
+      state,
+      'player',
+      () => 0,
+    )
+    const faintResolution = resolvePlayerSwitchInFaint(state)
+    state.history.unshift({
+      turn: state.turn,
+      playerStance: 'tech',
+      enemyStance: 'tech',
+      result: 'tie',
+      damageDealt: 0,
+      damageTaken: 0,
+      message: [
+        'Player sent out Storm Cloud Target!',
+        ...entryMessages,
+        ...(faintResolution?.messages ?? []),
+      ].join('\n'),
+    })
+
+    finalizeBattlePresentation(state)
+
+    expect(entrant.currentHp).toBe(0)
+    expect(state.pendingPlayerSwitch).toBe(true)
+    expect(String(state.pendingPlayerSwitchReason)).toBe('fainted')
+    expect(state.presentation?.events).toMatchObject([
+      {
+        type: 'switch',
+        side: 'player',
+        fromIndex: 0,
+        toIndex: 1,
+        reason: 'replacement',
+      },
+      {
+        type: 'hp-change',
+        side: 'player',
+        pokemonIndex: 1,
+        kind: 'damage',
+        amount: 13,
+        hpAfter: 0,
+      },
+      {
+        type: 'faint',
+        side: 'player',
+        pokemonIndex: 1,
+        hpAfter: 0,
+      },
+      { type: 'message', message: 'Choose your next Pokemon!' },
+    ])
+  })
+
   test('authors a boost event for Battle Shout encouragement', () => {
     const state = makePvpBattleState()
     beginBattlePresentation(state)
