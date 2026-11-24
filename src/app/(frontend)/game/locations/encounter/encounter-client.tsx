@@ -833,8 +833,11 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
 
   useEffect(() => {
     if (!isCapturing) captureInFlightRef.current = false
+    const isCaptureAimPhase =
+      phase === 'capture' ||
+      (phase === 'safari' && encounter?.encounterMode === 'safari')
     if (
-      phase !== 'capture' ||
+      !isCaptureAimPhase ||
       showCaptureAnimation ||
       isCapturing
     ) {
@@ -861,7 +864,15 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
       frame = window.requestAnimationFrame(tick)
     })()
     return () => { disposed = true; window.cancelAnimationFrame(frame) }
-  }, [hasAttemptedCapture, isCapturing, phase, showCaptureAnimation])
+  }, [
+    encounter?.currentCatchRate,
+    encounter?.encounterMode,
+    encounter?.safari?.actions,
+    hasAttemptedCapture,
+    isCapturing,
+    phase,
+    showCaptureAnimation,
+  ])
 
   useEffect(() => {
     const init = async () => {
@@ -1708,7 +1719,8 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
   const shieldBubbleColor = encounter?.shield?.bubbleColor || '#67e8f9'
   const visibleCatchRate = shieldActive ? 0 : catchRate
   const throwDisplayStageBonus =
-    phase === 'capture' && throwFeedback
+    (phase === 'capture' || (phase === 'safari' && isSafariEncounter)) &&
+    throwFeedback
       ? getThrowStageBonus(throwFeedback.quality)
       : 0
   const adjustedCatchRate = shieldActive
@@ -1916,8 +1928,8 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
             {encounter.isAlpha && !isSilphScopeGhostLocked && (
               <AlphaParticles className="-inset-x-5 -inset-y-8 z-0" />
             )}
-            {phase === 'capture' &&
-              !isSafariEncounter &&
+            {(phase === 'capture' ||
+              (phase === 'safari' && isSafariEncounter)) &&
               !showCaptureAnimation &&
               !isCapturing &&
               !hasAttemptedCapture &&
@@ -1949,24 +1961,26 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                 </>
               )}
             <AnimatePresence>
-              {throwFeedback && phase === 'capture' && (
-                <motion.div
-                  key={throwFeedback.id}
-                  className="pointer-events-none absolute left-1/2 top-2 z-30 -translate-x-1/2 rounded-full border border-game-charcoal/35 bg-game-surface-raised/95 px-3 py-1 text-xs font-black uppercase tracking-wider text-game-charcoal-strong shadow-lg"
-                  initial={{ opacity: 0, y: 8, scale: 0.9 }}
-                  animate={{ opacity: 1, y: -10, scale: 1 }}
-                  exit={{ opacity: 0, y: -22, scale: 0.94 }}
-                  transition={{ duration: 0.22 }}
-                >
-                  {throwFeedback.quality}
-                  {throwDisplayStageBonus !== 0 && (
-                    <span className="ml-1 text-game-charcoal-strong">
-                      {throwDisplayStageBonus > 0 ? '+' : ''}
-                      {throwDisplayStageBonus}
-                    </span>
-                  )}
-                </motion.div>
-              )}
+              {throwFeedback &&
+                (phase === 'capture' ||
+                  (phase === 'safari' && isSafariEncounter)) && (
+                  <motion.div
+                    key={throwFeedback.id}
+                    className="pointer-events-none absolute left-1/2 top-2 z-30 -translate-x-1/2 rounded-full border border-game-charcoal/35 bg-game-surface-raised/95 px-3 py-1 text-xs font-black uppercase tracking-wider text-game-charcoal-strong shadow-lg"
+                    initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                    animate={{ opacity: 1, y: -10, scale: 1 }}
+                    exit={{ opacity: 0, y: -22, scale: 0.94 }}
+                    transition={{ duration: 0.22 }}
+                  >
+                    {throwFeedback.quality}
+                    {throwDisplayStageBonus !== 0 && (
+                      <span className="ml-1 text-game-charcoal-strong">
+                        {throwDisplayStageBonus > 0 ? '+' : ''}
+                        {throwDisplayStageBonus}
+                      </span>
+                    )}
+                  </motion.div>
+                )}
             </AnimatePresence>
             {shieldActive && !isSilphScopeGhostLocked && (
               <motion.div
@@ -2116,6 +2130,8 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                       ball={balls[0]}
                       quantity={encounter.safari?.ballsRemaining || 0}
                       targetRef={pokemonTargetRef}
+                      ringScale={captureRingScale}
+                      aimReady={captureAimReady}
                       disabled={
                         submittingSafariAction ||
                         isCapturing ||

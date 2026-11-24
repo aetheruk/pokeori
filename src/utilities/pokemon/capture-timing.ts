@@ -33,7 +33,9 @@ export function verifyCaptureRingScale(
   attempt: number,
   now: number,
 ): number {
-  if (!proof) return 1
+  // A missing proof must stay neutral, rather than being treated as the
+  // largest ring size and penalized as a poor throw.
+  if (!proof) return 0.5
   if (!timing || proof.challengeId !== timing.id || timing.attempt !== attempt ||
     !Number.isSafeInteger(proof.elapsedMs) || proof.elapsedMs < 0 ||
     proof.elapsedMs > 86_400_000) throw new Error('Capture timing expired. Aim again.')
