@@ -1782,19 +1782,6 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
               ).label}
             </span>
           </div>
-          <div className="flex flex-wrap justify-between gap-x-3 text-xs text-game-muted">
-            <span>IV range {ivRange}</span>
-            <span>EV budget {difficultySettings.evBudget}/510</span>
-            <span>
-              {difficultySettings.aiProfile === 'advanced'
-                ? 'Advanced AI'
-                : 'Trainer AI'}
-            </span>
-          </div>
-          <p className="text-xs leading-relaxed text-game-muted">
-            Higher settings favor stronger seen Pokémon. Trainer level above
-            sets their level separately.
-          </p>
         </div>
       </div>
     )
