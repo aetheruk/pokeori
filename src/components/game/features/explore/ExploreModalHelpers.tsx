@@ -59,7 +59,7 @@ import {
   getTypeIcon,
   isChronicleExploreItem,
 } from './utils'
-import { getVsSeekerDifficultyMultiplier } from '@/utilities/vs-seeker'
+import { getVsSeekerDifficultySettings } from '@/utilities/vs-seeker-difficulty'
 import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import { getEligibleUndergroundMiningSettings } from '@/utilities/research/underground-mining'
 
@@ -1705,13 +1705,9 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
     const difficulties = item.vsSeekerDifficultyOptions || [1, 2, 3, 4, 5]
     const selectedLevel = item.vsSeekerLevel || levels[levels.length - 1]
     const selectedDifficulty = item.vsSeekerDifficulty || difficulties[0]
-    const difficultyLabels: Record<number, string> = {
-      1: 'Casual',
-      2: 'Skilled',
-      3: 'Tough',
-      4: 'Expert',
-      5: 'Master',
-    }
+    const difficultySettings =
+      getVsSeekerDifficultySettings(selectedDifficulty)
+    const ivRange = `${Math.max(0, difficultySettings.ivTarget - 3)}–${Math.min(31, difficultySettings.ivTarget + 3)}`
 
     return (
       <div className="mt-6 space-y-5">
@@ -1758,9 +1754,9 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
               Difficulty
             </label>
             <span className="text-right text-sm font-bold text-game-clay-strong">
-              {difficultyLabels[selectedDifficulty] || `Level ${selectedDifficulty}`}
+              {difficultySettings.label}
               <span className="ml-2 font-mono text-xs text-game-muted">
-                ×{getVsSeekerDifficultyMultiplier(selectedDifficulty).toFixed(1)} payout
+                ×{difficultySettings.payoutMultiplier.toFixed(1)} payout
               </span>
             </span>
           </div>
@@ -1775,13 +1771,30 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
               item.setVsSeekerDifficulty(Number(event.target.value))
             }
             aria-label="VS Seeker difficulty"
-            aria-valuetext={difficultyLabels[selectedDifficulty] || `Difficulty ${selectedDifficulty}`}
+            aria-valuetext={`${difficultySettings.label}, IV range ${ivRange}, ${difficultySettings.evBudget} EV budget, ${difficultySettings.aiProfile} AI`}
             className="w-full accent-game-charcoal"
           />
           <div className="flex justify-between text-xs text-game-muted">
-            <span>{difficultyLabels[difficulties[0]] || 'Casual'}</span>
-            <span>{difficultyLabels[difficulties[difficulties.length - 1]] || 'Master'}</span>
+            <span>{getVsSeekerDifficultySettings(difficulties[0]).label}</span>
+            <span>
+              {getVsSeekerDifficultySettings(
+                difficulties[difficulties.length - 1],
+              ).label}
+            </span>
           </div>
+          <div className="flex flex-wrap justify-between gap-x-3 text-xs text-game-muted">
+            <span>IV range {ivRange}</span>
+            <span>EV budget {difficultySettings.evBudget}/510</span>
+            <span>
+              {difficultySettings.aiProfile === 'advanced'
+                ? 'Advanced AI'
+                : 'Trainer AI'}
+            </span>
+          </div>
+          <p className="text-xs leading-relaxed text-game-muted">
+            Higher settings favor stronger seen Pokémon. Trainer level above
+            sets their level separately.
+          </p>
         </div>
       </div>
     )
