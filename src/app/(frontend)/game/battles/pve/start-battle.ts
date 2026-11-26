@@ -707,6 +707,7 @@ export async function startBattleFromConfig(
                 level,
                 isWildBattle: battleConfig.isWildBattle,
                 difficulty: battleConfig.enemyDifficulty,
+                baseStats: formData?.stats,
               }),
             rarity,
             ...rarityLegacyFields,

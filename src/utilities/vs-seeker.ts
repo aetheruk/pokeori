@@ -13,6 +13,11 @@ import {
   getPokePowderIdForLevel,
 } from '@/utilities/rewards/candy-logic'
 import { getPokemonLevelCap } from '@/utilities/pokemon/experience'
+import { getVsSeekerPokemonRole } from '@/utilities/battle/enemy-stat-rolls'
+import {
+  getVsSeekerDifficultySettings,
+  normalizeVsSeekerDifficulty,
+} from '@/utilities/vs-seeker-difficulty'
 
 export const VS_SEEKER_COOLDOWN_MS = 30 * 60 * 1000
 export const VS_SEEKER_BACKGROUND = '/backgrounds/battle.avif'
@@ -89,7 +94,8 @@ function pickDifficultyWeightedUnique(
 ): SeenPokemonOption[] {
   const pool = [...items]
   const picks: SeenPokemonOption[] = []
-  const exponent = 0.35 + (difficulty - VS_SEEKER_MIN_DIFFICULTY) * 0.7
+  const settings = getVsSeekerDifficultySettings(difficulty)
+  const usedRoles = new Set<string>()
 
   while (pool.length > 0 && picks.length < count) {
     const weights = pool.map((option) => {
@@ -97,7 +103,9 @@ function pickDifficultyWeightedUnique(
         0.1,
         getPokemonBaseStatTotal(option) / 600,
       )
-      return normalizedBaseStatTotal ** exponent
+      const role = getVsSeekerPokemonRole(getPokemonForm(option.formId)?.stats)
+      const roleDiversityWeight = usedRoles.has(role) ? 0.4 : 1
+      return normalizedBaseStatTotal ** settings.baseStatExponent * roleDiversityWeight
     })
     const totalWeight = weights.reduce((total, weight) => total + weight, 0)
     let roll = rng() * totalWeight
@@ -111,7 +119,9 @@ function pickDifficultyWeightedUnique(
       }
     }
 
-    picks.push(pool.splice(selectedIndex, 1)[0])
+    const [picked] = pool.splice(selectedIndex, 1)
+    picks.push(picked)
+    usedRoles.add(getVsSeekerPokemonRole(getPokemonForm(picked.formId)?.stats))
   }
 
   return picks
@@ -165,33 +175,13 @@ export function isVsSeekerDifficultyAllowed(difficulty: number): boolean {
 }
 
 export function getVsSeekerDifficultyMultiplier(difficulty = 1): number {
-  const normalizedDifficulty = Math.min(
-    VS_SEEKER_MAX_DIFFICULTY,
-    Math.max(
-      VS_SEEKER_MIN_DIFFICULTY,
-      Math.floor(
-        Number.isFinite(difficulty) ? difficulty : VS_SEEKER_MIN_DIFFICULTY,
-      ),
-    ),
-  )
-
-  return 1 + (normalizedDifficulty - 1) * 0.5
+  return getVsSeekerDifficultySettings(difficulty).payoutMultiplier
 }
 
 export function getVsSeekerLeagueTicketReward(difficulty = 1): number {
-  const normalizedDifficulty = Math.min(
-    VS_SEEKER_MAX_DIFFICULTY,
-    Math.max(
-      VS_SEEKER_MIN_DIFFICULTY,
-      Math.floor(
-        Number.isFinite(difficulty) ? difficulty : VS_SEEKER_MIN_DIFFICULTY,
-      ),
-    ),
-  )
-
   return (
     VS_SEEKER_LEAGUE_TICKET_REWARD +
-    normalizedDifficulty -
+    normalizeVsSeekerDifficulty(difficulty) -
     VS_SEEKER_MIN_DIFFICULTY
   )
 }
@@ -205,7 +195,12 @@ export function getVsSeekerBadgeCount(
 
 export function getVsSeekerAiProfile(
   inventory: Record<string, number>,
+  difficulty?: number,
 ): 'trainer' | 'advanced' {
+  if (difficulty !== undefined) {
+    return getVsSeekerDifficultySettings(difficulty).aiProfile
+  }
+
   return getVsSeekerBadgeCount(inventory) >= VS_SEEKER_BADGE_LEVELS.length
     ? 'advanced'
     : 'trainer'
@@ -393,7 +388,7 @@ export function buildVsSeekerBattleConfig(params: {
     levelCap: level,
     enemyDifficulty: difficulty,
     allowSwapping: true,
-    aiProfile: getVsSeekerAiProfile(params.inventory),
+    aiProfile: getVsSeekerAiProfile(params.inventory, difficulty),
   }
 }
 
